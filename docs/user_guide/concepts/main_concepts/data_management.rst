@@ -9,47 +9,47 @@ Understand How Flyte Handles Data
 Types of Data
 =============
 
-There are two parts to the data in Flyte:
+In Flyte, data is categorized into metadata and raw data to optimize data handling and improve performance and security.
 
-1. Metadata
+* **Metadata**: Small values, like integers and strings, are treated as "stack parameters" (passed by value). This metadata is globally accessible to Flyte components (FlytePropeller, FlyteAdmin, and other running pods/jobs). Each entry is limited to 10MB and is passed directly between tasks. On top of that, metadata allow in-memory computations for branches, partial outputs, and composition of multiple outputs as input for other tasks.
 
-* It consists of data about inputs to a task, and other artifacts.
-* It is configured globally for FlytePropeller, FlyteAdmin etc., and the running pods/jobs need access to this bucket to get the data.
+* **Raw data**: Larger data, such as files and dataframes, are treated as "heap parameters" (passed by reference). Flyte stores raw data in an object store (e.g., S3), uploading it on first use and passing only a reference thereafter. Tasks can then access this data via Flyte’s automated download or streaming, enabling efficient access to large datasets without needing to transfer full copies.
 
-2. Raw data
+*Source code reference for auto-offloading value sizes limitation:*
 
-* It is the actual data (such as the Pandas DataFrame, Spark DataFrame, etc.).
-* Raw data paths are unique for every execution, and the prefixes can be modified per execution.
-* None of the Flyte control plane components would access the raw data. This provides great separation of data between the control plane and the data plane.
+.. raw:: html
 
-.. note:
-  Metadata and raw data can be present in entirely separate buckets.
+   <a href="https://github.com/flyteorg/flyte/blob/6c4f8dbfc6d23a0cd7bf81480856e9ae1dfa1b27/flytepropeller/pkg/controller/config/config.go#L184-L192">View source code on GitHub</a>
 
+Data Flow and Security
+~~~~~~~~~~~~~~~~~~~~~~
 
-Let us consider a simple Python task:
+Flyte’s data separation avoids bottlenecks and security risks:
+
+* **Metadata** remains within Flyte’s control plane, making it accessible through the Flyte Console or CLI.
+* **Raw Data** is accessible only by tasks, stored securely in an external blob store, preventing Flyte’s control plane from directly handling large data files.
+
+Moreover, a unique property of this separation is that all meta values are read by FlytePropeller engine and available on the FlyteConsole or CLI from the control plane.
+
+Example
+~~~~~~~
+
+Consider a basic Flyte task:
 
 .. code-block:: python
 
-   @task
-   def my_task(m: int, n: str, o: FlyteFile) -> pd.DataFrame:
-      ...
+    @task
+    def my_task(m: int, n: str, o: FlyteFile) -> pd.DataFrame:
+       ...
 
-In the above code sample, ``m``, ``n``, ``o`` are inputs to the task.
-``m`` of type ``int`` and ``n`` of type ``str`` are simple primitive types, while ``o`` is an arbitrarily sized file.
-All of them from Flyte's point of view are ``data``.
-The difference lies in how Flyte stores and passes each of these data items.
 
-For every task that receives input, Flyte sends an **Inputs Metadata** object, which contains all the primitive or simple scalar values inlined, but in the case of
-complex, large objects, they are offloaded and the `Metadata` simply stores a reference to the object. In our example, ``m`` and ``n`` are inlined while
-``o`` and the output ``pd.DataFrame`` are offloaded to an object store, and their reference is captured in the metadata.
+In this task, ``m``, ``n``, and ``o`` are inputs: ``m`` (int) and ``n`` (str) are simple types, while ``o`` is a large, arbitrarily sized file.
+Flyte treats each differently:
 
-`Flytekit TypeTransformers` make it possible to use complex objects as if they are available locally - just like persistent filehandles. But Flyte backend only deals with
-the references.
+* Metadata: Small values like ``m`` and ``n`` are inlined within Flyte’s metadata and passed directly between tasks.
+* Raw data: Objects like ``o`` and the output pd.DataFrame are offloaded to an object store (e.g., S3), with only references retained in metadata.
 
-Thus, primitive data types and references to large objects fall under Metadata - `Meta input` or `Meta output`, and the actual large object is known as **Raw data**.
-A unique property of this separation is that all `meta values` are read by FlytePropeller engine and available on the FlyteConsole or CLI from the control plane.
-`Raw` data is not read by any of the Flyte components and hence it is possible to store it in a completely separate blob storage or alternate stores, which can't be accessed by Flyte control plane components
-but can be accessed by users's container/tasks.
+Flytekit TypeTransformers make it possible to use complex objects as if they are available locally, just like persistent filehandles. However, the Flyte backend only deals with the references.
 
 Raw Data Prefix
 ~~~~~~~~~~~~~~~
@@ -57,21 +57,16 @@ Raw Data Prefix
 Every task can read/write its own data files. If ``FlyteFile`` or any natively supported type like ``pandas.DataFrame`` is used, Flyte will automatically offload and download
 data from the configured object-store paths. These paths are completely customizable per `LaunchPlan` or `Execution`.
 
-- The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :std:ref:`flytectl_register_files`.
+* The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :std:ref:`flytectl_register_files`.
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
-- To override the ``RawOutput`` path (prefix in an object store like S3/GCS), you can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
+* To override the ``RawOutput`` path (prefix in an object store like S3/GCS),
+    you can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
-  .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/launch_raw_output.png
+  .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/launch_raw_output.png
 
-- In the sandbox, the default Rawoutput-prefix is configured to be the root of the local bucket. Hence Flyte will write all the raw data (reference types like blob, file, df/schema/parquet, etc.) under a path defined by the execution.
+* In the sandbox, the default Rawoutput-prefix is configured to be the root of the local bucket.
+    Hence Flyte will write all the raw data (reference types like blob, file, df/schema/parquet, etc.) under a path defined by the execution.
 
-
-Metadata
-~~~~~~~~
-
-Metadata in Flyte is critical to enable the passing of data between tasks. It allows to perform in-memory computations for branches or send partial outputs from one task to another or compose outputs from multiple tasks into one input to be sent to a task.
-
-Thus, metadata is restricted due to its omnipresence. Each `meta output`/`input` cannot be larger than 1MB. If you have `List[int]`, it cannot be larger than 1MB, considering other input entities. In scenarios where large lists or strings need to be sent between tasks, file abstraction is preferred.
 
 ``LiteralType`` & Literals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,16 +149,86 @@ The illustration below explains how data flows from engine to the task and how t
 We could use fast metadata stores to speed up data movement or exploit locality.
 
 Between Flytepropeller and Tasks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/flyte_data_movement.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement.png
 
 
 Between Tasks
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
-.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/data_movement/flyte_data_transfer.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_transfer.png
 
+Practical Example
+~~~~~~~~~~~~~~~~~
+
+Let's consider a simple example where we have some tasks that needs to operate huge dataframes.
+
+The first task reads a file from the object store, shuffles the data, saves to local disk, and passes the path to the next task.
+
+.. code-block:: python
+
+    @task()
+    def task_read_and_shuffle_file(input_file: FlyteFile) -> FlyteFile:
+        """
+        Reads the input file as a DataFrame, shuffles the rows, and writes the shuffled DataFrame to a new file.
+        """
+        input_file.download()
+        df = pd.read_csv(input_file.path)
+
+        # Shuffle the DataFrame rows
+        shuffled_df = df.sample(frac=1).reset_index(drop=True)
+
+        output_file_path = "data_shuffle.csv"
+        shuffled_df.to_csv(output_file_path, index=False)
+
+        return FlyteFile(output_file_path)
+       ...
+
+The second task reads the file from the previous task, removes a column, saves to local disk, and returns the path.
+
+.. code-block:: python
+
+    @task()
+    def task_remove_column(input_file: FlyteFile, column_name: str) -> FlyteFile:
+        """
+        Reads the input file as a DataFrame, removes a specified column, and outputs it as a new file.
+        """
+        input_file.download()
+        df = pd.read_csv(input_file.path)
+
+        # remove column
+        if column_name in df.columns:
+            df = df.drop(columns=[column_name])
+
+        output_file_path = "data_finished.csv"
+        df.to_csv(output_file_path, index=False)
+
+        return FlyteFile(output_file_path)
+       ...
+
+And here is the workflow:
+
+.. code-block:: python
+
+    @workflow
+    def wf() -> FlyteFile:
+        existed_file = FlyteFile("s3://custom-bucket/data.csv")
+        shuffled_file = task_read_and_shuffle_file(input_file=existed_file)
+        result_file = task_remove_column(input_file=shuffled_file, column_name="County")
+        return result_file
+       ...
+
+This example shows how to access an existing file in a MinIO bucket from the Flyte Sandbox and pass it between tasks with ``FlyteFile``.
+When a workflow outputs a local file as a ``FlyteFile``, Flyte automatically uploads it to MinIO and provides an S3 URL for downstream tasks, no manual uploads needed. Take a look at the following:
+
+First task output metadata:
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_output.png
+
+Second task input metadata:
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_input.png
 
 Bringing in Your Own Datastores for Raw Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -174,3 +239,10 @@ For example, it is theoretically possible to use S3 ``s3://`` for metadata and G
 But for Metadata, the data should be accessible to Flyte control plane.
 
 Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in Flytestdlib.
+
+Deleting Raw Data in Your Own Datastores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flyte does not offer a direct function to delete raw data stored in external datastores like ``S3`` or ``GCS``. However, you can manage deletion by configuring a lifecycle policy within your datastore service.
+
+If caching is enabled in your Flyte ``task``, ensure that the ``max-cache-age`` is set to be shorter than the lifecycle policy in your datastore to prevent potential data inconsistency issues.

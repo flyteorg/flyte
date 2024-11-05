@@ -967,6 +967,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_array-node-config.use-map-plugin-logs", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-config.use-map-plugin-logs", testValue)
+			if vBool, err := cmdFlags.GetBool("array-node-config.use-map-plugin-logs"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.ArrayNode.UseMapPluginLogs)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_literal-offloading-config.Enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

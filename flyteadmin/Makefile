@@ -74,7 +74,7 @@ server:
 
 .PHONY: scheduler
 scheduler:
-	go run scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+	go run cmd/scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 .PHONY: migrate
 migrate:

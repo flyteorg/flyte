@@ -20,6 +20,7 @@ const (
 
 func TestTaskResourceAttributeUpdateRequiresAttributeFile(t *testing.T) {
 	testWorkflowTaskResourceAttributeUpdate(
+		t,
 		/* setup */ nil,
 		/* assert */ func(s *testutils.TestStruct, err error) {
 			assert.ErrorContains(t, err, "attrFile is mandatory")
@@ -29,6 +30,7 @@ func TestTaskResourceAttributeUpdateRequiresAttributeFile(t *testing.T) {
 
 func TestTaskResourceAttributeUpdateFailsWhenAttributeFileDoesNotExist(t *testing.T) {
 	testWorkflowTaskResourceAttributeUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataNonExistentFile
 			config.Force = true
@@ -42,6 +44,7 @@ func TestTaskResourceAttributeUpdateFailsWhenAttributeFileDoesNotExist(t *testin
 
 func TestTaskResourceAttributeUpdateFailsWhenAttributeFileIsMalformed(t *testing.T) {
 	testWorkflowTaskResourceAttributeUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataInvalidAttrFile
 			config.Force = true
@@ -56,6 +59,7 @@ func TestTaskResourceAttributeUpdateFailsWhenAttributeFileIsMalformed(t *testing
 func TestTaskResourceAttributeUpdateHappyPath(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowTaskAttributesFilePath
 				config.Force = true
@@ -69,6 +73,7 @@ func TestTaskResourceAttributeUpdateHappyPath(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainTaskAttributesFilePath
 				config.Force = true
@@ -82,6 +87,7 @@ func TestTaskResourceAttributeUpdateHappyPath(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectTaskAttributesFilePath
 				config.Force = true
@@ -97,6 +103,7 @@ func TestTaskResourceAttributeUpdateHappyPath(t *testing.T) {
 func TestTaskResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowTaskAttributesFilePath
 				config.Force = false
@@ -109,6 +116,7 @@ func TestTaskResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainTaskAttributesFilePath
 				config.Force = false
@@ -121,6 +129,7 @@ func TestTaskResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectTaskAttributesFilePath
 				config.Force = false
@@ -135,6 +144,7 @@ func TestTaskResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 func TestTaskResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowTaskAttributesFilePath
 				config.DryRun = true
@@ -147,6 +157,7 @@ func TestTaskResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainTaskAttributesFilePath
 				config.DryRun = true
@@ -159,6 +170,7 @@ func TestTaskResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectTaskAttributesFilePath
 				config.DryRun = true
@@ -173,6 +185,7 @@ func TestTaskResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 	t.Run("workflow without --force", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowTaskAttributesFilePath
 				config.Force = false
@@ -186,6 +199,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("workflow with --force", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowTaskAttributesFilePath
 				config.Force = true
@@ -199,6 +213,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain without --force", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainTaskAttributesFilePath
 				config.Force = false
@@ -212,6 +227,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain with --force", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainTaskAttributesFilePath
 				config.Force = true
@@ -225,6 +241,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project without --force", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectTaskAttributesFilePath
 				config.Force = false
@@ -238,6 +255,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project with --force", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectTaskAttributesFilePath
 				config.Force = true
@@ -253,6 +271,7 @@ func TestTaskResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 func TestTaskResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_TASK_RESOURCE).
@@ -274,6 +293,7 @@ func TestTaskResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_TASK_RESOURCE).
@@ -295,6 +315,7 @@ func TestTaskResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 
 	t.Run("project", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_TASK_RESOURCE).
@@ -318,6 +339,7 @@ func TestTaskResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 func TestTaskResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_TASK_RESOURCE).
@@ -338,6 +360,7 @@ func TestTaskResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_TASK_RESOURCE).
@@ -358,6 +381,7 @@ func TestTaskResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectTaskResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_TASK_RESOURCE).
@@ -378,10 +402,12 @@ func TestTaskResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func testWorkflowTaskResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testWorkflowTaskResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
 				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_TASK_RESOURCE).
@@ -396,11 +422,13 @@ func testWorkflowTaskResourceAttributeUpdate(
 }
 
 func testWorkflowTaskResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.WorkflowAttributes),
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestWorkflowTaskResourceAttribute()
 
@@ -442,10 +470,12 @@ func newTestWorkflowTaskResourceAttribute() *admin.WorkflowAttributes {
 }
 
 func testProjectTaskResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectTaskResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
 				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_TASK_RESOURCE).
@@ -460,11 +490,13 @@ func testProjectTaskResourceAttributeUpdate(
 }
 
 func testProjectTaskResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectAttributes),
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectTaskResourceAttribute()
 
@@ -504,10 +536,12 @@ func newTestProjectTaskResourceAttribute() *admin.ProjectAttributes {
 }
 
 func testProjectDomainTaskResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectDomainTaskResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
 				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_TASK_RESOURCE).
@@ -522,11 +556,13 @@ func testProjectDomainTaskResourceAttributeUpdate(
 }
 
 func testProjectDomainTaskResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes),
 	setup func(s *testutils.TestStruct, config *taskresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectDomainTaskResourceAttribute()
 

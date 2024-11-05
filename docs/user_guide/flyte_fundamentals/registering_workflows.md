@@ -72,7 +72,7 @@ run it with the supplied arguments. As you can see from the expected output, you
 can visit the link to the Flyte console to see the progress of your running
 execution.
 
-You may also run `run --remote --copy-all`, which is very similar to the above command. As the name suggests, this will copy the source tree rooted at the top-level `__init__.py` file. With this strategy, any modules discoverable on the `PYTHONPATH` will be importable.
+You may also run `run --remote --copy all`, which is very similar to the above command. As the name suggests, this will copy the source tree rooted at the top-level `__init__.py` file. With this strategy, any modules discoverable on the `PYTHONPATH` will be importable.
 
 ```{note}
 `pyflyte run` supports Flyte workflows that import any other user-defined modules that
@@ -260,6 +260,13 @@ metadata/configuration, it's more secure if they're private.
 Learn more about how to pull private image in the {ref}`User Guide <private_images>`.
 ```
 
+##### Relationship between ImageSpec and fast registration
+The `ImageSpec` construct available in flytekit also has a mechanism to copy files into the image being built. Its behavior depends on the type of registration used:
+* If fast register is used, then it's assumed that you don't also want to copy source files into the built image.
+* If fast register is not used (which is the default for `pyflyte package`, or if `pyflyte register --copy none` is specified), then it's assumed that you do want source files copied into the built image.
+
+If your `ImageSpec` constructor specifies a `source_root` and the `copy` argument is set to something other than `CopyFileDetection.NO_COPY`, then files will be copied regardless of fast registration status.
+
 #### Package your project with `pyflyte package`
 
 You can package your project with the `pyflyte package` command like so:
@@ -288,7 +295,7 @@ entities compiled as protobuf files that you can register with multiple Flyte
 clusters.
 
 ````{note}
-Like `pyflyte register`, can also specify multiple workflow directories, like:
+You can specify multiple workflow directories using the following command:
 
 ```{prompt} bash $
 pyflyte --pkgs <dir1> --pkgs <dir2> package ...
@@ -297,6 +304,12 @@ pyflyte --pkgs <dir1> --pkgs <dir2> package ...
 This is useful in cases where you want to register two different Flyte projects
 that you maintain in a single place.
 
+
+If you encounter a ``ModuleNotFoundError`` when packaging, use the `--source` option to include the correct source paths. For instance:
+
+```{prompt} bash $
+pyflyte --pkgs <dir1> package --source ./src -f
+```
 ````
 
 #### Register with `flytectl register`
@@ -357,6 +370,17 @@ two GitHub actions that facilitates this:
   This action uses `flytectl register` under the hood to handle registration
   of Flyte packages, for example, the `.tgz` archives that are created by
   `pyflyte package`.
+
+### Some CI/CD best practices
+
+In case Flyte workflows are registered on each commit in your build pipelines, you can consider the following recommendations and approach:
+
+- **Versioning Strategy** : Determining the version of the build for different types of commits makes them consistent and identifiable. For commits on feature branches, use `<branch-name>-<short-commit-hash>` and for the ones on main branches, use `main-<short-commit-hash>`. Use version numbers for the released (tagged) versions.
+
+- **Workflow Serialization and Registration** : Workflows should be serialized and registered based on the versioning of the build and the container image. Depending on whether the build is for a feature branch or main, the registration domain should be adjusted accordingly. For more context, please visit the [Registering workflows](https://docs.flyte.org/en/latest/user_guide/flyte_fundamentals/registering_workflows.html) page.
+
+- **Container Image Specification** : When managing multiple images across tasks within a Flyte workflow, use the `--image` flag during registration to specify which image to use. This avoids hardcoding the image within the task definition, promoting reusability and flexibility in workflows.
+
 
 ## What's next?
 

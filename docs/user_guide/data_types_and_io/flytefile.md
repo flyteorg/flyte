@@ -8,9 +8,9 @@
 
 Files are one of the most fundamental entities that users of Python work with,
 and they are fully supported by Flyte. In the IDL, they are known as
-[Blob](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L33)
+[Blob](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/literals.proto#L33)
 literals which are backed by the
-[blob type](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/types.proto#L47).
+[blob type](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/types.proto#L73)
 
 Let's assume our mission here is pretty simple. We download a few CSV file
 links, read them with the python built-in {py:class}`csv.DictReader` function,
@@ -89,5 +89,21 @@ You can enable type validation if you have the [python-magic](https://pypi.org/p
 :::{note}
 Currently, type validation is only supported on the `Mac OS` and `Linux` platforms.
 :::
+
+## Streaming support
+
+Flyte `1.5` introduced support for streaming `FlyteFile` types via the `fsspec` library. 
+This integration enables efficient, on-demand access to remote files, eliminating the need for fully downloading them to local storage.
+
+:::{note}
+This feature is marked as experimental. We'd love feedback on the API!
+:::
+
+Here is a simple example of removing some columns from a CSV file and writing the result to a new file:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/ddce0448141ea6d2cb148df52bf408874adb15ad/examples/data_types_and_io/data_types_and_io/file_streaming.py 
+:caption: data_types_and_io/file_streaming.py
+:lines: 8-20
+```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/

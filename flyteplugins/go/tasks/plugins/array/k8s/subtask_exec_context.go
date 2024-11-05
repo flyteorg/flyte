@@ -175,7 +175,7 @@ func (s SubTaskExecutionID) GetLogSuffix() string {
 	return fmt.Sprintf(" #%d-%d-%d", s.taskRetryAttempt, s.executionIndex, s.subtaskRetryAttempt)
 }
 
-var logTemplateRegexes = struct {
+var LogTemplateRegexes = struct {
 	ExecutionIndex     *regexp.Regexp
 	ParentName         *regexp.Regexp
 	RetryAttempt       *regexp.Regexp
@@ -189,17 +189,17 @@ var logTemplateRegexes = struct {
 
 func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
 	return []tasklog.TemplateVar{
-		{Regex: logTemplateRegexes.ParentName, Value: s.parentName},
+		{Regex: LogTemplateRegexes.ParentName, Value: s.parentName},
 		{
-			Regex: logTemplateRegexes.ExecutionIndex,
+			Regex: LogTemplateRegexes.ExecutionIndex,
 			Value: strconv.FormatUint(uint64(s.executionIndex), 10),
 		},
 		{
-			Regex: logTemplateRegexes.RetryAttempt,
+			Regex: LogTemplateRegexes.RetryAttempt,
 			Value: strconv.FormatUint(s.subtaskRetryAttempt, 10),
 		},
 		{
-			Regex: logTemplateRegexes.ParentRetryAttempt,
+			Regex: LogTemplateRegexes.ParentRetryAttempt,
 			Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10),
 		},
 	}
