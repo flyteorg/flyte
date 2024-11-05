@@ -180,7 +180,9 @@ Please add ``spark`` to the list of `enabled-plugins` in the config yaml file. F
 ``authentication handshake failed: x509: "Kubernetes Ingress Controller Fake Certificate" certificate is not trusted"`` when deploying flyte-core to your own kubernetes cluster
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Please enable ``tls`` in the ingress configuration of your Kubernetes cluster:
+This issue is caused by TLS being disabled in your Kubernetes cluster. You can resolve the problem by following these steps:
+
+Enable ``tls`` in the ``values.yaml`` ingress configuration of flyte-core in order to expose gRPC service at 443 port:
 
 .. code-block:: yaml
   ingress:
@@ -193,13 +195,13 @@ Please enable ``tls`` in the ingress configuration of your Kubernetes cluster:
       <http://ingress.kubernetes.io/default-backend-redirect|ingress.kubernetes.io/default-backend-redirect>: "/console"
       <http://kubernetes.io/ingress.class|kubernetes.io/ingress.class>: haproxy
     tls:
-      enabled: true
+      enabled: true # enable tls
 
-Moreover, disable ``insecure`` in your ``flytectl`` client config.yaml:
+Disable ``insecure`` in your ``flytectl`` client config.yaml:
 
 .. code-block:: yaml
   admin:
   endpoint: dns:///example.com
   authType: Pkce
-  insecure: false
+  insecure: false # disable insecure in flytectl
   insecureSkipVerify: true
