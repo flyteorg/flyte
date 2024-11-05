@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { ExecutionError_ErrorKind } from "./execution_pb.js";
 
 /**
@@ -42,6 +42,20 @@ export class ContainerError extends Message<ContainerError> {
    */
   origin = ExecutionError_ErrorKind.UNKNOWN;
 
+  /**
+   * Timestamp of the error
+   *
+   * @generated from field: google.protobuf.Timestamp timestamp = 5;
+   */
+  timestamp?: Timestamp;
+
+  /**
+   * Worker that generated the error
+   *
+   * @generated from field: string worker = 6;
+   */
+  worker = "";
+
   constructor(data?: PartialMessage<ContainerError>) {
     super();
     proto3.util.initPartial(data, this);
@@ -54,6 +68,8 @@ export class ContainerError extends Message<ContainerError> {
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "kind", kind: "enum", T: proto3.getEnumType(ContainerError_Kind) },
     { no: 4, name: "origin", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 6, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerError {
