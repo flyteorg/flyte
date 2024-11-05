@@ -16,7 +16,7 @@ var (
 	// Specifies the GIT sha of the build
 	Build = "unknown"
 	// Version for the build, should follow a semver
-	Version = "v1.14"
+	Version = "unknown"
 	// Build timestamp
 	BuildTime = time.Now().String()
 	// Git branch that was used to build the binary
