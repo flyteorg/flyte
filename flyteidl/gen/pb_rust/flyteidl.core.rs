@@ -2129,6 +2129,12 @@ pub struct ExecutionError {
     pub error_uri: ::prost::alloc::string::String,
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ExecutionError`.
 pub mod execution_error {
@@ -3091,6 +3097,12 @@ pub struct ContainerError {
     /// Defines the origin of the error (system, user, unknown).
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub origin: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ContainerError`.
 pub mod container_error {
