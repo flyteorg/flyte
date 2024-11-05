@@ -35,6 +35,15 @@ func getQualityOfServiceWithDuration(duration time.Duration) *core.QualityOfServ
 	}
 }
 
+func getQualityOfServiceWithNilDuration() *core.QualityOfService {
+	return &core.QualityOfService{
+		Designation: &core.QualityOfService_Spec{
+			Spec: &core.QualityOfServiceSpec{
+				QueueingBudget: nil,
+			},
+		},
+	}
+}
 func getMockConfig() runtimeInterfaces.Configuration {
 	mockConfig := mocks.NewMockConfigurationProvider(nil, nil, nil, nil, nil, nil)
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
@@ -116,6 +125,23 @@ func TestGetQualityOfService_ExecutionCreateRequest(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.EqualValues(t, spec.QueuingBudget, 3*time.Minute)
+
+	_, failError := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{
+		Workflow: getWorkflowWithQosSpec(getQualityOfServiceWithDuration(4 * time.Minute)),
+		LaunchPlan: &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				QualityOfService: getQualityOfServiceWithDuration(2 * time.Minute),
+			},
+		},
+		ExecutionCreateRequest: &admin.ExecutionCreateRequest{
+			Domain: "production",
+			Spec: &admin.ExecutionSpec{
+				QualityOfService: getQualityOfServiceWithNilDuration(),
+			},
+		},
+	})
+	assert.Error(t, failError)
+
 }
 
 func TestGetQualityOfService_LaunchPlan(t *testing.T) {
