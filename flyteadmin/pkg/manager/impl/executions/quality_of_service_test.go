@@ -196,6 +196,19 @@ func TestGetQualityOfService_Workflow(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.EqualValues(t, spec.QueuingBudget, 4*time.Minute)
+
+	_, failError := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{
+		Workflow: getWorkflowWithQosSpec(getQualityOfServiceWithNilDuration()),
+		LaunchPlan: &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{},
+		},
+		ExecutionCreateRequest: &admin.ExecutionCreateRequest{
+			Domain: "production",
+			Spec:   &admin.ExecutionSpec{},
+		},
+	})
+	assert.Error(t, failError)
+
 }
 
 func TestGetQualityOfService_MatchableResource(t *testing.T) {
