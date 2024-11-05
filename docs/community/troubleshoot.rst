@@ -182,7 +182,7 @@ Please add ``spark`` to the list of `enabled-plugins` in the config yaml file. F
 
 This issue is caused by TLS being disabled in your Kubernetes cluster. You can resolve the problem by following these steps:
 
-Enable ``tls`` in the ``values.yaml`` ingress configuration of flyte-core in order to expose gRPC service at 443 port:
+- Enable ``tls`` in the ``values.yaml`` ingress configuration of flyte-core in order to expose gRPC service at 443 port:
 
 .. code-block:: yaml
 
@@ -198,10 +198,10 @@ Enable ``tls`` in the ``values.yaml`` ingress configuration of flyte-core in ord
     tls:
       enabled: true # enable tls
 
-Disable ``insecure`` in your ``flytectl`` client config.yaml:
+- Disable ``insecure`` in your ``flytectl`` client config.yaml:
 
 .. code-block:: yaml
-  
+
   admin:
   endpoint: dns:///example.com
   authType: Pkce
