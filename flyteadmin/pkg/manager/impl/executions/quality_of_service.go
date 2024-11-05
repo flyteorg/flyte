@@ -110,7 +110,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid custom quality of service set in launch plan [%v], failed to parse duration [%v] with: %v",
 					input.LaunchPlan.Id,
-					input.ExecutionCreateRequest.Spec.QualityOfService.GetSpec().QueueingBudget, err)
+					input.LaunchPlan.Spec.QualityOfService.GetSpec().QueueingBudget, err)
 			}
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
