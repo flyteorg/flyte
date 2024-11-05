@@ -198,7 +198,7 @@ This issue is caused by TLS being disabled in your Kubernetes cluster. You can r
     tls:
       enabled: true # enable tls
 
-- Disable ``insecure`` in your ``flytectl`` client config.yaml:
+- Disable ``insecure`` in your ``flytectl`` client ``config.yaml``:
 
 .. code-block:: yaml
 
