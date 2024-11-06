@@ -19,14 +19,18 @@ Flyte doesn't provide resource management for multi-tenancy, which hierarchical 
 
 ## 3 Proposed Implementation
 
+Kueue
+
 ```yaml
 queueconfig:
   scheduler: yunikorn
   jobs:
     - type: "ray"
       gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
+      allow-preemption: false
     - type: "spark"
       gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
+      allow-preemption: true
 ```
 
 Mentioned configuration indicates what queues exist for an organization.
@@ -41,37 +45,63 @@ Thus, a clusterQueue including multiple resources represents the total acessaibl
 A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable. 
 
 
-A SchedulerConfigManager maintains config from mentioned yaml.
 It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
 
 ```go
-type YunikornScheduablePlugin interface {
-	MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
-  GetLabels(id core.Identifier) map[string]string
+type SchedulePlugin interface {
+  CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
+  CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
+  GetGroupLabels() (labels, annotations map[string]string)
 }
 
-type KueueScheduablePlugin interface {
-	MutateResourceForKueue(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
-  GetLabels(id core.Identifier) map[string]string
+type YunikornScheduablePlugin struct {
+	jobs map[string]string
+  Labels map[string]string
+  Annotations map[string]string
 }
 
-func (h *YunikornScheduablePlugin) MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error) error {
-  rayJob := object.(*rayv1.RayJob)
-  // TODO
+func (yk *YunikornSchedulPlugin) GetGroupLabels() (labels, annotations map[string]string) {
+  return yk.Labels, yk.Annotations
 }
 
-func (h *YunikornScheduablePlugin) GetLabels(id core.Identifier) map[string]string {
-  // 1.UserInfo
-  // 2.QueueName
-  // 3.ApplicationID
+func (yk *YunikornSchedulePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+  // Set queue name based on the job type and flyteidl.Identifier fields including "ResourceType", "Org" and "Name".
+  // 1.Clean yk.Labels and yk.Annotations
+  // 2.Add yunikorn.apache.org/user.info = <organization>.<Name>
+  // 3.Add yunikorn.apache.org/app-id = <ResourceType>-<uuid>
+  // 4.Add yunikorn.apache.org/queue = <organization>.<jobType>
 }
 
-func PatchPodSpec(target *v1.PodSpec, labels map[string]string) error {
-  // Get Metaobject from target
-  // Add label is the specific label doesn't exist
+func (yk *YunikornSchedulePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+  // 1.Add yunikorn.apache.org/task-group-name = yk.CreateTaskgroupName(ResourceType)
+  // 2.Add yunikorn.apache.org/task-groups = yk.CreateTaskgroup(object)
+  // 3.Add yunikorn.apache.org/schedulingPolicyParameters = yk.jobs[ResourceType]
+  // 4.Add yunikorn.apache.org/allow-preemption = true/false
+}
+
+type KueueScheduablePlugin struct {
+	jobs map[string]string
+  Labels map[string]string
+  Annotations map[string]string
+}
+
+func (k *KueueScheduablePlugin) GetGroupLabels() (labels, annotations map[string]string) {
+  return k.Labels, k.Annotations
+}
+
+func (k *KueueScheduablePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+  // Set queue name based on the job type and flyteidl.Identifier field "Org".
+  // Clean k.Labels and k.Annotations
+  // 1.Add kueue.x-k8s.io/queue-name = <organization>.<jobtype>
+  // Update k.Labels and k.Annotations
+}
+
+func (k *KueueScheduablePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+  // Add Label "kueue.x-k8s.io/pod-group-name" and "kueue.x-k8s.io/pod-group-total-count" for spark、dask.
+  // If object type is ray CRD and kubeflow CRD which are supported by Kueue then skips.
+  // Update k.Labels and k.Annotations
 }
 ```
-
 
 Creat a scheduler plugin according to the queueconfig.scheduler.
 Its basic responsibility validate whether submitted application is accepted. 
@@ -79,17 +109,14 @@ When a Yunikorn scheduler plugin created, it will create applicationID and queue
 in the other hand, a Kueue scheduler plugin constructs labels including localQueueName, preemption.
 
 ```go
-func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
-  o, err := e.plugin.BuildResource(ctx, k8sTaskCtx)
-	if err != nil {
-		return pluginsCore.UnknownTransition, err
-	}
-  if o, err = e.SchedulerPlugin.MutateResourceForKueue(o); err == nil {
-      return pluginsCore.UnknownTransition, err
-    }
-  } else {
-     return pluginsCore.UnknownTransition, err
-  }
+func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+  e.SchedulerPlugin.CreateLabels(taskCtx, o)
+  e.SchedulerPlugin.CreateGroupLabels(taskCtx, o)
+  schedulerLabels, schedulerAnnotations := e.SchedulerPlugin.GetLabels()
+	o.SetNamespace(taskCtx.GetNamespace())
+	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations(), schedulerAnnotations)))
+	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels(), schedulerLabels)))
+	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
 }
 ```
 When batchscheduler in flyte is yunikorn, some examples are like following.
