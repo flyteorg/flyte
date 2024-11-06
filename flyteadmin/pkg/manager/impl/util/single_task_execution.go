@@ -200,7 +200,7 @@ func CreateOrGetWorkflowModel(
 }
 
 func CreateOrGetLaunchPlan(ctx context.Context,
-	db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, identifier *core.Identifier,
+	db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, namedEntityManager interfaces.NamedEntityInterface, identifier *core.Identifier,
 	workflowInterface *core.TypedInterface, workflowID uint, authRole *admin.AuthRole, securityContext *core.SecurityContext) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error
@@ -264,6 +264,19 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 		err = db.LaunchPlanRepo().Create(ctx, launchPlanModel)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to save launch plan model [%+v] with err: %v", launchPlanIdentifier, err)
+			return nil, err
+		}
+		_, err = namedEntityManager.UpdateNamedEntity(ctx, admin.NamedEntityUpdateRequest{
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+			Id: &admin.NamedEntityIdentifier{
+				Project: launchPlan.GetId().GetProject(),
+				Domain:  launchPlan.GetId().GetDomain(),
+				Name:    launchPlan.GetId().GetName(),
+			},
+			Metadata: &admin.NamedEntityMetadata{State: admin.NamedEntityState_SYSTEM_GENERATED},
+		})
+		if err != nil {
+			logger.Warningf(ctx, "Failed to set launch plan state to system-generated: %v", err)
 			return nil, err
 		}
 	}

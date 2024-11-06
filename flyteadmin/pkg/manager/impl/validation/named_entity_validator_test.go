@@ -109,7 +109,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 		},
 	}))
 	assert.Equal(t, codes.InvalidArgument, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
-		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		ResourceType: core.ResourceType_DATASET,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -132,6 +132,30 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 	}))
 	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_TASK,
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Metadata: &admin.NamedEntityMetadata{
+			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
+		},
+	}))
+
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Metadata: &admin.NamedEntityMetadata{
+			Description: "description",
+		},
+	}))
+
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",

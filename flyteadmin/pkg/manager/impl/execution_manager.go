@@ -549,7 +549,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, nil, err
 	}
 
-	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
+	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, m.namedEntityManager, taskIdentifier,
 		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID,
 		request.Spec.AuthRole, request.Spec.SecurityContext)
 	if err != nil {

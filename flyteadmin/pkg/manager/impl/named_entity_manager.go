@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -17,20 +18,12 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const state = "state"
-
-// System-generated workflows are meant to be hidden from the user by default. Therefore we always only show
-// workflow-type named entities that have been user generated only.
-var nonSystemGeneratedWorkflowsFilter, _ = common.NewSingleValueFilter(
-	common.NamedEntityMetadata, common.NotEqual, state, admin.NamedEntityState_SYSTEM_GENERATED)
-var defaultWorkflowsFilter, _ = common.NewWithDefaultValueFilter(
-	strconv.Itoa(int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)), nonSystemGeneratedWorkflowsFilter)
 
 type NamedEntityMetrics struct {
 	Scope promutils.Scope
@@ -75,12 +68,8 @@ func (m *NamedEntityManager) GetNamedEntity(ctx context.Context, request admin.N
 	return util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
 }
 
-func (m *NamedEntityManager) getQueryFilters(referenceEntity core.ResourceType, requestFilters string) ([]common.InlineFilter, error) {
+func (m *NamedEntityManager) getQueryFilters(requestFilters string) ([]common.InlineFilter, error) {
 	filters := make([]common.InlineFilter, 0)
-	if referenceEntity == core.ResourceType_WORKFLOW {
-		filters = append(filters, defaultWorkflowsFilter)
-	}
-
 	if len(requestFilters) == 0 {
 		return filters, nil
 	}
@@ -111,10 +100,14 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
+	if len(request.Filters) == 0 {
+		// Add implicit filter to exclude system generated workflows
+		request.Filters = fmt.Sprintf("not_like(name,%s)", ".flytegen%")
+	}
 	// HACK: In order to filter by state (if requested) - we need to amend the filter to use COALESCE
 	// e.g. eq(state, 1) becomes 'WHERE (COALESCE(state, 0) = '1')' since not every NamedEntity necessarily
 	// has an entry, and therefore the default state value '0' (active), should be assumed.
-	filters, err := m.getQueryFilters(request.ResourceType, request.Filters)
+	filters, err := m.getQueryFilters(request.Filters)
 	if err != nil {
 		return nil, err
 	}

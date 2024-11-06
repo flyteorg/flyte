@@ -716,7 +716,7 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 		return nil, err
 	}
 
-	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, workflow.Id,
+	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, m.namedEntityManager, workflow.Id,
 		workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(), workflowModel.ID,
 		nil, securityContext)
 	if err != nil {
