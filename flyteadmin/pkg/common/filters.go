@@ -210,7 +210,7 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 		}, nil
 	case NotLike:
 		return GormQueryExpr{
-			// WHERE field NOT LIKE %value%
+			// WHERE field NOT LIKE value
 			Query: fmt.Sprintf(notLikeQuery, formattedField),
 			Args:  f.value,
 		}, nil
