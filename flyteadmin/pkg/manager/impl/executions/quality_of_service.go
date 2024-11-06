@@ -163,7 +163,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			logger.Debugf(ctx, "Determining quality of service tier from database override for [%s/%s/%s]",
 				input.ExecutionCreateRequest.Project, input.ExecutionCreateRequest.Domain,
 				input.ExecutionCreateRequest.Name)
-			qualityOfServiceTier = input.Workflow.Closure.CompiledWorkflow.Primary.Template.Metadata.QualityOfService.GetTier()
+			qualityOfServiceTier = qualityOfService.GetTier()
 		}
 	}
 
