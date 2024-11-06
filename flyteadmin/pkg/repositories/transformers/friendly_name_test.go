@@ -13,8 +13,8 @@ const FriendlyNameLengthLimit = 255
 
 var AllowedFriendlyNameChars = []rune(AllowedFriendlyNameStr)
 
-func TestGetExecutionName(t *testing.T) {
-	t.Run("friendly name", func(t *testing.T) {
+func TestCreateFriendlyName(t *testing.T) {
+	t.Run("successful creation", func(t *testing.T) {
 		randString := CreateFriendlyName(time.Now().UnixNano())
 		assert.LessOrEqual(t, len(randString), FriendlyNameLengthLimit)
 		for i := 0; i < len(randString); i++ {
