@@ -44,10 +44,6 @@ func (v ConfigurationValidator) validateConfigurationID(ctx context.Context, con
 	if configurationID.Project != "" {
 		return v.validateConfigurationIDProject(ctx, configurationID)
 	}
-	// Temporarily allow this to let FE split their changes
-	if configurationID.Domain != "" {
-		return nil
-	}
 	// Assume it's an org configuration update
 	return v.validateConfigurationIDOrg(configurationID)
 }

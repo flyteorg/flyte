@@ -941,13 +941,11 @@ service AdminService {
         get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
       }
       // project
-      // To allow FE split big changes into smaller ones, we keep the endpoint to use domain for now.
-      // We will change it back to {id.project} right after the FE is ready.
       additional_bindings {
-        get: "/api/v1/configuration/{id.domain}"
+        get: "/api/v1/configuration/{id.project}"
       }
       additional_bindings {
-        get: "/api/v1/org/configuration/{id.org}/{id.domain}"
+        get: "/api/v1/org/configuration/{id.org}/{id.project}"
       }
       // org
       additional_bindings {

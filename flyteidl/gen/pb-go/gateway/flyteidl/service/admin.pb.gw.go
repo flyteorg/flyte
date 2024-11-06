@@ -13769,7 +13769,7 @@ func local_request_AdminService_GetConfiguration_1(ctx context.Context, marshale
 }
 
 var (
-	filter_AdminService_GetConfiguration_2 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "domain": 1}, Base: []int{1, 2, 3, 2, 0, 0}, Check: []int{0, 1, 1, 2, 4, 3}}
+	filter_AdminService_GetConfiguration_2 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "project": 1}, Base: []int{1, 2, 3, 2, 0, 0}, Check: []int{0, 1, 1, 2, 4, 3}}
 )
 
 func request_AdminService_GetConfiguration_2(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -13783,14 +13783,14 @@ func request_AdminService_GetConfiguration_2(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["id.domain"]
+	val, ok = pathParams["id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.project", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.project", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -13816,14 +13816,14 @@ func local_request_AdminService_GetConfiguration_2(ctx context.Context, marshale
 		_   = err
 	)
 
-	val, ok = pathParams["id.domain"]
+	val, ok = pathParams["id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.project", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.project", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -13839,7 +13839,7 @@ func local_request_AdminService_GetConfiguration_2(ctx context.Context, marshale
 }
 
 var (
-	filter_AdminService_GetConfiguration_3 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "org": 1, "domain": 2}, Base: []int{1, 4, 5, 6, 2, 0, 4, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 5, 2, 7, 3, 4}}
+	filter_AdminService_GetConfiguration_3 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "org": 1, "project": 2}, Base: []int{1, 4, 5, 6, 2, 0, 4, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 5, 2, 7, 3, 4}}
 )
 
 func request_AdminService_GetConfiguration_3(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -13863,14 +13863,14 @@ func request_AdminService_GetConfiguration_3(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
 	}
 
-	val, ok = pathParams["id.domain"]
+	val, ok = pathParams["id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.project", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.project", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -13906,14 +13906,14 @@ func local_request_AdminService_GetConfiguration_3(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
 	}
 
-	val, ok = pathParams["id.domain"]
+	val, ok = pathParams["id.project"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.domain")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.project")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.domain", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.project", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.project", err)
 	}
 
 	if err := req.ParseForm(); err != nil {
@@ -17777,7 +17777,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/configuration/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/configuration/{id.project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17802,7 +17802,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/org/configuration/{id.org}/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/org/configuration/{id.org}/{id.project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -20948,7 +20948,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/configuration/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/configuration/{id.project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -20970,7 +20970,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/org/configuration/{id.org}/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetConfiguration", runtime.WithHTTPPathPattern("/api/v1/org/configuration/{id.org}/{id.project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -21428,9 +21428,9 @@ var (
 
 	pattern_AdminService_GetConfiguration_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "org", "configuration", "id.org", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_GetConfiguration_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "configuration", "id.domain"}, ""))
+	pattern_AdminService_GetConfiguration_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "configuration", "id.project"}, ""))
 
-	pattern_AdminService_GetConfiguration_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "org", "configuration", "id.org", "id.domain"}, ""))
+	pattern_AdminService_GetConfiguration_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "org", "configuration", "id.org", "id.project"}, ""))
 
 	pattern_AdminService_GetConfiguration_4 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "configuration"}, ""))
 

@@ -407,7 +407,7 @@
         ]
       }
     },
-    "/api/v1/configuration/{id.domain}": {
+    "/api/v1/configuration/{id.project}": {
       "get": {
         "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration3",
@@ -427,8 +427,8 @@
         },
         "parameters": [
           {
-            "name": "id.domain",
-            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
             "in": "path",
             "required": true,
             "type": "string"
@@ -441,8 +441,8 @@
             "type": "string"
           },
           {
-            "name": "id.project",
-            "description": "Name of the project the configuration belongs to.\n+optional",
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
             "in": "query",
             "required": false,
             "type": "string"
@@ -472,9 +472,7 @@
         "tags": [
           "AdminService"
         ]
-      }
-    },
-    "/api/v1/configuration/{id.project}": {
+      },
       "post": {
         "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
         "operationId": "AdminService_UpdateConfiguration3",
@@ -3120,7 +3118,7 @@
         ]
       }
     },
-    "/api/v1/org/configuration/{id.org}/{id.domain}": {
+    "/api/v1/org/configuration/{id.org}/{id.project}": {
       "get": {
         "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration4",
@@ -3147,15 +3145,15 @@
             "type": "string"
           },
           {
-            "name": "id.domain",
-            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "id.project",
-            "description": "Name of the project the configuration belongs to.\n+optional",
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3185,9 +3183,7 @@
         "tags": [
           "AdminService"
         ]
-      }
-    },
-    "/api/v1/org/configuration/{id.org}/{id.project}": {
+      },
       "post": {
         "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
         "operationId": "AdminService_UpdateConfiguration4",
