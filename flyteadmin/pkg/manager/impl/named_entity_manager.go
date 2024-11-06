@@ -25,13 +25,6 @@ import (
 
 const state = "state"
 
-// System-generated workflows are meant to be hidden from the user by default. Therefore we always only show
-// workflow-type named entities that have been user generated only.
-var nonSystemGeneratedWorkflowsFilter, _ = common.NewSingleValueFilter(
-	common.NamedEntityMetadata, common.NotEqual, state, admin.NamedEntityState_SYSTEM_GENERATED)
-var defaultWorkflowsFilter, _ = common.NewWithDefaultValueFilter(
-	strconv.Itoa(int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)), nonSystemGeneratedWorkflowsFilter)
-
 type NamedEntityMetrics struct {
 	Scope promutils.Scope
 }
