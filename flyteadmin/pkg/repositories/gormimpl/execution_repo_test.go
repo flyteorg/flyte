@@ -96,6 +96,7 @@ func getMockExecutionResponseFromDb(expected models.Execution) map[string]interf
 	execution["execution_name"] = expected.Name
 	execution["launch_plan_id"] = expected.LaunchPlanID
 	execution["workflow_id"] = expected.WorkflowID
+	execution["friendly_name"] = expected.FriendlyName
 	execution["phase"] = expected.Phase
 	execution["closure"] = expected.Closure
 	execution["spec"] = expected.Spec
@@ -381,6 +382,7 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 		},
 		LaunchPlanID: uint(2),
 		WorkflowID:   uint(3),
+		FriendlyName: "its-a-friendly-name",
 		Phase:        core.WorkflowExecution_SUCCEEDED.String(),
 		Closure:      []byte{1, 2},
 		Spec:         []byte{3, 4},
@@ -394,7 +396,7 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT "executions"."id","executions"."created_at","executions"."updated_at","executions"."deleted_at","executions"."execution_project","executions"."execution_domain","executions"."execution_name","executions"."launch_plan_id","executions"."workflow_id","executions"."task_id","executions"."phase","executions"."closure","executions"."spec","executions"."started_at","executions"."execution_created_at","executions"."execution_updated_at","executions"."duration","executions"."abort_cause","executions"."mode","executions"."source_execution_id","executions"."parent_node_execution_id","executions"."cluster","executions"."inputs_uri","executions"."user_inputs_uri","executions"."error_kind","executions"."error_code","executions"."user","executions"."state","executions"."launch_entity" FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id INNER JOIN tasks ON executions.task_id = tasks.id WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 AND workflows.name = $4 AND tasks.name = $5 AND execution_tags.key in ($6,$7) LIMIT 20`).WithReply(executions)
+	GlobalMock.NewMock().WithQuery(`SELECT "executions"."id","executions"."created_at","executions"."updated_at","executions"."deleted_at","executions"."execution_project","executions"."execution_domain","executions"."execution_name","executions"."launch_plan_id","executions"."workflow_id","executions"."task_id","executions"."friendly_name","executions"."phase","executions"."closure","executions"."spec","executions"."started_at","executions"."execution_created_at","executions"."execution_updated_at","executions"."duration","executions"."abort_cause","executions"."mode","executions"."source_execution_id","executions"."parent_node_execution_id","executions"."cluster","executions"."inputs_uri","executions"."user_inputs_uri","executions"."error_kind","executions"."error_code","executions"."user","executions"."state","executions"."launch_entity" FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id INNER JOIN tasks ON executions.task_id = tasks.id WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 AND workflows.name = $4 AND tasks.name = $5 AND execution_tags.key in ($6,$7) LIMIT 20`).WithReply(executions)
 	vals := []string{"tag1", "tag2"}
 	tagFilter, err := common.NewRepeatedValueFilter(common.AdminTag, common.ValueIn, "name", vals)
 	assert.NoError(t, err)
