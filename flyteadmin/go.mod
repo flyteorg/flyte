@@ -221,6 +221,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737 // indirect
 	github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2 v2.8.0
 	github.com/imdario/mergo v0.3.13 // indirect
+	github.com/wolfeidau/humanhash v1.1.0
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
