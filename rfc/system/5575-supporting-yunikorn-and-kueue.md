@@ -42,8 +42,7 @@ Thus, a clusterQueue including multiple resources represents the total acessaibl
 | clusterQueue | localQueue |
 | --- | --- |
 | <organization name> | ray、spark、default |
-A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable. 
-
+A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable.
 
 It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
 
@@ -52,6 +51,7 @@ type SchedulePlugin interface {
   CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
   CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
   GetGroupLabels() (labels, annotations map[string]string)
+  SetSchedulerName(object client.Objec)
 }
 
 type YunikornScheduablePlugin struct {
@@ -104,11 +104,19 @@ func (k *KueueScheduablePlugin) CreateGroupLabels(ctx context.Context, object cl
 ```
 
 Creat a scheduler plugin according to the queueconfig.scheduler.
-Its basic responsibility validate whether submitted application is accepted. 
+Its basic responsibility validate whether submitted application is accepted.
 When a Yunikorn scheduler plugin created, it will create applicationID and queue name.
 in the other hand, a Kueue scheduler plugin constructs labels including localQueueName, preemption.
 
 ```go
+func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+  o, err := e.plugin.BuildResource(ctx, k8sTaskCtx)
+	if err != nil {
+		return pluginsCore.UnknownTransition, err
+	}
+  e.SchedulerPlugin.SetSchedulerName(o)
+}
+
 func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
   e.SchedulerPlugin.CreateLabels(taskCtx, o)
   e.SchedulerPlugin.CreateGroupLabels(taskCtx, o)
@@ -119,6 +127,7 @@ func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
 }
 ```
+
 When batchscheduler in flyte is yunikorn, some examples are like following.
 For example, this appoarch submits a Ray job owned by user1 in organization1 to "root.organization1.ray".
 A spark application in ns1 submitted by user4 in organization1 is in "root.organization1.ns1".
@@ -150,9 +159,8 @@ In the other hand, Kueue currently doesn't support Spark CRD.
 
 ## 8 Unresolved questions
 
-
 ## 9 Conclusion
 
 Yunikorn and Kueue support gang scheduling allowing all necassary pods to run sumultaneously when required resource are available.
-Yunikorn provides preemption calculating the priority of applications based on their priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately. 
+Yunikorn provides preemption calculating the priority of applications based on their priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately.
 Yunikorn's hierarchical queue includes grarateed resources settings and ACLs.
