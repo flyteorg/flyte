@@ -40,7 +40,7 @@ data:
       show-source: true
       level: {{ default 1 .Values.configuration.logging.level }}
     propeller:
-      create-flyteworkflow-crd: {{ .Values.configuration.propeller.createCrd }}
+      create-flyteworkflow-crd: {{ .Values.configuration.propeller.createCRDs }}
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
