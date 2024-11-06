@@ -2,6 +2,7 @@ package executions
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -44,6 +45,7 @@ func getQualityOfServiceWithNilDuration() *core.QualityOfService {
 		},
 	}
 }
+
 func getMockConfig() runtimeInterfaces.Configuration {
 	mockConfig := mocks.NewMockConfigurationProvider(nil, nil, nil, nil, nil, nil)
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
@@ -84,6 +86,35 @@ func addGetResourceFunc(t *testing.T, resourceManager interfaces.ResourceInterfa
 				},
 			},
 		}, nil
+	}
+}
+
+func addGetErrorResourceFunc(t *testing.T, resourceManager interfaces.ResourceInterface, containSpec bool) {
+	resourceManager.(*managerMocks.MockResourceManager).GetResourceFunc = func(ctx context.Context,
+		request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
+		assert.EqualValues(t, request, interfaces.ResourceRequest{
+			Project:      workflowIdentifier.Project,
+			Domain:       workflowIdentifier.Domain,
+			Workflow:     workflowIdentifier.Name,
+			ResourceType: admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
+		})
+		noSourceError := errors.New("no resource")
+
+		noServiceResponse := &interfaces.ResourceResponse{
+			Attributes: &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_QualityOfService{
+					QualityOfService: getQualityOfServiceWithNilDuration(),
+				},
+			},
+		}
+
+		result, error := &interfaces.ResourceResponse{}, noSourceError
+
+		if containSpec {
+			result, error = noServiceResponse, nil
+		}
+
+		return result, error
 	}
 }
 
@@ -228,6 +259,33 @@ func TestGetQualityOfService_MatchableResource(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.EqualValues(t, spec.QueuingBudget, 5*time.Minute)
+
+	addGetErrorResourceFunc(t, &resourceManager, false)
+	_, failError := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{
+		Workflow: getWorkflowWithQosSpec(nil),
+		LaunchPlan: &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{},
+		},
+		ExecutionCreateRequest: &admin.ExecutionCreateRequest{
+			Domain: "production",
+			Spec:   &admin.ExecutionSpec{},
+		},
+	})
+	assert.Error(t, failError)
+
+	addGetErrorResourceFunc(t, &resourceManager, true)
+	_, noSpecError := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{
+		Workflow: getWorkflowWithQosSpec(nil),
+		LaunchPlan: &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{},
+		},
+		ExecutionCreateRequest: &admin.ExecutionCreateRequest{
+			Domain: "production",
+			Spec:   &admin.ExecutionSpec{},
+		},
+	})
+	assert.Error(t, noSpecError)
+
 }
 
 func TestGetQualityOfService_ConfigValues(t *testing.T) {
