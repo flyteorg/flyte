@@ -22,6 +22,7 @@ Starts the demo cluster without any source code:
 
 Starts the demo cluster with different port:
 ::
+
  flytectl demo start --port 6443
 
 Runs a dev cluster, which only has minio and postgres pod.
