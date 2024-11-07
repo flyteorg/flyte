@@ -96,8 +96,8 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				dir := filepath.Dir(newPath)
 
 				mu.Lock()
-				// 0755: the directory can be read by anyone but can only be written by the owner
-				os.MkdirAll(dir, 0755)
+				// 0777: the directory can be read and written by anyone
+				os.MkdirAll(dir, 0777)
 				mu.Unlock()
 				writer, err := os.Create(newPath)
 				if err != nil {
