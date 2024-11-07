@@ -1,6 +1,10 @@
 package sandbox
 
-import "github.com/flyteorg/flyte/flytectl/pkg/docker"
+import (
+	"fmt"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+)
 
 // Config holds configuration flags for sandbox command.
 type Config struct {
@@ -36,9 +40,18 @@ type Config struct {
 	DryRun bool `json:"dryRun" pflag:",Optional. Only print the docker commands to bring up flyte sandbox/demo container.This will still call github api's to get the latest flyte release to use'"`
 
 	Force bool `json:"force" pflag:",Optional. Forcefully delete existing sandbox cluster if it exists."`
+
+	// Allow user to specify the port for the sandbox
+	Port string `json:"port" pflag:",Optional. Specify the port for the sandbox."`
 }
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
 var (
-	DefaultConfig = &Config{}
+	DefaultConfig = &Config{
+		Port: "6443", // Default port for the sandbox
+	}
 )
+
+func (c Config) GetK8sEndpoint() string {
+	return fmt.Sprintf("https://127.0.0.1:%s", c.Port)
+}
