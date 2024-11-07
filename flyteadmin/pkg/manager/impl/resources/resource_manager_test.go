@@ -181,6 +181,33 @@ func TestGetWorkflowAttributes(t *testing.T) {
 			MatchingAttributes: testutils.ExecutionQueueAttributes,
 		},
 	}, response))
+
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.NewFlyteAdminError(codes.NotFound, "validationError")
+	}
+
+	_, validationError := manager.GetWorkflowAttributes(context.Background(), request)
+	assert.Error(t, validationError)
+
+	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
+		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
+		assert.Equal(t, project, ID.Project)
+		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, workflow, ID.Workflow)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
+		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
+		return models.Resource{
+			Project:      project,
+			Domain:       domain,
+			Workflow:     workflow,
+			ResourceType: "resource",
+			Attributes:   expectedSerializedAttrs,
+		}, errors.NewFlyteAdminError(codes.NotFound, "workflowAttributesModelError")
+	}
+
+	_, failError := manager.GetWorkflowAttributes(context.Background(), request)
+	assert.Error(t, failError)
 }
 
 func TestDeleteWorkflowAttributes(t *testing.T) {
