@@ -54,6 +54,13 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	_, err := manager.UpdateWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
+
+	request = &admin.WorkflowAttributesUpdateRequest{
+		Attributes: &admin.WorkflowAttributes{},
+	}
+	_, failError := manager.UpdateWorkflowAttributes(context.Background(), request)
+	assert.Error(t, failError)
+
 }
 
 func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
