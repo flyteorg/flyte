@@ -33,7 +33,25 @@ type Downloader struct {
 	mode core.IOStrategy_DownloadMode
 }
 
+// TODO add timeout and rate limit
+// TODO use chunk to download
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
+	/*
+	   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
+	   For multipart blobs, it lists all parts recursively and spawns concurrent goroutines to download each part while managing file I/O in parallel.
+
+	   - The function begins by validating the blob URI and categorizing the blob type (single or multipart).
+	   - In the multipart case, it recursively lists all blob parts and launches goroutines to download and save each part.
+	     Goroutine closure and I/O success tracking are managed to avoid resource leaks.
+	   - For single-part blobs, it directly downloads and writes the data to the specified path.
+
+	   Life Cycle:
+	   1. Blob URI                    -> Blob Metadata Type check       -> Recursive List parts if Multipart          -> Launch goroutines to download parts
+	      (input blob object)            (determine multipart/single)       (List API, handles recursive case)              (each part handled in parallel)
+	   2. Download part or full blob   -> Save locally with error checks -> Handle reader/writer closures             -> Return local path or error
+	      (download each part)             (error on write or directory)     (close streams safely, track success)        (completion or report missing closures)
+	*/
+
 	blobRef := storage.DataReference(blob.Uri)
 	scheme, _, _, err := blobRef.Split()
 	if err != nil {
@@ -41,6 +59,8 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 	}
 
 	if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
+		// Collect all parts of the multipart blob recursively (List API handles nested directories)
+		// Set maxItems to 100 as a parameter for the List API, enabling batch retrieval of items until all are downloaded
 		maxItems := 100
 		cursor := storage.NewCursorAtStart()
 		var items []storage.DataReference
@@ -60,6 +80,11 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		}
 
 		success := 0
+		itemCount := len(absPaths)
+		// Track successful closures of readers and writers in deferred functions
+		readerCloseSuccessCount := 0
+		writerCloseSuccessCount := 0
+		// We use Mutex to avoid race conditions when updating counters and creating directories
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range absPaths {
@@ -85,6 +110,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					if err != nil {
 						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
 					}
+					readerCloseSuccessCount += 1
 				}()
 
 				_, _, k, err := ref.Split()
@@ -96,6 +122,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				dir := filepath.Dir(newPath)
 
 				mu.Lock()
+				// os.MkdirAll creates the specified directory structure if it doesn’t already exist
 				// 0777: the directory can be read and written by anyone
 				os.MkdirAll(dir, 0777)
 				mu.Unlock()
@@ -109,6 +136,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					if err != nil {
 						logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
 					}
+					writerCloseSuccessCount += 1
 				}()
 
 				_, err = io.Copy(writer, reader)
@@ -121,45 +149,56 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				mu.Unlock()
 			}()
 		}
+		// Go routines are synchronized with a WaitGroup to prevent goroutine leaks.
 		wg.Wait()
-		logger.Infof(ctx, "Successfully copied [%d] remote files from [%s] to local [%s]", success, blobRef, toPath)
+		if success != itemCount {
+			return nil, errors.Errorf("failed to copy %d out of %d remote files from [%s] to local [%s]", itemCount-success, itemCount, blobRef, toPath)
+		} else if readerCloseSuccessCount != itemCount {
+			return nil, errors.Errorf("failed to close %d out of %d remote file readers", itemCount-readerCloseSuccessCount, itemCount)
+		} else if writerCloseSuccessCount != itemCount {
+			return nil, errors.Errorf("failed to close %d out of %d local file writers", itemCount-writerCloseSuccessCount, itemCount)
+		} else {
+			logger.Infof(ctx, "successfully copied %d remote files from [%s] to local [%s]", success, blobRef, toPath)
+			return toPath, nil
+		}
+	} else if blob.GetMetadata().GetType().Dimensionality == core.BlobType_SINGLE {
+		// reader should be declared here (avoid being shared across all goroutines)
+		var reader io.ReadCloser
+		if scheme == "http" || scheme == "https" {
+			reader, err = DownloadFileFromHTTP(ctx, blobRef)
+		} else {
+			reader, err = DownloadFileFromStorage(ctx, blobRef, d.store)
+		}
+		if err != nil {
+			logger.Errorf(ctx, "Failed to download from ref [%s]", blobRef)
+			return nil, err
+		}
+		defer func() {
+			err := reader.Close()
+			if err != nil {
+				logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", blobRef, err)
+			}
+		}()
+
+		writer, err := os.Create(toPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to open file at path %s", toPath)
+		}
+		defer func() {
+			err := writer.Close()
+			if err != nil {
+				logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+			}
+		}()
+		v, err := io.Copy(writer, reader)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to write remote data to local filesystem")
+		}
+		logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, blobRef, toPath)
 		return toPath, nil
-	}
-
-	// reader should be declared here (avoid being shared across all goroutines)
-	var reader io.ReadCloser
-	if scheme == "http" || scheme == "https" {
-		reader, err = DownloadFileFromHTTP(ctx, blobRef)
 	} else {
-		reader, err = DownloadFileFromStorage(ctx, blobRef, d.store)
+		return nil, errors.Errorf("unexpected Blob type encountered")
 	}
-	if err != nil {
-		logger.Errorf(ctx, "Failed to download from ref [%s]", blobRef)
-		return nil, err
-	}
-	defer func() {
-		err := reader.Close()
-		if err != nil {
-			logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", blobRef, err)
-		}
-	}()
-
-	writer, err := os.Create(toPath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to open file at path %s", toPath)
-	}
-	defer func() {
-		err := writer.Close()
-		if err != nil {
-			logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
-		}
-	}()
-	v, err := io.Copy(writer, reader)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to write remote data to local filesystem")
-	}
-	logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, blobRef, toPath)
-	return toPath, nil
 }
 
 func (d Downloader) handleSchema(ctx context.Context, schema *core.Schema, toFilePath string) (interface{}, error) {
