@@ -45,6 +45,37 @@ var taskExecutionIdentifier = &core.TaskExecutionIdentifier{
 	RetryAttempt:    1,
 }
 
+func TestGetTaskExecutions(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	_, err := client.CreateTask(ctx, &admin.TaskCreateRequest{
+		Id:   taskIdentifier,
+		Spec: testutils.GetValidTaskRequest().Spec,
+	})
+	require.NoError(t, err)
+
+	resp, err := client.GetTask(ctx, &admin.ObjectGetRequest{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      project,
+			Domain:       "development",
+			Name:         "task name",
+		},
+	})
+
+	assert.Nil(t, err)
+	assert.Equal(t, resp.Id.Project, project)
+	assert.Equal(t, resp.Id.Domain, "development")
+	assert.Equal(t, resp.Id.Name, "task name")
+	assert.Equal(t, resp.Id.Version, "task version")
+
+}
+
 func createTaskAndNodeExecution(
 	ctx context.Context, t *testing.T, client service.AdminServiceClient, conn *grpc.ClientConn,
 	occurredAtProto *timestamp.Timestamp) {
