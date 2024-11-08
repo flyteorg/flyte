@@ -182,8 +182,8 @@ func TestDownloadOptions_Download(t *testing.T) {
 		errProto := &core.ErrorDocument{}
 		err = store.ReadProtobuf(ctx, errFile, errProto)
 		assert.NoError(t, err)
-		if assert.NotNil(t, errProto.Error) {
-			assert.Equal(t, core.ContainerError_RECOVERABLE, errProto.Error.Kind)
+		if assert.NotNil(t, errProto.GetError()) {
+			assert.Equal(t, core.ContainerError_RECOVERABLE, errProto.GetError().GetKind())
 		}
 	})
 }
