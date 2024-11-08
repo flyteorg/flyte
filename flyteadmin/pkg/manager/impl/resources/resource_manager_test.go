@@ -732,6 +732,23 @@ func TestDeleteProjectAttributes(t *testing.T) {
 	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	_, err := manager.DeleteProjectAttributes(context.Background(), request)
 	assert.Nil(t, err)
+
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.NewFlyteAdminError(codes.NotFound, "validationError")
+	}
+	_, validationError := manager.DeleteProjectAttributes(context.Background(), request)
+	assert.Error(t, validationError)
+
+	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
+		ctx context.Context, ID repoInterfaces.ResourceID) error {
+		assert.Equal(t, project, ID.Project)
+		assert.Equal(t, "", ID.Domain)
+		assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG.String(), ID.ResourceType)
+		return errors.NewFlyteAdminError(codes.NotFound, "deleteError")
+	}
+	_, failError := manager.DeleteProjectAttributes(context.Background(), request)
+	assert.Error(t, failError)
 }
 
 func TestGetResource(t *testing.T) {
