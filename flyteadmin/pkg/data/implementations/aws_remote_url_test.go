@@ -80,6 +80,6 @@ func TestAWSGet(t *testing.T) {
 	}
 	urlBlob, err := remoteURL.Get(context.Background(), "s3://bucket/key")
 	assert.Nil(t, err)
-	assert.Equal(t, "www://host/path", urlBlob.Url)
-	assert.Equal(t, contentLength, urlBlob.Bytes)
+	assert.Equal(t, "www://host/path", urlBlob.GetUrl())
+	assert.Equal(t, contentLength, urlBlob.GetBytes())
 }

@@ -37,7 +37,7 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	flyteWf, err := e.workflowBuilder.Build(data.WorkflowClosure, data.ExecutionParameters.Inputs, data.ExecutionID, data.Namespace)
 	if err != nil {
 		logger.Infof(ctx, "failed to build the workflow [%+v] %v",
-			data.WorkflowClosure.Primary.Template.Id, err)
+			data.WorkflowClosure.GetPrimary().GetTemplate().GetId(), err)
 		return interfaces.ExecutionResponse{}, err
 	}
 	err = PrepareFlyteWorkflow(data, flyteWf)
@@ -64,11 +64,11 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	}
 
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
-		Project:               data.ExecutionID.Project,
-		Domain:                data.ExecutionID.Domain,
+		Project:               data.ExecutionID.GetProject(),
+		Domain:                data.ExecutionID.GetDomain(),
 		Workflow:              data.ReferenceWorkflowName,
 		LaunchPlan:            data.ReferenceWorkflowName,
-		ExecutionID:           data.ExecutionID.Name,
+		ExecutionID:           data.ExecutionID.GetName(),
 		ExecutionClusterLabel: data.ExecutionParameters.ExecutionClusterLabel,
 	}
 	targetCluster, err := e.executionCluster.GetTarget(ctx, &executionTargetSpec)
@@ -92,7 +92,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		TargetID: data.Cluster,
 	})
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error())
+		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error()) //nolint
 	}
 	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
 		PropagationPolicy: &deletePropagationBackground,

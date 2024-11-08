@@ -24,7 +24,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 		}
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
-			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
+			return req.GetProject() == project && req.GetDomain() == domain && req.GetResourceType() == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{
 			Attributes: &admin.ProjectDomainAttributes{
 				MatchingAttributes: &admin.MatchingAttributes{
@@ -42,12 +42,12 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 		}
 		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
 		assert.NoError(t, err)
-		assert.EqualValues(t, attrs.Attributes, attributes)
+		assert.EqualValues(t, attrs.GetAttributes(), attributes)
 	})
 	t.Run("admin service error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
-			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
+			return req.GetProject() == project && req.GetDomain() == domain && req.GetResourceType() == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{}, errFoo)
 
 		provider := serviceAdminProvider{
@@ -59,7 +59,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 	t.Run("wonky admin service response", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnGetProjectDomainAttributesMatch(ctx, mock.MatchedBy(func(req *admin.ProjectDomainAttributesGetRequest) bool {
-			return req.Project == project && req.Domain == domain && req.ResourceType == admin.MatchableResource_CLUSTER_RESOURCE
+			return req.GetProject() == project && req.GetDomain() == domain && req.GetResourceType() == admin.MatchableResource_CLUSTER_RESOURCE
 		})).Return(&admin.ProjectDomainAttributesGetResponse{
 			Attributes: &admin.ProjectDomainAttributes{
 				MatchingAttributes: &admin.MatchingAttributes{
@@ -88,7 +88,7 @@ func TestServiceGetProjects(t *testing.T) {
 	t.Run("happy case", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			return req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "created_at"
+			return req.GetLimit() == 100 && req.GetFilters() == "ne(state,1)" && req.GetSortBy().GetKey() == "created_at"
 		})).Return(&admin.Projects{
 			Projects: []*admin.Project{
 				{
@@ -104,12 +104,12 @@ func TestServiceGetProjects(t *testing.T) {
 		}
 		projects, err := provider.GetProjects(ctx)
 		assert.NoError(t, err)
-		assert.Len(t, projects.Projects, 2)
+		assert.Len(t, projects.GetProjects(), 2)
 	})
 	t.Run("admin error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			return req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "created_at"
+			return req.GetLimit() == 100 && req.GetFilters() == "ne(state,1)" && req.GetSortBy().GetKey() == "created_at"
 		})).Return(nil, errFoo)
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,

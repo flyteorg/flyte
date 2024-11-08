@@ -328,10 +328,10 @@ func GetSampleLpSpecForTest() *admin.LaunchPlanSpec {
 }
 
 func GetWorkflowRequestInterfaceBytes() []byte {
-	bytes, _ := proto.Marshal(GetWorkflowRequest().Spec.Template.Interface)
+	bytes, _ := proto.Marshal(GetWorkflowRequest().GetSpec().GetTemplate().GetInterface())
 	return bytes
 }
 
 func GetWorkflowRequestInterface() *core.TypedInterface {
-	return GetWorkflowRequest().Spec.Template.Interface
+	return GetWorkflowRequest().GetSpec().GetTemplate().GetInterface()
 }
