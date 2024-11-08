@@ -196,9 +196,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		}
 		logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, blobRef, toPath)
 		return toPath, nil
-	} else {
-		return nil, errors.Errorf("unexpected Blob type encountered")
 	}
+	
+	return nil, errors.Errorf("unexpected Blob type encountered")
 }
 
 func (d Downloader) handleSchema(ctx context.Context, schema *core.Schema, toFilePath string) (interface{}, error) {
