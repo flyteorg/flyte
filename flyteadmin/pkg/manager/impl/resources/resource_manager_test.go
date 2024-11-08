@@ -900,4 +900,38 @@ func TestListAllResources(t *testing.T) {
 		Workflow:   "workflow",
 		Attributes: &workflowAttributes,
 	}, response.Configurations[1]))
+
+	db.ResourceRepo().(*mocks.MockResourceRepo).ListAllFunction = func(ctx context.Context, resourceType string) (
+		[]models.Resource, error) {
+		assert.Equal(t, admin.MatchableResource_CLUSTER_RESOURCE.String(), resourceType)
+		return []models.Resource{
+			{
+				Project:      "projectA",
+				ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
+				Attributes:   marshaledProjectAttrs,
+			},
+			{
+				Project:      "projectB",
+				Domain:       "development",
+				Workflow:     "workflow",
+				ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
+				Attributes:   marshaledWorkflowAttrs,
+			},
+		}, errors.NewFlyteAdminError(codes.NotFound, "resourceError")
+	}
+
+	_, resourceError := manager.ListAll(context.Background(), &admin.ListMatchableAttributesRequest{
+		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
+	})
+	assert.Error(t, resourceError)
+
+	db.ResourceRepo().(*mocks.MockResourceRepo).ListAllFunction = func(ctx context.Context, resourceType string) (
+		[]models.Resource, error) {
+		assert.Equal(t, admin.MatchableResource_CLUSTER_RESOURCE.String(), resourceType)
+		return nil, nil
+	}
+	emptyResource, _ := manager.ListAll(context.Background(), &admin.ListMatchableAttributesRequest{
+		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
+	})
+	assert.Equal(t, &admin.ListMatchableAttributesResponse{}, emptyResource, "The two values should be equal")
 }
