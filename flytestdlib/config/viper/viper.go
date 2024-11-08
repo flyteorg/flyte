@@ -128,12 +128,10 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 
 	v.viper.AutomaticEnv() // read in environment variables that match
 
-	shouldWatchChanges := true
 	// If a config file is found, read it in.
 	if err = v.viper.ReadInConfig(); err == nil {
 		logger.Debugf(ctx, "Using config file: %+v", v.viper.ConfigFilesUsed())
 	} else if asErrorCollection, ok := err.(stdLibErrs.ErrorCollection); ok {
-		shouldWatchChanges = false
 		for i, e := range asErrorCollection {
 			if _, isNotFound := errors.Cause(e).(viperLib.ConfigFileNotFoundError); isNotFound {
 				logger.Errorf(ctx, "[%v] Couldn't find a config file [%v]. Relying on env vars and pflags.",
@@ -149,17 +147,15 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 		return err
 	}
 
-	if shouldWatchChanges {
-		v.watcherInitializer.Do(func() {
-			// Watch config files to pick up on file changes without requiring a full application restart.
-			// This call must occur after *all* config paths have been added.
-			v.viper.OnConfigChange(func(e fsnotify.Event) {
-				logger.Debugf(ctx, "Got a notification change for file [%v] \n", e.Name)
-				v.configChangeHandler()
-			})
-			v.viper.WatchConfig()
+	v.watcherInitializer.Do(func() {
+		// Watch config files to pick up on file changes without requiring a full application restart.
+		// This call must occur after *all* config paths have been added.
+		v.viper.OnConfigChange(func(e fsnotify.Event) {
+			logger.Debugf(ctx, "Got a notification change for file [%v] \n", e.Name)
+			v.configChangeHandler()
 		})
-	}
+		v.viper.WatchConfig()
+	})
 
 	return v.RefreshFromConfig(ctx, r, true)
 }
