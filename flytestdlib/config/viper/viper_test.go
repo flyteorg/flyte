@@ -6,8 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func Test_stringToByteArray(t *testing.T) {
