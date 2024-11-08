@@ -54,6 +54,8 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			default:
 				return nil, fmt.Errorf("unsupported literal scalar primitive type %T", scalarValue)
 			}
+		case *core.Scalar_Binary:
+			return scalarValue.Binary, nil
 		case *core.Scalar_Blob:
 			return scalarValue.Blob.Uri, nil
 		case *core.Scalar_Schema:
@@ -96,6 +98,10 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			}
 		}
 		return mapResult, nil
+	case *core.Literal_OffloadedMetadata:
+		// Return the URI of the offloaded metadata to be used when displaying in flytectl
+		return literalValue.OffloadedMetadata.Uri, nil
+
 	}
 	return nil, fmt.Errorf("unsupported literal type %T", literal)
 }

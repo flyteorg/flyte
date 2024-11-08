@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -234,7 +233,7 @@ func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
 			if name == "" {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing key in %s", fieldName)
 			}
-			if fixedInput == nil || fixedInput.GetValue() == nil {
+			if fixedInput.GetValue() == nil && fixedInput.GetOffloadedMetadata() == nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing valid literal in %s %s", fieldName, name)
 			}
 			if isDateTime(fixedInput) {
@@ -283,19 +282,9 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 			defaultValue := defaultInput.GetDefault()
 			if defaultValue != nil {
 				inputType := validators.LiteralTypeForLiteral(defaultValue)
-
-				if inputType == nil {
-					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-						fmt.Sprintf(
-							"Flyte encountered an issue while determining\n"+
-								"the type of the default value for Parameter '%s' in '%s'.\n"+
-								"Registered type: [%s].\n"+
-								"Flyte needs to support the latest FlyteIDL to support this type.\n"+
-								"Suggested solution: Please update all of your Flyte images to the latest version and "+
-								"try again.",
-							name, fieldName, defaultInput.GetVar().GetType().String(),
-						),
-					)
+				err := validators.ValidateLiteralType(inputType)
+				if err != nil {
+					return errors.NewInvalidLiteralTypeError(name, err)
 				}
 
 				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {

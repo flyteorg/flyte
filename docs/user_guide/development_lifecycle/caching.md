@@ -19,15 +19,23 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 
 ```
 
+### Input Caching
+
+In Flyte, input caching allows tasks to automatically cache the input data required for execution. This feature is particularly useful in scenarios where tasks may need to be re-executed, such as during retries due to failures or when manually triggered by users. By caching input data, Flyte optimizes workflow performance and resource usage, preventing unnecessary recomputation of task inputs.
+
+### Output Caching
+
+Output caching in Flyte allows users to cache the results of tasks to avoid redundant computations. This feature is especially valuable for tasks that perform expensive or time-consuming operations where the results are unlikely to change frequently.
+
 There are four parameters and one command-line flag related to caching.
 
 ## Parameters
 
 * `cache`(`bool`): Enables or disables caching of the workflow, task, or launch plan.
 By default, caching is disabled to avoid unintended consequences when caching executions with side effects.
-To enable caching set `cache=True`.
+To enable caching, set `cache=True`.
 * `cache_version` (`str`): Part of the cache key.
-A change to this parameter will invalidate the cache.
+Changing this version number tells Flyte to ignore previous cached results and run the task again if the task's function has changed.
 This allows you to explicitly indicate when a change has been made to the task that should invalidate any existing cached results.
 Note that this is not the only change that will invalidate the cache (see below).
 Also, note that you can manually trigger cache invalidation per execution using the [`overwrite-cache` flag](#overwrite-cache-flag).
@@ -35,7 +43,7 @@ Also, note that you can manually trigger cache invalidation per execution using 
 When enabled, Flyte ensures that a single instance of the task is run before any other instances that would otherwise run concurrently.
 This allows the initial instance to cache its result and lets the later instances reuse the resulting cached outputs.
 Cache serialization is disabled by default.
-* `cache_ignore_input_vars` (`Tuple[str, ...]`): Input variables that should not be included when calculating hash for cache. By default, no input variables are ignored. This parameter only applies to task serialization.
+* `cache_ignore_input_vars` (`Tuple[str, ...]`): Input variables that Flyte should ignore when deciding if a task’s result can be reused (hash calculation). By default, no input variables are ignored. This parameter only applies to task serialization.
 
 Task caching parameters can be specified at task definition time within `@task` decorator or at task invocation time using `with_overrides` method.
 
@@ -127,7 +135,7 @@ Task executions can be cached across different versions of the task because a ch
 
 ### How does local caching work?
 
-The flytekit package uses the [diskcache](https://github.com/grantjenks/python-diskcache) package, specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to aid in the memoization of task executions. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
+Flyte uses a tool called [diskcache](https://github.com/grantjenks/python-diskcache), specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to save task results so they don’t need to be recomputed if the same task is executed again, a technique known as ``memoization``. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
 
 Similar to the remote case, a local cache entry for a task will be invalidated if either the `cache_version` or the task signature is modified. In addition, the local cache can also be emptied by running the following command: `pyflyte local-cache clear`, which essentially obliterates the contents of the `~/.flyte/local-cache/` directory.
 To disable the local cache, you can set the `local.cache_enabled` config option (e.g. by setting the environment variable `FLYTE_LOCAL_CACHE_ENABLED=False`).

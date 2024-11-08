@@ -207,10 +207,12 @@
       "properties": {
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict."
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "description": "The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization."
         }
       },
       "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."

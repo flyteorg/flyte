@@ -400,8 +400,10 @@ pub struct BlobMetadata {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Binary {
+    /// Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
     #[prost(bytes="vec", tag="1")]
     pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
@@ -2127,6 +2129,12 @@ pub struct ExecutionError {
     pub error_uri: ::prost::alloc::string::String,
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ExecutionError`.
 pub mod execution_error {
@@ -3089,6 +3097,12 @@ pub struct ContainerError {
     /// Defines the origin of the error (system, user, unknown).
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub origin: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ContainerError`.
 pub mod container_error {

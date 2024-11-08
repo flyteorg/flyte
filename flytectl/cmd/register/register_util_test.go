@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	ghMocks "github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -61,7 +62,8 @@ func registerFilesSetup() {
 }
 
 func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/valid-parent-folder-register.tar"}
@@ -78,7 +80,8 @@ func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/valid-register.tar"}
@@ -95,7 +98,8 @@ func TestGetSortedArchivedFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/valid-unordered-register.tar"}
@@ -112,7 +116,8 @@ func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
 }
 
 func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/invalid.tar"}
@@ -125,7 +130,8 @@ func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedTgzList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/valid-register.tgz"}
@@ -142,7 +148,8 @@ func TestGetSortedArchivedTgzList(t *testing.T) {
 }
 
 func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/invalid.tgz"}
 	fileList, tmpDir, err := GetSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
@@ -154,7 +161,8 @@ func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"testdata/invalid-extension-register.zip"}
@@ -168,7 +176,8 @@ func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"http://invalidhost:invalidport/testdata/valid-register.tar"}
 	fileList, tmpDir, err := GetSerializeOutputFiles(s.Ctx, args, rconfig.DefaultFilesConfig.Archive)
@@ -180,7 +189,8 @@ func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
-	s := setup()
+	s := testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"http://dummyhost:80/testdata/valid-register.tar"}
@@ -197,7 +207,8 @@ func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
 }
 
 func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) {
-	setup()
+	testutils.Setup(t)
+
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args := []string{"http://dummyhost:80/testdata/valid-register.tar"}
@@ -220,7 +231,8 @@ func Test_getTotalSize(t *testing.T) {
 
 func TestRegisterFile(t *testing.T) {
 	t.Run("Successful run", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
@@ -230,7 +242,8 @@ func TestRegisterFile(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Failed Scheduled launch plan registration", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
 		variableMap := map[string]*core.Variable{
@@ -284,7 +297,8 @@ func TestRegisterFile(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("Non existent file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		args := []string{"testdata/non-existent.pb"}
 		var registerResults []Result
@@ -295,7 +309,8 @@ func TestRegisterFile(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("unmarhal failure", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		args := []string{"testdata/valid-register.tar"}
 		var registerResults []Result
@@ -306,7 +321,8 @@ func TestRegisterFile(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("AlreadyExists", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.AlreadyExists, "AlreadyExists"))
@@ -319,7 +335,8 @@ func TestRegisterFile(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Registration Error", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.InvalidArgument, "Invalid"))
@@ -335,7 +352,8 @@ func TestRegisterFile(t *testing.T) {
 
 func TestHydrateLaunchPlanSpec(t *testing.T) {
 	t.Run("IamRole override", func(t *testing.T) {
-		setup()
+		testutils.Setup(t)
+
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.AssumableIamRole = "iamRole"
 		lpSpec := &admin.LaunchPlanSpec{}
@@ -376,7 +394,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 
 func TestUploadFastRegisterArtifact(t *testing.T) {
 	t.Run("Successful upload", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 		store, err := storage.NewDataStore(&storage.Config{
@@ -394,7 +413,8 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Failed upload", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 		store, err := storage.NewDataStore(&storage.Config{
@@ -472,7 +492,8 @@ func TestGetAllFlytesnacksExample(t *testing.T) {
 
 func TestRegister(t *testing.T) {
 	t.Run("Failed to register", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		node := &admin.NodeExecution{}
 		err := register(s.Ctx, node, s.CmdCtx, rconfig.DefaultFilesConfig.DryRun, rconfig.DefaultFilesConfig.EnableSchedule)
@@ -685,20 +706,23 @@ func TestLeftDiff(t *testing.T) {
 func TestValidateLaunchSpec(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil launchplan spec", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		err := validateLaunchSpec(ctx, nil, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with nil workflow id", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{}
 		err := validateLaunchSpec(ctx, lpSpec, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with empty metadata", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
@@ -712,7 +736,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("launchplan spec with metadata and empty schedule", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
@@ -727,7 +752,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("validate spec failed to fetch workflow", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 
 		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
@@ -752,7 +778,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 		assert.Equal(t, "failed", err.Error())
 	})
 	t.Run("failed to fetch workflow", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 
 		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
@@ -774,7 +801,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 		assert.Equal(t, "failed", err.Error())
 	})
 	t.Run("launchplan spec missing required param schedule", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		variableMap := map[string]*core.Variable{
 			"var1": {
@@ -836,7 +864,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 		assert.Contains(t, err.Error(), "param values are missing on scheduled workflow for the following params")
 	})
 	t.Run("launchplan spec non empty schedule default param success", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		variableMap := map[string]*core.Variable{
 			"var1": {
@@ -941,7 +970,8 @@ func TestValidateLaunchSpec(t *testing.T) {
 	})
 
 	t.Run("launchplan spec non empty schedule required param without value fail", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		variableMap := map[string]*core.Variable{
 			"var1": {

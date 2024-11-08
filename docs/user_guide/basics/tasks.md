@@ -51,9 +51,9 @@ We create a task that computes the slope of a regression line:
 ```
 
 :::{note}
-Flytekit will assign a default name to the output variable like `out0`.
+Flytekit will assign a default name to the output variable like `o0`.
 In case of multiple outputs, each output will be numbered in the order
-starting with 0, e.g., -> `out0, out1, out2, ...`.
+starting with 0, e.g., `o0`, `o1`, `o2`, etc.
 :::
 
 You can execute a Flyte task just like any regular Python function:

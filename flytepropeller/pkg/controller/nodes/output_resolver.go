@@ -66,7 +66,7 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 
 	// resolving binding attribute path if exist
 	if len(bindAttrPath) > 0 {
-		output, err = resolveAttrPathInPromise(n.GetID(), output, bindAttrPath)
+		output, err = resolveAttrPathInPromise(ctx, r.store, n.GetID(), output, bindAttrPath)
 	}
 
 	return output, err

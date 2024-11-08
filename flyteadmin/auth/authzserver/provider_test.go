@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
@@ -36,7 +37,7 @@ func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
 	sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
 	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
-	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
 	assert.NoError(t, err)
 	return p, secrets
 }
@@ -58,7 +59,7 @@ func newInvalidMockProvider(ctx context.Context, t *testing.T, secrets auth.Secr
 	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
 	invalidFunc()
-	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, errorContains)
 	assert.Equal(t, Provider{}, p)
@@ -294,7 +295,7 @@ func TestProvider_ValidateAccessToken(t *testing.T) {
 		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
 		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
-		p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
+		p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		// create a signer for rsa 256

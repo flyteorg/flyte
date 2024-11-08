@@ -131,7 +131,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, param.Type.String(), inputVar, expectedType.String()))
+						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, c.LiteralTypeToStr(param.Type), inputVar, c.LiteralTypeToStr(expectedType)))
 					} else {
 						sourceType = cType
 					}
@@ -147,7 +147,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 					} else if sourceType.GetMapValueType() != nil {
 						sourceType = sourceType.GetMapValueType()
 					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
-
+						// This is for retrieving the literal type of an attribute in a dataclass or Pydantic BaseModel
 						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
 
 						if !exist {
@@ -164,7 +164,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, sourceType.String(), inputVar, expectedType.String()))
+				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, c.LiteralTypeToStr(sourceType), inputVar, c.LiteralTypeToStr(expectedType)))
 				return nil, nil, !errs.HasErrors()
 			}
 		}
@@ -180,7 +180,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, c.LiteralTypeToStr(literalType), c.LiteralTypeToStr(expectedType)))
 		}
 
 		if expectedType.GetEnumType() != nil {

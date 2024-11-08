@@ -5748,6 +5748,12 @@ export namespace flyteidl {
 
             /** ExecutionError kind */
             kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ExecutionError timestamp */
+            timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ExecutionError worker */
+            worker?: (string|null);
         }
 
         /** Represents an ExecutionError. */
@@ -5770,6 +5776,12 @@ export namespace flyteidl {
 
             /** ExecutionError kind. */
             public kind: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ExecutionError timestamp. */
+            public timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ExecutionError worker. */
+            public worker: string;
 
             /**
              * Creates a new ExecutionError instance using the specified properties.
@@ -7555,6 +7567,12 @@ export namespace flyteidl {
 
             /** ContainerError origin */
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ContainerError timestamp */
+            timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ContainerError worker */
+            worker?: (string|null);
         }
 
         /** Represents a ContainerError. */
@@ -7577,6 +7595,12 @@ export namespace flyteidl {
 
             /** ContainerError origin. */
             public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ContainerError timestamp. */
+            public timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ContainerError worker. */
+            public worker: string;
 
             /**
              * Creates a new ContainerError instance using the specified properties.

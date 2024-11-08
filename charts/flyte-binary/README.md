@@ -41,7 +41,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.13.1"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.13.2"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -116,6 +116,8 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
 | flyte-core-components.admin.disableScheduler | bool | `false` |  |
 | flyte-core-components.admin.disabled | bool | `false` |  |
+| flyte-core-components.admin.seedProjectsWithDetails[0].description | string | `"Default project setup."` |  |
+| flyte-core-components.admin.seedProjectsWithDetails[0].name | string | `"flytesnacks"` |  |
 | flyte-core-components.admin.seedProjects[0] | string | `"flytesnacks"` |  |
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
