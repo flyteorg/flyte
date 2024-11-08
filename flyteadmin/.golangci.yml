@@ -7,25 +7,22 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - gas
     - gci
     - goconst
     - goimports
-    - golint
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
+    - protogetter
 
 linters-settings:
   gci:
@@ -35,6 +32,8 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
+  goconst:
+    ignore-tests: true
 issues:
   exclude-rules:
     - path: pkg/workflowengine/impl/prepare_execution.go
