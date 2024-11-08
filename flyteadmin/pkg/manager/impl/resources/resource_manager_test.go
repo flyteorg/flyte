@@ -282,6 +282,19 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	_, err := manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
+
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.NewFlyteAdminError(codes.NotFound, "validationError")
+	}
+	_, validationError := manager.UpdateProjectDomainAttributes(context.Background(), request)
+	assert.Error(t, validationError)
+
+	request = &admin.ProjectDomainAttributesUpdateRequest{
+		Attributes: &admin.ProjectDomainAttributes{},
+	}
+	_, attributesError := manager.UpdateProjectDomainAttributes(context.Background(), request)
+	assert.Error(t, attributesError)
 }
 
 func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
