@@ -97,7 +97,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
+	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Where(getIDFilter(nodeExecution.ID)).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
