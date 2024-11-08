@@ -79,7 +79,8 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 			}
 		}
 
-		success := 0
+		// Track the count of successful downloads and the total number of items
+		downloadSuccess := 0
 		itemCount := len(absPaths)
 		// Track successful closures of readers and writers in deferred functions
 		readerCloseSuccessCount := 0
@@ -110,7 +111,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					if err != nil {
 						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
 					}
+					mu.Lock()
 					readerCloseSuccessCount += 1
+					mu.Unlock()
 				}()
 
 				_, _, k, err := ref.Split()
@@ -136,7 +139,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					if err != nil {
 						logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
 					}
+					mu.Lock()
 					writerCloseSuccessCount += 1
+					mu.Unlock()
 				}()
 
 				_, err = io.Copy(writer, reader)
@@ -145,22 +150,20 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					return
 				}
 				mu.Lock()
-				success += 1
+				downloadSuccess += 1
 				mu.Unlock()
 			}()
 		}
 		// Go routines are synchronized with a WaitGroup to prevent goroutine leaks.
 		wg.Wait()
-		if success != itemCount {
-			return nil, errors.Errorf("failed to copy %d out of %d remote files from [%s] to local [%s]", itemCount-success, itemCount, blobRef, toPath)
-		} else if readerCloseSuccessCount != itemCount {
-			return nil, errors.Errorf("failed to close %d out of %d remote file readers", itemCount-readerCloseSuccessCount, itemCount)
-		} else if writerCloseSuccessCount != itemCount {
-			return nil, errors.Errorf("failed to close %d out of %d local file writers", itemCount-writerCloseSuccessCount, itemCount)
-		} else {
-			logger.Infof(ctx, "successfully copied %d remote files from [%s] to local [%s]", success, blobRef, toPath)
-			return toPath, nil
+		if downloadSuccess != itemCount || readerCloseSuccessCount != itemCount || writerCloseSuccessCount != itemCount {
+			return nil, errors.Errorf(
+				"Failed to copy %d out of %d remote files from [%s] to local [%s]. Failed to close %d readers; Failed to close %d writers.",
+				itemCount-downloadSuccess, itemCount, blobRef, toPath, itemCount-readerCloseSuccessCount, itemCount-writerCloseSuccessCount,
+			)
 		}
+		logger.Infof(ctx, "successfully copied %d remote files from [%s] to local [%s]", downloadSuccess, blobRef, toPath)
+		return toPath, nil
 	} else if blob.GetMetadata().GetType().Dimensionality == core.BlobType_SINGLE {
 		// reader should be declared here (avoid being shared across all goroutines)
 		var reader io.ReadCloser
@@ -197,7 +200,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, blobRef, toPath)
 		return toPath, nil
 	}
-	
+
 	return nil, errors.Errorf("unexpected Blob type encountered")
 }
 
