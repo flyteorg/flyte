@@ -136,15 +136,16 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 		shouldWatchChanges = false
 		for i, e := range asErrorCollection {
 			if _, isNotFound := errors.Cause(e).(viperLib.ConfigFileNotFoundError); isNotFound {
-				logger.Infof(ctx, "[%v] Couldn't find a config file [%v]. Relying on env vars and pflags.",
+				logger.Errorf(ctx, "[%v] Couldn't find a config file [%v]. Relying on env vars and pflags.",
 					i, v.viper.underlying[i].ConfigFileUsed())
+				return e
 			} else {
 				return err
 			}
 		}
 	} else if reflect.TypeOf(err) == reflect.TypeOf(viperLib.ConfigFileNotFoundError{}) {
-		shouldWatchChanges = false
-		logger.Info(ctx, "Couldn't find a config file. Relying on env vars and pflags.")
+		logger.Errorf(ctx, "Couldn't find a config file. Relying on env vars and pflags.")
+		return err
 	} else {
 		return err
 	}
