@@ -22,7 +22,7 @@ import (
 )
 
 const MESSAGEPACK = "msgpack"
-const FLYTE_USE_OLD_DC_FORMAT = "FLYTE_USE_OLD_DC_FORMAT"
+const FlyteUseOldDcFormat = "FLYTE_USE_OLD_DC_FORMAT"
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
 	switch p := v.(type) {
@@ -565,7 +565,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			strValue = fmt.Sprintf("%.0f", math.Trunc(f))
 		}
 		if newT.Simple == core.SimpleType_STRUCT {
-			useOldFormat := strings.ToLower(os.Getenv(FLYTE_USE_OLD_DC_FORMAT))
+			useOldFormat := strings.ToLower(os.Getenv(FlyteUseOldDcFormat))
 			if _, isValueStringType := v.(string); !isValueStringType {
 				if useOldFormat == "1" || useOldFormat == "t" || useOldFormat == "true" {
 					byteValue, err := json.Marshal(v)

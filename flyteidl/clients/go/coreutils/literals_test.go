@@ -5,7 +5,6 @@ package coreutils
 
 import (
 	"fmt"
-	"github.com/shamaton/msgpack/v2"
 	"os"
 	"reflect"
 	"strconv"
@@ -16,6 +15,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -457,7 +457,7 @@ func TestMakeLiteralForType(t *testing.T) {
 	})
 
 	t.Run("Generic", func(t *testing.T) {
-		os.Setenv("FLYTE_USE_OLD_DC_FORMAT", "true")
+		os.Setenv(FlyteUseOldDcFormat, "true")
 		literalVal := map[string]interface{}{
 			"x": 1,
 			"y": "ystringvalue",
@@ -483,7 +483,7 @@ func TestMakeLiteralForType(t *testing.T) {
 		for key, val := range expectedStructVal.Fields {
 			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
 		}
-		os.Unsetenv("FLYTE_USE_OLD_DC_FORMAT")
+		os.Unsetenv(FlyteUseOldDcFormat)
 	})
 
 	t.Run("SimpleBinary", func(t *testing.T) {
