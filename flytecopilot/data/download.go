@@ -109,10 +109,11 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				defer func() {
 					err := reader.Close()
 					if err != nil {
-						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
+						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s].\n"+
+							"Error: %s", ref, err)
 					}
 					mu.Lock()
-					readerCloseSuccessCount += 1
+					readerCloseSuccessCount++
 					mu.Unlock()
 				}()
 
@@ -127,20 +128,26 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				mu.Lock()
 				// os.MkdirAll creates the specified directory structure if it doesn’t already exist
 				// 0777: the directory can be read and written by anyone
-				os.MkdirAll(dir, 0777)
+				err = os.MkdirAll(dir, 0777)
 				mu.Unlock()
+				if err != nil {
+					logger.Errorf(ctx, "failed to make dir at path [%s]", dir)
+					return
+				}
+
 				writer, err := os.Create(newPath)
 				if err != nil {
-					logger.Errorf(ctx, "failed to open file at path %s", newPath)
+					logger.Errorf(ctx, "failed to open file at path [%s]", newPath)
 					return
 				}
 				defer func() {
 					err := writer.Close()
 					if err != nil {
-						logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+						logger.Errorf(ctx, "failed to close File write stream.\n"+
+							"Error: [%s]", err)
 					}
 					mu.Lock()
-					writerCloseSuccessCount += 1
+					writerCloseSuccessCount++
 					mu.Unlock()
 				}()
 
@@ -150,7 +157,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					return
 				}
 				mu.Lock()
-				downloadSuccess += 1
+				downloadSuccess++
 				mu.Unlock()
 			}()
 		}
@@ -158,7 +165,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		wg.Wait()
 		if downloadSuccess != itemCount || readerCloseSuccessCount != itemCount || writerCloseSuccessCount != itemCount {
 			return nil, errors.Errorf(
-				"Failed to copy %d out of %d remote files from [%s] to local [%s]. Failed to close %d readers; Failed to close %d writers.",
+				"Failed to copy %d out of %d remote files from [%s] to local [%s].\n"+
+					"Failed to close %d readers\n"+
+					"Failed to close %d writers.",
 				itemCount-downloadSuccess, itemCount, blobRef, toPath, itemCount-readerCloseSuccessCount, itemCount-writerCloseSuccessCount,
 			)
 		}
