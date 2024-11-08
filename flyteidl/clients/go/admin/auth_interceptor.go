@@ -93,7 +93,7 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 		transport.Proxy = http.ProxyURL(&cfg.HTTPProxyURL.URL)
 	}
 
-	if cfg.ProxyCommand != nil && len(cfg.ProxyCommand) > 0 {
+	if len(cfg.ProxyCommand) > 0 {
 		httpClient.Transport = &proxyAuthTransport{
 			transport:              transport,
 			proxyCredentialsFuture: proxyCredentialsFuture,
@@ -130,7 +130,7 @@ func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCach
 		if err != nil {
 			return fmt.Errorf("failed to fetch client metadata. Error: %v", err)
 		}
-		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+		authorizationMetadataKey = clientMetadata.GetAuthorizationMetadataKey()
 	}
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
@@ -227,7 +227,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 						if newErr != nil {
 							errString := fmt.Sprintf("authentication error! Original Error: %v, Auth Error: %v", err, newErr)
 							logger.Errorf(ctx, errString)
-							return fmt.Errorf(errString)
+							return fmt.Errorf(errString) //nolint
 						}
 
 						tokenCache.CondBroadcast()
