@@ -353,8 +353,8 @@ func WithAuditFields(ctx context.Context, subject string, clientIds []string, to
 func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationContext) HTTPRequestToMetadataAnnotator {
 	return func(ctx context.Context, request *http.Request) metadata.MD {
 		// TODO: Improve error handling
-		idToken, _, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
-		if len(idToken) == 0 {
+		idToken, accessToken, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+		if len(idToken) == 0 && len(accessToken) == 0 {
 			// If no token was found in the cookies, look for an authorization header, starting with a potentially
 			// custom header set in the Config object
 			if len(authCtx.Options().HTTPAuthorizationHeader) > 0 {
@@ -372,9 +372,18 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 			return nil
 		}
 
-		// IDtoken is injected into grpc authorization metadata
-		meta := metadata.MD{
-			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", IDTokenScheme, idToken)},
+		var meta metadata.MD
+
+		if len(accessToken) > 0 {
+			// Access token is injected into grpc authorization metadata
+			meta = metadata.MD{
+				DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", BearerScheme, accessToken)},
+			}
+		} else {
+			// IDtoken is injected into grpc authorization metadata
+			meta = metadata.MD{
+				DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", IDTokenScheme, idToken)},
+			}
 		}
 
 		userInfo, err := authCtx.CookieManager().RetrieveUserInfo(ctx, request)
