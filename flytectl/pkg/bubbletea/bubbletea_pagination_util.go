@@ -65,23 +65,9 @@ func (p printTableProto) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func _max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func _min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func getSliceBounds(m *pageModel) (start int, end int) {
 	start = (m.paginator.Page - firstBatchIndex*pagePerBatch) * msgPerPage
-	end = _min(start+msgPerPage, len(*m.items))
+	end = min(start+msgPerPage, len(*m.items))
 	return start, end
 }
 
@@ -117,7 +103,7 @@ func getMessageList(batchIndex int) ([]proto.Message, error) {
 
 	msg, err := callback(filters.Filters{
 		Limit:  msgPerBatch,
-		Page:   int32(batchIndex + 1),
+		Page:   int32(batchIndex + 1), // #nosec G115
 		SortBy: filter.SortBy,
 		Asc:    filter.Asc,
 	})

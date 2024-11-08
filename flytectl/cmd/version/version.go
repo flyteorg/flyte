@@ -103,9 +103,9 @@ func getControlPlaneVersion(ctx context.Context, cmdCtx cmdCore.CommandContext) 
 	}
 	// Print FlyteAdmin
 	if err := printVersion(versionOutput{
-		Build:     v.ControlPlaneVersion.Build,
-		BuildTime: v.ControlPlaneVersion.BuildTime,
-		Version:   v.ControlPlaneVersion.Version,
+		Build:     v.GetControlPlaneVersion().GetBuild(),
+		BuildTime: v.GetControlPlaneVersion().GetBuildTime(),
+		Version:   v.GetControlPlaneVersion().GetVersion(),
 		App:       controlPlanAppName,
 	}); err != nil {
 		return fmt.Errorf("Unable to get the control plane version. Please try again: %v", err)
