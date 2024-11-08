@@ -44,7 +44,7 @@ func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *fl
 			if op1Valid && op2Valid && op1Type != nil && op2Type != nil {
 				if op1Type.String() != op2Type.String() {
 					errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), "RightValue",
-						op1Type.String(), op2Type.String()))
+						c.LiteralTypeToStr(op1Type), c.LiteralTypeToStr(op2Type)))
 				}
 			}
 		} else if expr.GetConjunction() != nil {

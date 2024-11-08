@@ -51,8 +51,7 @@ func getProjectSetup() {
 }
 
 func TestListProjectFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{}
@@ -65,8 +64,7 @@ func TestListProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	argsProject = []string{}
@@ -80,8 +78,7 @@ func TestGetProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFuncError(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{

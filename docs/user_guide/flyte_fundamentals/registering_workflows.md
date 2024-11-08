@@ -304,6 +304,12 @@ pyflyte --pkgs <dir1> --pkgs <dir2> package ...
 This is useful in cases where you want to register two different Flyte projects
 that you maintain in a single place.
 
+
+If you encounter a ``ModuleNotFoundError`` when packaging, use the `--source` option to include the correct source paths. For instance:
+
+```{prompt} bash $
+pyflyte --pkgs <dir1> package --source ./src -f
+```
 ````
 
 #### Register with `flytectl register`

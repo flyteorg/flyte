@@ -217,6 +217,21 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 		},
 	}
 	workflowID := uint(12)
+
+	mockNamedEntityManager := managerMocks.NamedEntityManager{}
+	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+		assert.Equal(t, request.ResourceType, core.ResourceType_LAUNCH_PLAN)
+		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
+			Project: "flytekit",
+			Domain:  "production",
+			Name:    ".flytegen.app.workflows.MyWorkflow.my_task",
+		}), fmt.Sprintf("%+v", request.Id))
+		assert.True(t, proto.Equal(request.Metadata, &admin.NamedEntityMetadata{
+			State: admin.NamedEntityState_SYSTEM_GENERATED,
+		}))
+		return &admin.NamedEntityUpdateResponse{}, nil
+	}
+
 	taskIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "flytekit",
@@ -233,7 +248,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 		},
 	}
 	launchPlan, err := CreateOrGetLaunchPlan(
-		context.Background(), repository, config, taskIdentifier, workflowInterface, workflowID, &spec)
+		context.Background(), repository, config, &mockNamedEntityManager, taskIdentifier, workflowInterface, workflowID, &spec)
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
