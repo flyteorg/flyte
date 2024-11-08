@@ -22,10 +22,10 @@ func TestToTagKey(t *testing.T) {
 	tagKey := ToTagKey(datasetID, tagName)
 
 	assert.Equal(t, tagName, tagKey.TagName)
-	assert.Equal(t, datasetID.Project, tagKey.DatasetProject)
-	assert.Equal(t, datasetID.Domain, tagKey.DatasetDomain)
-	assert.Equal(t, datasetID.Name, tagKey.DatasetName)
-	assert.Equal(t, datasetID.Version, tagKey.DatasetVersion)
+	assert.Equal(t, datasetID.GetProject(), tagKey.DatasetProject)
+	assert.Equal(t, datasetID.GetDomain(), tagKey.DatasetDomain)
+	assert.Equal(t, datasetID.GetName(), tagKey.DatasetName)
+	assert.Equal(t, datasetID.GetVersion(), tagKey.DatasetVersion)
 }
 
 func TestFromTagModel(t *testing.T) {
@@ -46,10 +46,10 @@ func TestFromTagModel(t *testing.T) {
 
 	tag := FromTagModel(datasetID, tagModel)
 
-	assert.Equal(t, tag.Name, tagModel.TagName)
-	assert.Equal(t, datasetID.Project, tag.Dataset.Project)
-	assert.Equal(t, datasetID.Domain, tag.Dataset.Domain)
-	assert.Equal(t, datasetID.Name, tag.Dataset.Name)
-	assert.Equal(t, datasetID.Version, tag.Dataset.Version)
-	assert.Equal(t, datasetID.UUID, tag.Dataset.UUID)
+	assert.Equal(t, tag.GetName(), tagModel.TagName)
+	assert.Equal(t, datasetID.GetProject(), tag.GetDataset().GetProject())
+	assert.Equal(t, datasetID.GetDomain(), tag.GetDataset().GetDomain())
+	assert.Equal(t, datasetID.GetName(), tag.GetDataset().GetName())
+	assert.Equal(t, datasetID.GetVersion(), tag.GetDataset().GetVersion())
+	assert.Equal(t, datasetID.GetUUID(), tag.GetDataset().GetUUID())
 }
