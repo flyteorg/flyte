@@ -96,7 +96,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				defer wg.Done()
 				defer func() {
 					if err := recover(); err != nil {
-						logger.Errorf(ctx, "recover receives error: %s", err)
+						logger.Errorf(ctx, "recover receives error: [%s]", err)
 					}
 				}()
 
