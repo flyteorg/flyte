@@ -415,6 +415,30 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 			MatchingAttributes: testutils.ExecutionQueueAttributes,
 		},
 	}, response))
+
+	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
+		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
+		assert.Equal(t, project, ID.Project)
+		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, "", ID.Workflow)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
+		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
+		return models.Resource{
+			Project:      project,
+			Domain:       domain,
+			ResourceType: "resource",
+			Attributes:   expectedSerializedAttrs,
+		}, errors.NewFlyteAdminError(codes.NotFound, "projectDomainError")
+	}
+	_, projectDomainError := manager.GetProjectDomainAttributes(context.Background(), request)
+	assert.Error(t, projectDomainError)
+
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.NewFlyteAdminError(codes.NotFound, "validationError")
+	}
+	_, validationError := manager.GetProjectDomainAttributes(context.Background(), request)
+	assert.Error(t, validationError)
 }
 
 func TestDeleteProjectDomainAttributes(t *testing.T) {
