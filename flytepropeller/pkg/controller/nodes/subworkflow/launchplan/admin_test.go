@@ -61,7 +61,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil
+				return o.GetProject() == "p" && o.GetDomain() == "d" && o.GetName() == "n" && o.GetSpec().GetInputs() == nil
 			}),
 		).Return(nil, nil)
 
@@ -108,7 +108,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil
+				return o.GetProject() == "p" && o.GetDomain() == "d" && o.GetName() == "n" && o.GetSpec().GetInputs() == nil
 			}),
 		).Return(nil, nil)
 
@@ -170,9 +170,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
-					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW &&
-					reflect.DeepEqual(o.Spec.Labels.Values, map[string]string{"foo": "bar"}) // Ensure shard-key was removed.
+				return o.GetProject() == "p" && o.GetDomain() == "d" && o.GetName() == "n" && o.GetSpec().GetInputs() == nil &&
+					o.GetSpec().GetMetadata().GetMode() == admin.ExecutionMetadata_CHILD_WORKFLOW &&
+					reflect.DeepEqual(o.GetSpec().GetLabels().GetValues(), map[string]string{"foo": "bar"}) // Ensure shard-key was removed.
 			}),
 		).Return(nil, nil)
 		assert.NoError(t, err)
@@ -216,8 +216,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.On("RecoverExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
-				return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
-					proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
+				return o.GetId().GetProject() == "p" && o.GetId().GetDomain() == "d" && o.GetId().GetName() == "w" && o.GetName() == "n" &&
+					proto.Equal(o.GetMetadata().GetParentNodeExecution(), parentNodeExecution)
 			}),
 		).Return(nil, nil)
 		assert.NoError(t, err)
@@ -256,8 +256,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.On("RecoverExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
-				return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
-					proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
+				return o.GetId().GetProject() == "p" && o.GetId().GetDomain() == "d" && o.GetId().GetName() == "w" && o.GetName() == "n" &&
+					proto.Equal(o.GetMetadata().GetParentNodeExecution(), parentNodeExecution)
 			}),
 		).Return(nil, recoveryErr)
 
@@ -266,8 +266,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 				createCalled = true
-				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
-					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW
+				return o.GetProject() == "p" && o.GetDomain() == "d" && o.GetName() == "n" && o.GetSpec().GetInputs() == nil &&
+					o.GetSpec().GetMetadata().GetMode() == admin.ExecutionMetadata_CHILD_WORKFLOW
 			}),
 		).Return(nil, nil)
 
@@ -367,7 +367,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
-			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
+			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.GetId() == id && o.GetCause() == reason }),
 		).Return(&admin.ExecutionTerminateResponse{}, nil)
 		assert.NoError(t, err)
 		err = exec.Kill(ctx, id, reason)
@@ -380,7 +380,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
-			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
+			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.GetId() == id && o.GetCause() == reason }),
 		).Return(nil, status.Error(codes.NotFound, ""))
 		assert.NoError(t, err)
 		err = exec.Kill(ctx, id, reason)
@@ -393,7 +393,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
-			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
+			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.GetId() == id && o.GetCause() == reason }),
 		).Return(nil, status.Error(codes.Canceled, ""))
 		assert.NoError(t, err)
 		err = exec.Kill(ctx, id, reason)
@@ -426,7 +426,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		).Return(&admin.LaunchPlan{Id: id}, nil)
 		lp, err := exec.GetLaunchPlan(ctx, id)
 		assert.NoError(t, err)
-		assert.Equal(t, lp.Id, id)
+		assert.Equal(t, lp.GetId(), id)
 	})
 
 	t.Run("launch plan not found", func(t *testing.T) {

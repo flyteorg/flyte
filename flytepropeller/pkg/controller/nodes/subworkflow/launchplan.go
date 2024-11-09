@@ -28,17 +28,17 @@ type launchPlanHandler struct {
 
 func getParentNodeExecutionID(nCtx interfaces.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {
 	nodeExecID := &core.NodeExecutionIdentifier{
-		ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
+		ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId(),
 	}
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		var err error
-		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId)
+		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId())
 		if err != nil {
 			return nil, err
 		}
 		nodeExecID.NodeId = currentNodeUniqueID
 	} else {
-		nodeExecID.NodeId = nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
+		nodeExecID.NodeId = nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId()
 	}
 	return nodeExecID, nil
 }
@@ -77,11 +77,11 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 	}
 
 	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
-		fullyQualifiedNodeID := nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
+		fullyQualifiedNodeID := nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId()
 		if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 			// compute fully qualified node id (prefixed with parent id and retry attempt) to ensure uniqueness
 			var err error
-			fullyQualifiedNodeID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId)
+			fullyQualifiedNodeID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId())
 			if err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -94,11 +94,11 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 				logger.Warnf(ctx, "Failed to recover workflow node [%+v] with err [%+v]", nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
-		if recovered != nil && recovered.Closure != nil && recovered.Closure.Phase == core.NodeExecution_SUCCEEDED {
-			if recovered.Closure.GetWorkflowNodeMetadata() != nil {
-				launchCtx.RecoveryExecution = recovered.Closure.GetWorkflowNodeMetadata().ExecutionId
+		if recovered != nil && recovered.GetClosure() != nil && recovered.GetClosure().GetPhase() == core.NodeExecution_SUCCEEDED {
+			if recovered.GetClosure().GetWorkflowNodeMetadata() != nil {
+				launchCtx.RecoveryExecution = recovered.GetClosure().GetWorkflowNodeMetadata().GetExecutionId()
 			} else {
-				logger.Debugf(ctx, "Attempted to recovered workflow node execution [%+v] but was missing workflow node metadata", recovered.Id)
+				logger.Debugf(ctx, "Attempted to recovered workflow node execution [%+v] but was missing workflow node metadata", recovered.GetId())
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 		nodeInputs, nCtx.NodeExecutionMetadata().GetOwnerID().String())
 	if err != nil {
 		if launchplan.IsAlreadyExists(err) {
-			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)
+			logger.Infof(ctx, "Execution already exists [%s].", childID.GetName())
 		} else if launchplan.IsUserError(err) {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RuntimeExecutionError, err.Error(), nil)), nil
 		} else {
@@ -114,7 +114,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 		}
 	} else {
 		eCtx := nCtx.ExecutionContext()
-		logger.Infof(ctx, "Launched launchplan with ID [%s], Parallelism is now set to [%d]", childID.Name, eCtx.IncrementParallelism())
+		logger.Infof(ctx, "Launched launchplan with ID [%s], Parallelism is now set to [%d]", childID.GetName(), eCtx.IncrementParallelism())
 	}
 
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{
@@ -180,7 +180,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 	switch wfStatusClosure.GetPhase() {
 	case core.WorkflowExecution_ABORTED:
 		wErr = fmt.Errorf("launchplan execution aborted")
-		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] aborted", childID.Name)
+		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] aborted", childID.GetName())
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RemoteChildWorkflowExecutionFailed, err.Error(), &handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 		})), nil

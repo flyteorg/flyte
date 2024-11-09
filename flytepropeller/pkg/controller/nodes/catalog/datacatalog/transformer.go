@@ -26,43 +26,43 @@ var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
 var emptyVariableMap = core.VariableMap{Variables: map[string]*core.Variable{}}
 
 func getDatasetNameFromTask(taskID core.Identifier) string {
-	return fmt.Sprintf("%s-%s", taskNamespace, taskID.Name)
+	return fmt.Sprintf("%s-%s", taskNamespace, taskID.GetName())
 }
 
 // Transform the artifact Data into task execution outputs as a literal map
 func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.TypedInterface, artifact *datacatalog.Artifact) (*core.LiteralMap, error) {
 
 	// if there are no outputs in the task, return empty map
-	if taskInterface.Outputs == nil || len(taskInterface.Outputs.Variables) == 0 {
+	if taskInterface.GetOutputs() == nil || len(taskInterface.GetOutputs().GetVariables()) == 0 {
 		return &emptyLiteralMap, nil
 	}
 
-	outputVariables := taskInterface.Outputs.Variables
-	artifactDataList := artifact.Data
+	outputVariables := taskInterface.GetOutputs().GetVariables()
+	artifactDataList := artifact.GetData()
 
 	// verify the task outputs matches what is stored in ArtifactData
 	if len(outputVariables) != len(artifactDataList) {
-		return nil, fmt.Errorf("the task %s with %d outputs, should have %d artifactData for artifact %s", id.String(), len(outputVariables), len(artifactDataList), artifact.Id)
+		return nil, fmt.Errorf("the task %s with %d outputs, should have %d artifactData for artifact %s", id.String(), len(outputVariables), len(artifactDataList), artifact.GetId())
 	}
 
 	outputs := make(map[string]*core.Literal, len(artifactDataList))
 	for _, artifactData := range artifactDataList {
 		// verify that the name and type of artifactData matches what is expected from the interface
-		if _, ok := outputVariables[artifactData.Name]; !ok {
-			return nil, fmt.Errorf("unexpected artifactData with name [%v] does not match any task output variables %v", artifactData.Name, reflect.ValueOf(outputVariables).MapKeys())
+		if _, ok := outputVariables[artifactData.GetName()]; !ok {
+			return nil, fmt.Errorf("unexpected artifactData with name [%v] does not match any task output variables %v", artifactData.GetName(), reflect.ValueOf(outputVariables).MapKeys())
 		}
 
-		expectedVarType := outputVariables[artifactData.Name].GetType()
-		inputType := validators.LiteralTypeForLiteral(artifactData.Value)
+		expectedVarType := outputVariables[artifactData.GetName()].GetType()
+		inputType := validators.LiteralTypeForLiteral(artifactData.GetValue())
 		err := validators.ValidateLiteralType(inputType)
 		if err != nil {
-			return nil, fmt.Errorf("failed to validate literal type for %s with err: %s", artifactData.Name, err)
+			return nil, fmt.Errorf("failed to validate literal type for %s with err: %s", artifactData.GetName(), err)
 		}
 		if !validators.AreTypesCastable(inputType, expectedVarType) {
-			return nil, fmt.Errorf("unexpected artifactData: [%v] type: [%v] does not match any task output type: [%v]", artifactData.Name, inputType, expectedVarType)
+			return nil, fmt.Errorf("unexpected artifactData: [%v] type: [%v] does not match any task output type: [%v]", artifactData.GetName(), inputType, expectedVarType)
 		}
 
-		outputs[artifactData.Name] = artifactData.Value
+		outputs[artifactData.GetName()] = artifactData.GetValue()
 	}
 
 	return &core.LiteralMap{Literals: outputs}, nil
@@ -86,12 +86,12 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 	taskInputs := &emptyVariableMap
 	taskOutputs := &emptyVariableMap
 
-	if taskInterface.Inputs != nil && len(taskInterface.Inputs.Variables) != 0 {
-		taskInputs = taskInterface.Inputs
+	if taskInterface.GetInputs() != nil && len(taskInterface.GetInputs().GetVariables()) != 0 {
+		taskInputs = taskInterface.GetInputs()
 	}
 
-	if taskInterface.Outputs != nil && len(taskInterface.Outputs.Variables) != 0 {
-		taskOutputs = taskInterface.Outputs
+	if taskInterface.GetOutputs() != nil && len(taskInterface.GetOutputs().GetVariables()) != 0 {
+		taskOutputs = taskInterface.GetOutputs()
 	}
 
 	inputHash, err := pbhash.ComputeHash(ctx, taskInputs)
@@ -138,8 +138,8 @@ func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.
 	}
 
 	datasetID := &datacatalog.DatasetID{
-		Project: k.Identifier.Project,
-		Domain:  k.Identifier.Domain,
+		Project: k.Identifier.GetProject(),
+		Domain:  k.Identifier.GetDomain(),
 		Name:    getDatasetNameFromTask(k.Identifier),
 		Version: datasetVersion,
 	}
@@ -150,7 +150,7 @@ func DatasetIDToIdentifier(id *datacatalog.DatasetID) *core.Identifier {
 	if id == nil {
 		return nil
 	}
-	return &core.Identifier{ResourceType: core.ResourceType_DATASET, Name: id.Name, Project: id.Project, Domain: id.Domain, Version: id.Version}
+	return &core.Identifier{ResourceType: core.ResourceType_DATASET, Name: id.GetName(), Project: id.GetProject(), Domain: id.GetDomain(), Version: id.GetVersion()}
 }
 
 // With Node-Node relationship this is bound to change. So lets keep it extensible
@@ -175,7 +175,7 @@ func GetDatasetMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier) 
 	}
 	return &datacatalog.Metadata{
 		KeyMap: map[string]string{
-			taskVersionKey: taskExecutionID.TaskId.Version,
+			taskVersionKey: taskExecutionID.GetTaskId().GetVersion(),
 		},
 	}
 }
@@ -186,10 +186,10 @@ func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier)
 	}
 	return &datacatalog.Metadata{
 		KeyMap: map[string]string{
-			execProjectKey:     taskExecutionID.NodeExecutionId.GetExecutionId().GetProject(),
-			execDomainKey:      taskExecutionID.NodeExecutionId.GetExecutionId().GetDomain(),
-			execNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
-			execNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
+			execProjectKey:     taskExecutionID.GetNodeExecutionId().GetExecutionId().GetProject(),
+			execDomainKey:      taskExecutionID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+			execNameKey:        taskExecutionID.GetNodeExecutionId().GetExecutionId().GetName(),
+			execNodeIDKey:      taskExecutionID.GetNodeExecutionId().GetNodeId(),
 			execTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
 		},
 	}
@@ -207,7 +207,7 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 	}
 
 	// Jul-06-2020 DataCatalog stores only wfExecutionKey & taskVersionKey So we will default the project / domain to the current dataset's project domain
-	val := GetOrDefault(artifactMd.KeyMap, execTaskAttemptKey, "0")
+	val := GetOrDefault(artifactMd.GetKeyMap(), execTaskAttemptKey, "0")
 	attempt, err := strconv.ParseUint(val, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
@@ -215,19 +215,19 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 
 	return &core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
-			ResourceType: currentID.ResourceType,
-			Project:      currentID.Project,
-			Domain:       currentID.Domain,
-			Name:         currentID.Name,
-			Version:      GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown"),
+			ResourceType: currentID.GetResourceType(),
+			Project:      currentID.GetProject(),
+			Domain:       currentID.GetDomain(),
+			Name:         currentID.GetName(),
+			Version:      GetOrDefault(datasetMd.GetKeyMap(), taskVersionKey, "unknown"),
 		},
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
-			NodeId: GetOrDefault(artifactMd.KeyMap, execNodeIDKey, "unknown"),
+			NodeId: GetOrDefault(artifactMd.GetKeyMap(), execNodeIDKey, "unknown"),
 			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: GetOrDefault(artifactMd.KeyMap, execProjectKey, currentID.GetProject()),
-				Domain:  GetOrDefault(artifactMd.KeyMap, execDomainKey, currentID.GetDomain()),
-				Name:    GetOrDefault(artifactMd.KeyMap, execNameKey, "unknown"),
+				Project: GetOrDefault(artifactMd.GetKeyMap(), execProjectKey, currentID.GetProject()),
+				Domain:  GetOrDefault(artifactMd.GetKeyMap(), execDomainKey, currentID.GetDomain()),
+				Name:    GetOrDefault(artifactMd.GetKeyMap(), execNameKey, "unknown"),
 			},
 		},
 	}, nil
@@ -241,8 +241,8 @@ func EventCatalogMetadata(datasetID *datacatalog.DatasetID, tag *datacatalog.Tag
 
 	if tag != nil {
 		md.ArtifactTag = &core.CatalogArtifactTag{
-			ArtifactId: tag.ArtifactId,
-			Name:       tag.Name,
+			ArtifactId: tag.GetArtifactId(),
+			Name:       tag.GetName(),
 		}
 	}
 

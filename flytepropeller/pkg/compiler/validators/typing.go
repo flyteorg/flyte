@@ -136,7 +136,7 @@ func (t schemaTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	}
 
 	// Flyte Schema can only be serialized to parquet
-	if len(structuredDatasetType.Format) != 0 && !strings.EqualFold(structuredDatasetType.Format, "parquet") {
+	if len(structuredDatasetType.GetFormat()) != 0 && !strings.EqualFold(structuredDatasetType.GetFormat(), "parquet") {
 		return false
 	}
 
@@ -168,7 +168,7 @@ func (t structuredDatasetChecker) CastsFrom(upstreamType *flyte.LiteralType) boo
 	}
 	if schemaType != nil {
 		// Flyte Schema can only be serialized to parquet
-		format := t.literalType.GetStructuredDatasetType().Format
+		format := t.literalType.GetStructuredDatasetType().GetFormat()
 		if len(format) != 0 && !strings.EqualFold(format, "parquet") {
 			return false
 		}
@@ -179,22 +179,22 @@ func (t structuredDatasetChecker) CastsFrom(upstreamType *flyte.LiteralType) boo
 
 // Upstream (schema) -> downstream (schema)
 func schemaCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.SchemaType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 
 	nameToTypeMap := make(map[string]flyte.SchemaType_SchemaColumn_SchemaColumnType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.Type
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetType()
 	}
 
 	// Check that the downstream schema is a strict sub-set of the upstream schema.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if upstreamType != column.Type {
+		if upstreamType != column.GetType() {
 			return false
 		}
 	}
@@ -244,26 +244,26 @@ func (t unionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 // Upstream (structuredDatasetType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.StructuredDatasetType) bool {
 	// Skip the format check here when format is empty. https://github.com/flyteorg/flyte/issues/2864
-	if len(upstream.Format) != 0 && len(downstream.Format) != 0 && !strings.EqualFold(upstream.Format, downstream.Format) {
+	if len(upstream.GetFormat()) != 0 && len(downstream.GetFormat()) != 0 && !strings.EqualFold(upstream.GetFormat(), downstream.GetFormat()) {
 		return false
 	}
 
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 
 	nameToTypeMap := make(map[string]*flyte.LiteralType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.LiteralType
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetLiteralType()
 	}
 
 	// Check that the downstream structured dataset is a strict sub-set of the upstream structured dataset.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if !getTypeChecker(column.LiteralType).CastsFrom(upstreamType) {
+		if !getTypeChecker(column.GetLiteralType()).CastsFrom(upstreamType) {
 			return false
 		}
 	}
@@ -272,21 +272,21 @@ func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatase
 
 // Upstream (schemaType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.StructuredDatasetType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SchemaType_SchemaColumn_SchemaColumnType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.GetType()
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetType()
 	}
 
 	// Check that the downstream structuredDataset is a strict sub-set of the upstream schema.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if !schemaTypeIsMatchStructuredDatasetType(upstreamType, column.LiteralType.GetSimple()) {
+		if !schemaTypeIsMatchStructuredDatasetType(upstreamType, column.GetLiteralType().GetSimple()) {
 			return false
 		}
 	}
@@ -295,17 +295,17 @@ func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *fly
 
 // Upstream (structuredDatasetType) -> downstream (schemaType)
 func schemaCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.SchemaType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SimpleType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.LiteralType.GetSimple()
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetLiteralType().GetSimple()
 	}
 
 	// Check that the downstream schema is a strict sub-set of the upstream structuredDataset.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}

@@ -24,7 +24,7 @@ func TestExecutionErrorJSONMarshalling(t *testing.T) {
 	uErr := json.Unmarshal(data, newExecErr)
 	assert.Nil(t, uErr)
 
-	assert.Equal(t, execError.Code, newExecErr.ExecutionError.Code)
-	assert.Equal(t, execError.Message, newExecErr.ExecutionError.Message)
-	assert.Equal(t, execError.ErrorUri, newExecErr.ExecutionError.ErrorUri)
+	assert.Equal(t, execError.GetCode(), newExecErr.ExecutionError.GetCode())
+	assert.Equal(t, execError.GetMessage(), newExecErr.ExecutionError.GetMessage())
+	assert.Equal(t, execError.GetErrorUri(), newExecErr.ExecutionError.GetErrorUri())
 }
