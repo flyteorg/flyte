@@ -94,8 +94,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	cfg := GetConfig()
 
 	headNodeRayStartParams := make(map[string]string)
-	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
-		headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
+	if rayJob.GetRayCluster().GetHeadGroupSpec() != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
+		headNodeRayStartParams = rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams()
 	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
 		headNodeRayStartParams = headNode.StartParameters
 	}
@@ -144,7 +144,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
 
-	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {
 		workerPodSpec := podSpec.DeepCopy()
 		workerPodTemplate := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
@@ -155,7 +155,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
-			workerNodeRayStartParams = spec.RayStartParams
+			workerNodeRayStartParams = spec.GetRayStartParams()
 		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
 			workerNodeRayStartParams = workerNode.StartParameters
 		}
@@ -168,17 +168,17 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 			workerNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 		}
 
-		minReplicas := spec.MinReplicas
-		if minReplicas > spec.Replicas {
-			minReplicas = spec.Replicas
+		minReplicas := spec.GetMinReplicas()
+		if minReplicas > spec.GetReplicas() {
+			minReplicas = spec.GetReplicas()
 		}
-		maxReplicas := spec.MaxReplicas
-		if maxReplicas < spec.Replicas {
-			maxReplicas = spec.Replicas
+		maxReplicas := spec.GetMaxReplicas()
+		if maxReplicas < spec.GetReplicas() {
+			maxReplicas = spec.GetReplicas()
 		}
 
 		workerNodeSpec := rayv1.WorkerGroupSpec{
-			GroupName:      spec.GroupName,
+			GroupName:      spec.GetGroupName(),
 			MinReplicas:    &minReplicas,
 			MaxReplicas:    &maxReplicas,
 			Replicas:       &spec.Replicas,
@@ -201,7 +201,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 
 	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
 	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
-	if rayJob.ShutdownAfterJobFinishes {
+	if rayJob.GetShutdownAfterJobFinishes() {
 		shutdownAfterJobFinishes = true
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
@@ -211,10 +211,10 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var err error
 	var runtimeEnvYaml string
-	runtimeEnvYaml = rayJob.RuntimeEnvYaml
+	runtimeEnvYaml = rayJob.GetRuntimeEnvYaml()
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
+	if rayJob.GetRuntimeEnv() != "" && rayJob.GetRuntimeEnvYaml() == "" {
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.GetRuntimeEnv())
 		if err != nil {
 			return nil, err
 		}

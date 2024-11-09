@@ -192,7 +192,7 @@ func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
 		{Regex: LogTemplateRegexes.ParentName, Value: s.parentName},
 		{
 			Regex: LogTemplateRegexes.ExecutionIndex,
-			Value: strconv.FormatUint(uint64(s.executionIndex), 10),
+			Value: strconv.FormatUint(uint64(s.executionIndex), 10), // #nosec G115
 		},
 		{
 			Regex: LogTemplateRegexes.RetryAttempt,
@@ -212,7 +212,8 @@ func NewSubTaskExecutionID(taskExecutionID pluginsCore.TaskExecutionID, executio
 		executionIndex,
 		taskExecutionID.GetGeneratedName(),
 		retryAttempt,
-		taskExecutionID.GetID().RetryAttempt,
+		// TODO (whynopointer)
+		taskExecutionID.GetID().RetryAttempt, //nolint:protogetter
 	}
 }
 
@@ -252,8 +253,8 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 	var err error
 	secretsMap := make(map[string]string)
 	injectSecretsLabel := make(map[string]string)
-	if taskTemplate.SecurityContext != nil && len(taskTemplate.SecurityContext.Secrets) > 0 {
-		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTemplate.SecurityContext.Secrets)
+	if taskTemplate.GetSecurityContext() != nil && len(taskTemplate.GetSecurityContext().GetSecrets()) > 0 {
+		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTemplate.GetSecurityContext().GetSecrets())
 		if err != nil {
 			return SubTaskExecutionMetadata{}, err
 		}
@@ -264,6 +265,7 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 	}
 
 	subTaskExecutionID := NewSubTaskExecutionID(taskExecutionMetadata.GetTaskExecutionID(), executionIndex, retryAttempt)
+	// #nosec G115
 	interruptible := taskExecutionMetadata.IsInterruptible() && int32(systemFailures) < taskExecutionMetadata.GetInterruptibleFailureThreshold()
 	return SubTaskExecutionMetadata{
 		taskExecutionMetadata,

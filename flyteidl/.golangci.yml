@@ -1,13 +1,12 @@
 run:
   skip-dirs:
-    - pkg/client 
+    - pkg/client
     - gen
-
 linters:
   disable-all: true
   enable:
     - errcheck
-    - gas
+    - gosec
     - goconst
     - goimports
     - gosimple

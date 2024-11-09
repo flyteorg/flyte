@@ -3,12 +3,11 @@ run:
     # because we're skipping TLS verification - for now
     - cmd/entrypoints/serve.go
     - pkg/async/messages/sqs.go
-
 linters:
   disable-all: true
   enable:
     - errcheck
-    - gas
+    - gosec
     - gci
     - goconst
     - goimports
@@ -23,7 +22,6 @@ linters:
     - unparam
     - unused
     - protogetter
-
 linters-settings:
   gci:
     custom-order: true

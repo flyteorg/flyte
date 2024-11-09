@@ -96,8 +96,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 
 	// override the default token in propeller
-	if len(sparkJob.DatabricksToken) != 0 {
-		token = sparkJob.DatabricksToken
+	if len(sparkJob.GetDatabricksToken()) != 0 {
+		token = sparkJob.GetDatabricksToken()
 	}
 	modifiedArgs, err := template.Render(ctx, container.GetArgs(), template.Parameters{
 		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
@@ -110,20 +110,20 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 
 	databricksJob := make(map[string]interface{})
-	err = utils.UnmarshalStructToObj(sparkJob.DatabricksConf, &databricksJob)
+	err = utils.UnmarshalStructToObj(sparkJob.GetDatabricksConf(), &databricksJob)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to unmarshal databricksJob: %v: %v", sparkJob.DatabricksConf, err)
+		return nil, nil, fmt.Errorf("failed to unmarshal databricksJob: %v: %v", sparkJob.GetDatabricksConf(), err)
 	}
 
 	// If "existing_cluster_id" is in databricks_job, then we don't need to set "new_cluster"
 	// Refer the docs here: https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#request-structure
 	if clusterConfig, ok := databricksJob[newCluster].(map[string]interface{}); ok {
 		if dockerConfig, ok := clusterConfig[dockerImage].(map[string]interface{}); !ok || dockerConfig[url] == nil {
-			clusterConfig[dockerImage] = map[string]string{url: container.Image}
+			clusterConfig[dockerImage] = map[string]string{url: container.GetImage()}
 		}
 
-		if clusterConfig[sparkConfig] == nil && len(sparkJob.SparkConf) != 0 {
-			clusterConfig[sparkConfig] = sparkJob.SparkConf
+		if clusterConfig[sparkConfig] == nil && len(sparkJob.GetSparkConf()) != 0 {
+			clusterConfig[sparkConfig] = sparkJob.GetSparkConf()
 		}
 	}
 	databricksJob[sparkPythonTask] = map[string]interface{}{pythonFile: p.cfg.EntrypointFile, parameters: modifiedArgs}
@@ -299,7 +299,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 	if err != nil {
 		return err
 	}
-	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+	if taskTemplate.GetInterface() == nil || taskTemplate.GetInterface().GetOutputs() == nil || taskTemplate.Interface.Outputs.Variables == nil {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
 	}

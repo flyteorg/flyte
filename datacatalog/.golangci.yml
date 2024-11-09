@@ -1,11 +1,11 @@
 run:
   skip-dirs:
     - pkg/client
-
 linters:
   disable-all: true
   enable:
     - errcheck
+    - gosec
     - gci
     - goconst
     - goimports
@@ -20,7 +20,6 @@ linters:
     - unparam
     - unused
     - protogetter
-
 linters-settings:
   gci:
     custom-order: true

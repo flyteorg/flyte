@@ -39,7 +39,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 
 	// Extract the custom plugin pb
 	var arrayJob *idlPlugins.ArrayJob
-	if taskTemplate.Type == AwsBatchTaskType {
+	if taskTemplate.GetType() == AwsBatchTaskType {
 		arrayJob = &idlPlugins.ArrayJob{
 			Parallelism: 1,
 			Size:        1,
@@ -48,7 +48,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			},
 		}
 	} else {
-		arrayJob, err = arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+		arrayJob, err = arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.GetTaskTypeVersion())
 	}
 	if err != nil {
 		return state, err
@@ -58,9 +58,9 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	var inputReaders []io.InputReader
 
 	// Save this in the state
-	if taskTemplate.TaskTypeVersion == 0 {
-		state = state.SetOriginalArraySize(arrayJob.Size)
-		arrayJobSize = arrayJob.Size
+	if taskTemplate.GetTaskTypeVersion() == 0 {
+		state = state.SetOriginalArraySize(arrayJob.GetSize())
+		arrayJobSize = arrayJob.GetSize()
 		state = state.SetOriginalMinSuccesses(arrayJob.GetMinSuccesses())
 
 		// build input readers
@@ -77,15 +77,15 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		// identify and validate the size of the array job
 		size := -1
 		var literalCollection *idlCore.LiteralCollection
-		for _, literal := range inputs.Literals {
+		for _, literal := range inputs.GetLiterals() {
 			if literalCollection = literal.GetCollection(); literalCollection != nil {
 				// validate length of input list
-				if size != -1 && size != len(literalCollection.Literals) {
+				if size != -1 && size != len(literalCollection.GetLiterals()) {
 					state = state.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason("all maptask input lists must be the same length")
 					return state, nil
 				}
 
-				size = len(literalCollection.Literals)
+				size = len(literalCollection.GetLiterals())
 			}
 		}
 
@@ -106,7 +106,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		arrayJobSize = int64(size)
 
 		// build input readers
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.Literals, size)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.GetLiterals(), size)
 	}
 
 	if arrayJobSize > maxArrayJobSize {
@@ -117,10 +117,10 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// If the task is not discoverable, then skip data catalog work and move directly to launch
-	if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
+	if taskTemplate.GetMetadata() == nil || !taskTemplate.GetMetadata().GetDiscoverable() {
 		logger.Infof(ctx, "Task is not discoverable, moving to launch phase...")
 		// Set an all set indexes to cache. This task won't try to write to catalog anyway.
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize))) // #nosec G115
 		state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason("Task is not discoverable.")
 
 		state.SetExecutionArraySize(int(arrayJobSize))
@@ -165,7 +165,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			// TODO: maybe add a config option to decide the behavior on catalog failure.
 			logger.Warnf(ctx, "Failing to lookup catalog. Will move on to launching the task. Error: %v", err)
 
-			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
+			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize))) // #nosec G115
 			state = state.SetExecutionArraySize(int(arrayJobSize))
 			state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason(fmt.Sprintf("Skipping cache check due to err [%v]", err))
 			return state, nil
@@ -178,7 +178,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		}
 
 		cachedResults := resp.GetCachedResults()
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJobSize)))
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJobSize))) // #nosec G115
 		state = state.SetExecutionArraySize(int(arrayJobSize) - resp.GetCachedCount())
 
 		// If all the sub-tasks are actually done, then we can just move on.
@@ -223,14 +223,14 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		return state, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
-	if tMeta := taskTemplate.Metadata; tMeta == nil || !tMeta.Discoverable {
+	if tMeta := taskTemplate.GetMetadata(); tMeta == nil || !tMeta.GetDiscoverable() {
 		logger.Debugf(ctx, "Task is not marked as discoverable. Moving to [%v] phase.", phaseOnSuccess)
 		return state.SetPhase(phaseOnSuccess, versionOnSuccess).SetReason("Task is not discoverable."), externalResources, nil
 	}
 
 	var inputReaders []io.InputReader
 	arrayJobSize := int(state.GetOriginalArraySize())
-	if taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 {
 		// input readers
 		inputReaders, err = ConstructRemoteFileInputReaders(ctx, tCtx.DataStore(), tCtx.InputReader().GetInputPrefixPath(), arrayJobSize)
 		if err != nil {
@@ -242,7 +242,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 			return state, externalResources, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
 		}
 
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.Literals, arrayJobSize)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.GetLiterals(), arrayJobSize)
 	}
 
 	// output reader
@@ -251,8 +251,8 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		return nil, externalResources, err
 	}
 
-	iface := *taskTemplate.Interface
-	iface.Outputs = makeSingularTaskInterface(iface.Outputs)
+	iface := taskTemplate.GetInterface()
+	iface.Outputs = makeSingularTaskInterface(iface.GetOutputs())
 
 	// Do not cache failed tasks. Retrieve the final phase from array status and unset the non-successful ones.
 
@@ -262,14 +262,15 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		if !phase.IsSuccess() {
 			// tasksToCache is built on the originalArraySize and ArrayStatus.Detailed is the executionArraySize
 			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
-			tasksToCache.Clear(uint(originalIdx))
+			tasksToCache.Clear(uint(originalIdx)) // #nosec G115
 		}
 	}
 
 	// Create catalog put items, but only put the ones that were not originally cached (as read from the catalog results bitset)
-	catalogWriterItems, err := ConstructCatalogUploadRequests(*tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId,
-		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), taskTemplate.Metadata.DiscoveryVersion,
-		taskTemplate.Metadata.CacheIgnoreInputVars, iface, &tasksToCache, inputReaders, outputReaders)
+	//nolint:protogetter
+	catalogWriterItems, err := ConstructCatalogUploadRequests(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId,
+		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), taskTemplate.GetMetadata().GetDiscoveryVersion(),
+		taskTemplate.GetMetadata().GetCacheIgnoreInputVars(), iface, &tasksToCache, inputReaders, outputReaders)
 
 	if err != nil {
 		return nil, externalResources, err
@@ -292,6 +293,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		externalResources = make([]*core.ExternalResource, 0)
 		for idx, phaseIdx := range state.ArrayStatus.Detailed.GetItems() {
 			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
+			// #nosec G115
 			if !tasksToCache.IsSet(uint(originalIdx)) {
 				continue
 			}
@@ -299,8 +301,8 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 			externalResources = append(externalResources,
 				&core.ExternalResource{
 					CacheStatus:  idlCore.CatalogCacheStatus_CACHE_POPULATED,
-					Index:        uint32(originalIdx),
-					RetryAttempt: uint32(state.RetryAttempts.GetItem(idx)),
+					Index:        uint32(originalIdx),                      // #nosec G115
+					RetryAttempt: uint32(state.RetryAttempts.GetItem(idx)), // #nosec G115
 					Phase:        core.Phases[phaseIdx],
 				},
 			)
@@ -337,8 +339,8 @@ func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogCl
 	return false, nil
 }
 
-func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
-	cacheVersion string, cacheIgnoreInputVars []string, taskInterface idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
+func ConstructCatalogUploadRequests(keyID *idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
+	cacheVersion string, cacheIgnoreInputVars []string, taskInterface *idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
 	inputReaders []io.InputReader, outputReaders []io.OutputReader) ([]catalog.UploadRequest, error) {
 
 	writerWorkItems := make([]catalog.UploadRequest, 0, len(inputReaders))
@@ -349,17 +351,18 @@ func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore
 	}
 
 	for idx, input := range inputReaders {
+		// #nosec G115
 		if !whichTasksToCache.IsSet(uint(idx)) {
 			continue
 		}
 
 		wi := catalog.UploadRequest{
 			Key: catalog.Key{
-				Identifier:           keyID,
+				Identifier:           *keyID,
 				InputReader:          input,
 				CacheVersion:         cacheVersion,
 				CacheIgnoreInputVars: cacheIgnoreInputVars,
-				TypedInterface:       taskInterface,
+				TypedInterface:       *taskInterface,
 			},
 			ArtifactData: outputReaders[idx],
 			ArtifactMetadata: catalog.Metadata{
@@ -400,6 +403,7 @@ func NewLiteralScalarOfInteger(number int64) *idlCore.Literal {
 func CatalogBitsetToLiteralCollection(catalogResults *bitarray.BitSet, size int) *idlCore.LiteralCollection {
 	literals := make([]*idlCore.Literal, 0, size)
 	for i := 0; i < size; i++ {
+		// #nosec G115
 		if !catalogResults.IsSet(uint(i)) {
 			literals = append(literals, NewLiteralScalarOfInteger(int64(i)))
 		}
@@ -410,15 +414,15 @@ func CatalogBitsetToLiteralCollection(catalogResults *bitarray.BitSet, size int)
 }
 
 func makeSingularTaskInterface(varMap *idlCore.VariableMap) *idlCore.VariableMap {
-	if varMap == nil || len(varMap.Variables) == 0 {
+	if varMap == nil || len(varMap.GetVariables()) == 0 {
 		return varMap
 	}
 
 	res := &idlCore.VariableMap{
-		Variables: make(map[string]*idlCore.Variable, len(varMap.Variables)),
+		Variables: make(map[string]*idlCore.Variable, len(varMap.GetVariables())),
 	}
 
-	for key, val := range varMap.Variables {
+	for key, val := range varMap.GetVariables() {
 		if val.GetType().GetCollectionType() != nil {
 			res.Variables[key] = &idlCore.Variable{Type: val.GetType().GetCollectionType()}
 		} else {
@@ -440,17 +444,18 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 
 	workItems := make([]catalog.DownloadRequest, 0, len(inputs))
 
-	iface := *t.Interface
-	iface.Outputs = makeSingularTaskInterface(iface.Outputs)
+	iface := t.GetInterface()
+	iface.Outputs = makeSingularTaskInterface(iface.GetOutputs())
 
 	for idx, inputReader := range inputs {
 		// TODO: Check if Identifier or Interface are empty and return err
 		item := catalog.DownloadRequest{
 			Key: catalog.Key{
-				Identifier:     *t.Id,
-				CacheVersion:   t.GetMetadata().DiscoveryVersion,
+				// TODO (whynopointer)
+				Identifier:     *t.Id, //nolint:protogetter
+				CacheVersion:   t.GetMetadata().GetDiscoveryVersion(),
 				InputReader:    inputReader,
-				TypedInterface: iface,
+				TypedInterface: *iface,
 			},
 			Target: outputs[idx],
 		}
@@ -471,7 +476,7 @@ func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputLiterals map
 		for inputName, inputLiteral := range inputLiterals {
 			if literalCollection = inputLiteral.GetCollection(); literalCollection != nil {
 				// if literal is a collection then we need to retrieve the specific literal for this subtask index
-				literals[inputName] = literalCollection.Literals[i]
+				literals[inputName] = literalCollection.GetLiterals()[i]
 			} else {
 				literals[inputName] = inputLiteral
 			}

@@ -102,19 +102,19 @@ var (
 
 func TestNewLiteralScalarOfInteger(t *testing.T) {
 	l := NewLiteralScalarOfInteger(int64(65))
-	assert.Equal(t, int64(65), l.Value.(*core.Literal_Scalar).Scalar.Value.(*core.Scalar_Primitive).
-		Primitive.Value.(*core.Primitive_Integer).Integer)
+	assert.Equal(t, int64(65), l.GetValue().(*core.Literal_Scalar).Scalar.GetValue().(*core.Scalar_Primitive).
+		Primitive.GetValue().(*core.Primitive_Integer).Integer)
 }
 
 func TestCatalogBitsetToLiteralCollection(t *testing.T) {
 	ba := bitarray.NewBitSet(3)
 	ba.Set(1)
 	lc := CatalogBitsetToLiteralCollection(ba, 3)
-	assert.Equal(t, 2, len(lc.Literals))
-	assert.Equal(t, int64(0), lc.Literals[0].Value.(*core.Literal_Scalar).Scalar.Value.(*core.Scalar_Primitive).
-		Primitive.Value.(*core.Primitive_Integer).Integer)
-	assert.Equal(t, int64(2), lc.Literals[1].Value.(*core.Literal_Scalar).Scalar.Value.(*core.Scalar_Primitive).
-		Primitive.Value.(*core.Primitive_Integer).Integer)
+	assert.Equal(t, 2, len(lc.GetLiterals()))
+	assert.Equal(t, int64(0), lc.GetLiterals()[0].GetValue().(*core.Literal_Scalar).Scalar.GetValue().(*core.Scalar_Primitive).
+		Primitive.GetValue().(*core.Primitive_Integer).Integer)
+	assert.Equal(t, int64(2), lc.GetLiterals()[1].GetValue().(*core.Literal_Scalar).Scalar.GetValue().(*core.Scalar_Primitive).
+		Primitive.GetValue().(*core.Primitive_Integer).Integer)
 }
 
 func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTemplate, future catalog.DownloadFuture,

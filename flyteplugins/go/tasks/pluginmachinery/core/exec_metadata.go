@@ -26,6 +26,7 @@ type TaskExecutionID interface {
 	// it'll get right-padded with character '0'. If the name is bigger than maxLength, it'll get hashed to fit within.
 	GetGeneratedNameWith(minLength, maxLength int) (string, error)
 
+	// TODO (whynopointer)
 	// GetID returns the underlying idl task identifier.
 	GetID() core.TaskExecutionIdentifier
 
@@ -48,7 +49,7 @@ type TaskExecutionMetadata interface {
 	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
-	GetSecurityContext() core.SecurityContext
+	GetSecurityContext() core.SecurityContext // TODO (whynopointer)
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32

@@ -59,7 +59,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	}
 	primaryContainerName := ""
 
-	if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 0 {
 		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
 		sidecarJob := sidecarJob{}
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
@@ -79,7 +79,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		// update annotations and labels
 		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, sidecarJob.Annotations)
 		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
-	} else if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 1 {
 		// handles pod tasks that marshal the pod spec to the task custom.
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
 		if err != nil {
@@ -100,9 +100,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().Metadata != nil {
-			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().Metadata.Annotations)
-			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().Metadata.Labels)
+		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().GetMetadata() != nil {
+			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().GetMetadata().GetAnnotations())
+			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().GetMetadata().GetLabels())
 		}
 	} else {
 		// handles both container / pod tasks that use the TaskTemplate Container and K8sPod fields
@@ -122,7 +122,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.Type == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.GetType() == SidecarTaskType || len(podSpec.Containers) == 1 {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 

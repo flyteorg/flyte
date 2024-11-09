@@ -91,7 +91,7 @@ func TestReadOrigin(t *testing.T) {
 			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
-			casted.Error = errorDoc.Error
+			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
 		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
@@ -129,7 +129,7 @@ func TestReadOrigin(t *testing.T) {
 			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
-			casted.Error = errorDoc.Error
+			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
 		maxPayloadSize := int64(0)
@@ -168,7 +168,7 @@ func TestReadOrigin(t *testing.T) {
 			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
-			casted.Error = errorDoc.Error
+			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
@@ -227,7 +227,7 @@ func TestReadOrigin(t *testing.T) {
 			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
-			casted.Error = errorDoc.Error
+			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(

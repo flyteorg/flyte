@@ -287,15 +287,15 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
-		if target.K8SPod.PodSpec == nil {
+		if target.K8SPod.GetPodSpec() == nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.GetPodSpec(), &podSpec)
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
+				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.GetPodSpec(), err.Error())
 		}
 
 		// get primary container name
@@ -306,9 +306,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod().Metadata != nil {
-			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
-			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
+		if taskTemplate.GetK8SPod().GetMetadata() != nil {
+			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
@@ -393,7 +393,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+			primaryContainer, taskTemplate.GetInterface(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
@@ -483,11 +483,11 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	}
 
 	var podTemplate *v1.PodTemplate
-	if taskTemplate.Metadata != nil && len(taskTemplate.Metadata.PodTemplateName) > 0 {
+	if taskTemplate.GetMetadata() != nil && len(taskTemplate.GetMetadata().GetPodTemplateName()) > 0 {
 		// retrieve PodTemplate by name from PodTemplateStore
-		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.Metadata.PodTemplateName)
+		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.GetMetadata().GetPodTemplateName())
 		if podTemplate == nil {
-			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.Metadata.PodTemplateName)
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.GetMetadata().GetPodTemplateName())
 		}
 	} else {
 		// check for default PodTemplate
