@@ -445,7 +445,8 @@ const (
 )
 
 func (l locationID) String() string {
-	return strconv.Itoa(int(l))
+	return strconv.Itoa(int(l)) // #nosec G115
+
 }
 
 func (s *StowStore) getLocation(id locationID) stow.Location {
