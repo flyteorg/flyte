@@ -212,7 +212,6 @@ func NewSubTaskExecutionID(taskExecutionID pluginsCore.TaskExecutionID, executio
 		executionIndex,
 		taskExecutionID.GetGeneratedName(),
 		retryAttempt,
-		// TODO (whynopointer)
 		taskExecutionID.GetID().RetryAttempt, //nolint:protogetter
 	}
 }

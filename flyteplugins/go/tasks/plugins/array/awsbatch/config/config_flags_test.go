@@ -120,7 +120,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("jobStoreConfig.parallelizm", testValue)
 			if vInt, err := cmdFlags.GetInt("jobStoreConfig.parallelizm"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.JobStoreConfig.Parallelizm)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.JobStoreConfig.Parallelism)
 
 			} else {
 				assert.FailNow(t, err.Error())

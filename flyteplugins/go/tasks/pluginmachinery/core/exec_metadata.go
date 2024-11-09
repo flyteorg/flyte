@@ -26,9 +26,8 @@ type TaskExecutionID interface {
 	// it'll get right-padded with character '0'. If the name is bigger than maxLength, it'll get hashed to fit within.
 	GetGeneratedNameWith(minLength, maxLength int) (string, error)
 
-	// TODO (whynopointer)
 	// GetID returns the underlying idl task identifier.
-	GetID() core.TaskExecutionIdentifier
+	GetID() core.TaskExecutionIdentifier // TODO (whynopointer)
 
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.

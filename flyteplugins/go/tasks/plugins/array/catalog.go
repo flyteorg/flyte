@@ -451,7 +451,6 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 		// TODO: Check if Identifier or Interface are empty and return err
 		item := catalog.DownloadRequest{
 			Key: catalog.Key{
-				// TODO (whynopointer)
 				Identifier:     *t.Id, //nolint:protogetter
 				CacheVersion:   t.GetMetadata().GetDiscoveryVersion(),
 				InputReader:    inputReader,
