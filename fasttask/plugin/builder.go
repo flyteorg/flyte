@@ -286,9 +286,13 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	if objectMeta.Labels == nil {
 		objectMeta.Labels = make(map[string]string, 0)
 	}
+	// we must include labels used to generate executionEnvId in parseExectionEnvID
 	objectMeta.Labels[EXECUTION_ENV_TYPE] = fastTaskType
 	objectMeta.Labels[EXECUTION_ENV_NAME] = executionEnvID.Name
 	objectMeta.Labels[EXECUTION_ENV_VERSION] = executionEnvID.Version
+	objectMeta.Labels[PROJECT_LABEL] = executionEnvID.Project
+	objectMeta.Labels[DOMAIN_LABEL] = executionEnvID.Domain
+	objectMeta.Labels[ORGANIZATION_LABEL] = executionEnvID.Org
 	if objectMeta.Annotations == nil {
 		objectMeta.Annotations = make(map[string]string, 0)
 	}
