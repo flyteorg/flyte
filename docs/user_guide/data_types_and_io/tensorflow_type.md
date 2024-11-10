@@ -11,7 +11,7 @@ This document outlines the TensorFlow types available in Flyte, which facilitate
 ### Import necessary libraries and modules
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 2-14
+:lines: 3-12
 ```
 
 ## Tensorflow model
@@ -32,7 +32,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 ```
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 16-33
+:lines: 16-34
 ```
 
 ## TFRecord files
@@ -49,7 +49,7 @@ The `TensorFlowRecordFileTransformer` enables you to work with single TFRecord f
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 35-45
+:lines: 38-48
 ```
 
 ## TFRecord directories
@@ -68,7 +68,7 @@ The `TensorFlowRecordsDirTransformer` allows you to work with directories of TFR
 #### Example
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 47-56
+:lines: 52-62
 ```
 
 ## Configuration class: `TFRecordDatasetConfig`
