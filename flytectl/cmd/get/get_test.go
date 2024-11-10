@@ -5,7 +5,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,8 +17,6 @@ const launchPlanVersionValue = "lp_version"
 const workflowNameValue = "wf_name"
 const workflowVersionValue = "wf_version"
 const testDataFolder = "../testdata/"
-
-var setup = testutils.Setup
 
 const (
 	testDataTempFile            = "temp-output-file"

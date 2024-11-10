@@ -107,6 +107,7 @@ func TestGetGormJoinTableQueryExpr(t *testing.T) {
 
 var expectedArgsForFilters = map[FilterExpression]string{
 	Contains:           "%value%",
+	NotLike:            "value",
 	GreaterThan:        "value",
 	GreaterThanOrEqual: "value",
 	LessThan:           "value",
@@ -168,4 +169,19 @@ func TestWithDefaultValueFilter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "COALESCE(named_entity_metadata.state, 0) = ?", queryExpression.Query)
 	assert.Equal(t, 1, queryExpression.Args)
+}
+
+func TestNotLikeFilter(t *testing.T) {
+	filter, err := NewSingleValueFilter(NamedEntityMetadata, NotLike, "name", ".flytegen%")
+	assert.NoError(t, err)
+
+	queryExpression, err := filter.GetGormQueryExpr()
+	assert.NoError(t, err)
+	assert.Equal(t, "name NOT LIKE ?", queryExpression.Query)
+	assert.Equal(t, ".flytegen%", queryExpression.Args)
+
+	queryExpression, err = filter.GetGormJoinTableQueryExpr("named_entity_metadata")
+	assert.NoError(t, err)
+	assert.Equal(t, "named_entity_metadata.name NOT LIKE ?", queryExpression.Query)
+	assert.Equal(t, ".flytegen%", queryExpression.Args)
 }

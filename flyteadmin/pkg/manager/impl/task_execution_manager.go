@@ -247,7 +247,7 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}
 	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, request.NodeExecutionId)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, request.NodeExecutionId, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}
@@ -267,12 +267,17 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListTaskExecutions", request.Token)
 	}
+	joinTableEntities := make(map[common.Entity]bool)
+	for _, filter := range filters {
+		joinTableEntities[filter.GetEntity()] = true
+	}
 
 	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
+		InlineFilters:     filters,
+		Offset:            offset,
+		Limit:             int(request.Limit),
+		SortParameter:     sortParameter,
+		JoinTableEntities: joinTableEntities,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",

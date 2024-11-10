@@ -353,6 +353,7 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		ow := &mocks2.OutputWriter{}
 		ow.OnGetOutputPrefixPath().Return("/prefix/")
 		ow.OnGetOutputPath().Return("/prefix/outputs.pb")
+		ow.OnGetErrorPath().Return("/prefix/error.pb")
 		ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, or io.OutputReader) error {
 			m, ee, err := or.Read(ctx)
 			assert.NoError(t, err)

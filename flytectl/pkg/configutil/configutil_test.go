@@ -1,6 +1,7 @@
 package configutil
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -20,7 +21,7 @@ func TestSetupConfig(t *testing.T) {
 	}
 	err = SetupConfig(file.Name(), AdminConfigTemplate, templateValue)
 	assert.NoError(t, err)
-	configBytes, err := ioutil.ReadAll(file)
+	configBytes, err := io.ReadAll(file)
 	assert.NoError(t, err)
 	expected := `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
@@ -62,21 +63,12 @@ console:
 	}
 	err = SetupConfig(file.Name(), AdminConfigTemplate, templateValue)
 	assert.NoError(t, err)
-	configBytes, err = ioutil.ReadAll(file)
+	configBytes, err = io.ReadAll(file)
 	assert.NoError(t, err)
 	expected = `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: dns:///admin.example.com
   insecure: true
-# This is not a needed configuration, only useful if you want to explore the data in sandbox. For non sandbox, please
-# do not use this configuration, instead prefer to use aws, gcs, azure sessions. Flytekit, should use fsspec to
-# auto select the right backend to pull data as long as the sessions are configured. For Sandbox, this is special, as
-# minio is s3 compatible and we ship with minio in sandbox.
-storage:
-  connection:
-    endpoint: http://localhost:9000
-    access-key: my-access-key
-    secret-key: my-secret-key
 `
 	assert.Equal(t, expected, string(configBytes))
 
@@ -91,8 +83,8 @@ func TestConfigCleanup(t *testing.T) {
 	if os.IsNotExist(err) {
 		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
 	}
-	_ = ioutil.WriteFile(FlytectlConfig, []byte("string"), 0600)
-	_ = ioutil.WriteFile(Kubeconfig, []byte("string"), 0600)
+	_ = os.WriteFile(FlytectlConfig, []byte("string"), 0600)
+	_ = os.WriteFile(Kubeconfig, []byte("string"), 0600)
 
 	err = ConfigCleanup()
 	assert.Nil(t, err)

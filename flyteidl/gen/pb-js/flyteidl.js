@@ -13823,6 +13823,8 @@
                  * @property {string|null} [message] ExecutionError message
                  * @property {string|null} [errorUri] ExecutionError errorUri
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ExecutionError timestamp
+                 * @property {string|null} [worker] ExecutionError worker
                  */
     
                 /**
@@ -13873,6 +13875,22 @@
                 ExecutionError.prototype.kind = 0;
     
                 /**
+                 * ExecutionError timestamp.
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.timestamp = null;
+    
+                /**
+                 * ExecutionError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.worker = "";
+    
+                /**
                  * Creates a new ExecutionError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ExecutionError
@@ -13904,6 +13922,10 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.errorUri);
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -13936,6 +13958,12 @@
                             break;
                         case 4:
                             message.kind = reader.int32();
+                            break;
+                        case 5:
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13974,6 +14002,14 @@
                         case 2:
                             break;
                         }
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
@@ -18268,6 +18304,8 @@
                  * @property {string|null} [message] ContainerError message
                  * @property {flyteidl.core.ContainerError.Kind|null} [kind] ContainerError kind
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ContainerError origin
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ContainerError timestamp
+                 * @property {string|null} [worker] ContainerError worker
                  */
     
                 /**
@@ -18318,6 +18356,22 @@
                 ContainerError.prototype.origin = 0;
     
                 /**
+                 * ContainerError timestamp.
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.timestamp = null;
+    
+                /**
+                 * ContainerError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.worker = "";
+    
+                /**
                  * Creates a new ContainerError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ContainerError
@@ -18349,6 +18403,10 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
                     if (message.origin != null && message.hasOwnProperty("origin"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -18381,6 +18439,12 @@
                             break;
                         case 4:
                             message.origin = reader.int32();
+                            break;
+                        case 5:
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18424,6 +18488,14 @@
                         case 2:
                             break;
                         }
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
