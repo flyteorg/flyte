@@ -132,11 +132,6 @@ func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 }
 ```
 
-When batchscheduler in flyte is yunikorn, some examples are like following.
-For example, this appoarch submits a Ray job owned by user1 in organization1 to "root.organization1.ray".
-A spark application in ns1 submitted by user4 in organization1 is in "root.organization1.ns1".
-In the other hand, results of these examples are "organization1-ray" and "organization1-ns1" when adopting Kueue.
-
 ## 4 Metrics & Dashboards
 
 1. The Yunikorn scheduler add applications to a specific queue based on their user info, queue name for any application type.
