@@ -31,10 +31,11 @@ queueconfig:
     - type: "spark"
       gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
       allow-preemption: true
+    - type: ".*"
 ```
 
 `root.organization1.ray` is the queue of the ray job submitted by user1 belonging organization1. 
-Other CRDs are not on the list will be submitted to `root.<organization>.default`.
+`.*` means that other jobs excluding ray and spark will be submitted to `root.<organization>.default`.
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
@@ -105,10 +106,11 @@ func (k *KueueScheduablePlugin) PatchGroupLabels(ctx context.Context, object cli
 }
 ```
 
-Creat a scheduler plugin according to the queueconfig.scheduler.
-Its basic responsibility validate whether submitted application is accepted.
-When a Yunikorn scheduler plugin created, it will create applicationID and queue name.
-in the other hand, a Kueue scheduler plugin constructs labels including localQueueName, preemption.
+When a job comes, following things happens.
+1. `SetSchedulerName` sets the `schedulerName` with the specific scheduler name
+2. `CreateLabels` new basic labels based on the scheduler.
+3. `CreateGroupLabels` creates `kueue.x-k8s.io/pod-group-name` or `yunikorn.apache.org/task-groups` according to the calculatied results from CRD.
+4. Merging labels and annotations from `CreateLabels` and `CreateGroupLabels` to the CRD.
 
 ```go
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
