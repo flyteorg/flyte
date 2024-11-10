@@ -10,12 +10,12 @@ Providing kubernetes (k8s) resource management, gang scheduling and preemption f
 
 ## 2 Motivation
 
-Flyte support multi-tenancy and various k8s plugins.
-
-Kueue and Yunikorn support gang scheduling and preemption.
-Gang scheduling guarantees the availability of certain K8s crd services, such as Spark, Ray, with sufficient resource and preemption make sure high priority task execute immediately.
-
-Flyte doesn't provide resource management for multi-tenancy, which hierarchical resource queues of Yunikorn can solve.
+Flyte supports multi-tenancy and various Kubernetes plugins.
+Some Kubernetes plugins may encounter into resource wastage when jobs partially start without performing any meaningful work. 
+A solution to this issue is gang scheduling, which guarantees that all worker pods derived from a CRD are scheduled simultaneously.
+Kueue or Apache Yunikorn support this mechanism. 
+Additionally, Yunikorn can map tenants and organizations to hierarchical queues to define resource quotas.
+Based on this setting, access control lists can be configured to grant access to users and groups.
 
 ## 3 Proposed Implementation
 
@@ -33,9 +33,8 @@ queueconfig:
       allow-preemption: true
 ```
 
-Mentioned configuration indicates what queues exist for an organization.
-Hierarchical queues will be structured as follows.
-root.organization1.ray、root.organization1.spark and root.organization1.default".
+`root.organization1.ray` is the queue of the ray job submitted by user1 belonging organization1. 
+Other CRDs are not on the list will be submitted to `root.<organization>.default`.
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
@@ -44,14 +43,17 @@ Thus, a clusterQueue including multiple resources represents the total acessaibl
 | <organization name> | ray、spark、default |
 A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable.
 
-It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
+A scheduling plugin implements functions `SetSchedulerName`, `PatchLabels` and `PatchGroupLabels` to update labels and `schedulerName`.
+`PatchLabels` patches necassary labels, such as `queuename`, `user-info` and `applcationID`, to jobs.
+`PatchGroupLabels` supports creating `group-pod` and `task-group` labels based on incoming CRD if need. 
+`SetSchedulerName` set `schedulerName` field in `podTemplate`.
 
 ```go
 type SchedulePlugin interface {
-  CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
-  CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
+  PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
+  PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
   GetGroupLabels() (labels, annotations map[string]string)
-  SetSchedulerName(object client.Objec)
+  SetSchedulerName(object client.Object)
 }
 
 type YunikornScheduablePlugin struct {
@@ -64,7 +66,7 @@ func (yk *YunikornSchedulPlugin) GetGroupLabels() (labels, annotations map[strin
   return yk.Labels, yk.Annotations
 }
 
-func (yk *YunikornSchedulePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+func (yk *YunikornSchedulePlugin) PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
   // Set queue name based on the job type and flyteidl.Identifier fields including "ResourceType", "Org" and "Name".
   // 1.Clean yk.Labels and yk.Annotations
   // 2.Add yunikorn.apache.org/user.info = <organization>.<Name>
@@ -72,7 +74,7 @@ func (yk *YunikornSchedulePlugin) CreateLabels(taskCtx pluginsCore.TaskExecution
   // 4.Add yunikorn.apache.org/queue = <organization>.<jobType>
 }
 
-func (yk *YunikornSchedulePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+func (yk *YunikornSchedulePlugin) PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
   // 1.Add yunikorn.apache.org/task-group-name = yk.CreateTaskgroupName(ResourceType)
   // 2.Add yunikorn.apache.org/task-groups = yk.CreateTaskgroup(object)
   // 3.Add yunikorn.apache.org/schedulingPolicyParameters = yk.jobs[ResourceType]
@@ -89,14 +91,14 @@ func (k *KueueScheduablePlugin) GetGroupLabels() (labels, annotations map[string
   return k.Labels, k.Annotations
 }
 
-func (k *KueueScheduablePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+func (k *KueueScheduablePlugin) PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
   // Set queue name based on the job type and flyteidl.Identifier field "Org".
   // Clean k.Labels and k.Annotations
   // 1.Add kueue.x-k8s.io/queue-name = <organization>.<jobtype>
   // Update k.Labels and k.Annotations
 }
 
-func (k *KueueScheduablePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+func (k *KueueScheduablePlugin) PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
   // Add Label "kueue.x-k8s.io/pod-group-name" and "kueue.x-k8s.io/pod-group-total-count" for spark、dask.
   // If object type is ray CRD and kubeflow CRD which are supported by Kueue then skips.
   // Update k.Labels and k.Annotations
