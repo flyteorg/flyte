@@ -26,7 +26,7 @@ var (
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
-					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/deusage-stats.html
+					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/usage-stats.html
 					DisableUsageStatsStartParameter: "true",
 				},
 				IPAddress: "$MY_POD_IP",
