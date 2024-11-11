@@ -19,6 +19,8 @@ type trivialChecker struct {
 }
 
 func removeTitleFieldFromProperties(schema map[string]*structpb.Value) {
+	// TODO: Explain why we need this
+	// TODO: givse me example about dataclass vs. Pydantic BaseModel
 	properties, ok := schema["properties"]
 	if !ok {
 		return
