@@ -44,15 +44,15 @@ Thus, a clusterQueue including multiple resources represents the total acessaibl
 | <organization name> | ray、spark、default |
 A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable.
 
-A scheduling plugin implements functions `SetSchedulerName`, `PatchLabels` and `PatchGroupLabels` to update labels and `schedulerName`.
-`PatchLabels` patches necassary labels, such as `queuename`, `user-info` and `applcationID`, to jobs.
-`PatchGroupLabels` supports creating `group-pod` and `task-group` labels based on incoming CRD if need. 
+A scheduling plugin implements functions `SetSchedulerName`, `CreateLabels` and `CreateGroupLabels` to create labels and `schedulerName`.
+`CreateLabels` patches necassary labels, such as `queuename`, `user-info` and `applcationID`, to jobs.
+`CreateGroupLabels` supports creating `group-pod` and `task-group` labels based on incoming CRD if need. 
 `SetSchedulerName` set `schedulerName` field in `podTemplate`.
 
 ```go
 type SchedulePlugin interface {
-  PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
-  PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
+  CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig)
+  CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate)
   GetGroupLabels() (labels, annotations map[string]string)
   SetSchedulerName(object client.Object)
 }
@@ -67,7 +67,7 @@ func (yk *YunikornSchedulPlugin) GetGroupLabels() (labels, annotations map[strin
   return yk.Labels, yk.Annotations
 }
 
-func (yk *YunikornSchedulePlugin) PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+func (yk *YunikornSchedulePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
   // Set queue name based on the job type and flyteidl.Identifier fields including "ResourceType", "Org" and "Name".
   // 1.Clean yk.Labels and yk.Annotations
   // 2.Add yunikorn.apache.org/user.info = <organization>.<Name>
@@ -75,7 +75,7 @@ func (yk *YunikornSchedulePlugin) PatchLabels(taskCtx pluginsCore.TaskExecutionM
   // 4.Add yunikorn.apache.org/queue = <organization>.<jobType>
 }
 
-func (yk *YunikornSchedulePlugin) PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+func (yk *YunikornSchedulePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
   // 1.Add yunikorn.apache.org/task-group-name = yk.CreateTaskgroupName(ResourceType)
   // 2.Add yunikorn.apache.org/task-groups = yk.CreateTaskgroup(object)
   // 3.Add yunikorn.apache.org/schedulingPolicyParameters = yk.jobs[ResourceType]
@@ -92,14 +92,14 @@ func (k *KueueScheduablePlugin) GetGroupLabels() (labels, annotations map[string
   return k.Labels, k.Annotations
 }
 
-func (k *KueueScheduablePlugin) PatchLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
+func (k *KueueScheduablePlugin) CreateLabels(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) (labels, annotations map[string]string) {
   // Set queue name based on the job type and flyteidl.Identifier field "Org".
   // Clean k.Labels and k.Annotations
   // 1.Add kueue.x-k8s.io/queue-name = <organization>.<jobtype>
   // Update k.Labels and k.Annotations
 }
 
-func (k *KueueScheduablePlugin) PatchGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
+func (k *KueueScheduablePlugin) CreateGroupLabels(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) {
   // Add Label "kueue.x-k8s.io/pod-group-name" and "kueue.x-k8s.io/pod-group-total-count" for spark、dask.
   // If object type is ray CRD and kubeflow CRD which are supported by Kueue then skips.
   // Update k.Labels and k.Annotations
