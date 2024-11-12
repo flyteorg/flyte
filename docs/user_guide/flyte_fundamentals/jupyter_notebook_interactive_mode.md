@@ -12,3 +12,8 @@
 :caption: basics/basic_interactive_mode.ipynb
 :cell: 6
 ```
+
+```{rli} https://raw.githubusercontent.com/Mecoli1219/flytesnacks/85966d139a9a3ccdf3323124563960fdd5f5844a/examples/basics/basics/basic_interactive_mode.ipynb
+:caption: basics/basic_interactive_mode.ipynb
+:lines: 1-4
+```

@@ -3,15 +3,15 @@ import requests
 from docutils import nodes
 from docutils.parsers.rst import directives
 from six import text_type
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
+from sphinx.application import Sphinx
+from sphinx.config import Config
+from sphinx.directives.code import container_wrapper, logger
 from sphinx.locale import __
 from sphinx.util import parselinenos
 from sphinx.util.docutils import SphinxDirective
-from sphinx.config import Config
 from sphinx.util.nodes import set_source_info
-from sphinx.directives.code import logger
-from sphinx.directives.code import container_wrapper
 
 
 class NotebookRemoteLiteralIncludeReader(object):
@@ -136,8 +136,8 @@ class NotebookRemoteLiteralInclude(SphinxDirective):
             return [document.reporter.warning(text_type(exc), line=self.lineno)]
 
 
-def setup(app):
-    directives.register_directive("nb-rli", NotebookRemoteLiteralInclude)
+def setup(app: Sphinx) -> dict:
+    app.add_directive("nb-rli", NotebookRemoteLiteralInclude)
 
     return {
         "parallel_read_safe": True,
