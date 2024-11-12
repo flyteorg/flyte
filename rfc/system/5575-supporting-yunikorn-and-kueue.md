@@ -113,18 +113,42 @@ When a job comes, following things happens.
 4. Merging labels and annotations from `CreateLabels` and `CreateGroupLabels` to the CRD.
 
 ```go
+type PluginManager struct {
+	id              string
+	plugin          k8s.Plugin
+	resourceToWatch runtime.Object
+	kubeClient      pluginsCore.KubeClient
+	metrics         PluginMetrics
+	// Per namespace-resource
+	backOffController    *backoff.Controller
+	resourceLevelMonitor *ResourceLevelMonitor
+	eventWatcher         EventWatcher
+}
+
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
   o, err := e.plugin.BuildResource(ctx, k8sTaskCtx)
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
-  e.SchedulerPlugin.SetSchedulerName(o)
+  if p, ok := e.plugin.(k8s.ScheduablePlugin); ok {
+		o, err = p.SetSchedulerName(o)
+		if err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+	}
 }
 
 func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
-  e.SchedulerPlugin.CreateLabels(taskCtx, o)
-  e.SchedulerPlugin.CreateGroupLabels(taskCtx, o)
-  schedulerLabels, schedulerAnnotations := e.SchedulerPlugin.GetLabels()
+  var schedulerLabels, schedulerAnnotations map[string]string
+  if p, ok := e.plugin.(k8s.ScheduablePlugin); ok {
+		o, err = p.SetSchedulerName(o)
+		if err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+     p.CreateLabels(taskCtx, o)
+     p.CreateGroupLabels(taskCtx, o)
+     schedulerLabels, schedulerAnnotations = e.plugin.GetLabels()
+	}
 	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations(), schedulerAnnotations)))
 	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels(), schedulerLabels)))
