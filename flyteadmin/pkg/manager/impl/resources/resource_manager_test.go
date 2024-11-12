@@ -969,6 +969,9 @@ func TestListAllResources(t *testing.T) {
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})
 	assert.Error(t, resourceError)
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, resourceError, &newError)
+	assert.Equal(t, newError.Error(), "resourceError")
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).ListAllFunction = func(ctx context.Context, resourceType string) (
 		[]models.Resource, error) {
