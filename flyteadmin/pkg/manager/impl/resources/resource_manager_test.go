@@ -246,6 +246,8 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 	}
 	_, validationError := manager.DeleteWorkflowAttributes(context.Background(), request)
 	assert.Error(t, validationError)
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, validationError, &newError)
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) error {
@@ -258,6 +260,8 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 
 	_, failError := manager.DeleteWorkflowAttributes(context.Background(), request)
 	assert.Error(t, failError)
+	var secondError errors.FlyteAdminError
+	assert.ErrorAs(t, failError, &secondError)
 }
 
 func TestUpdateProjectDomainAttributes(t *testing.T) {
