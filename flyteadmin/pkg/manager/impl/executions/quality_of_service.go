@@ -110,7 +110,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid custom quality of service set in launch plan [%v], failed to parse duration [%v] with: %v",
 					input.LaunchPlan.Id,
-					input.ExecutionCreateRequest.Spec.QualityOfService.GetSpec().QueueingBudget, err)
+					input.LaunchPlan.Spec.QualityOfService.GetSpec().QueueingBudget, err)
 			}
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
@@ -129,7 +129,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid custom quality of service set in workflow [%v], failed to parse duration [%v] with: %v",
 					workflowIdentifier,
-					input.ExecutionCreateRequest.Spec.QualityOfService.GetSpec().QueueingBudget, err)
+					input.Workflow.Closure.CompiledWorkflow.Primary.Template.Metadata.QualityOfService.GetSpec().QueueingBudget, err)
 			}
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
@@ -154,7 +154,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid custom quality of service set in overridable matching attributes for [%v],"+
 						"failed to parse duration [%v] with: %v", workflowIdentifier,
-					input.ExecutionCreateRequest.Spec.QualityOfService.GetSpec().QueueingBudget, err)
+					qualityOfService.GetSpec().QueueingBudget, err)
 			}
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
@@ -163,7 +163,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			logger.Debugf(ctx, "Determining quality of service tier from database override for [%s/%s/%s]",
 				input.ExecutionCreateRequest.Project, input.ExecutionCreateRequest.Domain,
 				input.ExecutionCreateRequest.Name)
-			qualityOfServiceTier = input.Workflow.Closure.CompiledWorkflow.Primary.Template.Metadata.QualityOfService.GetTier()
+			qualityOfServiceTier = qualityOfService.GetTier()
 		}
 	}
 
