@@ -60,7 +60,8 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	}
 	_, failError := manager.UpdateWorkflowAttributes(context.Background(), request)
 	assert.Error(t, failError)
-
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, failError, &newError)
 }
 
 func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
