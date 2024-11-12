@@ -32,7 +32,7 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 	mockAwsEmail := mocks.SESClient{}
 	var awsSES sesiface.SESAPI = &mockAwsEmail
 	expectedSenderEmail := "no-reply@example.com"
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -67,7 +67,7 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 }
 
 func TestFlyteEmailToSesEmailInput(t *testing.T) {
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -97,7 +97,7 @@ func TestAwsEmailer_SendEmailError(t *testing.T) {
 
 	testEmail := NewAwsEmailer(getNotificationsConfig(), promutils.NewTestScope(), awsSES)
 
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -125,7 +125,7 @@ func TestAwsEmailer_SendEmailEmailOutput(t *testing.T) {
 
 	testEmail := NewAwsEmailer(getNotificationsConfig(), promutils.NewTestScope(), awsSES)
 
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{

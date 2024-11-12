@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 )
 
-var launchPlanIdentifier = core.Identifier{
+var launchPlanIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_LAUNCH_PLAN,
 	Project:      "project",
 	Domain:       "domain",
@@ -42,11 +42,11 @@ var outputs = core.VariableMap{
 }
 
 func getProviderForTest(t *testing.T) common.InterfaceProvider {
-	launchPlanStatus := admin.LaunchPlanClosure{
+	launchPlanStatus := &admin.LaunchPlanClosure{
 		ExpectedInputs:  &inputs,
 		ExpectedOutputs: &outputs,
 	}
-	bytes, _ := proto.Marshal(&launchPlanStatus)
+	bytes, _ := proto.Marshal(launchPlanStatus)
 	provider, err := NewLaunchPlanInterfaceProvider(
 		models.LaunchPlan{
 			Closure: bytes,

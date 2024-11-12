@@ -815,7 +815,7 @@ Section: otel
 type (string)
 ------------------------------------------------------------------------------------------------------------------------
 
-Sets the type of exporter to configure [noop/file/jaeger].
+Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp].
 
 **Default Value**: 
 
@@ -848,6 +848,43 @@ Configuration for exporting telemetry traces to a jaeger
   endpoint: http://localhost:14268/api/traces
   
 
+otlpgrpc (`otelutils.OtlpGrpcConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP gRPC collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4317
+  
+
+otlphttp (`otelutils.OtlpHttpConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP HTTP collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4318/v1/traces
+  
+
+sampler (`otelutils.SamplerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for the sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  parentSampler: always
+  traceIdRatio: 0.01
+  
+
 otelutils.FileConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -869,13 +906,68 @@ otelutils.JaegerConfig
 endpoint (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Endpoint for the jaeger telemtry trace ingestor
+Endpoint for the jaeger telemetry trace ingestor
 
 **Default Value**: 
 
 .. code-block:: yaml
 
   http://localhost:14268/api/traces
+  
+
+otelutils.OtlpGrpcConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4317
+  
+
+otelutils.OtlpHttpConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4318/v1/traces
+  
+
+otelutils.SamplerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+parentSampler (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Sets the parent sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  always
+  
+
+traceIdRatio (float64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.01"
   
 
 Section: plugins
@@ -896,6 +988,7 @@ agent-service (`agent.Config`_)
     endpoint: ""
     insecure: true
     timeouts: null
+  pollInterval: 10s
   resourceConstraints:
     NamespaceScopeResourceConstraint:
       Value: 50
@@ -1108,6 +1201,7 @@ k8s (`config.K8sPluginConfig`_)
   gpu-unpartitioned-node-selector-requirement: null
   gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
+  image-pull-policy: ""
   inject-finalizer: false
   interruptible-node-selector: null
   interruptible-node-selector-requirement: null
@@ -1117,6 +1211,8 @@ k8s (`config.K8sPluginConfig`_)
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
+  update-backoff-retries: 5
+  update-base-backoff-duration: 10
   
 
 k8s-array (`k8s.Config`_)
@@ -1463,6 +1559,18 @@ supportedTaskTypes ([]string)
 
   - task_type_1
   - task_type_2
+  
+
+pollInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The interval at which the plugin should poll the agent for metadata updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
   
 
 agent.Deployment
@@ -2460,6 +2568,16 @@ image-pull-backoff-grace-period (`config.Duration`_)
   3m0s
   
 
+image-pull-policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 pod-pending-timeout (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2594,6 +2712,30 @@ If true, will send k8s object events in TaskExecutionEvent updates.
 .. code-block:: yaml
 
   "false"
+  
+
+update-base-backoff-duration (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Initial delay in exponential backoff when updating a resource in milliseconds.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+update-backoff-retries (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Number of retries for exponential backoff when updating a resource.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
   
 
 config.FlyteCoPilotConfig
@@ -4423,18 +4565,6 @@ Enable creation of the FlyteWorkflow CRD on startup
   "false"
   
 
-array-node-event-version (int)
-------------------------------------------------------------------------------------------------------------------------
-
-ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
 node-execution-worker-count (int)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -4445,6 +4575,35 @@ Number of workers to evaluate node executions, currently only used for array nod
 .. code-block:: yaml
 
   "8"
+  
+
+array-node-config (`config.ArrayNodeConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-parallelism-behavior: unlimited
+  event-version: 0
+  
+
+literal-offloading-config (`config.LiteralOffloadingConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+config used for literal offloading.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Enabled: false
+  max-size-in-mb-for-offloading: 1000
+  min-size-in-mb-for-offloading: 10
+  supported-sdk-versions:
+    FLYTE_SDK: 1.13.5
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4485,6 +4644,33 @@ workflowstore (`workflowstore.Config`_)
 .. code-block:: yaml
 
   policy: ResourceVersionCache
+  
+
+config.ArrayNodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+event-version (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+default-parallelism-behavior (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default parallelism behavior for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  unlimited
   
 
 config.CompositeQueueConfig
@@ -4625,7 +4811,7 @@ config.Config (resourcemanager)
 type (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Which resource manager to use
+Which resource manager to use, redis or noop. Default is noop.
 
 **Default Value**: 
 
@@ -4744,6 +4930,16 @@ fallback-to-output-reference (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Whether output data should be sent by reference when it is too large to be sent inline in execution events.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+ErrorOnAlreadyExists (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 
@@ -4874,6 +5070,55 @@ Name (string)
 .. code-block:: yaml
 
   ""
+  
+
+config.LiteralOffloadingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+supported-sdk-versions (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_SDK: 1.13.5
+  
+
+min-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to trigger offloading
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+max-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to fail fast
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
   
 
 config.NodeConfig

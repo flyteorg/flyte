@@ -17,7 +17,7 @@ func TestRegisterProject(t *testing.T) {
 	mockProjectManager := mocks.MockProjectManager{}
 	mockProjectManager.SetCreateProject(
 		func(ctx context.Context,
-			request admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error) {
+			request *admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error) {
 			return &admin.ProjectRegisterResponse{}, nil
 		},
 	)
@@ -50,11 +50,11 @@ func TestListProjects(t *testing.T) {
 			},
 		},
 	}
-	mockProjectManager.SetListCallback(func(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
+	mockProjectManager.SetListCallback(func(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
 		assert.NotNil(t, request)
 		return projects, nil
 	})
-	resp, err := mockProjectManager.ListProjects(context.Background(), admin.ProjectListRequest{})
+	resp, err := mockProjectManager.ListProjects(context.Background(), &admin.ProjectListRequest{})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(projects, resp))
 }
@@ -62,11 +62,11 @@ func TestListProjects(t *testing.T) {
 func TestGetProject(t *testing.T) {
 	mockProjectManager := mocks.MockProjectManager{}
 	project := &admin.Project{Id: "project id", Name: "project"}
-	mockProjectManager.SetGetCallBack(func(ctx context.Context, request admin.ProjectGetRequest) (*admin.Project, error) {
+	mockProjectManager.SetGetCallBack(func(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
 		assert.NotNil(t, request)
 		return project, nil
 	})
-	resp, err := mockProjectManager.GetProject(context.Background(), admin.ProjectGetRequest{})
+	resp, err := mockProjectManager.GetProject(context.Background(), &admin.ProjectGetRequest{})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(project, resp))
 }

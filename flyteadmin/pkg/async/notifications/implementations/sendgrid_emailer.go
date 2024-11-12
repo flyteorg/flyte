@@ -30,7 +30,7 @@ func getEmailAddresses(addresses []string) []*mail.Email {
 	return sendgridAddresses
 }
 
-func getSendgridEmail(adminEmail admin.EmailMessage) *mail.SGMailV3 {
+func getSendgridEmail(adminEmail *admin.EmailMessage) *mail.SGMailV3 {
 	m := mail.NewV3Mail()
 	// This from email address is really here as a formality. For sendgrid specifically, the sender email is determined
 	// from the api key that's used, not what you send along here.
@@ -60,7 +60,7 @@ func getAPIKey(config runtimeInterfaces.EmailServerConfig) string {
 	return strings.TrimSpace(string(apiKeyFile))
 }
 
-func (s SendgridEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (s SendgridEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	m := getSendgridEmail(email)
 	s.systemMetrics.SendTotal.Inc()
 	response, err := s.client.Send(m)

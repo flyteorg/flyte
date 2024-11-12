@@ -69,6 +69,7 @@ type Controller interface {
 
 type controllerMetrics struct {
 	Scope                           promutils.Scope
+	SyncErrors                      prometheus.Counter
 	SyncStarted                     prometheus.Counter
 	KubernetesResourcesCreated      prometheus.Counter
 	KubernetesResourcesCreateErrors prometheus.Counter
@@ -484,14 +485,13 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Id
 
 	var k8sManifest = string(template)
-	for templateKey, templateValue := range templateValues {
-		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
-	}
-	// Replace remaining template variables from domain specific defaults.
 	for templateKey, templateValue := range customTemplateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
-
+	// Replace remaining template variables from domain specific defaults.
+	for templateKey, templateValue := range templateValues {
+		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
+	}
 	return k8sManifest, nil
 }
 
@@ -615,6 +615,7 @@ func (c *controller) Sync(ctx context.Context) error {
 	logger.Infof(ctx, "Completed cluster resource creation loop with stats: [%+v]", stats)
 
 	if len(errs) > 0 {
+		c.metrics.SyncErrors.Add(float64(len(errs)))
 		return errors.NewCollectedFlyteAdminError(codes.Internal, errs)
 	}
 
@@ -637,7 +638,8 @@ func (c *controller) Run() {
 
 func newMetrics(scope promutils.Scope) controllerMetrics {
 	return controllerMetrics{
-		Scope: scope,
+		Scope:      scope,
+		SyncErrors: scope.MustNewCounter("sync_errors", "overall count of errors that occurred within a 'sync' method"),
 		SyncStarted: scope.MustNewCounter("k8s_resource_syncs",
 			"overall count of the number of invocations of the resource controller 'sync' method"),
 		KubernetesResourcesCreated: scope.MustNewCounter("k8s_resources_created",

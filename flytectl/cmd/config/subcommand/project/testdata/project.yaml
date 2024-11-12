@@ -1,0 +1,14 @@
+description: flytesnacks test
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+id: flytesnacks
+labels:
+  values:
+    team: flytesnacks
+name: flytesnacks
+

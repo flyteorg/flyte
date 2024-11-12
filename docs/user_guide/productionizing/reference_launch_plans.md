@@ -16,7 +16,7 @@ Reference launch plans cannot be run locally. You must mock them out.
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/reference_launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/reference_launch_plan.py
 :caption: productionizing/reference_launch_plan.py
 :lines: 1-36
 ```

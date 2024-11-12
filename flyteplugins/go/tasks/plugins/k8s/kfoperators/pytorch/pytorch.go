@@ -7,6 +7,7 @@ import (
 
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
+	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -16,6 +17,7 @@ import (
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -28,7 +30,9 @@ type pytorchOperatorResourceHandler struct {
 var _ k8s.Plugin = pytorchOperatorResourceHandler{}
 
 func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	return k8s.PluginProperties{
+		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
+	}
 }
 
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
@@ -98,6 +102,25 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}
+
+		updateEnvVars := func(container *apiv1.Container) {
+			if container.Env == nil {
+				container.Env = make([]apiv1.EnvVar, 0, 2)
+			}
+			container.Env = append(container.Env, apiv1.EnvVar{
+				Name: pluginsK8s.FlyteInternalWorkerNameEnvVarKey,
+				ValueFrom: &apiv1.EnvVarSource{
+					FieldRef: &apiv1.ObjectFieldSelector{
+						FieldPath: "metadata.name",
+					},
+				},
+			})
+			container.Env = append(container.Env, apiv1.EnvVar{
+				Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
+				Value: k8s.EarliestErrorAggregationStrategy.String(),
+			})
+		}
+		updateEnvVars(&workerReplicaSpec.Template.Spec.Containers[0])
 
 		if kfPytorchTaskExtraArgs.GetRunPolicy() != nil {
 			runPolicy = common.ParseRunPolicy(*kfPytorchTaskExtraArgs.GetRunPolicy())
@@ -205,7 +228,14 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 		CustomInfo: statusDetails,
 	}
 
-	return common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return phaseInfo, phaseVersionUpdateErr
+	}
+
+	return phaseInfo, err
 }
 
 func init() {

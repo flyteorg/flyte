@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 
+	"github.com/robfig/cron/v3"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -16,7 +17,7 @@ import (
 )
 
 func ValidateLaunchPlan(ctx context.Context,
-	request admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
+	request *admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, workflowInterface *core.TypedInterface) error {
 	if err := ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		return err
@@ -70,7 +71,7 @@ func ValidateLaunchPlan(ctx context.Context,
 	return nil
 }
 
-func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
+func validateSchedule(request *admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
 	schedule := request.GetSpec().GetEntityMetadata().GetSchedule()
 	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil || schedule.GetCronSchedule() != nil {
 		for key, value := range expectedInputs.Parameters {
@@ -89,6 +90,19 @@ func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *cor
 				return errors.NewFlyteAdminErrorf(
 					codes.InvalidArgument,
 					"KickoffTimeInputArg must reference a datetime input. [%v] is a [%v]", schedule.GetKickoffTimeInputArg(), param.GetVar().GetType())
+			}
+		}
+
+		// validate cron expression
+		var cronExpression string
+		if schedule.GetCronExpression() != "" {
+			cronExpression = schedule.GetCronExpression()
+		} else if schedule.GetCronSchedule() != nil {
+			cronExpression = schedule.GetCronSchedule().GetSchedule()
+		}
+		if cronExpression != "" {
+			if _, err := cron.ParseStandard(cronExpression); err != nil {
+				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Invalid cron expression: %v", err)
 			}
 		}
 	}
@@ -143,6 +157,10 @@ func checkAndFetchExpectedInputForLaunchPlan(
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unexpected fixed_input %s", name)
 		}
 		inputType := validators.LiteralTypeForLiteral(fixedInput)
+		err := validators.ValidateLiteralType(inputType)
+		if err != nil {
+			return nil, errors.NewInvalidLiteralTypeError(name, err)
+		}
 		if !validators.AreTypesCastable(inputType, value.GetType()) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"invalid fixed_input wrong type %s, expected %v, got %v instead", name, value.GetType(), inputType)

@@ -143,7 +143,7 @@ func ValidateVersion(version string) error {
 	return nil
 }
 
-func ValidateResourceListRequest(request admin.ResourceListRequest) error {
+func ValidateResourceListRequest(request *admin.ResourceListRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
@@ -159,7 +159,7 @@ func ValidateResourceListRequest(request admin.ResourceListRequest) error {
 	return nil
 }
 
-func ValidateDescriptionEntityListRequest(request admin.DescriptionEntityListRequest) error {
+func ValidateDescriptionEntityListRequest(request *admin.DescriptionEntityListRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
@@ -178,7 +178,7 @@ func ValidateDescriptionEntityListRequest(request admin.DescriptionEntityListReq
 	return nil
 }
 
-func ValidateActiveLaunchPlanRequest(request admin.ActiveLaunchPlanRequest) error {
+func ValidateActiveLaunchPlanRequest(request *admin.ActiveLaunchPlanRequest) error {
 	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
 		return err
 	}
@@ -191,7 +191,7 @@ func ValidateActiveLaunchPlanRequest(request admin.ActiveLaunchPlanRequest) erro
 	return nil
 }
 
-func ValidateActiveLaunchPlanListRequest(request admin.ActiveLaunchPlanListRequest) error {
+func ValidateActiveLaunchPlanListRequest(request *admin.ActiveLaunchPlanListRequest) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func ValidateActiveLaunchPlanListRequest(request admin.ActiveLaunchPlanListReque
 	return nil
 }
 
-func ValidateNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifierListRequest) error {
+func ValidateNamedEntityIdentifierListRequest(request *admin.NamedEntityIdentifierListRequest) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}
@@ -217,7 +217,7 @@ func ValidateNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifie
 	return nil
 }
 
-func ValidateDescriptionEntityGetRequest(request admin.ObjectGetRequest) error {
+func ValidateDescriptionEntityGetRequest(request *admin.ObjectGetRequest) error {
 	if err := ValidateResourceType(request.Id.ResourceType); err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
 			if name == "" {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing key in %s", fieldName)
 			}
-			if fixedInput == nil || fixedInput.GetValue() == nil {
+			if fixedInput.GetValue() == nil && fixedInput.GetOffloadedMetadata() == nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing valid literal in %s %s", fieldName, name)
 			}
 			if isDateTime(fixedInput) {
@@ -282,11 +282,17 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 			defaultValue := defaultInput.GetDefault()
 			if defaultValue != nil {
 				inputType := validators.LiteralTypeForLiteral(defaultValue)
+				err := validators.ValidateLiteralType(inputType)
+				if err != nil {
+					return errors.NewInvalidLiteralTypeError(name, err)
+				}
+
 				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {
 					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 						"Type mismatch for Parameter %s in %s has type %s, expected %s", name, fieldName,
 						defaultInput.GetVar().GetType().String(), inputType.String())
 				}
+
 				if defaultInput.GetVar().GetType().GetSimple() == core.SimpleType_DATETIME {
 					// Make datetime specific validations
 					return ValidateDatetime(defaultValue)

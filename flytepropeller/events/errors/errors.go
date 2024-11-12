@@ -33,7 +33,11 @@ type EventError struct {
 }
 
 func (r EventError) Error() string {
-	return fmt.Sprintf("%s: %s, caused by [%s]", r.Code, r.Message, r.Cause.Error())
+	var cause string
+	if r.Cause != nil {
+		cause = r.Cause.Error()
+	}
+	return fmt.Sprintf("%s: %s, caused by [%s]", r.Code, r.Message, cause)
 }
 
 func (r *EventError) Is(target error) bool {

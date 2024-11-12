@@ -10,9 +10,9 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-var archivableResourceTypes = sets.NewInt32(int32(core.ResourceType_WORKFLOW), int32(core.ResourceType_TASK))
+var archivableResourceTypes = sets.NewInt32(int32(core.ResourceType_WORKFLOW), int32(core.ResourceType_TASK), int32(core.ResourceType_LAUNCH_PLAN))
 
-func ValidateNamedEntityGetRequest(request admin.NamedEntityGetRequest) error {
+func ValidateNamedEntityGetRequest(request *admin.NamedEntityGetRequest) error {
 	if err := ValidateResourceType(request.ResourceType); err != nil {
 		return err
 	}
@@ -22,7 +22,7 @@ func ValidateNamedEntityGetRequest(request admin.NamedEntityGetRequest) error {
 	return nil
 }
 
-func ValidateNamedEntityUpdateRequest(request admin.NamedEntityUpdateRequest) error {
+func ValidateNamedEntityUpdateRequest(request *admin.NamedEntityUpdateRequest) error {
 	if err := ValidateResourceType(request.ResourceType); err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func ValidateNamedEntityUpdateRequest(request admin.NamedEntityUpdateRequest) er
 	return nil
 }
 
-func ValidateNamedEntityListRequest(request admin.NamedEntityListRequest) error {
+func ValidateNamedEntityListRequest(request *admin.NamedEntityListRequest) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}

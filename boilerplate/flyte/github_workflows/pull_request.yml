@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:

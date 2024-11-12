@@ -22,7 +22,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/enum_type.py
 :caption: data_types_and_io/enum_type.py
 :lines: 1-3
 ```
@@ -30,14 +30,14 @@ To begin, import the dependencies:
 We define an enum and a simple coffee maker workflow that accepts an order and brews coffee ☕️ accordingly.
 The assumption is that the coffee maker only understands enum inputs:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/enum_type.py
 :caption: data_types_and_io/enum_type.py
 :lines: 9-35
 ```
 
 The workflow can also accept an enum value:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/enum_type.py
 :caption: data_types_and_io/enum_type.py
 :pyobject: coffee_maker_enum
 ```
@@ -45,13 +45,13 @@ The workflow can also accept an enum value:
 You can send a string to the `coffee_maker_enum` workflow during its execution, like this:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/enum_type.py \
   coffee_maker_enum --coffee_enum="latte"
 ```
 
 You can run the workflows locally:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/enum_type.py
 :caption: data_types_and_io/enum_type.py
 :lines: 44-46
 ```

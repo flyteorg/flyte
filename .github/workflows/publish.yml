@@ -33,7 +33,7 @@ jobs:
     name: Push to Github Registry
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
       - name: Set up QEMU
@@ -66,3 +66,5 @@ jobs:
           platforms: linux/arm64,linux/amd64
           push: ${{ inputs.push }}
           tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

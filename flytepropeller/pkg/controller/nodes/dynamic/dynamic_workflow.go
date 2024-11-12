@@ -169,7 +169,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 				return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to set ephemeral node execution attributions")
 			}
 
-			newParentInfo, err := node_common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+			newParentInfo, err := node_common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), true)
 			if err != nil {
 				return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to generate uniqueID")
 			}
@@ -207,7 +207,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 
 	// The current node would end up becoming the parent for the dynamic task nodes.
 	// This is done to track the lineage. For level zero, the CreateParentInfo will return nil
-	newParentInfo, err := node_common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := node_common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), true)
 	if err != nil {
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to generate uniqueID")
 	}
@@ -343,8 +343,7 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 
 	var launchPlanInterfaces = make([]common.InterfaceProvider, len(launchPlanIDs))
 	for idx, id := range launchPlanIDs {
-		idVal := id
-		lp, err := d.lpReader.GetLaunchPlan(ctx, &idVal)
+		lp, err := d.lpReader.GetLaunchPlan(ctx, id)
 		if err != nil {
 			logger.Debugf(ctx, "Error fetching launch plan definition from admin")
 			if launchplan.IsNotFound(err) || launchplan.IsUserError(err) {
@@ -354,7 +353,7 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 			return nil, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to retrieve launchplan information %s:%s:%s:%s",
 				id.Project, id.Domain, id.Name, id.Version)
 		}
-		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(*lp)
+		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(lp)
 	}
 
 	return launchPlanInterfaces, nil

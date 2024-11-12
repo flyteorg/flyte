@@ -28,7 +28,9 @@ const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
 const defaultContainerTemplateName = "default"
+const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
+const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
 
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
@@ -316,6 +318,19 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 	return podSpec, &objectMeta, primaryContainerName, nil
 }
 
+func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
+	if taskTemplate == nil {
+		return false
+	}
+	config := taskTemplate.GetConfig()
+	if config == nil {
+		return false
+	}
+	// The presence of any "link_type" is sufficient to guarantee that the console URL should be included.
+	_, exists := config["link_type"]
+	return exists
+}
+
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
 // applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
@@ -328,10 +343,20 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
-		Inputs:           tCtx.InputReader(),
-		OutputPath:       tCtx.OutputWriter(),
-		Task:             tCtx.TaskReader(),
-		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:            tCtx.InputReader(),
+		OutputPath:        tCtx.OutputWriter(),
+		Task:              tCtx.TaskReader(),
+		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
+		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
+	}
+
+	// iterate over the initContainers first
+	for index := range podSpec.InitContainers {
+		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
+
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	resourceRequests := make([]v1.ResourceRequirements, 0, len(podSpec.Containers))
@@ -364,14 +389,17 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		dataLoadingConfig = pod.GetDataConfig()
 	}
 
+	primaryInitContainerName := ""
+
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
 			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
-		if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
-			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
+		primaryInitContainerName, err = AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
+			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig)
+		if err != nil {
 			return nil, nil, err
 		}
 	}
@@ -383,7 +411,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// merge PodSpec and ObjectMeta with configuration pod template (if exists)
-	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName)
+	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -472,7 +500,7 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 // MergeWithBasePodTemplate attempts to merge the provided PodSpec and ObjectMeta with the configuration PodTemplate for
 // this task.
 func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
-	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 
 	// attempt to retrieve base PodTemplate
 	podTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
@@ -484,7 +512,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge podSpec with podTemplate
-	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName)
+	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -501,7 +529,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 // mergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
 // set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
 // container-level configuration from the basePodSpec.
-func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string) (*v1.PodSpec, error) {
+func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
 	if basePodSpec == nil || podSpec == nil {
 		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
 	}
@@ -513,6 +541,16 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			defaultContainerTemplate = &basePodSpec.Containers[i]
 		} else if basePodSpec.Containers[i].Name == primaryContainerTemplateName {
 			primaryContainerTemplate = &basePodSpec.Containers[i]
+		}
+	}
+
+	// extract defaultInitContainerTemplate and primaryInitContainerTemplate
+	var defaultInitContainerTemplate, primaryInitContainerTemplate *v1.Container
+	for i := 0; i < len(basePodSpec.InitContainers); i++ {
+		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
+		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
 		}
 	}
 
@@ -557,6 +595,43 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	}
 
 	mergedPodSpec.Containers = mergedContainers
+
+	// merge PodTemplate init containers
+	var mergedInitContainers []v1.Container
+	for _, initContainer := range podSpec.InitContainers {
+		// if applicable start with defaultContainerTemplate
+		var mergedInitContainer *v1.Container
+		if defaultInitContainerTemplate != nil {
+			mergedInitContainer = defaultInitContainerTemplate.DeepCopy()
+		}
+
+		// if applicable merge with primaryInitContainerTemplate
+		if initContainer.Name == primaryInitContainerName && primaryInitContainerTemplate != nil {
+			if mergedInitContainer == nil {
+				mergedInitContainer = primaryInitContainerTemplate.DeepCopy()
+			} else {
+				err := mergo.Merge(mergedInitContainer, primaryInitContainerTemplate, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		// if applicable merge with existing init initContainer
+		if mergedInitContainer == nil {
+			mergedInitContainers = append(mergedInitContainers, initContainer)
+		} else {
+			err := mergo.Merge(mergedInitContainer, initContainer, mergo.WithOverride, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, err
+			}
+
+			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
+		}
+	}
+
+	mergedPodSpec.InitContainers = mergedInitContainers
+
 	return mergedPodSpec, nil
 }
 
@@ -585,8 +660,8 @@ func BuildIdentityPod() *v1.Pod {
 //	resources requested is beyond the capability of the system. for this we will rely on configuration
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
-func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
-	phaseInfo, t := demystifyPendingHelper(status)
+func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	phaseInfo, t := demystifyPendingHelper(status, info)
 
 	if phaseInfo.Phase().IsTerminal() {
 		return phaseInfo, nil
@@ -603,13 +678,14 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 		return phaseInfo, nil
 	}
 
-	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", phaseInfo.Info()), nil
 }
 
-func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time) {
+func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
-	phaseInfo := pluginsCore.PhaseInfoUndefined
+	phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Demistify Pending", &info)
+
 	t := time.Now()
 	for _, c := range status.Conditions {
 		t = c.LastTransitionTime.Time
@@ -617,7 +693,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
+				return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -630,7 +706,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
+			return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {

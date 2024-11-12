@@ -4,6 +4,7 @@
 package coreutils
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -113,7 +114,7 @@ func TestFetchLiteral(t *testing.T) {
 		s := MakeBinaryLiteral([]byte{'h'})
 		assert.Equal(t, []byte{'h'}, s.GetScalar().GetBinary().GetValue())
 		_, err := ExtractFromLiteral(s)
-		assert.NotNil(t, err)
+		assert.Nil(t, err)
 	})
 
 	t.Run("NoneType", func(t *testing.T) {
@@ -125,6 +126,7 @@ func TestFetchLiteral(t *testing.T) {
 	})
 
 	t.Run("Generic", func(t *testing.T) {
+		os.Setenv(FlyteUseOldDcFormat, "true")
 		literalVal := map[string]interface{}{
 			"x": 1,
 			"y": "ystringvalue",
@@ -150,6 +152,7 @@ func TestFetchLiteral(t *testing.T) {
 		for key, val := range expectedStructVal.Fields {
 			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
 		}
+		os.Unsetenv(FlyteUseOldDcFormat)
 	})
 
 	t.Run("Generic Passed As String", func(t *testing.T) {
@@ -196,6 +199,30 @@ func TestFetchLiteral(t *testing.T) {
 		lit, err := MakeLiteralForType(literalType, literalVal)
 		assert.NoError(t, err)
 		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, literalVal, extractedLiteralVal)
+	})
+
+	t.Run("Offloaded metadata", func(t *testing.T) {
+		literalVal := "s3://blah/blah/blah"
+		var storedLiteralType = &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_INTEGER,
+					},
+				},
+			},
+		}
+		offloadedLiteral := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri:          literalVal,
+					InferredType: storedLiteralType,
+				},
+			},
+		}
+		extractedLiteralVal, err := ExtractFromLiteral(offloadedLiteral)
 		assert.NoError(t, err)
 		assert.Equal(t, literalVal, extractedLiteralVal)
 	})

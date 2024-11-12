@@ -19,12 +19,12 @@ const (
 	DeckFile    = "deck.html"
 )
 
-func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob) bool {
+func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
 		urlBlob.Bytes < config.MaxSizeInBytes
 }
 
-func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob, outputURI string) bool {
+func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob, outputURI string) bool {
 	return len(outputURI) > 0 && shouldFetchData(config, urlBlob)
 }
 
@@ -32,11 +32,11 @@ func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob a
 func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, inputURI string) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
-	var inputsURLBlob admin.UrlBlob
+	inputsURLBlob := &admin.UrlBlob{}
 	var fullInputs core.LiteralMap
 
 	if len(inputURI) == 0 {
-		return &fullInputs, &inputsURLBlob, nil
+		return &fullInputs, inputsURLBlob, nil
 	}
 
 	var err error
@@ -55,7 +55,7 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
 		}
 	}
-	return &fullInputs, &inputsURLBlob, nil
+	return &fullInputs, inputsURLBlob, nil
 }
 
 // ExecutionClosure defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
@@ -98,10 +98,10 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
-	var outputsURLBlob admin.UrlBlob
+	outputsURLBlob := &admin.UrlBlob{}
 	var fullOutputs = &core.LiteralMap{}
 	if closure == nil {
-		return fullOutputs, &outputsURLBlob, nil
+		return fullOutputs, outputsURLBlob, nil
 	}
 
 	if len(closure.GetOutputUri()) > 0 && remoteDataConfig.SignedURL.Enabled {
@@ -127,5 +127,5 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		}
 	}
 
-	return fullOutputs, &outputsURLBlob, nil
+	return fullOutputs, outputsURLBlob, nil
 }

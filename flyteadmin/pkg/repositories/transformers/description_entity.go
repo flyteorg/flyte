@@ -16,7 +16,7 @@ import (
 // CreateDescriptionEntityModel Transforms a TaskCreateRequest to a Description entity model
 func CreateDescriptionEntityModel(
 	descriptionEntity *admin.DescriptionEntity,
-	id core.Identifier) (*models.DescriptionEntity, error) {
+	id *core.Identifier) (*models.DescriptionEntity, error) {
 	ctx := context.Background()
 	if descriptionEntity == nil {
 		return nil, nil

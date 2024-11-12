@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -63,7 +64,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If we fall in here, that means that the full path is deterministic and we should check for existence.
 	if len(req.Filename) > 0 && len(req.FilenameRoot) > 0 {
 		knownLocation, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-			req.Project, req.Domain, req.FilenameRoot, req.Filename)
+			req.Org, req.Project, req.Domain, req.FilenameRoot, req.Filename)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create storage location. Error %v", err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
@@ -125,7 +126,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		prefix = base32.StdEncoding.EncodeToString(req.ContentMd5)
 	}
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-		req.Project, req.Domain, prefix, req.Filename)
+		req.Org, req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create shardedStorageLocation. Error %v", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
@@ -161,7 +162,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 	// Lookup task, node, workflow execution
 	var nativeURL string
 	if nodeExecutionIDEnvelope, casted := req.GetSource().(*service.CreateDownloadLinkRequest_NodeExecutionId); casted {
-		node, err := s.nodeExecutionManager.GetNodeExecution(ctx, admin.NodeExecutionGetRequest{
+		node, err := s.nodeExecutionManager.GetNodeExecution(ctx, &admin.NodeExecutionGetRequest{
 			Id: nodeExecutionIDEnvelope.NodeExecutionId,
 		})
 
@@ -181,7 +182,17 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "no deckUrl found for request [%+v]", req)
 	}
 
-	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(nativeURL), storage.SignedURLProperties{
+	ref := storage.DataReference(nativeURL)
+	meta, err := s.dataStore.Head(ctx, ref)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to head object before signing url. Error: %v", err)
+	}
+
+	if !meta.Exists() {
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "object not found")
+	}
+
+	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, ref, storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
 		ExpiresIn: req.ExpiresIn.AsDuration(),
 	})
@@ -287,6 +298,9 @@ func (s Service) validateCreateDownloadLinkRequest(req *service.CreateDownloadLi
 func createStorageLocation(ctx context.Context, store *storage.DataStore,
 	cfg config.DataProxyUploadConfig, keyParts ...string) (storage.DataReference, error) {
 
+	keyParts = lo.Filter(keyParts, func(key string, _ int) bool {
+		return key != ""
+	})
 	storagePath, err := store.ConstructReference(ctx, store.GetBaseContainerFQN(ctx),
 		append([]string{cfg.StoragePrefix}, keyParts...)...)
 	if err != nil {
@@ -309,9 +323,9 @@ func (s Service) validateResolveArtifactRequest(req *service.GetDataRequest) err
 
 // GetCompleteTaskExecutionID returns the task execution identifier for the task execution with the Task ID filled in.
 // The one coming from the node execution doesn't have this as this is not data encapsulated in the flyte url.
-func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID core.TaskExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID *core.TaskExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
 
-	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
 		NodeExecutionId: taskExecID.GetNodeExecutionId(),
 		Limit:           1,
 		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(int(taskExecID.RetryAttempt))),
@@ -326,9 +340,9 @@ func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID core
 	return taskExec.Id, nil
 }
 
-func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
-	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
-		NodeExecutionId: &nodeExecID,
+func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID *core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
+		NodeExecutionId: nodeExecID,
 		Limit:           1,
 		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(attempt)),
 	})
@@ -342,11 +356,11 @@ func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID
 	return taskExec.Id, nil
 }
 
-func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
+func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
 	*service.GetDataResponse, error) {
 
-	resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, admin.NodeExecutionGetDataRequest{
-		Id: &nodeExecID,
+	resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, &admin.NodeExecutionGetDataRequest{
+		Id: nodeExecID,
 	})
 	if err != nil {
 		return nil, err
@@ -361,7 +375,7 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.N
 		// Assume deck, and create a download link request
 		dlRequest := service.CreateDownloadLinkRequest{
 			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
-			Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: &nodeExecID},
+			Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: nodeExecID},
 		}
 		resp, err := s.CreateDownloadLink(ctx, &dlRequest)
 		if err != nil {
@@ -391,12 +405,12 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.N
 	}, nil
 }
 
-func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID core.TaskExecutionIdentifier, ioType common.ArtifactType, name string) (
+func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.TaskExecutionIdentifier, ioType common.ArtifactType, name string) (
 	*service.GetDataResponse, error) {
 
 	var lm *core.LiteralMap
-	reqT := admin.TaskExecutionGetDataRequest{
-		Id: &taskExecID,
+	reqT := &admin.TaskExecutionGetDataRequest{
+		Id: taskExecID,
 	}
 	resp, err := s.taskExecutionManager.GetTaskExecutionData(ctx, reqT)
 	if err != nil {
@@ -445,13 +459,13 @@ func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
 	}
 
 	if execution.NodeExecID != nil {
-		return s.GetDataFromNodeExecution(ctx, *execution.NodeExecID, execution.IOType, execution.LiteralName)
+		return s.GetDataFromNodeExecution(ctx, execution.NodeExecID, execution.IOType, execution.LiteralName)
 	} else if execution.PartialTaskExecID != nil {
-		taskExecID, err := s.GetCompleteTaskExecutionID(ctx, *execution.PartialTaskExecID)
+		taskExecID, err := s.GetCompleteTaskExecutionID(ctx, execution.PartialTaskExecID)
 		if err != nil {
 			return nil, err
 		}
-		return s.GetDataFromTaskExecution(ctx, *taskExecID, execution.IOType, execution.LiteralName)
+		return s.GetDataFromTaskExecution(ctx, taskExecID, execution.IOType, execution.LiteralName)
 	}
 
 	return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse get data request %v", req)

@@ -6,6 +6,9 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/admin/common.proto";
 
+// Empty request for GetDomain
+message GetDomainRequest {}
+
 // Namespace within a project commonly used to differentiate between different service instances.
 // e.g. "production", "development", etc.
 message Domain {
@@ -16,6 +19,10 @@ message Domain {
     string name  = 2;
 }
 
+// Represents a list of domains.
+message GetDomainsResponse {
+    repeated Domain domains = 1;
+}
 
 // Top-level namespace used to classify different entities like workflows and executions.
 message Project {
@@ -43,6 +50,9 @@ message Project {
 
         // System generated projects that aren't explicitly created or managed by a user.
         SYSTEM_GENERATED = 2;
+
+        // System archived projects that aren't explicitly archived by a user.
+        SYSTEM_ARCHIVED = 3;
     }
     ProjectState state = 6;
 
@@ -108,3 +118,15 @@ message ProjectGetRequest {
     // Optional, org key applied to the resource.
     string org = 2;
 }
+
+
+// Error returned for inactive projects
+message InactiveProject {
+    // Indicates a unique project.
+    // +required
+    string id = 1;
+
+    // Optional, org key applied to the resource.
+    string org = 2;
+}
+

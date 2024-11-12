@@ -46,7 +46,7 @@ func getMockApplicationConfigForProjectManagerTest() runtimeInterfaces.Applicati
 	return &mockApplicationConfig
 }
 
-func testListProjects(request admin.ProjectListRequest, token string, orderExpr string, queryExpr *common.GormQueryExpr, t *testing.T) {
+func testListProjects(request *admin.ProjectListRequest, token string, orderExpr string, queryExpr *common.GormQueryExpr, t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).ListProjectsFunction = func(
 		ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error) {
@@ -79,14 +79,14 @@ func testListProjects(request admin.ProjectListRequest, token string, orderExpr 
 }
 
 func TestListProjects_NoFilters_LimitOne(t *testing.T) {
-	testListProjects(admin.ProjectListRequest{
+	testListProjects(&admin.ProjectListRequest{
 		Token: "1",
 		Limit: 1,
 	}, "2", "identifier asc", nil, t)
 }
 
 func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
-	testListProjects(admin.ProjectListRequest{
+	testListProjects(&admin.ProjectListRequest{
 		Token:   "1",
 		Limit:   999,
 		Filters: "eq(project.name,foo)",
@@ -101,7 +101,7 @@ func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
 }
 
 func TestListProjects_NoToken_NoLimit(t *testing.T) {
-	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", nil, t)
+	testListProjects(&admin.ProjectListRequest{}, "", "identifier asc", nil, t)
 }
 
 func TestProjectManager_CreateProject(t *testing.T) {
@@ -118,7 +118,7 @@ func TestProjectManager_CreateProject(t *testing.T) {
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+	_, err := projectManager.CreateProject(context.Background(), &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
 			Name:        "flyte-project-name",
@@ -138,7 +138,7 @@ func TestProjectManager_CreateProjectError(t *testing.T) {
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+	_, err := projectManager.CreateProject(context.Background(), &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
 			Name:        "flyte-project-name",
@@ -147,7 +147,7 @@ func TestProjectManager_CreateProjectError(t *testing.T) {
 	})
 	assert.EqualError(t, err, "uh oh")
 
-	_, err = projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+	_, err = projectManager.CreateProject(context.Background(), &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
 			Name:        "flyte-project-name",
@@ -171,7 +171,7 @@ func TestProjectManager_CreateProjectErrorDueToBadLabels(t *testing.T) {
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+	_, err := projectManager.CreateProject(context.Background(), &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
 			Name:        "flyte-project-name",
@@ -180,7 +180,7 @@ func TestProjectManager_CreateProjectErrorDueToBadLabels(t *testing.T) {
 	})
 	assert.EqualError(t, err, "uh oh")
 
-	_, err = projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+	_, err = projectManager.CreateProject(context.Background(), &admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
 			Name:        "flyte-project-name",
@@ -226,7 +226,7 @@ func TestProjectManager_UpdateProject(t *testing.T) {
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+	_, err := projectManager.UpdateProject(context.Background(), &admin.Project{
 		Id:          "project-id",
 		Name:        "new-project-name",
 		Description: "new-project-description",
@@ -250,7 +250,7 @@ func TestProjectManager_UpdateProject_ErrorDueToProjectNotFound(t *testing.T) {
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+	_, err := projectManager.UpdateProject(context.Background(), &admin.Project{
 		Id:          "not-found-project-id",
 		Name:        "not-found-project-name",
 		Description: "not-found-project-description",
@@ -272,7 +272,7 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
-	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+	_, err := projectManager.UpdateProject(context.Background(), &admin.Project{
 		Id:   "project-id",
 		Name: "longnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamel",
 	})
@@ -298,7 +298,7 @@ func TestProjectManager_TestGetProject(t *testing.T) {
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	resp, _ := projectManager.GetProject(context.Background(),
-		*mockedProject)
+		mockedProject)
 
 	assert.Equal(t, mockedProject.Id, resp.Id)
 	assert.Equal(t, "a-mocked-project", resp.Name)
@@ -317,7 +317,7 @@ func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	_, err := projectManager.GetProject(context.Background(),
-		*mockedProject)
+		mockedProject)
 
 	assert.EqualError(t, err, "project "+project+" not found")
 }
@@ -330,7 +330,7 @@ func TestProjectManager_TestGetProject_ErrorDueToEmptyProjectGetRequest(t *testi
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	_, err := projectManager.GetProject(context.Background(),
-		*mockedProject)
+		mockedProject)
 
 	assert.EqualError(t, err, "missing project_id")
 }

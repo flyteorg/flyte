@@ -27,6 +27,7 @@ func Test_launch(t *testing.T) {
 		s := State{
 			ResourceMeta: "abc",
 			Phase:        PhaseResourcesCreated,
+			PhaseVersion: 2,
 		}
 		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, nil)
 
@@ -51,6 +52,7 @@ func Test_launch(t *testing.T) {
 		c := &mocks2.AutoRefresh{}
 		s := State{
 			Phase:        PhaseResourcesCreated,
+			PhaseVersion: 2,
 			ResourceMeta: "abc",
 		}
 
@@ -96,6 +98,7 @@ func Test_launch(t *testing.T) {
 		c := &mocks2.AutoRefresh{}
 		s := State{
 			Phase:        PhaseResourcesCreated,
+			PhaseVersion: 2,
 			ResourceMeta: "my-id",
 		}
 		c.OnGetOrCreate("my-id", CacheItem{State: s}).Return(CacheItem{State: s}, fmt.Errorf("failed to cache"))

@@ -100,9 +100,18 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		for t, cfg := range replicaSpecCfgMap {
 			// Short circuit if replica set has no replicas to avoid unnecessarily
 			// generating pod specs
-			if cfg.GetReplicas() <= 0 {
+			var replicas int32
+			// replicas is deprecated since the common replica spec is introduced.
+			// Therefore, if the common replica spec is set, use that to get the common fields
+			if cfg.GetCommon() != nil {
+				replicas = cfg.GetCommon().GetReplicas()
+			} else {
+				replicas = cfg.GetReplicas()
+			}
+			if replicas <= 0 {
 				continue
 			}
+
 			rs, err := common.ToReplicaSpecWithOverrides(ctx, taskCtx, cfg, kubeflowv1.TFJobDefaultContainerName, false)
 			if err != nil {
 				return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
@@ -176,7 +185,14 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 		CustomInfo: statusDetails,
 	}
 
-	return common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return phaseInfo, phaseVersionUpdateErr
+	}
+
+	return phaseInfo, err
 }
 
 func init() {

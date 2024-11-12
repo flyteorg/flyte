@@ -40,28 +40,28 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, we import the required libraries.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :lines: 1
 ```
 
 We define a task that returns the index of a character, where A-Z/a-z is equivalent to 0-25.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :pyobject: return_index
 ```
 
 We also create a task that prepares a list of 26 characters by populating the frequency of each character.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :pyobject: update_list
 ```
 
 We define a task to calculate the number of common characters between the two strings.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :pyobject: derive_count
 ```
@@ -75,7 +75,7 @@ We define a dynamic workflow to accomplish the following:
 
 The looping process is contingent on the number of characters in both strings, which is unknown until runtime.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :pyobject: count_characters
 ```
@@ -97,14 +97,14 @@ Local execution works when a `@dynamic` decorator is used because Flytekit treat
 
 Define a workflow that triggers the dynamic workflow.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :pyobject: dynamic_wf
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py
 :caption: advanced_composition/dynamic_workflow.py
 :lines: 78-79
 ```
@@ -214,13 +214,13 @@ To run the provided workflows on the Flyte cluster, you can use the following co
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py \
   dynamic_wf --s1 "Pear" --s2 "Earth"
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/dynamic_workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/dynamic_workflow.py \
   merge_sort --numbers '[1813, 3105, 3260, 2634, 383, 7037, 3291, 2403, 315, 7164]' --numbers_count 10
 ```
 

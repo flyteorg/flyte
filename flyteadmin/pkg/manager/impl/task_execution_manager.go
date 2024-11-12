@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -65,7 +66,7 @@ func (m *TaskExecutionManager) createTaskExecution(
 
 	nodeExecutionID := request.Event.ParentNodeExecutionId
 	nodeExecutionExists, err := m.db.NodeExecutionRepo().Exists(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionID,
+		NodeExecutionIdentifier: nodeExecutionID,
 	})
 	if err != nil || !nodeExecutionExists {
 		m.metrics.MissingTaskExecution.Inc()
@@ -124,7 +125,7 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 	return *existingTaskExecution, nil
 }
 
-func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request admin.TaskExecutionEventRequest) (
+func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request *admin.TaskExecutionEventRequest) (
 	*admin.TaskExecutionEventResponse, error) {
 
 	if err := validation.ValidateTaskExecutionRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
@@ -137,12 +138,12 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 
 	// Get the parent node execution, if none found a MissingEntityError will be returned
 	nodeExecutionID := request.Event.ParentNodeExecutionId
-	taskExecutionID := core.TaskExecutionIdentifier{
+	taskExecutionID := &core.TaskExecutionIdentifier{
 		TaskId:          request.Event.TaskId,
 		NodeExecutionId: nodeExecutionID,
 		RetryAttempt:    request.Event.RetryAttempt,
 	}
-	ctx = getTaskExecutionContext(ctx, &taskExecutionID)
+	ctx = getTaskExecutionContext(ctx, taskExecutionID)
 	logger.Debugf(ctx, "Received task execution event for [%+v] transitioning to phase [%v]",
 		taskExecutionID, request.Event.Phase)
 
@@ -158,7 +159,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 			logger.Debugf(ctx, "Failed to find existing task execution [%+v] with err %v", taskExecutionID, err)
 			return nil, err
 		}
-		_, err := m.createTaskExecution(ctx, &request)
+		_, err := m.createTaskExecution(ctx, request)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +184,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
 	}
 
-	taskExecutionModel, err = m.updateTaskExecutionModelState(ctx, &request, &taskExecutionModel)
+	taskExecutionModel, err = m.updateTaskExecutionModelState(ctx, request, &taskExecutionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update task execution with id [%+v] with err %v",
 			taskExecutionID, err)
@@ -200,14 +201,14 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		}
 	}
 
-	if err = m.notificationClient.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+	if err = m.notificationClient.Publish(ctx, proto.MessageName(request), request); err != nil {
 		m.metrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
 
 	go func() {
 		ceCtx := context.TODO()
-		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
+		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			logger.Errorf(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
 	}()
@@ -219,7 +220,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 }
 
 func (m *TaskExecutionManager) GetTaskExecution(
-	ctx context.Context, request admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
+	ctx context.Context, request *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
 	err := validation.ValidateTaskExecutionIdentifier(request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate GetTaskExecution [%+v] with err: %v", request.Id, err)
@@ -239,14 +240,14 @@ func (m *TaskExecutionManager) GetTaskExecution(
 }
 
 func (m *TaskExecutionManager) ListTaskExecutions(
-	ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+	ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 	if err := validation.ValidateTaskExecutionListRequest(request); err != nil {
 		logger.Debugf(ctx, "ListTaskExecutions request [%+v] is invalid: %v", request, err)
 		return nil, err
 	}
 	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, request.NodeExecutionId, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}
@@ -266,12 +267,17 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListTaskExecutions", request.Token)
 	}
+	joinTableEntities := make(map[common.Entity]bool)
+	for _, filter := range filters {
+		joinTableEntities[filter.GetEntity()] = true
+	}
 
 	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
+		InlineFilters:     filters,
+		Offset:            offset,
+		Limit:             int(request.Limit),
+		SortParameter:     sortParameter,
+		JoinTableEntities: joinTableEntities,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",
@@ -296,12 +302,12 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 }
 
 func (m *TaskExecutionManager) GetTaskExecutionData(
-	ctx context.Context, request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
+	ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
 	}
 	ctx = getTaskExecutionContext(ctx, request.Id)
-	taskExecution, err := m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{
+	taskExecution, err := m.GetTaskExecution(ctx, &admin.TaskExecutionGetRequest{
 		Id: request.Id,
 	})
 	if err != nil {
@@ -310,13 +316,26 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.InputUri)
-	if err != nil {
-		return nil, err
-	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.Closure)
+	var inputs *core.LiteralMap
+	var inputURLBlob *admin.UrlBlob
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		var err error
+		inputs, inputURLBlob, err = util.GetInputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, taskExecution.InputUri)
+		return err
+	})
+
+	var outputs *core.LiteralMap
+	var outputURLBlob *admin.UrlBlob
+	group.Go(func() error {
+		var err error
+		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, taskExecution.Closure)
+		return err
+	})
+
+	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +345,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
+		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(request.Id, false),
 	}
 
 	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))

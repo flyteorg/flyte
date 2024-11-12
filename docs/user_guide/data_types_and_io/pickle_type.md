@@ -27,7 +27,7 @@ This example demonstrates how you can utilize custom objects without registering
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pickle_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
 :caption: data_types_and_io/pickle_type.py
 :lines: 1
 ```
@@ -40,7 +40,7 @@ Alternatively, you can {ref}`turn this object into a dataclass <dataclass>` for 
 We have used a simple object here for demonstration purposes.
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pickle_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
 :caption: data_types_and_io/pickle_type.py
 :lines: 7-26
 ```
@@ -53,7 +53,7 @@ or significant list elements, you can specify a batch size.
 This feature allows for the processing of each batch as a separate pickle file.
 The following example demonstrates how to set the batch size.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pickle_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
 :caption: data_types_and_io/pickle_type.py
 :lines: 35-58
 ```
@@ -64,7 +64,7 @@ The `welcome_superheroes` task will generate two pickle files: one containing tw
 
 You can run the workflows locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pickle_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
 :caption: data_types_and_io/pickle_type.py
 :lines: 62-64
 ```

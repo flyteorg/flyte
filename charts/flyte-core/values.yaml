@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.11.1-b1  # FLYTEADMIN_TAG
+    tag: v1.13.2  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -144,7 +144,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.11.1-b1  # FLYTESCHEDULER_TAG
+    tag: v1.13.2  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -210,7 +210,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.11.1-b1  # DATACATALOG_TAG
+    tag: v1.13.2  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -279,10 +279,17 @@ flyteagent:
   enabled: false
   plugin_config:
     plugins:
-      agentService:
+      # -- Agent service configuration for propeller.
+      agent-service:
+        # -- The default agent service to use for plugin tasks.
         defaultAgent:
+          # -- The agent service endpoint propeller should connect to.
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
+        # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
+        # need to be configured.
+        supportedTaskTypes: []
   # -- Labels for flyteagent pods
   podLabels: {}
 
@@ -300,7 +307,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.11.1-b1  # FLYTEPROPELLER_TAG
+    tag: v1.13.2  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -312,7 +319,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
@@ -374,6 +380,10 @@ flytepropeller:
     interval: 60s
     # -- Sets the timeout after which request to scrape metrics will time out
     scrapeTimeout: 30s
+
+  prometheus:
+    enabled: false
+
 #
 # FLYTECONSOLE SETTINGS
 #
@@ -385,7 +395,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
-    tag: v1.10.3  # FLYTECONSOLE_TAG
+    tag: v1.17.1  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -426,6 +436,21 @@ flyteconsole:
     fsGroupChangePolicy: "OnRootMismatch"
     seLinuxOptions:
       type: spc_t
+
+  # -- Settings for flyteconsole service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteconsole service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+
+  livenessProbe: {}
+  readinessProbe: {}
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -468,6 +493,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook pods
+  podAnnotations: {}
+  # -- Additional webhook container environment variables
+  podEnv: {}
+  # -- Labels for webhook pods
+  podLabels: {}
+  # -- nodeSelector for webhook deployment
+  nodeSelector: {}
   # -- Sets securityContext for webhook pod(s).
   securityContext:
     fsGroup: 65534
@@ -482,6 +515,27 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+  prometheus:
+    enabled: false
 
 # ------------------------------------------------
 #
@@ -509,6 +563,7 @@ common:
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/app-root: /console
+      nginx.ingress.kubernetes.io/service-upstream: "true"
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
@@ -554,6 +609,9 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
+    targetGCPercent: 70
 
 # Database configuration
 db:
@@ -743,7 +801,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.1-b1  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.2  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -805,6 +863,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -887,15 +946,48 @@ external_events:
 # an SNS topic (or gcp equivalent)
 cloud_events:
   enable: false
-  type: aws
-  aws:
-    region: us-east-2
   eventsPublisher:
     # Make sure this is not a fifo queue. Admin does not yet support
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
       - all  # Or workflow, node, task. Or "*"
+  type: aws
+  # -- Configuration for sending cloud events to AWS SNS
+  aws:
+    region: us-east-2
+  # -- Configuration for sending cloud events to GCP Pub Sub
+  gcp:
+    region: us-east1
+  # -- Configuration for sending cloud events to Kafka
+  kafka:
+    # -- The version of Kafka
+    version: "3.7.0"
+    # -- The kafka brokers to talk to
+    brokers:
+      - mybroker:443
+    # -- SASL based authentication
+    saslConfig:
+      # -- Whether to use SASL authentication
+      enabled: false
+      # -- The kafka user
+      user: kafka
+      # -- The password for the kafka user
+      password: ""
+      # -- Optional mount path of file containing the kafka password.
+      passwordPath: ""
+      # -- Whether the send the SASL handsahke first
+      handshake: true
+      # -- Which SASL mechanism to use. Defaults to PLAIN
+      mechanism: PLAIN
+    # -- Certificate based authentication
+    tlsConfig:
+      # -- Whether to use certificate based authentication or TLS
+      enabled: false
+      # -- Path to the client certificate
+      certPath: /etc/ssl/certs/kafka-client.crt
+      # -- Path to the client private key
+      keyPath: /etc/ssl/certs/kafka-client.key
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
@@ -941,6 +1033,11 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
   # -- Resource templates that should be applied
   templates:

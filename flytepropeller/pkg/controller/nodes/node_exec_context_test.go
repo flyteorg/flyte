@@ -19,6 +19,8 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	mocks3 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -142,6 +144,52 @@ func Test_NodeContextDefault(t *testing.T) {
 	nodeExecContext, err = nodeExecutor.BuildNodeExecutionContext(context.Background(), execContext, nodeLookup, "node-a")
 	assert.NoError(t, err)
 	assert.Equal(t, "s3://bucket-b", nodeExecContext.RawOutputPrefix().String())
+
+	// Test that retrieving task nodes
+	taskIdentifier := common.GetTargetEntity(ctx, nodeExecContext)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Project, taskIdentifier.Project)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Domain, taskIdentifier.Domain)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Name, taskIdentifier.Name)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Version, taskIdentifier.Version)
+}
+
+func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
+	id := &core.Identifier{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Project:      "proj",
+		Domain:       "domain",
+		Name:         "sub-lp",
+		Version:      "v2",
+	}
+
+	subWfNode := &mocks.ExecutableWorkflowNode{}
+	subWfNode.OnGetSubWorkflowRef().Return(nil)
+	subWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
+
+	n := &mocks.ExecutableNode{}
+	n.OnGetWorkflowNode().Return(subWfNode)
+
+	nCtx := &mocks3.NodeExecutionContext{}
+	nCtx.OnNode().Return(n)
+
+	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
+	assert.Equal(t, id.Project, fetchedID.Project)
+	assert.Equal(t, id.Domain, fetchedID.Domain)
+	assert.Equal(t, id.Name, fetchedID.Name)
+	assert.Equal(t, id.Version, fetchedID.Version)
+}
+
+func TestGetTargetEntity_EmptyTask(t *testing.T) {
+	n := &mocks.ExecutableNode{}
+	n.OnGetWorkflowNode().Return(nil)
+	taskID := ""
+	n.OnGetTaskID().Return(&taskID)
+
+	nCtx := &mocks3.NodeExecutionContext{}
+	nCtx.OnNode().Return(n)
+
+	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
+	assert.Nil(t, fetchedID)
 }
 
 func Test_NodeContextDefaultInterruptible(t *testing.T) {

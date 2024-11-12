@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
@@ -22,6 +20,7 @@ import (
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -44,21 +43,10 @@ type AdminService struct {
 	Metrics                  AdminMetrics
 }
 
-// Intercepts all admin requests to handle panics during execution.
-func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message) {
-	err := recover()
-	if err == nil {
-		return
-	}
-
-	m.Metrics.PanicCounter.Inc()
-	logger.Fatalf(ctx, "panic-ed for request: [%+v] with err: %v with Stack: %v", request, err, string(debug.Stack()))
-}
-
 const defaultRetries = 3
 
 func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, configuration runtimeIfaces.Configuration,
-	kubeConfig, master string, dataStorageClient *storage.DataStore, adminScope promutils.Scope) *AdminService {
+	kubeConfig, master string, dataStorageClient *storage.DataStore, adminScope promutils.Scope, sm core.SecretManager) *AdminService {
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
 	panicCounter := adminScope.MustNewCounter("initialization_panic",
@@ -94,7 +82,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
 
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
-	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope, sm)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -32,6 +33,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type extendedFakeClient struct {
@@ -160,6 +162,10 @@ type dummyOutputWriter struct {
 func (d *dummyOutputWriter) Put(ctx context.Context, reader io.OutputReader) error {
 	d.r = reader
 	return nil
+}
+
+func (d *dummyOutputWriter) GetErrorPath() storage.DataReference {
+	return "s3://errors/error.pb"
 }
 
 func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCore.TaskExecutionContext {
@@ -761,13 +767,15 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 		},
 	}
 
-	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
+	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
 	phaseInfoQueuedVersion1 := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+		time.Now(),
 		pluginStateQueuedVersion1.K8sPluginState.PhaseVersion,
 		pluginStateQueuedVersion1.K8sPluginState.Reason,
 		nil,
 	)
 	phaseInfoQueuedReasonBar := pluginsCore.PhaseInfoQueuedWithTaskInfo(
+		time.Now(),
 		pluginStateQueuedReasonBar.K8sPluginState.PhaseVersion,
 		pluginStateQueuedReasonBar.K8sPluginState.Reason,
 		nil,

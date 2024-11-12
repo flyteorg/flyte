@@ -1,11 +1,8 @@
 package v1alpha1
 
 import (
-	"bytes"
-
-	"github.com/golang/protobuf/jsonpb"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type ConditionKind string
@@ -25,20 +22,12 @@ type ApproveCondition struct {
 }
 
 func (in ApproveCondition) MarshalJSON() ([]byte, error) {
-	if in.ApproveCondition == nil {
-		return nilJSON, nil
-	}
-
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.ApproveCondition); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.ApproveCondition)
 }
 
 func (in *ApproveCondition) UnmarshalJSON(b []byte) error {
 	in.ApproveCondition = &core.ApproveCondition{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.ApproveCondition)
+	return utils.UnmarshalBytesToPb(b, in.ApproveCondition)
 }
 
 type SignalCondition struct {
@@ -46,20 +35,12 @@ type SignalCondition struct {
 }
 
 func (in SignalCondition) MarshalJSON() ([]byte, error) {
-	if in.SignalCondition == nil {
-		return nilJSON, nil
-	}
-
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.SignalCondition); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.SignalCondition)
 }
 
 func (in *SignalCondition) UnmarshalJSON(b []byte) error {
 	in.SignalCondition = &core.SignalCondition{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.SignalCondition)
+	return utils.UnmarshalBytesToPb(b, in.SignalCondition)
 }
 
 type SleepCondition struct {
@@ -67,20 +48,12 @@ type SleepCondition struct {
 }
 
 func (in SleepCondition) MarshalJSON() ([]byte, error) {
-	if in.SleepCondition == nil {
-		return nilJSON, nil
-	}
-
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.SleepCondition); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.SleepCondition)
 }
 
 func (in *SleepCondition) UnmarshalJSON(b []byte) error {
 	in.SleepCondition = &core.SleepCondition{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.SleepCondition)
+	return utils.UnmarshalBytesToPb(b, in.SleepCondition)
 }
 
 type GateNodeSpec struct {

@@ -3,13 +3,14 @@ package cache
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 	"sync"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
@@ -116,11 +117,15 @@ type autoRefresh struct {
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
 	lruMap          *lru.Cache
-	toDelete        *syncSet
-	syncPeriod      time.Duration
-	workqueue       workqueue.RateLimitingInterface
-	parallelizm     int
-	lock            sync.RWMutex
+	// Items that are currently being processed are in the processing set.
+	// It will prevent the same item from being processed multiple times by different workers.
+	processing  *sync.Map
+	toDelete    *syncSet
+	syncPeriod  time.Duration
+	workqueue   workqueue.RateLimitingInterface
+	parallelizm int
+	lock        sync.RWMutex
+	clock       clock.Clock
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -161,15 +166,27 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	}
 
 	enqueueCtx := contextutils.WithGoroutineLabel(ctx, fmt.Sprintf("%v-enqueue", w.name))
-
-	go wait.Until(func() {
-		err := w.enqueueBatches(enqueueCtx)
-		if err != nil {
-			logger.Errorf(enqueueCtx, "Failed to enqueue. Error: %v", err)
-		}
-	}, w.syncPeriod, enqueueCtx.Done())
+	go w.enqueueLoop(enqueueCtx)
 
 	return nil
+}
+
+func (w *autoRefresh) enqueueLoop(ctx context.Context) {
+	timer := w.clock.NewTimer(w.syncPeriod)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-timer.C():
+			err := w.enqueueBatches(ctx)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to enqueue. Error: %v", err)
+			}
+			timer.Reset(w.syncPeriod)
+		}
+	}
 }
 
 // Update updates the item only if it exists in the cache, return true if we updated the item.
@@ -211,6 +228,13 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 
 	w.lruMap.Add(id, item)
 	w.metrics.CacheMiss.Inc()
+
+	// It fixes cold start issue in the AutoRefreshCache by adding the item to the workqueue when it is created.
+	// This way, the item will be processed without waiting for the next sync cycle (30s by default).
+	batch := make([]ItemWrapper, 0, 1)
+	batch = append(batch, itemWrapper{id: id, item: item})
+	w.workqueue.AddRateLimited(&batch)
+	w.processing.Store(id, w.clock.Now())
 	return item, nil
 }
 
@@ -236,7 +260,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
-			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal()) {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.inProcessing(k)) {
 				snapshot = append(snapshot, itemWrapper{
 					id:   k.(ItemID),
 					item: value.(Item),
@@ -253,6 +277,9 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	for _, batch := range batches {
 		b := batch
 		w.workqueue.AddRateLimited(&b)
+		for i := 1; i < len(b); i++ {
+			w.processing.Store(b[i].GetID(), w.clock.Now())
+		}
 	}
 
 	return nil
@@ -277,9 +304,9 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		}
 
 		if err, isErr = rVal.(error); isErr {
-			err = fmt.Errorf("worker panic'd and is shutting down. Error: %w", err)
+			err = fmt.Errorf("worker panic'd and is shutting down. Error: %w with Stack: %v", err, string(debug.Stack()))
 		} else {
-			err = fmt.Errorf("worker panic'd and is shutting down. Panic value: %v", rVal)
+			err = fmt.Errorf("worker panic'd and is shutting down. Panic value: %v with Stack: %v", rVal, string(debug.Stack()))
 		}
 
 		logger.Error(ctx, err)
@@ -295,7 +322,6 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
-
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
 			w.workqueue.Forget(batch)
@@ -304,6 +330,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			newBatch := make(Batch, 0, len(*batch.(*Batch)))
 			for _, b := range *batch.(*Batch) {
 				itemID := b.GetID()
+				w.processing.Delete(itemID)
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -346,9 +373,28 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 	}
 }
 
+// Checks if the item is currently being processed and returns false if the item has been in processing for too long
+func (w *autoRefresh) inProcessing(key interface{}) bool {
+	item, found := w.processing.Load(key)
+	if found {
+		// handle potential race conditions where the item is in processing but not in the workqueue
+		if timeItem, ok := item.(time.Time); ok && w.clock.Since(timeItem) > (w.syncPeriod*5) {
+			w.processing.Delete(key)
+			return false
+		}
+		return true
+	}
+	return false
+}
+
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
 func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
 	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, createBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock.RealClock{})
+}
+
+func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
+	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 
 	metrics := newMetrics(scope)
 	lruCache, err := lru.NewWithEvict(size, getEvictionFunction(metrics.Evictions))
@@ -363,9 +409,14 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
+		processing:      &sync.Map{},
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
-		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),
+		workqueue: workqueue.NewRateLimitingQueueWithConfig(syncRateLimiter, workqueue.RateLimitingQueueConfig{
+			Name:  scope.CurrentScope(),
+			Clock: clock,
+		}),
+		clock: clock,
 	}
 
 	return cache, nil
@@ -376,4 +427,9 @@ func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue
 	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
 
 	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
+}
+
+func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
+	parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock)
 }

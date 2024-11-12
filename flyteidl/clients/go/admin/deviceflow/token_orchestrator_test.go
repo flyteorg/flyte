@@ -23,7 +23,7 @@ import (
 func TestFetchFromAuthFlow(t *testing.T) {
 	ctx := context.Background()
 	t.Run("fetch from auth flow", func(t *testing.T) {
-		tokenCache := &cache.TokenCacheInMemoryProvider{}
+		tokenCache := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{
@@ -97,7 +97,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		}))
 		defer fakeServer.Close()
 
-		tokenCache := &cache.TokenCacheInMemoryProvider{}
+		tokenCache := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{

@@ -53,7 +53,7 @@ func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.Re
 }
 
 func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
-	ctx context.Context, request admin.WorkflowAttributesUpdateRequest, model models.Resource,
+	ctx context.Context, request *admin.WorkflowAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.WorkflowAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
 		Project:      model.Project,
@@ -88,7 +88,7 @@ func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
 }
 
 func (m *ResourceManager) UpdateWorkflowAttributes(
-	ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
+	ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) (
 	*admin.WorkflowAttributesUpdateResponse, error) {
 	var resource admin.MatchableResource
 	var err error
@@ -96,7 +96,7 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 		return nil, err
 	}
 
-	model, err := transformers.WorkflowAttributesToResourceModel(*request.Attributes, resource)
+	model, err := transformers.WorkflowAttributesToResourceModel(request.Attributes, resource)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 }
 
 func (m *ResourceManager) GetWorkflowAttributes(
-	ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+	ctx context.Context, request *admin.WorkflowAttributesGetRequest) (
 	*admin.WorkflowAttributesGetResponse, error) {
 	if err := validation.ValidateWorkflowAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (m *ResourceManager) GetWorkflowAttributes(
 }
 
 func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
-	request admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
+	request *admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
 	if err := validation.ValidateWorkflowAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 	return &admin.WorkflowAttributesDeleteResponse{}, nil
 }
 
-func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (
 	*admin.ProjectAttributesUpdateResponse, error) {
 
 	var resource admin.MatchableResource
@@ -154,7 +154,7 @@ func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request a
 	if resource, err = validation.ValidateProjectAttributesUpdateRequest(ctx, m.db, request); err != nil {
 		return nil, err
 	}
-	model, err := transformers.ProjectAttributesToResourceModel(*request.Attributes, resource)
+	model, err := transformers.ProjectAttributesToResourceModel(request.Attributes, resource)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request a
 	return &admin.ProjectAttributesUpdateResponse{}, nil
 }
 
-func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 
 	if err := validation.ValidateProjectExists(ctx, m.db, request.Project); err != nil {
@@ -201,7 +201,7 @@ func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request 
 // Admin server level configuration.
 // Note this merge is only done for WorkflowExecutionConfig
 // This code should be removed pending implementation of a complete settings implementation.
-func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 
 	getResponse, err := m.GetProjectAttributesBase(ctx, request)
@@ -215,7 +215,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 					Project: request.Project,
 					MatchingAttributes: &admin.MatchingAttributes{
 						Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
-							WorkflowExecutionConfig: &configLevelDefaults,
+							WorkflowExecutionConfig: configLevelDefaults,
 						},
 					},
 				},
@@ -230,8 +230,8 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 	responseAttributes := getResponse.Attributes.GetMatchingAttributes().GetWorkflowExecutionConfig()
 	if responseAttributes != nil {
 		logger.Warningf(ctx, "Merging response %s with defaults %s", responseAttributes, configLevelDefaults)
-		tmp := util.MergeIntoExecConfig(*responseAttributes, &configLevelDefaults)
-		responseAttributes = &tmp
+		tmp := util.MergeIntoExecConfig(responseAttributes, configLevelDefaults)
+		responseAttributes = tmp
 		return &admin.ProjectAttributesGetResponse{
 			Attributes: &admin.ProjectAttributes{
 				Project: request.Project,
@@ -247,7 +247,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 	return getResponse, nil
 }
 
-func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 
 	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project); err != nil {
@@ -262,7 +262,7 @@ func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request a
 }
 
 func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
+	ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
 		Project:      model.Project,
@@ -297,7 +297,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 }
 
 func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
-	ctx context.Context, request admin.ProjectAttributesUpdateRequest, model models.Resource,
+	ctx context.Context, request *admin.ProjectAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.ProjectAttributesUpdateResponse, error) {
 
 	resourceID := repo_interface.ResourceID{
@@ -333,7 +333,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
 }
 
 func (m *ResourceManager) UpdateProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
+	ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
 	var resource admin.MatchableResource
 	var err error
@@ -342,7 +342,7 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Attributes.Project, request.Attributes.Domain)
 
-	model, err := transformers.ProjectDomainAttributesToResourceModel(*request.Attributes, resource)
+	model, err := transformers.ProjectDomainAttributesToResourceModel(request.Attributes, resource)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 }
 
 func (m *ResourceManager) GetProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
+	ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
 	if err := validation.ValidateProjectDomainAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
@@ -377,7 +377,7 @@ func (m *ResourceManager) GetProjectDomainAttributes(
 }
 
 func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
-	request admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
+	request *admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
 	if err := validation.ValidateProjectDomainAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
@@ -390,7 +390,7 @@ func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
 	return &admin.ProjectDomainAttributesDeleteResponse{}, nil
 }
 
-func (m *ResourceManager) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+func (m *ResourceManager) ListAll(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
 	*admin.ListMatchableAttributesResponse, error) {
 	if err := validation.ValidateListAllMatchableAttributesRequest(request); err != nil {
 		return nil, err

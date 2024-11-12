@@ -17,7 +17,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 For any {py:func}`flytekit.task` in Flyte, there is always one required import, which is:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache_serialize.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache_serialize.py
 :caption: development_lifecycle/task_cache_serialize.py
 :lines: 1
 ```
@@ -27,7 +27,7 @@ Task cache serializing is disabled by default to avoid unexpected behavior for t
 This operation is only useful for cacheable tasks, where one may reuse output from a previous execution. Flyte requires implicitly enabling the `cache` parameter on all cache serializable tasks.
 Cache key definitions follow the same rules as non-serialized cache tasks. It is important to understand the implications of the task signature and `cache_version` parameter in defining cached results.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache_serialize.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache_serialize.py
 :caption: development_lifecycle/task_cache_serialize.py
 :pyobject: square
 ```

@@ -9,6 +9,9 @@ import (
 	"strings"
 	"sync"
 
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/retry"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
@@ -167,6 +170,7 @@ func GetPKCEAuthTokenSource(ctx context.Context, pkceTokenOrchestrator pkce.Toke
 type ClientCredentialsTokenSourceProvider struct {
 	ccConfig   clientcredentials.Config
 	tokenCache cache.TokenCache
+	cfg        *Config
 }
 
 func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, scopes []string, tokenURL string,
@@ -188,7 +192,7 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 	}
 	secret = strings.TrimSpace(secret)
 	if tokenCache == nil {
-		tokenCache = &cache.TokenCacheInMemoryProvider{}
+		tokenCache = cache.NewTokenCacheInMemoryProvider()
 	}
 	return ClientCredentialsTokenSourceProvider{
 		ccConfig: clientcredentials.Config{
@@ -198,7 +202,9 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 			Scopes:         scopes,
 			EndpointParams: endpointParams,
 		},
-		tokenCache: tokenCache}, nil
+		tokenCache: tokenCache,
+		cfg:        cfg,
+	}, nil
 }
 
 func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
@@ -207,6 +213,7 @@ func (p ClientCredentialsTokenSourceProvider) GetTokenSource(ctx context.Context
 		new:        p.ccConfig.TokenSource(ctx),
 		mu:         sync.Mutex{},
 		tokenCache: p.tokenCache,
+		cfg:        p.cfg,
 	}, nil
 }
 
@@ -215,6 +222,7 @@ type customTokenSource struct {
 	mu         sync.Mutex // guards everything else
 	new        oauth2.TokenSource
 	tokenCache cache.TokenCache
+	cfg        *Config
 }
 
 func (s *customTokenSource) Token() (*oauth2.Token, error) {
@@ -225,16 +233,30 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 		return token, nil
 	}
 
-	token, err := s.new.Token()
+	totalAttempts := s.cfg.MaxRetries + 1 // Add one for initial request attempt
+	backoff := wait.Backoff{
+		Duration: s.cfg.PerRetryTimeout.Duration,
+		Steps:    totalAttempts,
+	}
+	var token *oauth2.Token
+	err := retry.OnError(backoff, func(err error) bool {
+		return err != nil
+	}, func() (err error) {
+		token, err = s.new.Token()
+		if err != nil {
+			logger.Infof(s.ctx, "failed to get token: %w", err)
+			return fmt.Errorf("failed to get token: %w", err)
+		}
+		return nil
+	})
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to get token: %w", err)
-		return nil, fmt.Errorf("failed to get token: %w", err)
+		return nil, err
 	}
 	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
 
 	err = s.tokenCache.SaveToken(token)
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to cache token: %w", err)
+		logger.Warnf(s.ctx, "failed to cache token: %v", err)
 	}
 
 	return token, nil

@@ -127,7 +127,9 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			tokenCache := &tokenCacheMocks.TokenCache{}
-			tokenCache.OnGetToken().Return(test.token, nil).Once()
+			tokenCache.OnGetToken().Return(test.token, nil).Maybe()
+			tokenCache.On("Lock").Return().Maybe()
+			tokenCache.On("Unlock").Return().Maybe()
 			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
 			assert.NoError(t, err)
 			source, err := provider.GetTokenSource(ctx)

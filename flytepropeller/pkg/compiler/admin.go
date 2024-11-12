@@ -11,8 +11,8 @@ import (
 // but that implementation relies on the internal Admin Gorm model. We should consider deprecating that one in favor
 // of this one as Admin already has a dependency on the Propeller compiler.
 type LaunchPlanInterfaceProvider struct {
-	expectedInputs  core.ParameterMap
-	expectedOutputs core.VariableMap
+	expectedInputs  *core.ParameterMap
+	expectedOutputs *core.VariableMap
 	identifier      *core.Identifier
 }
 
@@ -20,17 +20,17 @@ func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
 	return p.identifier
 }
 func (p *LaunchPlanInterfaceProvider) GetExpectedInputs() *core.ParameterMap {
-	return &p.expectedInputs
+	return p.expectedInputs
 
 }
 func (p *LaunchPlanInterfaceProvider) GetExpectedOutputs() *core.VariableMap {
-	return &p.expectedOutputs
+	return p.expectedOutputs
 }
 
-func NewLaunchPlanInterfaceProvider(launchPlan admin.LaunchPlan) *LaunchPlanInterfaceProvider {
+func NewLaunchPlanInterfaceProvider(launchPlan *admin.LaunchPlan) *LaunchPlanInterfaceProvider {
 	return &LaunchPlanInterfaceProvider{
-		expectedInputs:  *launchPlan.Closure.ExpectedInputs,
-		expectedOutputs: *launchPlan.Closure.ExpectedOutputs,
+		expectedInputs:  launchPlan.Closure.ExpectedInputs,
+		expectedOutputs: launchPlan.Closure.ExpectedOutputs,
 		identifier:      launchPlan.Id,
 	}
 }

@@ -25,7 +25,7 @@ type queues = []singleQueueConfiguration
 type queueConfig = map[tag]queues
 
 type QueueAllocator interface {
-	GetQueue(ctx context.Context, identifier core.Identifier) singleQueueConfiguration
+	GetQueue(ctx context.Context, identifier *core.Identifier) singleQueueConfiguration
 }
 
 type queueAllocatorImpl struct {
@@ -52,7 +52,7 @@ func (q *queueAllocatorImpl) refreshExecutionQueues(executionQueues []runtimeInt
 	q.queueConfigMap = queueConfigMap
 }
 
-func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Identifier) singleQueueConfiguration {
+func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier *core.Identifier) singleQueueConfiguration {
 	// NOTE: If refreshing the execution queues & workflow configs on every call to GetQueue becomes too slow we should
 	// investigate caching the computed queue assignments.
 	executionQueues := q.config.QueueConfiguration().GetExecutionQueues()

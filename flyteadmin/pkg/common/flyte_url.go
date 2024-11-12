@@ -125,7 +125,7 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 
 }
 
-func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
+func FlyteURLsFromNodeExecutionID(nodeExecutionID *core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
 	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s", nodeExecutionID.ExecutionId.Project,
 		nodeExecutionID.ExecutionId.Domain, nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
 
@@ -142,7 +142,7 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 // FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
 // This constructs a fully unique prefix, and when post-pended with the output name, forms a fully unique name for
 // the artifact service (including the project/domain of course, which the artifact service will add).
-func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier) string {
+func FlyteURLKeyFromNodeExecutionID(nodeExecutionID *core.NodeExecutionIdentifier) string {
 	res := fmt.Sprintf("%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
 
 	return res
@@ -150,13 +150,13 @@ func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier
 
 // FlyteURLKeyFromNodeExecutionIDRetry is a modified version of the function above.
 // See the uniqueness comment above.
-func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int) string {
+func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID *core.NodeExecutionIdentifier, retry int) string {
 	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry))
 
 	return res
 }
 
-func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
+func FlyteURLsFromTaskExecutionID(taskExecutionID *core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
 	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Project,
 		taskExecutionID.NodeExecutionId.ExecutionId.Domain, taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))
 

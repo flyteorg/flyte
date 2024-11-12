@@ -39,6 +39,7 @@ type NodeExecutionMetadata interface {
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetInterruptibleFailureThreshold() int32
+	GetConsoleURL() string
 }
 
 type NodeExecutionContext interface {

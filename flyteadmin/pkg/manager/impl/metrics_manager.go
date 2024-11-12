@@ -116,7 +116,7 @@ func (m *MetricsManager) getLatestUpstreamNodeExecution(nodeID string, upstreamN
 }
 
 // getNodeExecutions queries the nodeExecutionManager for NodeExecutions adhering to the specified request.
-func (m *MetricsManager) getNodeExecutions(ctx context.Context, request admin.NodeExecutionListRequest) (map[string]*admin.NodeExecution, error) {
+func (m *MetricsManager) getNodeExecutions(ctx context.Context, request *admin.NodeExecutionListRequest) (map[string]*admin.NodeExecution, error) {
 	nodeExecutions := make(map[string]*admin.NodeExecution)
 	for {
 		response, err := m.nodeExecutionManager.ListNodeExecutions(ctx, request)
@@ -139,7 +139,7 @@ func (m *MetricsManager) getNodeExecutions(ctx context.Context, request admin.No
 }
 
 // getTaskExecutions queries the taskExecutionManager for TaskExecutions adhering to the specified request.
-func (m *MetricsManager) getTaskExecutions(ctx context.Context, request admin.TaskExecutionListRequest) ([]*admin.TaskExecution, error) {
+func (m *MetricsManager) getTaskExecutions(ctx context.Context, request *admin.TaskExecutionListRequest) ([]*admin.TaskExecution, error) {
 	taskExecutions := make([]*admin.TaskExecution, 0)
 	for {
 		response, err := m.taskExecutionManager.ListTaskExecutions(ctx, request)
@@ -165,7 +165,7 @@ func (m *MetricsManager) parseBranchNodeExecution(ctx context.Context,
 	nodeExecution *admin.NodeExecution, branchNode *core.BranchNode, spans *[]*core.Span, depth int) error {
 
 	// retrieve node execution(s)
-	nodeExecutions, err := m.getNodeExecutions(ctx, admin.NodeExecutionListRequest{
+	nodeExecutions, err := m.getNodeExecutions(ctx, &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: nodeExecution.Id.ExecutionId,
 		Limit:               RequestLimit,
 		UniqueParentId:      nodeExecution.Id.NodeId,
@@ -218,7 +218,7 @@ func (m *MetricsManager) parseBranchNodeExecution(ctx context.Context,
 // parseDynamicNodeExecution partitions the DynamicNode execution into a collection of Categorical and Reference Spans
 // which are appended to the provided spans argument.
 func (m *MetricsManager) parseDynamicNodeExecution(ctx context.Context, nodeExecution *admin.NodeExecution, spans *[]*core.Span, depth int) error {
-	taskExecutions, err := m.getTaskExecutions(ctx, admin.TaskExecutionListRequest{
+	taskExecutions, err := m.getTaskExecutions(ctx, &admin.TaskExecutionListRequest{
 		NodeExecutionId: nodeExecution.Id,
 		Limit:           RequestLimit,
 	})
@@ -236,7 +236,7 @@ func (m *MetricsManager) parseDynamicNodeExecution(ctx context.Context, nodeExec
 		// task execution(s)
 		parseTaskExecutions(taskExecutions, spans, depth)
 
-		nodeExecutions, err := m.getNodeExecutions(ctx, admin.NodeExecutionListRequest{
+		nodeExecutions, err := m.getNodeExecutions(ctx, &admin.NodeExecutionListRequest{
 			WorkflowExecutionId: nodeExecution.Id.ExecutionId,
 			Limit:               RequestLimit,
 			UniqueParentId:      nodeExecution.Id.NodeId,
@@ -257,7 +257,7 @@ func (m *MetricsManager) parseDynamicNodeExecution(ctx context.Context, nodeExec
 				startNode.Closure.UpdatedAt, nodeReset))
 
 			// node execution(s)
-			getDataRequest := admin.NodeExecutionGetDataRequest{Id: nodeExecution.Id}
+			getDataRequest := &admin.NodeExecutionGetDataRequest{Id: nodeExecution.Id}
 			nodeExecutionData, err := m.nodeExecutionManager.GetNodeExecutionData(ctx, getDataRequest)
 			if err != nil {
 				return err
@@ -285,13 +285,13 @@ func (m *MetricsManager) parseExecution(ctx context.Context, execution *admin.Ex
 	spans := make([]*core.Span, 0)
 	if depth != 0 {
 		// retrieve workflow and node executions
-		workflowRequest := admin.ObjectGetRequest{Id: execution.Closure.WorkflowId}
+		workflowRequest := &admin.ObjectGetRequest{Id: execution.Closure.WorkflowId}
 		workflow, err := m.workflowManager.GetWorkflow(ctx, workflowRequest)
 		if err != nil {
 			return nil, err
 		}
 
-		nodeExecutions, err := m.getNodeExecutions(ctx, admin.NodeExecutionListRequest{
+		nodeExecutions, err := m.getNodeExecutions(ctx, &admin.NodeExecutionListRequest{
 			WorkflowExecutionId: execution.Id,
 			Limit:               RequestLimit,
 		})
@@ -366,7 +366,7 @@ func (m *MetricsManager) parseLaunchPlanNodeExecution(ctx context.Context, nodeE
 		*spans = append(*spans, createOperationSpan(nodeExecution.Closure.CreatedAt, nodeExecution.Closure.UpdatedAt, nodeSetup))
 	} else {
 		// retrieve execution
-		executionRequest := admin.WorkflowExecutionGetRequest{Id: workflowNode.ExecutionId}
+		executionRequest := &admin.WorkflowExecutionGetRequest{Id: workflowNode.ExecutionId}
 		execution, err := m.executionManager.GetExecution(ctx, executionRequest)
 		if err != nil {
 			return err
@@ -507,7 +507,7 @@ func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 	nodeExecution *admin.NodeExecution, identifier *core.Identifier, spans *[]*core.Span, depth int) error {
 
 	// retrieve node execution(s)
-	nodeExecutions, err := m.getNodeExecutions(ctx, admin.NodeExecutionListRequest{
+	nodeExecutions, err := m.getNodeExecutions(ctx, &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: nodeExecution.Id.ExecutionId,
 		Limit:               RequestLimit,
 		UniqueParentId:      nodeExecution.Id.NodeId,
@@ -525,7 +525,7 @@ func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 		*spans = append(*spans, createOperationSpan(nodeExecution.Closure.CreatedAt, startNode.Closure.UpdatedAt, nodeSetup))
 
 		// retrieve workflow
-		workflowRequest := admin.ObjectGetRequest{Id: identifier}
+		workflowRequest := &admin.ObjectGetRequest{Id: identifier}
 		workflow, err := m.workflowManager.GetWorkflow(ctx, workflowRequest)
 		if err != nil {
 			return err
@@ -610,7 +610,7 @@ func parseTaskExecutions(taskExecutions []*admin.TaskExecution, spans *[]*core.S
 // are appended to the provided spans argument.
 func (m *MetricsManager) parseTaskNodeExecution(ctx context.Context, nodeExecution *admin.NodeExecution, spans *[]*core.Span, depth int) error {
 	// retrieve task executions
-	taskExecutions, err := m.getTaskExecutions(ctx, admin.TaskExecutionListRequest{
+	taskExecutions, err := m.getTaskExecutions(ctx, &admin.TaskExecutionListRequest{
 		NodeExecutionId: nodeExecution.Id,
 		Limit:           RequestLimit,
 	})
@@ -642,10 +642,10 @@ func (m *MetricsManager) parseTaskNodeExecution(ctx context.Context, nodeExecuti
 // GetExecutionMetrics returns a Span hierarchically breaking down the workflow execution into a collection of
 // Categorical and Reference Spans.
 func (m *MetricsManager) GetExecutionMetrics(ctx context.Context,
-	request admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
+	request *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
 
 	// retrieve workflow execution
-	executionRequest := admin.WorkflowExecutionGetRequest{Id: request.Id}
+	executionRequest := &admin.WorkflowExecutionGetRequest{Id: request.Id}
 	execution, err := m.executionManager.GetExecution(ctx, executionRequest)
 	if err != nil {
 		return nil, err

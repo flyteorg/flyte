@@ -39,6 +39,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		parentInfo := mocks2.ImmutableParentInfo{}
 		parentInfo.OnCurrentAttempt().Return(0)
 		parentInfo.OnGetUniqueID().Return("u")
+		parentInfo.OnIsInDynamicChain().Return(true)
 		node := mocks.ExecutableNode{}
 		node.OnGetID().Return("n")
 		node.OnGetName().Return("nodey")
@@ -53,11 +54,12 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			},
 		}, info, "inputPath", &status, v1alpha1.EventVersion2, &parentInfo, &node, "clusterID", v1alpha1.DynamicNodePhaseParentFinalized, &config.EventConfig{
 			RawOutputPolicy: config.RawOutputPolicyReference,
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, nev.IsDynamic)
 		assert.True(t, nev.IsParent)
 		assert.Equal(t, nodeExecutionEventVersion, nev.EventVersion)
+		assert.True(t, nev.IsInDynamicChain)
 	})
 	t.Run("is parent", func(t *testing.T) {
 		info := handler.PhaseInfoDynamicRunning(&handler.ExecutionInfo{TaskNodeInfo: &handler.TaskNodeInfo{
@@ -69,6 +71,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		parentInfo := mocks2.ImmutableParentInfo{}
 		parentInfo.OnCurrentAttempt().Return(0)
 		parentInfo.OnGetUniqueID().Return("u")
+		parentInfo.OnIsInDynamicChain().Return(false)
 		node := mocks.ExecutableNode{}
 		node.OnGetID().Return("n")
 		node.OnGetName().Return("nodey")
@@ -87,7 +90,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			},
 		}, info, "inputPath", &status, v1alpha1.EventVersion2, &parentInfo, &node, "clusterID", v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 			RawOutputPolicy: config.RawOutputPolicyReference,
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.False(t, nev.IsDynamic)
 		assert.True(t, nev.IsParent)
@@ -116,7 +119,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			},
 		}, info, "inputPath", &status, v1alpha1.EventVersion2, nil, &node, "clusterID", v1alpha1.DynamicNodePhaseParentFinalized, &config.EventConfig{
 			RawOutputPolicy: config.RawOutputPolicyInline,
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(inputs, nev.GetInputData()))
 	})

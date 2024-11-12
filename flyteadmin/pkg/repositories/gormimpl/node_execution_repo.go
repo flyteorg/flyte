@@ -3,10 +3,10 @@ package gormimpl
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -97,7 +97,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
+	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Where(getIDFilter(nodeExecution.ID)).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -113,12 +113,10 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}
 	var nodeExecutions []models.NodeExecution
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecutions")
-	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// (this query isn't called for deletes).
-	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
-		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
+	// And add join condition, if any
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToNodeExec)
+	}
 
 	// Apply filters
 	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
@@ -165,12 +163,10 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	var err error
 	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Preload("ChildNodeExecutions")
 
-	// Add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// (this query isn't called for deletes).
-	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
-		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
+	// And add join condition, if any
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToNodeExec)
+	}
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)

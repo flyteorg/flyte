@@ -37,7 +37,7 @@ func (c *workflowCompiler) CompileWorkflow(
 
 	compiledWorkflowClosure, err := compiler.CompileWorkflow(primaryWf, subworkflows, tasks, launchPlans)
 	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to compile workflow with err %v", err)
+		return nil, errors.NewFlyteAdminError(codes.InvalidArgument, err.Error())
 	}
 	return compiledWorkflowClosure, nil
 }

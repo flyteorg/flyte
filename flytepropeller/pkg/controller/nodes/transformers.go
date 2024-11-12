@@ -76,14 +76,17 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 	}
 }
 
-func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
+func ToNodeExecutionEvent(
+	nodeExecID *core.NodeExecutionIdentifier,
 	info handler.PhaseInfo,
 	inputPath string,
 	status v1alpha1.ExecutableNodeStatus,
 	eventVersion v1alpha1.EventVersion,
 	parentInfo executors.ImmutableParentInfo,
 	node v1alpha1.ExecutableNode, clusterID string, dynamicNodePhase v1alpha1.DynamicNodePhase,
-	eventConfig *config.EventConfig) (*event.NodeExecutionEvent, error) {
+	eventConfig *config.EventConfig,
+	targetEntity *core.Identifier) (*event.NodeExecutionEvent, error) {
+
 	if info.GetPhase() == handler.EPhaseNotReady {
 		return nil, nil
 	}
@@ -101,9 +104,17 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		phase = core.NodeExecution_RUNNING
 	}
 
+	// At some point, the entity that this event corresponds to came from a dynamic task. See the IDL for more info.
+	var dynamicChain = false
+	if parentInfo != nil && parentInfo.IsInDynamicChain() {
+		dynamicChain = true
+	}
+
+	eInfo := info.GetInfo()
 	var nev *event.NodeExecutionEvent
-	// Start node is special case where the Inputs and Outputs are the same and hence here we copy the Output file
+	// Start node is special case where the Outputs are the same and hence here we copy the Output file
 	// into the OutputResult and in admin we copy it over into input as well.
+	// Start node doesn't have inputs.
 	if nodeExecID.NodeId == v1alpha1.StartNodeID {
 		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
 		nev = &event.NodeExecutionEvent{
@@ -112,19 +123,35 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			OutputResult: ToNodeExecOutput(&handler.OutputInfo{
 				OutputURI: outputsFile,
 			}),
-			OccurredAt:   occurredTime,
-			ProducerId:   clusterID,
-			EventVersion: nodeExecutionEventVersion,
-			ReportedAt:   ptypes.TimestampNow(),
+			OccurredAt:       occurredTime,
+			ProducerId:       clusterID,
+			EventVersion:     nodeExecutionEventVersion,
+			ReportedAt:       ptypes.TimestampNow(),
+			TargetEntity:     targetEntity,
+			IsInDynamicChain: dynamicChain,
 		}
 	} else {
+		// include target_entity from function caller.
 		nev = &event.NodeExecutionEvent{
-			Id:           nodeExecID,
-			Phase:        phase,
-			OccurredAt:   occurredTime,
-			ProducerId:   clusterID,
-			EventVersion: nodeExecutionEventVersion,
-			ReportedAt:   ptypes.TimestampNow(),
+			Id:               nodeExecID,
+			Phase:            phase,
+			OccurredAt:       occurredTime,
+			ProducerId:       clusterID,
+			EventVersion:     nodeExecutionEventVersion,
+			ReportedAt:       ptypes.TimestampNow(),
+			TargetEntity:     targetEntity,
+			IsInDynamicChain: dynamicChain,
+		}
+		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
+			if eInfo != nil {
+				nev.InputValue = &event.NodeExecutionEvent_InputData{
+					InputData: eInfo.Inputs,
+				}
+			}
+		} else {
+			nev.InputValue = &event.NodeExecutionEvent_InputUri{
+				InputUri: inputPath,
+			}
 		}
 	}
 
@@ -150,7 +177,6 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.NodeName = node.GetName()
 	}
 
-	eInfo := info.GetInfo()
 	if eInfo != nil {
 		if eInfo.WorkflowNodeInfo != nil {
 			v := ToNodeExecWorkflowNodeMetadata(eInfo.WorkflowNodeInfo)
@@ -179,7 +205,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.IsParent = true
 	} else if node.GetKind() == v1alpha1.NodeKindArray {
 		nev.IsArray = true
-		if config.GetConfig().ArrayNodeEventVersion == 1 {
+		if config.GetConfig().ArrayNode.EventVersion == 1 {
 			nev.IsParent = true
 		}
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
@@ -188,17 +214,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			nev.IsParent = true
 		}
 	}
-	if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
-		if eInfo != nil {
-			nev.InputValue = &event.NodeExecutionEvent_InputData{
-				InputData: eInfo.Inputs,
-			}
-		}
-	} else {
-		nev.InputValue = &event.NodeExecutionEvent_InputUri{
-			InputUri: inputPath,
-		}
-	}
+
 	return nev, nil
 }
 

@@ -3,6 +3,7 @@
 #
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
+LINT_FLAGS ?=
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
@@ -14,13 +15,11 @@ generate: download_tooling #generate go code
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
-	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
+	GL_DEBUG=linters_output,env golangci-lint run $(LINT_FLAGS) --deadline=5m --exclude deprecated -v
 
-# If code is failing goimports linter, this will fix.
-# skips 'vendor'
-.PHONY: goimports
-goimports:
-	@boilerplate/flyte/golang_test_targets/goimports
+.PHONY: lint-fix
+lint-fix: LINT_FLAGS=--fix
+lint-fix: lint
 
 .PHONY: mod_download
 mod_download: #download dependencies (including test deps) for the package
@@ -54,7 +53,6 @@ test_unit_visual:
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh
 
 .PHONY: go-tidy
 go-tidy:

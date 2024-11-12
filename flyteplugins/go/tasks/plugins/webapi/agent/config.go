@@ -47,6 +47,7 @@ var (
 		// AsyncPlugin should be registered to at least one task type.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
 		SupportedTaskTypes: []string{"task_type_1", "task_type_2"},
+		PollInterval:       config.Duration{Duration: 10 * time.Second},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
@@ -71,6 +72,9 @@ type Config struct {
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
 	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
+
+	// PollInterval is the interval at which the plugin should poll the agent for metadata updates
+	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
 }
 
 type Deployment struct {

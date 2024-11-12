@@ -28,7 +28,7 @@ var alphabeticalSortParam, _ = common.NewSortParameter(&admin.Sort{
 	Key:       "identifier",
 }, models.ProjectColumns)
 
-func (m *ProjectManager) CreateProject(ctx context.Context, request admin.ProjectRegisterRequest) (
+func (m *ProjectManager) CreateProject(ctx context.Context, request *admin.ProjectRegisterRequest) (
 	*admin.ProjectRegisterResponse, error) {
 	if err := validation.ValidateProjectRegisterRequest(request); err != nil {
 		return nil, err
@@ -42,19 +42,7 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request admin.Projec
 	return &admin.ProjectRegisterResponse{}, nil
 }
 
-func (m *ProjectManager) getDomains() []*admin.Domain {
-	configDomains := m.config.ApplicationConfiguration().GetDomainsConfig()
-	var domains = make([]*admin.Domain, len(*configDomains))
-	for index, configDomain := range *configDomains {
-		domains[index] = &admin.Domain{
-			Id:   configDomain.ID,
-			Name: configDomain.Name,
-		}
-	}
-	return domains
-}
-
-func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
+func (m *ProjectManager) ListProjects(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
 	spec := util.FilterSpec{
 		RequestFilters: request.Filters,
 	}
@@ -76,7 +64,6 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListProjects", request.Token)
 	}
-
 	// And finally, query the database
 	listProjectsInput := repoInterfaces.ListResourceInput{
 		Limit:         int(request.Limit),
@@ -88,7 +75,7 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 	if err != nil {
 		return nil, err
 	}
-	projects := transformers.FromProjectModels(projectModels, m.getDomains())
+	projects := transformers.FromProjectModels(projectModels, m.GetDomains(ctx, &admin.GetDomainRequest{}).Domains)
 
 	var token string
 	if len(projects) == int(request.Limit) {
@@ -101,7 +88,7 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 	}, nil
 }
 
-func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.Project) (*admin.ProjectUpdateResponse, error) {
+func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate *admin.Project) (*admin.ProjectUpdateResponse, error) {
 	var response admin.ProjectUpdateResponse
 	projectRepo := m.db.ProjectRepo()
 
@@ -117,7 +104,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	}
 
 	// Transform the provided project into a model and apply to the DB.
-	projectUpdateModel := transformers.CreateProjectModel(&projectUpdate)
+	projectUpdateModel := transformers.CreateProjectModel(projectUpdate)
 	err = projectRepo.UpdateProject(ctx, projectUpdateModel)
 
 	if err != nil {
@@ -127,7 +114,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	return &response, nil
 }
 
-func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGetRequest) (*admin.Project, error) {
+func (m *ProjectManager) GetProject(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
 	if err := validation.ValidateProjectGetRequest(request); err != nil {
 		return nil, err
 	}
@@ -135,9 +122,23 @@ func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGe
 	if err != nil {
 		return nil, err
 	}
-	projectResponse := transformers.FromProjectModel(projectModel, m.getDomains())
+	projectResponse := transformers.FromProjectModel(projectModel, m.GetDomains(ctx, &admin.GetDomainRequest{}).Domains)
 
-	return &projectResponse, nil
+	return projectResponse, nil
+}
+
+func (m *ProjectManager) GetDomains(ctx context.Context, request *admin.GetDomainRequest) *admin.GetDomainsResponse {
+	configDomains := m.config.ApplicationConfiguration().GetDomainsConfig()
+	var domains = make([]*admin.Domain, len(*configDomains))
+	for index, configDomain := range *configDomains {
+		domains[index] = &admin.Domain{
+			Id:   configDomain.ID,
+			Name: configDomain.Name,
+		}
+	}
+	return &admin.GetDomainsResponse{
+		Domains: domains,
+	}
 }
 
 func NewProjectManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {

@@ -20,7 +20,7 @@ import (
 const numSystemNodes = 2 // A workflow graph always has a start and end node injected by the platform.
 
 func ValidateWorkflow(
-	ctx context.Context, request admin.WorkflowCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, request *admin.WorkflowCreateRequest, db repositoryInterfaces.Repository,
 	config runtime.ApplicationConfiguration) error {
 	if err := ValidateIdentifier(request.Id, common.Workflow); err != nil {
 		return err
@@ -34,10 +34,10 @@ func ValidateWorkflow(
 	return nil
 }
 
-func ValidateCompiledWorkflow(identifier core.Identifier, workflow admin.WorkflowClosure, config runtime.RegistrationValidationConfiguration) error {
+func ValidateCompiledWorkflow(identifier *core.Identifier, workflow *admin.WorkflowClosure, config runtime.RegistrationValidationConfiguration) error {
 	if len(config.GetWorkflowSizeLimit()) > 0 {
 		workflowSizeLimit := resource.MustParse(config.GetWorkflowSizeLimit())
-		workflowSizeValue := resource.NewQuantity(int64(proto.Size(&workflow)), resource.DecimalExponent)
+		workflowSizeValue := resource.NewQuantity(int64(proto.Size(workflow)), resource.DecimalExponent)
 		if workflowSizeLimit.Cmp(*workflowSizeValue) <= -1 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"Workflow closure size exceeds max limit [%v]", config.GetWorkflowSizeLimit())

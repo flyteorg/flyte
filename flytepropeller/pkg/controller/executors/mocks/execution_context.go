@@ -184,6 +184,38 @@ func (_m *ExecutionContext) GetAnnotations() map[string]string {
 	return r0
 }
 
+type ExecutionContext_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_GetConsoleURL) Return(_a0 string) *ExecutionContext_GetConsoleURL {
+	return &ExecutionContext_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnGetConsoleURL() *ExecutionContext_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &ExecutionContext_GetConsoleURL{Call: c_call}
+}
+
+func (_m *ExecutionContext) OnGetConsoleURLMatch(matchers ...interface{}) *ExecutionContext_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &ExecutionContext_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *ExecutionContext) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ExecutionContext_GetCreationTimestamp struct {
 	*mock.Call
 }

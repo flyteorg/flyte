@@ -36,13 +36,13 @@ func CreateProjectModel(project *admin.Project) models.Project {
 	}
 }
 
-func FromProjectModel(projectModel models.Project, domains []*admin.Domain) admin.Project {
+func FromProjectModel(projectModel models.Project, domains []*admin.Domain) *admin.Project {
 	projectDeserialized := &admin.Project{}
 	err := proto.Unmarshal(projectModel.Labels, projectDeserialized)
 	if err != nil {
-		return admin.Project{}
+		return &admin.Project{}
 	}
-	project := admin.Project{
+	project := &admin.Project{
 		Id:          projectModel.Identifier,
 		Name:        projectModel.Name,
 		Description: projectModel.Description,
@@ -57,7 +57,7 @@ func FromProjectModels(projectModels []models.Project, domains []*admin.Domain) 
 	projects := make([]*admin.Project, len(projectModels))
 	for index, projectModel := range projectModels {
 		project := FromProjectModel(projectModel, domains)
-		projects[index] = &project
+		projects[index] = project
 	}
 	return projects
 }

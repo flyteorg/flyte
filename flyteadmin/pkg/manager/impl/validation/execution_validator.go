@@ -26,7 +26,7 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 	core.ResourceType_TASK:        nil,
 }
 
-func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
+func ValidateExecutionRequest(ctx context.Context, request *admin.ExecutionCreateRequest,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
@@ -68,6 +68,9 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 			return err
 		}
 	}
+	if err := validateLabels(request.Spec.Labels); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -98,6 +101,10 @@ func CheckAndFetchInputsForExecution(
 			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
 			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
+			err := validators.ValidateLiteralType(inputType)
+			if err != nil {
+				return nil, errors.NewInvalidLiteralTypeError(name, err)
+			}
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
 			}
@@ -132,7 +139,7 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	return nil
 }
 
-func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
+func ValidateCreateWorkflowEventRequest(request *admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
 	if request.Event == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler was called without event")

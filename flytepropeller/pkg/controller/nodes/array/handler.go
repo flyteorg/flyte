@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 	"github.com/flyteorg/flyte/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -21,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -43,6 +45,7 @@ var (
 // arrayNodeHandler is a handle implementation for processing array nodes
 type arrayNodeHandler struct {
 	eventConfig                 *config.EventConfig
+	literalOffloadingConfig     config.LiteralOffloadingConfig
 	gatherOutputsRequestChannel chan *gatherOutputsRequest
 	metrics                     metrics
 	nodeExecutionRequestChannel chan *nodeExecutionRequest
@@ -94,6 +97,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			} else {
 				// record events transitioning subNodes to aborted
 				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+
 				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 				}
@@ -111,6 +115,10 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
+		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
+		if eventsErr.IsAlreadyExists(err) {
+			return nil
+		}
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
@@ -183,12 +191,29 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
-		for _, variable := range literalMap.Literals {
+
+		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
+			err := validators.ValidateLiteralType(literalType)
+			if err != nil {
+				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
+				return handler.DoTransition(handler.TransitionTypeEphemeral,
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
+				), nil
+			}
+			if variable.GetOffloadedMetadata() != nil {
+				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
+				// We need this for the map task to be able to create the subNodeSpec
+				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
+				if err != nil {
+					return handler.DoTransition(handler.TransitionTypeEphemeral,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
+					), nil
+				}
+			}
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
 				collectionLength := len(variable.GetCollection().Literals)
-
 				if size == -1 {
 					size = collectionLength
 				} else if size != collectionLength {
@@ -252,26 +277,14 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		availableParallelism := 0
-		// using the workflow's parallelism if the array node parallelism is not set
-		useWorkflowParallelism := arrayNode.GetParallelism() == nil
-		if useWorkflowParallelism {
-			// greedily take all available slots
-			// TODO: This will need to be re-evaluated if we want to support dynamics & sub_workflows
-			currentParallelism := nCtx.ExecutionContext().CurrentParallelism()
-			maxParallelism := nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism
-			availableParallelism = int(maxParallelism - currentParallelism)
-		} else {
-			availableParallelism = int(*arrayNode.GetParallelism())
-			if availableParallelism == 0 {
-				availableParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-			}
-		}
-
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, availableParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
+		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			if availableParallelism == 0 {
+			if currentParallelism >= maxParallelism {
 				break
 			}
 
@@ -315,10 +328,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
 			// parallelism is handled during subNode evaluations + avoid deadlocks
-			if useWorkflowParallelism {
+			if incrementWorkflowParallelism {
 				nCtx.ExecutionContext().IncrementParallelism()
 			}
-			availableParallelism--
+			currentParallelism++
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -351,6 +364,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 				}
 			}
+
 			if err := eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts()); err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -417,6 +431,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
+		}
+
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
 		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {
@@ -497,7 +517,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// attempt best effort at initializing outputLiterals with output variable names. currently
 		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
-
 		switch arrayNode.GetSubNodeSpec().GetKind() {
 		case v1alpha1.NodeKindTask:
 			taskID := *arrayNode.GetSubNodeSpec().TaskRef
@@ -546,6 +565,18 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
+		// only offload literal if config is enabled for this feature.
+		if a.literalOffloadingConfig.Enabled {
+			for outputLiteralKey, outputLiteral := range outputLiterals {
+				// if the size of the output Literal is > threshold then we write the literal to the offloaded store and populate the literal with its zero value and update the offloaded url
+				// use the OffloadLargeLiteralKey to create  {OffloadLargeLiteralKey}_offloaded_metadata.pb file in the datastore.
+				// Update the url in the outputLiteral with the offloaded url and also update the size of the literal.
+				offloadedOutputFile := v1alpha1.GetOutputsLiteralMetadataFile(outputLiteralKey, nCtx.NodeStatus().GetOutputDir())
+				if err := common.OffloadLargeLiteral(ctx, nCtx.DataStore(), offloadedOutputFile, outputLiteral, a.literalOffloadingConfig); err != nil {
+					return handler.UnknownTransition, err
+				}
+			}
+		}
 		outputLiteralMap := &idlcore.LiteralMap{
 			Literals: outputLiterals,
 		}
@@ -582,17 +613,42 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
-		// increment it if we detect any changes in subNode state.
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		} else if incrementTaskPhaseVersion {
-			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
+		// increment taskPhaseVersion if we detect any changes in subNode state.
+		if incrementTaskPhaseVersion {
+			arrayNodeState.TaskPhaseVersion++
 		}
 
-		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
-			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-			return handler.UnknownTransition, err
+		const maxRetries = 3
+		retries := 0
+		for retries <= maxRetries {
+			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
+
+			if err == nil {
+				break
+			}
+
+			// Handle potential race condition if FlyteWorkflow CRD fails to get synced
+			if eventsErr.IsAlreadyExists(err) {
+				if !incrementTaskPhaseVersion {
+					break
+				}
+				logger.Warnf(ctx, "Event version already exists, bumping version and retrying (%d/%d): [%s]", retries+1, maxRetries, err.Error())
+				arrayNodeState.TaskPhaseVersion++
+			} else {
+				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+				return handler.UnknownTransition, err
+			}
+
+			retries++
+			if retries > maxRetries {
+				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
+				return handler.UnknownTransition, err
+			}
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 	}
 
@@ -623,7 +679,7 @@ func (a *arrayNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) e
 }
 
 // New initializes a new arrayNodeHandler
-func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
+func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalOffloadingConfig config.LiteralOffloadingConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// create k8s PluginState byte mocks to reuse instead of creating for each subNode evaluation
 	pluginStateBytesNotStarted, err := bytesFromK8sPluginState(k8s.PluginState{Phase: k8s.PluginPhaseNotStarted})
 	if err != nil {
@@ -635,9 +691,22 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 		return nil, err
 	}
 
+	eventConfigCopy, err := stdConfig.DeepCopyConfig(eventConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	deepCopiedEventConfig, ok := eventConfigCopy.(*config.EventConfig)
+	if !ok {
+		return nil, fmt.Errorf("deep copy error: expected *config.EventConfig, but got %T", eventConfigCopy)
+	}
+
+	deepCopiedEventConfig.ErrorOnAlreadyExists = true
+
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
-		eventConfig:                 eventConfig,
+		eventConfig:                 deepCopiedEventConfig,
+		literalOffloadingConfig:     literalOffloadingConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
 		nodeExecutionRequestChannel: make(chan *nodeExecutionRequest),
@@ -713,7 +782,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// initialize mocks
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus)
 
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}

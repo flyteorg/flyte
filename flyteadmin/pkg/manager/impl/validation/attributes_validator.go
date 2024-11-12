@@ -40,7 +40,7 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 
 func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration,
-	request admin.ProjectDomainAttributesUpdateRequest) (
+	request *admin.ProjectDomainAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
 		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
@@ -55,7 +55,7 @@ func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 
 func ValidateProjectAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository,
-	request admin.ProjectAttributesUpdateRequest) (
+	request *admin.ProjectAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 
 	if request.Attributes == nil {
@@ -69,7 +69,7 @@ func ValidateProjectAttributesUpdateRequest(ctx context.Context,
 }
 
 func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesGetRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.ProjectDomainAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositor
 }
 
 func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesDeleteRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.ProjectDomainAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db reposi
 }
 
 func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesUpdateRequest) (
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
 		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
@@ -104,7 +104,7 @@ func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositoryI
 }
 
 func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesGetRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositoryInte
 }
 
 func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesDeleteRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositoryI
 	return nil
 }
 
-func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttributesRequest) error {
+func ValidateListAllMatchableAttributesRequest(request *admin.ListMatchableAttributesRequest) error {
 	if _, ok := admin.MatchableResource_name[int32(request.ResourceType)]; !ok {
 		return shared.GetInvalidArgumentError(shared.ResourceType)
 	}

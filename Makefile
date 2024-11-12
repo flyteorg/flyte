@@ -6,10 +6,10 @@ define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --tags --long --match "v*" --first-parent)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
-PACKAGE ?=github.com/flyteorg/flytestdlib
+PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
 TMP_BUILD_DIR := .tmp_build
 
@@ -140,6 +140,10 @@ go-tidy:
 lint-helm-charts:
 	# This pressuposes that you have act installed
 	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+
+.PHONY: spellcheck
+spellcheck:
+	act pull_request --container-architecture linux/amd64 -W .github/workflows/codespell.yml
 
 .PHONY: clean
 clean: ## Remove the HTML files related to the Flyteconsole and Makefile

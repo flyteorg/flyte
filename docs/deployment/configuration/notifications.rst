@@ -1,7 +1,8 @@
 .. _deployment-configuration-notifications:
 
+#############
 Notifications
--------------
+#############
 
 .. tags:: Infrastructure, Advanced
 
@@ -62,10 +63,10 @@ The ``notifications`` top-level portion of the FlyteAdmin config specifies how t
 
 As with schedules, the notifications handling is composed of two parts. One handles enqueuing notifications asynchronously and the second part handles processing pending notifications and actually firing off emails and alerts.
 
-This is only supported for Flyte instances running on AWS.
+This is only supported for Flyte instances running on AWS or GCP.
 
-Config
-=======
+AWS Config
+==========
 
 To publish notifications, you'll need to set up an `SNS topic <https://aws.amazon.com/sns/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc>`_.
 
@@ -80,9 +81,7 @@ Let's look at the following config section and explain what each value represent
 .. code-block:: yaml
 
   notifications:
-    # Because AWS is the only cloud back-end supported for executing scheduled
-    # workflows in this case, only ``"aws"`` is a valid value. By default, the
-    #no-op executor is used.
+    # By default, the no-op executor is used.
     type: "aws"
 
     # This specifies which region AWS clients will use when creating SNS and SQS clients.
@@ -126,10 +125,76 @@ into `code <https://github.com/flyteorg/flyteadmin/blob/a84223dab00dfa52d8ba1ed2
 .. _admin-config-example:
 
 Example config
-==============
+--------------
 
 You can find the full configuration file `here <https://github.com/flyteorg/flyteadmin/blob/master/flyteadmin_config.yaml>`__.
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyteadmin/master/flyteadmin_config.yaml
    :caption: flyteadmin/flyteadmin_config.yaml
    :lines: 91-105
+
+GCP Config
+==========
+
+You'll need to set up a `Pub/Sub topic <https://cloud.google.com/pubsub/docs/create-topic>`__ to publish notifications to, 
+and a `Pub/Sub subscriber <https://cloud.google.com/pubsub/docs/subscription-overview>`__ to consume from that topic 
+and process notifications. The GCP service account used by FlyteAdmin must also have Pub/Sub publish and subscribe permissions.
+
+Email service
+-------------
+
+In order to actually publish notifications, you'll need an account with an external email service which will be 
+used to send notification emails and alerts using email APIs. 
+
+Currently, `SendGrid <https://sendgrid.com/en-us>`__ is the only supported external email service, 
+and you will need to have a verified SendGrid sender. Create a SendGrid API key with ``Mail Send`` permissions 
+and save it to a file ``key``. 
+
+Create a K8s secret in FlyteAdmin's cluster with that file:
+
+.. prompt:: bash $
+  
+    kubectl create secret generic -n flyte --from-file key sendgrid-key
+
+Mount the secret by adding the following to the ``flyte-core`` values YAML:
+
+.. code-block:: yaml
+
+    flyteadmin:
+      additionalVolumes:
+      - name: sendgrid-key
+        secret:
+          secretName: sendgrid-key
+          items:
+            - key: key
+              path: key
+      additionalVolumeMounts:
+      - name: sendgrid-key
+        mountPath: /sendgrid
+
+Config
+------
+
+In the ``flyte-core`` values YAML, the top-level ``notifications`` config should be
+placed under ``workflow_notifications``.
+
+.. code-block:: yaml
+
+    workflow_notifications:
+      enabled: true
+      config:
+        notifications:
+          type: gcp
+          gcp:
+            projectId: "{{ YOUR PROJECT ID }}"
+          publisher:
+            topicName: "{{ YOUR PUB/SUB TOPIC NAME }}"
+          processor:
+            queueName: "{{ YOUR PUB/SUB SUBSCRIBER NAME }}"
+          emailer:
+            emailServerConfig:
+              serviceName: sendgrid
+              apiKeyFilePath: /sendgrid/key
+            subject: "Flyte execution \"{{ name }}\" has {{ phase }} in \"{{ project }}\"."
+            sender: "{{ YOUR SENDGRID SENDER EMAIL }}"
+            body: View details at <a href=https://{{ YOUR FLYTE HOST }}/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>https://{{ YOUR FLYTE HOST }}/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>

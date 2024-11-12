@@ -27,7 +27,9 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -64,10 +66,11 @@ func (e ErrorCollection) Error() string {
 
 // Parameters struct is used by the Templating Engine to replace the templated parameters
 type Parameters struct {
-	TaskExecMetadata core.TaskExecutionMetadata
-	Inputs           io.InputReader
-	OutputPath       io.OutputFilePaths
-	Task             core.TaskTemplatePath
+	TaskExecMetadata  core.TaskExecutionMetadata
+	Inputs            io.InputReader
+	OutputPath        io.OutputFilePaths
+	Task              core.TaskTemplatePath
+	IncludeConsoleURL bool
 }
 
 // Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
@@ -198,6 +201,19 @@ func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
 		return o.Blob.Uri, nil
 	case *idlCore.Scalar_Schema:
 		return o.Schema.Uri, nil
+	case *idlCore.Scalar_Binary:
+		binaryBytes := o.Binary.Value
+		var currVal any
+		if o.Binary.Tag == coreutils.MESSAGEPACK {
+			err := msgpack.Unmarshal(binaryBytes, &currVal)
+			if err != nil {
+				return "", fmt.Errorf("failed to unmarshal messagepack bytes with literal:[%v], err:[%v]", l, err)
+			}
+			// TODO: Try to support Primitive_Datetime, Primitive_Duration, Flyte File, and Flyte Directory.
+			return fmt.Sprintf("%v", currVal), nil
+		}
+		return "", fmt.Errorf("unsupported binary tag [%v]", o.Binary.Tag)
+
 	default:
 		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
 	}

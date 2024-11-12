@@ -100,6 +100,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-streak-length"), defaultConfig.MaxStreakLength, "Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "event-config.raw-output-policy"), defaultConfig.EventConfig.RawOutputPolicy, "How output data should be passed along in execution events.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "event-config.fallback-to-output-reference"), defaultConfig.EventConfig.FallbackToOutputReference, "Whether output data should be sent by reference when it is too large to be sent inline in execution events.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "event-config.-"), defaultConfig.EventConfig.ErrorOnAlreadyExists, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "include-shard-key-label"), defaultConfig.IncludeShardKeyLabel, "Include the specified shard key label in the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "exclude-shard-key-label"), defaultConfig.ExcludeShardKeyLabel, "Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "include-project-label"), defaultConfig.IncludeProjectLabel, "Include the specified project label in the k8s FlyteWorkflow CRD label selector")
@@ -108,7 +109,13 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "exclude-domain-label"), defaultConfig.ExcludeDomainLabel, "Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster-id"), defaultConfig.ClusterID, "Unique cluster id running this flytepropeller instance with which to annotate execution events")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "create-flyteworkflow-crd"), defaultConfig.CreateFlyteWorkflowCRD, "Enable creation of the FlyteWorkflow CRD on startup")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-event-version"), defaultConfig.ArrayNodeEventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "node-execution-worker-count"), defaultConfig.NodeExecutionWorkerCount, "Number of workers to evaluate node executions,  currently only used for array nodes")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-config.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node-config.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "array-node-config.use-map-plugin-logs"), defaultConfig.ArrayNode.UseMapPluginLogs, "Override subNode log links with those configured for the map plugin logs")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.Enabled"), defaultConfig.LiteralOffloadingConfig.Enabled, "")
+	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.supported-sdk-versions"), defaultConfig.LiteralOffloadingConfig.SupportedSDKVersions, "Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.min-size-in-mb-for-offloading"), defaultConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, "Size of a literal at which to trigger offloading")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.max-size-in-mb-for-offloading"), defaultConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, "Size of a literal at which to fail fast")
 	return cmdFlags
 }

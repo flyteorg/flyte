@@ -16,6 +16,7 @@ import (
 	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
@@ -24,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -33,12 +35,18 @@ const (
 	KeyIDClaim    = "key_id"
 )
 
+type providerMetrics struct {
+	InvalidTokens prometheus.Counter
+	ExpiredTokens prometheus.Counter
+}
+
 // Provider implements OAuth2 Authorization Server.
 type Provider struct {
 	fosite.OAuth2Provider
 	cfg       config.AuthorizationServer
 	publicKey []rsa.PublicKey
 	keySet    jwk.Set
+	metrics   providerMetrics
 }
 
 func (p Provider) PublicKeys() []rsa.PublicKey {
@@ -111,15 +119,28 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 	})
 
 	if err != nil {
+		logger.Infof(ctx, "failed to parse token for audience '%s'. Error: %v", expectedAudience, err)
 		return nil, err
 	}
 
 	if !parsedToken.Valid {
+		if ve, ok := err.(*jwtgo.ValidationError); ok && ve.Is(jwtgo.ErrTokenExpired) {
+			logger.Infof(ctx, "parsed token for audience '%s' is expired", expectedAudience)
+			p.metrics.ExpiredTokens.Inc()
+		} else {
+			logger.Infof(ctx, "parsed token for audience '%s' is invalid: %+v", expectedAudience, err)
+			p.metrics.InvalidTokens.Inc()
+		}
 		return nil, fmt.Errorf("parsed token is invalid")
 	}
 
 	claimsRaw := parsedToken.Claims.(jwtgo.MapClaims)
-	return verifyClaims(sets.NewString(expectedAudience), claimsRaw)
+	identityCtx, err := verifyClaims(sets.NewString(expectedAudience), claimsRaw)
+	if err != nil {
+		logger.Infof(ctx, "failed to verify claims for audience: '%s'. Error: %v", expectedAudience, err)
+		return nil, err
+	}
+	return identityCtx, nil
 }
 
 // NewProvider creates a new OAuth2 Provider that is able to do OAuth 2-legged and 3-legged flows. It'll lookup
@@ -127,7 +148,7 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 // sign and generate hashes for tokens. The RSA Private key is expected to be in PEM format with the public key embedded.
 // Use auth.GetInitSecretsCommand() to generate new valid secrets that will be accepted by this provider.
 // The config.SecretNameClaimSymmetricKey must be a 32-bytes long key in Base64Encoding.
-func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.SecretManager) (Provider, error) {
+func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.SecretManager, scope promutils.Scope) (Provider, error) {
 	// fosite requires four parameters for the server to get up and running:
 	// 1. config - for any enforcement you may desire, you can do this using `compose.Config`. You like PKCE, enforce it!
 	// 2. store - no auth service is generally useful unless it can remember clients and users.
@@ -147,6 +168,9 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to read secretTokenHash file. Error: %w", err)
 	}
+	if tokenHashBase64 == "" {
+		return Provider{}, fmt.Errorf("failed to read secretTokenHash. Error: empty value")
+	}
 
 	secret, err := base64.RawStdEncoding.DecodeString(tokenHashBase64)
 	if err != nil {
@@ -158,8 +182,14 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to read token signing RSA Key. Error: %w", err)
 	}
+	if privateKeyPEM == "" {
+		return Provider{}, fmt.Errorf("failed to read token signing RSA Key. Error: empty value")
+	}
 
 	block, _ := pem.Decode([]byte(privateKeyPEM))
+	if block == nil {
+		return Provider{}, fmt.Errorf("failed to decode token signing RSA Key. Error: no PEM data found")
+	}
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to parse PKCS1PrivateKey. Error: %w", err)
@@ -197,7 +227,13 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	// Try to load old key to validate tokens using it to support key rotation.
 	privateKeyPEM, err = sm.Get(ctx, cfg.OldTokenSigningRSAKeySecretName)
 	if err == nil {
+		if privateKeyPEM == "" {
+			return Provider{}, fmt.Errorf("failed to read PKCS1PrivateKey. Error: empty value")
+		}
 		block, _ = pem.Decode([]byte(privateKeyPEM))
+		if block == nil {
+			return Provider{}, fmt.Errorf("failed to decode PKCS1PrivateKey. Error: no PEM data found")
+		}
 		oldPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 		if err != nil {
 			return Provider{}, fmt.Errorf("failed to parse PKCS1PrivateKey. Error: %w", err)
@@ -215,5 +251,9 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 		OAuth2Provider: oauth2Provider,
 		publicKey:      publicKeys,
 		keySet:         keysSet,
+		metrics: providerMetrics{
+			ExpiredTokens: scope.MustNewCounter("expired_token", "The number of expired tokens"),
+			InvalidTokens: scope.MustNewCounter("invalid_tokens", "The number of invalid tokens"),
+		},
 	}, nil
 }

@@ -16,13 +16,13 @@ type NoopRemoteURL struct {
 	remoteDataStoreClient storage.DataStore
 }
 
-func (n *NoopRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+func (n *NoopRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	metadata, err := n.remoteDataStoreClient.Head(ctx, storage.DataReference(uri))
 	if err != nil {
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to get metadata for uri: %s with err: %v", uri, err)
 	}
-	return admin.UrlBlob{
+	return &admin.UrlBlob{
 		Url:   uri,
 		Bytes: metadata.Size(),
 	}, nil

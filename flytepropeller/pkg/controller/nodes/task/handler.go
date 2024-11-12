@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -19,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -200,6 +200,7 @@ type Handler struct {
 	pluginScope     promutils.Scope
 	eventConfig     *controllerConfig.EventConfig
 	clusterID       string
+	agentService    *pluginCore.AgentService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -226,6 +227,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
+	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
@@ -245,9 +247,15 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
+
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
+
+		if cp.GetID() == agent.ID {
+			t.agentService.CorePlugin = cp
+		}
+
 		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
 		// static definition includes that task type as something it is registered to handle.
 		for _, tt := range p.RegisteredTaskTypes {
@@ -306,7 +314,6 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	}
 
 	t.resourceManager = rm
-
 	return nil
 }
 
@@ -337,6 +344,11 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
 	}
+
+	if t.agentService.ContainTaskType(ttype) {
+		return t.agentService.CorePlugin, nil
+	}
+
 	if t.defaultPlugin != nil {
 		logger.Warnf(ctx, "No plugin found for Handler-type [%s], defaulting to [%s]", ttype, t.defaultPlugin.GetID())
 		return t.defaultPlugin, nil
@@ -722,6 +734,15 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 	}
 	ok, err := r.Exists(ctx)
 	if err != nil {
+		if regErrors.Is(err, ioutils.ErrRemoteFileExceedsMaxSize) {
+			return &io.ExecutionError{
+				ExecutionError: &core.ExecutionError{
+					Code:    "OutputSizeExceeded",
+					Message: fmt.Sprintf("Remote output size exceeds max, err: [%s]", err.Error()),
+				},
+				IsRecoverable: false,
+			}, nil
+		}
 		logger.Errorf(ctx, "Failed to check if the output file exists. Error: %s", err.Error())
 		return nil, err
 	}
@@ -824,23 +845,28 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		}
 	}
 
-	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
+	phaseInfo := pluginCore.PhaseInfoFailed(pluginCore.PhaseAborted, &core.ExecutionError{
+		Code:    "Task Aborted",
+		Message: reason,
+	}, nil)
+	evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+		TaskExecContext:       tCtx,
+		InputReader:           nCtx.InputReader(),
+		EventConfig:           t.eventConfig,
+		OutputWriter:          tCtx.ow,
+		Info:                  phaseInfo,
+		NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+		ExecContext:           nCtx.ExecutionContext(),
+		TaskType:              ttype,
+		PluginID:              p.GetID(),
+		ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
+		ClusterID:             t.clusterID,
+		OccurredAt:            time.Now(),
+	})
 	if err != nil {
 		return err
 	}
-	if err := evRecorder.RecordTaskEvent(ctx, &event.TaskExecutionEvent{
-		TaskId:                taskExecID.TaskId,
-		ParentNodeExecutionId: nodeExecutionID,
-		RetryAttempt:          nCtx.CurrentAttempt(),
-		Phase:                 core.TaskExecution_ABORTED,
-		OccurredAt:            ptypes.TimestampNow(),
-		OutputResult: &event.TaskExecutionEvent_Error{
-			Error: &core.ExecutionError{
-				Code:    "Task Aborted",
-				Message: reason,
-			}},
-	}, t.eventConfig); err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
+	if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
 		// If a prior workflow/node/task execution event has failed because of an invalid cluster error, don't stall the abort
 		// at this point in the clean-up.
 		logger.Errorf(ctx, "failed to send event to Admin. error: %s", err.Error())
@@ -913,5 +939,6 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		cfg:             cfg,
 		eventConfig:     eventConfig,
 		clusterID:       clusterID,
+		agentService:    &pluginCore.AgentService{},
 	}, nil
 }

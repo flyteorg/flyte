@@ -71,8 +71,6 @@ Enable the MMCloud agent by adding the following config to the relevant YAML fil
         mmcloud-agent:
           endpoint: <AGENT_ENDPOINT>
           insecure: true
-      supportedTaskTypes:
-      - mmcloud_task
       agentForTaskTypes:
       - mmcloud_task: mmcloud-agent
 

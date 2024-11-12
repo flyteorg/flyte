@@ -152,7 +152,7 @@ func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx interfa
 }
 
 func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExecutionContext) (executors.ExecutionContext, error) {
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 	if err != nil {
 		return nil, err
 	}

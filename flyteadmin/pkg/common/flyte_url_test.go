@@ -10,7 +10,7 @@ import (
 
 func TestFlyteURLsFromNodeExecutionID(t *testing.T) {
 	t.Run("with deck", func(t *testing.T) {
-		ne := core.NodeExecutionIdentifier{
+		ne := &core.NodeExecutionIdentifier{
 			NodeId: "n0-dn0-n1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "fs",
@@ -25,7 +25,7 @@ func TestFlyteURLsFromNodeExecutionID(t *testing.T) {
 	})
 
 	t.Run("without deck", func(t *testing.T) {
-		ne := core.NodeExecutionIdentifier{
+		ne := &core.NodeExecutionIdentifier{
 			NodeId: "n0-dn0-n1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "fs",
@@ -42,7 +42,7 @@ func TestFlyteURLsFromNodeExecutionID(t *testing.T) {
 
 func TestFlyteURLsFromTaskExecutionID(t *testing.T) {
 	t.Run("with deck", func(t *testing.T) {
-		te := core.TaskExecutionIdentifier{
+		te := &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "fs",
@@ -67,7 +67,7 @@ func TestFlyteURLsFromTaskExecutionID(t *testing.T) {
 	})
 
 	t.Run("without deck", func(t *testing.T) {
-		te := core.TaskExecutionIdentifier{
+		te := &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "fs",

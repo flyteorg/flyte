@@ -26,7 +26,7 @@ func TestRefreshTheToken(t *testing.T) {
 			ClientID: "dummyClient",
 		},
 	}
-	tokenCacheProvider := &cache.TokenCacheInMemoryProvider{}
+	tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
 	orchestrator := BaseTokenOrchestrator{
 		ClientConfig: clientConf,
 		TokenCache:   tokenCacheProvider,
@@ -58,7 +58,7 @@ func TestFetchFromCache(t *testing.T) {
 	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("no token in cache", func(t *testing.T) {
-		tokenCacheProvider := &cache.TokenCacheInMemoryProvider{}
+		tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
 
 		orchestrator, err := NewBaseTokenOrchestrator(ctx, tokenCacheProvider, mockAuthClient)
 
@@ -69,7 +69,7 @@ func TestFetchFromCache(t *testing.T) {
 	})
 
 	t.Run("token in cache", func(t *testing.T) {
-		tokenCacheProvider := &cache.TokenCacheInMemoryProvider{}
+		tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewBaseTokenOrchestrator(ctx, tokenCacheProvider, mockAuthClient)
 		assert.NoError(t, err)
 		fileData, _ := os.ReadFile("testdata/token.json")
@@ -86,7 +86,7 @@ func TestFetchFromCache(t *testing.T) {
 	})
 
 	t.Run("expired token in cache", func(t *testing.T) {
-		tokenCacheProvider := &cache.TokenCacheInMemoryProvider{}
+		tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewBaseTokenOrchestrator(ctx, tokenCacheProvider, mockAuthClient)
 		assert.NoError(t, err)
 		fileData, _ := os.ReadFile("testdata/token.json")

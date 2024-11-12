@@ -2,13 +2,13 @@ package agent
 
 import (
 	"context"
-	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -35,9 +35,12 @@ func TestPlugin(t *testing.T) {
 	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
+	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
+		registry:    agentRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -59,16 +62,14 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		agentDeployment, _ := plugin.getFinalAgent(spark, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		agentDeployment, _ = plugin.getFinalAgent(foo, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		agentDeployment, _ = plugin.getFinalAgent(bar, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
@@ -114,17 +115,24 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
+		simpleStruct := structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"foo": {Kind: &structpb.Value_StringValue{StringValue: "foo"}},
+			},
+		}
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:    admin.State_RUNNING,
-			Outputs:  nil,
-			Message:  "Job is running",
-			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			State:      admin.State_RUNNING,
+			Outputs:    nil,
+			Message:    "Job is running",
+			LogLinks:   []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			CustomInfo: &simpleStruct,
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		assert.Equal(t, &simpleStruct, phase.Info().CustomInfo)
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
@@ -318,12 +326,12 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	agentRegistry, err := initializeAgentRegistry(cs)
-	assert.NoError(t, err)
 
-	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistry := getAgentRegistry(context.Background(), cs)
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	sort.Strings(agentRegistryKeys)
+	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
 
-	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
+	for _, key := range expectedKeys {
+		assert.Contains(t, agentRegistryKeys, key)
+	}
 }

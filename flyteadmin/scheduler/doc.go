@@ -7,7 +7,7 @@
 //    The above actions are exposed through launchplan activation/deactivation api's and do not have separate controls.
 //    Whenever a launchplan with a schedule is activated, a new schedule entry is created in the datastore
 //    On deactivation the created scheduled and launchplan is deactivated through a flag
-//    Atmost one launchplan is active at any moment across its various versions and same semantics apply for the
+//    At most one launchplan is active at any moment across its various versions and same semantics apply for the
 //    schedules as well.
 // 2] Scheduler
 //    This component is a singleton and has its source in the current folder and is responsible for reading the schedules
@@ -78,7 +78,7 @@
 //		   by the admin. i.e admin could execute the schedules in this order T2, T1. This is rare case though
 //
 // 		c) Case when the scheduler goes down then once it comes back up it will run catch up on all the schedules using
-//		   the last snapshoted timestamp to time.Now()
+//		   the last snapshotted timestamp to time.Now()
 //
 //		d) Case when the snapshoter fails to record the last execution at T2 but has recorded at T1, where T1 < T2 ,
 //		   then new schedules would be created from T1 -> time.Now() during catchup and the idempotency aspect of the admin

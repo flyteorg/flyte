@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * Indicates various phases of Workflow Execution
@@ -341,6 +341,20 @@ export class ExecutionError extends Message<ExecutionError> {
    */
   kind = ExecutionError_ErrorKind.UNKNOWN;
 
+  /**
+   * Timestamp of the error
+   *
+   * @generated from field: google.protobuf.Timestamp timestamp = 5;
+   */
+  timestamp?: Timestamp;
+
+  /**
+   * Worker that generated the error
+   *
+   * @generated from field: string worker = 6;
+   */
+  worker = "";
+
   constructor(data?: PartialMessage<ExecutionError>) {
     super();
     proto3.util.initPartial(data, this);
@@ -353,6 +367,8 @@ export class ExecutionError extends Message<ExecutionError> {
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "error_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "kind", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 6, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionError {
@@ -427,6 +443,16 @@ export class TaskLog extends Message<TaskLog> {
    */
   ttl?: Duration;
 
+  /**
+   * @generated from field: bool ShowWhilePending = 5;
+   */
+  ShowWhilePending = false;
+
+  /**
+   * @generated from field: bool HideOnceFinished = 6;
+   */
+  HideOnceFinished = false;
+
   constructor(data?: PartialMessage<TaskLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -439,6 +465,8 @@ export class TaskLog extends Message<TaskLog> {
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "message_format", kind: "enum", T: proto3.getEnumType(TaskLog_MessageFormat) },
     { no: 4, name: "ttl", kind: "message", T: Duration },
+    { no: 5, name: "ShowWhilePending", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "HideOnceFinished", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskLog {
