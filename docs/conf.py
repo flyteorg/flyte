@@ -629,6 +629,7 @@ import_projects = [
                 "examples/data_types_and_io",
                 "examples/development_lifecycle",
                 "examples/extending",
+                "examples/papermill_plugin",
                 "examples/productionizing",
                 "examples/testing"
             ]
