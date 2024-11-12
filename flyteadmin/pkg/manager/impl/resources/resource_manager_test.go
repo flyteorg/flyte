@@ -306,12 +306,20 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	}
 	_, validationError := manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.Error(t, validationError)
+	var secondError errors.FlyteAdminError
+	assert.ErrorAs(t, validationError, &secondError)
+	assert.Equal(t, secondError.Error(), "failed to validate that project [project] and domain [domain] are registered, err: [validationError]")
 
 	request = &admin.ProjectDomainAttributesUpdateRequest{
 		Attributes: &admin.ProjectDomainAttributes{},
 	}
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = mocks.NewMockRepository().ProjectRepo().(*mocks.MockProjectRepo).GetFunction
+
 	_, attributesError := manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.Error(t, attributesError)
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, attributesError, &newError)
+	assert.Equal(t, newError.Error(), "domain [] is unrecognized by system")
 }
 
 func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
