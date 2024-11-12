@@ -248,6 +248,7 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 	assert.Error(t, validationError)
 	var newError errors.FlyteAdminError
 	assert.ErrorAs(t, validationError, &newError)
+	assert.Equal(t, newError.Error(), "failed to validate that project [project] and domain [domain] are registered, err: [validationError]")
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) error {
@@ -257,11 +258,14 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		return errors.NewFlyteAdminError(codes.NotFound, "deleteError")
 	}
+	//cause we use reference of ProjectRepo GetFunction, need to reset to default GetFunction
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = mocks.NewMockRepository().ProjectRepo().(*mocks.MockProjectRepo).GetFunction
 
 	_, failError := manager.DeleteWorkflowAttributes(context.Background(), request)
 	assert.Error(t, failError)
 	var secondError errors.FlyteAdminError
 	assert.ErrorAs(t, failError, &secondError)
+	assert.Equal(t, secondError.Error(), "deleteError")
 }
 
 func TestUpdateProjectDomainAttributes(t *testing.T) {
