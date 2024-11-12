@@ -199,6 +199,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	assert.Error(t, validationError)
 	var newError errors.FlyteAdminError
 	assert.ErrorAs(t, validationError, &newError)
+	assert.Equal(t, newError.Error(), "failed to validate that project [project] and domain [domain] are registered, err: [validationError]")
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
@@ -215,9 +216,13 @@ func TestGetWorkflowAttributes(t *testing.T) {
 			Attributes:   expectedSerializedAttrs,
 		}, errors.NewFlyteAdminError(codes.NotFound, "workflowAttributesModelError")
 	}
+	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = mocks.NewMockRepository().ProjectRepo().(*mocks.MockProjectRepo).GetFunction
 
 	_, failError := manager.GetWorkflowAttributes(context.Background(), request)
 	assert.Error(t, failError)
+	var secondError errors.FlyteAdminError
+	assert.ErrorAs(t, failError, &secondError)
+	assert.Equal(t, secondError.Error(), "workflowAttributesModelError")
 }
 
 func TestDeleteWorkflowAttributes(t *testing.T) {
