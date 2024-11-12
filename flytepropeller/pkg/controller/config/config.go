@@ -14,7 +14,7 @@
 //	   prof-port: 11254
 //	   metrics-prefix: flyte
 //	   enable-admin-launcher: true
-//	   max-ttl-hours: 1
+//	   max-ttl: 1h
 //	   gc-interval: 500m
 //	   queue:
 //	     type: batch
@@ -64,6 +64,7 @@ var (
 		},
 		MaxWorkflowRetries: 10,
 		MaxTTLInHours:      23,
+		MaxTTL:             config.Duration{Duration: 23 * time.Hour},
 		GCInterval: config.Duration{
 			Duration: 30 * time.Minute,
 		},
@@ -172,7 +173,8 @@ type Config struct {
 	MetricKeys               []string                `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
 	EnableAdminLauncher      bool                    `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
 	MaxWorkflowRetries       int                     `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
-	MaxTTLInHours            int                     `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
+	MaxTTLInHours            int                     `json:"max-ttl-hours" pflag:"DEPRECATED: Maximum number of hours a completed workflow should be retained. Number between 1-23 hours. 0 means GC is disabled and we retain all workflows."`
+	MaxTTL                   config.Duration         `json:"max-ttl" pflag:"Maximum number of minutes or hours a completed workflow should be retained. Allowed values: 0,5m,10m,..,50m,55m,1h,2h,..,23h]. 0 means GC is disabled and we retain all workflows."`
 	GCInterval               config.Duration         `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
 	LeaderElection           LeaderElectionConfig    `json:"leader-election,omitempty" pflag:",Config for leader election."`
 	PublishK8sEvents         bool                    `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`

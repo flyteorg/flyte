@@ -2,11 +2,14 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"runtime/pprof"
+	"sort"
 	"strings"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/utils/clock"
 
@@ -29,7 +32,7 @@ type gcMetrics struct {
 type GarbageCollector struct {
 	wfClient                  v1alpha1.FlyteworkflowV1alpha1Interface
 	namespaceClient           corev1.NamespaceInterface
-	ttlHours                  int
+	ttl                       time.Duration
 	interval                  time.Duration
 	clk                       clock.WithTicker
 	metrics                   *gcMetrics
@@ -39,7 +42,7 @@ type GarbageCollector struct {
 
 // Issues a background deletion command with label selector for all completed workflows outside of the retention period
 func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
-	s := CompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours, g.clk.Now())
+	s := CompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttl, g.clk.Now())
 	if len(g.labelSelectorRequirements) != 0 {
 		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
 	}
@@ -51,71 +54,22 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 			return err
 		}
 		for _, n := range namespaceList.Items {
-			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
-			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
-
-			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
-				g.metrics.gcRoundFailure.Inc(namespaceCtx)
-				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
-			} else {
-				g.metrics.gcRoundSuccess.Inc(namespaceCtx)
-			}
+			_ = g.deleteWorkflowsForNamespace(ctx, n.GetName(), s)
 		}
 	} else {
-		namespaceCtx := contextutils.WithNamespace(ctx, g.namespace)
-		logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", g.namespace)
-		if err := g.deleteWorkflowsForNamespace(ctx, g.namespace, s); err != nil {
-			g.metrics.gcRoundFailure.Inc(namespaceCtx)
-			logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", g.namespace, err)
-		} else {
-			g.metrics.gcRoundSuccess.Inc(namespaceCtx)
-		}
-	}
-	return nil
-}
-
-// Deprecated: Please use deleteWorkflows instead
-func (g *GarbageCollector) deprecatedDeleteWorkflows(ctx context.Context) error {
-	s := DeprecatedCompletedWorkflowsSelectorOutsideRetentionPeriod(g.ttlHours, g.clk.Now())
-	if len(g.labelSelectorRequirements) != 0 {
-		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
-	}
-
-	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
-	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
-		namespaceList, err := g.namespaceClient.List(ctx, v1.ListOptions{})
-		if err != nil {
-			return err
-		}
-		for _, n := range namespaceList.Items {
-			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
-			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
-
-			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
-				g.metrics.gcRoundFailure.Inc(namespaceCtx)
-				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
-			} else {
-				g.metrics.gcRoundSuccess.Inc(namespaceCtx)
-			}
-		}
-	} else {
-		namespaceCtx := contextutils.WithNamespace(ctx, g.namespace)
-		logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", g.namespace)
-		if err := g.deleteWorkflowsForNamespace(ctx, g.namespace, s); err != nil {
-			g.metrics.gcRoundFailure.Inc(namespaceCtx)
-			logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", g.namespace, err)
-		} else {
-			g.metrics.gcRoundSuccess.Inc(namespaceCtx)
-		}
+		_ = g.deleteWorkflowsForNamespace(ctx, g.namespace, s)
 	}
 	return nil
 }
 
 func (g *GarbageCollector) deleteWorkflowsForNamespace(ctx context.Context, namespace string, labelSelector *v1.LabelSelector) error {
+	ctx = contextutils.WithNamespace(ctx, namespace)
+	logger.Infof(ctx, "Triggering Workflow delete for namespace: [%s]", namespace)
+
 	gracePeriodZero := int64(0)
 	propagation := v1.DeletePropagationBackground
 
-	return g.wfClient.FlyteWorkflows(namespace).DeleteCollection(
+	err := g.wfClient.FlyteWorkflows(namespace).DeleteCollection(
 		ctx,
 		v1.DeleteOptions{
 			GracePeriodSeconds: &gracePeriodZero,
@@ -125,11 +79,18 @@ func (g *GarbageCollector) deleteWorkflowsForNamespace(ctx context.Context, name
 			LabelSelector: v1.FormatLabelSelector(labelSelector),
 		},
 	)
+	if err != nil {
+		logger.Errorf(ctx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", namespace, err)
+		g.metrics.gcRoundFailure.Inc(ctx)
+	} else {
+		g.metrics.gcRoundSuccess.Inc(ctx)
+	}
+	return err
 }
 
 // runGC runs GC periodically
 func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
-	logger.Infof(ctx, "Background workflow garbage collection started, with duration [%s], TTL [%d] hours", g.interval.String(), g.ttlHours)
+	logger.Infof(ctx, "Background workflow garbage collection started, with duration [%s], TTL [%v]", g.interval.String(), g.ttl)
 
 	ctx = contextutils.WithGoroutineLabel(ctx, "gc-worker")
 	pprof.SetGoroutineLabels(ctx)
@@ -139,9 +100,6 @@ func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
 		case <-ticker.C():
 			logger.Infof(ctx, "Garbage collector running...")
 			t := g.metrics.gcTime.Start(ctx)
-			if err := g.deprecatedDeleteWorkflows(ctx); err != nil {
-				logger.Errorf(ctx, "Garbage collection failed in this round.Error : [%v]", err)
-			}
 
 			if err := g.deleteWorkflows(ctx); err != nil {
 				logger.Errorf(ctx, "Garbage collection failed in this round.Error : [%v]", err)
@@ -158,8 +116,8 @@ func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
 
 // StartGC starts a background garbage collection routine. Use the context to signal an exit signal
 func (g *GarbageCollector) StartGC(ctx context.Context) error {
-	if g.ttlHours <= 0 {
-		logger.Warningf(ctx, "Garbage collector is disabled, as ttl [%d] is <=0", g.ttlHours)
+	if g.ttl <= 0 {
+		logger.Warningf(ctx, "Garbage collector is disabled, as ttl [%v] is <=0", g.ttl)
 		return nil
 	}
 	ticker := g.clk.NewTicker(g.interval)
@@ -168,16 +126,40 @@ func (g *GarbageCollector) StartGC(ctx context.Context) error {
 }
 
 func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.WithTicker, namespaceClient corev1.NamespaceInterface, wfClient v1alpha1.FlyteworkflowV1alpha1Interface) (*GarbageCollector, error) {
-	ttl := 23
-	if cfg.MaxTTLInHours <= 23 {
-		ttl = cfg.MaxTTLInHours
-	} else {
-		logger.Warningf(context.TODO(), "defaulting max ttl for workflows to 23 hours, since configured duration is larger than 23 [%d]", cfg.MaxTTLInHours)
+	ttl := cfg.MaxTTL.Duration
+	if ttl == 23*time.Hour { // if new config has the default value, fallback to the old config
+		ttl = time.Duration(cfg.MaxTTLInHours) * time.Hour
+		logger.Warningf(context.TODO(), "using max-ttl-hours [%v]", cfg.MaxTTLInHours)
 	}
+
+	if ttl > 23*time.Hour {
+		logger.Warningf(context.TODO(), "defaulting max ttl for workflows to 23 hours, since configured duration is larger than 23h [%v]", cfg.MaxTTL.Duration)
+		ttl = 23 * time.Hour
+	}
+	if ttl < 0 {
+		logger.Warningf(context.TODO(), "defaulting max ttl for workflows to 0(disabled), since configured duration is less than 0 [%v]", cfg.MaxTTL.Duration)
+		ttl = 0 * time.Hour
+	}
+	allowedTTLs := sets.New[time.Duration]()
+	for i := 0; i < 12; i++ {
+		allowedTTLs.Insert(time.Duration(i) * minuteGranularity)
+	}
+	for i := 1; i < 24; i++ {
+		allowedTTLs.Insert(time.Duration(i) * time.Hour)
+	}
+
+	if !allowedTTLs.Has(ttl) {
+		allowed := allowedTTLs.UnsortedList()
+		sort.Slice(allowed, func(i, j int) bool {
+			return allowed[i] < allowed[j]
+		})
+		return nil, fmt.Errorf("invalid maxTTL. Allowed values: %q", allowed)
+	}
+
 	labelSelectorRequirements := getShardedLabelSelectorRequirements(cfg)
 	return &GarbageCollector{
 		wfClient:        wfClient,
-		ttlHours:        ttl,
+		ttl:             ttl,
 		interval:        cfg.GCInterval.Duration,
 		namespaceClient: namespaceClient,
 		metrics: &gcMetrics{

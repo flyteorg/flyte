@@ -491,6 +491,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_max-ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.MaxTTL.String()
+
+			cmdFlags.Set("max-ttl", testValue)
+			if vString, err := cmdFlags.GetString("max-ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.MaxTTL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_gc-interval", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

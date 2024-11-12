@@ -78,6 +78,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-admin-launcher"), defaultConfig.EnableAdminLauncher, "")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-workflow-retries"), defaultConfig.MaxWorkflowRetries, "")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-ttl-hours"), defaultConfig.MaxTTLInHours, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "max-ttl"), defaultConfig.MaxTTL.String(), "5m, 10m, .., 50m, 55m, 1h, 2h, .., 23h]. 0 means GC is disabled and we retain all workflows.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc-interval"), defaultConfig.GCInterval.String(), "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "leader-election.enabled"), defaultConfig.LeaderElection.Enabled, "Enables/Disables leader election.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.lock-config-map.Namespace"), defaultConfig.LeaderElection.LockConfigMap.Namespace, "")
