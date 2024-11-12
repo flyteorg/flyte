@@ -197,6 +197,8 @@ func TestGetWorkflowAttributes(t *testing.T) {
 
 	_, validationError := manager.GetWorkflowAttributes(context.Background(), request)
 	assert.Error(t, validationError)
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, validationError, &newError)
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
