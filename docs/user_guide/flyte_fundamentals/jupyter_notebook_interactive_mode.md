@@ -23,7 +23,7 @@ kernelspec:
 :lines: 1-4
 ```
 
-```{nb-rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
+<!-- ```{nb-rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
 :caption: basics/basic_interactive_mode.ipynb
 :cell: 5
 :lines: 1-2
@@ -32,6 +32,6 @@ kernelspec:
 ```{nb-rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
 :caption: basics/basic_interactive_mode.ipynb
 :cell: 3
-```
+``` -->
 
 <!-- [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics -->
