@@ -62,6 +62,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	assert.Error(t, failError)
 	var newError errors.FlyteAdminError
 	assert.ErrorAs(t, failError, &newError)
+	assert.Equal(t, newError.Error(), "domain [] is unrecognized by system")
 }
 
 func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
