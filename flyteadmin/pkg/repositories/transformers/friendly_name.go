@@ -5,6 +5,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 )
 
+// Length of the random string used for generating hash keys; can be any positive integer
 const RandStringLength = 20
 
 /* #nosec */
