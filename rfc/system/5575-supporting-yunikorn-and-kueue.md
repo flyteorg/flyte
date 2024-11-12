@@ -31,11 +31,9 @@ queueconfig:
     - type: "spark"
       gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
       allow-preemption: true
-    - type: ".*"
 ```
 
 `root.organization1.ray` is the queue of the ray job submitted by user1 belonging organization1. 
-`.*` means that other jobs excluding ray and spark will be submitted to `root.<organization>.default`.
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
