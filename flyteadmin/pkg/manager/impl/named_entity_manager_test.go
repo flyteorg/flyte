@@ -87,7 +87,7 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
-	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters("eq(state, 0)")
+	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_LAUNCH_PLAN, "eq(state, 0)")
 	assert.NoError(t, err)
 	assert.Len(t, updatedFilters, 1)
 
@@ -97,9 +97,18 @@ func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	assert.Equal(t, "COALESCE(state, 0) = ?", queryExp.Query)
 	assert.Equal(t, "0", queryExp.Args)
 
-	updatedFilters, err = manager.(*NamedEntityManager).getQueryFilters("")
+	updatedFilters, err = manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_TASK, "")
 	assert.NoError(t, err)
-	assert.Len(t, updatedFilters, 0)
+	assert.Len(t, updatedFilters, 2)
+	queryExp, err = updatedFilters[0].GetGormQueryExpr()
+	assert.NoError(t, err)
+	assert.Equal(t, "name NOT LIKE ?", queryExp.Query)
+	assert.Equal(t, ".flytegen%", queryExp.Args)
+
+	queryExp, err = updatedFilters[1].GetGormQueryExpr()
+	assert.NoError(t, err)
+	assert.Equal(t, "COALESCE(state, 0) <> ?", queryExp.Query)
+	assert.Equal(t, admin.NamedEntityState_WORKSPACE_GENERATED, queryExp.Args)
 }
 
 func TestNamedEntityManager_Update(t *testing.T) {

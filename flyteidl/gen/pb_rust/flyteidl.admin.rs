@@ -812,6 +812,8 @@ pub enum NamedEntityState {
     NamedEntityArchived = 1,
     /// System generated entities that aren't explicitly created or managed by a user.
     SystemGenerated = 2,
+    /// System generated entities that are created as part of workspaces.
+    WorkspaceGenerated = 3,
 }
 impl NamedEntityState {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -823,6 +825,7 @@ impl NamedEntityState {
             NamedEntityState::NamedEntityActive => "NAMED_ENTITY_ACTIVE",
             NamedEntityState::NamedEntityArchived => "NAMED_ENTITY_ARCHIVED",
             NamedEntityState::SystemGenerated => "SYSTEM_GENERATED",
+            NamedEntityState::WorkspaceGenerated => "WORKSPACE_GENERATED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -831,6 +834,7 @@ impl NamedEntityState {
             "NAMED_ENTITY_ACTIVE" => Some(Self::NamedEntityActive),
             "NAMED_ENTITY_ARCHIVED" => Some(Self::NamedEntityArchived),
             "SYSTEM_GENERATED" => Some(Self::SystemGenerated),
+            "WORKSPACE_GENERATED" => Some(Self::WorkspaceGenerated),
             _ => None,
         }
     }

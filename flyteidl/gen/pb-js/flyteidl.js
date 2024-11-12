@@ -27792,12 +27792,14 @@
              * @property {number} NAMED_ENTITY_ACTIVE=0 NAMED_ENTITY_ACTIVE value
              * @property {number} NAMED_ENTITY_ARCHIVED=1 NAMED_ENTITY_ARCHIVED value
              * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
+             * @property {number} WORKSPACE_GENERATED=3 WORKSPACE_GENERATED value
              */
             admin.NamedEntityState = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NAMED_ENTITY_ACTIVE"] = 0;
                 values[valuesById[1] = "NAMED_ENTITY_ARCHIVED"] = 1;
                 values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
+                values[valuesById[3] = "WORKSPACE_GENERATED"] = 3;
                 return values;
             })();
     
@@ -27926,6 +27928,7 @@
                         case 0:
                         case 1:
                         case 2:
+                        case 3:
                             break;
                         }
                     return null;

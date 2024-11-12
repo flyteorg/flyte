@@ -11369,7 +11369,8 @@ export namespace flyteidl {
         enum NamedEntityState {
             NAMED_ENTITY_ACTIVE = 0,
             NAMED_ENTITY_ARCHIVED = 1,
-            SYSTEM_GENERATED = 2
+            SYSTEM_GENERATED = 2,
+            WORKSPACE_GENERATED = 3
         }
 
         /** Properties of a NamedEntityMetadata. */

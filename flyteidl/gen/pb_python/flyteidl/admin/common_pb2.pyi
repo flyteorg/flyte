@@ -15,9 +15,11 @@ class NamedEntityState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NAMED_ENTITY_ACTIVE: _ClassVar[NamedEntityState]
     NAMED_ENTITY_ARCHIVED: _ClassVar[NamedEntityState]
     SYSTEM_GENERATED: _ClassVar[NamedEntityState]
+    WORKSPACE_GENERATED: _ClassVar[NamedEntityState]
 NAMED_ENTITY_ACTIVE: NamedEntityState
 NAMED_ENTITY_ARCHIVED: NamedEntityState
 SYSTEM_GENERATED: NamedEntityState
+WORKSPACE_GENERATED: NamedEntityState
 
 class NamedEntityIdentifier(_message.Message):
     __slots__ = ["project", "domain", "name", "org"]

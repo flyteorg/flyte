@@ -11748,10 +11748,11 @@
       "enum": [
         "NAMED_ENTITY_ACTIVE",
         "NAMED_ENTITY_ARCHIVED",
-        "SYSTEM_GENERATED"
+        "SYSTEM_GENERATED",
+        "WORKSPACE_GENERATED"
       ],
       "default": "NAMED_ENTITY_ACTIVE",
-      "description": "The status of the named entity is used to control its visibility in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI.\n - SYSTEM_GENERATED: System generated entities that aren't explicitly created or managed by a user."
+      "description": "The status of the named entity is used to control its visibility in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI.\n - SYSTEM_GENERATED: System generated entities that aren't explicitly created or managed by a user.\n - WORKSPACE_GENERATED: System generated entities that are created as part of workspaces."
     },
     "adminNamedEntityUpdateResponse": {
       "type": "object",

@@ -35,12 +35,20 @@ export enum NamedEntityState {
    * @generated from enum value: SYSTEM_GENERATED = 2;
    */
   SYSTEM_GENERATED = 2,
+
+  /**
+   * System generated entities that are created as part of workspaces.
+   *
+   * @generated from enum value: WORKSPACE_GENERATED = 3;
+   */
+  WORKSPACE_GENERATED = 3,
 }
 // Retrieve enum metadata with: proto3.getEnumType(NamedEntityState)
 proto3.util.setEnumType(NamedEntityState, "flyteidl.admin.NamedEntityState", [
   { no: 0, name: "NAMED_ENTITY_ACTIVE" },
   { no: 1, name: "NAMED_ENTITY_ARCHIVED" },
   { no: 2, name: "SYSTEM_GENERATED" },
+  { no: 3, name: "WORKSPACE_GENERATED" },
 ]);
 
 /**
