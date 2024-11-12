@@ -5,20 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const MESSAGEPACK = "msgpack"
+const FlyteUseOldDcFormat = "FLYTE_USE_OLD_DC_FORMAT"
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
 	switch p := v.(type) {
@@ -561,12 +565,32 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			strValue = fmt.Sprintf("%.0f", math.Trunc(f))
 		}
 		if newT.Simple == core.SimpleType_STRUCT {
+			useOldFormat := strings.ToLower(os.Getenv(FlyteUseOldDcFormat))
 			if _, isValueStringType := v.(string); !isValueStringType {
-				byteValue, err := json.Marshal(v)
-				if err != nil {
-					return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+				if useOldFormat == "1" || useOldFormat == "t" || useOldFormat == "true" {
+					byteValue, err := json.Marshal(v)
+					if err != nil {
+						return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+					}
+					strValue = string(byteValue)
+				} else {
+					byteValue, err := msgpack.Marshal(v)
+					if err != nil {
+						return nil, fmt.Errorf("unable to marshal to msgpack bytes for struct value %v", v)
+					}
+					return &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Binary{
+									Binary: &core.Binary{
+										Value: byteValue,
+										Tag:   MESSAGEPACK,
+									},
+								},
+							},
+						},
+					}, nil
 				}
-				strValue = string(byteValue)
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)

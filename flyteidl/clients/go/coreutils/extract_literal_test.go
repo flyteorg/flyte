@@ -4,6 +4,7 @@
 package coreutils
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -125,6 +126,7 @@ func TestFetchLiteral(t *testing.T) {
 	})
 
 	t.Run("Generic", func(t *testing.T) {
+		os.Setenv(FlyteUseOldDcFormat, "true")
 		literalVal := map[string]interface{}{
 			"x": 1,
 			"y": "ystringvalue",
@@ -150,6 +152,7 @@ func TestFetchLiteral(t *testing.T) {
 		for key, val := range expectedStructVal.GetFields() {
 			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
 		}
+		os.Unsetenv(FlyteUseOldDcFormat)
 	})
 
 	t.Run("Generic Passed As String", func(t *testing.T) {
