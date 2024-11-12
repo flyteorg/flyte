@@ -457,6 +457,9 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 	}
 	_, projectDomainError := manager.GetProjectDomainAttributes(context.Background(), request)
 	assert.Error(t, projectDomainError)
+	var newError errors.FlyteAdminError
+	assert.ErrorAs(t, projectDomainError, &newError)
+	assert.Equal(t, newError.Error(), "projectDomainError")
 
 	db.ProjectRepo().(*mocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {
@@ -464,6 +467,10 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 	}
 	_, validationError := manager.GetProjectDomainAttributes(context.Background(), request)
 	assert.Error(t, validationError)
+	var secondError errors.FlyteAdminError
+	assert.ErrorAs(t, validationError, &secondError)
+	assert.Equal(t, secondError.Error(), "failed to validate that project [project] and domain [domain] are registered, err: [validationError]")
+
 }
 
 func TestDeleteProjectDomainAttributes(t *testing.T) {
