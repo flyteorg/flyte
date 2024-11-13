@@ -221,7 +221,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 					}
 					authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
 					tokenSource := oauthMetadataProvider.tokenSource
-					logger.Debugf(ctx, "authorizationMetadataKey: %s", authorizationMetadataKey)
 					err = func() error {
 						if !tokenCache.TryLock() {
 							tokenCache.CondWait()
