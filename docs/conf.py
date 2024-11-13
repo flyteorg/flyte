@@ -690,6 +690,15 @@ os.environ["FLYTE_SDK_LOGGING_LEVEL_ROOT"] = "50"
 # Disable warnings from tensorflow
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
 
 class CustomWarningSuppressor(logging.Filter):
     """Filter logs by `suppress_warnings`."""
