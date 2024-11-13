@@ -185,6 +185,13 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 }
 
 func IsSameDCFormat(oldSpec *admin.LaunchPlanSpec, newSpec *admin.LaunchPlanSpec) bool {
+	// Compare dataclass formats by:
+	// 1. Retrieving default inputs.
+	// 2. Ensuring both dataclasses have the same keys and length.
+	// 3. Deserializing values to map[string]interface{} and comparing them.
+	// 4. If a value is not a dataclass, use pbhash to compare directly, similar to the launch plan manager.
+	// Reference: https://github.com/flyteorg/flyte/blob/5f695895ed6a7fa45d980023ab874591184b0fc1/flyteadmin/pkg/manager/impl/launch_plan_manager.go
+
 	oldParams := oldSpec.GetDefaultInputs().GetParameters()
 	newParams := newSpec.GetDefaultInputs().GetParameters()
 
@@ -211,7 +218,7 @@ func IsSameDCFormat(oldSpec *admin.LaunchPlanSpec, newSpec *admin.LaunchPlanSpec
 	return true
 }
 
-// todo: if collection type or map type, we should handle it
+// TODO: Handle collection and map types
 func parametersAreEqual(oldParam, newParam *core.Parameter) bool {
 	oldDefault := oldParam.GetDefault()
 	newDefault := newParam.GetDefault()
@@ -226,7 +233,7 @@ func parametersAreEqual(oldParam, newParam *core.Parameter) bool {
 		return false
 	}
 
-	// Step 2.1: Use pbhash to compare the two values
+	// Step 2.1: Use pbhash to compare the two values directly
 	oldHash, err1 := pbhash.ComputeHash(context.Background(), oldDefault)
 	newHash, err2 := pbhash.ComputeHash(context.Background(), newDefault)
 	if err1 != nil || err2 != nil {
@@ -245,7 +252,7 @@ func parametersAreEqual(oldParam, newParam *core.Parameter) bool {
 		return false
 	}
 
-	// Check if one is Scalar.Generic and the other is Scalar.Binary
+	// Step 2.3: Check if one is Scalar.Generic and the other is Scalar.Binary
 	if isGenericScalar(oldScalar) && isBinaryScalar(newScalar) {
 		decodedNew, err := decodeBinaryLiteral(newScalar.GetBinary().GetValue())
 		if err != nil {
