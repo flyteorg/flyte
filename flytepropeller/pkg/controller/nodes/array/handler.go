@@ -355,6 +355,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 				}
 			}
+
 			if err := eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts()); err != nil {
 				return handler.UnknownTransition, err
 			}

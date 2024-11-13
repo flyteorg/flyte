@@ -5,6 +5,7 @@ package coreutils
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -455,6 +457,7 @@ func TestMakeLiteralForType(t *testing.T) {
 	})
 
 	t.Run("Generic", func(t *testing.T) {
+		os.Setenv(FlyteUseOldDcFormat, "true")
 		literalVal := map[string]interface{}{
 			"x": 1,
 			"y": "ystringvalue",
@@ -480,6 +483,69 @@ func TestMakeLiteralForType(t *testing.T) {
 		for key, val := range expectedStructVal.Fields {
 			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
 		}
+		os.Unsetenv(FlyteUseOldDcFormat)
+	})
+
+	t.Run("SimpleBinary", func(t *testing.T) {
+		// We compare the deserialized values instead of the raw msgpack bytes because Go does not guarantee the order
+		// of map keys during serialization. This means that while the serialized bytes may differ, the deserialized
+		// values should be logically equivalent.
+
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		v := map[string]interface{}{
+			"a": int64(1),
+			"b": 3.14,
+			"c": "example_string",
+			"d": map[string]interface{}{
+				"1": int64(100),
+				"2": int64(200),
+			},
+			"e": map[string]interface{}{
+				"a": int64(1),
+				"b": 3.14,
+			},
+			"f": []string{"a", "b", "c"},
+		}
+
+		val, err := MakeLiteralForType(literalType, v)
+		assert.NoError(t, err)
+
+		msgpackBytes, err := msgpack.Marshal(v)
+		assert.NoError(t, err)
+
+		literalVal := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: msgpackBytes,
+							Tag:   MESSAGEPACK,
+						},
+					},
+				},
+			},
+		}
+
+		expectedLiteralVal, err := ExtractFromLiteral(literalVal)
+		assert.NoError(t, err)
+		actualLiteralVal, err := ExtractFromLiteral(val)
+		assert.NoError(t, err)
+
+		// Check if the extracted value is of type *core.Binary (not []byte)
+		expectedBinary, ok := expectedLiteralVal.(*core.Binary)
+		assert.True(t, ok, "expectedLiteralVal is not of type *core.Binary")
+		actualBinary, ok := actualLiteralVal.(*core.Binary)
+		assert.True(t, ok, "actualLiteralVal is not of type *core.Binary")
+
+		// Now check if the Binary values match
+		var expectedVal, actualVal map[string]interface{}
+		err = msgpack.Unmarshal(expectedBinary.Value, &expectedVal)
+		assert.NoError(t, err)
+		err = msgpack.Unmarshal(actualBinary.Value, &actualVal)
+		assert.NoError(t, err)
+
+		// Finally, assert that the deserialized values are equal
+		assert.Equal(t, expectedVal, actualVal)
 	})
 
 	t.Run("ArrayStrings", func(t *testing.T) {

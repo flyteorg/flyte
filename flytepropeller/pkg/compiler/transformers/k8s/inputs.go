@@ -36,7 +36,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 		}
 
 		if !validators.IsInstance(inputVal, v.Type) {
-			errs.Collect(errors.NewMismatchingInstanceErr(nodeID, inputVar, v.Type.String(), inputVal.String()))
+			errs.Collect(errors.NewMismatchingInstanceErr(nodeID, inputVar, common.LiteralTypeToStr(v.Type), inputVal.String()))
 			continue
 		}
 

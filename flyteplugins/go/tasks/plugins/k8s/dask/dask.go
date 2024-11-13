@@ -279,7 +279,7 @@ func createJobSpec(workerSpec daskAPI.WorkerSpec, schedulerSpec daskAPI.Schedule
 }
 
 func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
-	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+	logPlugin, err := logs.InitializeLogPlugins(&GetConfig().Logs)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -296,7 +296,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		tasklog.Input{
 			Namespace:       job.ObjectMeta.Namespace,
 			PodName:         job.Status.JobRunnerPodName,
-			LogName:         "(User logs)",
+			LogName:         "(Dask Runner Logs)",
 			TaskExecutionID: taskExecID,
 		},
 	)

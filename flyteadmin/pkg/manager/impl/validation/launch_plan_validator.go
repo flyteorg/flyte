@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 
+	"github.com/robfig/cron/v3"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -89,6 +90,19 @@ func validateSchedule(request *admin.LaunchPlanCreateRequest, expectedInputs *co
 				return errors.NewFlyteAdminErrorf(
 					codes.InvalidArgument,
 					"KickoffTimeInputArg must reference a datetime input. [%v] is a [%v]", schedule.GetKickoffTimeInputArg(), param.GetVar().GetType())
+			}
+		}
+
+		// validate cron expression
+		var cronExpression string
+		if schedule.GetCronExpression() != "" {
+			cronExpression = schedule.GetCronExpression()
+		} else if schedule.GetCronSchedule() != nil {
+			cronExpression = schedule.GetCronSchedule().GetSchedule()
+		}
+		if cronExpression != "" {
+			if _, err := cron.ParseStandard(cronExpression); err != nil {
+				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Invalid cron expression: %v", err)
 			}
 		}
 	}

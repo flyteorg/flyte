@@ -338,23 +338,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
 	}
 
-	var launchPlanActor launchplan.FlyteAdmin
-	if cfg.EnableAdminLauncher {
-		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
-			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"), store)
-		if err != nil {
-			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
-
-		if err := launchPlanActor.Initialize(ctx); err != nil {
-			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
-	} else {
-		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
-	}
-
 	logger.Info(ctx, "Setting up event sink and recorder")
 	eventSink, err := events.ConstructEventSink(ctx, events.GetConfig(ctx), scope.NewSubScope("event_sink"))
 	if err != nil {
@@ -433,6 +416,23 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	controller.levelMonitor = NewResourceLevelMonitor(scope.NewSubScope("collector"), flyteworkflowInformer.Lister())
+
+	var launchPlanActor launchplan.FlyteAdmin
+	if cfg.EnableAdminLauncher {
+		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, launchplan.GetAdminConfig(),
+			scope.NewSubScope("admin_launcher"), store, controller.enqueueWorkflowForNodeUpdates)
+		if err != nil {
+			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+
+		if err := launchPlanActor.Initialize(ctx); err != nil {
+			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+	} else {
+		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
+	}
 
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,

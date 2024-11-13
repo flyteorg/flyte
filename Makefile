@@ -6,10 +6,10 @@ define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --tags --long --match "v*" --first-parent)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
-PACKAGE ?=github.com/flyteorg/flytestdlib
+PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
 TMP_BUILD_DIR := .tmp_build
 

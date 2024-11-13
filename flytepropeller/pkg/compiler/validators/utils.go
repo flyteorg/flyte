@@ -169,13 +169,6 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 	return res, nil
 }
 
-func GetTagForType(x *core.LiteralType) string {
-	if x.GetStructure() == nil {
-		return ""
-	}
-	return x.GetStructure().GetTag()
-}
-
 // ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
 func ValidateLiteralType(lt *core.LiteralType) error {
 	if lt == nil {
@@ -415,4 +408,11 @@ func IsInstance(lit *core.Literal, t *core.LiteralType) bool {
 		return AreTypesCastable(lit.GetOffloadedMetadata().GetInferredType(), t)
 	}
 	return instanceChecker.isInstance(lit)
+}
+
+func GetTagForType(x *core.LiteralType) string {
+	if x.GetStructure() == nil {
+		return ""
+	}
+	return x.GetStructure().GetTag()
 }

@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 // Indicates various phases of Workflow Execution
 message WorkflowExecution {
@@ -73,6 +74,10 @@ message ExecutionError {
         SYSTEM = 2;
     }
     ErrorKind kind = 4;
+    // Timestamp of the error
+    google.protobuf.Timestamp timestamp = 5;
+    // Worker that generated the error
+    string worker = 6;
 }
 
 // Log information for the task that is specific to a log sink
