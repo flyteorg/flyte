@@ -211,6 +211,7 @@ func IsSameDCFormat(oldSpec *admin.LaunchPlanSpec, newSpec *admin.LaunchPlanSpec
 	return true
 }
 
+// todo: if collection type or map type, we should handle it
 func parametersAreEqual(oldParam, newParam *core.Parameter) bool {
 	oldDefault := oldParam.GetDefault()
 	newDefault := newParam.GetDefault()
