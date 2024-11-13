@@ -164,7 +164,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		mockTokenCache := &mocks.TokenCache{}
-		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
+		mockTokenCache.OnGetTokenMatch().Return(tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"net/http"
 	"sync"
 
@@ -23,7 +24,6 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
 func MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authorizationMetadataKey string,
 	perRPCCredentials *PerRPCCredentialsFuture) error {
-
 	_, err := tokenSource.Token()
 	if err != nil {
 		return fmt.Errorf("failed to issue token. Error: %w", err)
@@ -35,6 +35,20 @@ func MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authori
 	return nil
 }
 
+// MaterializeInMemoryCredentials initializes the perRPCCredentials with the token source containing in memory cached token.
+// This path doesn't perform the token refresh and only build the cred source with cached token.
+func MaterializeInMemoryCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache,
+	perRPCCredentials *PerRPCCredentialsFuture, authorizationMetadataKey string) error {
+	tokenSource, err := NewInMemoryTokenSourceProvider(tokenCache).GetTokenSource(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get token source. Error: %w", err)
+	}
+	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
+	perRPCCredentials.Store(wrappedTokenSource)
+	return nil
+}
+
+>>>>>>> d6b17dc0c (Auth/prevent lookup per call (#5686) (#555))
 func GetProxyTokenSource(ctx context.Context, cfg *Config) (oauth2.TokenSource, error) {
 	tokenSourceProvider, err := NewExternalTokenSourceProvider(cfg.ProxyCommand)
 	if err != nil {
@@ -152,6 +166,7 @@ func (o *OauthMetadataProvider) GetOauthMetadata(cfg *Config, tokenCache cache.T
 		if err != nil {
 			logger.Errorf(context.Background(), "Failed to load token related config. Error: %v", err)
 		}
+		logger.Debugf(context.Background(), "Successfully loaded token related metadata")
 	})
 	if err != nil {
 		return err
@@ -178,7 +193,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
-
 		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
 		t, _ := tokenCache.GetToken()
 		if t != nil {
@@ -187,11 +201,11 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 				return err
 			}
 			authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
-			tokenSource := oauthMetadataProvider.tokenSource
-
-			err = MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
-			if err != nil {
-				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
+			if isValid := utils.Valid(t); isValid {
+				err := MaterializeInMemoryCredentials(ctx, cfg, tokenCache, credentialsFuture, authorizationMetadataKey)
+				if err != nil {
+					return fmt.Errorf("failed to materialize credentials. Error: %v", err)
+				}
 			}
 		}
 
@@ -208,7 +222,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 					}
 					authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
 					tokenSource := oauthMetadataProvider.tokenSource
-
 					err = func() error {
 						if !tokenCache.TryLock() {
 							tokenCache.CondWait()
@@ -237,6 +250,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 					if err != nil {
 						return err
 					}
+
 					return invoker(ctx, method, req, reply, cc, opts...)
 				}
 			}
