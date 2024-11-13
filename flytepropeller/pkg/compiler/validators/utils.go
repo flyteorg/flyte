@@ -233,7 +233,11 @@ func (t collectionInstanceChecker) isInstance(lit *core.Literal) bool {
 		return false
 	}
 	for _, x := range lit.GetCollection().Literals {
-		if !IsInstance(x, t.literalType.GetCollectionType()) {
+		if _, ok := x.GetValue().(*core.Literal_OffloadedMetadata); ok {
+			if !AreTypesCastable(x.GetOffloadedMetadata().GetInferredType(), t.literalType) {
+				return false
+			}
+		} else if !IsInstance(x, t.literalType.GetCollectionType()) {
 			return false
 		}
 	}
@@ -249,7 +253,11 @@ func (t mapInstanceChecker) isInstance(lit *core.Literal) bool {
 		return false
 	}
 	for _, x := range lit.GetMap().Literals {
-		if !IsInstance(x, t.literalType.GetMapValueType()) {
+		if _, ok := x.GetValue().(*core.Literal_OffloadedMetadata); ok {
+			if !AreTypesCastable(x.GetOffloadedMetadata().GetInferredType(), t.literalType) {
+				return false
+			}
+		} else if !IsInstance(x, t.literalType.GetMapValueType()) {
 			return false
 		}
 	}

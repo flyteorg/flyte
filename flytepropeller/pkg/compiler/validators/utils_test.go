@@ -5,13 +5,12 @@ import (
 
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func TestLiteralTypeForLiterals(t *testing.T) {
+func TestIsInstance(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		assert.True(t, IsInstance(nil, &core.LiteralType{
 			Type: &core.LiteralType_Simple{
