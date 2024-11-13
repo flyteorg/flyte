@@ -27,10 +27,10 @@ why?
 
 this is not work?
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/simple.py
+<!-- ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/simple.py
 :caption: papermill_plugin/simple.py
 :lines: 1
-```
+``` -->
 
 <!-- ```{nb-rli} https://raw.githubusercontent.com/Mecoli1219/flytesnacks/85966d139a9a3ccdf3323124563960fdd5f5844a/examples/basics/basics/basic_interactive_mode.ipynb
 :caption: basics/basic_interactive_mode.ipynb
