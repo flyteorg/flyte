@@ -18,7 +18,7 @@ kernelspec:
 :lines: 1
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/fbe246177d321e0491b652084c1c3a9c0cb0d35c/examples/papermill_plugin/papermill_plugin/simple.py
 :caption: basics/basic_interactive_mode.ipynb
 :lines: 1-4
 ```
