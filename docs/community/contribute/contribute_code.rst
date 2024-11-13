@@ -25,12 +25,38 @@ To understand how the below components interact with each other, refer to :ref:`
     * - **Purpose**: Deployment, Documentation, and Issues
     * - **Languages**: RST
 
-To build the Flyte docs locally you will need the following prerequisites:
+In the ``flyteorg/flyte`` root directory you can run ``make dev-docs`` to build the documentation locally. The generated documentation will be in the ``docs/_build/html`` directory.
 
+**Setup process**
+
+1. First you need to make sure you can run linux/amd64 container
+2. Run the following commands to build the documentation and serve it locally
+
+.. prompt:: bash $
+
+ make dev-docs
+ python -m http.server --directory docs/_build/html
+
+3. Go to http://localhost:8000 to see the documentation.
+
+**Supported environment variables of** ``make dev-docs``
+
+* ``DEV_DOCS_WATCH``: If set, the docs will be built and served using `sphinx-autobuild <https://github.com/sphinx-doc/sphinx-autobuild>`__ for live updates.
+* ``FLYTEKIT_LOCAL_PATH``: If set, the local path to flytekit will be used instead of the source code from the ``flyteorg/flytekit repo``.
+* ``FLYTECTL_LOCAL_PATH``: If set, the local path to flytectl will be used instead of the source code from the ``flyteorg/flytectl repo``.
+* ``FLYTESNACKS_LOCAL_PATH``: If set, the local path to flytesnacks will be used instead of the source code from the ``flyteorg/flytesnacks`` repo.
+
+For example, to use the local flytekit source code instead of the source code from the ``flyteorg/flytekit`` repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
+
+**Alternative conda setup steps**
+
+* Install ``conda``.
+    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
 * Install `conda-lock <https://github.com/conda/conda-lock>`__.
-* In the ``flyteorg/flyte`` root directory you can run:
-    * ``make dev-docs`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory. See `the script <https://github.com/flyteorg/flyte/blob/master/script/local_build_docs.sh>`__ for additional environment variables that can be set.
-        * For example, to use the local flytekit source code instead of the source code from the flyteorg/flytekit repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
+* In the ``flyteorg/flyte`` root directory run:
+    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
+    * ``conda activate monodocs-env``
+    * ``pip install ./flyteidl``
 
 ``flyteidl``
 ************
