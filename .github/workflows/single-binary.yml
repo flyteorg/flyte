@@ -21,7 +21,7 @@ jobs:
         with:
           go-version: "1.22"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
           working-directory: docker/sandbox-bundled/bootstrap
       - name: Check formatting
