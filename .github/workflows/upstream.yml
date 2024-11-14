@@ -20,10 +20,11 @@ jobs:
           message: |
             ### :mega: Next step: upstream this commit
 
-            @${{ github.event.pull_request.user.login }} run the following commands from a flyteorg/flyte repo and resolve any conflicts. Be sure to **update the commit message to be OSS friendly**.
+            @${{ github.event.pull_request.user.login }} run the following commands from a unionai/flyte repo and resolve any conflicts. Be sure to **update the commit message to be OSS friendly**.
             ```
-            git remote get-url upstream &>/dev/null || git remote add upstream https://github.com/unionai/flyte.git
-            git checkout -b union/upstream-${{ github.event.pull_request.merge_commit_sha }}
+            git fetch origin
+            git remote get-url upstream &>/dev/null || git remote add upstream https://github.com/flyteorg/flyte.git
+            git checkout -b union/upstream-${{ github.event.pull_request.merge_commit_sha }} usptream/master
             git cherry-pick -e ${{ github.event.pull_request.merge_commit_sha }}
             ```
             When done, `git push` and create a PR in flyteorg/flyte.
