@@ -266,11 +266,10 @@ func TestPlugin(t *testing.T) {
 		taskContext.On("Resource").Return(ResourceWrapper{
 			Phase:    flyteIdlCore.TaskExecution_FAILED,
 			Outputs:  nil,
-			Message:  "",
+			Message:  "boom",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 			AgentError: &admin.AgentError{
-				Code:    "ERROR: 500",
-				Message: "boom",
+				Code: "ERROR: 500",
 			},
 		})
 
