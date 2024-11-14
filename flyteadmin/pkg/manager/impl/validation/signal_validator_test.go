@@ -329,6 +329,6 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		assert.NotNil(t, err)
 
 		// Expected error message
-		assert.Contains(t, err.Error(), failedToValidateLiteralType)
+		assert.Contains(t, err.Error(), "requested signal value [scalar:{}] is not castable to existing signal type")
 	})
 }
