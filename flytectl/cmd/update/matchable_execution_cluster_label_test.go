@@ -274,10 +274,10 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -296,10 +296,10 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -318,10 +318,10 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -342,10 +342,10 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -363,10 +363,10 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -384,10 +384,10 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 					Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -410,10 +410,10 @@ func testWorkflowExecutionClusterLabelUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
-				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+				OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 				Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+				OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -475,10 +475,10 @@ func testProjectExecutionClusterLabelUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
-				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+				OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 				Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+				OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -538,10 +538,10 @@ func testProjectDomainExecutionClusterLabelUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
-				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
+				OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
 				Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 				Return(nil)
 		},
 		setup,

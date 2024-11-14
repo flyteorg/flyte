@@ -46,7 +46,7 @@ import (
 
 // Updates workflows and tasks references to reflect the needed ones for this workflow (ignoring subworkflows)
 func (w *workflowBuilder) updateRequiredReferences() {
-	reqs := getRequirements(w.CoreWorkflow.Template, w.allSubWorkflows, false, errors.NewCompileErrors())
+	reqs := getRequirements(w.GetCoreWorkflow().GetTemplate(), w.allSubWorkflows, false, errors.NewCompileErrors())
 	workflows := map[c.WorkflowIDKey]c.InterfaceProvider{}
 	tasks := c.TaskIndex{}
 	for _, workflowID := range reqs.launchPlanIds {
@@ -167,8 +167,8 @@ func (w workflowBuilder) AddEdges(n c.NodeBuilder, edgeDirection c.EdgeDirection
 
 // Contains the main validation logic for the coreWorkflow. If successful, it'll build an executable Workflow.
 func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.CompileErrors) (c.Workflow, bool) {
-	if len(fg.Template.Nodes) == 0 {
-		errs.Collect(errors.NewNoNodesFoundErr(fg.Template.Id.String()))
+	if len(fg.GetTemplate().GetNodes()) == 0 {
+		errs.Collect(errors.NewNoNodesFoundErr(fg.GetTemplate().GetId().String()))
 		return nil, !errs.HasErrors()
 	}
 
@@ -183,25 +183,25 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	}
 
 	var ok bool
-	if wf.CoreWorkflow.Template.Interface, ok = v.ValidateInterface(c.StartNodeID, wf.CoreWorkflow.Template.Interface, errs.NewScope()); !ok {
+	if wf.CoreWorkflow.Template.Interface, ok = v.ValidateInterface(c.StartNodeID, wf.GetCoreWorkflow().GetTemplate().GetInterface(), errs.NewScope()); !ok {
 		return nil, !errs.HasErrors()
 	}
 
-	checkpoint := make([]*core.Node, 0, len(fg.Template.Nodes))
-	checkpoint = append(checkpoint, fg.Template.Nodes...)
-	fg.Template.Nodes = make([]*core.Node, 0, len(fg.Template.Nodes))
+	checkpoint := make([]*core.Node, 0, len(fg.GetTemplate().GetNodes()))
+	checkpoint = append(checkpoint, fg.GetTemplate().GetNodes()...)
+	fg.Template.Nodes = make([]*core.Node, 0, len(fg.GetTemplate().GetNodes()))
 	wf.GetCoreWorkflow().Connections = &core.ConnectionSet{
 		Downstream: make(map[string]*core.ConnectionSet_IdList),
 		Upstream:   make(map[string]*core.ConnectionSet_IdList),
 	}
 
 	globalInputNode, _ := wf.AddNode(wf.GetOrCreateNodeBuilder(startNode), errs)
-	globalInputNode.SetInterface(&core.TypedInterface{Outputs: wf.CoreWorkflow.Template.Interface.Inputs})
+	globalInputNode.SetInterface(&core.TypedInterface{Outputs: wf.GetCoreWorkflow().GetTemplate().GetInterface().GetInputs()})
 
 	endNode := &core.Node{Id: c.EndNodeID}
 	globalOutputNode, _ := wf.AddNode(wf.GetOrCreateNodeBuilder(endNode), errs)
-	globalOutputNode.SetInterface(&core.TypedInterface{Inputs: wf.CoreWorkflow.Template.Interface.Outputs})
-	globalOutputNode.SetInputs(wf.CoreWorkflow.Template.Outputs)
+	globalOutputNode.SetInterface(&core.TypedInterface{Inputs: wf.GetCoreWorkflow().GetTemplate().GetInterface().GetOutputs()})
+	globalOutputNode.SetInputs(wf.GetCoreWorkflow().GetTemplate().GetOutputs())
 
 	// Track top level nodes (a branch in a branch node is NOT a top level node). The final graph should ensure that all
 	// top level nodes are executed before the end node. We do that by adding execution edges from leaf nodes that do not
@@ -210,7 +210,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 
 	// Add and validate all other nodes
 	for _, n := range checkpoint {
-		topLevelNodes.Insert(n.Id)
+		topLevelNodes.Insert(n.GetId())
 		if node, addOk := wf.AddNode(wf.GetOrCreateNodeBuilder(n), errs.NewScope()); addOk {
 			v.ValidateNode(&wf, node, false /* validateConditionTypes */, errs.NewScope())
 		}
@@ -225,8 +225,8 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		wf.AddEdges(n, c.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
-	if fg.Template.FailureNode != nil {
-		failureNode := fg.Template.FailureNode
+	if fg.GetTemplate().GetFailureNode() != nil {
+		failureNode := fg.GetTemplate().GetFailureNode()
 		v.ValidateNode(&wf, wf.GetOrCreateNodeBuilder(failureNode), false, errs.NewScope())
 		wf.AddEdges(wf.GetOrCreateNodeBuilder(failureNode), c.EdgeDirectionUpstream, errs.NewScope())
 	}
@@ -272,7 +272,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 
 // Validates that all requirements for the coreWorkflow and its subworkflows are present.
 func (w workflowBuilder) validateAllRequirements(errs errors.CompileErrors) bool {
-	reqs := getRequirements(w.CoreWorkflow.Template, w.allSubWorkflows, true, errs)
+	reqs := getRequirements(w.GetCoreWorkflow().GetTemplate(), w.allSubWorkflows, true, errs)
 
 	for _, lp := range reqs.launchPlanIds {
 		if _, ok := w.allLaunchPlans[lp.String()]; !ok {
@@ -314,17 +314,17 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 	uniqueTasks := sets.NewString()
 	taskBuilders := make([]c.Task, 0, len(tasks))
 	for _, task := range tasks {
-		if task.Template == nil || task.Template.Id == nil {
+		if task.GetTemplate() == nil || task.GetTemplate().GetId() == nil {
 			errs.Collect(errors.NewValueRequiredErr("task", "Template.Id"))
 			return nil, errs
 		}
 
-		if uniqueTasks.Has(task.Template.Id.String()) {
+		if uniqueTasks.Has(task.GetTemplate().GetId().String()) {
 			continue
 		}
 
-		taskBuilders = append(taskBuilders, &taskBuilder{flyteTask: task.Template})
-		uniqueTasks.Insert(task.Template.Id.String())
+		taskBuilders = append(taskBuilders, &taskBuilder{flyteTask: task.GetTemplate()})
+		uniqueTasks.Insert(task.GetTemplate().GetId().String())
 	}
 
 	// Validate overall requirements of the coreWorkflow.

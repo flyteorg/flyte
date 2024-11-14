@@ -48,26 +48,26 @@ type WorkflowManager struct {
 }
 
 func getWorkflowContext(ctx context.Context, identifier *core.Identifier) context.Context {
-	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
-	return contextutils.WithWorkflowID(ctx, identifier.Name)
+	ctx = contextutils.WithProjectDomain(ctx, identifier.GetProject(), identifier.GetDomain())
+	return contextutils.WithWorkflowID(ctx, identifier.GetName())
 }
 
 func (w *WorkflowManager) setDefaults(request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateRequest, error) {
 	// TODO: Also add environment and configuration defaults once those have been determined.
-	if request.Id == nil {
+	if request.GetId() == nil {
 		return request, errors.NewFlyteAdminError(codes.InvalidArgument, "missing identifier for WorkflowCreateRequest")
 	}
-	request.Spec.Template.Id = request.Id
+	request.Spec.Template.Id = request.GetId()
 	return request, nil
 }
 
 func (w *WorkflowManager) getCompiledWorkflow(
 	ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowClosure, error) {
-	reqs, err := w.compiler.GetRequirements(request.Spec.Template, request.Spec.SubWorkflows)
+	reqs, err := w.compiler.GetRequirements(request.GetSpec().GetTemplate(), request.GetSpec().GetSubWorkflows())
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
 		logger.Errorf(ctx, "Failed to get workflow requirements for template [%+v] with err %v",
-			request.Spec.Template, err)
+			request.GetSpec().GetTemplate(), err)
 		return &admin.WorkflowClosure{}, err
 	}
 
@@ -76,10 +76,10 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		task, err := util.GetTask(ctx, w.db, taskID)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get task with id [%+v] when compiling workflow with id [%+v] with err %v",
-				taskID, request.Id, err)
+				taskID, request.GetId(), err)
 			return &admin.WorkflowClosure{}, err
 		}
-		tasks[idx] = task.Closure.CompiledTask
+		tasks[idx] = task.GetClosure().GetCompiledTask()
 	}
 
 	var launchPlans = make([]compiler.InterfaceProvider, len(reqs.GetRequiredLaunchPlanIds()))
@@ -88,7 +88,7 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		launchPlanModel, err = util.GetLaunchPlanModel(ctx, w.db, launchPlanID)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get launch plan with id [%+v] when compiling workflow with id [%+v] with err %v",
-				launchPlanID, request.Id, err)
+				launchPlanID, request.GetId(), err)
 			return &admin.WorkflowClosure{}, err
 		}
 		var launchPlanInterfaceProvider workflowengine.InterfaceProvider
@@ -101,16 +101,16 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		launchPlans[idx] = launchPlanInterfaceProvider
 	}
 
-	closure, err := w.compiler.CompileWorkflow(request.Spec.Template, request.Spec.SubWorkflows, tasks, launchPlans)
+	closure, err := w.compiler.CompileWorkflow(request.GetSpec().GetTemplate(), request.GetSpec().GetSubWorkflows(), tasks, launchPlans)
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
-		logger.Debugf(ctx, "Failed to compile workflow with id [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to compile workflow with id [%+v] with err %v", request.GetId(), err)
 		return &admin.WorkflowClosure{}, err
 	}
 	createdAt, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
 		return &admin.WorkflowClosure{}, errors.NewFlyteAdminErrorf(codes.Internal,
-			"Failed to serialize CreatedAt: %v when saving compiled workflow %+v", err, request.Id)
+			"Failed to serialize CreatedAt: %v when saving compiled workflow %+v", err, request.GetId())
 	}
 	return &admin.WorkflowClosure{
 		CompiledWorkflow: closure,
@@ -121,10 +121,10 @@ func (w *WorkflowManager) getCompiledWorkflow(
 func (w *WorkflowManager) createDataReference(
 	ctx context.Context, identifier *core.Identifier) (storage.DataReference, error) {
 	nestedSubKeys := []string{
-		identifier.Project,
-		identifier.Domain,
-		identifier.Name,
-		identifier.Version,
+		identifier.GetProject(),
+		identifier.GetDomain(),
+		identifier.GetName(),
+		identifier.GetVersion(),
 	}
 	nestedKeys := append(w.storagePrefix, nestedSubKeys...)
 	return w.storageClient.ConstructReference(ctx, w.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
@@ -136,10 +136,10 @@ func (w *WorkflowManager) CreateWorkflow(
 	if err := validation.ValidateWorkflow(ctx, request, w.db, w.config.ApplicationConfiguration()); err != nil {
 		return nil, err
 	}
-	ctx = getWorkflowContext(ctx, request.Id)
+	ctx = getWorkflowContext(ctx, request.GetId())
 	finalizedRequest, err := w.setDefaults(request)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to set defaults for workflow with id [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to set defaults for workflow with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	// Validate that the workflow compiles.
@@ -147,21 +147,21 @@ func (w *WorkflowManager) CreateWorkflow(
 	if err != nil {
 		logger.Errorf(ctx, "Failed to compile workflow with err: %v", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"failed to compile workflow for [%+v] with err: %v", request.Id, err)
+			"failed to compile workflow for [%+v] with err: %v", request.GetId(), err)
 	}
 	err = validation.ValidateCompiledWorkflow(
-		request.Id, workflowClosure, w.config.RegistrationValidationConfiguration())
+		request.GetId(), workflowClosure, w.config.RegistrationValidationConfiguration())
 	if err != nil {
 		return nil, err
 	}
-	workflowDigest, err := util.GetWorkflowDigest(ctx, workflowClosure.CompiledWorkflow)
+	workflowDigest, err := util.GetWorkflowDigest(ctx, workflowClosure.GetCompiledWorkflow())
 	if err != nil {
 		logger.Errorf(ctx, "failed to compute workflow digest with err %v", err)
 		return nil, err
 	}
 
 	// Assert that a matching workflow doesn't already exist before uploading the workflow closure.
-	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, request.Id)
+	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, request.GetId())
 	// Check that no identical or conflicting workflows exist.
 	if err == nil {
 		// A workflow's structure is uniquely defined by its collection of nodes.
@@ -174,29 +174,29 @@ func (w *WorkflowManager) CreateWorkflow(
 			return nil, transformerErr
 		}
 		// A workflow exists with different structure
-		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, request, existingWorkflow.Closure.GetCompiledWorkflow(), workflowClosure.GetCompiledWorkflow())
+		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, request, existingWorkflow.GetClosure().GetCompiledWorkflow(), workflowClosure.GetCompiledWorkflow())
 	} else if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
 		logger.Debugf(ctx, "Failed to get workflow for comparison in CreateWorkflow with ID [%+v] with err %v",
-			request.Id, err)
+			request.GetId(), err)
 		return nil, err
 	}
 
-	remoteClosureDataRef, err := w.createDataReference(ctx, request.Spec.Template.Id)
+	remoteClosureDataRef, err := w.createDataReference(ctx, request.GetSpec().GetTemplate().GetId())
 	if err != nil {
 		logger.Infof(ctx, "failed to construct data reference for workflow closure with id [%+v] with err %v",
-			request.Id, err)
+			request.GetId(), err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"failed to construct data reference for workflow closure with id [%+v] and err %v", request.Id, err)
+			"failed to construct data reference for workflow closure with id [%+v] and err %v", request.GetId(), err)
 	}
 	err = w.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, workflowClosure)
 
 	if err != nil {
 		logger.Infof(ctx,
 			"failed to write marshaled workflow with id [%+v] to storage %s with err %v and base container: %s",
-			request.Id, remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
+			request.GetId(), remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to write marshaled workflow [%+v] to storage %s with err %v and base container: %s",
-			request.Id, remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
+			request.GetId(), remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
 	}
 	// Save the workflow & its reference to the offloaded, compiled workflow in the database.
 	workflowModel, err := transformers.CreateWorkflowModel(
@@ -207,17 +207,17 @@ func (w *WorkflowManager) CreateWorkflow(
 			finalizedRequest, remoteClosureDataRef.String(), err)
 		return nil, err
 	}
-	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, request.Id)
+	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.GetSpec().GetDescription(), request.GetId())
 	if err != nil {
 		logger.Errorf(ctx,
-			"Failed to transform description model [%+v] with err: %v", request.Spec.Description, err)
+			"Failed to transform description model [%+v] with err: %v", request.GetSpec().GetDescription(), err)
 		return nil, err
 	}
 	if descriptionModel != nil {
 		workflowModel.ShortDescription = descriptionModel.ShortDescription
 	}
 	if err = w.db.WorkflowRepo().Create(ctx, workflowModel, descriptionModel); err != nil {
-		logger.Infof(ctx, "Failed to create workflow model [%+v] with err %v", request.Id, err)
+		logger.Infof(ctx, "Failed to create workflow model [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	w.metrics.TypedInterfaceSizeBytes.Observe(float64(len(workflowModel.TypedInterface)))
@@ -226,14 +226,14 @@ func (w *WorkflowManager) CreateWorkflow(
 }
 
 func (w *WorkflowManager) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
-	if err := validation.ValidateIdentifier(request.Id, common.Workflow); err != nil {
-		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
+	if err := validation.ValidateIdentifier(request.GetId(), common.Workflow); err != nil {
+		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = getWorkflowContext(ctx, request.Id)
-	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, request.Id)
+	ctx = getWorkflowContext(ctx, request.GetId())
+	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, request.GetId())
 	if err != nil {
-		logger.Infof(ctx, "Failed to get workflow with id [%+v] with err %v", request.Id, err)
+		logger.Infof(ctx, "Failed to get workflow with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	return workflow, nil
@@ -246,37 +246,37 @@ func (w *WorkflowManager) ListWorkflows(
 	if err := validation.ValidateResourceListRequest(request); err != nil {
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetId().GetProject(), request.GetId().GetDomain())
+	ctx = contextutils.WithWorkflowID(ctx, request.GetId().GetName())
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
+		Project:        request.GetId().GetProject(),
+		Domain:         request.GetId().GetDomain(),
+		Name:           request.GetId().GetName(),
+		RequestFilters: request.GetFilters(),
 	}, common.Workflow)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.WorkflowColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.WorkflowColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListWorkflows", request.Token)
+			"invalid pagination token %s for ListWorkflows", request.GetToken())
 	}
 	listWorkflowsInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
 	}
 	output, err := w.db.WorkflowRepo().List(ctx, listWorkflowsInput)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to list workflows with [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to list workflows with [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	workflowList, err := transformers.FromWorkflowModels(output.Workflows)
@@ -286,7 +286,7 @@ func (w *WorkflowManager) ListWorkflows(
 		return nil, err
 	}
 	var token string
-	if len(output.Workflows) == int(request.Limit) {
+	if len(output.Workflows) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.Workflows))
 	}
 	return &admin.WorkflowList{
@@ -301,28 +301,28 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request *
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetProject(), request.GetDomain())
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project: request.Project,
-		Domain:  request.Domain,
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
 	}, common.Workflow)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.WorkflowColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.WorkflowColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListWorkflowIdentifiers", request.Token)
+			"invalid pagination token %s for ListWorkflowIdentifiers", request.GetToken())
 	}
 	listWorkflowsInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -331,12 +331,12 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request *
 	output, err := w.db.WorkflowRepo().ListIdentifiers(ctx, listWorkflowsInput)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list workflow ids with project: %s and domain: %s with err %v",
-			request.Project, request.Domain, err)
+			request.GetProject(), request.GetDomain(), err)
 		return nil, err
 	}
 
 	var token string
-	if len(output.Workflows) == int(request.Limit) {
+	if len(output.Workflows) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.Workflows))
 	}
 	entities := transformers.FromWorkflowModelsToIdentifiers(output.Workflows)

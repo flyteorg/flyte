@@ -275,7 +275,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 func TestGetLaunchPlanFunc(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
-	s.FetcherExt.OnFetchAllVerOfLPMatch(mock.Anything, mock.Anything, "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.LaunchPlans, nil)
+	s.FetcherExt.OnFetchAllVerOfLPMatch(mock.Anything, mock.Anything, "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchAllVerOfLP", s.Ctx, "launchplan1", "dummyProject", "dummyDomain", launchplan.DefaultConfig.Filter)
@@ -308,7 +308,7 @@ func TestGetLaunchPlans(t *testing.T) {
 	t.Run("no workflow filter", func(t *testing.T) {
 		s := testutils.Setup(t)
 		getLaunchPlanSetup()
-		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.LaunchPlans, nil)
+		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 		argsLp = []string{}
 		err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 		assert.Nil(t, err)
@@ -319,7 +319,7 @@ func TestGetLaunchPlans(t *testing.T) {
 		getLaunchPlanSetup()
 		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{
 			FieldSelector: "workflow.name=workflow2",
-		}).Return(launchPlanListResponse.LaunchPlans, nil)
+		}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 		argsLp = []string{}
 		launchplan.DefaultConfig.Workflow = "workflow2"
 		err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
@@ -379,7 +379,7 @@ func TestGetLaunchPlanTableFunc(t *testing.T) {
 	s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceGetRequest).Return(launchPlanListResponse, nil)
 	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(launchPlan2, nil)
 	s.MockAdminClient.OnListLaunchPlanIdsMatch(s.Ctx, namedIDRequest).Return(namedIdentifierList, nil)
-	s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.LaunchPlans, nil)
+	s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)

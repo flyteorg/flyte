@@ -148,7 +148,7 @@ func TestCreateTaskInfo(t *testing.T) {
 		taskInfo := createTaskInfo("run-id", "job-id", testInstance)
 
 		assert.Equal(t, 1, len(taskInfo.Logs))
-		assert.Equal(t, taskInfo.Logs[0].Uri, "https://test-account.cloud.databricks.com/#job/job-id/run/run-id")
-		assert.Equal(t, taskInfo.Logs[0].Name, "Databricks Console")
+		assert.Equal(t, taskInfo.Logs[0].GetUri(), "https://test-account.cloud.databricks.com/#job/job-id/run/run-id")
+		assert.Equal(t, taskInfo.Logs[0].GetName(), "Databricks Console")
 	})
 }

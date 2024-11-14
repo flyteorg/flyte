@@ -179,7 +179,7 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 		workqueue.NewMaxOfRateLimiter(
 			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
-		), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
+		), cfg.ResyncInterval.Duration, uint(cfg.Workers), uint(cfg.Size), // #nosec G115
 		scope.NewSubScope("cache"))
 
 	if err != nil {

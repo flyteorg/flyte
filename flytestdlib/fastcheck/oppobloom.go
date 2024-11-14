@@ -57,7 +57,7 @@ func (f *OppoBloomFilter) getIndex(id []byte) int32 {
 	h := md5UintHash{md5.New()}
 	h.Write(id)
 	uindex := h.Sum32() & f.sizeMask
-	return int32(uindex)
+	return int32(uindex) // #nosec G115
 }
 
 func (f *OppoBloomFilter) Add(_ context.Context, id []byte) bool {
@@ -116,6 +116,6 @@ func NewOppoBloomFilter(size int, scope promutils.Scope) (*OppoBloomFilter, erro
 	// round to the next largest power of two
 	size = int(math.Pow(2, math.Ceil(math.Log2(float64(size)))))
 	slice := make([]*[]byte, size)
-	sizeMask := uint32(size - 1)
+	sizeMask := uint32(size - 1) // #nosec G115
 	return &OppoBloomFilter{slice, sizeMask, newMetrics(scope)}, nil
 }

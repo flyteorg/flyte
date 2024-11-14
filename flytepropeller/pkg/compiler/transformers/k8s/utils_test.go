@@ -14,9 +14,9 @@ func TestComputeRetryStrategy(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		nodeRetries     int
-		taskRetries     int
-		expectedRetries int
+		nodeRetries     uint32
+		taskRetries     uint32
+		expectedRetries uint32
 	}{
 		{"node-only", 1, 0, 2},
 		{"task-only", 0, 1, 2},
@@ -31,7 +31,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				node = &core.Node{
 					Metadata: &core.NodeMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.nodeRetries),
+							Retries: test.nodeRetries,
 						},
 					},
 				}
@@ -42,7 +42,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				tmpl = &core.TaskTemplate{
 					Metadata: &core.TaskMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.taskRetries),
+							Retries: test.taskRetries,
 						},
 					},
 				}
@@ -51,7 +51,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 			r := computeRetryStrategy(node, tmpl)
 			if test.expectedRetries != 0 {
 				assert.NotNil(t, r)
-				assert.Equal(t, test.expectedRetries, *r.MinAttempts)
+				assert.Equal(t, int(test.expectedRetries), *r.MinAttempts) // #nosec G115
 			} else {
 				assert.Nil(t, r)
 			}
@@ -292,7 +292,7 @@ func TestStripInterfaceTypeMetadata(t *testing.T) {
 		}
 
 		stripped := StripInterfaceTypeMetadata(i)
-		assert.Nil(t, stripped.Inputs.Variables["a"].Type.Metadata)
-		assert.Nil(t, stripped.Outputs.Variables["a"].Type.Metadata)
+		assert.Nil(t, stripped.GetInputs().GetVariables()["a"].GetType().GetMetadata())
+		assert.Nil(t, stripped.GetOutputs().GetVariables()["a"].GetType().GetMetadata())
 	})
 }

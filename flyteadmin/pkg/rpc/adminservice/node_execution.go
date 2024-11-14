@@ -68,8 +68,8 @@ func (m *AdminService) ListNodeExecutionsForTask(
 	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.TaskExecutionId != nil && request.TaskExecutionId.TaskId != nil &&
-		request.TaskExecutionId.TaskId.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetTaskExecutionId() != nil && request.GetTaskExecutionId().GetTaskId() != nil &&
+		request.GetTaskExecutionId().GetTaskId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.TaskExecutionId.TaskId.ResourceType = core.ResourceType_TASK
 	}

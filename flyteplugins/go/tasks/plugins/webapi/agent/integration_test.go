@@ -261,7 +261,7 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
-		return slices.Equal(request.Template.GetContainer().Args, expectedArgs)
+		return slices.Equal(request.GetTemplate().GetContainer().GetArgs(), expectedArgs)
 	})
 	asyncAgentClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
 		ResourceMeta: []byte{1, 2, 3, 4}}, nil)

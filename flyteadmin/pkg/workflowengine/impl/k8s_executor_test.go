@@ -281,7 +281,7 @@ func TestExecute_MiscError(t *testing.T) {
 func TestAbort(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
 	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		assert.Equal(t, execID.Name, name)
+		assert.Equal(t, execID.GetName(), name)
 		assert.Equal(t, options.PropagationPolicy, &deletePropagationBackground)
 		return nil
 	}
@@ -306,7 +306,7 @@ func TestAbort_Notfound(t *testing.T) {
 		return k8_api_err.NewNotFound(schema.GroupResource{
 			Group:    "foo",
 			Resource: "bar",
-		}, execID.Name)
+		}, execID.GetName())
 	}
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)

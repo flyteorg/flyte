@@ -25,11 +25,11 @@ var datasetID = &datacatalog.DatasetID{
 }
 
 func assertDatasetIDEqualsModel(t *testing.T, idlDataset *datacatalog.DatasetID, model *models.DatasetKey) {
-	assert.Equal(t, idlDataset.Project, model.Project)
-	assert.Equal(t, idlDataset.Domain, model.Domain)
-	assert.Equal(t, idlDataset.Name, model.Name)
-	assert.Equal(t, idlDataset.Version, model.Version)
-	assert.Equal(t, idlDataset.UUID, model.UUID)
+	assert.Equal(t, idlDataset.GetProject(), model.Project)
+	assert.Equal(t, idlDataset.GetDomain(), model.Domain)
+	assert.Equal(t, idlDataset.GetName(), model.Name)
+	assert.Equal(t, idlDataset.GetVersion(), model.Version)
+	assert.Equal(t, idlDataset.GetUUID(), model.UUID)
 }
 
 func TestCreateDatasetModelNoParitions(t *testing.T) {
@@ -40,11 +40,11 @@ func TestCreateDatasetModelNoParitions(t *testing.T) {
 
 	datasetModel, err := CreateDatasetModel(dataset)
 	assert.NoError(t, err)
-	assertDatasetIDEqualsModel(t, dataset.Id, &datasetModel.DatasetKey)
+	assertDatasetIDEqualsModel(t, dataset.GetId(), &datasetModel.DatasetKey)
 
 	unmarshaledMetadata, err := unmarshalMetadata(datasetModel.SerializedMetadata)
 	assert.NoError(t, err)
-	assert.EqualValues(t, unmarshaledMetadata.KeyMap, metadata.KeyMap)
+	assert.EqualValues(t, unmarshaledMetadata.GetKeyMap(), metadata.GetKeyMap())
 
 	assert.Len(t, datasetModel.PartitionKeys, 0)
 }
@@ -58,15 +58,15 @@ func TestCreateDatasetModel(t *testing.T) {
 
 	datasetModel, err := CreateDatasetModel(dataset)
 	assert.NoError(t, err)
-	assertDatasetIDEqualsModel(t, dataset.Id, &datasetModel.DatasetKey)
+	assertDatasetIDEqualsModel(t, dataset.GetId(), &datasetModel.DatasetKey)
 
 	unmarshaledMetadata, err := unmarshalMetadata(datasetModel.SerializedMetadata)
 	assert.NoError(t, err)
-	assert.EqualValues(t, unmarshaledMetadata.KeyMap, metadata.KeyMap)
+	assert.EqualValues(t, unmarshaledMetadata.GetKeyMap(), metadata.GetKeyMap())
 
 	assert.Len(t, datasetModel.PartitionKeys, 2)
-	assert.Equal(t, datasetModel.PartitionKeys[0], models.PartitionKey{Name: dataset.PartitionKeys[0]})
-	assert.Equal(t, datasetModel.PartitionKeys[1], models.PartitionKey{Name: dataset.PartitionKeys[1]})
+	assert.Equal(t, datasetModel.PartitionKeys[0], models.PartitionKey{Name: dataset.GetPartitionKeys()[0]})
+	assert.Equal(t, datasetModel.PartitionKeys[1], models.PartitionKey{Name: dataset.GetPartitionKeys()[1]})
 }
 
 func TestFromDatasetID(t *testing.T) {
@@ -86,9 +86,9 @@ func TestFromDatasetModelNoPartitionsOrMetadata(t *testing.T) {
 	}
 	dataset, err := FromDatasetModel(*datasetModel)
 	assert.NoError(t, err)
-	assertDatasetIDEqualsModel(t, dataset.Id, &datasetModel.DatasetKey)
-	assert.Len(t, dataset.Metadata.KeyMap, 0)
-	assert.Len(t, dataset.PartitionKeys, 0)
+	assertDatasetIDEqualsModel(t, dataset.GetId(), &datasetModel.DatasetKey)
+	assert.Len(t, dataset.GetMetadata().GetKeyMap(), 0)
+	assert.Len(t, dataset.GetPartitionKeys(), 0)
 }
 
 func TestFromDatasetModelWithPartitions(t *testing.T) {
@@ -108,8 +108,8 @@ func TestFromDatasetModelWithPartitions(t *testing.T) {
 	}
 	dataset, err := FromDatasetModel(*datasetModel)
 	assert.NoError(t, err)
-	assertDatasetIDEqualsModel(t, dataset.Id, &datasetModel.DatasetKey)
-	assert.Len(t, dataset.Metadata.KeyMap, 2)
-	assert.EqualValues(t, dataset.Metadata.KeyMap, metadata.KeyMap)
-	assert.Len(t, dataset.PartitionKeys, 2)
+	assertDatasetIDEqualsModel(t, dataset.GetId(), &datasetModel.DatasetKey)
+	assert.Len(t, dataset.GetMetadata().GetKeyMap(), 2)
+	assert.EqualValues(t, dataset.GetMetadata().GetKeyMap(), metadata.GetKeyMap())
+	assert.Len(t, dataset.GetPartitionKeys(), 2)
 }

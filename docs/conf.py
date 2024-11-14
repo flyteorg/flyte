@@ -344,6 +344,22 @@ exclude_patterns = [
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
+    "examples/advanced_composition/**",
+    "examples/basics/**",
+    "examples/customizing_dependencies/**",
+    "examples/data_types_and_io/**",
+    "examples/development_lifecycle/**",
+    "examples/extending/**",
+    "examples/productionizing/**",
+    "examples/testing/**",
+    "flytesnacks/examples/advanced_composition/*.md",
+    "flytesnacks/examples/basics/*.md",
+    "flytesnacks/examples/customizing_dependencies/*.md",
+    "flytesnacks/examples/data_types_and_io/*.md",
+    "flytesnacks/examples/development_lifecycle/*.md",
+    "flytesnacks/examples/extending/*.md",
+    "flytesnacks/examples/productionizing/*.md",
+    "flytesnacks/examples/testing/*.md",
     "api/flytectl/index.rst",
     "protos/boilerplate/**",
     "protos/tmp/**",
@@ -623,14 +639,6 @@ import_projects = [
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
                 "flytesnacks/index.md",
-                "examples/advanced_composition",
-                "examples/basics",
-                "examples/customizing_dependencies",
-                "examples/data_types_and_io",
-                "examples/development_lifecycle",
-                "examples/extending",
-                "examples/productionizing",
-                "examples/testing"
             ]
         ],
         "local": flytesnacks_local_path is not None,
@@ -690,6 +698,15 @@ os.environ["FLYTE_SDK_LOGGING_LEVEL_ROOT"] = "50"
 
 # Disable warnings from tensorflow
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
 
 
 class CustomWarningSuppressor(logging.Filter):

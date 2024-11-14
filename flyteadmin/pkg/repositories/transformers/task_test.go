@@ -52,10 +52,10 @@ func TestFromTaskModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
-	}, task.Id))
+	}, task.GetId()))
 	expectedClosure := testutils.GetTaskClosure()
 	expectedClosure.CreatedAt = createdAtProto
-	assert.True(t, proto.Equal(expectedClosure, task.Closure))
+	assert.True(t, proto.Equal(expectedClosure, task.GetClosure()))
 }
 
 func TestFromTaskModels(t *testing.T) {
@@ -100,10 +100,10 @@ func TestFromTaskModels(t *testing.T) {
 		Domain:       "domain a",
 		Name:         "name a",
 		Version:      "version a",
-	}, taskList[0].Id))
+	}, taskList[0].GetId()))
 	expectedClosure := testutils.GetTaskClosure()
 	expectedClosure.CreatedAt = createdAtAProto
-	assert.True(t, proto.Equal(expectedClosure, taskList[0].Closure))
+	assert.True(t, proto.Equal(expectedClosure, taskList[0].GetClosure()))
 
 	assert.True(t, proto.Equal(&core.Identifier{
 		ResourceType: core.ResourceType_TASK,
@@ -111,11 +111,11 @@ func TestFromTaskModels(t *testing.T) {
 		Domain:       "domain b",
 		Name:         "name b",
 		Version:      "version b",
-	}, taskList[1].Id))
+	}, taskList[1].GetId()))
 	expectedClosure = &admin.TaskClosure{
 		CreatedAt: createdAtBProto,
 	}
-	assert.True(t, proto.Equal(expectedClosure, taskList[1].Closure))
+	assert.True(t, proto.Equal(expectedClosure, taskList[1].GetClosure()))
 }
 
 func TestFromTaskModelsToIdentifiers(t *testing.T) {
@@ -139,10 +139,10 @@ func TestFromTaskModelsToIdentifiers(t *testing.T) {
 	}
 
 	taskIds := FromTaskModelsToIdentifiers(taskModels)
-	assert.Equal(t, "domain a", taskIds[0].Domain)
-	assert.Equal(t, "project a", taskIds[0].Project)
-	assert.Equal(t, "name a", taskIds[0].Name)
-	assert.Equal(t, "domain b", taskIds[1].Domain)
-	assert.Equal(t, "project b", taskIds[1].Project)
-	assert.Equal(t, "name b", taskIds[1].Name)
+	assert.Equal(t, "domain a", taskIds[0].GetDomain())
+	assert.Equal(t, "project a", taskIds[0].GetProject())
+	assert.Equal(t, "name a", taskIds[0].GetName())
+	assert.Equal(t, "domain b", taskIds[1].GetDomain())
+	assert.Equal(t, "project b", taskIds[1].GetProject())
+	assert.Equal(t, "name b", taskIds[1].GetName())
 }

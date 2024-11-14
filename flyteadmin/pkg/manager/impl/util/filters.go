@@ -274,28 +274,28 @@ func GetWorkflowExecutionIdentifierFilters(
 	ctx context.Context, workflowExecutionIdentifier *core.WorkflowExecutionIdentifier, entity common.Entity) ([]common.InlineFilter, error) {
 	identifierFilters := make([]common.InlineFilter, 3)
 	identifierProjectFilter, err := GetSingleValueEqualityFilter(
-		entity, shared.Project, workflowExecutionIdentifier.Project)
+		entity, shared.Project, workflowExecutionIdentifier.GetProject())
 	if err != nil {
 		logger.Warningf(ctx, "Failed to create execution identifier filter for project: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Project, workflowExecutionIdentifier)
+			workflowExecutionIdentifier.GetProject(), workflowExecutionIdentifier)
 		return nil, err
 	}
 	identifierFilters[0] = identifierProjectFilter
 
 	identifierDomainFilter, err := GetSingleValueEqualityFilter(
-		entity, shared.Domain, workflowExecutionIdentifier.Domain)
+		entity, shared.Domain, workflowExecutionIdentifier.GetDomain())
 	if err != nil {
 		logger.Warningf(ctx, "Failed to create execution identifier filter for domain: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Domain, workflowExecutionIdentifier)
+			workflowExecutionIdentifier.GetDomain(), workflowExecutionIdentifier)
 		return nil, err
 	}
 	identifierFilters[1] = identifierDomainFilter
 
 	identifierNameFilter, err := GetSingleValueEqualityFilter(
-		entity, shared.Name, workflowExecutionIdentifier.Name)
+		entity, shared.Name, workflowExecutionIdentifier.GetName())
 	if err != nil {
 		logger.Warningf(ctx, "Failed to create execution identifier filter for domain: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Name, workflowExecutionIdentifier)
+			workflowExecutionIdentifier.GetName(), workflowExecutionIdentifier)
 		return nil, err
 	}
 	identifierFilters[2] = identifierNameFilter
@@ -306,15 +306,15 @@ func GetWorkflowExecutionIdentifierFilters(
 func GetNodeExecutionIdentifierFilters(
 	ctx context.Context, nodeExecutionIdentifier *core.NodeExecutionIdentifier, entity common.Entity) ([]common.InlineFilter, error) {
 	workflowExecutionIdentifierFilters, err :=
-		GetWorkflowExecutionIdentifierFilters(ctx, nodeExecutionIdentifier.ExecutionId, entity)
+		GetWorkflowExecutionIdentifierFilters(ctx, nodeExecutionIdentifier.GetExecutionId(), entity)
 	if err != nil {
 		return nil, err
 	}
 	nodeIDFilter, err := GetSingleValueEqualityFilter(
-		entity, shared.NodeID, nodeExecutionIdentifier.NodeId)
+		entity, shared.NodeID, nodeExecutionIdentifier.GetNodeId())
 	if err != nil {
 		logger.Warningf(ctx, "Failed to create node execution identifier filter for node id: %s with identifier [%+v]",
-			nodeExecutionIdentifier.NodeId, nodeExecutionIdentifier)
+			nodeExecutionIdentifier.GetNodeId(), nodeExecutionIdentifier)
 	}
 	return append(workflowExecutionIdentifierFilters, nodeIDFilter), nil
 }

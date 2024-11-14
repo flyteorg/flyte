@@ -37,15 +37,15 @@ func (m *tagManager) AddTag(ctx context.Context, request *datacatalog.AddTagRequ
 	timer := m.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	if err := validators.ValidateTag(request.Tag); err != nil {
+	if err := validators.ValidateTag(request.GetTag()); err != nil {
 		logger.Warnf(ctx, "Invalid get tag request %+v err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
 
 	// verify the artifact and dataset exists before adding a tag to it
-	datasetID := request.Tag.Dataset
-	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
+	datasetID := request.GetTag().GetDataset()
+	ctx = contextutils.WithProjectDomain(ctx, datasetID.GetProject(), datasetID.GetDomain())
 
 	datasetKey := transformers.FromDatasetID(datasetID)
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
@@ -54,17 +54,17 @@ func (m *tagManager) AddTag(ctx context.Context, request *datacatalog.AddTagRequ
 		return nil, err
 	}
 
-	artifactKey := transformers.ToArtifactKey(datasetID, request.Tag.ArtifactId)
+	artifactKey := transformers.ToArtifactKey(datasetID, request.GetTag().GetArtifactId())
 	_, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
 	if err != nil {
 		m.systemMetrics.addTagFailureCounter.Inc(ctx)
 		return nil, err
 	}
 
-	tagKey := transformers.ToTagKey(datasetID, request.Tag.Name)
+	tagKey := transformers.ToTagKey(datasetID, request.GetTag().GetName())
 	err = m.repo.TagRepo().Create(ctx, models.Tag{
 		TagKey:      tagKey,
-		ArtifactID:  request.Tag.ArtifactId,
+		ArtifactID:  request.GetTag().GetArtifactId(),
 		DatasetUUID: dataset.UUID,
 	})
 	if err != nil {

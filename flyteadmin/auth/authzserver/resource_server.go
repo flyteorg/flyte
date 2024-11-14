@@ -116,7 +116,7 @@ func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, cfg authConfig
 		return nil, fmt.Errorf("failed to decode provider discovery object: %v", err)
 	}
 
-	return oidc.NewRemoteKeySet(oidc.ClientContext(ctx, httpClient), p.JwksUri), nil
+	return oidc.NewRemoteKeySet(oidc.ClientContext(ctx, httpClient), p.GetJwksUri()), nil
 }
 
 // NewOAuth2ResourceServer initializes a new OAuth2ResourceServer.

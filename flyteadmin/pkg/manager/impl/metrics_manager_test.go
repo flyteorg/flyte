@@ -28,8 +28,8 @@ var (
 
 func addTimestamp(ts *timestamp.Timestamp, seconds int64) *timestamp.Timestamp {
 	return &timestamp.Timestamp{
-		Seconds: ts.Seconds + seconds,
-		Nanos:   ts.Nanos,
+		Seconds: ts.GetSeconds() + seconds,
+		Nanos:   ts.GetNanos(),
 	}
 }
 
@@ -89,10 +89,10 @@ func parseSpans(spans []*core.Span) (map[string][]int64, int) {
 	operationDurations := make(map[string][]int64)
 	referenceCount := 0
 	for _, span := range spans {
-		switch id := span.Id.(type) {
+		switch id := span.GetId().(type) {
 		case *core.Span_OperationId:
 			operationID := id.OperationId
-			duration := span.EndTime.Seconds - span.StartTime.Seconds
+			duration := span.GetEndTime().GetSeconds() - span.GetStartTime().GetSeconds()
 			if array, exists := operationDurations[operationID]; exists {
 				operationDurations[operationID] = append(array, duration)
 			} else {
@@ -907,11 +907,11 @@ func TestParseTaskExecution(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// parse task execution
 			span := parseTaskExecution(test.taskExecution)
-			_, ok := span.Id.(*core.Span_TaskId)
+			_, ok := span.GetId().(*core.Span_TaskId)
 			assert.True(t, ok)
 
 			// validate spans
-			operationDurations, referenceCount := parseSpans(span.Spans)
+			operationDurations, referenceCount := parseSpans(span.GetSpans())
 			assert.True(t, reflect.DeepEqual(test.operationDurations, operationDurations))
 			assert.Equal(t, 0, referenceCount)
 		})

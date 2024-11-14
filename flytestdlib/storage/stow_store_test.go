@@ -97,7 +97,8 @@ func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item,
 	numItems := endIndexExc - startIndex
 	results := make([]stow.Item, numItems)
 	for index, itemKey := range itemKeys[startIndex:endIndexExc] {
-		results[index] = m.items[itemKey]
+		url := fmt.Sprintf("s3://%s/%s", m.id, m.items[itemKey].url)
+		results[index] = mockStowItem{url: url, size: m.items[itemKey].size}
 	}
 
 	if endIndexExc == len(m.items) {

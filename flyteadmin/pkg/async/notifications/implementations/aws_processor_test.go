@@ -31,10 +31,10 @@ func TestProcessor_StartProcessing(t *testing.T) {
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
 	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
-		assert.Equal(t, email.Body, testEmail.Body)
-		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
-		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
-		assert.Equal(t, email.SenderEmail, testEmail.SenderEmail)
+		assert.Equal(t, email.GetBody(), testEmail.GetBody())
+		assert.Equal(t, email.GetRecipientsEmail(), testEmail.GetRecipientsEmail())
+		assert.Equal(t, email.GetSubjectLine(), testEmail.GetSubjectLine())
+		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
 	mockEmailer.SetSendEmailFunc(sendEmailValidationFunc)
