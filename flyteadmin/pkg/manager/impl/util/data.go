@@ -22,10 +22,13 @@ const (
 )
 
 type GetObjectRequest struct {
-	Cluster string
-	Project string
-	Domain  string
-	Prefix  string
+	Cluster  string
+	Org      string
+	Project  string
+	Domain   string
+	Protocol string
+	Bucket   string
+	Prefix   string
 }
 
 type GetObjectResponse struct {
@@ -50,7 +53,7 @@ func GetInputs(ctx context.Context,
 	urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
 	storageClient *storage.DataStore,
-	cluster, project, domain, inputURI string,
+	cluster, org, project, domain, inputURI string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var inputsURLBlob admin.UrlBlob
@@ -72,7 +75,7 @@ func GetInputs(ctx context.Context,
 		if IsLocalURI(ctx, storageClient, inputURI) {
 			err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
 		} else {
-			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, inputURI, &fullInputs)
+			err = readFromDataPlane(ctx, objectStore, cluster, org, project, domain, inputURI, &fullInputs)
 		}
 	}
 	return &fullInputs, &inputsURLBlob, err
@@ -120,7 +123,7 @@ func GetOutputs(ctx context.Context,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
 	storageClient *storage.DataStore,
 	closure ExecutionClosure,
-	cluster, project, domain string,
+	cluster, org, project, domain string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var outputsURLBlob admin.UrlBlob
@@ -147,7 +150,7 @@ func GetOutputs(ctx context.Context,
 		if IsLocalURI(ctx, storageClient, closure.GetOutputUri()) {
 			err = storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
 		} else {
-			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, closure.GetOutputUri(), fullOutputs)
+			err = readFromDataPlane(ctx, objectStore, cluster, org, project, domain, closure.GetOutputUri(), fullOutputs)
 		}
 	}
 	return fullOutputs, &outputsURLBlob, err
@@ -160,7 +163,7 @@ func IsLocalURI(ctx context.Context, store *storage.DataStore, uri string) bool 
 
 func readFromDataPlane(ctx context.Context,
 	objectStore ObjectStore,
-	cluster, project, domain, reference string,
+	cluster, org, project, domain, reference string,
 	msg proto.Message,
 ) error {
 	if objectStore == nil {
@@ -173,10 +176,13 @@ func readFromDataPlane(ctx context.Context,
 	}
 
 	out, err := objectStore.GetObject(ctx, GetObjectRequest{
-		Cluster: cluster,
-		Prefix:  refURL.Path,
-		Project: project,
-		Domain:  domain,
+		Cluster:  cluster,
+		Org:      org,
+		Protocol: refURL.Scheme,
+		Bucket:   refURL.Host,
+		Prefix:   refURL.Path,
+		Project:  project,
+		Domain:   domain,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to fetch object: %w", err)
