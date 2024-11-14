@@ -1,8 +1,6 @@
 module github.com/unionai/flyte/fasttask/plugin
 
-go 1.21
-
-toolchain go1.21.4
+go 1.22
 
 require (
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000

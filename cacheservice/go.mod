@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/cacheservice
 
-go 1.21
+go 1.22
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7
