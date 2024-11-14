@@ -172,17 +172,17 @@ func TestReadOrigin(t *testing.T) {
 		}).Return(nil)
 
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
-			[]storage.DataReference{"error-0.pb", "error-1.pb", "error-2.pb"}, storage.NewCursorAtEnd(), nil)
+			[]storage.DataReference{"s3://errors/error-0.pb", "s3://errors/error-1.pb", "s3://errors/error-2.pb"}, storage.NewCursorAtEnd(), nil)
 
-		store.OnHead(ctx, storage.DataReference("error-0.pb")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference("s3://errors/error-0.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
-		store.OnHead(ctx, storage.DataReference("error-1.pb")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference("s3://errors/error-1.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
-		store.OnHead(ctx, storage.DataReference("error-2.pb")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference("s3://errors/error-2.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -231,9 +231,9 @@ func TestReadOrigin(t *testing.T) {
 		}).Return(nil)
 
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
-			[]storage.DataReference{"error.pb"}, storage.NewCursorAtEnd(), nil)
+			[]storage.DataReference{"s3://errors/error.pb"}, storage.NewCursorAtEnd(), nil)
 
-		store.OnHead(ctx, storage.DataReference("error.pb")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference("s3://errors/error.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
