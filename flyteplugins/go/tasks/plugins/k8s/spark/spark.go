@@ -338,6 +338,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 				PrimaryPodName: sj.Status.DriverInfo.PodName,
 			}
 			logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+				Namespace:            sj.Namespace,
 				PodName:              sj.Status.DriverInfo.PodName,
 				PrimaryContainerName: "spark-kubernetes-driver",
 				Containers: []*core.ContainerContext{
@@ -348,6 +349,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			for executorPodName, executorState := range sj.Status.ExecutorState {
 				if executorState != sparkOp.ExecutorPendingState && executorState != sparkOp.ExecutorUnknownState {
 					logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+						Namespace:            sj.Namespace,
 						PodName:              executorPodName,
 						PrimaryContainerName: "spark-kubernetes-executor",
 						Containers: []*core.ContainerContext{

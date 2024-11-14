@@ -754,6 +754,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 		PrimaryPodName: "job-runner-pod-name",
 		Pods: []*core.PodLogContext{
 			{
+				Namespace:            defaultNamespace,
 				PodName:              "job-runner-pod-name",
 				PrimaryContainerName: "job-runner",
 				Containers: []*core.ContainerContext{

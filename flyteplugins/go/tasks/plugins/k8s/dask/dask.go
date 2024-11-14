@@ -316,6 +316,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 			PrimaryPodName: job.Status.JobRunnerPodName,
 			Pods: []*core.PodLogContext{
 				{
+					Namespace:            job.ObjectMeta.Namespace,
 					PodName:              job.Status.JobRunnerPodName,
 					PrimaryContainerName: "job-runner",
 					Containers: []*core.ContainerContext{

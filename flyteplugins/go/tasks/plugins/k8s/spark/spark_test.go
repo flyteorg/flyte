@@ -169,6 +169,7 @@ func TestGetTaskPhase(t *testing.T) {
 		PrimaryPodName: "spark-pod",
 		Pods: []*core.PodLogContext{
 			{
+				Namespace:            "spark-namespace",
 				PodName:              "spark-pod",
 				PrimaryContainerName: "spark-kubernetes-driver",
 				Containers: []*core.ContainerContext{
@@ -178,6 +179,7 @@ func TestGetTaskPhase(t *testing.T) {
 				},
 			},
 			{
+				Namespace:            "spark-namespace",
 				PodName:              "exec-pod-2",
 				PrimaryContainerName: "spark-kubernetes-executor",
 				Containers: []*core.ContainerContext{
