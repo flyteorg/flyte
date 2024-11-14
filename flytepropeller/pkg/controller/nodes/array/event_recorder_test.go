@@ -40,11 +40,18 @@ func TestGetPluginLogs(t *testing.T) {
 	// initialize log plugin
 	logConfig := &logs.LogConfig{
 		Templates: []tasklog.TemplateLogPlugin{
-			tasklog.TemplateLogPlugin{
+			{
 				Name:        "foo",
 				DisplayName: "bar",
 				TemplateURIs: []tasklog.TemplateURI{
 					"/console/projects/{{.executionProject}}/domains/{{.executionDomain}}/executions/{{.executionName}}/nodeId/{{.nodeID}}/taskId/{{.taskID}}/attempt/{{.taskRetryAttempt}}/mappedIndex/{{.subtaskExecutionIndex}}/mappedAttempt/{{.subtaskRetryAttempt}}/view/logs?duration=all",
+				},
+			},
+			{
+				Name:        "log_link",
+				DisplayName: "Log Link",
+				TemplateURIs: []tasklog.TemplateURI{
+					"/{{.podName}}/{{.containerName}}",
 				},
 			},
 		},
@@ -97,10 +104,12 @@ func TestGetPluginLogs(t *testing.T) {
 	nCtx.OnNodeID().Return("foo")
 
 	// call `getPluginLogs`
-	logs, err := getPluginLogs(mapLogPlugin, nCtx, 1, 0, "")
+	logs, err := getPluginLogs(mapLogPlugin, nCtx, 1, 0, "test_pod", "test_cont")
 	assert.Nil(t, err)
 
 	assert.Equal(t, len(logConfig.Templates), len(logs))
 	assert.Equal(t, "bar", logs[0].Name)
 	assert.Equal(t, "/console/projects/node_project/domains/node_domain/executions/node_name/nodeId/foo/taskId/task_name/attempt/0/mappedIndex/1/mappedAttempt/0/view/logs?duration=all", logs[0].Uri)
+	assert.Equal(t, "Log Link", logs[1].Name)
+	assert.Equal(t, "/test_pod/test_cont", logs[1].Uri)
 }

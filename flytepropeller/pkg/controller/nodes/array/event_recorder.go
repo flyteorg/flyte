@@ -179,7 +179,8 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			if taskExecutionEvent.Metadata != nil {
 				taskExecGeneratedName = taskExecutionEvent.Metadata.GeneratedName
 			}
-			logs, err := getPluginLogs(mapLogPlugin, nCtx, index, retryAttempt, taskExecGeneratedName)
+			containerName := findPodContainerInLogContext(taskExecutionEvent.GetLogContext(), taskExecGeneratedName)
+			logs, err := getPluginLogs(mapLogPlugin, nCtx, index, retryAttempt, taskExecGeneratedName, containerName)
 			if err != nil {
 				logger.Warnf(ctx, "failed to compute logs for ArrayNode:%s index:%d retryAttempt:%d with error:%v", nCtx.NodeID(), index, retryAttempt, err)
 			} else {
@@ -336,7 +337,7 @@ func newArrayEventRecorder(eventRecorder interfaces.EventRecorder, expectTaskEve
 	}
 }
 
-func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32, taskExecGeneratedName string) ([]*idlcore.TaskLog, error) {
+func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32, podName, containerName string) ([]*idlcore.TaskLog, error) {
 	subNodeSpec := nCtx.Node().GetArrayNode().GetSubNodeSpec()
 
 	// retrieve taskTemplate from subNode
@@ -380,20 +381,16 @@ func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContex
 		nodeID:        nodeID,
 	}
 
-	var podName string
-	var containerName string
-	if taskExecGeneratedName == "" {
+	if podName == "" {
 		subNodeID := fmt.Sprintf("n%v", strconv.Itoa(index))
 		subNodeRetryAttemptStr := strconv.FormatUint(uint64(retryAttempt), 10)
-		generatedPodAndContainerName, err := encoding.FixedLengthUniqueIDForParts(length, []string{uniqueID, subNodeID, subNodeRetryAttemptStr})
+		podName, err = encoding.FixedLengthUniqueIDForParts(length, []string{uniqueID, subNodeID, subNodeRetryAttemptStr})
 		if err != nil {
 			return nil, err
 		}
-		podName = generatedPodAndContainerName
-		containerName = generatedPodAndContainerName
-	} else {
-		podName = taskExecGeneratedName
-		containerName = taskExecGeneratedName
+	}
+	if containerName == "" {
+		containerName = podName
 	}
 
 	// initialize map plugin specific LogTemplateVars
@@ -476,4 +473,13 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	}
 
 	return nil
+}
+
+func findPodContainerInLogContext(logCtx *idlcore.LogContext, podName string) string {
+	for _, podLogCtx := range logCtx.GetPods() {
+		if podLogCtx.PodName == podName {
+			return podLogCtx.GetPrimaryContainerName()
+		}
+	}
+	return ""
 }
