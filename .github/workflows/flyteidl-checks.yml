@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - master
+      - 'release-v**'
 env:
   GO_VERSION: "1.22"
 jobs:
