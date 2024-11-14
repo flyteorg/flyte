@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleBlobMultipart(t *testing.T) {
@@ -19,9 +19,11 @@ func TestHandleBlobMultipart(t *testing.T) {
 		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 		ref := storage.DataReference("s3://container/folder/file1")
-		s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+		err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+		assert.NoError(t, err)
 		ref = storage.DataReference("s3://container/folder/file2")
-		s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+		err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+		assert.NoError(t, err)
 
 		d := Downloader{store: s}
 
@@ -87,7 +89,8 @@ func TestHandleBlobSinglePart(t *testing.T) {
 	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 	ref := storage.DataReference("s3://container/file")
-	s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+	err = s.WriteRaw(context.Background(), ref, 0, storage.Options{}, bytes.NewReader([]byte{}))
+	assert.NoError(t, err)
 
 	d := Downloader{store: s}
 
