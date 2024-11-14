@@ -134,7 +134,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
-		assert.Equal(t, "cluster", execCreateRequest.Spec.ExecutionClusterLabel.Value)
+		assert.Equal(t, "cluster", execCreateRequest.GetSpec().GetExecutionClusterLabel().GetValue())
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := testutils.Setup(t)

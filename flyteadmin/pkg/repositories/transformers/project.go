@@ -14,12 +14,12 @@ type CreateProjectModelInput struct {
 }
 
 func CreateProjectModel(project *admin.Project) models.Project {
-	stateInt := int32(project.State)
-	if project.Labels == nil {
+	stateInt := int32(project.GetState())
+	if project.GetLabels() == nil {
 		return models.Project{
-			Identifier:  project.Id,
-			Name:        project.Name,
-			Description: project.Description,
+			Identifier:  project.GetId(),
+			Name:        project.GetName(),
+			Description: project.GetDescription(),
 			State:       &stateInt,
 		}
 	}
@@ -28,9 +28,9 @@ func CreateProjectModel(project *admin.Project) models.Project {
 		return models.Project{}
 	}
 	return models.Project{
-		Identifier:  project.Id,
-		Name:        project.Name,
-		Description: project.Description,
+		Identifier:  project.GetId(),
+		Name:        project.GetName(),
+		Description: project.GetDescription(),
 		Labels:      projectBytes,
 		State:       &stateInt,
 	}
@@ -46,7 +46,7 @@ func FromProjectModel(projectModel models.Project, domains []*admin.Domain) *adm
 		Id:          projectModel.Identifier,
 		Name:        projectModel.Name,
 		Description: projectModel.Description,
-		Labels:      projectDeserialized.Labels,
+		Labels:      projectDeserialized.GetLabels(),
 		State:       admin.Project_ProjectState(*projectModel.State),
 	}
 	project.Domains = domains

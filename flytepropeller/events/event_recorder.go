@@ -86,8 +86,8 @@ func (r *eventRecorder) RecordWorkflowEvent(ctx context.Context, e *event.Workfl
 // If error message too large, truncate to mitigate grpc message size limit. Split the truncated size equally between
 // the beginning and the end of the message to capture the most relevant information.
 func truncateErrorMessage(err *core.ExecutionError, length int) {
-	if len(err.Message) > length {
-		err.Message = fmt.Sprintf("%s\n%s\n%s", err.Message[:length/2], truncationIndicator, err.Message[(len(err.Message)-length/2):])
+	if len(err.GetMessage()) > length {
+		err.Message = fmt.Sprintf("%s\n%s\n%s", err.GetMessage()[:length/2], truncationIndicator, err.GetMessage()[(len(err.GetMessage())-length/2):])
 	}
 }
 

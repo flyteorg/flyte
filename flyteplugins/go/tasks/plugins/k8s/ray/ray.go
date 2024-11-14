@@ -94,8 +94,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	cfg := GetConfig()
 
 	headNodeRayStartParams := make(map[string]string)
-	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
-		headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
+	if rayJob.GetRayCluster().GetHeadGroupSpec() != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
+		headNodeRayStartParams = rayJob.GetRayCluster().GetHeadGroupSpec().GetRayStartParams()
 	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
 		headNodeRayStartParams = headNode.StartParameters
 	}
@@ -133,7 +133,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		headPodSpec,
 		objectMeta,
 		taskCtx,
-		rayJob.RayCluster.HeadGroupSpec,
+		rayJob.GetRayCluster().GetHeadGroupSpec(),
 	)
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
 
-	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+	for _, spec := range rayJob.GetRayCluster().GetWorkerGroupSpec() {
 		workerPodSpec := taskPodSpec.DeepCopy()
 		workerPodTemplate, err := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
@@ -165,7 +165,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
-			workerNodeRayStartParams = spec.RayStartParams
+			workerNodeRayStartParams = spec.GetRayStartParams()
 		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
 			workerNodeRayStartParams = workerNode.StartParameters
 		}
@@ -178,17 +178,17 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 			workerNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 		}
 
-		minReplicas := spec.MinReplicas
-		if minReplicas > spec.Replicas {
-			minReplicas = spec.Replicas
+		minReplicas := spec.GetMinReplicas()
+		if minReplicas > spec.GetReplicas() {
+			minReplicas = spec.GetReplicas()
 		}
-		maxReplicas := spec.MaxReplicas
-		if maxReplicas < spec.Replicas {
-			maxReplicas = spec.Replicas
+		maxReplicas := spec.GetMaxReplicas()
+		if maxReplicas < spec.GetReplicas() {
+			maxReplicas = spec.GetReplicas()
 		}
 
 		workerNodeSpec := rayv1.WorkerGroupSpec{
-			GroupName:      spec.GroupName,
+			GroupName:      spec.GetGroupName(),
 			MinReplicas:    &minReplicas,
 			MaxReplicas:    &maxReplicas,
 			Replicas:       &spec.Replicas,
@@ -211,7 +211,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
 	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
-	if rayJob.ShutdownAfterJobFinishes {
+	if rayJob.GetShutdownAfterJobFinishes() {
 		shutdownAfterJobFinishes = true
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
@@ -221,10 +221,10 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
-	runtimeEnvYaml = rayJob.RuntimeEnvYaml
+	runtimeEnvYaml = rayJob.GetRuntimeEnvYaml()
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
-	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
-		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
+	if rayJob.GetRuntimeEnv() != "" && rayJob.GetRuntimeEnvYaml() == "" {
+		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.GetRuntimeEnv())
 		if err != nil {
 			return nil, err
 		}
@@ -369,7 +369,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	// Inject a sidecar for capturing and exposing Ray job logs
 	injectLogsSidecar(primaryContainer, basePodSpec)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.K8SPod)
+	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -497,7 +497,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	}
 	primaryContainer.Ports = append(primaryContainer.Ports, ports...)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.K8SPod)
+	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -517,16 +517,16 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 		return podSpec, nil
 	}
 
-	if k8sPod.PodSpec == nil {
+	if k8sPod.GetPodSpec() == nil {
 		return podSpec, nil
 	}
 
 	var customPodSpec *v1.PodSpec
 
-	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec)
+	err := utils.UnmarshalStructToObj(k8sPod.GetPodSpec(), &customPodSpec)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.PodSpec, err.Error())
+			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.GetPodSpec(), err.Error())
 	}
 
 	for _, container := range customPodSpec.Containers {

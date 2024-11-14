@@ -23,25 +23,25 @@ func validateResource(resourceName core.Resources_ResourceName, resourceVal stri
 
 func validateKnownResources(resources []*core.Resources_ResourceEntry, errs errors.CompileErrors) {
 	for _, r := range resources {
-		validateResource(r.Name, r.Value, errs.NewScope())
+		validateResource(r.GetName(), r.GetValue(), errs.NewScope())
 	}
 }
 
 func validateResources(resources *core.Resources, errs errors.CompileErrors) (ok bool) {
 	// Validate known resource keys.
-	validateKnownResources(resources.Requests, errs.NewScope())
-	validateKnownResources(resources.Limits, errs.NewScope())
+	validateKnownResources(resources.GetRequests(), errs.NewScope())
+	validateKnownResources(resources.GetLimits(), errs.NewScope())
 
 	return !errs.HasErrors()
 }
 
 func validateContainerCommand(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool) {
-	if task.Interface == nil {
+	if task.GetInterface() == nil {
 		// Nothing to validate.
 		return
 	}
-	hasInputs := task.Interface.Inputs != nil && len(task.Interface.GetInputs().Variables) > 0
-	hasOutputs := task.Interface.Outputs != nil && len(task.Interface.GetOutputs().Variables) > 0
+	hasInputs := task.GetInterface().GetInputs() != nil && len(task.GetInterface().GetInputs().GetVariables()) > 0
+	hasOutputs := task.GetInterface().GetOutputs() != nil && len(task.GetInterface().GetOutputs().GetVariables()) > 0
 	if !(hasInputs || hasOutputs) {
 		// Nothing to validate.
 		return
@@ -63,12 +63,12 @@ func validateContainer(task *core.TaskTemplate, errs errors.CompileErrors) (ok b
 	validateContainerCommand(task, errs)
 
 	container := task.GetContainer()
-	if container.Image == "" {
+	if container.GetImage() == "" {
 		errs.Collect(errors.NewValueRequiredErr("container", "image"))
 	}
 
-	if container.Resources != nil {
-		validateResources(container.Resources, errs.NewScope())
+	if container.GetResources() != nil {
+		validateResources(container.GetResources(), errs.NewScope())
 	}
 
 	return !errs.HasErrors()
@@ -80,7 +80,7 @@ func validateK8sPod(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool
 		return
 	}
 	var podSpec v1.PodSpec
-	if err := utils.UnmarshalStructToObj(task.GetK8SPod().PodSpec, &podSpec); err != nil {
+	if err := utils.UnmarshalStructToObj(task.GetK8SPod().GetPodSpec(), &podSpec); err != nil {
 		errs.Collect(errors.NewInvalidValueErr("root", "k8s pod spec"))
 		return
 	}
@@ -93,7 +93,7 @@ func validateK8sPod(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool
 }
 
 func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) common.Task {
-	if task.Id == nil {
+	if task.GetId() == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "Id"))
 	}
 

@@ -101,10 +101,10 @@ func TestGetEventInfo(t *testing.T) {
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
-	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
+	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.GetFields()[sparkDriverUI].GetStringValue())
 	generatedLinks := make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 
 	expectedLinks := []string{
@@ -121,12 +121,12 @@ func TestGetEventInfo(t *testing.T) {
 	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
-	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
+	assert.True(t, info.Logs[4].GetShowWhilePending()) // All User Logs should be shown while pending
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -151,10 +151,10 @@ func TestGetEventInfo(t *testing.T) {
 	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
-	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
+	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.GetFields()[sparkHistoryUI].GetStringValue())
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 
 	expectedLinks = []string{

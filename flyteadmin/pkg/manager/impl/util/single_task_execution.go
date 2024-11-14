@@ -48,8 +48,8 @@ func generateWorkflowNameFromTask(taskName string) string {
 }
 
 func generateBindings(outputs *core.VariableMap, nodeID string) []*core.Binding {
-	bindings := make([]*core.Binding, 0, len(outputs.Variables))
-	for key := range outputs.Variables {
+	bindings := make([]*core.Binding, 0, len(outputs.GetVariables()))
+	for key := range outputs.GetVariables() {
 		binding := &core.Binding{
 			Var: key,
 			Binding: &core.BindingData{
@@ -73,16 +73,16 @@ func CreateOrGetWorkflowModel(
 	task *admin.Task) (*models.Workflow, error) {
 	workflowIdentifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
-		Project:      taskIdentifier.Project,
-		Domain:       taskIdentifier.Domain,
-		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
-		Version:      taskIdentifier.Version,
+		Project:      taskIdentifier.GetProject(),
+		Domain:       taskIdentifier.GetDomain(),
+		Name:         generateWorkflowNameFromTask(taskIdentifier.GetName()),
+		Version:      taskIdentifier.GetVersion(),
 	}
 	workflowModel, err := db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
-		Project: workflowIdentifier.Project,
-		Domain:  workflowIdentifier.Domain,
-		Name:    workflowIdentifier.Name,
-		Version: workflowIdentifier.Version,
+		Project: workflowIdentifier.GetProject(),
+		Domain:  workflowIdentifier.GetDomain(),
+		Name:    workflowIdentifier.GetName(),
+		Version: workflowIdentifier.GetVersion(),
 	})
 
 	var retryStrategy *core.RetryStrategy
@@ -100,15 +100,15 @@ func CreateOrGetWorkflowModel(
 		workflowSpec := admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
 				Id:        &workflowIdentifier,
-				Interface: task.Closure.CompiledTask.Template.Interface,
+				Interface: task.GetClosure().GetCompiledTask().GetTemplate().GetInterface(),
 				Nodes: []*core.Node{
 					{
-						Id: generateNodeNameFromTask(taskIdentifier.Name),
+						Id: generateNodeNameFromTask(taskIdentifier.GetName()),
 						Metadata: &core.NodeMetadata{
-							Name:    generateNodeNameFromTask(taskIdentifier.Name),
+							Name:    generateNodeNameFromTask(taskIdentifier.GetName()),
 							Retries: retryStrategy,
 						},
-						Inputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
+						Inputs: generateBindings(task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs(), noInputNodeID),
 						Target: &core.Node_TaskNode{
 							TaskNode: &core.TaskNode{
 								Reference: &core.TaskNode_ReferenceId{
@@ -119,7 +119,7 @@ func CreateOrGetWorkflowModel(
 					},
 				},
 
-				Outputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
+				Outputs: generateBindings(task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetOutputs(), generateNodeNameFromTask(taskIdentifier.GetName())),
 			},
 		}
 
@@ -138,9 +138,9 @@ func CreateOrGetWorkflowModel(
 		_, err = namedEntityManager.UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Id: &admin.NamedEntityIdentifier{
-				Project: workflowIdentifier.Project,
-				Domain:  workflowIdentifier.Domain,
-				Name:    workflowIdentifier.Name,
+				Project: workflowIdentifier.GetProject(),
+				Domain:  workflowIdentifier.GetDomain(),
+				Name:    workflowIdentifier.GetName(),
 			},
 			Metadata: &admin.NamedEntityMetadata{State: admin.NamedEntityState_SYSTEM_GENERATED},
 		})
@@ -149,10 +149,10 @@ func CreateOrGetWorkflowModel(
 			return nil, err
 		}
 		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
-			Project: workflowIdentifier.Project,
-			Domain:  workflowIdentifier.Domain,
-			Name:    workflowIdentifier.Name,
-			Version: workflowIdentifier.Version,
+			Project: workflowIdentifier.GetProject(),
+			Domain:  workflowIdentifier.GetDomain(),
+			Name:    workflowIdentifier.GetName(),
+			Version: workflowIdentifier.GetVersion(),
 		})
 		if err != nil {
 			// This is unexpected - at this point we've successfully just created the skeleton workflow.
@@ -171,10 +171,10 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	var err error
 	launchPlanIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
-		Project:      taskIdentifier.Project,
-		Domain:       taskIdentifier.Domain,
-		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
-		Version:      taskIdentifier.Version,
+		Project:      taskIdentifier.GetProject(),
+		Domain:       taskIdentifier.GetDomain(),
+		Name:         generateWorkflowNameFromTask(taskIdentifier.GetName()),
+		Version:      taskIdentifier.GetVersion(),
 	}
 	launchPlan, err = GetLaunchPlan(ctx, db, launchPlanIdentifier)
 	if err != nil {
@@ -188,29 +188,29 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 			Spec: &admin.LaunchPlanSpec{
 				WorkflowId: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
-					Project:      taskIdentifier.Project,
-					Domain:       taskIdentifier.Domain,
-					Name:         taskIdentifier.Name,
-					Version:      taskIdentifier.Version,
+					Project:      taskIdentifier.GetProject(),
+					Domain:       taskIdentifier.GetDomain(),
+					Name:         taskIdentifier.GetName(),
+					Version:      taskIdentifier.GetVersion(),
 				},
 				EntityMetadata:  &admin.LaunchPlanMetadata{},
 				DefaultInputs:   &core.ParameterMap{},
 				FixedInputs:     &core.LiteralMap{},
 				Labels:          &admin.Labels{},
 				Annotations:     &admin.Annotations{},
-				AuthRole:        spec.AuthRole,
-				SecurityContext: spec.SecurityContext,
+				AuthRole:        spec.GetAuthRole(),
+				SecurityContext: spec.GetSecurityContext(),
 			},
 		}
 		if err := validation.ValidateLaunchPlan(ctx, generatedCreateLaunchPlanReq, db, config.ApplicationConfiguration(), workflowInterface); err != nil {
 			logger.Debugf(ctx, "could not create launch plan: %+v, request failed validation with err: %v", taskIdentifier, err)
 			return nil, err
 		}
-		transformedLaunchPlan := transformers.CreateLaunchPlan(generatedCreateLaunchPlanReq, workflowInterface.Outputs)
+		transformedLaunchPlan := transformers.CreateLaunchPlan(generatedCreateLaunchPlanReq, workflowInterface.GetOutputs())
 		launchPlan = transformedLaunchPlan
 		launchPlanDigest, err := GetLaunchPlanDigest(ctx, launchPlan)
 		if err != nil {
-			logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.Id, err)
+			logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.GetId(), err)
 			return nil, err
 		}
 		launchPlanModel, err :=
@@ -218,7 +218,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 		if err != nil {
 			logger.Errorf(ctx,
 				"Failed to transform launch plan model [%+v], and workflow outputs [%+v] with err: %v",
-				taskIdentifier, workflowInterface.Outputs, err)
+				taskIdentifier, workflowInterface.GetOutputs(), err)
 			return nil, err
 		}
 		err = db.LaunchPlanRepo().Create(ctx, launchPlanModel)

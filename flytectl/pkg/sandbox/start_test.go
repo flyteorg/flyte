@@ -123,7 +123,7 @@ func TestStartFunc(t *testing.T) {
 	config.DisableAgent = true
 	assert.Nil(t, util.SetupFlyteDir())
 	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm))
-	assert.Nil(t, ioutil.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm))
+	assert.Nil(t, os.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm)) // #nosec G306
 
 	fakePod.SetName("flyte")
 

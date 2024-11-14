@@ -103,13 +103,13 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 		return err
 	}
 
-	if edits.Id == "" {
-		return fmt.Errorf(clierrors.ErrProjectNotPassed)
+	if edits.GetId() == "" {
+		return fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
 	}
 
-	currentProject, err := cmdCtx.AdminFetcherExt().GetProjectByID(ctx, edits.Id)
+	currentProject, err := cmdCtx.AdminFetcherExt().GetProjectByID(ctx, edits.GetId())
 	if err != nil {
-		return fmt.Errorf("update project %s: could not fetch project: %w", edits.Id, err)
+		return fmt.Errorf("update project %s: could not fetch project: %w", edits.GetId(), err)
 	}
 
 	// We do not compare currentProject against edits directly, because edits does not
@@ -139,10 +139,10 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 
 	_, err = cmdCtx.AdminClient().UpdateProject(ctx, edits)
 	if err != nil {
-		return fmt.Errorf(clierrors.ErrFailedProjectUpdate, edits.Id, err)
+		return fmt.Errorf(clierrors.ErrFailedProjectUpdate, edits.GetId(), err)
 	}
 
-	fmt.Printf("project %s updated\n", edits.Id)
+	fmt.Printf("project %s updated\n", edits.GetId())
 	return nil
 }
 
@@ -152,14 +152,14 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 func copyProjectWithEdits(target *admin.Project, edited *admin.Project, projectConfig *project.ConfigProject) *admin.Project {
 	copy := *target
 
-	if edited.Name != "" {
-		copy.Name = edited.Name
+	if edited.GetName() != "" {
+		copy.Name = edited.GetName()
 	}
-	if edited.Description != "" {
-		copy.Description = edited.Description
+	if edited.GetDescription() != "" {
+		copy.Description = edited.GetDescription()
 	}
 	if len(edited.GetLabels().GetValues()) != 0 {
-		copy.Labels = edited.Labels
+		copy.Labels = edited.GetLabels()
 	}
 
 	// `edited` comes with `admin.Project_ACTIVE` state by default
@@ -182,9 +182,9 @@ func copyProjectWithEdits(target *admin.Project, edited *admin.Project, projectC
 	// YAML file input, and the flags for `ConfigProject` would also
 	// be good.
 	if projectConfig.Archive || projectConfig.Activate {
-		copy.State = edited.State
+		copy.State = edited.GetState()
 	} else {
-		edited.State = copy.State
+		edited.State = copy.GetState()
 	}
 	return &copy
 }

@@ -78,7 +78,7 @@ func getScheduleName(scheduleNamePrefix string, identifier *core.Identifier) str
 
 func getScheduleDescription(identifier *core.Identifier) string {
 	return fmt.Sprintf(scheduleDescriptionFormat,
-		identifier.Project, identifier.Domain, identifier.Name)
+		identifier.GetProject(), identifier.GetDomain(), identifier.GetName())
 }
 
 func getScheduleExpression(schedule *admin.Schedule) (string, error) {
@@ -88,11 +88,11 @@ func getScheduleExpression(schedule *admin.Schedule) (string, error) {
 	if schedule.GetRate() != nil {
 		// AWS uses pluralization for units of values not equal to 1.
 		// See https://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html
-		unit := strings.ToLower(schedule.GetRate().Unit.String())
-		if schedule.GetRate().Value != 1 {
+		unit := strings.ToLower(schedule.GetRate().GetUnit().String())
+		if schedule.GetRate().GetValue() != 1 {
 			unit = fmt.Sprintf("%ss", unit)
 		}
-		return fmt.Sprintf(rateExpression, schedule.GetRate().Value, unit), nil
+		return fmt.Sprintf(rateExpression, schedule.GetRate().GetValue(), unit), nil
 	}
 	logger.Debugf(context.Background(), "scheduler encountered invalid schedule expression: %s", schedule.String())
 	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unrecognized schedule expression")
@@ -176,9 +176,9 @@ func (s *cloudWatchScheduler) CreateScheduleInput(ctx context.Context, appConfig
 	payload, err := SerializeScheduleWorkflowPayload(
 		schedule.GetKickoffTimeInputArg(),
 		&admin.NamedEntityIdentifier{
-			Project: identifier.Project,
-			Domain:  identifier.Domain,
-			Name:    identifier.Name,
+			Project: identifier.GetProject(),
+			Domain:  identifier.GetDomain(),
+			Name:    identifier.GetName(),
 		})
 	if err != nil {
 		logger.Errorf(ctx, "failed to serialize schedule workflow payload for launch plan: %v with err: %v",

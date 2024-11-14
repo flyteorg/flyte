@@ -18,16 +18,16 @@ func ValidateDatasetID(ds *datacatalog.DatasetID) error {
 	if ds == nil {
 		return NewMissingArgumentError(datasetEntity)
 	}
-	if err := ValidateEmptyStringField(ds.Project, datasetProject); err != nil {
+	if err := ValidateEmptyStringField(ds.GetProject(), datasetProject); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(ds.Domain, datasetDomain); err != nil {
+	if err := ValidateEmptyStringField(ds.GetDomain(), datasetDomain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(ds.Name, datasetName); err != nil {
+	if err := ValidateEmptyStringField(ds.GetName(), datasetName); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(ds.Version, datasetVersion); err != nil {
+	if err := ValidateEmptyStringField(ds.GetVersion(), datasetVersion); err != nil {
 		return err
 	}
 	return nil
@@ -35,15 +35,15 @@ func ValidateDatasetID(ds *datacatalog.DatasetID) error {
 
 // Ensure list Datasets request is properly constructed
 func ValidateListDatasetsRequest(request *datacatalog.ListDatasetsRequest) error {
-	if request.Pagination != nil {
-		err := ValidatePagination(request.Pagination)
+	if request.GetPagination() != nil {
+		err := ValidatePagination(request.GetPagination())
 		if err != nil {
 			return err
 		}
 	}
 
 	// Datasets cannot be filtered by tag, partitions or artifacts
-	for _, filter := range request.Filter.GetFilters() {
+	for _, filter := range request.GetFilter().GetFilters() {
 		if filter.GetTagFilter() != nil {
 			return NewInvalidFilterError(common.Dataset, common.Tag)
 		} else if filter.GetPartitionFilter() != nil {

@@ -520,7 +520,7 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 		collection := make([]any, len(literals))
 		for i, l := range literals {
 			var v any
-			_ = msgpack.Unmarshal(l.GetScalar().GetBinary().Value, &v)
+			_ = msgpack.Unmarshal(l.GetScalar().GetBinary().GetValue(), &v)
 			collection[i] = v
 		}
 		return collection
@@ -1434,10 +1434,10 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 
 			// Helper function to unmarshal a Binary Literal into an any
 			unmarshalBinaryLiteral := func(literal *core.Literal) (any, error) {
-				if scalar, ok := literal.Value.(*core.Literal_Scalar); ok {
-					if binary, ok := scalar.Scalar.Value.(*core.Scalar_Binary); ok {
+				if scalar, ok := literal.GetValue().(*core.Literal_Scalar); ok {
+					if binary, ok := scalar.Scalar.GetValue().(*core.Scalar_Binary); ok {
 						var value any
-						err := msgpack.Unmarshal(binary.Binary.Value, &value)
+						err := msgpack.Unmarshal(binary.Binary.GetValue(), &value)
 						return value, err
 					}
 				}

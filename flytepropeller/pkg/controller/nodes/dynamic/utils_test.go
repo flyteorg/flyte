@@ -62,5 +62,5 @@ func TestUnderlyingInterface(t *testing.T) {
 	iface, err = underlyingInterface(context.TODO(), tr)
 	assert.NoError(t, err)
 	assert.NotNil(t, iface)
-	assert.Nil(t, iface.Outputs)
+	assert.Nil(t, iface.GetOutputs())
 }

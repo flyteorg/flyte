@@ -282,7 +282,7 @@ func TestFormatVariableDescriptions(t *testing.T) {
 		"bar":  barVar,
 	}
 	FormatVariableDescriptions(variableMap)
-	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", variableMap[DefaultFormattedDescriptionsKey].Description)
+	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", variableMap[DefaultFormattedDescriptionsKey].GetDescription())
 }
 
 func TestFormatParameterDescriptions(t *testing.T) {
@@ -305,5 +305,5 @@ func TestFormatParameterDescriptions(t *testing.T) {
 		"empty": emptyParam,
 	}
 	FormatParameterDescriptions(paramMap)
-	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", paramMap[DefaultFormattedDescriptionsKey].Var.Description)
+	assert.Equal(t, "bar\nfoo\nvar1: foo\nvar2: bar", paramMap[DefaultFormattedDescriptionsKey].GetVar().GetDescription())
 }

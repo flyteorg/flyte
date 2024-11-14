@@ -97,15 +97,15 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 		assert.NoError(t, err)
 		var sawPythonTask, sawSidecarTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
-			if override.TaskType == "python" {
+			if override.GetTaskType() == "python" {
 				sawPythonTask = true
-				assert.EqualValues(t, []string{"plugin_a"}, override.PluginId)
-			} else if override.TaskType == "sidecar" {
+				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
+			} else if override.GetTaskType() == "sidecar" {
 				sawSidecarTask = true
-				assert.EqualValues(t, []string{"plugin_c"}, override.PluginId)
-			} else if override.TaskType == "hive" {
+				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
+			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
-				assert.EqualValues(t, []string{"plugin_d"}, override.PluginId)
+				assert.EqualValues(t, []string{"plugin_d"}, override.GetPluginId())
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")
@@ -194,15 +194,15 @@ func TestMergeUpdateWorkflowAttributes(t *testing.T) {
 		assert.NoError(t, err)
 		var sawPythonTask, sawSidecarTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
-			if override.TaskType == "python" {
+			if override.GetTaskType() == "python" {
 				sawPythonTask = true
-				assert.EqualValues(t, []string{"plugin_a"}, override.PluginId)
-			} else if override.TaskType == "sidecar" {
+				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
+			} else if override.GetTaskType() == "sidecar" {
 				sawSidecarTask = true
-				assert.EqualValues(t, []string{"plugin_c"}, override.PluginId)
-			} else if override.TaskType == "hive" {
+				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
+			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
-				assert.EqualValues(t, []string{"plugin_d"}, override.PluginId)
+				assert.EqualValues(t, []string{"plugin_d"}, override.GetPluginId())
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")

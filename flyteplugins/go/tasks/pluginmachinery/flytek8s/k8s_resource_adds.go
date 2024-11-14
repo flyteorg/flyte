@@ -43,25 +43,26 @@ func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
 
 func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1.EnvVar {
 
-	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.ExecutionId == nil {
+	//nolint:protogetter
+	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.GetExecutionId() == nil {
 		return []v1.EnvVar{}
 	}
 
 	// Execution level env variables.
-	nodeExecutionID := id.GetID().NodeExecutionId.ExecutionId
-	attemptNumber := strconv.Itoa(int(id.GetID().RetryAttempt))
+	nodeExecutionID := id.GetID().NodeExecutionId.GetExecutionId() //nolint:protogetter
+	attemptNumber := strconv.Itoa(int(id.GetID().RetryAttempt))    //nolint:protogetter
 	envVars := []v1.EnvVar{
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_ID",
-			Value: nodeExecutionID.Name,
+			Value: nodeExecutionID.GetName(),
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_PROJECT",
-			Value: nodeExecutionID.Project,
+			Value: nodeExecutionID.GetProject(),
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
-			Value: nodeExecutionID.Domain,
+			Value: nodeExecutionID.GetDomain(),
 		},
 		{
 			Name:  "FLYTE_ATTEMPT_NUMBER",
@@ -82,48 +83,48 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 		consoleURL = strings.TrimRight(consoleURL, "/")
 		envVars = append(envVars, v1.EnvVar{
 			Name:  flyteExecutionURL,
-			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID()),
+			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.GetProject(), nodeExecutionID.GetDomain(), nodeExecutionID.GetName(), id.GetUniqueNodeID()),
 		})
 	}
 
 	// Task definition Level env variables.
-	if id.GetID().TaskId != nil {
-		taskID := id.GetID().TaskId
+	if id.GetID().TaskId != nil { //nolint:protogetter
+		taskID := id.GetID().TaskId //nolint:protogetter
 
 		envVars = append(envVars,
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_PROJECT",
-				Value: taskID.Project,
+				Value: taskID.GetProject(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_DOMAIN",
-				Value: taskID.Domain,
+				Value: taskID.GetDomain(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_NAME",
-				Value: taskID.Name,
+				Value: taskID.GetName(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_VERSION",
-				Value: taskID.Version,
+				Value: taskID.GetVersion(),
 			},
 			// Historic Task Definition Level env variables.
 			// Remove these once SDK is migrated to use the new ones.
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_PROJECT",
-				Value: taskID.Project,
+				Value: taskID.GetProject(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_DOMAIN",
-				Value: taskID.Domain,
+				Value: taskID.GetDomain(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_NAME",
-				Value: taskID.Name,
+				Value: taskID.GetName(),
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_VERSION",
-				Value: taskID.Version,
+				Value: taskID.GetVersion(),
 			})
 
 	}

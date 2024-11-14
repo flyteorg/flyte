@@ -12,7 +12,7 @@ import (
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 	envVars := make([]v1.EnvVar, 0, len(env))
 	for _, kv := range env {
-		envVars = append(envVars, v1.EnvVar{Name: kv.Key, Value: kv.Value})
+		envVars = append(envVars, v1.EnvVar{Name: kv.GetKey(), Value: kv.GetValue()})
 	}
 	return envVars
 }
@@ -22,12 +22,12 @@ func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceList, error) {
 	k8sResources := make(v1.ResourceList, len(resources))
 	for _, r := range resources {
-		rVal := r.Value
+		rVal := r.GetValue()
 		v, err := resource.ParseQuantity(rVal)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
 		}
-		switch r.Name {
+		switch r.GetName() {
 		case core.Resources_CPU:
 			if !v.IsZero() {
 				k8sResources[v1.ResourceCPU] = v
@@ -54,11 +54,11 @@ func ToK8sResourceRequirements(resources *core.Resources) (*v1.ResourceRequireme
 	if resources == nil {
 		return res, nil
 	}
-	req, err := ToK8sResourceList(resources.Requests)
+	req, err := ToK8sResourceList(resources.GetRequests())
 	if err != nil {
 		return res, err
 	}
-	lim, err := ToK8sResourceList(resources.Limits)
+	lim, err := ToK8sResourceList(resources.GetLimits())
 	if err != nil {
 		return res, err
 	}

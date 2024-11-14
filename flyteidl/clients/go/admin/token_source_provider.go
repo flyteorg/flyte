@@ -54,7 +54,7 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 				return nil, fmt.Errorf("failed to fetch auth metadata. Error: %v", err)
 			}
 
-			tokenURL = metadata.TokenEndpoint
+			tokenURL = metadata.GetTokenEndpoint()
 		}
 
 		scopes := cfg.Scopes
@@ -67,11 +67,11 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			}
 			// Update scopes from publicClientConfig
 			if len(scopes) == 0 {
-				scopes = publicClientConfig.Scopes
+				scopes = publicClientConfig.GetScopes()
 			}
 			// Update audience from publicClientConfig
 			if cfg.UseAudienceFromAdmin {
-				audienceValue = publicClientConfig.Audience
+				audienceValue = publicClientConfig.GetAudience()
 			}
 		}
 

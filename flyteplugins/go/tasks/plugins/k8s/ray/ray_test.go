@@ -500,7 +500,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			}
 
 			if p.workerK8SPod != nil {
-				for _, spec := range rayJobInput.RayCluster.WorkerGroupSpec {
+				for _, spec := range rayJobInput.GetRayCluster().GetWorkerGroupSpec() {
 					spec.K8SPod = p.workerK8SPod
 				}
 			}

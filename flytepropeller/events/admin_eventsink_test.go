@@ -86,7 +86,7 @@ func TestAdminWorkflowEvent(t *testing.T) {
 		"CreateWorkflowEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.WorkflowExecutionEventRequest) bool {
-			return req.Event == wfEvent
+			return req.GetEvent() == wfEvent
 		},
 		)).Return(&admin.WorkflowExecutionEventResponse{}, nil)
 
@@ -104,7 +104,7 @@ func TestAdminNodeEvent(t *testing.T) {
 		"CreateNodeEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.NodeExecutionEventRequest) bool {
-			return req.Event == nodeEvent
+			return req.GetEvent() == nodeEvent
 		}),
 	).Return(&admin.NodeExecutionEventResponse{}, nil)
 
@@ -122,7 +122,7 @@ func TestAdminTaskEvent(t *testing.T) {
 		"CreateTaskEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.TaskExecutionEventRequest) bool {
-			return req.Event == taskEvent
+			return req.GetEvent() == taskEvent
 		}),
 	).Return(&admin.TaskExecutionEventResponse{}, nil)
 
@@ -159,7 +159,7 @@ func TestAdminRateLimitError(t *testing.T) {
 		"CreateTaskEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.TaskExecutionEventRequest) bool {
-			return req.Event == taskEvent
+			return req.GetEvent() == taskEvent
 		}),
 	).Return(&admin.TaskExecutionEventResponse{}, nil)
 

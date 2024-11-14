@@ -57,16 +57,16 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 
 func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execContext executors.ExecutionContext) (*core.NodeExecutionIdentifier, error) {
 	nodeExecutionID := &core.NodeExecutionIdentifier{
-		ExecutionId: taskExecID.NodeExecutionId.ExecutionId,
+		ExecutionId: taskExecID.GetNodeExecutionId().GetExecutionId(),
 	}
 	if execContext.GetEventVersion() != v1alpha1.EventVersion0 {
-		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.NodeExecutionId.NodeId)
+		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.GetNodeExecutionId().GetNodeId())
 		if err != nil {
 			return nil, err
 		}
 		nodeExecutionID.NodeId = currentNodeUniqueID
 	} else {
-		nodeExecutionID.NodeId = taskExecID.NodeExecutionId.NodeId
+		nodeExecutionID.NodeId = taskExecID.GetNodeExecutionId().GetNodeId()
 	}
 	return nodeExecutionID, nil
 }
@@ -145,9 +145,9 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 		})
 	}
 	tev := &event.TaskExecutionEvent{
-		TaskId:                taskExecID.TaskId,
+		TaskId:                taskExecID.GetTaskId(),
 		ParentNodeExecutionId: nodeExecutionID,
-		RetryAttempt:          taskExecID.RetryAttempt,
+		RetryAttempt:          taskExecID.GetRetryAttempt(),
 		Phase:                 ToTaskEventPhase(input.Info.Phase()),
 		PhaseVersion:          input.Info.Version(),
 		ProducerId:            input.ClusterID,

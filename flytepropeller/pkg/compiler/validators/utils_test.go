@@ -114,9 +114,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 		assert.False(t, isOffloaded)
 	})
 
@@ -128,9 +128,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 		assert.False(t, isOffloaded)
 	})
 

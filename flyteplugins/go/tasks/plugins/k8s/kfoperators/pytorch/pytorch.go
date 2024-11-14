@@ -61,7 +61,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 
 	var masterReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
 
-	if taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 {
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &pytorchTaskExtraArgs)
@@ -85,7 +85,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
 		}
-	} else if taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetTaskTypeVersion() == 1 {
 		kfPytorchTaskExtraArgs := kfplugins.DistributedPyTorchTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfPytorchTaskExtraArgs)
@@ -132,7 +132,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		}
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
 	if *workerReplicaSpec.Replicas <= 0 {

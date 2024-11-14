@@ -254,15 +254,15 @@ func TestAbort(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
 			} {
 
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 			for i, taskPhase := range test.subNodeTaskPhases {
-				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase))
+				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
@@ -277,10 +277,10 @@ func TestAbort(t *testing.T) {
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 
-				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+				externalResources := eventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
 				for i, expectedPhase := range test.expectedExternalResourcePhases {
-					assert.Equal(t, expectedPhase, externalResources[i].Phase)
+					assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
 				}
 			} else {
 				assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
@@ -349,16 +349,15 @@ func TestFinalize(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 			for i, taskPhase := range test.subNodeTaskPhases {
-				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase))
+				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
@@ -447,10 +446,10 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 
-				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+				externalResources := eventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
 				for i, expectedPhase := range test.expectedExternalResourcePhases {
-					assert.Equal(t, expectedPhase, externalResources[i].Phase)
+					assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
 				}
 			} else {
 				assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
@@ -475,7 +474,7 @@ func (f *fakeEventRecorder) RecordNodeEvent(ctx context.Context, event *event.No
 
 func (f *fakeEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
 	f.recordTaskEventCallCount++
-	if f.phaseVersionFailures == 0 || event.PhaseVersion < f.phaseVersionFailures {
+	if f.phaseVersionFailures == 0 || event.GetPhaseVersion() < f.phaseVersionFailures {
 		return f.taskErr
 	}
 	return nil
@@ -860,13 +859,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
 			nodeSpec := arrayNodeSpec
@@ -921,7 +919,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			assert.Equal(t, test.expectedTaskPhaseVersion, arrayNodeState.TaskPhaseVersion)
 
 			for i, expectedPhase := range test.expectedArrayNodeSubPhases {
-				assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i)))
+				assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i))) // #nosec G115
 			}
 
 			bufferedEventRecorder, ok := eventRecorder.(*bufferedEventRecorder)
@@ -929,10 +927,10 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				if len(test.expectedExternalResourcePhases) > 0 {
 					assert.Equal(t, 1, len(bufferedEventRecorder.taskExecutionEvents))
 
-					externalResources := bufferedEventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+					externalResources := bufferedEventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 					assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
 					for i, expectedPhase := range test.expectedExternalResourcePhases {
-						assert.Equal(t, expectedPhase, externalResources[i].Phase)
+						assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
 					}
 				} else {
 					assert.Equal(t, 0, len(bufferedEventRecorder.taskExecutionEvents))
@@ -1000,8 +998,8 @@ func TestHandle_InvalidLiteralType(t *testing.T) {
 			// Validate results
 			assert.Equal(t, test.expectedTransitionType, transition.Type())
 			assert.Equal(t, test.expectedPhase, transition.Info().GetPhase())
-			assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().Code)
-			assert.Contains(t, transition.Info().GetErr().Message, test.expectedContainedErrorMsg)
+			assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().GetCode())
+			assert.Contains(t, transition.Info().GetErr().GetMessage(), test.expectedContainedErrorMsg)
 		})
 	}
 }
@@ -1175,7 +1173,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 			subNodePhases, err := bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(v1alpha1.NodePhaseRecovered))
 			assert.NoError(t, err)
 			for i, nodePhase := range test.subNodePhases {
-				subNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				subNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
 			retryAttempts, err := bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(1))
@@ -1304,13 +1302,12 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
