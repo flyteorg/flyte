@@ -1391,13 +1391,6 @@ export class AgentError extends Message<AgentError> {
   code = "";
 
   /**
-   * A detailed error message.
-   *
-   * @generated from field: string message = 2;
-   */
-  message = "";
-
-  /**
    * An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
    *
    * @generated from field: flyteidl.admin.AgentError.Kind kind = 3;
@@ -1420,7 +1413,6 @@ export class AgentError extends Message<AgentError> {
   static readonly typeName = "flyteidl.admin.AgentError";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "kind", kind: "enum", T: proto3.getEnumType(AgentError_Kind) },
     { no: 4, name: "origin", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
   ]);

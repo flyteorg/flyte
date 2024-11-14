@@ -10887,9 +10887,6 @@ export namespace flyteidl {
             /** AgentError code */
             code?: (string|null);
 
-            /** AgentError message */
-            message?: (string|null);
-
             /** AgentError kind */
             kind?: (flyteidl.admin.AgentError.Kind|null);
 
@@ -10908,9 +10905,6 @@ export namespace flyteidl {
 
             /** AgentError code. */
             public code: string;
-
-            /** AgentError message. */
-            public message: string;
 
             /** AgentError kind. */
             public kind: flyteidl.admin.AgentError.Kind;

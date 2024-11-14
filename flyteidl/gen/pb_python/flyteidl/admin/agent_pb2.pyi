@@ -277,7 +277,7 @@ class GetTaskLogsResponse(_message.Message):
     def __init__(self, header: _Optional[_Union[GetTaskLogsResponseHeader, _Mapping]] = ..., body: _Optional[_Union[GetTaskLogsResponseBody, _Mapping]] = ...) -> None: ...
 
 class AgentError(_message.Message):
-    __slots__ = ["code", "message", "kind", "origin"]
+    __slots__ = ["code", "kind", "origin"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         NON_RECOVERABLE: _ClassVar[AgentError.Kind]
@@ -285,11 +285,9 @@ class AgentError(_message.Message):
     NON_RECOVERABLE: AgentError.Kind
     RECOVERABLE: AgentError.Kind
     CODE_FIELD_NUMBER: _ClassVar[int]
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     ORIGIN_FIELD_NUMBER: _ClassVar[int]
     code: str
-    message: str
     kind: AgentError.Kind
     origin: _execution_pb2.ExecutionError.ErrorKind
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[AgentError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...
+    def __init__(self, code: _Optional[str] = ..., kind: _Optional[_Union[AgentError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...

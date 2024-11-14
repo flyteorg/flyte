@@ -637,10 +637,6 @@
           "type": "string",
           "description": "A simplified code for errors, so that we can provide a glossary of all possible errors."
         },
-        "message": {
-          "type": "string",
-          "description": "A detailed error message."
-        },
         "kind": {
           "$ref": "#/definitions/adminAgentErrorKind",
           "description": "An abstract error kind for this error. Defaults to Non_Recoverable if not specified."

@@ -26605,7 +26605,6 @@
                  * @memberof flyteidl.admin
                  * @interface IAgentError
                  * @property {string|null} [code] AgentError code
-                 * @property {string|null} [message] AgentError message
                  * @property {flyteidl.admin.AgentError.Kind|null} [kind] AgentError kind
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] AgentError origin
                  */
@@ -26632,14 +26631,6 @@
                  * @instance
                  */
                 AgentError.prototype.code = "";
-    
-                /**
-                 * AgentError message.
-                 * @member {string} message
-                 * @memberof flyteidl.admin.AgentError
-                 * @instance
-                 */
-                AgentError.prototype.message = "";
     
                 /**
                  * AgentError kind.
@@ -26683,8 +26674,6 @@
                         writer = $Writer.create();
                     if (message.code != null && message.hasOwnProperty("code"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.code);
-                    if (message.message != null && message.hasOwnProperty("message"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
                     if (message.origin != null && message.hasOwnProperty("origin"))
@@ -26712,9 +26701,6 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.code = reader.string();
-                            break;
-                        case 2:
-                            message.message = reader.string();
                             break;
                         case 3:
                             message.kind = reader.int32();
@@ -26744,9 +26730,6 @@
                     if (message.code != null && message.hasOwnProperty("code"))
                         if (!$util.isString(message.code))
                             return "code: string expected";
-                    if (message.message != null && message.hasOwnProperty("message"))
-                        if (!$util.isString(message.message))
-                            return "message: string expected";
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         switch (message.kind) {
                         default:

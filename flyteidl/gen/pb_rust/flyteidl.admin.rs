@@ -359,9 +359,6 @@ pub struct AgentError {
     /// A simplified code for errors, so that we can provide a glossary of all possible errors.
     #[prost(string, tag="1")]
     pub code: ::prost::alloc::string::String,
-    /// A detailed error message.
-    #[prost(string, tag="2")]
-    pub message: ::prost::alloc::string::String,
     /// An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
     #[prost(enumeration="agent_error::Kind", tag="3")]
     pub kind: i32,

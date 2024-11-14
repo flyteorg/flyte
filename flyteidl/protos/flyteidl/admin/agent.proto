@@ -264,8 +264,6 @@ message GetTaskLogsResponse {
 message AgentError {
   // A simplified code for errors, so that we can provide a glossary of all possible errors.
   string code = 1;
-  // A detailed error message.
-  string message = 2;
 
   // Defines a generic error type that dictates the behavior of the retry strategy.
   enum Kind {
