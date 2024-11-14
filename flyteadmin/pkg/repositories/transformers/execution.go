@@ -74,6 +74,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
 	}
 	createdAt := timestamppb.New(input.CreatedAt)
+	friendlyName := CreateFriendlyName(input.CreatedAt.UnixNano())
 	closure := admin.ExecutionClosure{
 		CreatedAt:     createdAt,
 		UpdatedAt:     createdAt,
@@ -119,6 +120,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Name:    input.WorkflowExecutionID.Name,
 		},
 		Spec:                  spec,
+		FriendlyName:          friendlyName,
 		Phase:                 closure.Phase.String(),
 		Closure:               closureBytes,
 		WorkflowID:            input.WorkflowID,

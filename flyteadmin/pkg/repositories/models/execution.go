@@ -26,6 +26,7 @@ type Execution struct {
 	LaunchPlanID uint   `gorm:"index"`
 	WorkflowID   uint   `gorm:"index"`
 	TaskID       uint   `gorm:"index"`
+	FriendlyName string `valid:"length(0|255)"`
 	Phase        string `valid:"length(0|255)"`
 	Closure      []byte
 	Spec         []byte `gorm:"not null"`
