@@ -539,9 +539,9 @@ func TestMakeLiteralForType(t *testing.T) {
 
 		// Now check if the Binary values match
 		var expectedVal, actualVal map[string]interface{}
-		err = msgpack.Unmarshal(expectedBinary.Value, &expectedVal)
+		err = msgpack.Unmarshal(expectedBinary.GetValue(), &expectedVal)
 		assert.NoError(t, err)
-		err = msgpack.Unmarshal(actualBinary.Value, &actualVal)
+		err = msgpack.Unmarshal(actualBinary.GetValue(), &actualVal)
 		assert.NoError(t, err)
 
 		// Finally, assert that the deserialized values are equal
