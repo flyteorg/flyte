@@ -25,6 +25,11 @@ This creates a new environment called `monodocs-env` with all the dependencies n
 In the `flyteorg/flyte` root directory make sure you have activated the `monodocs-env` (or whatever you called it) environment and do:
 
 ```bash
+# need to set this to a fake value to build the docs locally
+$ export DOCSEARCH_API_KEY=fake-api-key
+```
+
+```bash
 $ make docs
 ```
 
