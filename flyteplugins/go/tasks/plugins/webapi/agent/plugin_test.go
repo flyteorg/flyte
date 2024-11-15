@@ -276,8 +276,8 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
-		assert.Equal(t, "ERROR: 500", phase.Err().Code)
-		assert.Equal(t, "failed to run the job: boom", phase.Err().Message)
+		assert.Equal(t, "ERROR: 500", phase.Err().GetCode())
+		assert.Equal(t, "failed to run the job: boom", phase.Err().GetMessage())
 	})
 
 	t.Run("test TaskExecution_FAILED Status Without Agent Error", func(t *testing.T) {
@@ -292,7 +292,7 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
-		assert.Equal(t, pluginErrors.TaskFailedWithError, phase.Err().Code)
+		assert.Equal(t, pluginErrors.TaskFailedWithError, phase.Err().GetCode())
 	})
 
 	t.Run("test UNDEFINED Phase", func(t *testing.T) {

@@ -263,8 +263,8 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
 	errorCode := pluginErrors.TaskFailedWithError
-	if resource.AgentError != nil && resource.AgentError.Code != "" {
-		errorCode = resource.AgentError.Code
+	if resource.AgentError != nil && resource.AgentError.GetCode() != "" {
+		errorCode = resource.AgentError.GetCode()
 	}
 
 	switch resource.Phase {
