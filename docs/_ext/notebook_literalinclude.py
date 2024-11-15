@@ -1,9 +1,10 @@
 import json
+import os
 
 from docutils import nodes
 from docutils.parsers.rst import directives
 from six import text_type
-from typing import Any, Dict, List, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Tuple, TYPE_CHECKING, Union
 
 from sphinx.application import Sphinx
 from sphinx.config import Config
@@ -14,19 +15,19 @@ from sphinx.util.docutils import SphinxDirective
 from sphinx.util.nodes import set_source_info
 from sphinx.util._pathlib import _StrPath
 
-if TYPE_CHECKING:
-    import os
-
 
 class NotebookLiteralIncludeReader(object):
 
     def __init__(
-        self, filename: str | os.PathLike[str], options: Dict[str, Any], config: Config
+        self,
+        filename: Union[str, os.PathLike[str]],
+        options: Dict[str, Any],
+        config: Config,
     ) -> None:
         self.filename = _StrPath(filename)
         self.options = options
 
-    def read_file(self, filename: str | os.PathLike[str]) -> List[str]:
+    def read_file(self, filename: Union[str, os.PathLike[str]]) -> List[str]:
         filename = _StrPath(filename)
         json_data = json.loads(filename.read_text())
 
