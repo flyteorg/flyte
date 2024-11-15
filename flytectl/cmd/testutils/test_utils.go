@@ -41,8 +41,7 @@ type TestStruct struct {
 	Stderr          *os.File
 }
 
-// Make sure to call TearDown after using this function
-func Setup() (s TestStruct) {
+func Setup(t *testing.T) (s TestStruct) {
 	s.Ctx = context.Background()
 	s.Reader, s.Writer, s.Err = os.Pipe()
 	if s.Err != nil {
@@ -67,12 +66,13 @@ func Setup() (s TestStruct) {
 	config.GetConfig().Domain = domainValue
 	config.GetConfig().Output = output
 
-	return s
-}
+	// We need to make sure that the original final descriptors are restored after the test
+	t.Cleanup(func() {
+		os.Stdout = s.StdOut
+		os.Stderr = s.Stderr
+	})
 
-func (s *TestStruct) TearDown() {
-	os.Stdout = s.StdOut
-	os.Stderr = s.Stderr
+	return s
 }
 
 // TearDownAndVerify TODO: Change this to verify log lines from context

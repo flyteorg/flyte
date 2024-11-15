@@ -101,7 +101,7 @@ func TestConstructTaskLog(t *testing.T) {
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
 	taskLog := ConstructTaskLog(ExecutionState{CommandID: "123", URI: u.String()})
-	assert.Equal(t, expected, taskLog.Uri)
+	assert.Equal(t, expected, taskLog.GetUri())
 }
 
 func TestConstructTaskInfo(t *testing.T) {
@@ -120,7 +120,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	}
 
 	taskInfo := ConstructTaskInfo(e)
-	assert.Equal(t, "https://wellness.qubole.com/v2/analyze?command_id=123", taskInfo.Logs[0].Uri)
+	assert.Equal(t, "https://wellness.qubole.com/v2/analyze?command_id=123", taskInfo.Logs[0].GetUri())
 	assert.Len(t, taskInfo.ExternalResources, 1)
 	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "123")
 }
@@ -358,7 +358,7 @@ func TestWriteOutputs(t *testing.T) {
 		literals, err1, err2 := reader.Read(context.Background())
 		assert.Nil(t, err1)
 		assert.NoError(t, err2)
-		assert.NotNil(t, literals.Literals["results"].GetScalar().GetSchema())
+		assert.NotNil(t, literals.GetLiterals()["results"].GetScalar().GetSchema())
 	})
 
 	state := ExecutionState{}

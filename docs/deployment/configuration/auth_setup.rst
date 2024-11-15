@@ -254,15 +254,15 @@ Apply OIDC Configuration
                httpPort: 8088
                grpc:
                  port: 8089
-             security:
-               secure: false
-               useAuth: true
-               allowCors: true
-               allowedOrigins:
-          # Accepting all domains for Sandbox installation
-                 - "*"
-               allowedHeaders:
-                 - "Content-Type"
+               security:
+                 secure: false
+                 useAuth: true
+                 allowCors: true
+                 allowedOrigins:
+            # Accepting all domains for Sandbox installation
+                   - "*"
+                 allowedHeaders:
+                   - "Content-Type"
              auth:
                appAuth:
                  thirdPartyConfig:

@@ -91,7 +91,7 @@ func ToNodeExecutionEvent(
 		return nil, nil
 	}
 	if info.GetPhase() == handler.EPhaseUndefined {
-		return nil, fmt.Errorf("illegal state, undefined phase received for node [%s]", nodeExecID.NodeId)
+		return nil, fmt.Errorf("illegal state, undefined phase received for node [%s]", nodeExecID.GetNodeId())
 	}
 	occurredTime, err := ptypes.TimestampProto(info.GetOccurredAt())
 	if err != nil {
@@ -115,7 +115,7 @@ func ToNodeExecutionEvent(
 	// Start node is special case where the Outputs are the same and hence here we copy the Output file
 	// into the OutputResult and in admin we copy it over into input as well.
 	// Start node doesn't have inputs.
-	if nodeExecID.NodeId == v1alpha1.StartNodeID {
+	if nodeExecID.GetNodeId() == v1alpha1.StartNodeID {
 		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
 		nev = &event.NodeExecutionEvent{
 			Id:    nodeExecID,
@@ -162,7 +162,7 @@ func ToNodeExecutionEvent(
 	}
 
 	if eventVersion != v1alpha1.EventVersion0 {
-		currentNodeUniqueID, err := common.GenerateUniqueID(parentInfo, nev.Id.NodeId)
+		currentNodeUniqueID, err := common.GenerateUniqueID(parentInfo, nev.GetId().GetNodeId())
 		if err != nil {
 			return nil, err
 		}
@@ -210,7 +210,7 @@ func ToNodeExecutionEvent(
 		}
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
 		nev.IsDynamic = true
-		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {
+		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().GetDynamicWorkflow() != nil {
 			nev.IsParent = true
 		}
 	}

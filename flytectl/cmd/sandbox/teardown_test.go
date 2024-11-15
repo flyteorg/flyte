@@ -20,7 +20,7 @@ func TestTearDownClusterFunc(t *testing.T) {
 	var containers []types.Container
 	_ = util.SetupFlyteDir()
 	_ = util.WriteIntoFile([]byte("data"), configutil.FlytectlConfig)
-	s := testutils.Setup()
+	s := testutils.Setup(t)
 	ctx := s.Ctx
 	mockDocker := &mocks.Docker{}
 	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)

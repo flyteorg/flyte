@@ -59,9 +59,9 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier *core.Iden
 	q.refreshExecutionQueues(executionQueues)
 
 	resource, err := q.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Workflow:     identifier.Name,
+		Project:      identifier.GetProject(),
+		Domain:       identifier.GetDomain(),
+		Workflow:     identifier.GetName(),
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})
 
@@ -71,7 +71,7 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier *core.Iden
 	}
 
 	if resource != nil && resource.Attributes != nil && resource.Attributes.GetExecutionQueueAttributes() != nil {
-		for _, tag := range resource.Attributes.GetExecutionQueueAttributes().Tags {
+		for _, tag := range resource.Attributes.GetExecutionQueueAttributes().GetTags() {
 			matches, ok := q.queueConfigMap[tag]
 			if !ok {
 				continue
@@ -84,7 +84,7 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier *core.Iden
 	var defaultTags []string
 	// If we've made it this far, check to see if a domain-specific default workflow config exists for this particular domain.
 	for _, workflowConfig := range q.config.QueueConfiguration().GetWorkflowConfigs() {
-		if workflowConfig.Domain == identifier.Domain {
+		if workflowConfig.Domain == identifier.GetDomain() {
 			tags = workflowConfig.Tags
 		} else if len(workflowConfig.Domain) == 0 {
 			defaultTags = workflowConfig.Tags

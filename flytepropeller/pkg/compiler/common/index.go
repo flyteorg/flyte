@@ -55,16 +55,16 @@ func NewWorkflowIndex(workflows []*core.CompiledWorkflow, errs errors.CompileErr
 	ok = true
 	index = make(WorkflowIndex, len(workflows))
 	for _, wf := range workflows {
-		if wf.Template.Id == nil {
+		if wf.GetTemplate().GetId() == nil {
 			// TODO: Log/Return error
 			return nil, false
 		}
 
-		if _, found := index[wf.Template.Id.String()]; found {
-			errs.Collect(errors.NewDuplicateIDFoundErr(wf.Template.Id.String()))
+		if _, found := index[wf.GetTemplate().GetId().String()]; found {
+			errs.Collect(errors.NewDuplicateIDFoundErr(wf.GetTemplate().GetId().String()))
 			ok = false
 		} else {
-			index[wf.Template.Id.String()] = wf
+			index[wf.GetTemplate().GetId().String()] = wf
 		}
 	}
 

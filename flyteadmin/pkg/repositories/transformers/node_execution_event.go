@@ -11,21 +11,21 @@ import (
 
 // Transforms a NodeExecutionEventRequest to a NodeExecutionEvent model
 func CreateNodeExecutionEventModel(request *admin.NodeExecutionEventRequest) (*models.NodeExecutionEvent, error) {
-	occurredAt, err := ptypes.Timestamp(request.Event.OccurredAt)
+	occurredAt, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to marshal occurred at timestamp")
 	}
 	return &models.NodeExecutionEvent{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: request.Event.Id.NodeId,
+			NodeID: request.GetEvent().GetId().GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: request.Event.Id.ExecutionId.Project,
-				Domain:  request.Event.Id.ExecutionId.Domain,
-				Name:    request.Event.Id.ExecutionId.Name,
+				Project: request.GetEvent().GetId().GetExecutionId().GetProject(),
+				Domain:  request.GetEvent().GetId().GetExecutionId().GetDomain(),
+				Name:    request.GetEvent().GetId().GetExecutionId().GetName(),
 			},
 		},
-		RequestID:  request.RequestId,
+		RequestID:  request.GetRequestId(),
 		OccurredAt: occurredAt,
-		Phase:      request.Event.Phase.String(),
+		Phase:      request.GetEvent().GetPhase().String(),
 	}, nil
 }

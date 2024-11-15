@@ -101,10 +101,10 @@ func TestGetEventInfo(t *testing.T) {
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
-	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
+	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.GetFields()[sparkDriverUI].GetStringValue())
 	generatedLinks := make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 
 	expectedLinks := []string{
@@ -121,12 +121,12 @@ func TestGetEventInfo(t *testing.T) {
 	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
-	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
+	assert.True(t, info.Logs[4].GetShowWhilePending()) // All User Logs should be shown while pending
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -151,10 +151,10 @@ func TestGetEventInfo(t *testing.T) {
 	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
-	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
+	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.GetFields()[sparkHistoryUI].GetStringValue())
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
-		generatedLinks = append(generatedLinks, l.Uri)
+		generatedLinks = append(generatedLinks, l.GetUri())
 	}
 
 	expectedLinks = []string{
@@ -853,7 +853,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
-	assert.Equal(t, 10, len(sparkApp.Spec.Driver.Env))
+	assert.Equal(t, 9, len(sparkApp.Spec.Driver.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
 	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
@@ -890,7 +890,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
-	assert.Equal(t, 10, len(sparkApp.Spec.Executor.Env))
+	assert.Equal(t, 9, len(sparkApp.Spec.Executor.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
 	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)

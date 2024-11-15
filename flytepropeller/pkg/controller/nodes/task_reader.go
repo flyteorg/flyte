@@ -12,7 +12,7 @@ type taskReader struct {
 }
 
 func (t taskReader) GetTaskType() v1alpha1.TaskType {
-	return t.TaskTemplate.Type
+	return t.TaskTemplate.GetType()
 }
 
 func (t taskReader) GetTaskID() *core.Identifier {

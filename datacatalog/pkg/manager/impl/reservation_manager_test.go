@@ -50,10 +50,10 @@ func TestGetOrExtendReservation_CreateReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
-				key.DatasetDomain == datasetID.Domain &&
-				key.DatasetVersion == datasetID.Version &&
-				key.DatasetName == datasetID.Name &&
+			return key.DatasetProject == datasetID.GetProject() &&
+				key.DatasetDomain == datasetID.GetDomain() &&
+				key.DatasetVersion == datasetID.GetVersion() &&
+				key.DatasetName == datasetID.GetName() &&
 				key.TagName == tagName
 		})).Return(models.Reservation{}, errors2.NewDataCatalogErrorf(codes.NotFound, "entry not found"))
 
@@ -62,10 +62,10 @@ func TestGetOrExtendReservation_CreateReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Create",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
-				reservation.DatasetDomain == datasetID.Domain &&
-				reservation.DatasetName == datasetID.Name &&
-				reservation.DatasetVersion == datasetID.Version &&
+			return reservation.DatasetProject == datasetID.GetProject() &&
+				reservation.DatasetDomain == datasetID.GetDomain() &&
+				reservation.DatasetName == datasetID.GetName() &&
+				reservation.DatasetVersion == datasetID.GetVersion() &&
 				reservation.TagName == tagName &&
 				reservation.OwnerID == currentOwner &&
 				reservation.ExpiresAt == now.Add(heartbeatInterval*heartbeatGracePeriodMultiplier)
@@ -86,8 +86,8 @@ func TestGetOrExtendReservation_CreateReservation(t *testing.T) {
 	resp, err := reservationManager.GetOrExtendReservation(context.Background(), &req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, currentOwner, resp.GetReservation().OwnerId)
-	assert.Equal(t, heartbeatIntervalPb, resp.GetReservation().HeartbeatInterval)
+	assert.Equal(t, currentOwner, resp.GetReservation().GetOwnerId())
+	assert.Equal(t, heartbeatIntervalPb, resp.GetReservation().GetHeartbeatInterval())
 }
 
 func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
@@ -98,10 +98,10 @@ func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
-				key.DatasetDomain == datasetID.Domain &&
-				key.DatasetVersion == datasetID.Version &&
-				key.DatasetName == datasetID.Name &&
+			return key.DatasetProject == datasetID.GetProject() &&
+				key.DatasetDomain == datasetID.GetDomain() &&
+				key.DatasetVersion == datasetID.GetVersion() &&
+				key.DatasetName == datasetID.GetName() &&
 				key.TagName == tagName
 		})).Return(models.Reservation{}, errors2.NewDataCatalogErrorf(codes.NotFound, "entry not found"))
 
@@ -110,10 +110,10 @@ func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Create",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
-				reservation.DatasetDomain == datasetID.Domain &&
-				reservation.DatasetName == datasetID.Name &&
-				reservation.DatasetVersion == datasetID.Version &&
+			return reservation.DatasetProject == datasetID.GetProject() &&
+				reservation.DatasetDomain == datasetID.GetDomain() &&
+				reservation.DatasetName == datasetID.GetName() &&
+				reservation.DatasetVersion == datasetID.GetVersion() &&
 				reservation.TagName == tagName &&
 				reservation.OwnerID == currentOwner &&
 				reservation.ExpiresAt == now.Add(heartbeatInterval*heartbeatGracePeriodMultiplier)
@@ -134,8 +134,8 @@ func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
 	resp, err := reservationManager.GetOrExtendReservation(context.Background(), &req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, currentOwner, resp.GetReservation().OwnerId)
-	assert.Equal(t, heartbeatIntervalPb, resp.GetReservation().HeartbeatInterval)
+	assert.Equal(t, currentOwner, resp.GetReservation().GetOwnerId())
+	assert.Equal(t, heartbeatIntervalPb, resp.GetReservation().GetHeartbeatInterval())
 }
 
 func TestGetOrExtendReservation_ExtendReservation(t *testing.T) {
@@ -151,10 +151,10 @@ func TestGetOrExtendReservation_ExtendReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Update",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
-				reservation.DatasetDomain == datasetID.Domain &&
-				reservation.DatasetName == datasetID.Name &&
-				reservation.DatasetVersion == datasetID.Version &&
+			return reservation.DatasetProject == datasetID.GetProject() &&
+				reservation.DatasetDomain == datasetID.GetDomain() &&
+				reservation.DatasetName == datasetID.GetName() &&
+				reservation.DatasetVersion == datasetID.GetVersion() &&
 				reservation.TagName == tagName &&
 				reservation.OwnerID == prevOwner &&
 				reservation.ExpiresAt == now.Add(heartbeatInterval*heartbeatGracePeriodMultiplier)
@@ -175,7 +175,7 @@ func TestGetOrExtendReservation_ExtendReservation(t *testing.T) {
 	resp, err := reservationManager.GetOrExtendReservation(context.Background(), &req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, prevOwner, resp.GetReservation().OwnerId)
+	assert.Equal(t, prevOwner, resp.GetReservation().GetOwnerId())
 }
 
 func TestGetOrExtendReservation_TakeOverReservation(t *testing.T) {
@@ -191,10 +191,10 @@ func TestGetOrExtendReservation_TakeOverReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Update",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
-				reservation.DatasetDomain == datasetID.Domain &&
-				reservation.DatasetName == datasetID.Name &&
-				reservation.DatasetVersion == datasetID.Version &&
+			return reservation.DatasetProject == datasetID.GetProject() &&
+				reservation.DatasetDomain == datasetID.GetDomain() &&
+				reservation.DatasetName == datasetID.GetName() &&
+				reservation.DatasetVersion == datasetID.GetVersion() &&
 				reservation.TagName == tagName &&
 				reservation.OwnerID == currentOwner &&
 				reservation.ExpiresAt == now.Add(heartbeatInterval*heartbeatGracePeriodMultiplier)
@@ -215,7 +215,7 @@ func TestGetOrExtendReservation_TakeOverReservation(t *testing.T) {
 	resp, err := reservationManager.GetOrExtendReservation(context.Background(), &req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, currentOwner, resp.GetReservation().OwnerId)
+	assert.Equal(t, currentOwner, resp.GetReservation().GetOwnerId())
 }
 
 func TestGetOrExtendReservation_ReservationExists(t *testing.T) {
@@ -241,7 +241,7 @@ func TestGetOrExtendReservation_ReservationExists(t *testing.T) {
 	resp, err := reservationManager.GetOrExtendReservation(context.Background(), &req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, prevOwner, resp.GetReservation().OwnerId)
+	assert.Equal(t, prevOwner, resp.GetReservation().GetOwnerId())
 }
 
 func TestReleaseReservation(t *testing.T) {
@@ -252,10 +252,10 @@ func TestReleaseReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
-				reservationKey.DatasetDomain == datasetID.Domain &&
-				reservationKey.DatasetName == datasetID.Name &&
-				reservationKey.DatasetVersion == datasetID.Version &&
+			return reservationKey.DatasetProject == datasetID.GetProject() &&
+				reservationKey.DatasetDomain == datasetID.GetDomain() &&
+				reservationKey.DatasetName == datasetID.GetName() &&
+				reservationKey.DatasetVersion == datasetID.GetVersion() &&
 				reservationKey.TagName == tagName
 		}),
 		mock.MatchedBy(func(ownerID string) bool {
@@ -286,10 +286,10 @@ func TestReleaseReservation_Failure(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
-				reservationKey.DatasetDomain == datasetID.Domain &&
-				reservationKey.DatasetName == datasetID.Name &&
-				reservationKey.DatasetVersion == datasetID.Version &&
+			return reservationKey.DatasetProject == datasetID.GetProject() &&
+				reservationKey.DatasetDomain == datasetID.GetDomain() &&
+				reservationKey.DatasetName == datasetID.GetName() &&
+				reservationKey.DatasetVersion == datasetID.GetVersion() &&
 				reservationKey.TagName == tagName
 		}),
 		mock.MatchedBy(func(ownerID string) bool {
@@ -324,10 +324,10 @@ func TestReleaseReservation_GracefulFailure(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
-				reservationKey.DatasetDomain == datasetID.Domain &&
-				reservationKey.DatasetName == datasetID.Name &&
-				reservationKey.DatasetVersion == datasetID.Version &&
+			return reservationKey.DatasetProject == datasetID.GetProject() &&
+				reservationKey.DatasetDomain == datasetID.GetDomain() &&
+				reservationKey.DatasetName == datasetID.GetName() &&
+				reservationKey.DatasetVersion == datasetID.GetVersion() &&
 				reservationKey.TagName == tagName
 		}),
 		mock.MatchedBy(func(ownerID string) bool {
@@ -360,10 +360,10 @@ func setUpReservationRepoGet(dcRepo *mocks.DataCatalogRepo, prevExpiresAt time.T
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
-				key.DatasetDomain == datasetID.Domain &&
-				key.DatasetVersion == datasetID.Version &&
-				key.DatasetName == datasetID.Name &&
+			return key.DatasetProject == datasetID.GetProject() &&
+				key.DatasetDomain == datasetID.GetDomain() &&
+				key.DatasetVersion == datasetID.GetVersion() &&
+				key.DatasetName == datasetID.GetName() &&
 				key.TagName == tagName
 		})).Return(
 		models.Reservation{

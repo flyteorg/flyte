@@ -711,6 +711,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedEventRecorder{}
+			// #nosec G115
 			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
@@ -735,11 +736,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				if tt.want.event {
 					if assert.Equal(t, 1, len(ev.evs)) {
 						e := ev.evs[0]
-						assert.Equal(t, tt.want.eventPhase.String(), e.Phase.String())
+						assert.Equal(t, tt.want.eventPhase.String(), e.GetPhase().String())
 						if tt.args.expectedState.TaskInfo != nil {
-							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.Logs)
+							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.GetLogs())
 						}
-						if e.Phase == core.TaskExecution_RUNNING || e.Phase == core.TaskExecution_SUCCEEDED {
+						if e.GetPhase() == core.TaskExecution_RUNNING || e.GetPhase() == core.TaskExecution_SUCCEEDED {
 							assert.True(t, proto.Equal(inputs, e.GetInputData()))
 						}
 					}
@@ -761,11 +762,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
-						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)
+						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri())
 				} else {
 					assert.True(t, got.Info().GetInfo() == nil || got.Info().GetInfo().TaskNodeInfo == nil ||
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata == nil ||
-						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri) == 0)
+						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri()) == 0)
 				}
 			}
 		})

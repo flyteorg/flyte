@@ -35,10 +35,10 @@ func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 	ctx := context.Background()
 	resp, err := provider.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
 	assert.NoError(t, err)
-	assert.Equal(t, "my-client", resp.ClientId)
-	assert.Equal(t, "client/", resp.RedirectUri)
-	assert.Equal(t, []string{"all"}, resp.Scopes)
-	assert.Equal(t, "http://dummyServer", resp.Audience)
+	assert.Equal(t, "my-client", resp.GetClientId())
+	assert.Equal(t, "client/", resp.GetRedirectUri())
+	assert.Equal(t, []string{"all"}, resp.GetScopes())
+	assert.Equal(t, "http://dummyServer", resp.GetAudience())
 }
 
 func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
@@ -50,7 +50,7 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		ctx := context.Background()
 		resp, err := provider.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
 		assert.NoError(t, err)
-		assert.Equal(t, "https://issuer/", resp.Issuer)
+		assert.Equal(t, "https://issuer/", resp.GetIssuer())
 	})
 
 	var issuer string
@@ -91,7 +91,7 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		ctx := context.Background()
 		resp, err := provider.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
 		assert.NoError(t, err)
-		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
+		assert.Equal(t, "https://dev-14186422.okta.com", resp.GetIssuer())
 	})
 
 	t.Run("External AuthServer fallback url", func(t *testing.T) {
@@ -110,7 +110,7 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		ctx := context.Background()
 		resp, err := provider.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
 		assert.NoError(t, err)
-		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
+		assert.Equal(t, "https://dev-14186422.okta.com", resp.GetIssuer())
 	})
 }
 

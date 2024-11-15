@@ -95,8 +95,8 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 			OutputPath:       taskCtx.OutputWriter(),
 			Task:             taskCtx.TaskReader(),
 		}
-		argTemplate = taskTemplate.GetContainer().Args
-		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
+		argTemplate = taskTemplate.GetContainer().GetArgs()
+		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().GetArgs(), templateParameters)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -108,7 +108,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
+	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
 	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
@@ -196,12 +196,12 @@ func (p *Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	return nil, ResourceWrapper{
-		Phase:      resource.Phase,
-		Outputs:    resource.Outputs,
-		Message:    resource.Message,
-		LogLinks:   resource.LogLinks,
-		CustomInfo: resource.CustomInfo,
-		AgentError: resource.AgentError,
+		Phase:      resource.GetPhase(),
+		Outputs:    resource.GetOutputs(),
+		Message:    resource.GetMessage(),
+		LogLinks:   resource.GetLogLinks(),
+		CustomInfo: resource.GetCustomInfo(),
+		AgentError: resource.GetAgentError(),
 	}, err
 }
 
@@ -217,7 +217,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	defer cancel()
 
 	request := &admin.GetTaskRequest{
-		TaskType:     metadata.TaskCategory.Name,
+		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
 	}
@@ -227,12 +227,12 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 
 	return ResourceWrapper{
-		Phase:      res.Resource.Phase,
-		State:      res.Resource.State,
-		Outputs:    res.Resource.Outputs,
-		Message:    res.Resource.Message,
-		LogLinks:   res.Resource.LogLinks,
-		CustomInfo: res.Resource.CustomInfo,
+		Phase:      res.GetResource().GetPhase(),
+		State:      res.GetResource().GetState(),
+		Outputs:    res.GetResource().GetOutputs(),
+		Message:    res.GetResource().GetMessage(),
+		LogLinks:   res.GetResource().GetLogLinks(),
+		CustomInfo: res.GetResource().GetCustomInfo(),
 	}, nil
 }
 
@@ -251,7 +251,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	defer cancel()
 
 	request := &admin.DeleteTaskRequest{
-		TaskType:     metadata.TaskCategory.Name,
+		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
 	}
@@ -355,7 +355,7 @@ func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if agent, exists := p.registry[taskCategory.Name][taskCategory.Version]; exists {
+	if agent, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
 	return &cfg.DefaultAgent, false
@@ -367,7 +367,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 		return err
 	}
 
-	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+	if taskTemplate.GetInterface() == nil || taskTemplate.GetInterface().GetOutputs() == nil || taskTemplate.Interface.Outputs.Variables == nil {
 		logger.Debugf(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
 	}
@@ -393,7 +393,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
-		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs,
+		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs, // nolint:protogetter
 	}
 }
 

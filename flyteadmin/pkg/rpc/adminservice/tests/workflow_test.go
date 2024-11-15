@@ -49,7 +49,7 @@ func TestCreateWorkflowError(t *testing.T) {
 	mockWorkflowManager.SetCreateCallback(
 		func(ctx context.Context,
 			request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), request.Id)
+			return nil, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

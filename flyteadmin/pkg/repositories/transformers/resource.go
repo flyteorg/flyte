@@ -14,14 +14,14 @@ import (
 )
 
 func WorkflowAttributesToResourceModel(attributes *admin.WorkflowAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
-		Domain:       attributes.Domain,
-		Workflow:     attributes.Workflow,
+		Project:      attributes.GetProject(),
+		Domain:       attributes.GetDomain(),
+		Workflow:     attributes.GetWorkflow(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityWorkflowLevel,
 		Attributes:   attributeBytes,
@@ -31,15 +31,15 @@ func WorkflowAttributesToResourceModel(attributes *admin.WorkflowAttributes, res
 func mergeUpdatePluginOverrides(existingAttributes *admin.MatchingAttributes,
 	newMatchingAttributes *admin.MatchingAttributes) *admin.MatchingAttributes {
 	taskPluginOverrides := make(map[string]*admin.PluginOverride)
-	if existingAttributes.GetPluginOverrides() != nil && len(existingAttributes.GetPluginOverrides().Overrides) > 0 {
-		for _, pluginOverride := range existingAttributes.GetPluginOverrides().Overrides {
-			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+	if existingAttributes.GetPluginOverrides() != nil && len(existingAttributes.GetPluginOverrides().GetOverrides()) > 0 {
+		for _, pluginOverride := range existingAttributes.GetPluginOverrides().GetOverrides() {
+			taskPluginOverrides[pluginOverride.GetTaskType()] = pluginOverride
 		}
 	}
 	if newMatchingAttributes.GetPluginOverrides() != nil &&
-		len(newMatchingAttributes.GetPluginOverrides().Overrides) > 0 {
-		for _, pluginOverride := range newMatchingAttributes.GetPluginOverrides().Overrides {
-			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+		len(newMatchingAttributes.GetPluginOverrides().GetOverrides()) > 0 {
+		for _, pluginOverride := range newMatchingAttributes.GetPluginOverrides().GetOverrides() {
+			taskPluginOverrides[pluginOverride.GetTaskType()] = pluginOverride
 		}
 	}
 
@@ -99,13 +99,13 @@ func FromResourceModelToWorkflowAttributes(model models.Resource) (admin.Workflo
 }
 
 func ProjectDomainAttributesToResourceModel(attributes *admin.ProjectDomainAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
-		Domain:       attributes.Domain,
+		Project:      attributes.GetProject(),
+		Domain:       attributes.GetDomain(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectDomainLevel,
 		Attributes:   attributeBytes,
@@ -113,12 +113,12 @@ func ProjectDomainAttributesToResourceModel(attributes *admin.ProjectDomainAttri
 }
 
 func ProjectAttributesToResourceModel(attributes *admin.ProjectAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
+		Project:      attributes.GetProject(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectLevel,
 		Attributes:   attributeBytes,

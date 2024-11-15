@@ -16,6 +16,7 @@ import (
 
 func TestExecutionCanBeActivated(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ARCHIVED
 			config.Activate = true
@@ -27,13 +28,14 @@ func TestExecutionCanBeActivated(t *testing.T) {
 				t, "UpdateExecution", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.ExecutionUpdateRequest) bool {
-						return r.State == admin.ExecutionState_EXECUTION_ACTIVE
+						return r.GetState() == admin.ExecutionState_EXECUTION_ACTIVE
 					}))
 		})
 }
 
 func TestExecutionCanBeArchived(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ACTIVE
 			config.Archive = true
@@ -45,13 +47,14 @@ func TestExecutionCanBeArchived(t *testing.T) {
 				t, "UpdateExecution", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.ExecutionUpdateRequest) bool {
-						return r.State == admin.ExecutionState_EXECUTION_ARCHIVED
+						return r.GetState() == admin.ExecutionState_EXECUTION_ARCHIVED
 					}))
 		})
 }
 
 func TestExecutionCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			config.Activate = true
 			config.Archive = true
@@ -64,6 +67,7 @@ func TestExecutionCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T) {
 
 func TestExecutionUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ACTIVE
 			config.Activate = true
@@ -77,6 +81,7 @@ func TestExecutionUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 
 func TestExecutionUpdateWithoutForceFlagFails(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ARCHIVED
 			config.Activate = true
@@ -90,6 +95,7 @@ func TestExecutionUpdateWithoutForceFlagFails(t *testing.T) {
 
 func TestExecutionUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	testExecutionUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 			execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ARCHIVED
 			config.Activate = true
@@ -104,6 +110,7 @@ func TestExecutionUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestForceFlagIsIgnoredWithDryRunDuringExecutionUpdate(t *testing.T) {
 	t.Run("without --force", func(t *testing.T) {
 		testExecutionUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 				execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ARCHIVED
 				config.Activate = true
@@ -119,6 +126,7 @@ func TestForceFlagIsIgnoredWithDryRunDuringExecutionUpdate(t *testing.T) {
 
 	t.Run("with --force", func(t *testing.T) {
 		testExecutionUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
 				execution.Closure.StateChangeDetails.State = admin.ExecutionState_EXECUTION_ARCHIVED
 				config.Activate = true
@@ -135,9 +143,10 @@ func TestForceFlagIsIgnoredWithDryRunDuringExecutionUpdate(t *testing.T) {
 
 func TestExecutionUpdateFailsWhenExecutionDoesNotExist(t *testing.T) {
 	testExecutionUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(nil, ext.NewNotFoundError("execution not found"))
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -153,9 +162,10 @@ func TestExecutionUpdateFailsWhenExecutionDoesNotExist(t *testing.T) {
 
 func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 	testExecutionUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -174,8 +184,7 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func TestExecutionUpdateRequiresExecutionName(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	err := updateExecutionFunc(s.Ctx, nil, s.CmdCtx)
 
@@ -183,13 +192,15 @@ func TestExecutionUpdateRequiresExecutionName(t *testing.T) {
 }
 
 func testExecutionUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testExecutionUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -201,12 +212,12 @@ func testExecutionUpdate(
 }
 
 func testExecutionUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, execution *admin.Execution),
 	setup func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	target := newTestExecution()
 
@@ -217,10 +228,9 @@ func testExecutionUpdateWithMockSetup(
 	execution.UConfig = &execution.UpdateConfig{}
 	if setup != nil {
 		setup(&s, execution.UConfig, target)
-		defer s.TearDown()
 	}
 
-	args := []string{target.Id.Name}
+	args := []string{target.GetId().GetName()}
 	err := updateExecutionFunc(s.Ctx, args, s.CmdCtx)
 
 	if asserter != nil {

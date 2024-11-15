@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - flytectl/**
+      - 'release-v**'
   push:
     branches:
       - master

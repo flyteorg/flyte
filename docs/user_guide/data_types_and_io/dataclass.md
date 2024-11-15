@@ -21,13 +21,13 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the necessary dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 1-9
 ```
 
 Build your custom image with ImageSpec:
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 16-19
 ```
@@ -35,7 +35,7 @@ Build your custom image with ImageSpec:
 ## Python types
 We define a `dataclass` with `int`, `str` and `dict` as the data types.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :pyobject: Datum
 ```
@@ -48,7 +48,7 @@ All variables in a data class should be **annotated with their type**. Failure t
 
 Once declared, a dataclass can be returned as an output or accepted as an input.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 32-47
 ```
@@ -57,7 +57,7 @@ Once declared, a dataclass can be returned as an output or accepted as an input.
 We also define a data class that accepts {std:ref}`StructuredDataset <structured_dataset>`,
 {std:ref}`FlyteFile <files>` and {std:ref}`FlyteDirectory <folder>`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 51-88
 ```
@@ -67,14 +67,14 @@ flyte file, flyte directory and structured dataset.
 
 We define a workflow that calls the tasks created above.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :pyobject: dataclass_wf
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 101-102
 ```

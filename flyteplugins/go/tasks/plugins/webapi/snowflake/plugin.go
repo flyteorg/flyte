@@ -84,7 +84,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	config := task.GetConfig()
 
 	outputs, err := template.Render(ctx, []string{
-		task.GetSql().Statement,
+		task.GetSql().GetStatement(),
 	}, template.Parameters{
 		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
 		Inputs:           taskCtx.InputReader(),

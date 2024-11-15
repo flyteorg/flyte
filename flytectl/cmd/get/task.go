@@ -125,14 +125,14 @@ func TaskToTableProtoMessages(l []*admin.Task) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.Task)
-		if m.Closure != nil && m.Closure.CompiledTask != nil {
-			if m.Closure.CompiledTask.Template != nil {
-				if m.Closure.CompiledTask.Template.Interface != nil {
-					if m.Closure.CompiledTask.Template.Interface.Inputs != nil && m.Closure.CompiledTask.Template.Interface.Inputs.Variables != nil {
-						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Inputs.Variables)
+		if m.GetClosure() != nil && m.GetClosure().GetCompiledTask() != nil {
+			if m.GetClosure().GetCompiledTask().GetTemplate() != nil {
+				if m.GetClosure().GetCompiledTask().GetTemplate().GetInterface() != nil {
+					if m.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs() != nil && m.Closure.CompiledTask.Template.Interface.Inputs.Variables != nil {
+						printer.FormatVariableDescriptions(m.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs().GetVariables())
 					}
-					if m.Closure.CompiledTask.Template.Interface.Outputs != nil && m.Closure.CompiledTask.Template.Interface.Outputs.Variables != nil {
-						printer.FormatVariableDescriptions(m.Closure.CompiledTask.Template.Interface.Outputs.Variables)
+					if m.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetOutputs() != nil && m.Closure.CompiledTask.Template.Interface.Outputs.Variables != nil {
+						printer.FormatVariableDescriptions(m.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetOutputs().GetVariables())
 					}
 				}
 			}

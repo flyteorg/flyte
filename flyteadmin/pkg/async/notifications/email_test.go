@@ -155,8 +155,8 @@ func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {
 		SubjectLine: `Notice: Execution "e124" has succeeded in "prod".`,
 		Body:        `Execution "e124" has succeeded in "prod". View details at <a href="https://example.com/executions/proj/prod/e124">https://example.com/executions/proj/prod/e124</a>.`,
 	}
-	assert.True(t, emailMessage.Body == expected.Body)
-	assert.True(t, emailMessage.SubjectLine == expected.SubjectLine)
-	assert.True(t, emailMessage.SenderEmail == expected.SenderEmail)
-	assert.True(t, len(emailMessage.RecipientsEmail) == len(expected.RecipientsEmail))
+	assert.True(t, emailMessage.GetBody() == expected.GetBody())
+	assert.True(t, emailMessage.GetSubjectLine() == expected.GetSubjectLine())
+	assert.True(t, emailMessage.GetSenderEmail() == expected.GetSenderEmail())
+	assert.True(t, len(emailMessage.GetRecipientsEmail()) == len(expected.GetRecipientsEmail()))
 }

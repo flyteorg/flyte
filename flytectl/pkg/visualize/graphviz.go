@@ -56,11 +56,11 @@ func operandToString(op *core.Operand) string {
 }
 
 func comparisonToString(expr *core.ComparisonExpression) string {
-	return fmt.Sprintf("%s %s %s", operandToString(expr.LeftValue), expr.Operator.String(), operandToString(expr.RightValue))
+	return fmt.Sprintf("%s %s %s", operandToString(expr.GetLeftValue()), expr.GetOperator().String(), operandToString(expr.GetRightValue()))
 }
 
 func conjunctionToString(expr *core.ConjunctionExpression) string {
-	return fmt.Sprintf("(%s) %s (%s)", booleanExprToString(expr.LeftExpression), expr.Operator.String(), booleanExprToString(expr.RightExpression))
+	return fmt.Sprintf("(%s) %s (%s)", booleanExprToString(expr.GetLeftExpression()), expr.GetOperator().String(), booleanExprToString(expr.GetRightExpression()))
 }
 
 func booleanExprToString(expr *core.BooleanExpression) string {
@@ -86,9 +86,9 @@ func constructEndNode(parentGraph string, n string, graph Graphvizer) (*graphviz
 
 func constructTaskNode(parentGraph string, name string, graph Graphvizer, n *core.Node, t *core.CompiledTask) (*graphviz.Node, error) {
 	attrs := map[string]string{ShapeType: BoxShape}
-	if n.Metadata != nil && n.Metadata.Name != "" {
-		v := strings.LastIndexAny(n.Metadata.Name, ".")
-		attrs[LabelAttr] = fmt.Sprintf("\"%s [%s]\"", n.Metadata.Name[v+1:], t.Template.Type)
+	if n.GetMetadata() != nil && n.GetMetadata().GetName() != "" {
+		v := strings.LastIndexAny(n.GetMetadata().GetName(), ".")
+		attrs[LabelAttr] = fmt.Sprintf("\"%s [%s]\"", n.GetMetadata().GetName()[v+1:], t.GetTemplate().GetType())
 	}
 	tName := strings.ReplaceAll(name, "-", "_")
 	err := graph.AddNode(parentGraph, tName, attrs)
@@ -104,8 +104,8 @@ func constructErrorNode(parentGraph string, name string, graph Graphvizer, m str
 
 func constructBranchConditionNode(parentGraph string, name string, graph Graphvizer, n *core.Node) (*graphviz.Node, error) {
 	attrs := map[string]string{ShapeType: DiamondShape}
-	if n.Metadata != nil && n.Metadata.Name != "" {
-		attrs[LabelAttr] = fmt.Sprintf("\"[%s]\"", n.Metadata.Name)
+	if n.GetMetadata() != nil && n.GetMetadata().GetName() != "" {
+		attrs[LabelAttr] = fmt.Sprintf("\"[%s]\"", n.GetMetadata().GetName())
 	}
 	cName := strings.ReplaceAll(name, "-", "_")
 	err := graph.AddNode(parentGraph, cName, attrs)
@@ -151,27 +151,27 @@ func (gb *graphBuilder) addBranchSubNodeEdge(graph Graphvizer, parentNode, n *gr
 }
 
 func (gb *graphBuilder) constructBranchNode(parentGraph string, prefix string, graph Graphvizer, n *core.Node) (*graphviz.Node, error) {
-	parentBranchNode, err := constructBranchConditionNode(parentGraph, getName(prefix, n.Id), graph, n)
+	parentBranchNode, err := constructBranchConditionNode(parentGraph, getName(prefix, n.GetId()), graph, n)
 	if err != nil {
 		return nil, err
 	}
-	gb.graphNodes[n.Id] = parentBranchNode
+	gb.graphNodes[n.GetId()] = parentBranchNode
 
 	if n.GetBranchNode().GetIfElse() == nil {
 		return parentBranchNode, nil
 	}
 
-	subNode, err := gb.constructNode(parentGraph, prefix, graph, n.GetBranchNode().GetIfElse().Case.ThenNode)
+	subNode, err := gb.constructNode(parentGraph, prefix, graph, n.GetBranchNode().GetIfElse().GetCase().GetThenNode())
 	if err != nil {
 		return nil, err
 	}
-	if err := gb.addBranchSubNodeEdge(graph, parentBranchNode, subNode, booleanExprToString(n.GetBranchNode().GetIfElse().Case.Condition)); err != nil {
+	if err := gb.addBranchSubNodeEdge(graph, parentBranchNode, subNode, booleanExprToString(n.GetBranchNode().GetIfElse().GetCase().GetCondition())); err != nil {
 		return nil, err
 	}
 
 	if n.GetBranchNode().GetIfElse().GetError() != nil {
 		name := fmt.Sprintf("%s-error", parentBranchNode.Name)
-		subNode, err := constructErrorNode(prefix, name, graph, n.GetBranchNode().GetIfElse().GetError().Message)
+		subNode, err := constructErrorNode(prefix, name, graph, n.GetBranchNode().GetIfElse().GetError().GetMessage())
 		if err != nil {
 			return nil, err
 		}
@@ -191,11 +191,11 @@ func (gb *graphBuilder) constructBranchNode(parentGraph string, prefix string, g
 
 	if n.GetBranchNode().GetIfElse().GetOther() != nil {
 		for _, c := range n.GetBranchNode().GetIfElse().GetOther() {
-			subNode, err := gb.constructNode(parentGraph, prefix, graph, c.ThenNode)
+			subNode, err := gb.constructNode(parentGraph, prefix, graph, c.GetThenNode())
 			if err != nil {
 				return nil, err
 			}
-			if err := gb.addBranchSubNodeEdge(graph, parentBranchNode, subNode, booleanExprToString(c.Condition)); err != nil {
+			if err := gb.addBranchSubNodeEdge(graph, parentBranchNode, subNode, booleanExprToString(c.GetCondition())); err != nil {
 				return nil, err
 			}
 		}
@@ -204,18 +204,18 @@ func (gb *graphBuilder) constructBranchNode(parentGraph string, prefix string, g
 }
 
 func (gb *graphBuilder) constructNode(parentGraphName string, prefix string, graph Graphvizer, n *core.Node) (*graphviz.Node, error) {
-	name := getName(prefix, n.Id)
+	name := getName(prefix, n.GetId())
 	var err error
 	var gn *graphviz.Node
 
-	if n.Id == StartNode {
+	if n.GetId() == StartNode {
 		gn, err = constructStartNode(parentGraphName, strings.ReplaceAll(name, "-", "_"), graph)
 		gb.nodeClusters[name] = parentGraphName
-	} else if n.Id == EndNode {
+	} else if n.GetId() == EndNode {
 		gn, err = constructEndNode(parentGraphName, strings.ReplaceAll(name, "-", "_"), graph)
 		gb.nodeClusters[name] = parentGraphName
 	} else {
-		switch n.Target.(type) {
+		switch n.GetTarget().(type) {
 		case *core.Node_TaskNode:
 			tID := n.GetTaskNode().GetReferenceId().String()
 			t, ok := gb.tasks[tID]
@@ -228,7 +228,7 @@ func (gb *graphBuilder) constructNode(parentGraphName string, prefix string, gra
 			}
 			gb.nodeClusters[name] = parentGraphName
 		case *core.Node_BranchNode:
-			sanitizedName := strings.ReplaceAll(n.Metadata.Name, "-", "_")
+			sanitizedName := strings.ReplaceAll(n.GetMetadata().GetName(), "-", "_")
 			branchSubGraphName := SubgraphPrefix + sanitizedName
 			err := graph.AddSubGraph(parentGraphName, branchSubGraphName, map[string]string{LabelAttr: sanitizedName})
 			if err != nil {
@@ -269,7 +269,7 @@ func (gb *graphBuilder) constructNode(parentGraphName string, prefix string, gra
 	if err != nil {
 		return nil, err
 	}
-	gb.graphNodes[n.Id] = gn
+	gb.graphNodes[n.GetId()] = gn
 	return gn, nil
 }
 
@@ -298,27 +298,27 @@ func (gb *graphBuilder) addEdge(fromNodeName, toNodeName string, graph Graphvize
 }
 
 func (gb *graphBuilder) constructGraph(parentGraphName string, prefix string, graph Graphvizer, w *core.CompiledWorkflow) error {
-	if w == nil || w.Template == nil {
+	if w == nil || w.GetTemplate() == nil {
 		return nil
 	}
-	for _, n := range w.Template.Nodes {
+	for _, n := range w.GetTemplate().GetNodes() {
 		if _, err := gb.constructNode(parentGraphName, prefix, graph, n); err != nil {
 			return err
 		}
 	}
 
 	for name := range gb.graphNodes {
-		upstreamNodes := w.Connections.Upstream[name]
-		downstreamNodes := w.Connections.Downstream[name]
+		upstreamNodes := w.GetConnections().GetUpstream()[name]
+		downstreamNodes := w.GetConnections().GetDownstream()[name]
 		if downstreamNodes != nil {
-			for _, n := range downstreamNodes.Ids {
+			for _, n := range downstreamNodes.GetIds() {
 				if err := gb.addEdge(name, n, graph); err != nil {
 					return err
 				}
 			}
 		}
 		if upstreamNodes != nil {
-			for _, n := range upstreamNodes.Ids {
+			for _, n := range upstreamNodes.GetIds() {
 				if err := gb.addEdge(n, name, graph); err != nil {
 					return err
 				}
@@ -334,23 +334,23 @@ func (gb *graphBuilder) CompiledWorkflowClosureToGraph(w *core.CompiledWorkflowC
 	_ = dotGraph.SetStrict(true)
 
 	tLookup := make(map[string]*core.CompiledTask)
-	for _, t := range w.Tasks {
-		if t.Template == nil || t.Template.Id == nil {
+	for _, t := range w.GetTasks() {
+		if t.GetTemplate() == nil || t.GetTemplate().GetId() == nil {
 			return FlyteGraph{}, fmt.Errorf("no template found in the workflow task %v", t)
 		}
-		tLookup[t.Template.Id.String()] = t
+		tLookup[t.GetTemplate().GetId().String()] = t
 	}
 	gb.tasks = tLookup
 	wLookup := make(map[string]*core.CompiledWorkflow)
-	for _, swf := range w.SubWorkflows {
-		if swf.Template == nil || swf.Template.Id == nil {
+	for _, swf := range w.GetSubWorkflows() {
+		if swf.GetTemplate() == nil || swf.GetTemplate().GetId() == nil {
 			return FlyteGraph{}, fmt.Errorf("no template found in the sub workflow %v", swf)
 		}
-		wLookup[swf.Template.Id.String()] = swf
+		wLookup[swf.GetTemplate().GetId().String()] = swf
 	}
 	gb.subWf = wLookup
 
-	return dotGraph, gb.constructGraph("", "", dotGraph, w.Primary)
+	return dotGraph, gb.constructGraph("", "", dotGraph, w.GetPrimary())
 }
 
 func newGraphBuilder() *graphBuilder {

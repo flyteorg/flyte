@@ -33,8 +33,8 @@ manage your project's Python requirements.
 
 ````{dropdown} See requirements.txt
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/basic-template-imagespec/%7B%7Bcookiecutter.project_name%7D%7D/requirements.txt
-:caption: requirements.txt
+```{code-block} bash
+flytekit>=1.5.0
 ```
 
 ````
