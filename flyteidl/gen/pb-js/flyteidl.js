@@ -10982,6 +10982,7 @@
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
+                 * @property {boolean|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
                  */
     
                 /**
@@ -11038,6 +11039,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.executionMode = 0;
+    
+                /**
+                 * ArrayNode isOriginalSubNodeInterface.
+                 * @member {boolean} isOriginalSubNodeInterface
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.isOriginalSubNodeInterface = false;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11098,6 +11107,8 @@
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
                     if (message.executionMode != null && message.hasOwnProperty("executionMode"))
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
+                    if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.isOriginalSubNodeInterface);
                     return writer;
                 };
     
@@ -11133,6 +11144,9 @@
                             break;
                         case 5:
                             message.executionMode = reader.int32();
+                            break;
+                        case 6:
+                            message.isOriginalSubNodeInterface = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11184,6 +11198,9 @@
                         case 1:
                             break;
                         }
+                    if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
+                        if (typeof message.isOriginalSubNodeInterface !== "boolean")
+                            return "isOriginalSubNodeInterface: boolean expected";
                     return null;
                 };
     

@@ -554,6 +554,13 @@ export class ArrayNode extends Message<ArrayNode> {
    */
   executionMode = ArrayNode_ExecutionMode.MINIMAL_STATE;
 
+  /**
+   * Indicates whether the sub node's original interface was overridden
+   *
+   * @generated from field: bool is_original_sub_node_interface = 6;
+   */
+  isOriginalSubNodeInterface = false;
+
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -567,6 +574,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
     { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
+    { no: 6, name: "is_original_sub_node_interface", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {

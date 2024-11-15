@@ -147,6 +147,9 @@ message ArrayNode {
 
     // execution_mode determines the execution path for ArrayNode.
     ExecutionMode execution_mode = 5;
+
+    // Indicates whether the sub node's original interface was overridden
+    bool is_original_sub_node_interface = 6;
 }
 
 // Defines extra information about the Node.

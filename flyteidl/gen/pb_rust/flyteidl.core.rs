@@ -2431,6 +2431,9 @@ pub struct ArrayNode {
     /// execution_mode determines the execution path for ArrayNode.
     #[prost(enumeration="array_node::ExecutionMode", tag="5")]
     pub execution_mode: i32,
+    /// Indicates whether the sub node's original interface was overridden
+    #[prost(bool, tag="6")]
+    pub is_original_sub_node_interface: bool,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
