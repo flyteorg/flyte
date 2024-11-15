@@ -263,13 +263,13 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 }
 
 func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
-	_, c, k, err := reference.Split()
+	_, containerName, key, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
 		return nil, NewCursorAtEnd(), err
 	}
 
-	container, err := s.getContainer(ctx, locationIDMain, c)
+	container, err := s.getContainer(ctx, locationIDMain, containerName)
 	if err != nil {
 		return nil, NewCursorAtEnd(), err
 	}
@@ -284,7 +284,7 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	} else {
 		stowCursor = cursor.customPosition
 	}
-	items, stowCursor, err := container.Items(k, stowCursor, maxItems)
+	items, stowCursor, err := container.Items(key, stowCursor, maxItems)
 	t1.Stop()
 	t2.Stop()
 
@@ -302,7 +302,7 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	}
 
 	incFailureCounterForError(ctx, s.metrics.ListFailure, err)
-	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", k)
+	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", key)
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {

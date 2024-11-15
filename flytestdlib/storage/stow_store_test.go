@@ -97,7 +97,8 @@ func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item,
 	numItems := endIndexExc - startIndex
 	results := make([]stow.Item, numItems)
 	for index, itemKey := range itemKeys[startIndex:endIndexExc] {
-		results[index] = m.items[itemKey]
+		url := fmt.Sprintf("s3://%s/%s", m.id, m.items[itemKey].url)
+		results[index] = mockStowItem{url: url, size: m.items[itemKey].size}
 	}
 
 	if endIndexExc == len(m.items) {
@@ -419,7 +420,7 @@ func TestStowStore_List(t *testing.T) {
 		items, cursor, err := s.List(ctx, dataReference, maxResults, NewCursorAtStart())
 		assert.NoError(t, err)
 		assert.Equal(t, NewCursorAtEnd(), cursor)
-		assert.Equal(t, []DataReference{"a/1", "a/2"}, items)
+		assert.Equal(t, []DataReference{"s3://container/a/1", "s3://container/a/2"}, items)
 	})
 
 	t.Run("Listing with pagination", func(t *testing.T) {
@@ -446,10 +447,10 @@ func TestStowStore_List(t *testing.T) {
 		var dataReference DataReference = "s3://container/a"
 		items, cursor, err := s.List(ctx, dataReference, maxResults, NewCursorAtStart())
 		assert.NoError(t, err)
-		assert.Equal(t, []DataReference{"a/1"}, items)
+		assert.Equal(t, []DataReference{"s3://container/a/1"}, items)
 		items, _, err = s.List(ctx, dataReference, maxResults, cursor)
 		assert.NoError(t, err)
-		assert.Equal(t, []DataReference{"a/2"}, items)
+		assert.Equal(t, []DataReference{"s3://container/a/2"}, items)
 	})
 }
 

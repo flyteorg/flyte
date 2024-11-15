@@ -75,6 +75,7 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 		}
 
 		n, ok := nl.GetNode(upstreamNodeID)
+
 		if !ok {
 			return nil, errors.Errorf(errors.IllegalStateError, "id", upstreamNodeID,
 				"Undefined node in Workflow")

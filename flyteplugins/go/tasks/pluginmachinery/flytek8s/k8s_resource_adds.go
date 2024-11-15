@@ -17,6 +17,9 @@ import (
 
 const (
 	flyteExecutionURL = "FLYTE_EXECUTION_URL"
+
+	FlyteInternalWorkerNameEnvVarKey        = "_F_WN"  // "FLYTE_INTERNAL_WORKER_NAME"
+	FlyteInternalDistErrorStrategyEnvVarKey = "_F_DES" // "FLYTE_INTERNAL_DIST_ERROR_STRATEGY"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
@@ -59,15 +62,6 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
 			Value: nodeExecutionID.Domain,
-		},
-		{
-			// FLYTE_INTERNAL_POD_NAME
-			Name: "_F_PN",
-			ValueFrom: &v1.EnvVarSource{
-				FieldRef: &v1.ObjectFieldSelector{
-					FieldPath: "metadata.name",
-				},
-			},
 		},
 		{
 			Name:  "FLYTE_ATTEMPT_NUMBER",
