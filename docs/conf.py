@@ -79,7 +79,7 @@ extensions = [
     # custom extensions
     "auto_examples",
     "import_projects",
-    "notebook_rli",
+    "notebook_literalinclude",
 ]
 
 source_suffix = {

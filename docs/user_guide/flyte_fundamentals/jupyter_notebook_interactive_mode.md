@@ -25,15 +25,22 @@ this is not work?
 :lines: 1
 ```
 
-<!-- ```{literalinclude} /examples/basics/basics/basic_interactive_mode.ipynb
-:caption: basics/basic_interactive_mode.ipynb
+test
+
+```{literalinclude} /examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
+:caption: papermill_plugin/nb_simple.ipynb
+:lines: 1
+```
+
+```{nb-literalinclude} /examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
+:caption: papermill_plugin/nb_simple.ipynb
 :cell: 5
 :lines: 1-2
 ```
 
-```{literalinclude} /examples/basics/basics/basic_interactive_mode.ipynb
-:caption: basics/basic_interactive_mode.ipynb
+```{nb-literalinclude} /examples/papermill_plugin/papermill_plugin/nb_simple.ipynb
+:caption: papermill_plugin/nb_simple.ipynb
 :cell: 3
-``` -->
+```
 
 <!-- [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics -->
