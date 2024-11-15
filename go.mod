@@ -4,8 +4,8 @@ go 1.22
 
 require (
 	github.com/flyteorg/flyte/datacatalog v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flyteadmin v1.13.3
-	github.com/flyteorg/flyte/flytepropeller v1.13.3
+	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.2.0
 	github.com/prometheus/client_golang v1.19.1
