@@ -3,6 +3,7 @@ package testing
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -19,7 +20,7 @@ const (
 
 type EchoPlugin struct {
 	enqueueOwner   core.EnqueueOwner
-	taskStartTimes map[string]time.Time
+	taskStartTimes sync.Map
 }
 
 func (e *EchoPlugin) GetID() string {
@@ -33,13 +34,9 @@ func (e *EchoPlugin) GetProperties() core.PluginProperties {
 func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	echoConfig := ConfigSection.GetConfig().(*Config)
 
-	var startTime time.Time
-	var exists bool
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	if startTime, exists = e.taskStartTimes[taskExecutionID]; !exists {
-		startTime = time.Now()
-		e.taskStartTimes[taskExecutionID] = startTime
-
+	startTime, exists := e.taskStartTimes.LoadOrStore(taskExecutionID, time.Now())
+	if !exists {
 		// start timer to enqueue owner once task sleep duration has elapsed
 		go func() {
 			time.Sleep(echoConfig.SleepDuration.Duration)
@@ -49,7 +46,7 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 		}()
 	}
 
-	if time.Since(startTime) >= echoConfig.SleepDuration.Duration {
+	if time.Since((startTime).(time.Time)) >= echoConfig.SleepDuration.Duration {
 		// copy inputs to outputs
 		inputToOutputVariableMappings, err := compileInputToOutputVariableMappings(ctx, tCtx)
 		if err != nil {
@@ -94,7 +91,7 @@ func (e *EchoPlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 func (e *EchoPlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	delete(e.taskStartTimes, taskExecutionID)
+	e.taskStartTimes.Delete(taskExecutionID)
 	return nil
 }
 
@@ -152,7 +149,7 @@ func init() {
 			LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 				return &EchoPlugin{
 					enqueueOwner:   iCtx.EnqueueOwner(),
-					taskStartTimes: make(map[string]time.Time),
+					taskStartTimes: sync.Map{},
 				}, nil
 			},
 			IsDefault: false,
