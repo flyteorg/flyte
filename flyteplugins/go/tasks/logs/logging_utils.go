@@ -131,6 +131,8 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 				DisplayName:         dynamicLogLink.DisplayName,
 				DynamicTemplateURIs: dynamicLogLink.TemplateURIs,
 				MessageFormat:       core.TaskLog_JSON,
+				ShowWhilePending:    dynamicLogLink.ShowWhilePending,
+				HideOnceFinished:    dynamicLogLink.HideOnceFinished,
 			})
 	}
 
