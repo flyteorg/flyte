@@ -42,9 +42,10 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	// Compare the two schemas
 	errs := jscmp.Compare(tgtSchema, srcSchema)
 
-	// json-schema-compare does not support additionalProperties
+	// If len(errs) >= 2, then the schemas are not compatible
+	// json-schema-compare does not support additionalProperties=true
 	if len(errs) == 1 {
-		return strings.Contains(errs[0].Error(), "FIXME additionalProperties not implemented")
+		return strings.Contains(errs[0].Error(), "additionalProperties not implemented")
 	}
 
 	return len(errs) == 0
