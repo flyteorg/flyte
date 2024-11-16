@@ -58,7 +58,7 @@ If you're running this code in a Jupyter notebook, you can also use the
 ```{nb-literalinclude} /examples/basics/basics/basic_interactive_mode.ipynb
 :caption: basics/basic_interactive_mode.ipynb
 :cell: 3
-:lines: 4-9
+:lines: 5-10
 ```
 
 ## Running a workflow
