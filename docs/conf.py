@@ -649,9 +649,7 @@ import_projects = [
         "docs_path": "docs",
         "dest": "mecoliflytesnacks",
         "cmd": [
-            ["cd", f"{flytesnacks_path}"],
-            ["git", "checkout", "origin/jupyter-basic"],
-            ["cd", "-"],
+            ["git", "-C", f"{flytesnacks_path}", "checkout", "origin/jupyter-basic"],
             ["cp", "-R", f"{flytesnacks_path}/examples", "./mecoliexamples"],
             [
                 # remove un-needed docs files in flytesnacks
