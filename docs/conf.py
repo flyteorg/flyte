@@ -644,6 +644,29 @@ import_projects = [
         "local": flytesnacks_local_path is not None,
     },
     {
+        "name": "mecoliflytesnacks",
+        "source": "https://github.com/Mecoli1219/flytesnacks",
+        "docs_path": "docs",
+        "dest": "mecoliflytesnacks",
+        "cmd": [
+            ["cd", f"{flytesnacks_path}"],
+            ["git", "checkout", "origin/jupyter-basic"],
+            ["cd", "-"],
+            ["cp", "-R", f"{flytesnacks_path}/examples", "./mecoliexamples"],
+            [
+                # remove un-needed docs files in flytesnacks
+                "rm",
+                "-rf",
+                "flytesnacks/jupyter_execute",
+                "flytesnacks/auto_examples",
+                "flytesnacks/_build",
+                "flytesnacks/_tags",
+                "flytesnacks/index.md",
+            ]
+        ],
+        "local": False,
+    },
+    {
         "name": "flytekit",
         "source": flytekit_local_path or "https://github.com/flyteorg/flytekit",
         "docs_path": "docs/source",
