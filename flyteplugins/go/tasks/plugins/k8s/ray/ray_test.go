@@ -1123,6 +1123,10 @@ func rayPluginContext() *k8smocks.PluginContext {
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	podList := []runtime.Object{
 		&corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "initializing ignored pod"},
+			Status:     corev1.PodStatus{Phase: corev1.PodPending},
+		},
+		&corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: podName},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{

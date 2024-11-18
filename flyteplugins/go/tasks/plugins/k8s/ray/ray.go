@@ -11,6 +11,7 @@ import (
 	"time"
 
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
+	"github.com/samber/lo"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -564,12 +565,18 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 }
 
 func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
+	pods = lo.Filter(pods, func(item v1.Pod, _ int) bool {
+		// Running, Succeeded or Failed is OK
+		return item.Status.Phase != v1.PodPending
+	})
 	logCtx := &core.LogContext{
 		Pods: make([]*core.PodLogContext, len(pods)),
 	}
 	for i, pod := range pods {
 		p := pod
-		if strings.HasPrefix(p.Name, rayJobName) && flytek8s.GetPrimaryContainerName(&p) == RayHeadContainerName {
+		// Ray job has name like `az6dh2bxk6wnxn2xv8l6-n0-0`
+		// Ray head primary pod has name like `az6dh2bxk6wnxn2xv8l6-n0-0-raycluster-szwgz-head-z59ss`
+		if strings.HasPrefix(p.Name, rayJobName) && strings.Contains(p.Name, "head") && flytek8s.GetPrimaryContainerName(&p) == RayHeadContainerName {
 			logCtx.PrimaryPodName = p.Name
 		}
 		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
