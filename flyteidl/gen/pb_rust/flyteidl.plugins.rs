@@ -210,6 +210,9 @@ pub struct HeadGroupSpec {
     /// Refer to <https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start>
     #[prost(map="string, string", tag="1")]
     pub ray_start_params: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Pod Spec for the ray head pod
+    #[prost(message, optional, tag="2")]
+    pub k8s_pod: ::core::option::Option<super::core::K8sPod>,
 }
 /// WorkerGroupSpec are the specs for the worker pods
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -231,6 +234,9 @@ pub struct WorkerGroupSpec {
     /// Refer to <https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start>
     #[prost(map="string, string", tag="5")]
     pub ray_start_params: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Pod Spec for ray worker pods
+    #[prost(message, optional, tag="6")]
+    pub k8s_pod: ::core::option::Option<super::core::K8sPod>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
