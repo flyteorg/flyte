@@ -1,11 +1,14 @@
 package viper
 
 import (
+	"context"
 	"encoding/base64"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func Test_stringToByteArray(t *testing.T) {
@@ -50,5 +53,32 @@ func Test_stringToByteArray(t *testing.T) {
 		res, err := stringToByteArray(reflect.TypeOf(input), reflect.TypeOf(""), input)
 		assert.NoError(t, err)
 		assert.NotEqual(t, []byte("hello"), res)
+	})
+}
+
+func TestViperAccessor_UpdateConfig(t *testing.T) {
+	ctx := context.Background()
+	t.Run("unable to find the config file", func(t *testing.T) {
+		// Create accessor
+		accessor := newAccessor(config.Options{
+			SearchPaths: []string{".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyte"},
+			StrictMode:  false,
+		})
+
+		// Update config
+		err := accessor.updateConfig(ctx, accessor.rootConfig)
+		assert.EqualError(t, err, "Config File \"config\" Not Found in \"[]\"")
+	})
+
+	t.Run("find the config file", func(t *testing.T) {
+		// Create accessor
+		accessor := newAccessor(config.Options{
+			SearchPaths: []string{"./testdata/viper_test_config.yaml"},
+			StrictMode:  false,
+		})
+
+		// Update config
+		err := accessor.updateConfig(ctx, accessor.rootConfig)
+		assert.NoError(t, err)
 	})
 }

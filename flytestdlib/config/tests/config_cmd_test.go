@@ -32,7 +32,7 @@ func TestDiscoverCommand(t *testing.T) {
 		t.Run(fmt.Sprintf(testNameFormatter, provider(config.Options{}).ID(), "No config file"), func(t *testing.T) {
 			cmd := config.NewConfigCommand(provider)
 			output, err := executeCommand(cmd, config.CommandDiscover)
-			assert.NoError(t, err)
+			assert.Error(t, err)
 			assert.Contains(t, output, "Couldn't find a config file.")
 		})
 
@@ -57,7 +57,7 @@ func TestValidateCommand(t *testing.T) {
 		t.Run(fmt.Sprintf(testNameFormatter, provider(config.Options{}).ID(), "No config file"), func(t *testing.T) {
 			cmd := config.NewConfigCommand(provider)
 			output, err := executeCommand(cmd, config.CommandValidate)
-			assert.NoError(t, err)
+			assert.Error(t, err)
 			assert.Contains(t, output, "Couldn't find a config file.")
 		})
 
