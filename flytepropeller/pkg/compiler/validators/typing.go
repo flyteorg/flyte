@@ -1,14 +1,11 @@
 package validators
 
 import (
-	"bytes"
 	"encoding/json"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/santhosh-tekuri/jsonschema"
 	"github.com/wI2L/jsondiff"
-	jscmp "gitlab.com/yvesf/json-schema-compare"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -22,38 +19,44 @@ type trivialChecker struct {
 }
 
 func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
-	compiler := jsonschema.NewCompiler()
+	// Check if the source schema is a supertype of the target schema, beyond simple inheritance.
+	// For custom types, we expect the JSON schemas in the metadata to come from the same JSON schema package,
+	// specifically draft 2020-12 from Mashumaro.
 
-	srcSchemaBytes, _ := json.Marshal(sourceMetaData.Fields)
-	tgtSchemaBytes, _ := json.Marshal(targetMetaData.Fields)
+	srcSchemaBytes, _ := json.Marshal(sourceMetaData.GetFields())
+	tgtSchemaBytes, _ := json.Marshal(targetMetaData.GetFields())
 
-	err := compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
-	if err != nil {
-		return false
+	patch, _ := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	for _, p := range patch {
+		if p.Type == jsondiff.OperationReplace {
+			if strings.Contains(p.Path, "title") {
+				// Ignore title changes to support inheritance
+				continue
+			} else if strings.Contains(p.Path, "max") {
+				// If the value of maxItems, maxProperties, maxLength is changed, the target schema should have a smaller range.
+				if p.OldValue.(int) == -1 || p.OldValue.(int) < p.Value.(int) {
+					return false
+				}
+				continue
+			} else if strings.Contains(p.Path, "min") {
+				// If the value of minItems, minProperties, minLength is changed, the target schema should have a larger range.
+				if p.OldValue.(int) == -1 || p.OldValue.(int) > p.Value.(int) {
+					return false
+				}
+				continue
+			}
+			return false
+		} else if p.Type == jsondiff.OperationAdd {
+			return false
+		}
 	}
-	err = compiler.AddResource("tgt", bytes.NewReader(tgtSchemaBytes))
-	if err != nil {
-		return false
-	}
+	return true
 
-	srcSchema, _ := compiler.Compile("src")
-	tgtSchema, _ := compiler.Compile("tgt")
-
-	// Compare the two schemas
-	errs := jscmp.Compare(tgtSchema, srcSchema)
-
-	// If len(errs) >= 2, then the schemas are not compatible
-	// json-schema-compare does not support additionalProperties=true
-	if len(errs) == 1 {
-		return strings.Contains(errs[0].Error(), "additionalProperties not implemented")
-	}
-
-	return len(errs) == 0
 }
 
 func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
-	srcSchemaBytes, _ := json.Marshal(sourceMetaData.Fields)
-	tgtSchemaBytes, _ := json.Marshal(targetMetaData.Fields)
+	srcSchemaBytes, _ := json.Marshal(sourceMetaData.GetFields())
+	tgtSchemaBytes, _ := json.Marshal(targetMetaData.GetFields())
 
 	patch, err := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
 	if err != nil {
