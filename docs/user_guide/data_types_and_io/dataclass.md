@@ -12,7 +12,16 @@ Flytekit uses the [Mashumaro library](https://github.com/Fatal1ty/mashumaro)
 to serialize and deserialize dataclasses.
 
 :::{important}
-If you're using Flytekit version below v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
+If you're using Flytekit version < v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
+:::
+
+:::{important}
+Flytekit version < v1.14.0 will produce protobuf struct literal for dataclasses.
+
+Flytekit version >= v1.14.0 will produce msgpack bytes literal for dataclasses.
+
+If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for dataclasses, you can 
+set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 :::
 
 ```{note}

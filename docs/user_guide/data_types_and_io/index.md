@@ -144,6 +144,7 @@ flytefile
 flytedirectory
 structureddataset
 dataclass
+pydantic
 accessing_attributes
 pytorch_type
 enum_type
