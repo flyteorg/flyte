@@ -28,7 +28,7 @@ type NamedEntityConfig struct {
 
 func (cfg NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdCore.CommandContext) error {
 	if cfg.Activate && cfg.Archive {
-		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
+		return fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
 	}
 
 	id := &admin.NamedEntityIdentifier{
@@ -45,7 +45,7 @@ func (cfg NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string,
 		return fmt.Errorf("update metadata for %s: could not fetch metadata: %w", name, err)
 	}
 
-	oldMetadata, newMetadata := composeNamedMetadataEdits(cfg, namedEntity.Metadata)
+	oldMetadata, newMetadata := composeNamedMetadataEdits(cfg, namedEntity.GetMetadata())
 	patch, err := DiffAsYaml(diffPathBefore, diffPathAfter, oldMetadata, newMetadata)
 	if err != nil {
 		panic(err)
@@ -86,15 +86,15 @@ func composeNamedMetadataEdits(config NamedEntityConfig, current *admin.NamedEnt
 	case config.Activate && config.Archive:
 		panic("cannot both activate and archive")
 	case config.Activate:
-		old.State = current.State
+		old.State = current.GetState()
 		new.State = admin.NamedEntityState_NAMED_ENTITY_ACTIVE
 	case config.Archive:
-		old.State = current.State
+		old.State = current.GetState()
 		new.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 	}
 
 	if config.Description != "" {
-		old.Description = current.Description
+		old.Description = current.GetDescription()
 		new.Description = config.Description
 	}
 

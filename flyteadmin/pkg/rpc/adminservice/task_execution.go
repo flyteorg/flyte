@@ -28,11 +28,11 @@ func (m *AdminService) GetTaskExecution(
 	ctx context.Context, request *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.Id != nil && request.Id.TaskId != nil && request.Id.TaskId.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetId() != nil && request.GetId().GetTaskId() != nil && request.GetId().GetTaskId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.TaskId.ResourceType = core.ResourceType_TASK
 	}
-	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
+	if err := validation.ValidateTaskExecutionIdentifier(request.GetId()); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +70,7 @@ func (m *AdminService) GetTaskExecutionData(
 	ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.Id != nil && request.Id.TaskId != nil && request.Id.TaskId.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetId() != nil && request.GetId().GetTaskId() != nil && request.GetId().GetTaskId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.TaskId.ResourceType = core.ResourceType_TASK
 	}

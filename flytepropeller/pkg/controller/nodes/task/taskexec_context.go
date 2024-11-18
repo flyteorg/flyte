@@ -258,12 +258,12 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		length = *l
 	}
 
-	rawOutputPrefix, uniqueID, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
+	rawOutputPrefix, uniqueID, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, id.GetRetryAttempt())
 	if err != nil {
 		return nil, err
 	}
 
-	prevCheckpointPath, err := ComputePreviousCheckpointPath(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
+	prevCheckpointPath, err := ComputePreviousCheckpointPath(ctx, length, nCtx, currentNodeUniqueID, id.GetRetryAttempt())
 	if err != nil {
 		return nil, err
 	}
@@ -280,9 +280,9 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 	}
 
 	resourceNamespacePrefix := pluginCore.ResourceNamespace(t.resourceManager.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(plugin.GetID()))
-	maxAttempts := uint32(controllerconfig.GetConfig().NodeConfig.DefaultMaxAttempts)
+	maxAttempts := uint32(controllerconfig.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
-		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts) // #nosec G115
 	}
 
 	taskTemplatePath, err := ioutils.GetTaskTemplatePath(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetDataDir())

@@ -264,7 +264,7 @@ func (s *createSuite) Test_CreateRelaunchExecution() {
 			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
-	executionConfig.Relaunch = relaunchExecResponse.Id.Name
+	executionConfig.Relaunch = relaunchExecResponse.GetId().GetName()
 	relaunchRequest := &admin.ExecutionRelaunchRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    executionConfig.Relaunch,

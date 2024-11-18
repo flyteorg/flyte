@@ -18,10 +18,10 @@ func (a *AdminFetcherExtClient) FetchAllVerOfTask(ctx context.Context, name, pro
 	if err != nil {
 		return nil, err
 	}
-	if len(tList.Tasks) == 0 {
+	if len(tList.GetTasks()) == 0 {
 		return nil, fmt.Errorf("no tasks retrieved for %v", name)
 	}
-	return tList.Tasks, nil
+	return tList.GetTasks(), nil
 }
 
 func (a *AdminFetcherExtClient) FetchTaskLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Task, error) {

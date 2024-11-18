@@ -45,7 +45,8 @@ users:
 		t.Error(err)
 	}
 	defer os.Remove(tmpfile.Name())
-	if err := ioutil.WriteFile(tmpfile.Name(), []byte(content), os.ModePerm); err != nil {
+	// #nosec G306
+	if err := os.WriteFile(tmpfile.Name(), []byte(content), os.ModePerm); err != nil {
 		t.Error(err)
 	}
 	t.Run("Create client from config", func(t *testing.T) {

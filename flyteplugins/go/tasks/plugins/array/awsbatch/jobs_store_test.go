@@ -35,7 +35,7 @@ func newJobsStore(t testing.TB, batchClient Client) *JobStore {
 func newJobsStoreWithSize(t testing.TB, batchClient Client, size int) *JobStore {
 	store, err := NewJobStore(context.TODO(), batchClient, config.JobStoreConfig{
 		CacheSize:      size,
-		Parallelizm:    1,
+		Parallelism:    1,
 		BatchChunkSize: 2,
 		ResyncPeriod:   config2.Duration{Duration: 1000},
 	}, EventHandler{}, promutils.NewTestScope())

@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/securecookie"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -68,6 +69,8 @@ func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte, domain 
 		Value:    encoded,
 		Domain:   domain,
 		SameSite: sameSiteMode,
+		HttpOnly: true,
+		Secure:   !config.GetConfig().Security.InsecureCookieHeader,
 	}, nil
 }
 
@@ -126,6 +129,7 @@ func NewCsrfCookie() http.Cookie {
 		Value:    csrfStateToken,
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
+		Secure:   !config.GetConfig().Security.InsecureCookieHeader,
 	}
 }
 
@@ -164,6 +168,7 @@ func NewRedirectCookie(ctx context.Context, redirectURL string) *http.Cookie {
 		Value:    urlObj.String(),
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
+		Secure:   !config.GetConfig().Security.InsecureCookieHeader,
 	}
 }
 

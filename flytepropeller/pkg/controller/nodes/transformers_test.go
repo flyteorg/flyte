@@ -56,10 +56,10 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			RawOutputPolicy: config.RawOutputPolicyReference,
 		}, nil)
 		assert.NoError(t, err)
-		assert.True(t, nev.IsDynamic)
-		assert.True(t, nev.IsParent)
-		assert.Equal(t, nodeExecutionEventVersion, nev.EventVersion)
-		assert.True(t, nev.IsInDynamicChain)
+		assert.True(t, nev.GetIsDynamic())
+		assert.True(t, nev.GetIsParent())
+		assert.Equal(t, nodeExecutionEventVersion, nev.GetEventVersion())
+		assert.True(t, nev.GetIsInDynamicChain())
 	})
 	t.Run("is parent", func(t *testing.T) {
 		info := handler.PhaseInfoDynamicRunning(&handler.ExecutionInfo{TaskNodeInfo: &handler.TaskNodeInfo{
@@ -92,9 +92,9 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			RawOutputPolicy: config.RawOutputPolicyReference,
 		}, nil)
 		assert.NoError(t, err)
-		assert.False(t, nev.IsDynamic)
-		assert.True(t, nev.IsParent)
-		assert.Equal(t, nodeExecutionEventVersion, nev.EventVersion)
+		assert.False(t, nev.GetIsDynamic())
+		assert.True(t, nev.GetIsParent())
+		assert.Equal(t, nodeExecutionEventVersion, nev.GetEventVersion())
 	})
 	t.Run("inline events", func(t *testing.T) {
 		inputs := &core.LiteralMap{

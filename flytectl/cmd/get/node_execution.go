@@ -110,7 +110,7 @@ func getExecutionDetails(ctx context.Context, project, domain, execName, nodeNam
 	}
 
 	sort.Slice(nExecDetailsForView[:], func(i, j int) bool {
-		return nExecDetailsForView[i].NodeExec.Closure.CreatedAt.AsTime().Before(nExecDetailsForView[j].NodeExec.Closure.CreatedAt.AsTime())
+		return nExecDetailsForView[i].NodeExec.Closure.GetCreatedAt().AsTime().Before(nExecDetailsForView[j].NodeExec.Closure.GetCreatedAt().AsTime())
 	})
 
 	return nExecDetailsForView, nil
@@ -125,49 +125,49 @@ func getNodeExecDetailsInt(ctx context.Context, project, domain, execName, nodeN
 	}
 
 	var nodeExecClosures []*NodeExecutionClosure
-	for _, nodeExec := range nExecDetails.NodeExecutions {
+	for _, nodeExec := range nExecDetails.GetNodeExecutions() {
 		nodeExecClosure := &NodeExecutionClosure{
 			NodeExec: &NodeExecution{nodeExec},
 		}
 		nodeExecClosures = append(nodeExecClosures, nodeExecClosure)
 
 		// Check if this is parent node. If yes do recursive call to get child nodes.
-		if nodeExec.Metadata != nil && nodeExec.Metadata.IsParentNode {
-			nodeExecClosure.ChildNodes, err = getNodeExecDetailsInt(ctx, project, domain, execName, nodeName, nodeExec.Id.NodeId, nodeExecDetailsMap, cmdCtx)
+		if nodeExec.GetMetadata() != nil && nodeExec.GetMetadata().GetIsParentNode() {
+			nodeExecClosure.ChildNodes, err = getNodeExecDetailsInt(ctx, project, domain, execName, nodeName, nodeExec.GetId().GetNodeId(), nodeExecDetailsMap, cmdCtx)
 			if err != nil {
 				return nil, err
 			}
 		} else {
 			taskExecList, err := cmdCtx.AdminFetcherExt().FetchTaskExecutionsOnNode(ctx,
-				nodeExec.Id.NodeId, execName, project, domain)
+				nodeExec.GetId().GetNodeId(), execName, project, domain)
 			if err != nil {
 				return nil, err
 			}
-			for _, taskExec := range taskExecList.TaskExecutions {
+			for _, taskExec := range taskExecList.GetTaskExecutions() {
 				taskExecClosure := &TaskExecutionClosure{
 					TaskExecution: &TaskExecution{taskExec},
 				}
 				nodeExecClosure.TaskExecutions = append(nodeExecClosure.TaskExecutions, taskExecClosure)
 			}
 			// Fetch the node inputs and outputs
-			nExecDataResp, err := cmdCtx.AdminFetcherExt().FetchNodeExecutionData(ctx, nodeExec.Id.NodeId, execName, project, domain)
+			nExecDataResp, err := cmdCtx.AdminFetcherExt().FetchNodeExecutionData(ctx, nodeExec.GetId().GetNodeId(), execName, project, domain)
 			if err != nil {
 				return nil, err
 			}
 			// Extract the inputs from the literal map
-			nodeExecClosure.Inputs, err = extractLiteralMap(nExecDataResp.FullInputs)
+			nodeExecClosure.Inputs, err = extractLiteralMap(nExecDataResp.GetFullInputs())
 			if err != nil {
 				return nil, err
 			}
 			// Extract the outputs from the literal map
-			nodeExecClosure.Outputs, err = extractLiteralMap(nExecDataResp.FullOutputs)
+			nodeExecClosure.Outputs, err = extractLiteralMap(nExecDataResp.GetFullOutputs())
 			if err != nil {
 				return nil, err
 			}
 		}
-		nodeExecDetailsMap[nodeExec.Id.NodeId] = nodeExecClosure
+		nodeExecDetailsMap[nodeExec.GetId().GetNodeId()] = nodeExecClosure
 		// Found the node
-		if len(nodeName) > 0 && nodeName == nodeExec.Id.NodeId {
+		if len(nodeName) > 0 && nodeName == nodeExec.GetId().GetNodeId() {
 			return nodeExecClosures, err
 		}
 	}
@@ -183,38 +183,38 @@ func createNodeTaskExecTreeView(rootView gotree.Tree, taskExecClosures []*TaskEx
 	}
 	// TODO: Replace this by filter to sort in the admin
 	sort.Slice(taskExecClosures[:], func(i, j int) bool {
-		return taskExecClosures[i].Id.RetryAttempt < taskExecClosures[j].Id.RetryAttempt
+		return taskExecClosures[i].Id.GetRetryAttempt() < taskExecClosures[j].Id.GetRetryAttempt()
 	})
 	for _, taskExecClosure := range taskExecClosures {
-		attemptView := rootView.Add(taskAttemptPrefix + strconv.Itoa(int(taskExecClosure.Id.RetryAttempt)))
-		attemptView.Add(taskExecPrefix + taskExecClosure.Closure.Phase.String() +
-			hyphenPrefix + taskExecClosure.Closure.CreatedAt.AsTime().String() +
-			hyphenPrefix + taskExecClosure.Closure.UpdatedAt.AsTime().String())
-		attemptView.Add(taskTypePrefix + taskExecClosure.Closure.TaskType)
-		attemptView.Add(taskReasonPrefix + taskExecClosure.Closure.Reason)
-		if taskExecClosure.Closure.Metadata != nil {
+		attemptView := rootView.Add(taskAttemptPrefix + strconv.Itoa(int(taskExecClosure.Id.GetRetryAttempt())))
+		attemptView.Add(taskExecPrefix + taskExecClosure.Closure.GetPhase().String() +
+			hyphenPrefix + taskExecClosure.Closure.GetCreatedAt().AsTime().String() +
+			hyphenPrefix + taskExecClosure.Closure.GetUpdatedAt().AsTime().String())
+		attemptView.Add(taskTypePrefix + taskExecClosure.Closure.GetTaskType())
+		attemptView.Add(taskReasonPrefix + taskExecClosure.Closure.GetReason())
+		if taskExecClosure.Closure.GetMetadata() != nil {
 			metadata := attemptView.Add(taskMetadataPrefix)
-			metadata.Add(taskGeneratedNamePrefix + taskExecClosure.Closure.Metadata.GeneratedName)
-			metadata.Add(taskPluginIDPrefix + taskExecClosure.Closure.Metadata.PluginIdentifier)
+			metadata.Add(taskGeneratedNamePrefix + taskExecClosure.Closure.GetMetadata().GetGeneratedName())
+			metadata.Add(taskPluginIDPrefix + taskExecClosure.Closure.GetMetadata().GetPluginIdentifier())
 			extResourcesView := metadata.Add(taskExtResourcesPrefix)
-			for _, extResource := range taskExecClosure.Closure.Metadata.ExternalResources {
-				extResourcesView.Add(taskExtResourcePrefix + extResource.ExternalId)
+			for _, extResource := range taskExecClosure.Closure.GetMetadata().GetExternalResources() {
+				extResourcesView.Add(taskExtResourcePrefix + extResource.GetExternalId())
 			}
 			resourcePoolInfoView := metadata.Add(taskResourcePrefix)
-			for _, rsPool := range taskExecClosure.Closure.Metadata.ResourcePoolInfo {
-				resourcePoolInfoView.Add(taskExtResourcePrefix + rsPool.Namespace)
-				resourcePoolInfoView.Add(taskExtResourceTokenPrefix + rsPool.AllocationToken)
+			for _, rsPool := range taskExecClosure.Closure.GetMetadata().GetResourcePoolInfo() {
+				resourcePoolInfoView.Add(taskExtResourcePrefix + rsPool.GetNamespace())
+				resourcePoolInfoView.Add(taskExtResourceTokenPrefix + rsPool.GetAllocationToken())
 			}
 		}
 
-		sort.Slice(taskExecClosure.Closure.Logs[:], func(i, j int) bool {
-			return taskExecClosure.Closure.Logs[i].Name < taskExecClosure.Closure.Logs[j].Name
+		sort.Slice(taskExecClosure.Closure.GetLogs()[:], func(i, j int) bool {
+			return taskExecClosure.Closure.GetLogs()[i].GetName() < taskExecClosure.Closure.GetLogs()[j].GetName()
 		})
 
 		logsView := attemptView.Add(taskLogsPrefix)
-		for _, logData := range taskExecClosure.Closure.Logs {
-			logsView.Add(taskLogsNamePrefix + logData.Name)
-			logsView.Add(taskLogURIPrefix + logData.Uri)
+		for _, logData := range taskExecClosure.Closure.GetLogs() {
+			logsView.Add(taskLogsNamePrefix + logData.GetName())
+			logsView.Add(taskLogURIPrefix + logData.GetUri())
 		}
 	}
 }
@@ -228,13 +228,13 @@ func createNodeDetailsTreeView(rootView gotree.Tree, nodeExecutionClosures []*No
 	}
 	// TODO : Move to sorting using filters.
 	sort.Slice(nodeExecutionClosures[:], func(i, j int) bool {
-		return nodeExecutionClosures[i].NodeExec.Closure.CreatedAt.AsTime().Before(nodeExecutionClosures[j].NodeExec.Closure.CreatedAt.AsTime())
+		return nodeExecutionClosures[i].NodeExec.Closure.GetCreatedAt().AsTime().Before(nodeExecutionClosures[j].NodeExec.Closure.GetCreatedAt().AsTime())
 	})
 
 	for _, nodeExecWrapper := range nodeExecutionClosures {
-		nExecView := rootView.Add(nodeExecWrapper.NodeExec.Id.NodeId + hyphenPrefix + nodeExecWrapper.NodeExec.Closure.Phase.String() +
-			hyphenPrefix + nodeExecWrapper.NodeExec.Closure.CreatedAt.AsTime().String() +
-			hyphenPrefix + nodeExecWrapper.NodeExec.Closure.UpdatedAt.AsTime().String())
+		nExecView := rootView.Add(nodeExecWrapper.NodeExec.Id.GetNodeId() + hyphenPrefix + nodeExecWrapper.NodeExec.Closure.GetPhase().String() +
+			hyphenPrefix + nodeExecWrapper.NodeExec.Closure.GetCreatedAt().AsTime().String() +
+			hyphenPrefix + nodeExecWrapper.NodeExec.Closure.GetUpdatedAt().AsTime().String())
 		if len(nodeExecWrapper.ChildNodes) > 0 {
 			createNodeDetailsTreeView(nExecView, nodeExecWrapper.ChildNodes)
 		}
@@ -254,7 +254,7 @@ func extractLiteralMap(literalMap *core.LiteralMap) (map[string]interface{}, err
 	if literalMap == nil || literalMap.Literals == nil {
 		return m, nil
 	}
-	for key, literalVal := range literalMap.Literals {
+	for key, literalVal := range literalMap.GetLiterals() {
 		extractedLiteralVal, err := coreutils.ExtractFromLiteral(literalVal)
 		if err != nil {
 			return nil, err

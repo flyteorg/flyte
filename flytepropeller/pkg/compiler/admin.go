@@ -29,8 +29,8 @@ func (p *LaunchPlanInterfaceProvider) GetExpectedOutputs() *core.VariableMap {
 
 func NewLaunchPlanInterfaceProvider(launchPlan *admin.LaunchPlan) *LaunchPlanInterfaceProvider {
 	return &LaunchPlanInterfaceProvider{
-		expectedInputs:  launchPlan.Closure.ExpectedInputs,
-		expectedOutputs: launchPlan.Closure.ExpectedOutputs,
-		identifier:      launchPlan.Id,
+		expectedInputs:  launchPlan.GetClosure().GetExpectedInputs(),
+		expectedOutputs: launchPlan.GetClosure().GetExpectedOutputs(),
+		identifier:      launchPlan.GetId(),
 	}
 }

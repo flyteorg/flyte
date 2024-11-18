@@ -27,13 +27,13 @@ func TestGetExecutionEnvVars(t *testing.T) {
 	}{
 		{
 			"no-console-url",
-			13,
+			12,
 			"",
 			nil,
 		},
 		{
 			"with-console-url",
-			14,
+			13,
 			"scheme://host/path",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
@@ -42,7 +42,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		},
 		{
 			"with-console-url-ending-in-single-slash",
-			14,
+			13,
 			"scheme://host/path/",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
@@ -51,7 +51,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		},
 		{
 			"with-console-url-ending-in-multiple-slashes",
-			14,
+			13,
 			"scheme://host/path////",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
@@ -63,7 +63,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 		envVars := GetExecutionEnvVars(mock, tt.consoleURL)
 		assert.Len(t, envVars, tt.expectedEnvVars)
 		if tt.expectedEnvVar != nil {
-			assert.True(t, proto.Equal(&envVars[5], tt.expectedEnvVar))
+			assert.True(t, proto.Equal(&envVars[4], tt.expectedEnvVar))
 		}
 	}
 }

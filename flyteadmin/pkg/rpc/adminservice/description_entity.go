@@ -12,7 +12,7 @@ import (
 func (m *AdminService) GetDescriptionEntity(ctx context.Context, request *admin.ObjectGetRequest) (*admin.DescriptionEntity, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.Id != nil && request.Id.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetId() != nil && request.GetId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.ResourceType = core.ResourceType_TASK
 	}

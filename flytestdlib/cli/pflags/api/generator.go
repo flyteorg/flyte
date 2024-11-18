@@ -498,8 +498,7 @@ func buildBasicField(ctx context.Context, tag Tag, t *types.Basic, defaultValueA
 }
 
 // NewGenerator initializes a PFlagProviderGenerator for pflags files for targetTypeName struct under pkg. If pkg is not filled in,
-// it's assumed to be current package (which is expected to be the common use case when invoking pflags from
-// go:generate comments)
+// it's assumed to be current package (which is expected to be the common use case when invoking pflags from `// go:generate comments)`
 func NewGenerator(pkg, targetTypeName, defaultVariableName string, shouldBindDefaultVar bool) (*PFlagProviderGenerator, error) {
 	ctx := context.Background()
 	var err error

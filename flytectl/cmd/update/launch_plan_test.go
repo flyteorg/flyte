@@ -28,7 +28,7 @@ func TestLaunchPlanCanBeActivated(t *testing.T) {
 				t, "UpdateLaunchPlan", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.LaunchPlanUpdateRequest) bool {
-						return r.State == admin.LaunchPlanState_ACTIVE
+						return r.GetState() == admin.LaunchPlanState_ACTIVE
 					}))
 		})
 }
@@ -47,7 +47,7 @@ func TestLaunchPlanCanBeArchived(t *testing.T) {
 				t, "UpdateLaunchPlan", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.LaunchPlanUpdateRequest) bool {
-						return r.State == admin.LaunchPlanState_INACTIVE
+						return r.GetState() == admin.LaunchPlanState_INACTIVE
 					}))
 		})
 }
@@ -66,7 +66,7 @@ func TestLaunchPlanCanBeDeactivated(t *testing.T) {
 				t, "UpdateLaunchPlan", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.LaunchPlanUpdateRequest) bool {
-						return r.State == admin.LaunchPlanState_INACTIVE
+						return r.GetState() == admin.LaunchPlanState_INACTIVE
 					}))
 		})
 }
@@ -275,8 +275,8 @@ func testLaunchPlanUpdateWithMockSetup(
 		setup(&s, launchplan.UConfig, target)
 	}
 
-	args := []string{target.Id.Name}
-	launchplan.UConfig.Version = target.Id.Version
+	args := []string{target.GetId().GetName()}
+	launchplan.UConfig.Version = target.GetId().GetVersion()
 	err := updateLPFunc(s.Ctx, args, s.CmdCtx)
 
 	if asserter != nil {

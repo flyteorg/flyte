@@ -48,8 +48,8 @@ func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *fl
 				}
 			}
 		} else if expr.GetConjunction() != nil {
-			ValidateBooleanExpression(w, node, expr.GetConjunction().LeftExpression, requireParamType, errs.NewScope())
-			ValidateBooleanExpression(w, node, expr.GetConjunction().RightExpression, requireParamType, errs.NewScope())
+			ValidateBooleanExpression(w, node, expr.GetConjunction().GetLeftExpression(), requireParamType, errs.NewScope())
+			ValidateBooleanExpression(w, node, expr.GetConjunction().GetRightExpression(), requireParamType, errs.NewScope())
 		} else {
 			errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Expr"))
 		}

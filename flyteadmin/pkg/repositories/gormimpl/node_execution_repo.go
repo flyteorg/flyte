@@ -36,11 +36,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Take(&nodeExecution)
@@ -49,11 +49,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: input.NodeExecutionIdentifier.GetNodeId(),
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+					Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+					Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 				},
 			})
 	} else if tx.Error != nil {
@@ -68,11 +68,11 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
@@ -81,11 +81,11 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: input.NodeExecutionIdentifier.GetNodeId(),
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+					Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+					Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 				},
 			})
 	} else if tx.Error != nil {
@@ -144,11 +144,11 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 	timer := r.metrics.ExistsDuration.Start()
 	tx := r.db.WithContext(ctx).Select(ID).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Take(&nodeExecution)

@@ -75,7 +75,7 @@ func newPluginStateManager(_ context.Context, prevCodecVersion CodecVersion, pre
 	return &pluginStateManager{
 		codec:            codex.GobStateCodec{},
 		codecVersion:     GobCodecVersion,
-		prevStateVersion: uint8(prevStateVersion),
+		prevStateVersion: uint8(prevStateVersion), // #nosec G115
 		prevState:        prevState,
 	}, nil
 }

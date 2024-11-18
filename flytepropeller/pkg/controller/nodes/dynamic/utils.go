@@ -21,7 +21,7 @@ func underlyingInterface(ctx context.Context, taskReader interfaces.TaskReader) 
 	}
 
 	if t.GetInterface() != nil {
-		iface.Outputs = t.GetInterface().Outputs
+		iface.Outputs = t.GetInterface().GetOutputs()
 	}
 	return iface, nil
 }
@@ -31,21 +31,21 @@ func hierarchicalNodeID(parentNodeID, retryAttempt, nodeID string) (string, erro
 }
 
 func updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt string, binding *core.BindingData) (err error) {
-	switch b := binding.Value.(type) {
+	switch b := binding.GetValue().(type) {
 	case *core.BindingData_Promise:
-		b.Promise.NodeId, err = hierarchicalNodeID(parentNodeID, retryAttempt, b.Promise.NodeId)
+		b.Promise.NodeId, err = hierarchicalNodeID(parentNodeID, retryAttempt, b.Promise.GetNodeId())
 		if err != nil {
 			return err
 		}
 	case *core.BindingData_Collection:
-		for _, item := range b.Collection.Bindings {
+		for _, item := range b.Collection.GetBindings() {
 			err = updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt, item)
 			if err != nil {
 				return err
 			}
 		}
 	case *core.BindingData_Map:
-		for _, item := range b.Map.Bindings {
+		for _, item := range b.Map.GetBindings() {
 			err = updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt, item)
 			if err != nil {
 				return err
@@ -60,7 +60,7 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 	compiledTasks := make([]*core.CompiledTask, 0, len(tasks))
 	visitedTasks := sets.NewString()
 	for _, t := range tasks {
-		if visitedTasks.Has(t.Id.String()) {
+		if visitedTasks.Has(t.GetId().String()) {
 			continue
 		}
 
@@ -70,7 +70,7 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 		}
 
 		compiledTasks = append(compiledTasks, ct)
-		visitedTasks.Insert(t.Id.String())
+		visitedTasks.Insert(t.GetId().String())
 	}
 
 	return compiledTasks, nil

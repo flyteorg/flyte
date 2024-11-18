@@ -50,8 +50,8 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 	var err error
 	secretsMap := make(map[string]string)
 	injectLabels := make(map[string]string)
-	if taskTmpl.SecurityContext != nil && len(taskTmpl.SecurityContext.Secrets) > 0 {
-		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTmpl.SecurityContext.Secrets)
+	if taskTmpl.GetSecurityContext() != nil && len(taskTmpl.GetSecurityContext().GetSecrets()) > 0 {
+		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTmpl.GetSecurityContext().GetSecrets())
 		if err != nil {
 			return TaskExecutionMetadata{}, err
 		}
@@ -59,7 +59,7 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 		injectLabels[secrets.PodLabel] = secrets.PodLabelValue
 	}
 
-	id := tCtx.GetSecurityContext().RunAs.ExecutionIdentity
+	id := tCtx.GetSecurityContext().RunAs.GetExecutionIdentity() //nolint:protogetter
 	if len(id) > 0 {
 		sanitizedID := k8sUtils.SanitizeLabelValue(id)
 		injectLabels[executionIdentityVariable] = sanitizedID

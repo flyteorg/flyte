@@ -72,7 +72,7 @@ func TestAddRunningState(t *testing.T) {
 	err := addNodeRunningState(&request, &nodeExecutionModel, &closure)
 	assert.Nil(t, err)
 	assert.Equal(t, startedAt, *nodeExecutionModel.StartedAt)
-	assert.True(t, proto.Equal(startedAtProto, closure.StartedAt))
+	assert.True(t, proto.Equal(startedAtProto, closure.GetStartedAt()))
 }
 
 func TestAddTerminalState_OutputURI(t *testing.T) {
@@ -251,9 +251,9 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		UpdatedAt: occurredAtProto,
 		TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
 			TaskNodeMetadata: &admin.TaskNodeMetadata{
-				CacheStatus:   request.Event.GetTaskNodeMetadata().CacheStatus,
-				CatalogKey:    request.Event.GetTaskNodeMetadata().CatalogKey,
-				CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
+				CacheStatus:   request.GetEvent().GetTaskNodeMetadata().GetCacheStatus(),
+				CatalogKey:    request.GetEvent().GetTaskNodeMetadata().GetCatalogKey(),
+				CheckpointUri: request.GetEvent().GetTaskNodeMetadata().GetCheckpointUri(),
 			},
 		},
 	}
@@ -266,7 +266,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		EventVersion: 2,
 	}
 	internalDataBytes, _ := proto.Marshal(internalData)
-	cacheStatus := request.Event.GetTaskNodeMetadata().CacheStatus.String()
+	cacheStatus := request.GetEvent().GetTaskNodeMetadata().GetCacheStatus().String()
 	assert.Equal(t, &models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: "node id",
@@ -383,7 +383,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 		assert.Equal(t, occurredAt, *nodeExecutionModel.StartedAt)
 		assert.EqualValues(t, occurredAt, *nodeExecutionModel.NodeExecutionUpdatedAt)
 		assert.NotNil(t, nodeExecutionModel.CacheStatus)
-		assert.Equal(t, *nodeExecutionModel.CacheStatus, request.Event.GetTaskNodeMetadata().CacheStatus.String())
+		assert.Equal(t, *nodeExecutionModel.CacheStatus, request.GetEvent().GetTaskNodeMetadata().GetCacheStatus().String())
 		assert.Equal(t, nodeExecutionModel.DynamicWorkflowRemoteClosureReference, dynamicWorkflowClosureRef)
 
 		var closure = &admin.NodeExecutionClosure{
@@ -392,12 +392,12 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 			UpdatedAt: occurredAtProto,
 			TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
 				TaskNodeMetadata: &admin.TaskNodeMetadata{
-					CacheStatus:   request.Event.GetTaskNodeMetadata().CacheStatus,
-					CatalogKey:    request.Event.GetTaskNodeMetadata().CatalogKey,
-					CheckpointUri: request.Event.GetTaskNodeMetadata().CheckpointUri,
+					CacheStatus:   request.GetEvent().GetTaskNodeMetadata().GetCacheStatus(),
+					CatalogKey:    request.GetEvent().GetTaskNodeMetadata().GetCatalogKey(),
+					CheckpointUri: request.GetEvent().GetTaskNodeMetadata().GetCheckpointUri(),
 				},
 			},
-			DynamicJobSpecUri: request.Event.GetTaskNodeMetadata().DynamicWorkflow.DynamicJobSpecUri,
+			DynamicJobSpecUri: request.GetEvent().GetTaskNodeMetadata().GetDynamicWorkflow().GetDynamicJobSpecUri(),
 		}
 		var closureBytes, _ = proto.Marshal(closure)
 		assert.Equal(t, nodeExecutionModel.Closure, closureBytes)
@@ -553,7 +553,7 @@ func TestFromNodeExecutionModel_Error(t *testing.T) {
 	expectedExecErr := execErr
 	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(expectedExecErr, nodeExecution.Closure.GetError()))
+	assert.True(t, proto.Equal(expectedExecErr, nodeExecution.GetClosure().GetError()))
 }
 
 func TestFromNodeExecutionModelWithChildren(t *testing.T) {

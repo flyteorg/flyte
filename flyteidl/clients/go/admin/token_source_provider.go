@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/externalprocess"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -53,7 +54,7 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 				return nil, fmt.Errorf("failed to fetch auth metadata. Error: %v", err)
 			}
 
-			tokenURL = metadata.TokenEndpoint
+			tokenURL = metadata.GetTokenEndpoint()
 		}
 
 		scopes := cfg.Scopes
@@ -66,11 +67,11 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			}
 			// Update scopes from publicClientConfig
 			if len(scopes) == 0 {
-				scopes = publicClientConfig.Scopes
+				scopes = publicClientConfig.GetScopes()
 			}
 			// Update audience from publicClientConfig
 			if cfg.UseAudienceFromAdmin {
-				audienceValue = publicClientConfig.Audience
+				audienceValue = publicClientConfig.GetAudience()
 			}
 		}
 
@@ -229,8 +230,14 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if token, err := s.tokenCache.GetToken(); err == nil && token.Valid() {
-		return token, nil
+	token, err := s.tokenCache.GetToken()
+	if err != nil {
+		logger.Warnf(s.ctx, "failed to get token from cache: %v", err)
+	} else {
+		if isValid := utils.Valid(token); isValid {
+			logger.Infof(context.Background(), "retrieved token from cache with expiry %v", token.Expiry)
+			return token, nil
+		}
 	}
 
 	totalAttempts := s.cfg.MaxRetries + 1 // Add one for initial request attempt
@@ -238,19 +245,21 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 		Duration: s.cfg.PerRetryTimeout.Duration,
 		Steps:    totalAttempts,
 	}
-	var token *oauth2.Token
-	err := retry.OnError(backoff, func(err error) bool {
+
+	err = retry.OnError(backoff, func(err error) bool {
 		return err != nil
 	}, func() (err error) {
 		token, err = s.new.Token()
 		if err != nil {
-			logger.Infof(s.ctx, "failed to get token: %w", err)
-			return fmt.Errorf("failed to get token: %w", err)
+			logger.Infof(s.ctx, "failed to get new token: %w", err)
+			return fmt.Errorf("failed to get new token: %w", err)
 		}
+		logger.Infof(context.Background(), "Fetched new token with expiry %v", token.Expiry)
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		logger.Warnf(s.ctx, "failed to get new token: %v", err)
+		return nil, fmt.Errorf("failed to get new token: %w", err)
 	}
 	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
 
@@ -260,6 +269,29 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 	}
 
 	return token, nil
+}
+
+type InMemoryTokenSourceProvider struct {
+	tokenCache cache.TokenCache
+}
+
+func NewInMemoryTokenSourceProvider(tokenCache cache.TokenCache) TokenSourceProvider {
+	return InMemoryTokenSourceProvider{tokenCache: tokenCache}
+}
+
+func (i InMemoryTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+	return GetInMemoryAuthTokenSource(ctx, i.tokenCache)
+}
+
+// GetInMemoryAuthTokenSource Returns the token source with cached token
+func GetInMemoryAuthTokenSource(ctx context.Context, tokenCache cache.TokenCache) (oauth2.TokenSource, error) {
+	authToken, err := tokenCache.GetToken()
+	if err != nil {
+		return nil, err
+	}
+	return &pkce.SimpleTokenSource{
+		CachedToken: authToken,
+	}, nil
 }
 
 type DeviceFlowTokenSourceProvider struct {

@@ -62,11 +62,11 @@ func TestFileEvent(t *testing.T) {
 	taskEvent := &event.TaskExecutionEvent{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
-			Project:      executionID.Project,
-			Domain:       executionID.Domain,
-			Name:         executionID.Name,
+			Project:      executionID.GetProject(),
+			Domain:       executionID.GetDomain(),
+			Name:         executionID.GetName(),
 		},
-		ParentNodeExecutionId: nodeEvent.Id,
+		ParentNodeExecutionId: nodeEvent.GetId(),
 		Phase:                 core.TaskExecution_FAILED,
 		OccurredAt:            now,
 	}
