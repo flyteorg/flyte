@@ -293,7 +293,7 @@ that integrates all Flyte components into a single binary.
    # Step 4: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly.
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
-   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
    # All logs from flyteadmin, flyteplugins, flytepropeller, etc. will appear in the terminal.
 
 
@@ -327,7 +327,7 @@ The following instructions provide guidance on how to build single binary with y
    # Step 3: Now, you can build the single binary. Go back to Flyte directory.
    make go-tidy
    make compile
-   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
 
 **5. Test by running a hello world workflow.**
 
