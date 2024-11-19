@@ -1,11 +1,14 @@
 package validators
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/santhosh-tekuri/jsonschema"
 	"github.com/wI2L/jsondiff"
+	jscmp "gitlab.com/yvesf/json-schema-compare"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -26,32 +29,31 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	srcSchemaBytes, _ := json.Marshal(sourceMetaData.GetFields())
 	tgtSchemaBytes, _ := json.Marshal(targetMetaData.GetFields())
 
-	patch, _ := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
-	for _, p := range patch {
-		if p.Type == jsondiff.OperationReplace {
-			if strings.Contains(p.Path, "title") {
-				// Ignore title changes to support inheritance
-				continue
-			} else if strings.Contains(p.Path, "max") {
-				// If the value of maxItems, maxProperties, maxLength is changed, the target schema should have a smaller range.
-				if p.OldValue.(int) == -1 || p.OldValue.(int) < p.Value.(int) {
-					return false
-				}
-				continue
-			} else if strings.Contains(p.Path, "min") {
-				// If the value of minItems, minProperties, minLength is changed, the target schema should have a larger range.
-				if p.OldValue.(int) == -1 || p.OldValue.(int) > p.Value.(int) {
-					return false
-				}
-				continue
-			}
-			return false
-		} else if p.Type == jsondiff.OperationAdd {
+	compiler := jsonschema.NewCompiler()
+
+	err := compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
+	if err != nil {
+		return false
+	}
+	err = compiler.AddResource("tgt", bytes.NewReader(tgtSchemaBytes))
+	if err != nil {
+		return false
+	}
+
+	srcSchema, _ := compiler.Compile("src")
+	tgtSchema, _ := compiler.Compile("tgt")
+
+	// Compare the two schemas
+	errs := jscmp.Compare(tgtSchema, srcSchema)
+
+	// Ignore not implemented errors in json-schema-compare (additionalProperties)
+	for _, err := range errs {
+		if !strings.Contains(err.Error(), "not implemented") {
 			return false
 		}
 	}
-	return true
 
+	return true
 }
 
 func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {

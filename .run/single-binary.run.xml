@@ -8,8 +8,6 @@
     <package value="github.com/flyteorg/flyte/cmd" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$" />
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="make cmd/single/dist" run_configuration_type="MAKEFILE_TARGET_RUN_CONFIGURATION" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
