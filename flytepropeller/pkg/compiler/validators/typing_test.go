@@ -558,7 +558,7 @@ func TestMapCasting(t *testing.T) {
 		assert.True(t, castable, "castable from Struct to struct")
 	})
 
-	t.Run("dataclass cast to same dataclass with draft 2020-12 (one level)", func(t *testing.T) {
+	t.Run("SameDataclassOneLevel(draft 2020-12)", func(t *testing.T) {
 		/*
 			@dataclass
 			class A:
@@ -657,7 +657,7 @@ func TestMapCasting(t *testing.T) {
 		assert.True(t, castable, "dataclass castable with one level properties")
 	})
 
-	t.Run("dataclass cast to dataclass with draft 2020-12 (two level)", func(t *testing.T) {
+	t.Run("SameDataclassTwoLevel(draft 2020-12)", func(t *testing.T) {
 		/*
 			@dataclass
 			class A:
@@ -825,7 +825,7 @@ func TestMapCasting(t *testing.T) {
 		assert.True(t, castable, "dataclass castable with two level properties")
 	})
 
-	t.Run("dataclass cast to superset dataclass with draft 2020-12 (one level)", func(t *testing.T) {
+	t.Run("BigToSmallAndChildToParent(dataclass draft 2020-12)", func(t *testing.T) {
 		/*
 			@dataclass
 			class A:
@@ -845,7 +845,10 @@ func TestMapCasting(t *testing.T) {
 						"required": &structpb.Value{
 							Kind: &structpb.Value_ListValue{
 								ListValue: &structpb.ListValue{
-									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+									Values: []*structpb.Value{
+										{Kind: &structpb.Value_StringValue{StringValue: "a"}},
+										{Kind: &structpb.Value_StringValue{StringValue: "b"}},
+									},
 								},
 							},
 						},
