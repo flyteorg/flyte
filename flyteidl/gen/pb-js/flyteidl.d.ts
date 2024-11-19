@@ -4667,8 +4667,9 @@ export namespace flyteidl {
 
             /** SubNodeInterfaceStatus enum. */
             enum SubNodeInterfaceStatus {
-                SUB_NODE_INTERFACE_LIST = 0,
-                SUB_NODE_INTERFACE_ORIGINAL = 1
+                UNKNOWN = 0,
+                SUB_NODE_INTERFACE_LIST = 1,
+                SUB_NODE_INTERFACE_ORIGINAL = 2
             }
         }
 

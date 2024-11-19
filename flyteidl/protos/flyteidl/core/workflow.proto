@@ -149,11 +149,14 @@ message ArrayNode {
     ExecutionMode execution_mode = 5;
 
     enum SubNodeInterfaceStatus {
+        // Set for backwards compatibility to compile ArrayNodes with older versions of flytekit
+        UNKNOWN = 0;
+
         // The original interface is transformed to an array interface
-        SUB_NODE_INTERFACE_LIST = 0;
+        SUB_NODE_INTERFACE_LIST = 1;
 
         // The interface stays as it was originally defined.
-        SUB_NODE_INTERFACE_ORIGINAL = 1;
+        SUB_NODE_INTERFACE_ORIGINAL = 2;
     }
 
     // Indicates whether the sub node's original interface was altered

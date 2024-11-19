@@ -11204,6 +11204,7 @@
                             return "subNodeInterfaceStatus: enum value expected";
                         case 0:
                         case 1:
+                        case 2:
                             break;
                         }
                     return null;
@@ -11227,13 +11228,15 @@
                  * SubNodeInterfaceStatus enum.
                  * @name flyteidl.core.ArrayNode.SubNodeInterfaceStatus
                  * @enum {string}
-                 * @property {number} SUB_NODE_INTERFACE_LIST=0 SUB_NODE_INTERFACE_LIST value
-                 * @property {number} SUB_NODE_INTERFACE_ORIGINAL=1 SUB_NODE_INTERFACE_ORIGINAL value
+                 * @property {number} UNKNOWN=0 UNKNOWN value
+                 * @property {number} SUB_NODE_INTERFACE_LIST=1 SUB_NODE_INTERFACE_LIST value
+                 * @property {number} SUB_NODE_INTERFACE_ORIGINAL=2 SUB_NODE_INTERFACE_ORIGINAL value
                  */
                 ArrayNode.SubNodeInterfaceStatus = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
-                    values[valuesById[0] = "SUB_NODE_INTERFACE_LIST"] = 0;
-                    values[valuesById[1] = "SUB_NODE_INTERFACE_ORIGINAL"] = 1;
+                    values[valuesById[0] = "UNKNOWN"] = 0;
+                    values[valuesById[1] = "SUB_NODE_INTERFACE_LIST"] = 1;
+                    values[valuesById[2] = "SUB_NODE_INTERFACE_ORIGINAL"] = 2;
                     return values;
                 })();
     

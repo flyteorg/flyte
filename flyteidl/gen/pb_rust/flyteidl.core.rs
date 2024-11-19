@@ -2474,10 +2474,12 @@ pub mod array_node {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum SubNodeInterfaceStatus {
+        /// Set for backwards compatibility to compile ArrayNodes with older versions of flytekit
+        Unknown = 0,
         /// The original interface is transformed to an array interface
-        SubNodeInterfaceList = 0,
+        SubNodeInterfaceList = 1,
         /// The interface stays as it was originally defined.
-        SubNodeInterfaceOriginal = 1,
+        SubNodeInterfaceOriginal = 2,
     }
     impl SubNodeInterfaceStatus {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2486,6 +2488,7 @@ pub mod array_node {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
+                SubNodeInterfaceStatus::Unknown => "UNKNOWN",
                 SubNodeInterfaceStatus::SubNodeInterfaceList => "SUB_NODE_INTERFACE_LIST",
                 SubNodeInterfaceStatus::SubNodeInterfaceOriginal => "SUB_NODE_INTERFACE_ORIGINAL",
             }
@@ -2493,6 +2496,7 @@ pub mod array_node {
         /// Creates an enum from field names used in the ProtoBuf definition.
         pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
             match value {
+                "UNKNOWN" => Some(Self::Unknown),
                 "SUB_NODE_INTERFACE_LIST" => Some(Self::SubNodeInterfaceList),
                 "SUB_NODE_INTERFACE_ORIGINAL" => Some(Self::SubNodeInterfaceOriginal),
                 _ => None,

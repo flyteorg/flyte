@@ -559,7 +559,7 @@ export class ArrayNode extends Message<ArrayNode> {
    *
    * @generated from field: flyteidl.core.ArrayNode.SubNodeInterfaceStatus sub_node_interface_status = 6;
    */
-  subNodeInterfaceStatus = ArrayNode_SubNodeInterfaceStatus.SUB_NODE_INTERFACE_LIST;
+  subNodeInterfaceStatus = ArrayNode_SubNodeInterfaceStatus.UNKNOWN;
 
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
@@ -625,23 +625,31 @@ proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.Execut
  */
 export enum ArrayNode_SubNodeInterfaceStatus {
   /**
+   * Set for backwards compatibility to compile ArrayNodes with older versions of flytekit
+   *
+   * @generated from enum value: UNKNOWN = 0;
+   */
+  UNKNOWN = 0,
+
+  /**
    * The original interface is transformed to an array interface
    *
-   * @generated from enum value: SUB_NODE_INTERFACE_LIST = 0;
+   * @generated from enum value: SUB_NODE_INTERFACE_LIST = 1;
    */
-  SUB_NODE_INTERFACE_LIST = 0,
+  SUB_NODE_INTERFACE_LIST = 1,
 
   /**
    * The interface stays as it was originally defined.
    *
-   * @generated from enum value: SUB_NODE_INTERFACE_ORIGINAL = 1;
+   * @generated from enum value: SUB_NODE_INTERFACE_ORIGINAL = 2;
    */
-  SUB_NODE_INTERFACE_ORIGINAL = 1,
+  SUB_NODE_INTERFACE_ORIGINAL = 2,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ArrayNode_SubNodeInterfaceStatus)
 proto3.util.setEnumType(ArrayNode_SubNodeInterfaceStatus, "flyteidl.core.ArrayNode.SubNodeInterfaceStatus", [
-  { no: 0, name: "SUB_NODE_INTERFACE_LIST" },
-  { no: 1, name: "SUB_NODE_INTERFACE_ORIGINAL" },
+  { no: 0, name: "UNKNOWN" },
+  { no: 1, name: "SUB_NODE_INTERFACE_LIST" },
+  { no: 2, name: "SUB_NODE_INTERFACE_ORIGINAL" },
 ]);
 
 /**

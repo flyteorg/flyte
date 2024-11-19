@@ -100,8 +100,10 @@ class ArrayNode(_message.Message):
     FULL_STATE: ArrayNode.ExecutionMode
     class SubNodeInterfaceStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
+        UNKNOWN: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
         SUB_NODE_INTERFACE_LIST: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
         SUB_NODE_INTERFACE_ORIGINAL: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
+    UNKNOWN: ArrayNode.SubNodeInterfaceStatus
     SUB_NODE_INTERFACE_LIST: ArrayNode.SubNodeInterfaceStatus
     SUB_NODE_INTERFACE_ORIGINAL: ArrayNode.SubNodeInterfaceStatus
     NODE_FIELD_NUMBER: _ClassVar[int]

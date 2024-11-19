@@ -4252,11 +4252,12 @@
     "ArrayNodeSubNodeInterfaceStatus": {
       "type": "string",
       "enum": [
+        "UNKNOWN",
         "SUB_NODE_INTERFACE_LIST",
         "SUB_NODE_INTERFACE_ORIGINAL"
       ],
-      "default": "SUB_NODE_INTERFACE_LIST",
-      "description": " - SUB_NODE_INTERFACE_LIST: The original interface is transformed to an array interface\n - SUB_NODE_INTERFACE_ORIGINAL: The interface stays as it was originally defined."
+      "default": "UNKNOWN",
+      "description": " - UNKNOWN: Set for backwards compatibility to compile ArrayNodes with older versions of flytekit\n - SUB_NODE_INTERFACE_LIST: The original interface is transformed to an array interface\n - SUB_NODE_INTERFACE_ORIGINAL: The interface stays as it was originally defined."
     },
     "BlobTypeBlobDimensionality": {
       "type": "string",
