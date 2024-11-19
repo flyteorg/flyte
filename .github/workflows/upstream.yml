@@ -22,11 +22,12 @@ jobs:
 
             @${{ github.event.pull_request.user.login }} run the following commands from a unionai/flyte repo and resolve any conflicts. Be sure to **update the commit message to be OSS friendly**.
             ```
-            git fetch origin
             git remote get-url upstream &>/dev/null || git remote add upstream https://github.com/flyteorg/flyte.git
-            git checkout -b union/upstream-${{ github.event.pull_request.merge_commit_sha }} usptream/master
+            git fetch origin
+            git fetch upstream
+            git checkout -b union/upstream-${{ github.event.pull_request.merge_commit_sha }} upstream/master
             git cherry-pick -e ${{ github.event.pull_request.merge_commit_sha }}
             ```
-            When done, `git push` and create a PR in flyteorg/flyte.
+            When done, `git push upstream union/upstream-${{ github.event.pull_request.merge_commit_sha }}` and create a PR in flyteorg/flyte.
 
             Need help? Unsure if your change should be upstreamed? Ask in [#help-eng](https://unionai.slack.com/archives/C06RE4ZR5QQ)
