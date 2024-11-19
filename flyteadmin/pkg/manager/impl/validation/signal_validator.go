@@ -76,6 +76,10 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 	if err != nil {
 		return err
 	}
+	err = propellervalidators.ValidateLiteralType(valueType)
+	if err != nil {
+		return errors.NewInvalidLiteralTypeError("", err)
+	}
 	if !propellervalidators.AreTypesCastable(lookupSignal.Type, valueType) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"requested signal value [%v] is not castable to existing signal type [%v]",

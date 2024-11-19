@@ -352,3 +352,43 @@ func TestDatasetIDToIdentifier(t *testing.T) {
 	assert.Equal(t, "v", id.Version)
 	assert.Equal(t, "o", id.Org)
 }
+
+func TestGenerateTaskOutputsFromArtifact_IDLNotFound(t *testing.T) {
+	taskID := core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Project:      "project",
+		Domain:       "domain",
+		Name:         "name",
+		Version:      "version",
+	}
+
+	taskInterface := core.TypedInterface{
+		Outputs: &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"output1": {
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: 1000,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	artifact := &datacatalog.Artifact{
+		Id: "artifact_id",
+		Data: []*datacatalog.ArtifactData{
+			{
+				Name:  "output1",
+				Value: &core.Literal{}, // This will cause LiteralTypeForLiteral to return nil
+			},
+		},
+	}
+
+	_, err := GenerateTaskOutputsFromArtifact(taskID, taskInterface, artifact)
+
+	expectedContainedErrorMsg := "failed to validate literal type"
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), expectedContainedErrorMsg)
+}

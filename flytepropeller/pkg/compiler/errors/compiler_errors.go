@@ -96,6 +96,9 @@ const (
 
 	// Field not found in the dataclass
 	FieldNotFoundError ErrorCode = "FieldNotFound"
+
+	// IDL not found when variable binding
+	InvalidLiteralTypeError ErrorCode = "InvalidLiteralType"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -207,6 +210,14 @@ func NewMismatchingTypesErr(nodeID, fromVar, fromType, toType string) *CompileEr
 		MismatchingTypes,
 		fmt.Sprintf("Variable [%v] (type [%v]) doesn't match expected type [%v].", fromVar, fromType,
 			toType),
+		nodeID,
+	)
+}
+
+func NewInvalidLiteralTypeErr(nodeID, inputVar string, err error) *CompileError {
+	return newError(
+		InvalidLiteralTypeError,
+		fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", inputVar, err),
 		nodeID,
 	)
 }

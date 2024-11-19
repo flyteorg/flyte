@@ -255,6 +255,23 @@ func literalTypeForLiterals(literals []*core.Literal) (*core.LiteralType, bool) 
 	return buildMultipleTypeUnion(innerType), isOffloadedType
 }
 
+// ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
+func ValidateLiteralType(lt *core.LiteralType) error {
+	if lt == nil {
+		err := fmt.Errorf("got unknown literal type: [%v].\n"+
+			"Suggested solution: Please update all your Flyte deployment images to the latest version and try again", lt)
+		return err
+	}
+	if lt.GetCollectionType() != nil {
+		return ValidateLiteralType(lt.GetCollectionType())
+	}
+	if lt.GetMapValueType() != nil {
+		return ValidateLiteralType(lt.GetMapValueType())
+	}
+
+	return nil
+}
+
 // LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
 // type None if the literal is a non-homogeneous type.
 func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {

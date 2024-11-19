@@ -17,6 +17,8 @@ import (
 
 var execConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
+const failedToValidateLiteralType = "Failed to validate literal type"
+
 func TestValidateExecEmptyProject(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Project = ""
@@ -188,6 +190,42 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
 	assert.EqualValues(t, expectedMap, *actualInputs)
+}
+
+func TestValidateExecUnknownIDLInputs(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	userInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := CheckAndFetchInputsForExecution(
+		userInputs,
+		nil,
+		defaultInputs,
+	)
+	assert.NotNil(t, err)
+
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
 }
 
 func TestValidExecutionId(t *testing.T) {

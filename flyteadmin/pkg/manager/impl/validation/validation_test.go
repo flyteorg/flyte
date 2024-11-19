@@ -320,6 +320,35 @@ func TestValidateParameterMap(t *testing.T) {
 		err := validateParameterMap(&exampleMap, "some text")
 		assert.NoError(t, err)
 	})
+	t.Run("invalid because inputType is nil", func(t *testing.T) {
+		// Create a literal that will cause LiteralTypeForLiteral to return nil.
+		// For example, a scalar with no value.
+		unsupportedLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{},
+			},
+		}
+
+		name := "foo"
+		fieldName := "test_field_name"
+		exampleMap := core.ParameterMap{
+			Parameters: map[string]*core.Parameter{
+				name: {
+					Var: &core.Variable{
+						// 1000 means an unsupported type
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+					},
+					Behavior: &core.Parameter_Default{
+						Default: unsupportedLiteral,
+					},
+				},
+			},
+		}
+		err := validateParameterMap(&exampleMap, fieldName)
+		assert.Error(t, err)
+		fmt.Println(err.Error())
+		assert.Contains(t, err.Error(), failedToValidateLiteralType)
+	})
 }
 
 func TestValidateToken(t *testing.T) {

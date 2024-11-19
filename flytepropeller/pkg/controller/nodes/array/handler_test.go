@@ -21,6 +21,7 @@ import (
 	execmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -1040,6 +1041,86 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				}
 
 				nCtx.ExecutionContext().(*execmocks.ExecutionContext).AssertNumberOfCalls(t, "IncrementParallelism", int(test.incrementParallelismCount))
+			})
+		}
+	}
+}
+
+func TestHandle_InvalidLiteralType(t *testing.T) {
+	ctx := context.Background()
+	scope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, scope)
+	assert.NoError(t, err)
+	nodeHandler := &mocks.NodeHandler{}
+
+	// Initialize ArrayNodeHandler
+	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
+	assert.NoError(t, err)
+
+	// Test cases
+	tests := []struct {
+		name                      string
+		inputLiteral              *idlcore.Literal
+		expectedTransitionType    handler.TransitionType
+		expectedPhase             handler.EPhase
+		expectedErrorCode         string
+		expectedContainedErrorMsg string
+	}{
+		{
+			name: "InvalidLiteralType",
+			inputLiteral: &idlcore.Literal{
+				Value: &idlcore.Literal_Scalar{
+					Scalar: &idlcore.Scalar{},
+				},
+			},
+			expectedTransitionType:    handler.TransitionTypeEphemeral,
+			expectedPhase:             handler.EPhaseFailed,
+			expectedErrorCode:         errors.IDLNotFoundErr,
+			expectedContainedErrorMsg: "Failed to validate literal type",
+		},
+	}
+
+	// Loop over arrayNodeSpecs to define arrayNodeSpec
+	for _, test := range tests {
+		for specName, arrayNodeSpec := range arrayNodeSpecs {
+			t.Run(fmt.Sprintf("%s-%s", test.name, specName), func(t *testing.T) {
+				// Create NodeExecutionContext
+				literalMap := &idlcore.LiteralMap{
+					Literals: map[string]*idlcore.Literal{
+						"invalidInput": test.inputLiteral,
+					},
+				}
+				arrayNodeState := &handler.ArrayNodeState{
+					Phase: v1alpha1.ArrayNodePhaseNone,
+				}
+
+				// Initialize subNodeStatus if needed
+				subNodeStatus := make(map[v1alpha1.NodeID]*v1alpha1.NodeStatus)
+
+				// Call createNodeExecutionContext with all required arguments
+				nCtx := createNodeExecutionContext(
+					dataStore,
+					newBufferedEventRecorder(),
+					nil, // outputVariables
+					literalMap,
+					arrayNodeSpec,
+					arrayNodeState,
+					0,                      // currentParallelism
+					workflowMaxParallelism, // Ensure workflowMaxParallelism is accessible
+					subNodeStatus,
+				)
+
+				// Evaluate node
+				transition, err := arrayNodeHandler.Handle(ctx, nCtx)
+				assert.NoError(t, err)
+
+				// Validate results
+				assert.Equal(t, test.expectedTransitionType, transition.Type())
+				assert.Equal(t, test.expectedPhase, transition.Info().GetPhase())
+				assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().Code)
+				assert.Contains(t, transition.Info().GetErr().Message, test.expectedContainedErrorMsg)
 			})
 		}
 	}

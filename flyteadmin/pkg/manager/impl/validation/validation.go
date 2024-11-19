@@ -304,6 +304,11 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 			defaultValue := defaultInput.GetDefault()
 			if defaultValue != nil {
 				inputType := validators.LiteralTypeForLiteral(defaultValue)
+				err := validators.ValidateLiteralType(inputType)
+				if err != nil {
+					return errors.NewInvalidLiteralTypeError(name, err)
+				}
+
 				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {
 					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 						"Type mismatch for Parameter %s in %s has type %s, expected %s", name, fieldName,
