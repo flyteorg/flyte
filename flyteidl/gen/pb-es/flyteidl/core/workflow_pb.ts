@@ -555,11 +555,11 @@ export class ArrayNode extends Message<ArrayNode> {
   executionMode = ArrayNode_ExecutionMode.MINIMAL_STATE;
 
   /**
-   * Indicates whether the sub node's original interface was overridden
+   * Indicates whether the sub node's original interface was altered
    *
-   * @generated from field: bool is_original_sub_node_interface = 6;
+   * @generated from field: flyteidl.core.ArrayNode.SubNodeInterfaceStatus sub_node_interface_status = 6;
    */
-  isOriginalSubNodeInterface = false;
+  subNodeInterfaceStatus = ArrayNode_SubNodeInterfaceStatus.SUB_NODE_INTERFACE_LIST;
 
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
@@ -574,7 +574,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
     { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
-    { no: 6, name: "is_original_sub_node_interface", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "sub_node_interface_status", kind: "enum", T: proto3.getEnumType(ArrayNode_SubNodeInterfaceStatus) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -618,6 +618,30 @@ export enum ArrayNode_ExecutionMode {
 proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.ExecutionMode", [
   { no: 0, name: "MINIMAL_STATE" },
   { no: 1, name: "FULL_STATE" },
+]);
+
+/**
+ * @generated from enum flyteidl.core.ArrayNode.SubNodeInterfaceStatus
+ */
+export enum ArrayNode_SubNodeInterfaceStatus {
+  /**
+   * The original interface is transformed to an array interface
+   *
+   * @generated from enum value: SUB_NODE_INTERFACE_LIST = 0;
+   */
+  SUB_NODE_INTERFACE_LIST = 0,
+
+  /**
+   * The interface stays as it was originally defined.
+   *
+   * @generated from enum value: SUB_NODE_INTERFACE_ORIGINAL = 1;
+   */
+  SUB_NODE_INTERFACE_ORIGINAL = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ArrayNode_SubNodeInterfaceStatus)
+proto3.util.setEnumType(ArrayNode_SubNodeInterfaceStatus, "flyteidl.core.ArrayNode.SubNodeInterfaceStatus", [
+  { no: 0, name: "SUB_NODE_INTERFACE_LIST" },
+  { no: 1, name: "SUB_NODE_INTERFACE_ORIGINAL" },
 ]);
 
 /**

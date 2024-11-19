@@ -10982,7 +10982,7 @@
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
-                 * @property {boolean|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
+                 * @property {flyteidl.core.ArrayNode.SubNodeInterfaceStatus|null} [subNodeInterfaceStatus] ArrayNode subNodeInterfaceStatus
                  */
     
                 /**
@@ -11041,12 +11041,12 @@
                 ArrayNode.prototype.executionMode = 0;
     
                 /**
-                 * ArrayNode isOriginalSubNodeInterface.
-                 * @member {boolean} isOriginalSubNodeInterface
+                 * ArrayNode subNodeInterfaceStatus.
+                 * @member {flyteidl.core.ArrayNode.SubNodeInterfaceStatus} subNodeInterfaceStatus
                  * @memberof flyteidl.core.ArrayNode
                  * @instance
                  */
-                ArrayNode.prototype.isOriginalSubNodeInterface = false;
+                ArrayNode.prototype.subNodeInterfaceStatus = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11107,8 +11107,8 @@
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
                     if (message.executionMode != null && message.hasOwnProperty("executionMode"))
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
-                    if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
-                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.isOriginalSubNodeInterface);
+                    if (message.subNodeInterfaceStatus != null && message.hasOwnProperty("subNodeInterfaceStatus"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).int32(message.subNodeInterfaceStatus);
                     return writer;
                 };
     
@@ -11146,7 +11146,7 @@
                             message.executionMode = reader.int32();
                             break;
                         case 6:
-                            message.isOriginalSubNodeInterface = reader.bool();
+                            message.subNodeInterfaceStatus = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11198,9 +11198,14 @@
                         case 1:
                             break;
                         }
-                    if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
-                        if (typeof message.isOriginalSubNodeInterface !== "boolean")
-                            return "isOriginalSubNodeInterface: boolean expected";
+                    if (message.subNodeInterfaceStatus != null && message.hasOwnProperty("subNodeInterfaceStatus"))
+                        switch (message.subNodeInterfaceStatus) {
+                        default:
+                            return "subNodeInterfaceStatus: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
     
@@ -11215,6 +11220,20 @@
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "MINIMAL_STATE"] = 0;
                     values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
+    
+                /**
+                 * SubNodeInterfaceStatus enum.
+                 * @name flyteidl.core.ArrayNode.SubNodeInterfaceStatus
+                 * @enum {string}
+                 * @property {number} SUB_NODE_INTERFACE_LIST=0 SUB_NODE_INTERFACE_LIST value
+                 * @property {number} SUB_NODE_INTERFACE_ORIGINAL=1 SUB_NODE_INTERFACE_ORIGINAL value
+                 */
+                ArrayNode.SubNodeInterfaceStatus = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "SUB_NODE_INTERFACE_LIST"] = 0;
+                    values[valuesById[1] = "SUB_NODE_INTERFACE_ORIGINAL"] = 1;
                     return values;
                 })();
     

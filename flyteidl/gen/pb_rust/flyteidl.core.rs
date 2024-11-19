@@ -2431,9 +2431,9 @@ pub struct ArrayNode {
     /// execution_mode determines the execution path for ArrayNode.
     #[prost(enumeration="array_node::ExecutionMode", tag="5")]
     pub execution_mode: i32,
-    /// Indicates whether the sub node's original interface was overridden
-    #[prost(bool, tag="6")]
-    pub is_original_sub_node_interface: bool,
+    /// Indicates whether the sub node's original interface was altered
+    #[prost(enumeration="array_node::SubNodeInterfaceStatus", tag="6")]
+    pub sub_node_interface_status: i32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -2467,6 +2467,34 @@ pub mod array_node {
             match value {
                 "MINIMAL_STATE" => Some(Self::MinimalState),
                 "FULL_STATE" => Some(Self::FullState),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum SubNodeInterfaceStatus {
+        /// The original interface is transformed to an array interface
+        SubNodeInterfaceList = 0,
+        /// The interface stays as it was originally defined.
+        SubNodeInterfaceOriginal = 1,
+    }
+    impl SubNodeInterfaceStatus {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                SubNodeInterfaceStatus::SubNodeInterfaceList => "SUB_NODE_INTERFACE_LIST",
+                SubNodeInterfaceStatus::SubNodeInterfaceOriginal => "SUB_NODE_INTERFACE_ORIGINAL",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "SUB_NODE_INTERFACE_LIST" => Some(Self::SubNodeInterfaceList),
+                "SUB_NODE_INTERFACE_ORIGINAL" => Some(Self::SubNodeInterfaceOriginal),
                 _ => None,
             }
         }

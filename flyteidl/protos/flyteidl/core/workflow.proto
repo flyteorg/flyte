@@ -148,8 +148,16 @@ message ArrayNode {
     // execution_mode determines the execution path for ArrayNode.
     ExecutionMode execution_mode = 5;
 
-    // Indicates whether the sub node's original interface was overridden
-    bool is_original_sub_node_interface = 6;
+    enum SubNodeInterfaceStatus {
+        // The original interface is transformed to an array interface
+        SUB_NODE_INTERFACE_LIST = 0;
+
+        // The interface stays as it was originally defined.
+        SUB_NODE_INTERFACE_ORIGINAL = 1;
+    }
+
+    // Indicates whether the sub node's original interface was altered
+    SubNodeInterfaceStatus sub_node_interface_status = 6;
 }
 
 // Defines extra information about the Node.
