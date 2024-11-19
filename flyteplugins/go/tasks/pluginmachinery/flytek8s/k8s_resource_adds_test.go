@@ -382,13 +382,12 @@ func TestDecorateEnvVars(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NoError(t, propellerCfg.SetConfig(&propellerCfg.Config{
-				LiteralOffloadingConfig: propellerCfg.LiteralOffloadingConfig{
-					Enabled:                  tt.offloadingEnabled,
-					MinSizeInMBForOffloading: 1,
-					MaxSizeInMBForOffloading: 42,
-				},
-			}))
+			cfg := propellerCfg.GetConfig()
+			cfg.LiteralOffloadingConfig = propellerCfg.LiteralOffloadingConfig{
+				Enabled:                  tt.offloadingEnabled,
+				MinSizeInMBForOffloading: 1,
+				MaxSizeInMBForOffloading: 42,
+			}
 
 			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 				DefaultEnvVars:        tt.additionEnvVar,

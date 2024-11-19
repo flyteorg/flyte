@@ -356,11 +356,6 @@ func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
 
-// SetConfig should be used for TESTING ONLY as it sets current value for the config.
-func SetConfig(cfg *Config) error {
-	return configSection.SetConfig(cfg)
-}
-
 // MustRegisterSubSection can be used to configure any subsections the the propeller configuration
 func MustRegisterSubSection(subSectionKey string, section config.Config) config.Section {
 	return configSection.MustRegisterSection(subSectionKey, section)
