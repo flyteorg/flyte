@@ -64,8 +64,9 @@ var (
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
-		UpdateBaseBackoffDuration: 10,
-		UpdateBackoffRetries:      5,
+		UpdateBaseBackoffDuration:          10,
+		UpdateBackoffRetries:               5,
+		AddTolerationsForExtendedResources: []string{},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -214,6 +215,9 @@ type K8sPluginConfig struct {
 
 	// Number of retries for exponential backoff when updating a resource.
 	UpdateBackoffRetries int `json:"update-backoff-retries" pflag:",Number of retries for exponential backoff when updating a resource."`
+
+	// Extended resources that should be added to the tolerations automatically.
+	AddTolerationsForExtendedResources []string `json:"add-tolerations-for-extended-resources" pflag:",Name of the extended resources for which tolerations should be added."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

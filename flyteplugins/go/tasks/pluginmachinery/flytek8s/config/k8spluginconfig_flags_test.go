@@ -365,4 +365,18 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_add-tolerations-for-extended-resources", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_K8sPluginConfig(defaultK8sConfig.AddTolerationsForExtendedResources, ",")
+
+			cmdFlags.Set("add-tolerations-for-extended-resources", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("add-tolerations-for-extended-resources"); err == nil {
+				testDecodeRaw_K8sPluginConfig(t, join_K8sPluginConfig(vStringSlice, ","), &actual.AddTolerationsForExtendedResources)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
