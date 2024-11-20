@@ -7,6 +7,7 @@ jupytext:
 ---
 
 (developing_agents)=
+
 # Developing agents
 
 The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Rather than building a complete gRPC service from scratch, you can implement an agent as a Python class, easing development. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
@@ -20,8 +21,9 @@ We strongly encourage you to contribute your agent to the Flyte community. To do
 ```
 
 There are two types of agents: **async** and **sync**.
-* **Async agents** enable long-running jobs that execute on an external platform over time. They communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
-* **Sync agents** enable request/response services that return immediate outputs (e.g. calling an internal API to fetch data or communicating with the OpenAI API).
+
+- **Async agents** enable long-running jobs that execute on an external platform over time. They communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
+- **Sync agents** enable request/response services that return immediate outputs (e.g. calling an internal API to fetch data or communicating with the OpenAI API).
 
 ```{note}
 
@@ -40,6 +42,15 @@ To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/fl
 - `create`: This method is used to initiate a new job. Users have the flexibility to use gRPC, REST, or an SDK to create a job.
 - `get`: This method retrieves the job resource (jobID or output literal) associated with the task, such as a BigQuery job ID or Databricks task ID.
 - `delete`: Invoking this method will send a request to delete the corresponding job.
+
+```{note}
+
+When users use create method to create a new job, with its job ID, they can use get method and job ID to check the execution state, if it is succeed or not.
+
+Exceptional delete case:
+If users interrupt task during it's running, FlytePropeller will invoke delete method to corresponding job.
+
+```
 
 ```python
 from typing import Optional
@@ -113,6 +124,7 @@ AgentRegistry.register(OpenAIAgent())
 ```
 
 #### Sensor interface specification
+
 With the agent framework, you can easily build a custom sensor in Flyte to watch certain events or monitor the bucket in your workflow.
 
 To create a new sensor, extend the `[BaseSensor](https://github.com/flyteorg/flytekit/blob/master/flytekit/sensor/base_sensor.py#L43)` class and implement the `poke` method, which checks whether a specific condition is met.
@@ -129,7 +141,6 @@ class FileSensor(BaseSensor):
         fs = s3fs.S3FileSystem()
         return fs.exists(path)
 ```
-
 
 ### 2. Test the agent
 
@@ -181,29 +192,29 @@ By default, all agent requests will be sent to the default agent service. Howeve
 you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration.
 
 ```yaml
- plugins:
-   agent-service:
-     # By default, all requests will be sent to the default agent.
-     defaultAgent:
-       endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
-       insecure: true
-       timeouts:
-         # CreateTask, GetTask and DeleteTask are for async agents.
-         # ExecuteTaskSync is for sync agents.
-         CreateTask: 5s
-         GetTask: 5s
-         DeleteTask: 5s
-         ExecuteTaskSync: 10s
-       defaultTimeout: 10s
-     agents:
-       custom_agent:
-         endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
-         insecure: false
-         defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
-         timeouts:
-           GetTask: 5s
-         defaultTimeout: 10s
-     agentForTaskTypes:
-       # It will override the default agent for custom_task, which means propeller will send the request to this agent.
-       - custom_task: custom_agent
+plugins:
+  agent-service:
+    # By default, all requests will be sent to the default agent.
+    defaultAgent:
+      endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+      insecure: true
+      timeouts:
+        # CreateTask, GetTask and DeleteTask are for async agents.
+        # ExecuteTaskSync is for sync agents.
+        CreateTask: 5s
+        GetTask: 5s
+        DeleteTask: 5s
+        ExecuteTaskSync: 10s
+      defaultTimeout: 10s
+    agents:
+      custom_agent:
+        endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
+        insecure: false
+        defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+        timeouts:
+          GetTask: 5s
+        defaultTimeout: 10s
+    agentForTaskTypes:
+      # It will override the default agent for custom_task, which means propeller will send the request to this agent.
+      - custom_task: custom_agent
 ```
