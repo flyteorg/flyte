@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -13,6 +12,7 @@ import (
 	jscmp "gitlab.com/yvesf/json-schema-compare"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type typeChecker interface {
