@@ -1,4 +1,4 @@
-(pydantic)=
+(pydantic_basemodel)=
 
 # Pydantic BaseModel
 
@@ -6,21 +6,22 @@
 .. tags:: Basic
 ```
 
-When you've multiple values that you want to send across Flyte entities, and you want them to have, you can use a `pydantic.BaseModel`.
-Note:
-You can put Dataclass and FlyteTypes (FlyteFile, FlyteDirectory, FlyteSchema, and StructuredDataset) in a pydantic BaseModel.
+When you have multiple values that you want to send across Flyte entities, and you want them to have, you can use a `pydantic.BaseModel`.
 
 :::{important}
 Pydantic BaseModel V2 only works when you are using flytekit version >= v1.14.0.
 :::
 
 :::{important}
-If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for pydantic basemodels,
+If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for Pydantic BaseModels,
 you can set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 
-For more details, you can refer the MSGPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
+For more details, you can refer the MESSAGEPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
 :::
 
+```{note}
+You can put Dataclass and FlyteTypes (FlyteFile, FlyteDirectory, FlyteSchema, and StructuredDataset) in a pydantic BaseModel.
+```
 
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
@@ -40,14 +41,14 @@ Build your custom image with ImageSpec:
 ```
 
 ## Python types
-We define a `dataclass` with `int`, `str` and `dict` as the data types.
+We define a `pydantic basemodel` with `int`, `str` and `dict` as the data types.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/pydantic_basemodel.py
 :caption: data_types_and_io/pydantic_basemodel.py
 :pyobject: Datum
 ```
 
-You can send a `dataclass` between different tasks written in various languages, and input it through the Flyte console as raw JSON.
+You can send a `pydantic basemodel` between different tasks written in various languages, and input it through the Flyte console as raw JSON.
 
 :::{note}
 All variables in a data class should be **annotated with their type**. Failure to do should will result in an error.

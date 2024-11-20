@@ -23,7 +23,7 @@ To begin, import the required dependencies and define a common task for subseque
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 1-10
+:lines: 1-9
 ```
 
 ## List
@@ -35,7 +35,7 @@ Flyte currently does not support output promise access through list slicing.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 14-23
+:lines: 13-22
 ```
 
 ## Dictionary
@@ -43,7 +43,7 @@ Access the output dictionary by specifying the key.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 27-35
+:lines: 26-34
 ```
 
 ## Data class
@@ -51,7 +51,7 @@ Directly access an attribute of a dataclass.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 39-53
+:lines: 38-51
 ```
 
 ## Complex type
@@ -59,14 +59,14 @@ Combinations of list, dict and dataclass also work effectively.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 57-80
+:lines: 55-78
 ```
 
 You can run all the workflows locally as follows:
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
-:lines: 84-88
+:lines: 82-86
 ```
 
 ## Failure scenario
