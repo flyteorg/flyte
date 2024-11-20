@@ -2,7 +2,9 @@ package validators
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -47,6 +49,7 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	errs := jscmp.Compare(tgtSchema, srcSchema)
 
 	// Ignore not implemented errors in json-schema-compare (additionalProperties)
+	// TODO: Explain why we use for loop here to check error msg
 	for _, err := range errs {
 		if !strings.Contains(err.Error(), "not implemented") {
 			return false
@@ -57,13 +60,26 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 }
 
 func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
-	srcSchemaBytes, _ := json.Marshal(sourceMetaData.GetFields())
-	tgtSchemaBytes, _ := json.Marshal(targetMetaData.GetFields())
-
-	patch, err := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	srcSchemaBytes, err := json.Marshal(sourceMetaData.GetFields())
 	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal source metadata: %v", err)
 		return false
 	}
+
+	tgtSchemaBytes, err := json.Marshal(targetMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal target metadata: %v", err)
+		return false
+	}
+
+	// Use jsondiff to compare the two schemas
+	patch, err := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compare JSON schemas: %v", err)
+		return false
+	}
+
+	// If the length of the patch is zero, the two JSON structures are identical
 	return len(patch) == 0
 }
 
@@ -86,10 +102,16 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 		return false
 	}
 
+	// Related Issue: https://github.com/flyteorg/flyte/issues/5489
+	// RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md#flytepropeller
 	if upstreamType.GetSimple() == flyte.SimpleType_STRUCT && t.literalType.GetSimple() == flyte.SimpleType_STRUCT {
+		// Json Schema is stored in Metadata
 		upstreamMetaData := upstreamType.GetMetadata()
 		downstreamMetaData := t.literalType.GetMetadata()
 
+		// There's bug in flytekit's dataclass Transformer to generate JSON Scheam before,
+		// in some case, we the JSON Schema will be nil, so we can only pass it to support
+		// backward compatible. (reference task should be supported.)
 		if upstreamMetaData == nil || downstreamMetaData == nil {
 			return true
 		}
