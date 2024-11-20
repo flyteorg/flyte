@@ -35,10 +35,12 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 
 	err := compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
 	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: %v", err)
 		return false
 	}
 	err = compiler.AddResource("tgt", bytes.NewReader(tgtSchemaBytes))
 	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: %v", err)
 		return false
 	}
 
