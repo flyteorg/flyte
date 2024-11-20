@@ -21,6 +21,7 @@ launch_plans
 imperative_workflows
 documenting_workflows
 shell_tasks
+test
+https://raw.githubusercontent.com/Mecoli1219/flytesnacks/85966d139a9a3ccdf3323124563960fdd5f5844a/examples/basics/basics/basic_interactive_mode.ipynb
 named_outputs
-/examples/basics/basics/basic_interactive_mode
 ```
