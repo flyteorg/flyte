@@ -28,22 +28,40 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	// For custom types, we expect the JSON schemas in the metadata to come from the same JSON schema package,
 	// specifically draft 2020-12 from Mashumaro.
 
-	srcSchemaBytes, _ := json.Marshal(sourceMetaData.GetFields())
-	tgtSchemaBytes, _ := json.Marshal(targetMetaData.GetFields())
+	srcSchemaBytes, err := json.Marshal(sourceMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal source metadata: [%v]", err)
+		return false
+	}
+	tgtSchemaBytes, err := json.Marshal(targetMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal target metadata: [%v]", err)
+		return false
+	}
 
 	compiler := jsonschema.NewCompiler()
 
-	err := compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
+	err = compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
 	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: [%v]", err)
 		return false
 	}
 	err = compiler.AddResource("tgt", bytes.NewReader(tgtSchemaBytes))
 	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: [%v]", err)
 		return false
 	}
 
-	srcSchema, _ := compiler.Compile("src")
-	tgtSchema, _ := compiler.Compile("tgt")
+	srcSchema, err := compiler.Compile("src")
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compile source schema: [%v]", err)
+		return false
+	}
+	tgtSchema, err := compiler.Compile("tgt")
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compile target schema: [%v]", err)
+		return false
+	}
 
 	// Compare the two schemas
 	errs := jscmp.Compare(tgtSchema, srcSchema)
@@ -63,20 +81,20 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	srcSchemaBytes, err := json.Marshal(sourceMetaData.GetFields())
 	if err != nil {
-		logger.Infof(context.Background(), "Failed to marshal source metadata: %v", err)
+		logger.Infof(context.Background(), "Failed to marshal source metadata: [%v]", err)
 		return false
 	}
 
 	tgtSchemaBytes, err := json.Marshal(targetMetaData.GetFields())
 	if err != nil {
-		logger.Infof(context.Background(), "Failed to marshal target metadata: %v", err)
+		logger.Infof(context.Background(), "Failed to marshal target metadata: [%v]", err)
 		return false
 	}
 
 	// Use jsondiff to compare the two schemas
 	patch, err := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
 	if err != nil {
-		logger.Infof(context.Background(), "Failed to compare JSON schemas: %v", err)
+		logger.Infof(context.Background(), "Failed to compare JSON schemas: [%v]", err)
 		return false
 	}
 
