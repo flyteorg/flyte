@@ -48,8 +48,9 @@ func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
 	// Compare the two schemas
 	errs := jscmp.Compare(tgtSchema, srcSchema)
 
-	// Ignore not implemented errors in json-schema-compare (additionalProperties)
-	// TODO: Explain why we use for loop here to check error msg
+	// Ignore the "not implemented" errors from json-schema-compare (additionalProperties, additionalItems, etc.)
+	// While handling nested structures, we might have multiple "not implemented" errors for a single field as well.
+	// If all the errors are "not implemented", we can consider the source schema as a supertype of the target schema.
 	for _, err := range errs {
 		if !strings.Contains(err.Error(), "not implemented") {
 			return false
