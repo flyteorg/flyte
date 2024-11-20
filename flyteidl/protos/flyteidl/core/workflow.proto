@@ -148,19 +148,8 @@ message ArrayNode {
     // execution_mode determines the execution path for ArrayNode.
     ExecutionMode execution_mode = 5;
 
-    enum SubNodeInterfaceStatus {
-        // Set for backwards compatibility to compile ArrayNodes with older versions of flytekit
-        UNKNOWN = 0;
-
-        // The original interface is transformed to an array interface
-        SUB_NODE_INTERFACE_LIST = 1;
-
-        // The interface stays as it was originally defined.
-        SUB_NODE_INTERFACE_ORIGINAL = 2;
-    }
-
     // Indicates whether the sub node's original interface was altered
-    SubNodeInterfaceStatus sub_node_interface_status = 6;
+    google.protobuf.BoolValue is_original_sub_node_interface = 6;
 }
 
 // Defines extra information about the Node.

@@ -4249,16 +4249,6 @@
       },
       "title": "Sets custom attributes for a project, domain and workflow combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
-    "ArrayNodeSubNodeInterfaceStatus": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "SUB_NODE_INTERFACE_LIST",
-        "SUB_NODE_INTERFACE_ORIGINAL"
-      ],
-      "default": "UNKNOWN",
-      "description": " - UNKNOWN: Set for backwards compatibility to compile ArrayNodes with older versions of flytekit\n - SUB_NODE_INTERFACE_LIST: The original interface is transformed to an array interface\n - SUB_NODE_INTERFACE_ORIGINAL: The interface stays as it was originally defined."
-    },
     "BlobTypeBlobDimensionality": {
       "type": "string",
       "enum": [
@@ -6571,8 +6561,8 @@
           "$ref": "#/definitions/coreArrayNodeExecutionMode",
           "description": "execution_mode determines the execution path for ArrayNode."
         },
-        "sub_node_interface_status": {
-          "$ref": "#/definitions/ArrayNodeSubNodeInterfaceStatus",
+        "is_original_sub_node_interface": {
+          "type": "boolean",
           "title": "Indicates whether the sub node's original interface was altered"
         }
       },

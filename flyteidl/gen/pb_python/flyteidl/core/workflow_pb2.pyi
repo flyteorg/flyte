@@ -91,34 +91,26 @@ class GateNode(_message.Message):
     def __init__(self, approve: _Optional[_Union[ApproveCondition, _Mapping]] = ..., signal: _Optional[_Union[SignalCondition, _Mapping]] = ..., sleep: _Optional[_Union[SleepCondition, _Mapping]] = ...) -> None: ...
 
 class ArrayNode(_message.Message):
-    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode", "sub_node_interface_status"]
+    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode", "is_original_sub_node_interface"]
     class ExecutionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         MINIMAL_STATE: _ClassVar[ArrayNode.ExecutionMode]
         FULL_STATE: _ClassVar[ArrayNode.ExecutionMode]
     MINIMAL_STATE: ArrayNode.ExecutionMode
     FULL_STATE: ArrayNode.ExecutionMode
-    class SubNodeInterfaceStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        UNKNOWN: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
-        SUB_NODE_INTERFACE_LIST: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
-        SUB_NODE_INTERFACE_ORIGINAL: _ClassVar[ArrayNode.SubNodeInterfaceStatus]
-    UNKNOWN: ArrayNode.SubNodeInterfaceStatus
-    SUB_NODE_INTERFACE_LIST: ArrayNode.SubNodeInterfaceStatus
-    SUB_NODE_INTERFACE_ORIGINAL: ArrayNode.SubNodeInterfaceStatus
     NODE_FIELD_NUMBER: _ClassVar[int]
     PARALLELISM_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESS_RATIO_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_MODE_FIELD_NUMBER: _ClassVar[int]
-    SUB_NODE_INTERFACE_STATUS_FIELD_NUMBER: _ClassVar[int]
+    IS_ORIGINAL_SUB_NODE_INTERFACE_FIELD_NUMBER: _ClassVar[int]
     node: Node
     parallelism: int
     min_successes: int
     min_success_ratio: float
     execution_mode: ArrayNode.ExecutionMode
-    sub_node_interface_status: ArrayNode.SubNodeInterfaceStatus
-    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., sub_node_interface_status: _Optional[_Union[ArrayNode.SubNodeInterfaceStatus, str]] = ...) -> None: ...
+    is_original_sub_node_interface: _wrappers_pb2.BoolValue
+    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
     __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]

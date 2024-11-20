@@ -4587,8 +4587,8 @@ export namespace flyteidl {
             /** ArrayNode executionMode */
             executionMode?: (flyteidl.core.ArrayNode.ExecutionMode|null);
 
-            /** ArrayNode subNodeInterfaceStatus */
-            subNodeInterfaceStatus?: (flyteidl.core.ArrayNode.SubNodeInterfaceStatus|null);
+            /** ArrayNode isOriginalSubNodeInterface */
+            isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4615,8 +4615,8 @@ export namespace flyteidl {
             /** ArrayNode executionMode. */
             public executionMode: flyteidl.core.ArrayNode.ExecutionMode;
 
-            /** ArrayNode subNodeInterfaceStatus. */
-            public subNodeInterfaceStatus: flyteidl.core.ArrayNode.SubNodeInterfaceStatus;
+            /** ArrayNode isOriginalSubNodeInterface. */
+            public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4663,13 +4663,6 @@ export namespace flyteidl {
             enum ExecutionMode {
                 MINIMAL_STATE = 0,
                 FULL_STATE = 1
-            }
-
-            /** SubNodeInterfaceStatus enum. */
-            enum SubNodeInterfaceStatus {
-                UNKNOWN = 0,
-                SUB_NODE_INTERFACE_LIST = 1,
-                SUB_NODE_INTERFACE_ORIGINAL = 2
             }
         }
 

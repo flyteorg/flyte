@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3 } from "@bufbuild/protobuf";
+import { BoolValue, Duration, Message, proto3 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
@@ -557,9 +557,9 @@ export class ArrayNode extends Message<ArrayNode> {
   /**
    * Indicates whether the sub node's original interface was altered
    *
-   * @generated from field: flyteidl.core.ArrayNode.SubNodeInterfaceStatus sub_node_interface_status = 6;
+   * @generated from field: google.protobuf.BoolValue is_original_sub_node_interface = 6;
    */
-  subNodeInterfaceStatus = ArrayNode_SubNodeInterfaceStatus.UNKNOWN;
+  isOriginalSubNodeInterface?: boolean;
 
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
@@ -574,7 +574,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
     { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
-    { no: 6, name: "sub_node_interface_status", kind: "enum", T: proto3.getEnumType(ArrayNode_SubNodeInterfaceStatus) },
+    { no: 6, name: "is_original_sub_node_interface", kind: "message", T: BoolValue },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -618,38 +618,6 @@ export enum ArrayNode_ExecutionMode {
 proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.ExecutionMode", [
   { no: 0, name: "MINIMAL_STATE" },
   { no: 1, name: "FULL_STATE" },
-]);
-
-/**
- * @generated from enum flyteidl.core.ArrayNode.SubNodeInterfaceStatus
- */
-export enum ArrayNode_SubNodeInterfaceStatus {
-  /**
-   * Set for backwards compatibility to compile ArrayNodes with older versions of flytekit
-   *
-   * @generated from enum value: UNKNOWN = 0;
-   */
-  UNKNOWN = 0,
-
-  /**
-   * The original interface is transformed to an array interface
-   *
-   * @generated from enum value: SUB_NODE_INTERFACE_LIST = 1;
-   */
-  SUB_NODE_INTERFACE_LIST = 1,
-
-  /**
-   * The interface stays as it was originally defined.
-   *
-   * @generated from enum value: SUB_NODE_INTERFACE_ORIGINAL = 2;
-   */
-  SUB_NODE_INTERFACE_ORIGINAL = 2,
-}
-// Retrieve enum metadata with: proto3.getEnumType(ArrayNode_SubNodeInterfaceStatus)
-proto3.util.setEnumType(ArrayNode_SubNodeInterfaceStatus, "flyteidl.core.ArrayNode.SubNodeInterfaceStatus", [
-  { no: 0, name: "UNKNOWN" },
-  { no: 1, name: "SUB_NODE_INTERFACE_LIST" },
-  { no: 2, name: "SUB_NODE_INTERFACE_ORIGINAL" },
 ]);
 
 /**
