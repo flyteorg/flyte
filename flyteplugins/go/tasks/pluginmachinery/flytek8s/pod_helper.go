@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -446,6 +447,54 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
+func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
+	podTolerations := podSpec.Tolerations
+
+	var newTolerations []v1.Toleration
+	for i := range podTolerations {
+		if toleration.MatchToleration(&podTolerations[i]) {
+			return podSpec
+		}
+		newTolerations = append(newTolerations, podTolerations[i])
+	}
+	newTolerations = append(newTolerations, *toleration)
+	podSpec.Tolerations = newTolerations
+	return podSpec
+}
+
+func AddTolerationsForExtendedResources(podSpec *v1.PodSpec) *v1.PodSpec {
+	if podSpec == nil {
+		podSpec = &v1.PodSpec{}
+	}
+
+	resources := sets.NewString()
+	for _, container := range podSpec.Containers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, container := range podSpec.InitContainers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, resource := range resources.List() {
+		addTolerationInPodSpec(podSpec, &v1.Toleration{
+			Key:      resource,
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		})
+	}
+
+	return podSpec
+}
+
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
 // involves parsing the raw PodSpec definition and applying all Flyte configuration options.
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, string, error) {
@@ -460,6 +509,8 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	if err != nil {
 		return nil, nil, "", err
 	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
 
 	return podSpec, objectMeta, primaryContainerName, nil
 }

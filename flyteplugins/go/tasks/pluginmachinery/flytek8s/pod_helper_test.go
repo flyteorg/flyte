@@ -3,6 +3,7 @@ package flytek8s
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
@@ -2210,4 +2211,113 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAddTolerationsForExtendedResources(t *testing.T) {
+	gpuResourceName := v1.ResourceName("nvidia.com/gpu")
+	addTolerationResourceName := v1.ResourceName("foo/bar")
+	noTolerationResourceName := v1.ResourceName("foo/baz")
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuResourceName: gpuResourceName,
+		AddTolerationsForExtendedResources: []string{
+			gpuResourceName.String(),
+			addTolerationResourceName.String(),
+		},
+	}))
+
+	podSpec := &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	fmt.Printf("%v\n", podSpec.Tolerations)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      gpuResourceName.String(),
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
 }

@@ -567,9 +567,10 @@ func TestBuildResouceDaskUsePodTemplate(t *testing.T) {
 
 func TestBuildResourceDaskExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		GpuDeviceNodeLabel:        "gpu-node-label",
-		GpuPartitionSizeNodeLabel: "gpu-partition-size",
-		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
 	}))
 
 	fixtures := []struct {
@@ -609,6 +610,11 @@ func TestBuildResourceDaskExtendedResources(t *testing.T) {
 					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-t4",
 					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: v1.TolerationOpExists,
 					Effect:   v1.TaintEffectNoSchedule,
 				},
 			},
@@ -660,6 +666,11 @@ func TestBuildResourceDaskExtendedResources(t *testing.T) {
 					Key:      "gpu-partition-size",
 					Value:    "1g.5gb",
 					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: v1.TolerationOpExists,
 					Effect:   v1.TaintEffectNoSchedule,
 				},
 			},
