@@ -11,7 +11,7 @@ Note that while this functionality may appear to be the normal behavior of Pytho
 Consequently, accessing attributes in this manner is, in fact, a specially implemented feature.
 This functionality facilitates the direct passing of output attributes within workflows, enhancing the convenience of working with complex data structures.
 
-```{note}
+```{important}
 Flytekit version >= v1.14.0 supports Pydantic BaseModel V2, you can do attribute access on Pydantic BaseModel V2 as well.
 ```
 

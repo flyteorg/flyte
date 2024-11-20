@@ -22,6 +22,8 @@ Flytekit version >= v1.14.0 will produce msgpack bytes literal for dataclasses.
 
 If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for dataclasses, you can 
 set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
+
+For more details, you can refer the MSGPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
 :::
 
 ```{note}
