@@ -12,6 +12,10 @@ Consequently, accessing attributes in this manner is, in fact, a specially imple
 This functionality facilitates the direct passing of output attributes within workflows, enhancing the convenience of working with complex data structures.
 
 ```{note}
+Flytekit version >= v1.14.0 supports Pydantic BaseModel V2, you can do attribute access on Pydantic BaseModel V2 as well.
+```
+
+```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
