@@ -52,15 +52,6 @@ remote = FlyteRemote(
 )
 ```
 
-If you're running this code in a Jupyter notebook, you can also use the
-`interactive_mode` to run workflows interactively:
-
-```{nb-literalinclude} /examples/basics/basics/basic_interactive_mode.ipynb
-:caption: basics/basic_interactive_mode.ipynb
-:cell: 3
-:lines: 5-10
-```
-
 ## Running a workflow
 
 You can run workflows using the `FlyteRemote` {py:meth}`~flytekit.remote.remote.FlyteRemote.execute`

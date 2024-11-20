@@ -22,4 +22,5 @@ imperative_workflows
 documenting_workflows
 shell_tasks
 named_outputs
+/examples/basics/basics/basic_interactive_mode
 ```
