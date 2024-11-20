@@ -54,6 +54,9 @@ enum ConcurrencyPolicy {
   
   // fail the CreateExecution request and do not permit the execution to start
   ABORT = 2;
+  
+  // terminate the oldest execution when the concurrency limit is reached and immediately begin proceeding with the new execution
+   REPLACE = 3;
 }
 
 message LaunchPlanSpec {
@@ -113,7 +116,7 @@ If we wanted further parallelization here, we could introduce a worker pool rath
 
 We should consider adding an index to the executions table to include
 - launch_plan_id
-- phase
+- phase==PENDING only (in order to safeguard for well-populated flyteadmin instances with lots of completed, historical executions)
 - created_at
 
 ##### Concurrency across launch plan versions
@@ -195,6 +198,7 @@ WHERE  ( launch_plan_named_entity_id, created_at ) IN (SELECT launch_plan_named_
                                           GROUP  BY launch_plan_named_entity_id); 
 ```
 
+Note, in this proposal, registering a new version of the launch plan and setting it to active will determine the concurrency policy across all launch plan versions.
 
 #### Prior Art
 The flyteadmin native scheduler (https://github.com/flyteorg/flyte/tree/master/flyteadmin/scheduler) already implements a reconciliation loop to catch up on any missed schedules.
