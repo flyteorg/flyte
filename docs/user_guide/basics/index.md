@@ -1,5 +1,7 @@
 # Basics
 
+.. include:: /examples
+
 This section introduces you to the basic building blocks of Flyte
 using `flytekit`. `flytekit` is a Python SDK for developing Flyte workflows and
 tasks, and can be used generally, whenever stateful computation is desirable.
@@ -20,8 +22,12 @@ workflows
 launch_plans
 imperative_workflows
 documenting_workflows
+/examples/basics/basics/basic_interactive_mode.ipynb
 shell_tasks
-test
+/examples/basics/basics/basic_interactive_mode
 https://raw.githubusercontent.com/Mecoli1219/flytesnacks/85966d139a9a3ccdf3323124563960fdd5f5844a/examples/basics/basics/basic_interactive_mode.ipynb
+examples/basics/basics/basic_interactive_mode.ipynb
+test
+examples/basics/basics/basic_interactive_mode
 named_outputs
 ```
