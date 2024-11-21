@@ -18,7 +18,6 @@ overcoming a major limitation of serialization into a JSON string within a Proto
 
 to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to work around this issue.
 
-By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing dataclasses, preserving the types defined in your `BaseModel` class.
 
 :::{important}
 If you're serializing dataclasses using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
