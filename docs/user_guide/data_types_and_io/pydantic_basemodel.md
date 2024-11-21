@@ -16,7 +16,6 @@ With the 1.14 release, `flytekit` adopted `MessagePack` as the serialization for
 :::{important}
 If you're serializing dataclasses using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for Pydantic BaseModels,
-you can set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 
 For more details, you can refer the MESSAGEPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
 :::
