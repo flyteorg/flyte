@@ -20,7 +20,8 @@ to store `int` types, Protobuf's `struct` converts them to `float`, forcing user
 
 
 :::{important}
-If you're serializing dataclasses using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
+By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing, preserving the types defined in your `BaseModel` class.
+If you're serializing `BaseModel` using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 
 For more details, you can refer the MESSAGEPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
 :::
