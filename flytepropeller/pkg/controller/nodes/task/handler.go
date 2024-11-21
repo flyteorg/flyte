@@ -182,14 +182,12 @@ func (p *pluginRequestedTransition) AddDeckURI(ctx context.Context, tCtx *taskEx
 	var deckURI *storage.DataReference
 	deckURIValue := tCtx.ow.GetDeckPath()
 	deckURI = &deckURIValue
+
 	if p.execInfo.OutputInfo == nil {
-		p.execInfo.OutputInfo = &handler.OutputInfo{
-			DeckURI: deckURI,
-		}
-	} else {
-		p.execInfo.OutputInfo.DeckURI = deckURI
+		p.execInfo.OutputInfo = &handler.OutputInfo{}
 	}
 
+	p.execInfo.OutputInfo.DeckURI = deckURI
 }
 
 // RemoveNonexistentDeckURI removes the deck URI from the plugin execution info if the URI does not exist in remote storage.
@@ -504,7 +502,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 
 	// Regardless of the observed phase, we always add the DeckUri to support real-time deck functionality.
 	// The deck should be accessible even if the task is still running or has failed.
-	// It's possible that the deck URI may not exist in remote storage yet or will never be exist.
+	// It's possible that the deck URI may not exist in remote storage yet or will never be existed.
 	// So, it is console's responsibility to handle the case when the deck URI actually does not exist.
 	pluginTrns.AddDeckURI(ctx, tCtx)
 
