@@ -16,7 +16,6 @@ serialization format for dataclasses, overcoming  a major limitation of serializ
 
 to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to work around this issue.
 
-By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing dataclasses.
 
 :::{important}
 
