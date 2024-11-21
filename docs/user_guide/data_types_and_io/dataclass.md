@@ -26,7 +26,6 @@ literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to 
 If you're using Flytekit version < v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
 :::
 
-:::{important}
 Flytekit version < v1.14.0 will produce protobuf struct literal for dataclasses.
 
 Flytekit version >= v1.14.0 will produce msgpack bytes literal for dataclasses.
