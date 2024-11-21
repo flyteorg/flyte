@@ -12,7 +12,9 @@
 Pydantic BaseModel V2 only works when you are using flytekit version >= v1.14.0.
 :::
 
+With the 1.14 release, `flytekit` adopted `MessagePack` as the serialization format for Pydantic `BaseModel`, overcoming a major limitation of serialization into a JSON string within a Protobuf `struct` datatype like the previous versions do: to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to workaround this issue. By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing dataclasses, preserving the types defined in your `BaseModel` class.
 :::{important}
+If you're serializing dataclasses using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 If you're using Flytekit version >= v1.14.0 and you want to produce protobuf struct literal for Pydantic BaseModels,
 you can set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 
