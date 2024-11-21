@@ -6,7 +6,7 @@
 .. tags:: Basic
 ```
 
-When you have multiple values that you want to send across Flyte entities, and you want them to have, you can use a `pydantic.BaseModel`.
+`flytekit` version >=1.14 supports natively the `JSON` format that Pydantic `BaseModel` produces,  enhancing the interoperability of Pydantic schemas with the Flyte type system.
 
 :::{important}
 Pydantic BaseModel V2 only works when you are using flytekit version >= v1.14.0.
