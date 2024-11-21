@@ -217,10 +217,10 @@ type K8sPluginConfig struct {
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
-// in K8s, where the IO is managed by the FlyteCoPilot sidecar process.
+// in K8s, where the IO is managed by the FlyteCoPilot uploader process.
 type FlyteCoPilotConfig struct {
-	// Co-pilot sidecar container name
-	NamePrefix string `json:"name" pflag:",Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)"`
+	// Co-pilot uploader container name
+	NamePrefix string `json:"name" pflag:",Flyte co-pilot uploader container name prefix. (additional bits will be added after this)"`
 	// Docker image FQN where co-pilot binary is installed
 	Image string `json:"image" pflag:",Flyte co-pilot Docker Image FQN"`
 	// Default Input Path for every task execution that uses co-pilot. This is used only if a input path is not provided by the user and inputs are required for the task
@@ -231,9 +231,9 @@ type FlyteCoPilotConfig struct {
 	InputVolumeName string `json:"input-vol-name" pflag:",Name of the data volume that is created for storing inputs"`
 	// Name of the output volume
 	OutputVolumeName string `json:"output-vol-name" pflag:",Name of the data volume that is created for storing outputs"`
-	// Time for which the sidecar container should wait after starting up, for the primary process to appear. If it does not show up in this time
+	// Time for which the uploader container should wait after starting up, for the primary process to appear. If it does not show up in this time
 	// the process will be assumed to be dead or in a terminal condition and will trigger an abort.
-	StartTimeout config2.Duration `json:"start-timeout" pflag:"-,Time for which the sidecar should wait on startup before assuming the primary container to have failed startup."`
+	StartTimeout config2.Duration `json:"start-timeout" pflag:"-,Time for which the uploader should wait on startup before assuming the primary container to have failed startup."`
 	// Resources for CoPilot Containers
 	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`

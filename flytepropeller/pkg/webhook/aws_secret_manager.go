@@ -15,19 +15,19 @@ import (
 )
 
 const (
-	// AWSSecretArnEnvVar defines the environment variable name to use to specify to the sidecar container which secret
+	// AWSSecretArnEnvVar defines the environment variable name to use to specify to the uploader container which secret
 	// to pull.
 	AWSSecretArnEnvVar = "SECRET_ARN"
 
-	// AWSSecretFilenameEnvVar defines the environment variable name to use to specify to the sidecar container where
+	// AWSSecretFilenameEnvVar defines the environment variable name to use to specify to the uploader container where
 	// to store the secret.
 	AWSSecretFilenameEnvVar = "SECRET_FILENAME"
 
 	// AWSSecretsVolumeName defines the static name of the volume used for mounting/sharing secrets between init-container
-	// sidecar and the rest of the containers in the pod.
+	// uploader and the rest of the containers in the pod.
 	AWSSecretsVolumeName = "aws-secret-vol" // #nosec
 
-	// AWS SideCar Docker Container expects the mount to always be under /tmp
+	// AWS Uploader Docker Container expects the mount to always be under /tmp
 	AWSInitContainerMountPath = "/tmp"
 )
 
@@ -36,7 +36,7 @@ var (
 	AWSSecretMountPathPrefix = []string{string(os.PathSeparator), "etc", "flyte", "secrets"}
 )
 
-// AWSSecretManagerInjector allows injecting of secrets from AWS Secret Manager as files. It uses AWS-provided SideCar
+// AWSSecretManagerInjector allows injecting of secrets from AWS Secret Manager as files. It uses AWS-provided Uploader
 // as an init-container to download the secret and save it to a local volume shared with all other containers in the pod.
 // It supports multiple secrets to be mounted but that will result into adding an init container for each secret.
 // The role/serviceaccount used to run the Pod must have permissions to pull the secret from AWS Secret Manager.
@@ -80,7 +80,7 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 		}
 
 		p.Spec.Volumes = appendVolumeIfNotExists(p.Spec.Volumes, vol)
-		p.Spec.InitContainers = append(p.Spec.InitContainers, createAWSSidecarContainer(i.cfg, p, secret))
+		p.Spec.InitContainers = append(p.Spec.InitContainers, createAWSUploaderContainer(i.cfg, p, secret))
 
 		secretVolumeMount := corev1.VolumeMount{
 			Name:      AWSSecretsVolumeName,
@@ -120,9 +120,9 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 	return p, true, nil
 }
 
-func createAWSSidecarContainer(cfg config.AWSSecretManagerConfig, p *corev1.Pod, secret *core.Secret) corev1.Container {
+func createAWSUploaderContainer(cfg config.AWSSecretManagerConfig, p *corev1.Pod, secret *core.Secret) corev1.Container {
 	return corev1.Container{
-		Image: cfg.SidecarImage,
+		Image: cfg.UploaderImage,
 		// Create a unique name to allow multiple secrets to be mounted.
 		Name: formatAWSInitContainerName(len(p.Spec.InitContainers)),
 		VolumeMounts: []corev1.VolumeMount{

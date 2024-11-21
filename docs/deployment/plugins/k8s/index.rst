@@ -127,7 +127,7 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - pytorch
                   default-for-task-types:
@@ -148,12 +148,12 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - pytorch
                   default-for-task-types:
                     container: container
-                    sidecar: sidecar
+                    uploader: uploader
                     container_array: k8s-array
                     pytorch: pytorch
 
@@ -174,7 +174,7 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - tensorflow
                   default-for-task-types:
@@ -194,12 +194,12 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - tensorflow
                   default-for-task-types:
                     container: container
-                    sidecar: sidecar
+                    uploader: uploader
                     container_array: k8s-array
                     tensorflow: tensorflow
 
@@ -220,7 +220,7 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - mpi
                   default-for-task-types:
@@ -240,12 +240,12 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - mpi
                   default-for-task-types:
                     container: container
-                    sidecar: sidecar
+                    uploader: uploader
                     container_array: k8s-array
                     mpi: mpi
 
@@ -265,7 +265,7 @@ Specify plugin configuration
                  task-plugins:
                    enabled-plugins:
                      - container
-                     - sidecar
+                     - uploader
                      - k8s-array
                      - ray
                    default-for-task-types:
@@ -290,12 +290,12 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - ray
                   default-for-task-types:
                     container: container
-                    sidecar: sidecar
+                    uploader: uploader
                     container_array: k8s-array
                     ray: ray
               plugins:
@@ -323,7 +323,7 @@ Specify plugin configuration
                         task-plugins:
                           enabled-plugins:
                             - container
-                            - sidecar
+                            - uploader
                             - k8s-array
                             - spark
                           default-for-task-types:
@@ -489,7 +489,7 @@ Specify plugin configuration
                         task-plugins:
                           enabled-plugins:
                             - container
-                            - sidecar
+                            - uploader
                             - k8s-array
                             - spark
                           default-for-task-types:
@@ -612,12 +612,12 @@ Specify plugin configuration
                       task-plugins:
                         enabled-plugins:
                           - container
-                          - sidecar
+                          - uploader
                           - k8s-array
                           - spark
                         default-for-task-types:
                           container: container
-                          sidecar: sidecar
+                          uploader: uploader
                           container_array: k8s-array
                           spark: spark
                 cluster_resource_manager:
@@ -724,12 +724,12 @@ Specify plugin configuration
                         task-plugins:
                           enabled-plugins:
                             - container
-                            - sidecar
+                            - uploader
                             - k8s-array
                             - spark
                           default-for-task-types:
                             container: container
-                            sidecar: sidecar
+                            uploader: uploader
                             container_array: k8s-array
                             spark: spark
                     cluster_resource_manager:
@@ -951,13 +951,13 @@ Specify plugin configuration
                       task-plugins:
                         enabled-plugins:
                           - container
-                          - sidecar
+                          - uploader
                           - k8s-array
                           - agent-service
                           - spark
                         default-for-task-types:
                           container: container
-                          sidecar: sidecar
+                          uploader: uploader
                           container_array: k8s-array
                           spark: spark
 
@@ -976,7 +976,7 @@ Specify plugin configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - sidecar
+                - uploader
                 - k8s-array
                 - dask
               default-for-task-types:
@@ -996,12 +996,12 @@ Specify plugin configuration
                 task-plugins:
                   enabled-plugins:
                     - container
-                    - sidecar
+                    - uploader
                     - k8s-array
                     - dask
                   default-for-task-types:
                     container: container
-                    sidecar: sidecar
+                    uploader: uploader
                     container_array: k8s-array
                     dask: dask
 

@@ -45,7 +45,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 			localDirectoryPath:  tmpDir,
 		}
 
-		assert.NoError(t, uopts.Sidecar(ctx))
+		assert.NoError(t, uopts.Uploader(ctx))
 	})
 
 	t.Run("uploadBlobType-FileNotFound", func(t *testing.T) {
@@ -91,7 +91,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 		ok, err := containerwatcher.FileExists(success)
 		assert.NoError(t, err)
 		assert.True(t, ok, "successfile not created")
-		assert.NoError(t, uopts.Sidecar(ctx))
+		assert.NoError(t, uopts.Uploader(ctx))
 		v, err := store.Head(ctx, "/output/errors.pb")
 		assert.NoError(t, err)
 		assert.True(t, v.Exists())

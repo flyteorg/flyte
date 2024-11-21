@@ -87,21 +87,21 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 		mergeUpdatedModel, err := MergeUpdatePluginAttributes(context.Background(), existingModel,
 			admin.MatchableResource_PLUGIN_OVERRIDE, &repoInterfaces.ResourceID{},
 			testutils.GetPluginOverridesAttributes(map[string][]string{
-				"sidecar": {"plugin_c"},
-				"hive":    {"plugin_d"},
+				"uploader": {"plugin_c"},
+				"hive":     {"plugin_d"},
 			}),
 		)
 		assert.NoError(t, err)
 		var updatedAttributes admin.MatchingAttributes
 		err = proto.Unmarshal(mergeUpdatedModel.Attributes, &updatedAttributes)
 		assert.NoError(t, err)
-		var sawPythonTask, sawSidecarTask, sawHiveTask bool
+		var sawPythonTask, sawUploaderTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
 			if override.GetTaskType() == "python" {
 				sawPythonTask = true
 				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
-			} else if override.GetTaskType() == "sidecar" {
-				sawSidecarTask = true
+			} else if override.GetTaskType() == "uploader" {
+				sawUploaderTask = true
 				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
 			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
@@ -109,7 +109,7 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")
-		assert.True(t, sawSidecarTask, "Missing sidecar task from finalized attributes")
+		assert.True(t, sawUploaderTask, "Missing uploader task from finalized attributes")
 		assert.True(t, sawHiveTask, "Missing hive task from finalized attributes")
 	})
 	t.Run("unsupported resource type", func(t *testing.T) {
@@ -184,21 +184,21 @@ func TestMergeUpdateWorkflowAttributes(t *testing.T) {
 				Domain:   resourceDomain,
 				Workflow: resourceWorkflow,
 				MatchingAttributes: testutils.GetPluginOverridesAttributes(map[string][]string{
-					"sidecar": {"plugin_c"},
-					"hive":    {"plugin_d"},
+					"uploader": {"plugin_c"},
+					"hive":     {"plugin_d"},
 				}),
 			})
 		assert.NoError(t, err)
 		var updatedAttributes admin.MatchingAttributes
 		err = proto.Unmarshal(mergeUpdatedModel.Attributes, &updatedAttributes)
 		assert.NoError(t, err)
-		var sawPythonTask, sawSidecarTask, sawHiveTask bool
+		var sawPythonTask, sawUploaderTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
 			if override.GetTaskType() == "python" {
 				sawPythonTask = true
 				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
-			} else if override.GetTaskType() == "sidecar" {
-				sawSidecarTask = true
+			} else if override.GetTaskType() == "uploader" {
+				sawUploaderTask = true
 				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
 			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
@@ -206,7 +206,7 @@ func TestMergeUpdateWorkflowAttributes(t *testing.T) {
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")
-		assert.True(t, sawSidecarTask, "Missing sidecar task from finalized attributes")
+		assert.True(t, sawUploaderTask, "Missing uploader task from finalized attributes")
 		assert.True(t, sawHiveTask, "Missing hive task from finalized attributes")
 	})
 	t.Run("unsupported resource type", func(t *testing.T) {

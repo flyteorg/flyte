@@ -41,13 +41,13 @@ Please make sure that the propeller has the correct service account for Sagemake
             # plugins
             enabled-plugins:
               - container
-              - sidecar
+              - uploader
               - k8s-array
               - sagemaker_training
               - sagemaker_hyperparameter_tuning
             default-for-task-types:
               container: container
-              sidecar: sidecar
+              uploader: uploader
               container_array: k8s-array
 
 Upgrade the Flyte Helm release

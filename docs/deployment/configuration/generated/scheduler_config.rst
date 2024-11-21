@@ -3320,7 +3320,7 @@ config.FlyteCoPilotConfig
 name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)
+Flyte co-pilot uploader container name prefix. (additional bits will be added after this)
 
 **Default Value**: 
 

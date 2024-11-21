@@ -106,7 +106,7 @@ func (r *ResourceLevelMonitor) RunCollectorOnce(ctx context.Context) {
 
 // This struct is here to ensure that we do not create more than one of these monitors for a given GVK. It wouldn't necessarily break
 // anything, but it's a waste of compute cycles to compute counts multiple times. This can happen if multiple plugins create the same
-// underlying K8s resource type. If two plugins both created Pods (ie sidecar and container), without this we would launch two
+// underlying K8s resource type. If two plugins both created Pods (ie uploader and container), without this we would launch two
 // ResourceLevelMonitor's, have two goroutines spinning, etc.
 type ResourceMonitorIndex struct {
 	lock     *sync.Mutex

@@ -197,28 +197,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_awsSecretManager.sidecarImage", func(t *testing.T) {
+	t.Run("Test_awsSecretManager.uploaderImage", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("awsSecretManager.sidecarImage", testValue)
-			if vString, err := cmdFlags.GetString("awsSecretManager.sidecarImage"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AWSSecretManagerConfig.SidecarImage)
+			cmdFlags.Set("awsSecretManager.uploaderImage", testValue)
+			if vString, err := cmdFlags.GetString("awsSecretManager.uploaderImage"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AWSSecretManagerConfig.UploaderImage)
 
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 	})
-	t.Run("Test_gcpSecretManager.sidecarImage", func(t *testing.T) {
+	t.Run("Test_gcpSecretManager.uploaderImage", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("gcpSecretManager.sidecarImage", testValue)
-			if vString, err := cmdFlags.GetString("gcpSecretManager.sidecarImage"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GCPSecretManagerConfig.SidecarImage)
+			cmdFlags.Set("gcpSecretManager.uploaderImage", testValue)
+			if vString, err := cmdFlags.GetString("gcpSecretManager.uploaderImage"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GCPSecretManagerConfig.UploaderImage)
 
 			} else {
 				assert.FailNow(t, err.Error())

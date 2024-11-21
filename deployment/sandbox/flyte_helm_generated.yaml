@@ -643,10 +643,10 @@ data:
           container: container
           container_array: k8s-array
           sensor: agent-service
-          sidecar: sidecar
+          uploader: uploader
         enabled-plugins:
         - container
-        - sidecar
+        - uploader
         - k8s-array
         - agent-service
         - echo

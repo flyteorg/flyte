@@ -30,7 +30,7 @@ type UploadOptions struct {
 	metaOutputName string
 	// The remote prefix where all the raw outputs should be uploaded of the form s3://bucket/prefix/
 	remoteOutputsRawPrefix string
-	// Local directory path where the sidecar should look for outputs.
+	// Local directory path where the uploader should look for outputs.
 	localDirectoryPath string
 	// Non primitive types will be dumped in this output format
 	metadataFormat        string
@@ -73,7 +73,7 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 	outputInterface := iface.GetOutputs()
 
 	if iface.GetOutputs() == nil || iface.Outputs.Variables == nil || len(iface.GetOutputs().GetVariables()) == 0 {
-		logger.Infof(ctx, "Empty output interface received. Assuming void outputs. Sidecar will exit immediately.")
+		logger.Infof(ctx, "Empty output interface received. Assuming void outputs. Uploader will exit immediately.")
 		return nil
 	}
 
@@ -140,7 +140,7 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 	return nil
 }
 
-func (u *UploadOptions) Sidecar(ctx context.Context) error {
+func (u *UploadOptions) Uploader(ctx context.Context) error {
 
 	if err := u.uploader(ctx); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
@@ -160,11 +160,11 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 
 	// deleteCmd represents the delete command
 	uploadCmd := &cobra.Command{
-		Use:   "sidecar <opts>",
+		Use:   "uploader <opts>",
 		Short: "uploads flyteData from the localpath to a remote dir.",
 		Long:  `Currently it looks at the outputs.pb and creates one file per variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return uploadOptions.Sidecar(context.Background())
+			return uploadOptions.Uploader(context.Background())
 		},
 	}
 
@@ -177,8 +177,8 @@ func NewUploadCommand(opts *RootOptions) *cobra.Command {
 	uploadCmd.Flags().DurationVarP(&uploadOptions.timeout, "timeout", "t", time.Hour*1, "Max time to allow for uploads to complete, default is 1H")
 	uploadCmd.Flags().BytesBase64VarP(&uploadOptions.typedInterface, "interface", "i", nil, "Typed Interface - core.TypedInterface, base64 encoded string of the serialized protobuf")
 	uploadCmd.Flags().DurationVarP(&uploadOptions.containerStartTimeout, "start-timeout", "", 0, "Max time to allow for container to startup. 0 indicates wait for ever.")
-	uploadCmd.Flags().StringVarP(&uploadOptions.startWatcherType, "start-watcher-type", "", containerwatcher.WatcherTypeSharedProcessNS, fmt.Sprintf("Sidecar will wait for container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
-	uploadCmd.Flags().StringVarP(&uploadOptions.exitWatcherType, "exit-watcher-type", "", containerwatcher.WatcherTypeSharedProcessNS, fmt.Sprintf("Sidecar will wait for completion of the container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
+	uploadCmd.Flags().StringVarP(&uploadOptions.startWatcherType, "start-watcher-type", "", containerwatcher.WatcherTypeSharedProcessNS, fmt.Sprintf("Uploader will wait for container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
+	uploadCmd.Flags().StringVarP(&uploadOptions.exitWatcherType, "exit-watcher-type", "", containerwatcher.WatcherTypeSharedProcessNS, fmt.Sprintf("Uploader will wait for completion of the container before starting upload process. Watcher type makes the type configurable. Available Type %+v", containerwatcher.AllWatcherTypes))
 	uploadCmd.Flags().StringVarP(&uploadOptions.containerInfo.Name, "watch-container", "", "", "For KubeAPI watcher, Wait for this container to exit.")
 	uploadCmd.Flags().StringVarP(&uploadOptions.containerInfo.Namespace, "namespace", "", "", "For KubeAPI watcher, Namespace of the pod [optional]")
 	uploadCmd.Flags().StringVarP(&uploadOptions.containerInfo.PodName, "pod-name", "", "", "For KubeAPI watcher, Name of the pod [optional].")

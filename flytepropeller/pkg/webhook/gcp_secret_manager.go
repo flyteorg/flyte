@@ -16,7 +16,7 @@ import (
 
 const (
 	// GCPSecretsVolumeName defines the static name of the volume used for mounting/sharing secrets between init-container
-	// sidecar and the rest of the containers in the pod.
+	// uploader and the rest of the containers in the pod.
 	GCPSecretsVolumeName = "gcp-secret-vol" // #nosec
 )
 
@@ -26,7 +26,7 @@ var (
 )
 
 // GCPSecretManagerInjector allows injecting of secrets from GCP Secret Manager as files. It uses a Google Cloud
-// SDK SideCar as an init-container to download the secret and save it to a local volume shared with all other
+// SDK Uploader as an init-container to download the secret and save it to a local volume shared with all other
 // containers in the pod. It supports multiple secrets to be mounted but that will result into adding an init
 // container for each secret. The Google serviceaccount (GSA) associated with the Pod, either via Workload
 // Identity (recommended) or the underlying node's serviceacccount, must have permissions to pull the secret
@@ -83,7 +83,7 @@ func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 		}
 
 		p.Spec.Volumes = appendVolumeIfNotExists(p.Spec.Volumes, vol)
-		p.Spec.InitContainers = append(p.Spec.InitContainers, createGCPSidecarContainer(i.cfg, p, secret))
+		p.Spec.InitContainers = append(p.Spec.InitContainers, createGCPUploaderContainer(i.cfg, p, secret))
 
 		secretVolumeMount := corev1.VolumeMount{
 			Name:      GCPSecretsVolumeName,
@@ -123,9 +123,9 @@ func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 	return p, true, nil
 }
 
-func createGCPSidecarContainer(cfg config.GCPSecretManagerConfig, p *corev1.Pod, secret *core.Secret) corev1.Container {
+func createGCPUploaderContainer(cfg config.GCPSecretManagerConfig, p *corev1.Pod, secret *core.Secret) corev1.Container {
 	return corev1.Container{
-		Image: cfg.SidecarImage,
+		Image: cfg.UploaderImage,
 		// Create a unique name to allow multiple secrets to be mounted.
 		Name:    formatGCPInitContainerName(len(p.Spec.InitContainers)),
 		Command: formatGCPSecretAccessCommand(secret),

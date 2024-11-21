@@ -39,7 +39,7 @@ metadata:
   name: flyte-sandbox-minio
   namespace: flyte
 secrets:
-- name: flyte-sandbox-minio
+  - name: flyte-sandbox-minio
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -53,48 +53,48 @@ metadata:
   name: flyte-sandbox-kubernetes-dashboard
   namespace: flyte
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-key-holder
-  - kubernetes-dashboard-certs
-  - kubernetes-dashboard-csrf
-  resources:
-  - secrets
-  verbs:
-  - get
-  - update
-  - delete
-- apiGroups:
-  - ""
-  resourceNames:
-  - kubernetes-dashboard-settings
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - update
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - dashboard-metrics-scraper
-  resources:
-  - services
-  verbs:
-  - proxy
-- apiGroups:
-  - ""
-  resourceNames:
-  - heapster
-  - 'http:heapster:'
-  - 'https:heapster:'
-  - dashboard-metrics-scraper
-  - http:dashboard-metrics-scraper
-  resources:
-  - services/proxy
-  verbs:
-  - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - kubernetes-dashboard-key-holder
+      - kubernetes-dashboard-certs
+      - kubernetes-dashboard-csrf
+    resources:
+      - secrets
+    verbs:
+      - get
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resourceNames:
+      - kubernetes-dashboard-settings
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resourceNames:
+      - heapster
+      - dashboard-metrics-scraper
+    resources:
+      - services
+    verbs:
+      - proxy
+  - apiGroups:
+      - ""
+    resourceNames:
+      - heapster
+      - "http:heapster:"
+      - "https:heapster:"
+      - dashboard-metrics-scraper
+      - http:dashboard-metrics-scraper
+    resources:
+      - services/proxy
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -108,86 +108,86 @@ metadata:
   name: flyte-sandbox-cluster-role
   namespace: flyte
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - resourcequotas
-  - secrets
-  - serviceaccounts
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - delete
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - podtemplates
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-  verbs:
-  - create
-  - delete
-  - deletecollection
-  - get
-  - list
-  - patch
-  - post
-  - update
-  - watch
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - create
-  - get
-  - list
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - resourcequotas
+      - secrets
+      - serviceaccounts
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - delete
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - podtemplates
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - flyte.lyft.com
+    resources:
+      - flyteworkflows
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - post
+      - update
+      - watch
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - create
+      - get
+      - list
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - "*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -200,130 +200,130 @@ metadata:
     helm.sh/chart: kubernetes-dashboard-6.0.0
   name: flyte-sandbox-kubernetes-dashboard-readonly
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  - endpoints
-  - persistentvolumeclaims
-  - pods
-  - replicationcontrollers
-  - replicationcontrollers/scale
-  - serviceaccounts
-  - services
-  - nodes
-  - persistentvolumeclaims
-  - persistentvolumes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - bindings
-  - events
-  - limitranges
-  - namespaces/status
-  - pods/log
-  - pods/status
-  - replicationcontrollers/status
-  - resourcequotas
-  - resourcequotas/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - deployments/scale
-  - replicasets
-  - replicasets/scale
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - autoscaling
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - cronjobs
-  - jobs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - daemonsets
-  - deployments
-  - deployments/scale
-  - ingresses
-  - networkpolicies
-  - replicasets
-  - replicasets/scale
-  - replicationcontrollers/scale
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - networkpolicies
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - storageclasses
-  - volumeattachments
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - clusterrolebindings
-  - clusterroles
-  - roles
-  - rolebindings
-  verbs:
-  - get
-  - list
-  - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - endpoints
+      - persistentvolumeclaims
+      - pods
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - serviceaccounts
+      - services
+      - nodes
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - bindings
+      - events
+      - limitranges
+      - namespaces/status
+      - pods/log
+      - pods/status
+      - replicationcontrollers/status
+      - resourcequotas
+      - resourcequotas/status
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - ingresses
+      - networkpolicies
+      - replicasets
+      - replicasets/scale
+      - replicationcontrollers/scale
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterrolebindings
+      - clusterroles
+      - roles
+      - rolebindings
+    verbs:
+      - get
+      - list
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -341,9 +341,9 @@ roleRef:
   kind: Role
   name: flyte-sandbox-kubernetes-dashboard
 subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
+  - kind: ServiceAccount
+    name: flyte-sandbox-kubernetes-dashboard
+    namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -361,9 +361,9 @@ roleRef:
   kind: ClusterRole
   name: flyte-sandbox-cluster-role
 subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox
-  namespace: flyte
+  - kind: ServiceAccount
+    name: flyte-sandbox
+    namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -380,9 +380,9 @@ roleRef:
   kind: ClusterRole
   name: flyte-sandbox-kubernetes-dashboard-readonly
 subjects:
-- kind: ServiceAccount
-  name: flyte-sandbox-kubernetes-dashboard
-  namespace: flyte
+  - kind: ServiceAccount
+    name: flyte-sandbox-kubernetes-dashboard
+    namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -447,10 +447,10 @@ data:
         default-for-task-types:
           container: container
           container_array: k8s-array
-          sidecar: sidecar
+          uploader: uploader
         enabled-plugins:
         - container
-        - sidecar
+        - uploader
         - k8s-array
         - agent-service
         - echo
@@ -895,11 +895,11 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: http-5000
-    nodePort: 30000
-    port: 5000
-    protocol: TCP
-    targetPort: 5000
+    - name: http-5000
+      nodePort: 30000
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
   selector:
     app: docker-registry
     release: flyte-sandbox
@@ -918,10 +918,10 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: grpc
-    nodePort: null
-    port: 8089
-    targetPort: grpc
+    - name: grpc
+      nodePort: null
+      port: 8089
+      targetPort: grpc
   selector:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
@@ -941,10 +941,10 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: http
-    nodePort: null
-    port: 8088
-    targetPort: http
+    - name: http
+      nodePort: null
+      port: 8088
+      targetPort: http
   selector:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
@@ -966,9 +966,9 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: http
-    port: 80
-    targetPort: http
+    - name: http
+      port: 80
+      targetPort: http
   selector:
     app.kubernetes.io/component: kubernetes-dashboard
     app.kubernetes.io/instance: flyte-sandbox
@@ -988,13 +988,13 @@ metadata:
 spec:
   externalTrafficPolicy: Cluster
   ports:
-  - name: minio-api
-    nodePort: 30002
-    port: 9000
-    targetPort: minio-api
-  - name: minio-console
-    port: 9001
-    targetPort: minio-console
+    - name: minio-api
+      nodePort: 30002
+      port: 9000
+      targetPort: minio-api
+    - name: minio-console
+      port: 9001
+      targetPort: minio-console
   selector:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: minio
@@ -1014,10 +1014,10 @@ metadata:
 spec:
   externalTrafficPolicy: Cluster
   ports:
-  - name: tcp-postgresql
-    nodePort: 30001
-    port: 5432
-    targetPort: tcp-postgresql
+    - name: tcp-postgresql
+      nodePort: 30001
+      port: 5432
+      targetPort: tcp-postgresql
   selector:
     app.kubernetes.io/component: primary
     app.kubernetes.io/instance: flyte-sandbox
@@ -1040,9 +1040,9 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - name: tcp-postgresql
-    port: 5432
-    targetPort: tcp-postgresql
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
   publishNotReadyAddresses: true
   selector:
     app.kubernetes.io/component: primary
@@ -1063,10 +1063,10 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: http
-    nodePort: 30080
-    port: 8000
-    protocol: TCP
+    - name: http
+      nodePort: 30080
+      port: 8000
+      protocol: TCP
   selector:
     app.kubernetes.io/component: proxy
     app.kubernetes.io/instance: flyte-sandbox
@@ -1086,9 +1086,9 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: webhook
-    port: 443
-    targetPort: webhook
+    - name: webhook
+      port: 443
+      targetPort: webhook
   selector:
     app.kubernetes.io/component: flyte-binary
     app.kubernetes.io/instance: flyte-sandbox
@@ -1108,7 +1108,7 @@ metadata:
   namespace: flyte
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   capacity:
     storage: 1Gi
   hostPath:
@@ -1128,7 +1128,7 @@ metadata:
   namespace: flyte
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   capacity:
     storage: 1Gi
   hostPath:
@@ -1148,7 +1148,7 @@ metadata:
   namespace: flyte
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -1168,7 +1168,7 @@ metadata:
   namespace: flyte
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -1207,83 +1207,83 @@ spec:
         app.kubernetes.io/name: flyte-sandbox
     spec:
       containers:
-      - args:
-        - start
-        - --config
-        - /etc/flyte/config.d/*.yaml
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        image: flyte-binary:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-          initialDelaySeconds: 30
-        name: flyte
-        ports:
-        - containerPort: 8088
-          name: http
-        - containerPort: 8089
-          name: grpc
-        - containerPort: 9443
-          name: webhook
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: http
-          initialDelaySeconds: 30
-        volumeMounts:
-        - mountPath: /etc/flyte/cluster-resource-templates
-          name: cluster-resource-templates
-        - mountPath: /etc/flyte/config.d
-          name: config
-        - mountPath: /var/run/flyte
-          name: state
+        - args:
+            - start
+            - --config
+            - /etc/flyte/config.d/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          image: flyte-binary:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 30
+          name: flyte
+          ports:
+            - containerPort: 8088
+              name: http
+            - containerPort: 8089
+              name: grpc
+            - containerPort: 9443
+              name: webhook
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 30
+          volumeMounts:
+            - mountPath: /etc/flyte/cluster-resource-templates
+              name: cluster-resource-templates
+            - mountPath: /etc/flyte/config.d
+              name: config
+            - mountPath: /var/run/flyte
+              name: state
       initContainers:
-      - args:
-        - |
-          until pg_isready \
-            -h flyte-sandbox-postgresql \
-            -p 5432 \
-            -U postgres
-          do
-            echo waiting for database
-            sleep 0.1
-          done
-        command:
-        - sh
-        - -ec
-        image: bitnami/postgresql:sandbox
-        imagePullPolicy: Never
-        name: wait-for-db
+        - args:
+            - |
+              until pg_isready \
+                -h flyte-sandbox-postgresql \
+                -p 5432 \
+                -U postgres
+              do
+                echo waiting for database
+                sleep 0.1
+              done
+          command:
+            - sh
+            - -ec
+          image: bitnami/postgresql:sandbox
+          imagePullPolicy: Never
+          name: wait-for-db
       serviceAccountName: flyte-sandbox
       volumes:
-      - name: cluster-resource-templates
-        projected:
-          sources:
-          - configMap:
-              name: flyte-sandbox-cluster-resource-templates
-          - configMap:
-              name: flyte-sandbox-extra-cluster-resource-templates
-      - name: config
-        projected:
-          sources:
-          - configMap:
-              name: flyte-sandbox-config
-          - secret:
-              name: flyte-sandbox-config-secret
-          - configMap:
-              name: flyte-sandbox-extra-config
-      - emptyDir: {}
-        name: state
+        - name: cluster-resource-templates
+          projected:
+            sources:
+              - configMap:
+                  name: flyte-sandbox-cluster-resource-templates
+              - configMap:
+                  name: flyte-sandbox-extra-cluster-resource-templates
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: flyte-sandbox-config
+              - secret:
+                  name: flyte-sandbox-config-secret
+              - configMap:
+                  name: flyte-sandbox-extra-config
+        - emptyDir: {}
+          name: state
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1311,36 +1311,36 @@ spec:
         app.kubernetes.io/name: flyte-sandbox
     spec:
       containers:
-      - args:
-        - --addr
-        - unix:///run/buildkit/buildkitd.sock
-        - --addr
-        - tcp://0.0.0.0:30003
-        image: moby/buildkit:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          exec:
-            command:
-            - buildctl
-            - debug
-            - workers
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        name: buildkit
-        ports:
-        - containerPort: 30003
-          name: tcp
-          protocol: TCP
-        readinessProbe:
-          exec:
-            command:
-            - buildctl
-            - debug
-            - workers
-          initialDelaySeconds: 5
-          periodSeconds: 30
-        securityContext:
-          privileged: true
+        - args:
+            - --addr
+            - unix:///run/buildkit/buildkitd.sock
+            - --addr
+            - tcp://0.0.0.0:30003
+          image: moby/buildkit:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            exec:
+              command:
+                - buildctl
+                - debug
+                - workers
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          name: buildkit
+          ports:
+            - containerPort: 30003
+              name: tcp
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - buildctl
+                - debug
+                - workers
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          securityContext:
+            privileged: true
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
 ---
@@ -1371,46 +1371,46 @@ spec:
         release: flyte-sandbox
     spec:
       containers:
-      - command:
-        - /bin/registry
-        - serve
-        - /etc/docker/registry/config.yml
-        env:
-        - name: REGISTRY_HTTP_SECRET
-          valueFrom:
-            secretKeyRef:
-              key: haSharedSecret
-              name: flyte-sandbox-docker-registry-secret
-        - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
-          value: /var/lib/registry
-        image: registry:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 5000
-        name: docker-registry
-        ports:
-        - containerPort: 5000
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 5000
-        resources: {}
-        volumeMounts:
-        - mountPath: /etc/docker/registry
-          name: flyte-sandbox-docker-registry-config
-        - mountPath: /var/lib/registry/
-          name: data
+        - command:
+            - /bin/registry
+            - serve
+            - /etc/docker/registry/config.yml
+          env:
+            - name: REGISTRY_HTTP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: haSharedSecret
+                  name: flyte-sandbox-docker-registry-secret
+            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+              value: /var/lib/registry
+          image: registry:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          name: docker-registry
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/docker/registry
+              name: flyte-sandbox-docker-registry-config
+            - mountPath: /var/lib/registry/
+              name: data
       securityContext:
         fsGroup: 1000
         runAsUser: 1000
       volumes:
-      - configMap:
+        - configMap:
+            name: flyte-sandbox-docker-registry-config
           name: flyte-sandbox-docker-registry-config
-        name: flyte-sandbox-docker-registry-config
-      - emptyDir: {}
-        name: data
+        - emptyDir: {}
+          name: data
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1448,52 +1448,52 @@ spec:
         helm.sh/chart: kubernetes-dashboard-6.0.0
     spec:
       containers:
-      - args:
-        - --namespace=flyte
-        - --metrics-provider=none
-        - --enable-insecure-login
-        - --enable-skip-login
-        image: kubernetesui/dashboard:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 9090
-            scheme: HTTP
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-        name: kubernetes-dashboard
-        ports:
-        - containerPort: 9090
-          name: http
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 2
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsGroup: 2001
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /certs
-          name: kubernetes-dashboard-certs
-        - mountPath: /tmp
-          name: tmp-volume
+        - args:
+            - --namespace=flyte
+            - --metrics-provider=none
+            - --enable-insecure-login
+            - --enable-skip-login
+          image: kubernetesui/dashboard:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          name: kubernetes-dashboard
+          ports:
+            - containerPort: 9090
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 2001
+            runAsUser: 1001
+          volumeMounts:
+            - mountPath: /certs
+              name: kubernetes-dashboard-certs
+            - mountPath: /tmp
+              name: tmp-volume
       securityContext:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: flyte-sandbox-kubernetes-dashboard
       volumes:
-      - name: kubernetes-dashboard-certs
-        secret:
-          secretName: flyte-sandbox-kubernetes-dashboard-certs
-      - emptyDir: {}
-        name: tmp-volume
+        - name: kubernetes-dashboard-certs
+          secret:
+            secretName: flyte-sandbox-kubernetes-dashboard-certs
+        - emptyDir: {}
+          name: tmp-volume
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1527,103 +1527,103 @@ spec:
         podAffinity: null
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/instance: flyte-sandbox
-                  app.kubernetes.io/name: minio
-              topologyKey: kubernetes.io/hostname
-            weight: 1
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: flyte-sandbox
+                    app.kubernetes.io/name: minio
+                topologyKey: kubernetes.io/hostname
+              weight: 1
       containers:
-      - env:
-        - name: BITNAMI_DEBUG
-          value: "false"
-        - name: MINIO_SCHEME
-          value: http
-        - name: MINIO_FORCE_NEW_KEYS
-          value: "no"
-        - name: MINIO_ROOT_USER
-          valueFrom:
-            secretKeyRef:
-              key: root-user
-              name: flyte-sandbox-minio
-        - name: MINIO_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: root-password
-              name: flyte-sandbox-minio
-        - name: MINIO_DEFAULT_BUCKETS
-          value: my-s3-bucket
-        - name: MINIO_BROWSER
-          value: "on"
-        - name: MINIO_PROMETHEUS_AUTH_TYPE
-          value: public
-        - name: MINIO_CONSOLE_PORT_NUMBER
-          value: "9001"
-        - name: MINIO_BROWSER_REDIRECT_URL
-          value: http://localhost:30080/minio
-        envFrom: null
-        image: docker.io/bitnami/minio:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          failureThreshold: 5
-          httpGet:
-            path: /minio/health/live
-            port: minio-api
-            scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: minio
-        ports:
-        - containerPort: 9000
-          name: minio-api
-          protocol: TCP
-        - containerPort: 9001
-          name: minio-console
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 5
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          tcpSocket:
-            port: minio-api
-          timeoutSeconds: 1
-        resources:
-          limits: {}
-          requests: {}
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1001
-        volumeMounts:
-        - mountPath: /data
-          name: data
+        - env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MINIO_SCHEME
+              value: http
+            - name: MINIO_FORCE_NEW_KEYS
+              value: "no"
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  key: root-user
+                  name: flyte-sandbox-minio
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: root-password
+                  name: flyte-sandbox-minio
+            - name: MINIO_DEFAULT_BUCKETS
+              value: my-s3-bucket
+            - name: MINIO_BROWSER
+              value: "on"
+            - name: MINIO_PROMETHEUS_AUTH_TYPE
+              value: public
+            - name: MINIO_CONSOLE_PORT_NUMBER
+              value: "9001"
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: http://localhost:30080/minio
+          envFrom: null
+          image: docker.io/bitnami/minio:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /minio/health/live
+              port: minio-api
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: minio
+          ports:
+            - containerPort: 9000
+              name: minio-api
+              protocol: TCP
+            - containerPort: 9001
+              name: minio-console
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: minio-api
+            timeoutSeconds: 1
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          volumeMounts:
+            - mountPath: /data
+              name: data
       initContainers:
-      - command:
-        - /bin/bash
-        - -ec
-        - |
-          chown -R 1001:1001 /data
-        image: docker.io/bitnami/os-shell:sandbox
-        imagePullPolicy: Never
-        name: volume-permissions
-        resources:
-          limits: {}
-          requests: {}
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /data
-          name: data
+        - command:
+            - /bin/bash
+            - -ec
+            - |
+              chown -R 1001:1001 /data
+          image: docker.io/bitnami/os-shell:sandbox
+          imagePullPolicy: Never
+          name: volume-permissions
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /data
+              name: data
       securityContext:
         fsGroup: 1001
       serviceAccountName: flyte-sandbox-minio
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-sandbox-minio-storage
+        - name: data
+          persistentVolumeClaim:
+            claimName: flyte-sandbox-minio-storage
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1651,26 +1651,26 @@ spec:
         app.kubernetes.io/name: flyte-sandbox
     spec:
       containers:
-      - image: envoyproxy/envoy:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
-            port: http
-        name: proxy
-        ports:
-        - containerPort: 8000
-          name: http
-        readinessProbe:
-          tcpSocket:
-            port: http
-        volumeMounts:
-        - mountPath: /etc/envoy
-          name: config
+        - image: envoyproxy/envoy:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: http
+          name: proxy
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+          volumeMounts:
+            - mountPath: /etc/envoy
+              name: config
       volumes:
-      - configMap:
-          name: flyte-sandbox-proxy-config
-        name: config
+        - configMap:
+            name: flyte-sandbox-proxy-config
+          name: config
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -1706,128 +1706,128 @@ spec:
         podAffinity: null
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/component: primary
-                  app.kubernetes.io/instance: flyte-sandbox
-                  app.kubernetes.io/name: postgresql
-              topologyKey: kubernetes.io/hostname
-            weight: 1
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: primary
+                    app.kubernetes.io/instance: flyte-sandbox
+                    app.kubernetes.io/name: postgresql
+                topologyKey: kubernetes.io/hostname
+              weight: 1
       containers:
-      - env:
-        - name: BITNAMI_DEBUG
-          value: "false"
-        - name: POSTGRESQL_PORT_NUMBER
-          value: "5432"
-        - name: POSTGRESQL_VOLUME_DIR
-          value: /bitnami/postgresql
-        - name: PGDATA
-          value: /bitnami/postgresql/data
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: postgres-password
-              name: flyte-sandbox-postgresql
-        - name: POSTGRESQL_ENABLE_LDAP
-          value: "no"
-        - name: POSTGRESQL_ENABLE_TLS
-          value: "no"
-        - name: POSTGRESQL_LOG_HOSTNAME
-          value: "false"
-        - name: POSTGRESQL_LOG_CONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_LOG_DISCONNECTIONS
-          value: "false"
-        - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
-          value: "off"
-        - name: POSTGRESQL_CLIENT_MIN_MESSAGES
-          value: error
-        - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
-          value: pgaudit
-        image: docker.io/bitnami/postgresql:sandbox
-        imagePullPolicy: Never
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-          failureThreshold: 6
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: postgresql
-        ports:
-        - containerPort: 5432
-          name: tcp-postgresql
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - -e
-            - |
-              exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
-              [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
-          failureThreshold: 6
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        resources:
-          limits: {}
-          requests:
-            cpu: 250m
-            memory: 256Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          runAsGroup: 0
-          runAsNonRoot: true
-          runAsUser: 1001
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
+        - env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: /bitnami/postgresql
+            - name: PGDATA
+              value: /bitnami/postgresql/data
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: flyte-sandbox-postgresql
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+            - name: POSTGRESQL_ENABLE_TLS
+              value: "no"
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: "false"
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: "off"
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: error
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: pgaudit
+          image: docker.io/bitnami/postgresql:sandbox
+          imagePullPolicy: Never
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: postgresql
+          ports:
+            - containerPort: 5432
+              name: tcp-postgresql
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits: {}
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 0
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /bitnami/postgresql
+              name: data
       hostIPC: false
       hostNetwork: false
       initContainers:
-      - command:
-        - /bin/sh
-        - -ec
-        - |
-          chown 1001:1001 /bitnami/postgresql
-          mkdir -p /bitnami/postgresql/data
-          chmod 700 /bitnami/postgresql/data
-          find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
-            xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/os-shell:sandbox
-        imagePullPolicy: Never
-        name: init-chmod-data
-        resources:
-          limits: {}
-          requests: {}
-        securityContext:
-          runAsGroup: 0
-          runAsNonRoot: false
-          runAsUser: 0
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - mountPath: /bitnami/postgresql
-          name: data
+        - command:
+            - /bin/sh
+            - -ec
+            - |
+              chown 1001:1001 /bitnami/postgresql
+              mkdir -p /bitnami/postgresql/data
+              chmod 700 /bitnami/postgresql/data
+              find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
+                xargs -r chown -R 1001:1001
+          image: docker.io/bitnami/os-shell:sandbox
+          imagePullPolicy: Never
+          name: init-chmod-data
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            runAsGroup: 0
+            runAsNonRoot: false
+            runAsUser: 0
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /bitnami/postgresql
+              name: data
       securityContext:
         fsGroup: 1001
       serviceAccountName: default
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: flyte-sandbox-db-storage
+        - name: data
+          persistentVolumeClaim:
+            claimName: flyte-sandbox-db-storage
   updateStrategy:
     rollingUpdate: {}
     type: RollingUpdate

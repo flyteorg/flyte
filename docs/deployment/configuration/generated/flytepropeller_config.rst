@@ -1356,7 +1356,7 @@ ray (`ray.Config`_)
     stackdriver-logresourcename: ""
     stackdriver-template-uri: ""
     templates: null
-  logsSidecar: null
+  logsUploader: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -2744,7 +2744,7 @@ config.FlyteCoPilotConfig
 name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)
+Flyte co-pilot uploader container name prefix. (additional bits will be added after this)
 
 **Default Value**: 
 
@@ -3742,7 +3742,7 @@ logs (`logs.LogConfig`_)
   templates: null
   
 
-logsSidecar (v1.Container)
+logsUploader (v1.Container)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -5857,7 +5857,7 @@ AWS Secret Manager config.
     requests:
       cpu: 200m
       memory: 500Mi
-  sidecarImage: docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
+  uploaderImage: docker.io/amazon/aws-secrets-manager-secret-uploader:v0.1.4
   
 
 gcpSecretManager (`config.GCPSecretManagerConfig`_)
@@ -5876,7 +5876,7 @@ GCP Secret Manager config.
     requests:
       cpu: 200m
       memory: 500Mi
-  sidecarImage: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+  uploaderImage: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
   
 
 vaultSecretManager (`config.VaultSecretManagerConfig`_)
@@ -5896,16 +5896,16 @@ Vault Secret Manager config.
 config.AWSSecretManagerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-sidecarImage (string)
+uploaderImage (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Specifies the sidecar docker image to use
+Specifies the uploader docker image to use
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4
+  docker.io/amazon/aws-secrets-manager-secret-uploader:v0.1.4
   
 
 resources (`v1.ResourceRequirements`_)
@@ -5961,10 +5961,10 @@ claims ([]v1.ResourceClaim)
 config.GCPSecretManagerConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-sidecarImage (string)
+uploaderImage (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Specifies the sidecar docker image to use
+Specifies the uploader docker image to use
 
 **Default Value**: 
 

@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "sidecar"
-	flyteInitContainerName    = "downloader"
+	flyteUploaderContainerName = "uploader"
+	flyteInitContainerName     = "downloader"
 )
 
 var pTraceCapability = v1.Capability("SYS_PTRACE")
@@ -88,16 +88,16 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	}...)
 }
 
-func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, startTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
+func UploaderCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, startTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
 	if iface == nil {
-		return nil, fmt.Errorf("interface is required for CoPilot Sidecar")
+		return nil, fmt.Errorf("interface is required for CoPilot Uploader")
 	}
 	b, err := proto.Marshal(iface)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal given core.TypedInterface")
 	}
 	return []string{
-		"sidecar",
+		"uploader",
 		"--start-timeout",
 		startTimeout.String(),
 		"--to-raw-output",
@@ -263,15 +263,15 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.OutputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.StartTimeout.Duration, iFace)
+			args, err := UploaderCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.StartTimeout.Duration, iFace)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
+			uploader, err := FlyteCoPilotContainer(flyteUploaderContainerName, cfg, args, outputsVolumeMount)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
+			coPilotPod.Containers = append(coPilotPod.Containers, uploader)
 		}
 	}
 

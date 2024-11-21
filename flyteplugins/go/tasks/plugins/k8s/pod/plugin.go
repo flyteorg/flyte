@@ -23,13 +23,13 @@ const (
 	podTaskType          = "pod"
 	pythonTaskType       = "python-task"
 	rawContainerTaskType = "raw-container"
-	SidecarTaskType      = "sidecar"
+	UploaderTaskType     = "uploader"
 )
 
-// Why, you might wonder do we recreate the generated go struct generated from the plugins.SidecarJob proto? Because
+// Why, you might wonder do we recreate the generated go struct generated from the plugins.UploaderJob proto? Because
 // although we unmarshal the task custom json, the PodSpec itself is not generated from a proto definition,
-// but a proper go struct defined in k8s libraries. Therefore we only unmarshal the sidecar as a json, rather than jsonpb.
-type sidecarJob struct {
+// but a proper go struct defined in k8s libraries. Therefore we only unmarshal the uploader as a json, rather than jsonpb.
+type uploaderJob struct {
 	PodSpec              *v1.PodSpec
 	PrimaryContainerName string
 	Annotations          map[string]string
@@ -59,27 +59,27 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	}
 	primaryContainerName := ""
 
-	if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 0 {
-		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
-		sidecarJob := sidecarJob{}
-		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
+	if taskTemplate.GetType() == UploaderTaskType && taskTemplate.GetTaskTypeVersion() == 0 {
+		// handles pod tasks when they are defined as Uploader tasks and marshal the podspec using k8s proto.
+		uploaderJob := uploaderJob{}
+		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &uploaderJob)
 		if err != nil {
 			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		if sidecarJob.PodSpec == nil {
+		if uploaderJob.PodSpec == nil {
 			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, nil PodSpec [%v]", taskTemplate.GetCustom())
 		}
 
-		podSpec = sidecarJob.PodSpec
+		podSpec = uploaderJob.PodSpec
 
 		// get primary container name
-		primaryContainerName = sidecarJob.PrimaryContainerName
+		primaryContainerName = uploaderJob.PrimaryContainerName
 
 		// update annotations and labels
-		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, sidecarJob.Annotations)
-		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
-	} else if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 1 {
+		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, uploaderJob.Annotations)
+		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, uploaderJob.Labels)
+	} else if taskTemplate.GetType() == UploaderTaskType && taskTemplate.GetTaskTypeVersion() == 1 {
 		// handles pod tasks that marshal the pod spec to the task custom.
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
 		if err != nil {
@@ -119,10 +119,10 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		return nil, err
 	}
 
-	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
+	// set primaryContainerKey annotation if this is a Uploader task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.GetType() == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.GetType() == UploaderTaskType || len(podSpec.Containers) == 1 {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -247,10 +247,10 @@ func (plugin) GetProperties() k8s.PluginProperties {
 }
 
 func init() {
-	// Register ContainerTaskType and SidecarTaskType plugin entries. These separate task types
+	// Register ContainerTaskType and UploaderTaskType plugin entries. These separate task types
 	// still exist within the system, only now both are evaluated using the same internal pod plugin
 	// instance. This simplifies migration as users may keep the same configuration but are
-	// seamlessly transitioned from separate container and sidecar plugins to a single pod plugin.
+	// seamlessly transitioned from separate container and uploader plugins to a single pod plugin.
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  ContainerTaskType,
@@ -262,8 +262,8 @@ func init() {
 
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
-			ID:                  SidecarTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{SidecarTaskType},
+			ID:                  UploaderTaskType,
+			RegisteredTaskTypes: []pluginsCore.TaskType{UploaderTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           false,
@@ -273,7 +273,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterK8sPlugin(
 		k8s.PluginEntry{
 			ID:                  podTaskType,
-			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, pythonTaskType, rawContainerTaskType, SidecarTaskType},
+			RegisteredTaskTypes: []pluginsCore.TaskType{ContainerTaskType, pythonTaskType, rawContainerTaskType, UploaderTaskType},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              DefaultPodPlugin,
 			IsDefault:           true,

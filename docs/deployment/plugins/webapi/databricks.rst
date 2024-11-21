@@ -140,11 +140,11 @@ Specify plugin configuration
               default-for-task-types:
                 container: container
                 container_array: k8s-array
-                sidecar: sidecar
+                uploader: uploader
                 spark: databricks
               enabled-plugins:
                 - container
-                - sidecar
+                - uploader
                 - k8s-array
                 - databricks
           plugins:
@@ -196,7 +196,7 @@ Specify plugin configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - sidecar
+                - uploader
                 - k8s-array
                 - databricks
               default-for-task-types:
@@ -228,12 +228,12 @@ Specify plugin configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - sidecar
+                - uploader
                 - k8s-array
                 - databricks
               default-for-task-types:
                 container: container
-                sidecar: sidecar
+                uploader: uploader
                 container_array: k8s-array
                 spark: databricks
       databricks:

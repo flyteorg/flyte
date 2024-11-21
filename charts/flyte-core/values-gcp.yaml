@@ -5,10 +5,10 @@ userSettings:
   googleProjectId: <PROJECT-ID>
   dbHost: <CLOUD-SQL-IP>
   dbPassword: <DBPASSWORD>
-# These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
-# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data 
-  bucketName: <METADATA_BUCKET_NAME> 
-  rawDataBucketName: <RAW_DATA_BUCKET_NAME> 
+  # These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
+  # Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data
+  bucketName: <METADATA_BUCKET_NAME>
+  rawDataBucketName: <RAW_DATA_BUCKET_NAME>
   hostName: <HOSTNAME>
 
 #
@@ -294,15 +294,14 @@ configmap:
         # plugins
         enabled-plugins:
           - container
-          - sidecar
+          - uploader
           - k8s-array
           - agent-service
           - echo
         default-for-task-types:
           container: container
-          sidecar: sidecar
+          uploader: uploader
           container_array: k8s-array
-
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various

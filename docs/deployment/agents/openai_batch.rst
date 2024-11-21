@@ -25,7 +25,7 @@ Specify agent configuration
           task-plugins:
             enabled-plugins:
               - container
-              - sidecar
+              - uploader
               - k8s-array
               - agent-service
             default-for-task-types:
@@ -46,12 +46,12 @@ Specify agent configuration
               task-plugins:
                 enabled-plugins:
                   - container
-                  - sidecar
+                  - uploader
                   - k8s-array
                   - agent-service
                 default-for-task-types:
                   container: container
-                  sidecar: sidecar
+                  uploader: uploader
                   container_array: k8s-array
                   openai-batch: agent-service
 
