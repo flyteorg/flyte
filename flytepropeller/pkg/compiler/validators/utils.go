@@ -202,18 +202,13 @@ func buildMultipleTypeUnion(innerType []*core.LiteralType) *core.LiteralType {
 	return unionLiteralType
 }
 
-func literalTypeForLiterals(literals []*core.Literal) (*core.LiteralType, bool) {
+func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	innerType := make([]*core.LiteralType, 0, 1)
 	innerTypeSet := sets.NewString()
 	var noneType *core.LiteralType
-	isOffloadedType := false
 	for _, x := range literals {
 		otherType := LiteralTypeForLiteral(x)
 		otherTypeKey := otherType.String()
-		if _, ok := x.GetValue().(*core.Literal_OffloadedMetadata); ok {
-			isOffloadedType = true
-			return otherType, isOffloadedType
-		}
 		if _, ok := x.GetValue().(*core.Literal_Collection); ok {
 			if x.GetCollection().GetLiterals() == nil {
 				noneType = otherType
@@ -235,9 +230,9 @@ func literalTypeForLiterals(literals []*core.Literal) (*core.LiteralType, bool) 
 	if len(innerType) == 0 {
 		return &core.LiteralType{
 			Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
-		}, isOffloadedType
+		}
 	} else if len(innerType) == 1 {
-		return innerType[0], isOffloadedType
+		return innerType[0]
 	}
 
 	// sort inner types to ensure consistent union types are generated
@@ -252,7 +247,7 @@ func literalTypeForLiterals(literals []*core.Literal) (*core.LiteralType, bool) 
 
 		return 0
 	})
-	return buildMultipleTypeUnion(innerType), isOffloadedType
+	return buildMultipleTypeUnion(innerType)
 }
 
 // ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
@@ -279,23 +274,15 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 	case *core.Literal_Scalar:
 		return literalTypeForScalar(l.GetScalar())
 	case *core.Literal_Collection:
-		collectionType, isOffloaded := literalTypeForLiterals(l.GetCollection().GetLiterals())
-		if isOffloaded {
-			return collectionType
-		}
 		return &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
-				CollectionType: collectionType,
+				CollectionType: literalTypeForLiterals(l.GetCollection().Literals),
 			},
 		}
 	case *core.Literal_Map:
-		mapValueType, isOffloaded := literalTypeForLiterals(maps.Values(l.GetMap().GetLiterals()))
-		if isOffloaded {
-			return mapValueType
-		}
 		return &core.LiteralType{
 			Type: &core.LiteralType_MapValueType{
-				MapValueType: mapValueType,
+				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
 			},
 		}
 	case *core.Literal_OffloadedMetadata:

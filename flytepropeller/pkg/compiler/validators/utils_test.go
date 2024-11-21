@@ -13,9 +13,8 @@ import (
 
 func TestLiteralTypeForLiterals(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
-		lt, isOffloaded := literalTypeForLiterals(nil)
+		lt := literalTypeForLiterals(nil)
 		assert.Equal(t, core.SimpleType_NONE.String(), lt.GetSimple().String())
-		assert.False(t, isOffloaded)
 	})
 
 	t.Run("binary idl with raw binary data and no tag", func(t *testing.T) {
@@ -95,18 +94,17 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 	})
 
 	t.Run("homogeneous", func(t *testing.T) {
-		lt, isOffloaded := literalTypeForLiterals([]*core.Literal{
+		lt := literalTypeForLiterals([]*core.Literal{
 			coreutils.MustMakeLiteral(5),
 			coreutils.MustMakeLiteral(0),
 			coreutils.MustMakeLiteral(5),
 		})
 
 		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetSimple().String())
-		assert.False(t, isOffloaded)
 	})
 
 	t.Run("non-homogenous", func(t *testing.T) {
-		lt, isOffloaded := literalTypeForLiterals([]*core.Literal{
+		lt := literalTypeForLiterals([]*core.Literal{
 			coreutils.MustMakeLiteral("hello"),
 			coreutils.MustMakeLiteral(5),
 			coreutils.MustMakeLiteral("world"),
@@ -114,24 +112,22 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
-		assert.False(t, isOffloaded)
+		assert.Len(t, lt.GetUnionType().Variants, 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
 	})
 
 	t.Run("non-homogenous ensure ordering", func(t *testing.T) {
-		lt, isOffloaded := literalTypeForLiterals([]*core.Literal{
+		lt := literalTypeForLiterals([]*core.Literal{
 			coreutils.MustMakeLiteral(5),
 			coreutils.MustMakeLiteral("world"),
 			coreutils.MustMakeLiteral(0),
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
-		assert.False(t, isOffloaded)
+		assert.Len(t, lt.GetUnionType().Variants, 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
 	})
 
 	t.Run("list with mixed types", func(t *testing.T) {
@@ -453,89 +449,6 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 				},
 			},
 		}
-		expectedLt := inferredType
-		lt := LiteralTypeForLiteral(literals)
-		assert.True(t, proto.Equal(expectedLt, lt))
-	})
-
-	t.Run("nested Lists of offloaded List of string types", func(t *testing.T) {
-		inferredType := &core.LiteralType{
-			Type: &core.LiteralType_CollectionType{
-				CollectionType: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_STRING,
-					},
-				},
-			},
-		}
-		literals := &core.Literal{
-			Value: &core.Literal_Collection{
-				Collection: &core.LiteralCollection{
-					Literals: []*core.Literal{
-						{
-							Value: &core.Literal_OffloadedMetadata{
-								OffloadedMetadata: &core.LiteralOffloadedMetadata{
-									Uri:          "dummy/uri-1",
-									SizeBytes:    1000,
-									InferredType: inferredType,
-								},
-							},
-						},
-						{
-							Value: &core.Literal_OffloadedMetadata{
-								OffloadedMetadata: &core.LiteralOffloadedMetadata{
-									Uri:          "dummy/uri-2",
-									SizeBytes:    1000,
-									InferredType: inferredType,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		expectedLt := inferredType
-		lt := LiteralTypeForLiteral(literals)
-		assert.True(t, proto.Equal(expectedLt, lt))
-	})
-	t.Run("nested map of offloaded map of string types", func(t *testing.T) {
-		inferredType := &core.LiteralType{
-			Type: &core.LiteralType_MapValueType{
-				MapValueType: &core.LiteralType{
-					Type: &core.LiteralType_Simple{
-						Simple: core.SimpleType_STRING,
-					},
-				},
-			},
-		}
-		literals := &core.Literal{
-			Value: &core.Literal_Map{
-				Map: &core.LiteralMap{
-					Literals: map[string]*core.Literal{
-
-						"key1": {
-							Value: &core.Literal_OffloadedMetadata{
-								OffloadedMetadata: &core.LiteralOffloadedMetadata{
-									Uri:          "dummy/uri-1",
-									SizeBytes:    1000,
-									InferredType: inferredType,
-								},
-							},
-						},
-						"key2": {
-							Value: &core.Literal_OffloadedMetadata{
-								OffloadedMetadata: &core.LiteralOffloadedMetadata{
-									Uri:          "dummy/uri-2",
-									SizeBytes:    1000,
-									InferredType: inferredType,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-
 		expectedLt := inferredType
 		lt := LiteralTypeForLiteral(literals)
 		assert.True(t, proto.Equal(expectedLt, lt))
