@@ -9,11 +9,13 @@
 When you've multiple values that you want to send across Flyte entities, you can use a `dataclass`.
 
 Flytekit uses the [Mashumaro library](https://github.com/Fatal1ty/mashumaro)
-to serialize and deserialize dataclasses. With the 1.14 release, `flytekit` adopted `MessagePack` as the serialization format for dataclasses, overcoming  a major limitation of serialization into a JSON string within a Protobuf `struct` datatype, like the previous versions do: to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to workaround this issue. By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing dataclasses.
+to serialize and deserialize dataclasses. With the 1.14 release, `flytekit` adopted `MessagePack` as the 
+serialization format for dataclasses, overcoming  a major limitation of serialization into a JSON string within a Protobuf `struct` datatype, like the previous versions do: to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to work around this issue. By default, `flytekit >= 1.14` will produce `msgpack` bytes literals when serializing dataclasses.
 
 :::{important}
 
-If you're serializing dataclasses using `flytekit` version >= v1.14.0 and you want to produce Protobuf `struct literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
+If you're serializing dataclasses using `flytekit` version >= v1.14.0, and you want to produce Protobuf `struct 
+literal` instead, you can set environment variable `FLYTE_USE_OLD_DC_FORMAT` to `true`.
 
 :::{important}
 If you're using Flytekit version < v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
