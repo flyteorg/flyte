@@ -1202,6 +1202,13 @@ export class ExecutionTerminateRequest extends Message<ExecutionTerminateRequest
    */
   cause = "";
 
+  /**
+   * Optional force termination
+   *
+   * @generated from field: bool force = 3;
+   */
+  force = false;
+
   constructor(data?: PartialMessage<ExecutionTerminateRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1212,6 +1219,7 @@ export class ExecutionTerminateRequest extends Message<ExecutionTerminateRequest
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: WorkflowExecutionIdentifier },
     { no: 2, name: "cause", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "force", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionTerminateRequest {

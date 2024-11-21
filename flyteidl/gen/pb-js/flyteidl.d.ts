@@ -14331,6 +14331,9 @@ export namespace flyteidl {
 
             /** ExecutionTerminateRequest cause */
             cause?: (string|null);
+
+            /** ExecutionTerminateRequest force */
+            force?: (boolean|null);
         }
 
         /** Represents an ExecutionTerminateRequest. */
@@ -14347,6 +14350,9 @@ export namespace flyteidl {
 
             /** ExecutionTerminateRequest cause. */
             public cause: string;
+
+            /** ExecutionTerminateRequest force. */
+            public force: boolean;
 
             /**
              * Creates a new ExecutionTerminateRequest instance using the specified properties.
