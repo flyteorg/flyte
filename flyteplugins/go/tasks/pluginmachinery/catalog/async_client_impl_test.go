@@ -162,11 +162,11 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 			}
 			gotPutFuture, err := c.Upload(ctx, tt.requests...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AsyncClientImpl.Uploader() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AsyncClientImpl.Sidecar() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotPutFuture, tt.wantPutFuture) {
-				t.Errorf("AsyncClientImpl.Uploader() = %v, want %v", gotPutFuture, tt.wantPutFuture)
+				t.Errorf("AsyncClientImpl.Sidecar() = %v, want %v", gotPutFuture, tt.wantPutFuture)
 			}
 			expectedWorkItemIDs := []string{inputHash1, inputHash2}
 			gottenWorkItemIDs := make([]string, 0)

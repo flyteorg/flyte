@@ -62,20 +62,20 @@ configuration:
     authorizedUris: []
 
   # inline Specify additional configuration or overrides for Flyte, to be merged with the base configuration
-  inline:
+  inline: 
     #This section automates the IAM Role annotation for the default KSA on each project namespace to enable IRSA
     #Learn more: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
     cluster_resources:
       customData:
-        - production:
-            - defaultIamServiceAccount:
-                value: <FLYTE_IAM_SA_EMAIL>
-        - staging:
-            - defaultIamServiceAccount:
-                value: <FLYTE_IAM_SA_EMAIL>
-        - development:
-            - defaultIamServiceAccount:
-                value: <FLYTE_IAM_SA_EMAIL>
+      - production:
+        - defaultIamServiceAccount:
+            value: <FLYTE_IAM_SA_EMAIL>
+      - staging:
+        - defaultIamServiceAccount:
+            value: <FLYTE_IAM_SA_EMAIL>
+      - development:
+        - defaultIamServiceAccount:
+            value: <FLYTE_IAM_SA_EMAIL>
     plugins:
       k8s:
         inject-finalizer: true
@@ -83,12 +83,12 @@ configuration:
         gpu-partition-size-node-label: cloud.google.com/gke-gpu-partition-size
         resource-tolerations:
           - nvidia.com/gpu:
-              - key: "nvidia.com/gpu"
-                operator: "Equal"
-                value: "present"
-                effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Equal"
+              value: "present"
+              effect: "NoSchedule"
     # Configuration for the Datacatalog engine, used when caching is enabled
-    # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html
+    # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html  
     storage:
       cache:
         max_size_mbs: 10
@@ -97,7 +97,7 @@ configuration:
       task-plugins:
         enabled-plugins:
           - container
-          - uploader
+          - sidecar
           - K8S-ARRAY #used for MapTasks
           - agent-service
           - echo
@@ -108,7 +108,7 @@ configuration:
 # clusterResourceTemplates Specify templates for Kubernetes resources that should be created for new Flyte projects
 clusterResourceTemplates:
   # inline Specify additional cluster resource templates, to be merged with the base configuration
-  inline:
+  inline: 
     #This section automates the creation of the project-domain namespaces
     001_namespace.yaml: |
       apiVersion: v1
@@ -123,7 +123,7 @@ clusterResourceTemplates:
         name: default
         namespace: '{{ namespace }}'
         annotations:
-          iam.gke.io/gcp-service-account: '{{ defaultIamServiceAccount }}'
+          iam.gke.io/gcp-service-account: '{{ defaultIamServiceAccount }}' 
 
 # serviceAccount Configure Flyte ServiceAccount
 serviceAccount:
@@ -131,18 +131,18 @@ serviceAccount:
   create: true
   #Automates annotation of default flyte-binary KSA. Make sure to bind the KSA to the GSA: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#authenticating_to
   annotations:
-    iam.gke.io/gcp-service-account: <FLYTE_IAM_SA_EMAIL>
+    iam.gke.io/gcp-service-account: <FLYTE_IAM_SA_EMAIL> 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:
   # create Create ClusterRole and ClusterRoleBinding resources
   create: true
   # extraRules Add additional rules to the ClusterRole
-  extraRules:
-    - apiGroups:
-        - ""
-      resources:
-        - serviceaccounts
-      verbs:
-        - create
-        - get
-        - patch
+  extraRules: 
+   - apiGroups:
+      - ""
+     resources:
+      - serviceaccounts
+     verbs:
+      - create
+      - get
+      - patch

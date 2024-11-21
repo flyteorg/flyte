@@ -272,12 +272,12 @@ func convertBase64RuntimeEnvToYaml(s string) (string, error) {
 	return string(y), nil
 }
 
-func injectLogsUploader(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
+func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 	cfg := GetConfig()
-	if cfg.LogsUploader == nil {
+	if cfg.LogsSidecar == nil {
 		return
 	}
-	uploader := cfg.LogsUploader.DeepCopy()
+	sidecar := cfg.LogsSidecar.DeepCopy()
 
 	// Ray logs integration
 	var rayStateVolMount *v1.VolumeMount
@@ -306,27 +306,27 @@ func injectLogsUploader(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 		primaryContainer.VolumeMounts = append(primaryContainer.VolumeMounts, volMount)
 		rayStateVolMount = &volMount
 	}
-	// We need to mirror the ray state volume mount into the uploader as readonly,
+	// We need to mirror the ray state volume mount into the sidecar as readonly,
 	// so that we can read the logs written by the head node.
 	readOnlyRayStateVolMount := *rayStateVolMount.DeepCopy()
 	readOnlyRayStateVolMount.ReadOnly = true
 
-	// Update volume mounts on uploader
+	// Update volume mounts on sidecar
 	// If one already exists with the desired mount path, simply replace it. Otherwise,
-	// add it to uploader's volume mounts.
-	foundExistingUploaderVolMount := false
-	for idx, vm := range uploader.VolumeMounts {
+	// add it to sidecar's volume mounts.
+	foundExistingSidecarVolMount := false
+	for idx, vm := range sidecar.VolumeMounts {
 		if vm.MountPath == rayStateMountPath {
-			foundExistingUploaderVolMount = true
-			uploader.VolumeMounts[idx] = readOnlyRayStateVolMount
+			foundExistingSidecarVolMount = true
+			sidecar.VolumeMounts[idx] = readOnlyRayStateVolMount
 		}
 	}
-	if !foundExistingUploaderVolMount {
-		uploader.VolumeMounts = append(uploader.VolumeMounts, readOnlyRayStateVolMount)
+	if !foundExistingSidecarVolMount {
+		sidecar.VolumeMounts = append(sidecar.VolumeMounts, readOnlyRayStateVolMount)
 	}
 
-	// Add uploader to containers
-	podSpec.Containers = append(podSpec.Containers, *uploader)
+	// Add sidecar to containers
+	podSpec.Containers = append(podSpec.Containers, *sidecar)
 }
 
 func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.HeadGroupSpec) (v1.PodTemplateSpec, error) {
@@ -366,8 +366,8 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 
 	primaryContainer.Ports = append(primaryContainer.Ports, ports...)
 
-	// Inject a uploader for capturing and exposing Ray job logs
-	injectLogsUploader(primaryContainer, basePodSpec)
+	// Inject a sidecar for capturing and exposing Ray job logs
+	injectLogsSidecar(primaryContainer, basePodSpec)
 
 	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
 	if err != nil {

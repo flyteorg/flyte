@@ -4,10 +4,10 @@ userSettings:
   certificateArn: <CERTIFICATE_ARN>
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
-  # These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
-  # Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data
-  bucketName: <METADATA_BUCKET_NAME>
-  rawDataBucketName: <RAW_DATA_BUCKET_NAME>
+# These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
+# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data 
+  bucketName: <METADATA_BUCKET_NAME> 
+  rawDataBucketName: <RAW_DATA_BUCKET_NAME>  
   logGroup: <LOG_GROUP_NAME>
   redisHostUrl: <REDIS_HOST_URL>
   redisHostKey: <REDIS_HOST_KEY>
@@ -270,6 +270,7 @@ configmap:
         #   hostPath: "{{ .Values.userSettings.redisHostUrl }}"
         #   hostKey: "{{ .Values.userSettings.redisHostKey }}"
 
+
   enabled_plugins:
     # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
     tasks:
@@ -279,7 +280,7 @@ configmap:
         # plugins
         enabled-plugins:
           - container
-          - uploader
+          - sidecar
           - k8s-array
           - agent-service
           - echo
@@ -288,10 +289,11 @@ configmap:
         #          - sagemaker_training
         default-for-task-types:
           container: container
-          uploader: uploader
+          sidecar: sidecar
           container_array: k8s-array
   #          sagemaker_custom_training_task: sagemaker_custom_training
   #          sagemaker_custom_training_job_task: sagemaker_custom_training
+
 
   # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
   # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
@@ -340,9 +342,9 @@ workflow_notifications:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has {{ phase }}"
         sender: "flyte@example.com"
         body: |
-          "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-           Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-           {{ error }}"
+         "Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+          Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+          {{ error }}"
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
@@ -410,6 +412,8 @@ cluster_resource_manager:
           hard:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
+
+
 
 #
 # SPARKOPERATOR

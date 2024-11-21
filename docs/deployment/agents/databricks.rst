@@ -146,11 +146,11 @@ Specify agent configuration
               default-for-task-types:
                 container: container
                 container_array: k8s-array
-                uploader: uploader
+                sidecar: sidecar
                 databricks: agent-service
               enabled-plugins:
                 - container
-                - uploader
+                - sidecar
                 - k8s-array
                 - agent-service
 
@@ -165,7 +165,7 @@ Specify agent configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - uploader
+                - sidecar
                 - k8s-array
                 - agent-service
               default-for-task-types:
@@ -185,12 +185,12 @@ Specify agent configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - uploader
+                - sidecar
                 - k8s-array
                 - agent-service
               default-for-task-types:
                 container: container
-                uploader: uploader
+                sidecar: sidecar
                 container_array: k8s-array
                 databricks: agent-service
 

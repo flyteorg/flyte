@@ -30,7 +30,7 @@ import (
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
 
-var uploaderResourceRequirements = &v1.ResourceRequirements{
+var sidecarResourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
 		v1.ResourceCPU:              resource.MustParse("2048m"),
 		v1.ResourceEphemeralStorage: resource.MustParse("100M"),
@@ -38,23 +38,23 @@ var uploaderResourceRequirements = &v1.ResourceRequirements{
 	},
 }
 
-func getUploaderTaskTemplateForTest(sideCarJob uploaderJob) *core.TaskTemplate {
-	uploaderJSON, err := json.Marshal(&sideCarJob)
+func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
+	sidecarJSON, err := json.Marshal(&sideCarJob)
 	if err != nil {
 		panic(err)
 	}
 	structObj := structpb.Struct{}
-	err = json.Unmarshal(uploaderJSON, &structObj)
+	err = json.Unmarshal(sidecarJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
 	return &core.TaskTemplate{
-		Type:   UploaderTaskType,
+		Type:   SidecarTaskType,
 		Custom: &structObj,
 	}
 }
 
-func dummyUploaderTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
+func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -98,9 +98,9 @@ func dummyUploaderTaskMetadata(resources *v1.ResourceRequirements, extendedResou
 	return taskMetadata
 }
 
-func getDummyUploaderTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
+func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
-	dummyTaskMetadata := dummyUploaderTaskMetadata(resources, extendedResources)
+	dummyTaskMetadata := dummySidecarTaskMetadata(resources, extendedResources)
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
 	inputReader.OnGetInputPath().Return("test-data-reference")
@@ -133,7 +133,7 @@ func getPodSpec() v1.PodSpec {
 		Containers: []v1.Container{
 			{
 				Name: "primary container",
-				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_uploader_tasks", "--task-name", "simple_uploader_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
 				Resources: v1.ResourceRequirements{
 					Limits: v1.ResourceList{
 						"cpu":    resource.MustParse("2"),
@@ -192,7 +192,7 @@ func checkTolerations(t *testing.T, res client.Object, gpuTol v1.Toleration) {
 	}
 }
 
-func TestBuildUploaderResource_TaskType2(t *testing.T) {
+func TestBuildSidecarResource_TaskType2(t *testing.T) {
 	podSpec := getPodSpec()
 
 	b, err := json.Marshal(podSpec)
@@ -206,7 +206,7 @@ func TestBuildUploaderResource_TaskType2(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
-		Type:            UploaderTaskType,
+		Type:            SidecarTaskType,
 		TaskTypeVersion: 2,
 		Config: map[string]string{
 			flytek8s.PrimaryContainerKey: "primary container",
@@ -248,7 +248,7 @@ func TestBuildUploaderResource_TaskType2(t *testing.T) {
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		GpuResourceName:      ResourceNvidiaGPU,
 	}))
-	taskCtx := getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -288,9 +288,9 @@ func TestBuildUploaderResource_TaskType2(t *testing.T) {
 	assert.Equal(t, expectedGPURes, res.(*v1.Pod).Spec.Containers[1].Resources.Limits[ResourceNvidiaGPU])
 }
 
-func TestBuildUploaderResource_TaskType2_Invalid_Spec(t *testing.T) {
+func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
 	task := core.TaskTemplate{
-		Type:            UploaderTaskType,
+		Type:            SidecarTaskType,
 		TaskTypeVersion: 2,
 		Config: map[string]string{
 			flytek8s.PrimaryContainerKey: "primary container",
@@ -309,12 +309,12 @@ func TestBuildUploaderResource_TaskType2_Invalid_Spec(t *testing.T) {
 		},
 	}
 
-	taskCtx := getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 }
 
-func TestBuildUploaderResource_TaskType1(t *testing.T) {
+func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	podSpec := getPodSpec()
 
 	b, err := json.Marshal(podSpec)
@@ -328,7 +328,7 @@ func TestBuildUploaderResource_TaskType1(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
-		Type:            UploaderTaskType,
+		Type:            SidecarTaskType,
 		Custom:          structObj,
 		TaskTypeVersion: 1,
 		Config: map[string]string{
@@ -357,7 +357,7 @@ func TestBuildUploaderResource_TaskType1(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -409,7 +409,7 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 	}
 
 	task := core.TaskTemplate{
-		Type:            UploaderTaskType,
+		Type:            SidecarTaskType,
 		Custom:          structObj,
 		TaskTypeVersion: 1,
 	}
@@ -422,35 +422,35 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err = DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config needs to be non-empty and include missing [primary_container_name] key")
 
 	task.Config = map[string]string{
 		"foo": "bar",
 	}
-	taskCtx = getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx = getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err = DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config missing [primary_container_name] key in [map[foo:bar]]")
 
 }
 
-func TestBuildUploaderResource(t *testing.T) {
+func TestBuildSidecarResource(t *testing.T) {
 	dir, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
-	uploaderCustomJSON, err := ioutil.ReadFile(path.Join(dir, "testdata", "uploader_custom"))
+	sidecarCustomJSON, err := ioutil.ReadFile(path.Join(dir, "testdata", "sidecar_custom"))
 	if err != nil {
-		t.Fatal(uploaderCustomJSON)
+		t.Fatal(sidecarCustomJSON)
 	}
-	uploaderCustom := structpb.Struct{}
-	if err := json.Unmarshal(uploaderCustomJSON, &uploaderCustom); err != nil {
+	sidecarCustom := structpb.Struct{}
+	if err := json.Unmarshal(sidecarCustomJSON, &sidecarCustom); err != nil {
 		t.Fatal(err)
 	}
 	task := core.TaskTemplate{
-		Type:   UploaderTaskType,
-		Custom: &uploaderCustom,
+		Type:   SidecarTaskType,
+		Custom: &sidecarCustom,
 	}
 
 	tolGPU := v1.Toleration{
@@ -474,7 +474,7 @@ func TestBuildUploaderResource(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummyUploaderTaskContext(&task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -510,8 +510,8 @@ func TestBuildUploaderResource(t *testing.T) {
 	assert.Equal(t, expectedEphemeralStorageLimit.Value(), res.(*v1.Pod).Spec.Containers[0].Resources.Limits.StorageEphemeral().Value())
 }
 
-func TestBuildUploaderReosurceMissingAnnotationsAndLabels(t *testing.T) {
-	sideCarJob := uploaderJob{
+func TestBuildSidecarReosurceMissingAnnotationsAndLabels(t *testing.T) {
+	sideCarJob := sidecarJob{
 		PrimaryContainerName: "PrimaryContainer",
 		PodSpec: &v1.PodSpec{
 			Containers: []v1.Container{
@@ -522,17 +522,17 @@ func TestBuildUploaderReosurceMissingAnnotationsAndLabels(t *testing.T) {
 		},
 	}
 
-	task := getUploaderTaskTemplateForTest(sideCarJob)
+	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	taskCtx := getDummyUploaderTaskContext(task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 	resp, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.NoError(t, err)
 	assert.EqualValues(t, map[string]string{}, resp.GetLabels())
 	assert.EqualValues(t, map[string]string{"primary_container_name": "PrimaryContainer"}, resp.GetAnnotations())
 }
 
-func TestBuildUploaderResourceMissingPrimary(t *testing.T) {
-	sideCarJob := uploaderJob{
+func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
+	sideCarJob := sidecarJob{
 		PrimaryContainerName: "PrimaryContainer",
 		PodSpec: &v1.PodSpec{
 			Containers: []v1.Container{
@@ -543,14 +543,14 @@ func TestBuildUploaderResourceMissingPrimary(t *testing.T) {
 		},
 	}
 
-	task := getUploaderTaskTemplateForTest(sideCarJob)
+	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	taskCtx := getDummyUploaderTaskContext(task, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 	_, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.True(t, errors.Is(err, errors2.Errorf("BadTaskSpecification", "")))
 }
 
-func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
+func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:        "gpu-node-label",
 		GpuPartitionSizeNodeLabel: "gpu-partition-size",
@@ -672,7 +672,7 @@ func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
 	}{
 		{
 			"v0",
-			*getUploaderTaskTemplateForTest(uploaderJob{
+			*getSidecarTaskTemplateForTest(sidecarJob{
 				PrimaryContainerName: podSpec.Containers[0].Name,
 				PodSpec:              &podSpec,
 			}),
@@ -680,7 +680,7 @@ func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
 		{
 			"v1",
 			core.TaskTemplate{
-				Type:            UploaderTaskType,
+				Type:            SidecarTaskType,
 				Custom:          structObj,
 				TaskTypeVersion: 1,
 				Config: map[string]string{
@@ -691,7 +691,7 @@ func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
 		{
 			"v2",
 			core.TaskTemplate{
-				Type:            UploaderTaskType,
+				Type:            SidecarTaskType,
 				TaskTypeVersion: 2,
 				Config: map[string]string{
 					flytek8s.PrimaryContainerKey: podSpec.Containers[0].Name,
@@ -710,7 +710,7 @@ func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
 			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
 				taskTemplate := tCfg.taskTemplate
 				taskTemplate.ExtendedResources = f.extendedResourcesBase
-				taskContext := getDummyUploaderTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+				taskContext := getDummySidecarTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
 				r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
 				assert.Nil(t, err)
 				assert.NotNil(t, r)
@@ -732,8 +732,8 @@ func TestBuildUploaderResource_ExtendedResources(t *testing.T) {
 	}
 }
 
-func TestGetTaskUploaderStatus(t *testing.T) {
-	sideCarJob := uploaderJob{
+func TestGetTaskSidecarStatus(t *testing.T) {
+	sideCarJob := sidecarJob{
 		PrimaryContainerName: "PrimaryContainer",
 		PodSpec: &v1.PodSpec{
 			Containers: []v1.Container{
@@ -744,7 +744,7 @@ func TestGetTaskUploaderStatus(t *testing.T) {
 		},
 	}
 
-	task := getUploaderTaskTemplateForTest(sideCarJob)
+	task := getSidecarTaskTemplateForTest(sideCarJob)
 
 	var testCases = map[v1.PodPhase]pluginsCore.Phase{
 		v1.PodSucceeded:           pluginsCore.PhaseSuccess,
@@ -762,7 +762,7 @@ func TestGetTaskUploaderStatus(t *testing.T) {
 		res.SetAnnotations(map[string]string{
 			flytek8s.PrimaryContainerKey: "PrimaryContainer",
 		})
-		taskCtx := getDummyUploaderTaskContext(task, uploaderResourceRequirements, nil)
+		taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 		assert.Nil(t, err)
 		assert.Equal(t, expectedTaskPhase, phaseInfo.Phase(),
@@ -770,7 +770,7 @@ func TestGetTaskUploaderStatus(t *testing.T) {
 	}
 }
 
-func TestDemystifiedUploaderStatus_PrimaryFailed(t *testing.T) {
+func TestDemystifiedSidecarStatus_PrimaryFailed(t *testing.T) {
 	res := &v1.Pod{
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
@@ -789,13 +789,13 @@ func TestDemystifiedUploaderStatus_PrimaryFailed(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummyUploaderTaskContext(&core.TaskTemplate{}, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 }
 
-func TestDemystifiedUploaderStatus_PrimarySucceeded(t *testing.T) {
+func TestDemystifiedSidecarStatus_PrimarySucceeded(t *testing.T) {
 	res := &v1.Pod{
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
@@ -814,13 +814,13 @@ func TestDemystifiedUploaderStatus_PrimarySucceeded(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummyUploaderTaskContext(&core.TaskTemplate{}, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 }
 
-func TestDemystifiedUploaderStatus_PrimaryRunning(t *testing.T) {
+func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 	res := &v1.Pod{
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
@@ -839,13 +839,13 @@ func TestDemystifiedUploaderStatus_PrimaryRunning(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummyUploaderTaskContext(&core.TaskTemplate{}, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
 
-func TestDemystifiedUploaderStatus_PrimaryMissing(t *testing.T) {
+func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res := &v1.Pod{
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
@@ -866,13 +866,13 @@ func TestDemystifiedUploaderStatus_PrimaryMissing(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummyUploaderTaskContext(&core.TaskTemplate{}, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 }
 
-func TestDemystifiedUploaderStatus_PrimaryNotExistsYet(t *testing.T) {
+func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
 	res := &v1.Pod{
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
@@ -893,7 +893,7 @@ func TestDemystifiedUploaderStatus_PrimaryNotExistsYet(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummyUploaderTaskContext(&core.TaskTemplate{}, uploaderResourceRequirements, nil)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())

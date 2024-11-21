@@ -224,8 +224,8 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
-        {{- if .Values.deployment.uploaders }}
-        {{- tpl ( .Values.deployment.uploaders | toYaml ) . | nindent 8 }}
+        {{- if .Values.deployment.sidecars }}
+        {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}
       volumes:
         {{- if .Values.configuration.auth.enabled }}

@@ -23,7 +23,7 @@ running container.
 - Install [kubectl](https://kubernetes.io/docs/tasks/tools/).
 - Have access to a Flyte cluster, for e.g. with `flytectl demo start` as
   described {ref}`here <getting_started_running_workflow_local_cluster>`.
-  :::
+:::
 
 The first step to using secrets in Flyte is to create one on the backend.
 By default, Flyte uses the K8s-native secrets manager, which we'll use in this
@@ -102,11 +102,10 @@ Never print secret values! The example above is just for demonstration purposes.
 :::
 
 :::{note}
-
 - In case Flyte fails to access the secret, an error is raised.
 - The `Secret` group and key are required parameters during declaration
   and usage. Failure to specify will cause a {py:class}`ValueError`.
-  :::
+:::
 
 ### Multiple keys grouped into one secret
 
@@ -225,6 +224,7 @@ argument names for the username and password.
 You can then use the `sql_query` task inside a workflow to grab data and
 perform downstream transformations on it.
 
+
 ## How secrets injection works
 
 The rest of this page describes how secrets injection works under the hood.
@@ -290,8 +290,9 @@ The global secrets take precedence over any secret discoverable by the secret ma
 The following secret managers are available at the time of writing:
 
 - [K8s secrets](https://kubernetes.io/docs/concepts/configuration/secret/#creating-a-secret) (**default**): `flyte-pod-webhook` will try to look for a K8s secret named after the secret Group and retrieve the value for the secret Key.
-- [AWS Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html): `flyte-pod-webhook` will add the AWS Secret Manager uploader container to a task Pod which will mount the secret.
+- [AWS Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html): `flyte-pod-webhook` will add the AWS Secret Manager sidecar container to a task Pod which will mount the secret.
 - [Vault Agent Injector](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-first-secret#write-a-secret) : `flyte-pod-webhook` will annotate the task Pod with the respective Vault annotations that trigger an existing Vault Agent Injector to retrieve the specified secret Key from a vault path defined as secret Group.
+
 
 When using the K8s secret manager plugin, which is enabled by default, the secrets need to be available in the same namespace as the task execution
 (for example `flytesnacks-development`). K8s secrets can be mounted as either files or injected as environment variables into the task pod,
@@ -306,7 +307,7 @@ When using the AWS secret management plugin, secrets need to be specified by nam
 
 ### Vault secrets manager
 
-When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster as described in this [step-by-step tutorial](https://learn.hashicorp.com/tutorials/vault/kubernetes-uploader).
+When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster as described in this [step-by-step tutorial](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar).
 Vault secrets can only be mounted as files and will become available under `"/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME"`.
 
 Vault comes with various secrets engines. Currently Flyte supports working with both version 1 and 2 of the `Key Vault engine <https://developer.hashicorp.com/vault/docs/secrets/kv>` as well as the `databases secrets engine <https://developer.hashicorp.com/vault/docs/secrets/databases>`.

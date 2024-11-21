@@ -41,7 +41,7 @@ Specify agent configuration
           task-plugins:
             enabled-plugins:
               - container
-              - uploader
+              - sidecar
               - k8s-array
               - agent-service
             default-for-task-types:
@@ -64,12 +64,12 @@ Specify agent configuration
                 # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
                 enabled-plugins:
                   - container
-                  - uploader
+                  - sidecar
                   - k8s-array
                   - agent-service
                 default-for-task-types:
                   container: container
-                  uploader: uploader
+                  sidecar: sidecar
                   container_array: k8s-array
                   snowflake: agent-service
 

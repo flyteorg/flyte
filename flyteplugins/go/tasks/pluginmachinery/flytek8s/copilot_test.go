@@ -142,8 +142,8 @@ func TestDownloadCommandArgs(t *testing.T) {
 	}
 }
 
-func TestUploaderCommandArgs(t *testing.T) {
-	_, err := UploaderCommandArgs("", "", "", time.Second*10, nil)
+func TestSidecarCommandArgs(t *testing.T) {
+	_, err := SidecarCommandArgs("", "", "", time.Second*10, nil)
 	assert.Error(t, err)
 
 	iFace := &core.TypedInterface{
@@ -154,9 +154,9 @@ func TestUploaderCommandArgs(t *testing.T) {
 			},
 		},
 	}
-	d, err := UploaderCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Second*10, iFace)
+	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Second*10, iFace)
 	assert.NoError(t, err)
-	expected := []string{"uploader", "--start-timeout", "10s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
+	expected := []string{"sidecar", "--start-timeout", "10s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])
@@ -254,7 +254,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 			cntr := c
 			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &cntr)
 		} else {
-			if c.Name == cfg.NamePrefix+flyteInitContainerName || c.Name == cfg.NamePrefix+flyteUploaderContainerName {
+			if c.Name == cfg.NamePrefix+flyteInitContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
 				if iFace != nil {
 					vmap := map[string]v1.VolumeMount{}
 					for _, v := range c.VolumeMounts {

@@ -31,7 +31,7 @@ Specify plugin configuration
         task-plugins:
           enabled-plugins:
             - container
-            - uploader
+            - sidecar
             - k8s-array
             - athena
           default-for-task-types:
@@ -51,12 +51,12 @@ Specify plugin configuration
               task-plugins:
                 enabled-plugins:
                   - container
-                  - uploader
+                  - sidecar
                   - k8s-array
                   - athena
                 default-for-task-types:
                   container: container
-                  uploader: uploader
+                  sidecar: sidecar
                   container_array: k8s-array
                   athena: athena
 

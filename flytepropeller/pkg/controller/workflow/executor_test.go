@@ -235,7 +235,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 		"python-task":   "pod",
 		"container":     "pod",
 		"raw-container": "pod",
-		"uploader":      "pod",
+		"sidecar":       "pod",
 	}
 
 	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))

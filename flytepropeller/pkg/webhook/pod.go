@@ -24,7 +24,7 @@
 //     stated in the flyteIdl.Secret object) into the Pod. There is no validation that the secret exist and is available
 //     to the Pod at this point. If the secret is not accessible, the Pod will fail with ContainerCreationConfigError and
 //     will be retried.
-//   - For Vault secrets, it'll inject the right annotations to trigger Vault's own uploader/webhook to mount the secret.
+//   - For Vault secrets, it'll inject the right annotations to trigger Vault's own sidecar/webhook to mount the secret.
 package webhook
 
 import (

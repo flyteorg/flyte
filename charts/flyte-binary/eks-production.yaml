@@ -13,7 +13,7 @@ configuration:
       s3:
         region: "<AWS-REGION-CODE>"
         authType: "iam"
-  #For logging to work, you need to setup an agent.
+  #For logging to work, you need to setup an agent. 
   # Learn more: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-EKS-logs.html
   logging:
     level: 5
@@ -33,21 +33,21 @@ configuration:
       clientSecret: <CC_PASSWD>
       clientSecretHash: <HASHED_CC_PASSWD>
     authorizedUris:
-      - https://flyte.company.com #change to your authorized URI
+    - https://flyte.company.com #change to your authorized URI
   inline:
     #This section automates the IAM Role annotation for the default KSA on each project namespace to enable IRSA
     #Learn more: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
     cluster_resources:
       customData:
-        - production:
-            - defaultIamRole:
-                value: <FLYTE_USER_IAM_ARN>
-        - staging:
-            - defaultIamRole:
-                value: <FLYTE_USER_IAM_ARN>
-        - development:
-            - defaultIamRole:
-                value: <FLYTE_USER_IAM_ARN>
+      - production:
+        - defaultIamRole:
+            value: <FLYTE_USER_IAM_ARN>
+      - staging:
+        - defaultIamRole:
+            value: <FLYTE_USER_IAM_ARN>
+      - development:
+        - defaultIamRole:
+            value: <FLYTE_USER_IAM_ARN>
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
     plugins:
@@ -57,7 +57,7 @@ configuration:
           - AWS_METADATA_SERVICE_TIMEOUT: 5
           - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
     # Configuration for the Datacatalog engine, used when caching is enabled
-    # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html
+    # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html  
     storage:
       cache:
         max_size_mbs: 10
@@ -66,7 +66,7 @@ configuration:
       task-plugins:
         enabled-plugins:
           - container
-          - uploader
+          - sidecar
           - K8S-ARRAY #used for MapTasks
           - agent-service
           - echo
@@ -103,20 +103,20 @@ ingress:
   #  nginx.ingress.kubernetes.io/backend-protocol: GRPC
   #host: <your-Flyte-URL> # change for the URL you'll use to connect to Flyte
   ## ---
-
+  
   #This section assumes you are using the ALB Ingress controller.
   ingressClassName: alb
   commonAnnotations:
-    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:<AWS-REGION>:<AWS-ACCOUNT-ID>:certificate/<CERTIFICATE-ID>"
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:<AWS-REGION>:<AWS-ACCOUNT-ID>:certificate/<CERTIFICATE-ID>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/target-type: ip
   httpAnnotations:
     alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
   grpcAnnotations:
-    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
   host: flyte.mydomain.com #replace with your fully-qualified domain name
 serviceAccount:
   create: true

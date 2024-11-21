@@ -57,12 +57,12 @@ Specify plugin configuration
               default-for-task-types:
                 container: container
                 container_array: k8s-array
-                uploader: uploader
+                sidecar: sidecar
                 snowflake: snowflake
               enabled-plugins:
                 - container
                 - k8s-array
-                - uploader
+                - sidecar
                 - snowflake
 
       .. group-tab:: Helm chart
@@ -76,7 +76,7 @@ Specify plugin configuration
             task-plugins:
               enabled-plugins:
                 - container
-                - uploader
+                - sidecar
                 - k8s-array
                 - snowflake
               default-for-task-types:
@@ -100,12 +100,12 @@ Specify plugin configuration
                 # plugins
                 enabled-plugins:
                   - container
-                  - uploader
+                  - sidecar
                   - k8s-array
                   - snowflake
                 default-for-task-types:
                   container: container
-                  uploader: uploader
+                  sidecar: sidecar
                   container_array: k8s-array
                   snowflake: snowflake
 

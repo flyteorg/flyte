@@ -858,7 +858,7 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 
 // DeterminePrimaryContainerPhase as the name suggests, given all the containers, will return a pluginsCore.PhaseInfo object
 // corresponding to the phase of the primaryContainer which is identified using the provided name.
-// This is useful in case of uploaders or pod jobs, where Flyte will monitor successful exit of a single container.
+// This is useful in case of sidecars or pod jobs, where Flyte will monitor successful exit of a single container.
 func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
 	for _, s := range statuses {
 		if s.Name == primaryContainerName {

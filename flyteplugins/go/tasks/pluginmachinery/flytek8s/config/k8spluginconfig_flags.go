@@ -54,7 +54,7 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-cpus"), defaultK8sConfig.DefaultCPURequest.String(), "Defines a default value for cpu for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-memory"), defaultK8sConfig.DefaultMemoryRequest.String(), "Defines a default value for memory for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "scheduler-name"), defaultK8sConfig.SchedulerName, "Defines scheduler name.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.name"), defaultK8sConfig.CoPilot.NamePrefix, "Flyte co-pilot uploader container name prefix. (additional bits will be added after this)")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.name"), defaultK8sConfig.CoPilot.NamePrefix, "Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.image"), defaultK8sConfig.CoPilot.Image, "Flyte co-pilot Docker Image FQN")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.default-input-path"), defaultK8sConfig.CoPilot.DefaultInputDataPath, "Default path where the volume should be mounted")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.default-output-path"), defaultK8sConfig.CoPilot.DefaultOutputPath, "Default path where the volume should be mounted")

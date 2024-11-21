@@ -268,7 +268,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 				},
 				OccurredAt: taskEventOccurredAtProto,
 				Reason:     "Task was scheduled",
-				TaskType:   "uploader",
+				TaskType:   "sidecar",
 			},
 		},
 		StorageClient: ds,
@@ -287,7 +287,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 				Message:    "Task was scheduled",
 			},
 		},
-		TaskType: "uploader",
+		TaskType: "sidecar",
 	}
 
 	expectedClosureBytes, err := proto.Marshal(expectedClosure)

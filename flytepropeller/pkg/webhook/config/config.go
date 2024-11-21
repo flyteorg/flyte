@@ -24,7 +24,7 @@ var (
 		ListenPort:        9443,
 		SecretManagerType: SecretManagerTypeK8s,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
-			UploaderImage: "docker.io/amazon/aws-secrets-manager-secret-uploader:v0.1.4",
+			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
 					corev1.ResourceMemory: resource.MustParse("500Mi"),
@@ -37,7 +37,7 @@ var (
 			},
 		},
 		GCPSecretManagerConfig: GCPSecretManagerConfig{
-			UploaderImage: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine",
+			SidecarImage: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine",
 			Resources: corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
 					corev1.ResourceMemory: resource.MustParse("500Mi"),
@@ -110,13 +110,13 @@ func (c Config) ExpandCertDir() string {
 }
 
 type AWSSecretManagerConfig struct {
-	UploaderImage string                      `json:"uploaderImage" pflag:",Specifies the uploader docker image to use"`
-	Resources     corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
+	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
 }
 
 type GCPSecretManagerConfig struct {
-	UploaderImage string                      `json:"uploaderImage" pflag:",Specifies the uploader docker image to use"`
-	Resources     corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
+	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
 }
 
 type VaultSecretManagerConfig struct {

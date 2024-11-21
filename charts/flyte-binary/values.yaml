@@ -162,12 +162,12 @@ configuration:
     clientSecretsExternalSecretRef: ""
   # co-pilot Configuration for Flyte CoPilot
   co-pilot:
-    # image Configure image to use for CoPilot uploader
+    # image Configure image to use for CoPilot sidecar
     image:
-      # repository CoPilot uploader image repository
-      repository: cr.flyte.org/flyteorg/flytecopilot # FLYTECOPILOT_IMAGE
-      # tag CoPilot uploader image tag
-      tag: v1.13.2 # FLYTECOPILOT_TAG
+      # repository CoPilot sidecar image repository
+      repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
+      # tag CoPilot sidecar image tag
+      tag: v1.13.2  # FLYTECOPILOT_TAG
   # agentService Flyte Agent configuration
   agentService:
     defaultAgent:
@@ -219,9 +219,9 @@ deployment:
   # image Configure image to use for Flyte
   image:
     # repository Flyte image repository
-    repository: cr.flyte.org/flyteorg/flyte-binary # FLYTE_IMAGE
+    repository: cr.flyte.org/flyteorg/flyte-binary  # FLYTE_IMAGE
     # tag Flyte image tag
-    tag: latest # FLYTE_TAG
+    tag: latest  # FLYTE_TAG
     # pullPolicy Flyte image pull policy
     pullPolicy: IfNotPresent
   # extraEnvVars Array with extra environment variables to add to Flyte
@@ -290,8 +290,8 @@ deployment:
   extraVolumeMounts: []
   # extraVolume Specify additional volumes for Flyte pod
   extraVolumes: []
-  # uploaders Specify additional containers for Flyte pod
-  uploaders: []
+  # sidecars Specify additional containers for Flyte pod
+  sidecars: []
   # initContainers Specify additional init containers for Flyte pod
   initContainers: []
   # extraPodSpec Specify additional configuration for Flyte pod
@@ -406,13 +406,13 @@ enabled_plugins:
       # Enable sagemaker*, athena if you install the backend plugins
       enabled-plugins:
         - container
-        - uploader
+        - sidecar
         - k8s-array
         - agent-service
         - echo
       default-for-task-types:
         container: container
-        uploader: uploader
+        sidecar: sidecar
         container_array: k8s-array
         # -- Uncomment to enable task type that uses Flyte Agent
         # bigquery_query_job_task: agent-service

@@ -31,7 +31,7 @@ tasks:
   task-plugins:
     enabled-plugins:
       - container
-      - uploader
+      - sidecar
       - K8S-ARRAY
       - echo
       - agent-service

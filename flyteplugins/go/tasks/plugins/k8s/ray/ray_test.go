@@ -592,16 +592,16 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 }
 
-func TestInjectLogsUploader(t *testing.T) {
+func TestInjectLogsSidecar(t *testing.T) {
 	rayJobObj := transformRayJobToCustomObj(dummyRayCustomObj())
 	params := []struct {
 		name         string
 		taskTemplate core.TaskTemplate
 		// primaryContainerName string
-		logsUploaderCfg                      *corev1.Container
+		logsSidecarCfg                       *corev1.Container
 		expectedVolumes                      []corev1.Volume
 		expectedPrimaryContainerVolumeMounts []corev1.VolumeMount
-		expectedLogsUploaderVolumeMounts     []corev1.VolumeMount
+		expectedLogsSidecarVolumeMounts      []corev1.VolumeMount
 	}{
 		{
 			"container target",
@@ -616,7 +616,7 @@ func TestInjectLogsUploader(t *testing.T) {
 				Custom: rayJobObj,
 			},
 			&corev1.Container{
-				Name:  "logs-uploader",
+				Name:  "logs-sidecar",
 				Image: "test-image",
 			},
 			[]corev1.Volume{
@@ -642,7 +642,7 @@ func TestInjectLogsUploader(t *testing.T) {
 			},
 		},
 		{
-			"container target with no uploader",
+			"container target with no sidecar",
 			core.TaskTemplate{
 				Id: &core.Identifier{Name: "ray-id"},
 				Target: &core.TaskTemplate_Container{
@@ -676,7 +676,7 @@ func TestInjectLogsUploader(t *testing.T) {
 				},
 			},
 			&corev1.Container{
-				Name:  "logs-uploader",
+				Name:  "logs-sidecar",
 				Image: "test-image",
 			},
 			[]corev1.Volume{
@@ -733,7 +733,7 @@ func TestInjectLogsUploader(t *testing.T) {
 				},
 			},
 			&corev1.Container{
-				Name:  "logs-uploader",
+				Name:  "logs-sidecar",
 				Image: "test-image",
 			},
 			[]corev1.Volume{
@@ -763,7 +763,7 @@ func TestInjectLogsUploader(t *testing.T) {
 	for _, p := range params {
 		t.Run(p.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{
-				LogsUploader: p.logsUploaderCfg,
+				LogsSidecar: p.logsSidecarCfg,
 			}))
 			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
@@ -780,7 +780,7 @@ func TestInjectLogsUploader(t *testing.T) {
 
 			// Check containers and respective volume mounts
 			foundPrimaryContainer := false
-			foundLogsUploader := false
+			foundLogsSidecar := false
 			for _, cnt := range headPodSpec.Containers {
 				if cnt.Name == "ray-head" {
 					foundPrimaryContainer = true
@@ -790,17 +790,17 @@ func TestInjectLogsUploader(t *testing.T) {
 						cnt.VolumeMounts,
 					)
 				}
-				if p.logsUploaderCfg != nil && cnt.Name == p.logsUploaderCfg.Name {
-					foundLogsUploader = true
+				if p.logsSidecarCfg != nil && cnt.Name == p.logsSidecarCfg.Name {
+					foundLogsSidecar = true
 					assert.EqualValues(
 						t,
-						p.expectedLogsUploaderVolumeMounts,
+						p.expectedLogsSidecarVolumeMounts,
 						cnt.VolumeMounts,
 					)
 				}
 			}
 			assert.Equal(t, true, foundPrimaryContainer)
-			assert.Equal(t, p.logsUploaderCfg != nil, foundLogsUploader)
+			assert.Equal(t, p.logsSidecarCfg != nil, foundLogsSidecar)
 		})
 	}
 }

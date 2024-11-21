@@ -170,7 +170,7 @@ Please add ``spark`` to the list of `enabled-plugins` in the config yaml file. F
     task-plugins:
       enabled-plugins:
         - container
-        - uploader
+        - sidecar
         - K8S-ARRAY
         - spark
       default-for-task-types:

@@ -25,7 +25,7 @@ Specify agent configuration
           task-plugins:
             enabled-plugins:
               - container
-              - uploader
+              - sidecar
               - k8s-array
               - agent-service
             default-for-task-types:
@@ -47,12 +47,12 @@ Specify agent configuration
               task-plugins:
                 enabled-plugins:
                   - container
-                  - uploader
+                  - sidecar
                   - k8s-array
                   - agent-service
                 default-for-task-types:
                   container: container
-                  uploader: uploader
+                  sidecar: sidecar
                   container_array: k8s-array
                   boto: agent-service
                   sagemaker-endpoint: agent-service
