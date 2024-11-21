@@ -127,6 +127,9 @@ message NodeExecutionEvent {
     // if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
     // as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
     bool is_in_dynamic_chain = 24;
+
+    // Whether this node launched a eager task.
+    bool is_eager = 25;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched
