@@ -22,6 +22,7 @@ pub async fn execute(
     namespace: String,
     workflow_id: String,
     cmd: Vec<String>,
+    env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
     fast_register_dir: Option<String>,
     task_status_tx: Sender<TaskStatus>,
@@ -98,6 +99,7 @@ pub async fn execute(
             &namespace,
             &workflow_id,
             cmd,
+            env_vars,
             additional_distribution,
             fast_register_dir,
             &task_status_tx,
@@ -243,6 +245,7 @@ async fn run_command(
     namespace: &str,
     workflow_id: &str,
     cmd: Vec<String>,
+    env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
     fast_register_dir: Option<String>,
     task_status_tx: &Sender<TaskStatus>,
@@ -259,6 +262,7 @@ async fn run_command(
         cmd,
         additional_distribution,
         fast_register_dir,
+        env_vars: Some(env_vars),
     })
     .unwrap();
     executor.framed.send(buf.into()).await.unwrap();

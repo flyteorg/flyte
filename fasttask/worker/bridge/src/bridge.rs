@@ -264,6 +264,9 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                                     additional_distribution = Some(cmd_str[i + 1].clone())
                                 }
                                 ref x if x.eq("pyflyte-execute") => pyflyte_execute_index = Some(i),
+                                ref x if x.eq("pyflyte-map-execute") => {
+                                    pyflyte_execute_index = Some(i)
+                                }
                                 _ => (),
                             }
                         }
@@ -304,10 +307,11 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                     };
 
                     // execute command
-                    let (task_id, namespace, workflow_id) = (
+                    let (task_id, namespace, workflow_id, env_vars) = (
                         heartbeat_response.task_id.clone(),
                         heartbeat_response.namespace.clone(),
                         heartbeat_response.workflow_id.clone(),
+                        heartbeat_response.env_vars.clone(),
                     );
                     let (
                         task_contexts_clone,
@@ -340,6 +344,7 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                             namespace,
                             workflow_id,
                             cmd,
+                            env_vars,
                             additional_distribution,
                             fast_register_dir,
                             task_status_tx_clone,

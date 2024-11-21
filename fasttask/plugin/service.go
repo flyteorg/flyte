@@ -28,7 +28,7 @@ const (
 type FastTaskService interface {
 	CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error)
 	Cleanup(ctx context.Context, taskID, queueID, workerID string) error
-	OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error)
+	OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error)
 }
 
 // fastTaskServiceImpl is a gRPC service that manages assignment and management of task executions
@@ -332,7 +332,7 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 
 // OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
 // empty string is returned.
-func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error) {
+func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error) {
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
@@ -379,6 +379,7 @@ func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID,
 		Namespace:  namespace,
 		WorkflowId: workflowID,
 		Cmd:        cmd,
+		EnvVars:    envVars,
 		Operation:  pb.HeartbeatResponse_ASSIGN,
 	}
 

@@ -86,6 +86,9 @@ message HeartbeatResponse {
 
     // The operation to perform on this fasttask execution.
     Operation operation = 5;
+
+    // A map of environment variables for the fasttask execution.
+    map<string, string> envVars = 6;
 }
 
 service FastTask {

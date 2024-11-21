@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use async_channel::Sender;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpStream;
@@ -23,6 +25,7 @@ pub struct Task {
     pub cmd: Vec<String>,
     pub additional_distribution: Option<String>,
     pub fast_register_dir: Option<String>,
+    pub env_vars: Option<HashMap<String, String>>,
 }
 
 #[derive(Deserialize, Serialize)]

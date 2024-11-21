@@ -500,7 +500,7 @@ func TestOfferOnQueue(t *testing.T) {
 			assert.False(t, exists)
 
 			// offer on queue and validate
-			workerID, err := fastTaskService.OfferOnQueue(ctx, test.queueID, test.taskID, test.namespace, test.workflowID, []string{})
+			workerID, err := fastTaskService.OfferOnQueue(ctx, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string))
 			assert.Equal(t, test.expectedWorkerID, workerID)
 			assert.Equal(t, test.expectedError, err)
 

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -538,8 +539,10 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				Id: "node_2",
 				Target: &core.Node_ArrayNode{
 					ArrayNode: &core.ArrayNode{
-						ExecutionMode: core.ArrayNode_FULL_STATE,
-						Node:          workflowNode,
+						IsOriginalSubNodeInterface: &wrappers.BoolValue{
+							Value: true,
+						},
+						Node: workflowNode,
 					},
 				},
 			}

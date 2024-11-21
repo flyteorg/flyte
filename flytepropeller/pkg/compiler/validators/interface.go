@@ -157,9 +157,12 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 		arrayNode := node.GetArrayNode()
 		underlyingNodeBuilder := w.GetOrCreateNodeBuilder(arrayNode.Node)
 		if underlyingIface, ok := ValidateUnderlyingInterface(w, underlyingNodeBuilder, errs.NewScope()); ok {
-			// ArrayNode interface should be inferred from the underlying node interface. `ExecutionVersion`
-			// indicates whether the interface needs to be wrapping in a collection.
-			if arrayNode.GetExecutionMode() == core.ArrayNode_FULL_STATE {
+			// ArrayNode interface should be inferred from the underlying node interface.
+			// Ensure backward compatibility for cases before IsOriginalSubNodeInterface was introduced.
+			// Previously, ArrayNode_FULL_STATE was used to infer whether the sub-node's interface had been transformed.
+			if (arrayNode.GetExecutionMode() == core.ArrayNode_FULL_STATE &&
+				arrayNode.GetIsOriginalSubNodeInterface() == nil) ||
+				arrayNode.GetIsOriginalSubNodeInterface().GetValue() {
 				iface = &core.TypedInterface{
 					Inputs: &core.VariableMap{
 						Variables: make(map[string]*core.Variable),

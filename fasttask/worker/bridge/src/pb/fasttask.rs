@@ -75,6 +75,10 @@ pub struct HeartbeatResponse {
     /// The operation to perform on this fasttask execution.
     #[prost(enumeration = "heartbeat_response::Operation", tag = "5")]
     pub operation: i32,
+    /// A map of environment variables for the fasttask execution.
+    #[prost(map = "string, string", tag = "6")]
+    pub env_vars:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Nested message and enum types in `HeartbeatResponse`.
 pub mod heartbeat_response {

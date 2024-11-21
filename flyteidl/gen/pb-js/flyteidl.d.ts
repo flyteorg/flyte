@@ -4592,6 +4592,9 @@ export namespace flyteidl {
 
             /** ArrayNode executionMode */
             executionMode?: (flyteidl.core.ArrayNode.ExecutionMode|null);
+
+            /** ArrayNode isOriginalSubNodeInterface */
+            isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4617,6 +4620,9 @@ export namespace flyteidl {
 
             /** ArrayNode executionMode. */
             public executionMode: flyteidl.core.ArrayNode.ExecutionMode;
+
+            /** ArrayNode isOriginalSubNodeInterface. */
+            public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";

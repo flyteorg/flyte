@@ -100,8 +100,8 @@ func (_m FastTaskService_OfferOnQueue) Return(_a0 string, _a1 error) *FastTaskSe
 	return &FastTaskService_OfferOnQueue{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string) *FastTaskService_OfferOnQueue {
-	c_call := _m.On("OfferOnQueue", ctx, queueID, taskID, namespace, workflowID, cmd)
+func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) *FastTaskService_OfferOnQueue {
+	c_call := _m.On("OfferOnQueue", ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
@@ -110,20 +110,20 @@ func (_m *FastTaskService) OnOfferOnQueueMatch(matchers ...interface{}) *FastTas
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
-// OfferOnQueue provides a mock function with given fields: ctx, queueID, taskID, namespace, workflowID, cmd
-func (_m *FastTaskService) OfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string) (string, error) {
-	ret := _m.Called(ctx, queueID, taskID, namespace, workflowID, cmd)
+// OfferOnQueue provides a mock function with given fields: ctx, queueID, taskID, namespace, workflowID, cmd, envVars
+func (_m *FastTaskService) OfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) (string, error) {
+	ret := _m.Called(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, []string) string); ok {
-		r0 = rf(ctx, queueID, taskID, namespace, workflowID, cmd)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, []string, map[string]string) string); ok {
+		r0 = rf(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string, []string) error); ok {
-		r1 = rf(ctx, queueID, taskID, namespace, workflowID, cmd)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string, []string, map[string]string) error); ok {
+		r1 = rf(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
 	} else {
 		r1 = ret.Error(1)
 	}

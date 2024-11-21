@@ -354,7 +354,8 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 	// offer the work to the queue
 	queueID := fastTaskEnvironment.GetQueueId()
 	ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-	workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command)
+	envVars := tCtx.TaskExecutionMetadata().GetEnvironmentVariables()
+	workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
 	}

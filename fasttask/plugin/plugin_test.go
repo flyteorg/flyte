@@ -502,6 +502,8 @@ func TestHandleNotYetStarted(t *testing.T) {
 		Namespace: "namespace",
 		Name:      "execution_id",
 	})
+	envVars := map[string]string{"TEST": "VALUE"}
+	taskMetadata.OnGetEnvironmentVariables().Return(envVars)
 	taskExecutionID := &coremocks.TaskExecutionID{}
 	taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
 		TaskId: &idlcore.Identifier{
@@ -558,7 +560,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 				// create FastTaskService mock
 				fastTaskService := &mocks.FastTaskService{}
-				fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}).Return(test.workerID, nil)
+				fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}, envVars).Return(test.workerID, nil)
 
 				// initialize plugin
 				plugin := &Plugin{
