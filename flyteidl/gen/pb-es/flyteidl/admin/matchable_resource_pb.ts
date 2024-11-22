@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { BoolValue, Message, proto3 } from "@bufbuild/protobuf";
-import { SecurityContext } from "../core/security_pb.js";
+import { Connection, SecurityContext } from "../core/security_pb.js";
 import { Annotations, Envs, Labels, RawOutputDataConfig } from "./common_pb.js";
 import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
@@ -73,6 +73,13 @@ export enum MatchableResource {
    * @generated from enum value: CLUSTER_ASSIGNMENT = 7;
    */
   CLUSTER_ASSIGNMENT = 7,
+
+  /**
+   * Configures the task connection to be used by the agent to connect to external systems.
+   *
+   * @generated from enum value: EXTERNAL_RESOURCE = 8;
+   */
+  EXTERNAL_RESOURCE = 8,
 }
 // Retrieve enum metadata with: proto3.getEnumType(MatchableResource)
 proto3.util.setEnumType(MatchableResource, "flyteidl.admin.MatchableResource", [
@@ -84,6 +91,7 @@ proto3.util.setEnumType(MatchableResource, "flyteidl.admin.MatchableResource", [
   { no: 5, name: "PLUGIN_OVERRIDE" },
   { no: 6, name: "WORKFLOW_EXECUTION_CONFIG" },
   { no: 7, name: "CLUSTER_ASSIGNMENT" },
+  { no: 8, name: "EXTERNAL_RESOURCE" },
 ]);
 
 /**
@@ -544,6 +552,48 @@ export class WorkflowExecutionConfig extends Message<WorkflowExecutionConfig> {
 }
 
 /**
+ * ExternalResourceAttributes is a message that encapsulates all the attributes
+ * that are required to connect to external resources or services.
+ *
+ * @generated from message flyteidl.admin.ExternalResourceAttributes
+ */
+export class ExternalResourceAttributes extends Message<ExternalResourceAttributes> {
+  /**
+   * Connections here is used by the agent to connect to external systems.
+   *
+   * @generated from field: map<string, flyteidl.core.Connection> connections = 1;
+   */
+  connections: { [key: string]: Connection } = {};
+
+  constructor(data?: PartialMessage<ExternalResourceAttributes>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExternalResourceAttributes";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "connections", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Connection} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceAttributes {
+    return new ExternalResourceAttributes().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExternalResourceAttributes {
+    return new ExternalResourceAttributes().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExternalResourceAttributes {
+    return new ExternalResourceAttributes().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExternalResourceAttributes | PlainMessage<ExternalResourceAttributes> | undefined, b: ExternalResourceAttributes | PlainMessage<ExternalResourceAttributes> | undefined): boolean {
+    return proto3.util.equals(ExternalResourceAttributes, a, b);
+  }
+}
+
+/**
  * Generic container for encapsulating all types of the above attributes messages.
  *
  * @generated from message flyteidl.admin.MatchingAttributes
@@ -600,6 +650,12 @@ export class MatchingAttributes extends Message<MatchingAttributes> {
      */
     value: ClusterAssignment;
     case: "clusterAssignment";
+  } | {
+    /**
+     * @generated from field: flyteidl.admin.ExternalResourceAttributes external_resource_attributes = 9;
+     */
+    value: ExternalResourceAttributes;
+    case: "externalResourceAttributes";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<MatchingAttributes>) {
@@ -618,6 +674,7 @@ export class MatchingAttributes extends Message<MatchingAttributes> {
     { no: 6, name: "plugin_overrides", kind: "message", T: PluginOverrides, oneof: "target" },
     { no: 7, name: "workflow_execution_config", kind: "message", T: WorkflowExecutionConfig, oneof: "target" },
     { no: 8, name: "cluster_assignment", kind: "message", T: ClusterAssignment, oneof: "target" },
+    { no: 9, name: "external_resource_attributes", kind: "message", T: ExternalResourceAttributes, oneof: "target" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MatchingAttributes {
