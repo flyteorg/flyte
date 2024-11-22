@@ -15,7 +15,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -63,18 +63,18 @@ var doNotconsumeBase64 = false
 func (e *workflowExecutor) resolveKickoffTimeArg(
 	request ScheduledWorkflowExecutionRequest, launchPlan *admin.LaunchPlan,
 	executionRequest *admin.ExecutionCreateRequest) error {
-	if request.KickoffTimeArg == "" || launchPlan.Closure.ExpectedInputs == nil {
+	if request.KickoffTimeArg == "" || launchPlan.GetClosure().GetExpectedInputs() == nil {
 		logger.Debugf(context.Background(), "No kickoff time to resolve for scheduled workflow execution: [%s/%s/%s]",
-			executionRequest.Project, executionRequest.Domain, executionRequest.Name)
+			executionRequest.GetProject(), executionRequest.GetDomain(), executionRequest.GetName())
 		return nil
 	}
-	for name := range launchPlan.Closure.ExpectedInputs.Parameters {
+	for name := range launchPlan.GetClosure().GetExpectedInputs().GetParameters() {
 		if name == request.KickoffTimeArg {
 			ts, err := ptypes.TimestampProto(request.KickoffTime)
 			if err != nil {
 				logger.Warningf(context.Background(),
 					"failed to serialize kickoff time %+v to timestamp proto for scheduled workflow execution with "+
-						"launchPlan [%+v]", request.KickoffTime, launchPlan.Id)
+						"launchPlan [%+v]", request.KickoffTime, launchPlan.GetId())
 				return errors.NewFlyteAdminErrorf(
 					codes.Internal, "could not serialize kickoff time %+v to timestamp proto", request.KickoffTime)
 			}
@@ -96,7 +96,7 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 	}
 	logger.Warningf(context.Background(),
 		"expected kickoff time arg with launch plan [%+v] but did not find any matching expected input to resolve",
-		launchPlan.Id)
+		launchPlan.GetId())
 	return nil
 }
 
@@ -112,24 +112,25 @@ func (e *workflowExecutor) getActiveLaunchPlanVersion(launchPlanIdentifier *admi
 		e.metrics.NoActiveLaunchPlanVersionsFound.Inc()
 		return &admin.LaunchPlan{}, err
 	}
-	if len(launchPlans.LaunchPlans) != 1 {
+	if len(launchPlans.GetLaunchPlans()) != 1 {
 		e.metrics.GreaterThan1LaunchPlanVersionsFound.Inc()
 		logger.Warningf(context.Background(), "failed to get exactly one active launch plan for identifier: %+v",
 			launchPlanIdentifier)
 		return &admin.LaunchPlan{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to get exactly one active launch plan for identifier: %+v", launchPlanIdentifier)
 	}
-	return launchPlans.LaunchPlans[0], nil
+	return launchPlans.GetLaunchPlans()[0], nil
 }
 
 func generateExecutionName(launchPlan *admin.LaunchPlan, kickoffTime time.Time) string {
 	hashedIdentifier := hashIdentifier(&core.Identifier{
-		Project: launchPlan.Id.Project,
-		Domain:  launchPlan.Id.Domain,
-		Name:    launchPlan.Id.Name,
+		Project: launchPlan.GetId().GetProject(),
+		Domain:  launchPlan.GetId().GetDomain(),
+		Name:    launchPlan.GetId().GetName(),
 	})
-	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier)
-	return naming.GetExecutionName(randomSeed)
+	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier) // #nosec G115
+
+	return common.GetExecutionName(randomSeed)
 }
 
 func (e *workflowExecutor) formulateExecutionCreateRequest(
@@ -137,7 +138,7 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 	// Deterministically assign a name based on the schedule kickoff time/launch plan definition.
 	name := generateExecutionName(launchPlan, kickoffTime)
 	logger.Debugf(context.Background(), "generated name [%s] for scheduled execution with launch plan [%+v]",
-		name, launchPlan.Id)
+		name, launchPlan.GetId())
 	kickoffTimeProto, err := ptypes.TimestampProto(kickoffTime)
 	if err != nil {
 		// We expected that kickoff times are valid (in order for a scheduled event to fire).
@@ -148,11 +149,11 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 			kickoffTime, err)
 	}
 	executionRequest := &admin.ExecutionCreateRequest{
-		Project: launchPlan.Id.Project,
-		Domain:  launchPlan.Id.Domain,
+		Project: launchPlan.GetId().GetProject(),
+		Domain:  launchPlan.GetId().GetDomain(),
 		Name:    name,
 		Spec: &admin.ExecutionSpec{
-			LaunchPlan: launchPlan.Id,
+			LaunchPlan: launchPlan.GetId(),
 			Metadata: &admin.ExecutionMetadata{
 				Mode:        admin.ExecutionMetadata_SCHEDULED,
 				ScheduledAt: kickoffTimeProto,
@@ -207,8 +208,9 @@ func (e *workflowExecutor) run() error {
 			continue
 		}
 		executionRequest := e.formulateExecutionCreateRequest(launchPlan, scheduledWorkflowExecutionRequest.KickoffTime)
-		ctx = contextutils.WithWorkflowID(ctx, fmt.Sprintf(workflowIdentifierFmt, executionRequest.Project,
-			executionRequest.Domain, executionRequest.Name))
+
+		ctx = contextutils.WithWorkflowID(ctx, fmt.Sprintf(workflowIdentifierFmt, executionRequest.GetProject(),
+			executionRequest.GetDomain(), executionRequest.GetName()))
 		err = e.resolveKickoffTimeArg(scheduledWorkflowExecutionRequest, launchPlan, executionRequest)
 		if err != nil {
 			e.metrics.FailedResolveKickoffTimeArg.Inc()
@@ -227,12 +229,12 @@ func (e *workflowExecutor) run() error {
 			if ok && ec.Code() != codes.AlreadyExists {
 				e.metrics.FailedKickoffExecution.Inc()
 				logger.Errorf(context.Background(), "failed to execute scheduled workflow [%s:%s:%s] with err: %v",
-					executionRequest.Project, executionRequest.Domain, executionRequest.Name, err)
+					executionRequest.GetProject(), executionRequest.GetDomain(), executionRequest.GetName(), err)
 				continue
 			}
 		} else {
 			logger.Debugf(context.Background(), "created scheduled workflow execution %+v with kickoff time %+v",
-				response.Id, scheduledWorkflowExecutionRequest.KickoffTime)
+				response.GetId(), scheduledWorkflowExecutionRequest.KickoffTime)
 		}
 		executionLaunchTime := time.Now()
 

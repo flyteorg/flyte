@@ -18,29 +18,29 @@ func SerializedMetadata(metadata *datacatalog.Metadata) ([]byte, error) {
 }
 
 func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
-	datasetID := request.Artifact.Dataset
+	datasetID := request.GetArtifact().GetDataset()
 
-	serializedMetadata, err := marshalMetadata(request.Artifact.Metadata)
+	serializedMetadata, err := marshalMetadata(request.GetArtifact().GetMetadata())
 	if err != nil {
 		return models.Artifact{}, err
 	}
 
-	partitions := make([]models.Partition, len(request.Artifact.Partitions))
-	for i, partition := range request.Artifact.GetPartitions() {
+	partitions := make([]models.Partition, len(request.GetArtifact().GetPartitions()))
+	for i, partition := range request.GetArtifact().GetPartitions() {
 		partitions[i] = models.Partition{
 			DatasetUUID: dataset.UUID,
-			Key:         partition.Key,
-			Value:       partition.Value,
+			Key:         partition.GetKey(),
+			Value:       partition.GetValue(),
 		}
 	}
 
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
-			DatasetProject: datasetID.Project,
-			DatasetDomain:  datasetID.Domain,
-			DatasetName:    datasetID.Name,
-			DatasetVersion: datasetID.Version,
-			ArtifactID:     request.Artifact.Id,
+			DatasetProject: datasetID.GetProject(),
+			DatasetDomain:  datasetID.GetDomain(),
+			DatasetName:    datasetID.GetName(),
+			DatasetVersion: datasetID.GetVersion(),
+			ArtifactID:     request.GetArtifact().GetId(),
 		},
 		DatasetUUID:        dataset.UUID,
 		ArtifactData:       artifactData,
@@ -112,10 +112,10 @@ func ToArtifactKey(datasetID *datacatalog.DatasetID, artifactID string) models.A
 		ArtifactID: artifactID,
 	}
 	if datasetID != nil {
-		artifactKey.DatasetProject = datasetID.Project
-		artifactKey.DatasetDomain = datasetID.Domain
-		artifactKey.DatasetName = datasetID.Name
-		artifactKey.DatasetVersion = datasetID.Version
+		artifactKey.DatasetProject = datasetID.GetProject()
+		artifactKey.DatasetDomain = datasetID.GetDomain()
+		artifactKey.DatasetName = datasetID.GetName()
+		artifactKey.DatasetVersion = datasetID.GetVersion()
 	}
 	return artifactKey
 }

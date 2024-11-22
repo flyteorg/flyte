@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
@@ -710,6 +711,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedEventRecorder{}
+			// #nosec G115
 			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
@@ -734,11 +736,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				if tt.want.event {
 					if assert.Equal(t, 1, len(ev.evs)) {
 						e := ev.evs[0]
-						assert.Equal(t, tt.want.eventPhase.String(), e.Phase.String())
+						assert.Equal(t, tt.want.eventPhase.String(), e.GetPhase().String())
 						if tt.args.expectedState.TaskInfo != nil {
-							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.Logs)
+							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.GetLogs())
 						}
-						if e.Phase == core.TaskExecution_RUNNING || e.Phase == core.TaskExecution_SUCCEEDED {
+						if e.GetPhase() == core.TaskExecution_RUNNING || e.GetPhase() == core.TaskExecution_SUCCEEDED {
 							assert.True(t, proto.Equal(inputs, e.GetInputData()))
 						}
 					}
@@ -760,11 +762,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
-						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)
+						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri())
 				} else {
 					assert.True(t, got.Info().GetInfo() == nil || got.Info().GetInfo().TaskNodeInfo == nil ||
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata == nil ||
-						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri) == 0)
+						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri()) == 0)
 				}
 			}
 		})
@@ -1269,4 +1271,42 @@ func TestNew(t *testing.T) {
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
 		contextutils.TaskIDKey)
+}
+
+func Test_task_Handle_ValidateOutputErr(t *testing.T) {
+	ctx := context.TODO()
+	nodeID := "n1"
+	execConfig := v1alpha1.ExecutionConfig{}
+
+	tk := &core.TaskTemplate{
+		Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},
+		Type: "test",
+		Interface: &core.TypedInterface{
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"x": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_BOOLEAN,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	taskID := &core.Identifier{}
+	tr := &nodeMocks.TaskReader{}
+	tr.OnGetTaskID().Return(taskID)
+	tr.OnReadMatch(mock.Anything).Return(tk, nil)
+
+	expectedErr := errors.Wrapf(ioutils.ErrRemoteFileExceedsMaxSize, "test file size exceeded")
+	r := &ioMocks.OutputReader{}
+	r.OnIsError(ctx).Return(false, nil)
+	r.OnExists(ctx).Return(true, expectedErr)
+
+	h := Handler{}
+	result, err := h.ValidateOutput(ctx, nodeID, nil, r, nil, execConfig, tr)
+	assert.NoError(t, err)
+	assert.False(t, result.IsRecoverable)
 }

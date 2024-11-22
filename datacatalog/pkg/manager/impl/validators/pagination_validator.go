@@ -27,18 +27,18 @@ func ValidateToken(token string) error {
 
 // Validate the pagination options and set default limits
 func ValidatePagination(options *datacatalog.PaginationOptions) error {
-	err := ValidateToken(options.Token)
+	err := ValidateToken(options.GetToken())
 	if err != nil {
 		return err
 	}
 
-	if options.SortKey != datacatalog.PaginationOptions_CREATION_TIME {
-		return errors.NewDataCatalogErrorf(codes.InvalidArgument, "Invalid sort key %v", options.SortKey)
+	if options.GetSortKey() != datacatalog.PaginationOptions_CREATION_TIME {
+		return errors.NewDataCatalogErrorf(codes.InvalidArgument, "Invalid sort key %v", options.GetSortKey())
 	}
 
-	if options.SortOrder != datacatalog.PaginationOptions_ASCENDING &&
-		options.SortOrder != datacatalog.PaginationOptions_DESCENDING {
-		return errors.NewDataCatalogErrorf(codes.InvalidArgument, "Invalid sort order %v", options.SortOrder)
+	if options.GetSortOrder() != datacatalog.PaginationOptions_ASCENDING &&
+		options.GetSortOrder() != datacatalog.PaginationOptions_DESCENDING {
+		return errors.NewDataCatalogErrorf(codes.InvalidArgument, "Invalid sort order %v", options.GetSortOrder())
 	}
 
 	return nil

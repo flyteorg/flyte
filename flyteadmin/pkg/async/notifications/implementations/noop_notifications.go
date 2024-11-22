@@ -16,7 +16,7 @@ type NoopEmail struct{}
 
 func (n *NoopEmail) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	logger.Debugf(ctx, "received noop SendEmail request with subject [%s] and recipient [%s]",
-		email.SubjectLine, strings.Join(email.RecipientsEmail, ","))
+		email.GetSubjectLine(), strings.Join(email.GetRecipientsEmail(), ","))
 	return nil
 }
 

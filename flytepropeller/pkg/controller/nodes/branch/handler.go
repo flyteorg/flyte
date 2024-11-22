@@ -183,7 +183,7 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecution
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {
-			errMsg = branch.GetElseFail().Message
+			errMsg = branch.GetElseFail().GetMessage()
 		}
 		logger.Errorf(ctx, errMsg)
 		return nil
@@ -227,7 +227,7 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecut
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {
-			errMsg = branch.GetElseFail().Message
+			errMsg = branch.GetElseFail().GetMessage()
 		}
 		logger.Errorf(ctx, "failed to evaluate branch - user error: %s", errMsg)
 		return nil

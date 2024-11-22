@@ -241,6 +241,28 @@ func GetExecutionRequest() *admin.ExecutionCreateRequest {
 	}
 }
 
+func GetExecutionRequestWithOffloadedInputs(inputParam string, literalValue *core.Literal) *admin.ExecutionCreateRequest {
+	execReq := GetExecutionRequest()
+	execReq.Inputs = &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_OffloadedMetadata{
+					OffloadedMetadata: &core.LiteralOffloadedMetadata{
+						Uri:       "s3://bucket/key",
+						SizeBytes: 100,
+						InferredType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_STRING,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	return execReq
+}
+
 func GetSampleWorkflowSpecForTest() *admin.WorkflowSpec {
 	return &admin.WorkflowSpec{
 		Template: &core.WorkflowTemplate{
@@ -306,10 +328,10 @@ func GetSampleLpSpecForTest() *admin.LaunchPlanSpec {
 }
 
 func GetWorkflowRequestInterfaceBytes() []byte {
-	bytes, _ := proto.Marshal(GetWorkflowRequest().Spec.Template.Interface)
+	bytes, _ := proto.Marshal(GetWorkflowRequest().GetSpec().GetTemplate().GetInterface())
 	return bytes
 }
 
 func GetWorkflowRequestInterface() *core.TypedInterface {
-	return GetWorkflowRequest().Spec.Template.Interface
+	return GetWorkflowRequest().GetSpec().GetTemplate().GetInterface()
 }

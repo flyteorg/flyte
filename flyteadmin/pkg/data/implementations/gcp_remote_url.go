@@ -110,7 +110,7 @@ func (g *GCPRemoteURL) signURL(ctx context.Context, gcsURI GCPGCSObject) (string
 			if err != nil {
 				return nil, err
 			}
-			return resp.SignedBlob, nil
+			return resp.GetSignedBlob(), nil
 		},
 		Expires: time.Now().Add(g.signDuration),
 	}
@@ -159,8 +159,8 @@ func (ts impersonationTokenSource) Token() (*oauth2.Token, error) {
 	}
 
 	return &oauth2.Token{
-		AccessToken: resp.AccessToken,
-		Expiry:      asTime(resp.ExpireTime),
+		AccessToken: resp.GetAccessToken(),
+		Expiry:      asTime(resp.GetExpireTime()),
 	}, nil
 }
 

@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -51,10 +50,10 @@ func ValidateMaxMapLengthField(m map[string]string, fieldName string, limit int)
 }
 
 func validateLabels(labels *admin.Labels) error {
-	if labels == nil || len(labels.Values) == 0 {
+	if labels == nil || len(labels.GetValues()) == 0 {
 		return nil
 	}
-	if err := ValidateMaxMapLengthField(labels.Values, "labels", maxLabelArrayLength); err != nil {
+	if err := ValidateMaxMapLengthField(labels.GetValues(), "labels", maxLabelArrayLength); err != nil {
 		return err
 	}
 	if err := validateLabelsAlphanumeric(labels); err != nil {
@@ -66,7 +65,7 @@ func validateLabels(labels *admin.Labels) error {
 // Given an admin.Labels, checks if the labels exist or not and if it does, checks if the labels are K8s compliant,
 // i.e. alphanumeric + - and _
 func validateLabelsAlphanumeric(labels *admin.Labels) error {
-	for key, value := range labels.Values {
+	for key, value := range labels.GetValues() {
 		if errs := validation.IsQualifiedName(key); len(errs) > 0 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label key [%s]: %v", key, errs)
 		}
@@ -81,16 +80,16 @@ func ValidateIdentifierFieldsSet(id *core.Identifier) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(id.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(id.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(id.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(id.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(id.Name, shared.Name); err != nil {
+	if err := ValidateEmptyStringField(id.GetName(), shared.Name); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(id.Version, shared.Version); err != nil {
+	if err := ValidateEmptyStringField(id.GetVersion(), shared.Version); err != nil {
 		return err
 	}
 	return nil
@@ -101,10 +100,10 @@ func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if entityToResourceType[expectedType] != id.ResourceType {
+	if entityToResourceType[expectedType] != id.GetResourceType() {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"unexpected resource type %s for identifier [%+v], expected %s instead",
-			strings.ToLower(id.ResourceType.String()), id, strings.ToLower(entityToResourceType[expectedType].String()))
+			strings.ToLower(id.GetResourceType().String()), id, strings.ToLower(entityToResourceType[expectedType].String()))
 	}
 	return ValidateIdentifierFieldsSet(id)
 }
@@ -114,13 +113,13 @@ func ValidateNamedEntityIdentifier(id *admin.NamedEntityIdentifier) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(id.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(id.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(id.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(id.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(id.Name, shared.Name); err != nil {
+	if err := ValidateEmptyStringField(id.GetName(), shared.Name); err != nil {
 		return err
 	}
 	return nil
@@ -145,96 +144,96 @@ func ValidateVersion(version string) error {
 }
 
 func ValidateResourceListRequest(request *admin.ResourceListRequest) error {
-	if request.Id == nil {
+	if request.GetId() == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func ValidateDescriptionEntityListRequest(request *admin.DescriptionEntityListRequest) error {
-	if request.Id == nil {
+	if request.GetId() == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Id.Name, shared.Name); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetName(), shared.Name); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func ValidateActiveLaunchPlanRequest(request *admin.ActiveLaunchPlanRequest) error {
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Id.Name, shared.Name); err != nil {
+	if err := ValidateEmptyStringField(request.GetId().GetName(), shared.Name); err != nil {
 		return err
 	}
 	return nil
 }
 
 func ValidateActiveLaunchPlanListRequest(request *admin.ActiveLaunchPlanListRequest) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func ValidateNamedEntityIdentifierListRequest(request *admin.NamedEntityIdentifierListRequest) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func ValidateDescriptionEntityGetRequest(request *admin.ObjectGetRequest) error {
-	if err := ValidateResourceType(request.Id.ResourceType); err != nil {
+	if err := ValidateResourceType(request.GetId().GetResourceType()); err != nil {
 		return err
 	}
-	if err := ValidateIdentifierFieldsSet(request.Id); err != nil {
+	if err := ValidateIdentifierFieldsSet(request.GetId()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
-	if inputMap != nil && len(inputMap.Literals) > 0 {
-		for name, fixedInput := range inputMap.Literals {
+	if inputMap != nil && len(inputMap.GetLiterals()) > 0 {
+		for name, fixedInput := range inputMap.GetLiterals() {
 			if name == "" {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing key in %s", fieldName)
 			}
-			if fixedInput == nil || fixedInput.GetValue() == nil {
+			if fixedInput.GetValue() == nil && fixedInput.GetOffloadedMetadata() == nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing valid literal in %s %s", fieldName, name)
 			}
 			if isDateTime(fixedInput) {
@@ -252,8 +251,8 @@ func validateParameterMapAllowArtifacts(inputMap *core.ParameterMap, fieldName s
 }
 
 func validateParameterMapDisableArtifacts(inputMap *core.ParameterMap, fieldName string) error {
-	if inputMap != nil && len(inputMap.Parameters) > 0 {
-		for name, defaultInput := range inputMap.Parameters {
+	if inputMap != nil && len(inputMap.GetParameters()) > 0 {
+		for name, defaultInput := range inputMap.GetParameters() {
 			if defaultInput.GetArtifactQuery() != nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "artifact mode not enabled but query found %s %s", fieldName, name)
 			}
@@ -263,8 +262,8 @@ func validateParameterMapDisableArtifacts(inputMap *core.ParameterMap, fieldName
 }
 
 func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
-	if inputMap != nil && len(inputMap.Parameters) > 0 {
-		for name, defaultInput := range inputMap.Parameters {
+	if inputMap != nil && len(inputMap.GetParameters()) > 0 {
+		for name, defaultInput := range inputMap.GetParameters() {
 			if name == "" {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing key in %s", fieldName)
 			}
@@ -283,19 +282,9 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 			defaultValue := defaultInput.GetDefault()
 			if defaultValue != nil {
 				inputType := validators.LiteralTypeForLiteral(defaultValue)
-
-				if inputType == nil {
-					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-						fmt.Sprintf(
-							"Flyte encountered an issue while determining\n"+
-								"the type of the default value for Parameter '%s' in '%s'.\n"+
-								"Registered type: [%s].\n"+
-								"Flyte needs to support the latest FlyteIDL to support this type.\n"+
-								"Suggested solution: Please update all of your Flyte images to the latest version and "+
-								"try again.",
-							name, fieldName, defaultInput.GetVar().GetType().String(),
-						),
-					)
+				err := validators.ValidateLiteralType(inputType)
+				if err != nil {
+					return errors.NewInvalidLiteralTypeError(name, err)
 				}
 
 				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {
@@ -358,7 +347,7 @@ func ValidateDatetime(literal *core.Literal) error {
 
 	err := timestamp.CheckValid()
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, err.Error())
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, err.Error()) //nolint
 	}
 	return nil
 }

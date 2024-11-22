@@ -172,11 +172,11 @@ func TestGetTask(t *testing.T) {
 		Id: &taskIdentifier,
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "project", task.Id.Project)
-	assert.Equal(t, "domain", task.Id.Domain)
-	assert.Equal(t, "name", task.Id.Name)
-	assert.Equal(t, "version", task.Id.Version)
-	assert.True(t, proto.Equal(testutils.GetTaskClosure(), task.Closure))
+	assert.Equal(t, "project", task.GetId().GetProject())
+	assert.Equal(t, "domain", task.GetId().GetDomain())
+	assert.Equal(t, "name", task.GetId().GetName())
+	assert.Equal(t, "version", task.GetId().GetVersion())
+	assert.True(t, proto.Equal(testutils.GetTaskClosure(), task.GetClosure()))
 }
 
 func TestGetTask_DatabaseError(t *testing.T) {
@@ -287,18 +287,18 @@ func TestListTasks(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, taskList)
-	assert.Len(t, taskList.Tasks, 2)
+	assert.Len(t, taskList.GetTasks(), 2)
 
-	for idx, task := range taskList.Tasks {
-		assert.Equal(t, projectValue, task.Id.Project)
-		assert.Equal(t, domainValue, task.Id.Domain)
-		assert.Equal(t, nameValue, task.Id.Name)
-		assert.Equal(t, fmt.Sprintf("version %v", idx), task.Id.Version)
+	for idx, task := range taskList.GetTasks() {
+		assert.Equal(t, projectValue, task.GetId().GetProject())
+		assert.Equal(t, domainValue, task.GetId().GetDomain())
+		assert.Equal(t, nameValue, task.GetId().GetName())
+		assert.Equal(t, fmt.Sprintf("version %v", idx), task.GetId().GetVersion())
 		assert.True(t, proto.Equal(&admin.TaskClosure{
 			CreatedAt: testutils.MockCreatedAtProto,
-		}, task.Closure))
+		}, task.GetClosure()))
 	}
-	assert.Equal(t, "2", taskList.Token)
+	assert.Equal(t, "2", taskList.GetToken())
 }
 
 func TestListTasks_MissingParameters(t *testing.T) {
@@ -401,6 +401,6 @@ func TestListUniqueTaskIdentifiers(t *testing.T) {
 	})
 
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(resp.Entities))
-	assert.Empty(t, resp.Token)
+	assert.Equal(t, 2, len(resp.GetEntities()))
+	assert.Empty(t, resp.GetToken())
 }

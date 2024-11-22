@@ -3,10 +3,10 @@ package gormimpl
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -36,11 +36,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Take(&nodeExecution)
@@ -49,11 +49,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: input.NodeExecutionIdentifier.GetNodeId(),
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+					Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+					Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 				},
 			})
 	} else if tx.Error != nil {
@@ -68,11 +68,11 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
@@ -81,11 +81,11 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: input.NodeExecutionIdentifier.GetNodeId(),
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+					Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+					Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 				},
 			})
 	} else if tx.Error != nil {
@@ -97,7 +97,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
+	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Where(getIDFilter(nodeExecution.ID)).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -113,12 +113,10 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}
 	var nodeExecutions []models.NodeExecution
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecutions")
-	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// (this query isn't called for deletes).
-	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
-		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
+	// And add join condition, if any
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToNodeExec)
+	}
 
 	// Apply filters
 	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
@@ -146,11 +144,11 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 	timer := r.metrics.ExistsDuration.Start()
 	tx := r.db.WithContext(ctx).Select(ID).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: input.NodeExecutionIdentifier.GetNodeId(),
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: input.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				Domain:  input.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
 	}).Take(&nodeExecution)
@@ -165,12 +163,10 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	var err error
 	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Preload("ChildNodeExecutions")
 
-	// Add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// (this query isn't called for deletes).
-	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
-		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
+	// And add join condition, if any
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToNodeExec)
+	}
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)

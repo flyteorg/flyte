@@ -147,10 +147,10 @@ func Test_NodeContextDefault(t *testing.T) {
 
 	// Test that retrieving task nodes
 	taskIdentifier := common.GetTargetEntity(ctx, nodeExecContext)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Project, taskIdentifier.Project)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Domain, taskIdentifier.Domain)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Name, taskIdentifier.Name)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Version, taskIdentifier.Version)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetProject(), taskIdentifier.GetProject())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetDomain(), taskIdentifier.GetDomain())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetName(), taskIdentifier.GetName())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetVersion(), taskIdentifier.GetVersion())
 }
 
 func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
@@ -173,10 +173,10 @@ func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
 	nCtx.OnNode().Return(n)
 
 	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
-	assert.Equal(t, id.Project, fetchedID.Project)
-	assert.Equal(t, id.Domain, fetchedID.Domain)
-	assert.Equal(t, id.Name, fetchedID.Name)
-	assert.Equal(t, id.Version, fetchedID.Version)
+	assert.Equal(t, id.GetProject(), fetchedID.GetProject())
+	assert.Equal(t, id.GetDomain(), fetchedID.GetDomain())
+	assert.Equal(t, id.GetName(), fetchedID.GetName())
+	assert.Equal(t, id.GetVersion(), fetchedID.GetVersion())
 }
 
 func TestGetTargetEntity_EmptyTask(t *testing.T) {

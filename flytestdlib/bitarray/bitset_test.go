@@ -58,11 +58,11 @@ func TestNewBitSet(t *testing.T) {
 func TestBitSet_Cap(t *testing.T) {
 	t.Run("Cap == size", func(t *testing.T) {
 		b := NewBitSet(blockSize * 5)
-		assert.Equal(t, int(blockSize*5), int(b.Cap()))
+		assert.Equal(t, int(blockSize*5), int(b.Cap())) // #nosec G115
 	})
 
 	t.Run("Cap > size", func(t *testing.T) {
 		b := NewBitSet(blockSize*2 + 20)
-		assert.Equal(t, int(blockSize*3), int(b.Cap()))
+		assert.Equal(t, int(blockSize*3), int(b.Cap())) // #nosec G115
 	})
 }

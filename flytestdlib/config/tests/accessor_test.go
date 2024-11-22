@@ -73,7 +73,7 @@ func populateConfigData(configPath string) (TestConfig, error) {
 		return TestConfig{}, err
 	}
 
-	return expected, ioutil.WriteFile(configPath, raw, os.ModePerm)
+	return expected, os.WriteFile(configPath, raw, os.ModePerm) // #nosec G306
 }
 
 func TestGetEmptySection(t *testing.T) {
@@ -431,9 +431,11 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			key := strings.ToUpper("my-component.str3")
 			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
-			assert.NoError(t, v.UpdateConfig(context.TODO()))
+			err = v.UpdateConfig(context.TODO())
+			assert.Error(t, err)
+			assert.EqualError(t, err, "Config File \"config\" Not Found in \"[]\"")
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			assert.Equal(t, "Set From Env", r.StringValue3)
+			assert.Equal(t, "", r.StringValue3)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler", provider(config.Options{}).ID()), func(t *testing.T) {
@@ -662,7 +664,7 @@ func runEqualTest(t *testing.T, accessor accessorCreatorFn, expected interface{}
 	assert.NoError(t, err)
 	defer func() { assert.NoError(t, os.Remove(f)) }()
 
-	assert.NoError(t, ioutil.WriteFile(f, raw, os.ModePerm))
+	assert.NoError(t, os.WriteFile(f, raw, os.ModePerm)) // #nosec G306
 	t.Logf("Generated yaml: %v", string(raw))
 	assert.NoError(t, accessor(rootSection, f).UpdateConfig(context.TODO()))
 

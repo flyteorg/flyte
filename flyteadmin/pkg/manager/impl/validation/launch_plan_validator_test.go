@@ -20,7 +20,7 @@ const (
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func getWorkflowInterface() *core.TypedInterface {
-	return testutils.GetSampleWorkflowSpecForTest().Template.Interface
+	return testutils.GetSampleWorkflowSpecForTest().GetTemplate().GetInterface()
 }
 
 func TestValidateLpEmptyProject(t *testing.T) {
@@ -231,6 +231,50 @@ func TestGetLpExpectedInvalidFixedInput(t *testing.T) {
 	assert.Nil(t, actualMap)
 }
 
+func TestGetLpExpectedInvalidFixedInputWithUnknownIDL(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	workflowVariableMap := &core.VariableMap{
+		Variables: map[string]*core.Variable{
+			"foo": {
+				Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+			},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	fixedInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := checkAndFetchExpectedInputForLaunchPlan(
+		workflowVariableMap,
+		fixedInputs,
+		defaultInputs,
+	)
+
+	assert.NotNil(t, err)
+
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
+}
+
 func TestGetLpExpectedNoFixedInput(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	actualMap, err := checkAndFetchExpectedInputForLaunchPlan(
@@ -314,7 +358,7 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 		},
 	}
 	t.Run("with deprecated cron expression", func(t *testing.T) {
-		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 
 		err := validateSchedule(request, inputMap)
 		assert.NotNil(t, err)
@@ -326,7 +370,7 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("with cron schedule", func(t *testing.T) {
-		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
 
 		err := validateSchedule(request, inputMap)
 		assert.NotNil(t, err)
@@ -334,7 +378,7 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{},
 	}
@@ -345,7 +389,7 @@ func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			foo: {
@@ -365,7 +409,7 @@ func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
 }
 
 func TestValidateSchedule_NoRequired(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			foo: {
@@ -384,7 +428,7 @@ func TestValidateSchedule_NoRequired(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			foo: {
@@ -401,4 +445,35 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 
 	err := validateSchedule(request, inputMap)
 	assert.Nil(t, err)
+}
+
+func TestValidateSchedule_InvalidCronExpression(t *testing.T) {
+	inputMap := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			foo: {
+				Var: &core.Variable{
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}},
+				},
+				Behavior: &core.Parameter_Required{
+					Required: true,
+				},
+			},
+		},
+	}
+
+	t.Run("with unsupported cron special characters on deprecated cron schedule: #", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * MON#1")
+		request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("with unsupported cron special characters: #", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * MON#1")
+		request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
 }

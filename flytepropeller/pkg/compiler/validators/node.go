@@ -15,19 +15,19 @@ func validateEffectiveOutputParameters(n c.NodeBuilder, errs errors.CompileError
 	params *flyte.VariableMap, ok bool) {
 	aliases := make(map[string]string, len(n.GetOutputAliases()))
 	for _, alias := range n.GetOutputAliases() {
-		if _, found := aliases[alias.Var]; found {
-			errs.Collect(errors.NewDuplicateAliasErr(n.GetId(), alias.Alias))
+		if _, found := aliases[alias.GetVar()]; found {
+			errs.Collect(errors.NewDuplicateAliasErr(n.GetId(), alias.GetAlias()))
 		} else {
-			aliases[alias.Var] = alias.Alias
+			aliases[alias.GetVar()] = alias.GetAlias()
 		}
 	}
 
 	if n.GetInterface() != nil {
 		params = &flyte.VariableMap{
-			Variables: make(map[string]*flyte.Variable, len(n.GetInterface().GetOutputs().Variables)),
+			Variables: make(map[string]*flyte.Variable, len(n.GetInterface().GetOutputs().GetVariables())),
 		}
 
-		for paramName, param := range n.GetInterface().GetOutputs().Variables {
+		for paramName, param := range n.GetInterface().GetOutputs().GetVariables() {
 			if alias, found := aliases[paramName]; found {
 				if newParam, paramOk := withVariableName(param); paramOk {
 					params.Variables[alias] = newParam
@@ -57,19 +57,19 @@ func branchNodeIDFormatter(parentNodeID, thenNodeID string) string {
 func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType bool, errs errors.CompileErrors) (
 	discoveredNodes []c.NodeBuilder, ok bool) {
 
-	cases := make([]*flyte.IfBlock, 0, len(n.GetBranchNode().IfElse.Other)+1)
-	if n.GetBranchNode().IfElse.Case == nil {
+	cases := make([]*flyte.IfBlock, 0, len(n.GetBranchNode().GetIfElse().GetOther())+1)
+	if n.GetBranchNode().GetIfElse().GetCase() == nil {
 		errs.Collect(errors.NewBranchNodeHasNoCondition(n.GetId()))
 	} else {
-		cases = append(cases, n.GetBranchNode().IfElse.Case)
+		cases = append(cases, n.GetBranchNode().GetIfElse().GetCase())
 	}
 
-	cases = append(cases, n.GetBranchNode().IfElse.Other...)
+	cases = append(cases, n.GetBranchNode().GetIfElse().GetOther()...)
 	discoveredNodes = make([]c.NodeBuilder, 0, len(cases))
 	subNodes := make([]c.NodeBuilder, 0, len(cases)+1)
 	for _, block := range cases {
 		// Validate condition
-		ValidateBooleanExpression(w, n, block.Condition, requireParamType, errs.NewScope())
+		ValidateBooleanExpression(w, n, block.GetCondition(), requireParamType, errs.NewScope())
 
 		if block.GetThenNode() == nil {
 			errs.Collect(errors.NewBranchNodeNotSpecified(n.GetId()))
@@ -79,10 +79,10 @@ func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType b
 		}
 	}
 
-	if elseNode := n.GetBranchNode().IfElse.GetElseNode(); elseNode != nil {
+	if elseNode := n.GetBranchNode().GetIfElse().GetElseNode(); elseNode != nil {
 		wrapperNode := w.GetOrCreateNodeBuilder(elseNode)
 		subNodes = append(subNodes, wrapperNode)
-	} else if defaultElse := n.GetBranchNode().IfElse.GetDefault(); defaultElse == nil {
+	} else if defaultElse := n.GetBranchNode().GetIfElse().GetDefault(); defaultElse == nil {
 		errs.Collect(errors.NewBranchNodeHasNoDefault(n.GetId()))
 	}
 
@@ -126,7 +126,7 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 	}
 
 	// Order upstream node ids to ensure consistent output of the compiler even if client ordering changes.
-	sort.Strings(n.GetCoreNode().UpstreamNodeIds)
+	sort.Strings(n.GetCoreNode().GetUpstreamNodeIds())
 
 	// Validate branch node conditions and inner nodes.
 	if n.GetBranchNode() != nil {

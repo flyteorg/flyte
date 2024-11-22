@@ -95,10 +95,10 @@ func TestFromProjectModels(t *testing.T) {
 	projects := FromProjectModels(projectModels, domains)
 	assert.Len(t, projects, 2)
 	for index, project := range projects {
-		assert.Equal(t, fmt.Sprintf("proj%v_id", index+1), project.Id)
-		assert.Equal(t, fmt.Sprintf("proj%v_name", index+1), project.Name)
-		assert.Equal(t, fmt.Sprintf("proj%v_description", index+1), project.Description)
-		assert.Equal(t, admin.Project_ACTIVE, project.State)
-		assert.EqualValues(t, domains, project.Domains)
+		assert.Equal(t, fmt.Sprintf("proj%v_id", index+1), project.GetId())
+		assert.Equal(t, fmt.Sprintf("proj%v_name", index+1), project.GetName())
+		assert.Equal(t, fmt.Sprintf("proj%v_description", index+1), project.GetDescription())
+		assert.Equal(t, admin.Project_ACTIVE, project.GetState())
+		assert.EqualValues(t, domains, project.GetDomains())
 	}
 }

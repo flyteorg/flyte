@@ -19,6 +19,6 @@ func TestGetChildWorkflowExecutionID(t *testing.T) {
 			},
 		},
 		1)
-	assert.Equal(t, id.Name, "fav2uxxi")
+	assert.Equal(t, id.GetName(), "fav2uxxi")
 	assert.NoError(t, err)
 }

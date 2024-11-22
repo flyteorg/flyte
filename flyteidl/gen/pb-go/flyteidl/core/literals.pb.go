@@ -315,8 +315,8 @@ type Binary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	Tag   string `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
+	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"` // Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
+	Tag   string `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`     // The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
 }
 
 func (x *Binary) Reset() {

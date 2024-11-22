@@ -29,7 +29,7 @@ func TestClient_SubmitJob(t *testing.T) {
 	c := NewCustomBatchClient(mocks.NewMockAwsBatchClient(), "account-id", "test-region", rateLimiter, rateLimiter).(*client)
 	store, err := NewJobStore(ctx, c, config.JobStoreConfig{
 		CacheSize:      1,
-		Parallelizm:    1,
+		Parallelism:    1,
 		BatchChunkSize: 1,
 		ResyncPeriod:   stdConfig.Duration{Duration: 1000},
 	}, EventHandler{}, promutils.NewTestScope())

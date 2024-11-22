@@ -89,9 +89,9 @@ func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata
 
 		externalResources = append(externalResources, &pluginCore.ExternalResource{
 			ExternalID:   subJob.ID,
-			Index:        uint32(originalIndex),
+			Index:        uint32(originalIndex), // #nosec G115
 			Logs:         subTaskLogLinks,
-			RetryAttempt: uint32(retryAttempt),
+			RetryAttempt: uint32(retryAttempt), // #nosec G115
 			Phase:        finalPhase,
 		})
 	}

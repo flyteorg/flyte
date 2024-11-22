@@ -30,16 +30,16 @@ func BuildConfigFromMetadataService(ctx context.Context, authMetadataClient serv
 
 	clientConf = &Config{
 		Config: &oauth2.Config{
-			ClientID:    clientResp.ClientId,
-			RedirectURL: clientResp.RedirectUri,
-			Scopes:      clientResp.Scopes,
+			ClientID:    clientResp.GetClientId(),
+			RedirectURL: clientResp.GetRedirectUri(),
+			Scopes:      clientResp.GetScopes(),
 			Endpoint: oauth2.Endpoint{
-				TokenURL: oauthMetaResp.TokenEndpoint,
-				AuthURL:  oauthMetaResp.AuthorizationEndpoint,
+				TokenURL: oauthMetaResp.GetTokenEndpoint(),
+				AuthURL:  oauthMetaResp.GetAuthorizationEndpoint(),
 			},
 		},
-		DeviceEndpoint: oauthMetaResp.DeviceAuthorizationEndpoint,
-		Audience:       clientResp.Audience,
+		DeviceEndpoint: oauthMetaResp.GetDeviceAuthorizationEndpoint(),
+		Audience:       clientResp.GetAudience(),
 	}
 
 	return clientConf, nil

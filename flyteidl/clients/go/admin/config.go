@@ -45,6 +45,7 @@ type Config struct {
 	MaxBackoffDelay       config.Duration `json:"maxBackoffDelay" pflag:",Max delay for grpc backoff"`
 	PerRetryTimeout       config.Duration `json:"perRetryTimeout" pflag:",gRPC per retry timeout"`
 	MaxRetries            int             `json:"maxRetries" pflag:",Max number of gRPC retries"`
+	MaxMessageSizeBytes   int             `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
 	AuthType              AuthType        `json:"authType" pflag:",Type of OAuth2 flow used for communicating with admin.ClientSecret,Pkce,ExternalCommand are valid values"`
 	TokenRefreshWindow    config.Duration `json:"tokenRefreshWindow" pflag:",Max duration between token refresh attempt and token expiry."`
 	// Deprecated: settings will be discovered dynamically

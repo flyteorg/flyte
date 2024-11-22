@@ -8,12 +8,13 @@ import (
 	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {
 	for _, b := range bindings {
-		if b.Var == name {
+		if b.GetVar() == name {
 			return true
 		}
 	}
@@ -26,7 +27,7 @@ func findVariableByName(vars *core.VariableMap, name string) (variable *core.Var
 		return nil, false
 	}
 
-	variable, found = vars.Variables[name]
+	variable, found = vars.GetVariables()[name]
 	return
 }
 
@@ -44,15 +45,22 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: scalar.GetBlob().GetMetadata().GetType()}}
 	case *core.Scalar_Binary:
-		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		// If the binary has a tag, treat it as a structured type (e.g., dict, dataclass, Pydantic BaseModel).
+		// Otherwise, treat it as raw binary data.
+		// Reference: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
+		if v.Binary.GetTag() == coreutils.MESSAGEPACK {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		} else {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		}
 	case *core.Scalar_Schema:
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_Schema{
-				Schema: scalar.GetSchema().Type,
+				Schema: scalar.GetSchema().GetType(),
 			},
 		}
 	case *core.Scalar_StructuredDataset:
-		if v.StructuredDataset == nil || v.StructuredDataset.Metadata == nil {
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
 			return &core.LiteralType{
 				Type: &core.LiteralType_StructuredDatasetType{},
 			}
@@ -60,7 +68,7 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_StructuredDatasetType{
-				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType,
+				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(),
 			},
 		}
 	case *core.Scalar_NoneType:
@@ -107,9 +115,9 @@ func literalTypeForPrimitive(primitive *core.Primitive) *core.LiteralType {
 }
 
 func buildVariablesIndex(params *core.VariableMap) (map[string]*core.Variable, sets.String) {
-	paramMap := make(map[string]*core.Variable, len(params.Variables))
+	paramMap := make(map[string]*core.Variable, len(params.GetVariables()))
 	paramSet := sets.NewString()
-	for paramName, param := range params.Variables {
+	for paramName, param := range params.GetVariables() {
 		paramMap[paramName] = param
 		paramSet.Insert(paramName)
 	}
@@ -122,7 +130,7 @@ func filterVariables(vars *core.VariableMap, varNames sets.String) *core.Variabl
 		Variables: make(map[string]*core.Variable, len(varNames)),
 	}
 
-	for paramName, param := range vars.Variables {
+	for paramName, param := range vars.GetVariables() {
 		if varNames.Has(paramName) {
 			res.Variables[paramName] = param
 		}
@@ -150,9 +158,9 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 
 	for k, v := range m2 {
 		if existingV, exists := res[k]; exists {
-			if v.Type.String() != existingV.Type.String() {
+			if v.GetType().String() != existingV.GetType().String() {
 				return nil, fmt.Errorf("key already exists with a different type. %v has type [%v] on one side "+
-					"and type [%v] on the other", k, existingV.Type.String(), v.Type.String())
+					"and type [%v] on the other", k, existingV.GetType().String(), v.GetType().String())
 			}
 		}
 
@@ -170,7 +178,7 @@ func buildMultipleTypeUnion(innerType []*core.LiteralType) *core.LiteralType {
 		unionType := x.GetCollectionType().GetUnionType()
 		if unionType != nil {
 			isNested = true
-			variants = append(variants, unionType.Variants...)
+			variants = append(variants, unionType.GetVariants()...)
 		} else {
 			variants = append(variants, x)
 		}
@@ -242,6 +250,23 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	return buildMultipleTypeUnion(innerType)
 }
 
+// ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
+func ValidateLiteralType(lt *core.LiteralType) error {
+	if lt == nil {
+		err := fmt.Errorf("got unknown literal type: [%v].\n"+
+			"Suggested solution: Please update all your Flyte deployment images to the latest version and try again", lt)
+		return err
+	}
+	if lt.GetCollectionType() != nil {
+		return ValidateLiteralType(lt.GetCollectionType())
+	}
+	if lt.GetMapValueType() != nil {
+		return ValidateLiteralType(lt.GetMapValueType())
+	}
+
+	return nil
+}
+
 // LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
 // type None if the literal is a non-homogeneous type.
 func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
@@ -251,17 +276,18 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 	case *core.Literal_Collection:
 		return &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
-				CollectionType: literalTypeForLiterals(l.GetCollection().Literals),
+				CollectionType: literalTypeForLiterals(l.GetCollection().GetLiterals()),
 			},
 		}
 	case *core.Literal_Map:
 		return &core.LiteralType{
 			Type: &core.LiteralType_MapValueType{
-				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
+				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().GetLiterals())),
 			},
 		}
+	case *core.Literal_OffloadedMetadata:
+		return l.GetOffloadedMetadata().GetInferredType()
 	}
-
 	return nil
 }
 
