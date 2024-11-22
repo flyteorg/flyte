@@ -42,7 +42,7 @@ type Config struct {
 	Force bool `json:"force" pflag:",Optional. Forcefully delete existing sandbox cluster if it exists."`
 
 	// Allow user to specify the port for the sandbox
-	Port string `json:"port" pflag:",Optional. Specify the port for the sandbox."`
+	Port string `json:"port" pflag:",Optional. Specify the port for the Kubernetes in the sandbox."`
 }
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
