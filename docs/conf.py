@@ -624,11 +624,10 @@ flytekit_path = flytekit_local_path or "_projects/api/flytekit"
 import_projects = [
     {
         "name": "flytesnacks",
-        "source": flytesnacks_local_path or "https://github.com/Mecoli1219/flytesnacks",
+        "source": flytesnacks_local_path or "https://github.com/flyteorg/flytesnacks",
         "docs_path": "docs",
         "dest": "flytesnacks",
         "cmd": [
-            ["git", "-C", f"{flytesnacks_path}", "checkout", "origin/jupyter-basic"],
             ["cp", "-R", f"{flytesnacks_path}/examples", "./examples"],
             [
                 # remove un-needed docs files in flytesnacks
