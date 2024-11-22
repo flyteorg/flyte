@@ -6,9 +6,6 @@ on:
       component:
         required: true
         type: string
-      go-version:
-        required: true
-        type: string
 jobs:
   lint:
     name: Run Lint
