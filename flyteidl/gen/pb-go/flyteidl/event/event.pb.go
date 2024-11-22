@@ -276,7 +276,7 @@ type NodeExecutionEvent struct {
 	// if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
 	// as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
 	IsInDynamicChain bool `protobuf:"varint,24,opt,name=is_in_dynamic_chain,json=isInDynamicChain,proto3" json:"is_in_dynamic_chain,omitempty"`
-	// Whether this node launched a eager task.
+	// Whether this node launched an eager task.
 	IsEager bool `protobuf:"varint,25,opt,name=is_eager,json=isEager,proto3" json:"is_eager,omitempty"`
 }
 

@@ -100,7 +100,7 @@ pub struct NodeExecutionEvent {
     /// as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
     #[prost(bool, tag="24")]
     pub is_in_dynamic_chain: bool,
-    /// Whether this node launched a eager task.
+    /// Whether this node launched an eager task.
     #[prost(bool, tag="25")]
     pub is_eager: bool,
     #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]

@@ -8775,7 +8775,7 @@
         },
         "is_eager": {
           "type": "boolean",
-          "description": "Whether this node launched a eager task."
+          "description": "Whether this node launched an eager task."
         }
       }
     },

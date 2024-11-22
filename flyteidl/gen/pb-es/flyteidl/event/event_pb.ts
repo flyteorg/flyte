@@ -308,7 +308,7 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
   isInDynamicChain = false;
 
   /**
-   * Whether this node launched a eager task.
+   * Whether this node launched an eager task.
    *
    * @generated from field: bool is_eager = 25;
    */
