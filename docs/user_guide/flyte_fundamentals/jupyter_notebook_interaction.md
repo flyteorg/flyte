@@ -74,7 +74,7 @@ execution = remote.execute(my_wf, inputs={"name": "Flyte"})
 ```
 
 You can then fetch the inputs and outputs of the execution by following the steps
-in {ref}`<getting_started_run_and_schedule_fetch_execution>`.
+in {ref}`getting_started_run_and_schedule_fetch_execution`.
 
 ## When Does Interactive `FlyteRemote` Re-register an Entity?
 

@@ -185,6 +185,7 @@ You can also launch tasks via `flytectl`, learn more in the {ref}`User Guide <re
 ```
 
 (getting_started_run_and_schedule_fetch_execution)=
+
 ## Fetching inputs and outputs of an execution
 
 By default, {py:meth}`FlyteRemote.execute <flytekit.remote.remote.FlyteRemote.execute>`
