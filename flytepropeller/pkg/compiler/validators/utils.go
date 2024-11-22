@@ -276,13 +276,13 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 	case *core.Literal_Collection:
 		return &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
-				CollectionType: literalTypeForLiterals(l.GetCollection().Literals),
+				CollectionType: literalTypeForLiterals(l.GetCollection().GetLiterals()),
 			},
 		}
 	case *core.Literal_Map:
 		return &core.LiteralType{
 			Type: &core.LiteralType_MapValueType{
-				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
+				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().GetLiterals())),
 			},
 		}
 	case *core.Literal_OffloadedMetadata:
