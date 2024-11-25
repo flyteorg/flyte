@@ -15321,6 +15321,7 @@
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
+                 * @property {boolean|null} [isEager] TaskMetadata isEager
                  */
     
                 /**
@@ -15436,6 +15437,14 @@
                  */
                 TaskMetadata.prototype.cacheIgnoreInputVars = $util.emptyArray;
     
+                /**
+                 * TaskMetadata isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.isEager = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -15500,6 +15509,8 @@
                     if (message.cacheIgnoreInputVars != null && message.cacheIgnoreInputVars.length)
                         for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
                             writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
                     return writer;
                 };
     
@@ -15563,6 +15574,9 @@
                             if (!(message.cacheIgnoreInputVars && message.cacheIgnoreInputVars.length))
                                 message.cacheIgnoreInputVars = [];
                             message.cacheIgnoreInputVars.push(reader.string());
+                            break;
+                        case 14:
+                            message.isEager = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15637,6 +15651,9 @@
                             if (!$util.isString(message.cacheIgnoreInputVars[i]))
                                 return "cacheIgnoreInputVars: string[] expected";
                     }
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     
@@ -20597,6 +20614,7 @@
                  * @property {boolean|null} [isArray] NodeExecutionEvent isArray
                  * @property {flyteidl.core.IIdentifier|null} [targetEntity] NodeExecutionEvent targetEntity
                  * @property {boolean|null} [isInDynamicChain] NodeExecutionEvent isInDynamicChain
+                 * @property {boolean|null} [isEager] NodeExecutionEvent isEager
                  */
     
                 /**
@@ -20806,6 +20824,14 @@
                  */
                 NodeExecutionEvent.prototype.isInDynamicChain = false;
     
+                /**
+                 * NodeExecutionEvent isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.isEager = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -20914,6 +20940,8 @@
                         $root.flyteidl.core.Identifier.encode(message.targetEntity, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
                         writer.uint32(/* id 24, wireType 0 =*/192).bool(message.isInDynamicChain);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 25, wireType 0 =*/200).bool(message.isEager);
                     return writer;
                 };
     
@@ -21006,6 +21034,9 @@
                             break;
                         case 24:
                             message.isInDynamicChain = reader.bool();
+                            break;
+                        case 25:
+                            message.isEager = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -21162,6 +21193,9 @@
                     if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
                         if (typeof message.isInDynamicChain !== "boolean")
                             return "isInDynamicChain: boolean expected";
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     
@@ -24564,6 +24598,7 @@
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  * @property {google.protobuf.IStruct|null} [customInfo] Resource customInfo
+                 * @property {flyteidl.admin.IAgentError|null} [agentError] Resource agentError
                  */
     
                 /**
@@ -24631,6 +24666,14 @@
                 Resource.prototype.customInfo = null;
     
                 /**
+                 * Resource agentError.
+                 * @member {flyteidl.admin.IAgentError|null|undefined} agentError
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.agentError = null;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -24667,6 +24710,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                         $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.agentError != null && message.hasOwnProperty("agentError"))
+                        $root.flyteidl.admin.AgentError.encode(message.agentError, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -24707,6 +24752,9 @@
                             break;
                         case 6:
                             message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.agentError = $root.flyteidl.admin.AgentError.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24773,6 +24821,11 @@
                         var error = $root.google.protobuf.Struct.verify(message.customInfo);
                         if (error)
                             return "customInfo." + error;
+                    }
+                    if (message.agentError != null && message.hasOwnProperty("agentError")) {
+                        var error = $root.flyteidl.admin.AgentError.verify(message.agentError);
+                        if (error)
+                            return "agentError." + error;
                     }
                     return null;
                 };
@@ -26668,6 +26721,175 @@
                 };
     
                 return GetTaskLogsResponse;
+            })();
+    
+            admin.AgentError = (function() {
+    
+                /**
+                 * Properties of an AgentError.
+                 * @memberof flyteidl.admin
+                 * @interface IAgentError
+                 * @property {string|null} [code] AgentError code
+                 * @property {flyteidl.admin.AgentError.Kind|null} [kind] AgentError kind
+                 * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] AgentError origin
+                 */
+    
+                /**
+                 * Constructs a new AgentError.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an AgentError.
+                 * @implements IAgentError
+                 * @constructor
+                 * @param {flyteidl.admin.IAgentError=} [properties] Properties to set
+                 */
+                function AgentError(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * AgentError code.
+                 * @member {string} code
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.code = "";
+    
+                /**
+                 * AgentError kind.
+                 * @member {flyteidl.admin.AgentError.Kind} kind
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.kind = 0;
+    
+                /**
+                 * AgentError origin.
+                 * @member {flyteidl.core.ExecutionError.ErrorKind} origin
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.origin = 0;
+    
+                /**
+                 * Creates a new AgentError instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {flyteidl.admin.IAgentError=} [properties] Properties to set
+                 * @returns {flyteidl.admin.AgentError} AgentError instance
+                 */
+                AgentError.create = function create(properties) {
+                    return new AgentError(properties);
+                };
+    
+                /**
+                 * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.admin.AgentError.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {flyteidl.admin.IAgentError} message AgentError message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                AgentError.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.code);
+                    if (message.kind != null && message.hasOwnProperty("kind"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
+                    if (message.origin != null && message.hasOwnProperty("origin"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an AgentError message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.AgentError} AgentError
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                AgentError.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AgentError();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.code = reader.string();
+                            break;
+                        case 3:
+                            message.kind = reader.int32();
+                            break;
+                        case 4:
+                            message.origin = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an AgentError message.
+                 * @function verify
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                AgentError.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        if (!$util.isString(message.code))
+                            return "code: string expected";
+                    if (message.kind != null && message.hasOwnProperty("kind"))
+                        switch (message.kind) {
+                        default:
+                            return "kind: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
+                    if (message.origin != null && message.hasOwnProperty("origin"))
+                        switch (message.origin) {
+                        default:
+                            return "origin: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                            break;
+                        }
+                    return null;
+                };
+    
+                /**
+                 * Kind enum.
+                 * @name flyteidl.admin.AgentError.Kind
+                 * @enum {string}
+                 * @property {number} NON_RECOVERABLE=0 NON_RECOVERABLE value
+                 * @property {number} RECOVERABLE=1 RECOVERABLE value
+                 */
+                AgentError.Kind = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "NON_RECOVERABLE"] = 0;
+                    values[valuesById[1] = "RECOVERABLE"] = 1;
+                    return values;
+                })();
+    
+                return AgentError;
             })();
     
             admin.ClusterAssignment = (function() {
@@ -41076,6 +41298,7 @@
                  * @property {string|null} [specNodeId] NodeExecutionMetaData specNodeId
                  * @property {boolean|null} [isDynamic] NodeExecutionMetaData isDynamic
                  * @property {boolean|null} [isArray] NodeExecutionMetaData isArray
+                 * @property {boolean|null} [isEager] NodeExecutionMetaData isEager
                  */
     
                 /**
@@ -41134,6 +41357,14 @@
                 NodeExecutionMetaData.prototype.isArray = false;
     
                 /**
+                 * NodeExecutionMetaData isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.admin.NodeExecutionMetaData
+                 * @instance
+                 */
+                NodeExecutionMetaData.prototype.isEager = false;
+    
+                /**
                  * Creates a new NodeExecutionMetaData instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NodeExecutionMetaData
@@ -41167,6 +41398,8 @@
                         writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isDynamic);
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         writer.uint32(/* id 5, wireType 0 =*/40).bool(message.isArray);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.isEager);
                     return writer;
                 };
     
@@ -41203,6 +41436,9 @@
                         case 5:
                             message.isArray = reader.bool();
                             break;
+                        case 6:
+                            message.isEager = reader.bool();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -41237,6 +41473,9 @@
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         if (typeof message.isArray !== "boolean")
                             return "isArray: boolean expected";
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     

@@ -293,7 +293,7 @@ that integrates all Flyte components into a single binary.
    # Step 4: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly.
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
-   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
    # All logs from flyteadmin, flyteplugins, flytepropeller, etc. will appear in the terminal.
 
 
@@ -327,7 +327,7 @@ The following instructions provide guidance on how to build single binary with y
    # Step 3: Now, you can build the single binary. Go back to Flyte directory.
    make go-tidy
    make compile
-   POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
+   POD_NAMESPACE=flyte flyte start --config flyte-single-binary-local.yaml
 
 **5. Test by running a hello world workflow.**
 
@@ -429,7 +429,7 @@ If not, we can start backends with a single command.
 Before running your workflow in the sandbox, make sure you're able to successfully run it locally.
 To deploy the workflow in the sandbox, you'll need to build a Flytekit image.
 Create a Dockerfile in your Flytekit directory with the minimum required configuration to run a task, as shown below.
-If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `officail flitekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__
+If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `official flytekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__
 
 .. code:: Dockerfile
 

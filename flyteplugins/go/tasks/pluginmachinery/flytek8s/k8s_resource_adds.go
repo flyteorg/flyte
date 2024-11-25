@@ -12,6 +12,7 @@ import (
 
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
@@ -68,15 +69,6 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 			Name:  "FLYTE_ATTEMPT_NUMBER",
 			Value: attemptNumber,
 		},
-		// TODO: Fill in these
-		// {
-		// 	Name:  "FLYTE_INTERNAL_EXECUTION_WORKFLOW",
-		// 	Value: "",
-		// },
-		// {
-		// 	Name:  "FLYTE_INTERNAL_EXECUTION_LAUNCHPLAN",
-		// 	Value: "",
-		// },
 	}
 
 	if len(consoleURL) > 0 {
@@ -131,9 +123,36 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 	return envVars
 }
 
+func GetLiteralOffloadingEnvVars() []v1.EnvVar {
+	propellerConfig := propellerCfg.GetConfig()
+	if !propellerConfig.LiteralOffloadingConfig.Enabled {
+		return []v1.EnvVar{}
+	}
+
+	envVars := []v1.EnvVar{}
+	if propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading > 0 {
+		envVars = append(envVars,
+			v1.EnvVar{
+				Name:  "_F_L_MIN_SIZE_MB",
+				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, 10),
+			},
+		)
+	}
+	if propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading > 0 {
+		envVars = append(envVars,
+			v1.EnvVar{
+				Name:  "_F_L_MAX_SIZE_MB",
+				Value: strconv.FormatInt(propellerConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, 10),
+			},
+		)
+	}
+	return envVars
+}
+
 func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.EnvFromSource, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID, consoleURL string) ([]v1.EnvVar, []v1.EnvFromSource) {
 	envVars = append(envVars, GetContextEnvVars(ctx)...)
 	envVars = append(envVars, GetExecutionEnvVars(id, consoleURL)...)
+	envVars = append(envVars, GetLiteralOffloadingEnvVars()...)
 
 	for k, v := range taskEnvironmentVariables {
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})

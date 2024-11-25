@@ -6407,6 +6407,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars */
             cacheIgnoreInputVars?: (string[]|null);
+
+            /** TaskMetadata isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6453,6 +6456,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars. */
             public cacheIgnoreInputVars: string[];
+
+            /** TaskMetadata isEager. */
+            public isEager: boolean;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -8519,6 +8525,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain */
             isInDynamicChain?: (boolean|null);
+
+            /** NodeExecutionEvent isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -8601,6 +8610,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain. */
             public isInDynamicChain: boolean;
+
+            /** NodeExecutionEvent isEager. */
+            public isEager: boolean;
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -10022,6 +10034,9 @@ export namespace flyteidl {
 
             /** Resource customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource agentError */
+            agentError?: (flyteidl.admin.IAgentError|null);
         }
 
         /** Represents a Resource. */
@@ -10050,6 +10065,9 @@ export namespace flyteidl {
 
             /** Resource customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource agentError. */
+            public agentError?: (flyteidl.admin.IAgentError|null);
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -10903,6 +10921,79 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an AgentError. */
+        interface IAgentError {
+
+            /** AgentError code */
+            code?: (string|null);
+
+            /** AgentError kind */
+            kind?: (flyteidl.admin.AgentError.Kind|null);
+
+            /** AgentError origin */
+            origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+        }
+
+        /** Represents an AgentError. */
+        class AgentError implements IAgentError {
+
+            /**
+             * Constructs a new AgentError.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAgentError);
+
+            /** AgentError code. */
+            public code: string;
+
+            /** AgentError kind. */
+            public kind: flyteidl.admin.AgentError.Kind;
+
+            /** AgentError origin. */
+            public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /**
+             * Creates a new AgentError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AgentError instance
+             */
+            public static create(properties?: flyteidl.admin.IAgentError): flyteidl.admin.AgentError;
+
+            /**
+             * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.admin.AgentError.verify|verify} messages.
+             * @param message AgentError message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAgentError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AgentError message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AgentError
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AgentError;
+
+            /**
+             * Verifies an AgentError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace AgentError {
+
+            /** Kind enum. */
+            enum Kind {
+                NON_RECOVERABLE = 0,
+                RECOVERABLE = 1
+            }
         }
 
         /** Properties of a ClusterAssignment. */
@@ -16964,6 +17055,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray */
             isArray?: (boolean|null);
+
+            /** NodeExecutionMetaData isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionMetaData. */
@@ -16989,6 +17083,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray. */
             public isArray: boolean;
+
+            /** NodeExecutionMetaData isEager. */
+            public isEager: boolean;
 
             /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.
