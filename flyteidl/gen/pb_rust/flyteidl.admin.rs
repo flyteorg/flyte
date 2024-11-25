@@ -2322,6 +2322,9 @@ pub struct NodeExecutionMetaData {
     /// array nodes from other nodes which can have is_parent_node as true.
     #[prost(bool, tag="5")]
     pub is_array: bool,
+    /// Whether this node is an eager node.
+    #[prost(bool, tag="6")]
+    pub is_eager: bool,
 }
 /// Request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
