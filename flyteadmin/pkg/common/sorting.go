@@ -30,13 +30,13 @@ func NewSortParameter(sort *admin.Sort, allowed sets.String) (SortParameter, err
 		return nil, nil
 	}
 
-	key := sort.Key
+	key := sort.GetKey()
 	if !allowed.Has(key) {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid sort key '%s'", key)
 	}
 
 	var gormOrderExpression string
-	switch sort.Direction {
+	switch sort.GetDirection() {
 	case admin.Sort_DESCENDING:
 		gormOrderExpression = fmt.Sprintf(gormDescending, key)
 	case admin.Sort_ASCENDING:

@@ -47,8 +47,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		// No args implying project domain attribute deletion
@@ -61,8 +60,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","attributes":{"foo":"bar"}}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultFetchConfig.AttrFile = testDataTempFile
@@ -76,8 +74,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		clusterresourceattribute.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
@@ -92,8 +89,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		// No args implying project domain attribute deletion
@@ -107,8 +103,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		args := []string{"workflow"}
@@ -122,8 +117,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","attributes":{"foo":"bar"}}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getClusterResourceAttributeSetup()
 		args := []string{"workflow"}

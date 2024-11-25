@@ -50,7 +50,7 @@ func TestSandboxClusterExec(t *testing.T) {
 func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	reader := bufio.NewReader(strings.NewReader("test"))
-	s := testutils.Setup()
+	s := testutils.Setup(t)
 	ctx := s.Ctx
 
 	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{

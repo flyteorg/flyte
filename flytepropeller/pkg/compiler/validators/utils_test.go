@@ -55,7 +55,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -83,7 +83,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -112,9 +112,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 	})
 
 	t.Run("non-homogenous ensure ordering", func(t *testing.T) {
@@ -125,9 +125,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 	})
 
 	t.Run("list with mixed types", func(t *testing.T) {
@@ -410,6 +410,47 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 
 		lt := LiteralTypeForLiteral(literals)
 
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("nested Lists with different types", func(t *testing.T) {
+		inferredType := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_UnionType{
+								UnionType: &core.UnionType{
+									Variants: []*core.LiteralType{
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_STRING,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		literals := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri:          "dummy/uri",
+					SizeBytes:    1000,
+					InferredType: inferredType,
+				},
+			},
+		}
+		expectedLt := inferredType
+		lt := LiteralTypeForLiteral(literals)
 		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 

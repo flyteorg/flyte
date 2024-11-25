@@ -33,7 +33,7 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request *admin.Proje
 	if err := validation.ValidateProjectRegisterRequest(request); err != nil {
 		return nil, err
 	}
-	projectModel := transformers.CreateProjectModel(request.Project)
+	projectModel := transformers.CreateProjectModel(request.GetProject())
 	err := m.db.ProjectRepo().Create(ctx, projectModel)
 	if err != nil {
 		return nil, err
@@ -44,14 +44,14 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request *admin.Proje
 
 func (m *ProjectManager) ListProjects(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
 	spec := util.FilterSpec{
-		RequestFilters: request.Filters,
+		RequestFilters: request.GetFilters(),
 	}
 	filters, err := util.GetDbFilters(spec, common.Project)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.ProjectColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.ProjectColumns)
 	if err != nil {
 		return nil, err
 	}
@@ -59,14 +59,14 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request *admin.Projec
 		sortParameter = alphabeticalSortParam
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListProjects", request.Token)
+			"invalid pagination token %s for ListProjects", request.GetToken())
 	}
 	// And finally, query the database
 	listProjectsInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -75,10 +75,10 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request *admin.Projec
 	if err != nil {
 		return nil, err
 	}
-	projects := transformers.FromProjectModels(projectModels, m.GetDomains(ctx, &admin.GetDomainRequest{}).Domains)
+	projects := transformers.FromProjectModels(projectModels, m.GetDomains(ctx, &admin.GetDomainRequest{}).GetDomains())
 
 	var token string
-	if len(projects) == int(request.Limit) {
+	if len(projects) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(projects))
 	}
 
@@ -93,7 +93,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate *admin
 	projectRepo := m.db.ProjectRepo()
 
 	// Fetch the existing project if exists. If not, return err and do not update.
-	_, err := projectRepo.Get(ctx, projectUpdate.Id)
+	_, err := projectRepo.Get(ctx, projectUpdate.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -118,11 +118,11 @@ func (m *ProjectManager) GetProject(ctx context.Context, request *admin.ProjectG
 	if err := validation.ValidateProjectGetRequest(request); err != nil {
 		return nil, err
 	}
-	projectModel, err := m.db.ProjectRepo().Get(ctx, request.Id)
+	projectModel, err := m.db.ProjectRepo().Get(ctx, request.GetId())
 	if err != nil {
 		return nil, err
 	}
-	projectResponse := transformers.FromProjectModel(projectModel, m.GetDomains(ctx, &admin.GetDomainRequest{}).Domains)
+	projectResponse := transformers.FromProjectModel(projectModel, m.GetDomains(ctx, &admin.GetDomainRequest{}).GetDomains())
 
 	return projectResponse, nil
 }

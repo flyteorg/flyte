@@ -16,6 +16,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	serverConfig "github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
@@ -199,34 +200,53 @@ func TestCookieManager(t *testing.T) {
 		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Error reading existing secure cookie [flyte_idt]. Error: [SECURE_COOKIE_ERROR] Error reading secure cookie flyte_idt, caused by: securecookie: error - caused by: crypto/aes: invalid key size 75")
 	})
 
-	t.Run("delete_cookies", func(t *testing.T) {
-		w := httptest.NewRecorder()
+	tests := []struct {
+		name                 string
+		insecureCookieHeader bool
+		expectedSecure       bool
+	}{
+		{
+			name:                 "secure_cookies",
+			insecureCookieHeader: false,
+			expectedSecure:       true,
+		},
+		{
+			name:                 "insecure_cookies",
+			insecureCookieHeader: true,
+			expectedSecure:       false,
+		},
+	}
 
-		manager.DeleteCookies(ctx, w)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
 
-		cookies := w.Result().Cookies()
-		require.Equal(t, 5, len(cookies))
+			serverConfig.SetConfig(&serverConfig.ServerConfig{
+				Security: serverConfig.ServerSecurityOptions{
+					InsecureCookieHeader: tt.insecureCookieHeader,
+				},
+			})
 
-		assert.True(t, time.Now().After(cookies[0].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[0].Domain)
-		assert.Equal(t, accessTokenCookieName, cookies[0].Name)
+			manager.DeleteCookies(ctx, w)
 
-		assert.True(t, time.Now().After(cookies[1].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
-		assert.Equal(t, accessTokenCookieNameSplitFirst, cookies[1].Name)
+			cookies := w.Result().Cookies()
+			require.Equal(t, 5, len(cookies))
 
-		assert.True(t, time.Now().After(cookies[2].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[2].Domain)
-		assert.Equal(t, accessTokenCookieNameSplitSecond, cookies[2].Name)
+			// Check secure flag for each cookie
+			for _, cookie := range cookies {
+				assert.Equal(t, tt.expectedSecure, cookie.Secure)
+				assert.True(t, time.Now().After(cookie.Expires))
+				assert.Equal(t, cookieSetting.Domain, cookie.Domain)
+			}
 
-		assert.True(t, time.Now().After(cookies[3].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[3].Domain)
-		assert.Equal(t, refreshTokenCookieName, cookies[3].Name)
-
-		assert.True(t, time.Now().After(cookies[4].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[4].Domain)
-		assert.Equal(t, idTokenCookieName, cookies[4].Name)
-	})
+			// Check cookie names
+			assert.Equal(t, accessTokenCookieName, cookies[0].Name)
+			assert.Equal(t, accessTokenCookieNameSplitFirst, cookies[1].Name)
+			assert.Equal(t, accessTokenCookieNameSplitSecond, cookies[2].Name)
+			assert.Equal(t, refreshTokenCookieName, cookies[3].Name)
+			assert.Equal(t, idTokenCookieName, cookies[4].Name)
+		})
+	}
 
 	t.Run("get_http_same_site_policy", func(t *testing.T) {
 		manager.sameSitePolicy = config.SameSiteLaxMode

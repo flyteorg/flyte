@@ -128,11 +128,11 @@ func TestUpdatePhaseCacheInfo(t *testing.T) {
 
 			// ensure cache and reservation status' are being set correctly
 			if test.cacheStatus != nil {
-				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCacheStatus())
 			}
 
 			if test.reservationStatus != nil {
-				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.ReservationStatus)
+				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetReservationStatus())
 			}
 		})
 	}

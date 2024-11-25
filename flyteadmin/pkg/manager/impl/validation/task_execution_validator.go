@@ -8,20 +8,20 @@ import (
 )
 
 func ValidateTaskExecutionRequest(request *admin.TaskExecutionEventRequest, maxOutputSizeInBytes int64) error {
-	if request.Event == nil {
+	if request.GetEvent() == nil {
 		return shared.GetMissingArgumentError(shared.Event)
 	}
-	if request.Event.OccurredAt == nil {
+	if request.GetEvent().GetOccurredAt() == nil {
 		return shared.GetMissingArgumentError(shared.OccurredAt)
 	}
-	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+	if err := ValidateOutputData(request.GetEvent().GetOutputData(), maxOutputSizeInBytes); err != nil {
 		return err
 	}
 
 	return ValidateTaskExecutionIdentifier(&core.TaskExecutionIdentifier{
-		TaskId:          request.Event.TaskId,
-		NodeExecutionId: request.Event.ParentNodeExecutionId,
-		RetryAttempt:    request.Event.RetryAttempt,
+		TaskId:          request.GetEvent().GetTaskId(),
+		NodeExecutionId: request.GetEvent().GetParentNodeExecutionId(),
+		RetryAttempt:    request.GetEvent().GetRetryAttempt(),
 	})
 }
 
@@ -29,19 +29,19 @@ func ValidateTaskExecutionIdentifier(identifier *core.TaskExecutionIdentifier) e
 	if identifier == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if identifier.NodeExecutionId == nil {
+	if identifier.GetNodeExecutionId() == nil {
 		return shared.GetMissingArgumentError(shared.NodeExecutionID)
 	}
 
-	if err := ValidateNodeExecutionIdentifier(identifier.NodeExecutionId); err != nil {
+	if err := ValidateNodeExecutionIdentifier(identifier.GetNodeExecutionId()); err != nil {
 		return err
 	}
 
-	if identifier.TaskId == nil {
+	if identifier.GetTaskId() == nil {
 		return shared.GetMissingArgumentError(shared.TaskID)
 	}
 
-	if err := ValidateIdentifier(identifier.TaskId, common.Task); err != nil {
+	if err := ValidateIdentifier(identifier.GetTaskId(), common.Task); err != nil {
 		return err
 	}
 
@@ -49,10 +49,10 @@ func ValidateTaskExecutionIdentifier(identifier *core.TaskExecutionIdentifier) e
 }
 
 func ValidateTaskExecutionListRequest(request *admin.TaskExecutionListRequest) error {
-	if err := ValidateNodeExecutionIdentifier(request.NodeExecutionId); err != nil {
+	if err := ValidateNodeExecutionIdentifier(request.GetNodeExecutionId()); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil

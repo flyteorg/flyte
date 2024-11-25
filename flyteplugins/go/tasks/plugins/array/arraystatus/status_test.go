@@ -29,7 +29,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 	})
 
 	t.Run("Populated Equal", func(t *testing.T) {
-		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		assert.Nil(t, err)
 		expected := ArrayStatus{
 			Detailed: expectedDetailed,
@@ -37,7 +37,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 		expectedHashCode, err := expected.HashCode()
 		assert.Nil(t, err)
 
-		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		assert.Nil(t, err)
 		actual := ArrayStatus{
 			Detailed: actualDetailed,
@@ -49,7 +49,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 	})
 
 	t.Run("Updated Not Equal", func(t *testing.T) {
-		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		assert.Nil(t, err)
 		expectedDetailed.SetItem(0, uint64(1))
 		expected := ArrayStatus{
@@ -58,7 +58,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 		expectedHashCode, err := expected.HashCode()
 		assert.Nil(t, err)
 
-		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		assert.Nil(t, err)
 		actual := ArrayStatus{
 			Detailed: actualDetailed,
@@ -70,7 +70,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 	})
 
 	t.Run("Updated Equal", func(t *testing.T) {
-		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		expectedDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		assert.Nil(t, err)
 		expectedDetailed.SetItem(0, uint64(1))
 		expected := ArrayStatus{
@@ -79,7 +79,7 @@ func TestArrayStatus_HashCode(t *testing.T) {
 		expectedHashCode, err := expected.HashCode()
 		assert.Nil(t, err)
 
-		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1))
+		actualDetailed, err := bitarray.NewCompactArray(size, bitarray.Item(len(types.Phases)-1)) // #nosec G115
 		actualDetailed.SetItem(0, uint64(1))
 		assert.Nil(t, err)
 		actual := ArrayStatus{

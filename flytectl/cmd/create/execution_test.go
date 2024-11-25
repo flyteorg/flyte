@@ -19,10 +19,11 @@ type createSuite struct {
 	suite.Suite
 	testutils.TestStruct
 	originalExecConfig ExecutionConfig
+	t                  *testing.T
 }
 
 func (s *createSuite) SetupTest() {
-	s.TestStruct = setup()
+	s.TestStruct = testutils.Setup(s.t)
 
 	// TODO: migrate to new command context from testutils
 	s.CmdCtx = cmdCore.NewCommandContext(s.MockClient, s.MockOutStream)
@@ -30,7 +31,6 @@ func (s *createSuite) SetupTest() {
 }
 
 func (s *createSuite) TearDownTest() {
-	defer s.TearDown()
 	orig := s.originalExecConfig
 	executionConfig = &orig
 	s.MockAdminClient.AssertExpectations(s.T())
@@ -264,7 +264,7 @@ func (s *createSuite) Test_CreateRelaunchExecution() {
 			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
-	executionConfig.Relaunch = relaunchExecResponse.Id.Name
+	executionConfig.Relaunch = relaunchExecResponse.GetId().GetName()
 	relaunchRequest := &admin.ExecutionRelaunchRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Name:    executionConfig.Relaunch,
@@ -331,5 +331,5 @@ func (s *createSuite) Test_CreateTaskExecution_DryRun() {
 }
 
 func TestCreateSuite(t *testing.T) {
-	suite.Run(t, &createSuite{originalExecConfig: *executionConfig})
+	suite.Run(t, &createSuite{originalExecConfig: *executionConfig, t: t})
 }

@@ -26,13 +26,13 @@ func (s *localSink) Sink(ctx context.Context, message proto.Message) error {
 	switch e := message.(type) {
 	case *event.WorkflowExecutionEvent:
 		eventOutput = fmt.Sprintf("[--WF EVENT--] %s, Phase: %s, OccuredAt: %s\n",
-			e.ExecutionId, e.Phase, e.OccurredAt.AsTime().String())
+			e.GetExecutionId(), e.GetPhase(), e.GetOccurredAt().AsTime().String())
 	case *event.NodeExecutionEvent:
 		eventOutput = fmt.Sprintf("[--NODE EVENT--] %s, Phase: %s, OccuredAt: %s\n",
-			e.Id, e.Phase, e.OccurredAt.AsTime().String())
+			e.GetId(), e.GetPhase(), e.GetOccurredAt().AsTime().String())
 	case *event.TaskExecutionEvent:
 		eventOutput = fmt.Sprintf("[--TASK EVENT--] %s,%s, Phase: %s, OccuredAt: %s\n",
-			e.TaskId, e.ParentNodeExecutionId, e.Phase, e.OccurredAt.AsTime().String())
+			e.GetTaskId(), e.GetParentNodeExecutionId(), e.GetPhase(), e.GetOccurredAt().AsTime().String())
 	}
 
 	return s.writer.Write(ctx, eventOutput)

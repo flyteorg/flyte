@@ -69,7 +69,7 @@ func (r *nodeEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeE
 		logger.Infof(ctx, "Failed to record node event [%+v] with err: %v", ev, err)
 		// Only attempt to retry sending an event in the case we tried to send raw output data inline
 		if eventConfig.FallbackToOutputReference && rawOutputPolicy == config.RawOutputPolicyInline {
-			logger.Infof(ctx, "Falling back to sending node event outputs by reference for [%+v]", ev.Id)
+			logger.Infof(ctx, "Falling back to sending node event outputs by reference for [%+v]", ev.GetId())
 			return r.handleFailure(ctx, origEvent, err)
 		}
 		return err

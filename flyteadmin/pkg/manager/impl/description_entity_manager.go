@@ -38,8 +38,8 @@ func (d *DescriptionEntityManager) GetDescriptionEntity(ctx context.Context, req
 		logger.Errorf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	return util.GetDescriptionEntity(ctx, d.db, request.Id)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetId().GetProject(), request.GetId().GetDomain())
+	return util.GetDescriptionEntity(ctx, d.db, request.GetId())
 }
 
 func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, request *admin.DescriptionEntityListRequest) (*admin.DescriptionEntityList, error) {
@@ -47,44 +47,44 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 	if err := validation.ValidateDescriptionEntityListRequest(request); err != nil {
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetId().GetProject(), request.GetId().GetDomain())
 
-	if request.ResourceType == core.ResourceType_WORKFLOW {
-		ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
+	if request.GetResourceType() == core.ResourceType_WORKFLOW {
+		ctx = contextutils.WithWorkflowID(ctx, request.GetId().GetName())
 	} else {
-		ctx = contextutils.WithTaskID(ctx, request.Id.Name)
+		ctx = contextutils.WithTaskID(ctx, request.GetId().GetName())
 	}
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
-	}, common.ResourceTypeToEntity[request.ResourceType])
+		Project:        request.GetId().GetProject(),
+		Domain:         request.GetId().GetDomain(),
+		Name:           request.GetId().GetName(),
+		RequestFilters: request.GetFilters(),
+	}, common.ResourceTypeToEntity[request.GetResourceType()])
 	if err != nil {
 		logger.Error(ctx, "failed to get database filter")
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.DescriptionEntityColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.DescriptionEntityColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListWorkflows", request.Token)
+			"invalid pagination token %s for ListWorkflows", request.GetToken())
 	}
 	listDescriptionEntitiesInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
 	}
 	output, err := d.db.DescriptionEntityRepo().List(ctx, listDescriptionEntitiesInput)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to list workflows with [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to list workflows with [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	descriptionEntityList, err := transformers.FromDescriptionEntityModels(output.Entities)
@@ -94,7 +94,7 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 		return nil, err
 	}
 	var token string
-	if len(output.Entities) == int(request.Limit) {
+	if len(output.Entities) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.Entities))
 	}
 	return &admin.DescriptionEntityList{

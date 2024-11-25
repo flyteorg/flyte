@@ -82,7 +82,7 @@ func NewCatalogClient(ctx context.Context, authOpt ...grpc.DialOption) (catalog.
 	case DataCatalogType:
 		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), authOpt...)
+			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), authOpt...) // #nosec G115
 	case NoOpDiscoveryType, "":
 		return NOOPCatalog{}, nil
 	}

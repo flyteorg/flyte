@@ -13823,6 +13823,8 @@
                  * @property {string|null} [message] ExecutionError message
                  * @property {string|null} [errorUri] ExecutionError errorUri
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ExecutionError timestamp
+                 * @property {string|null} [worker] ExecutionError worker
                  */
     
                 /**
@@ -13873,6 +13875,22 @@
                 ExecutionError.prototype.kind = 0;
     
                 /**
+                 * ExecutionError timestamp.
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.timestamp = null;
+    
+                /**
+                 * ExecutionError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.worker = "";
+    
+                /**
                  * Creates a new ExecutionError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ExecutionError
@@ -13904,6 +13922,10 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.errorUri);
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -13936,6 +13958,12 @@
                             break;
                         case 4:
                             message.kind = reader.int32();
+                            break;
+                        case 5:
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13974,6 +14002,14 @@
                         case 2:
                             break;
                         }
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
@@ -18268,6 +18304,8 @@
                  * @property {string|null} [message] ContainerError message
                  * @property {flyteidl.core.ContainerError.Kind|null} [kind] ContainerError kind
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ContainerError origin
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ContainerError timestamp
+                 * @property {string|null} [worker] ContainerError worker
                  */
     
                 /**
@@ -18318,6 +18356,22 @@
                 ContainerError.prototype.origin = 0;
     
                 /**
+                 * ContainerError timestamp.
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.timestamp = null;
+    
+                /**
+                 * ContainerError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.worker = "";
+    
+                /**
                  * Creates a new ContainerError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ContainerError
@@ -18349,6 +18403,10 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
                     if (message.origin != null && message.hasOwnProperty("origin"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -18381,6 +18439,12 @@
                             break;
                         case 4:
                             message.origin = reader.int32();
+                            break;
+                        case 5:
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18424,6 +18488,14 @@
                         case 2:
                             break;
                         }
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
@@ -24473,6 +24545,7 @@
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  * @property {google.protobuf.IStruct|null} [customInfo] Resource customInfo
+                 * @property {flyteidl.admin.IAgentError|null} [agentError] Resource agentError
                  */
     
                 /**
@@ -24540,6 +24613,14 @@
                 Resource.prototype.customInfo = null;
     
                 /**
+                 * Resource agentError.
+                 * @member {flyteidl.admin.IAgentError|null|undefined} agentError
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.agentError = null;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -24576,6 +24657,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                         $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.agentError != null && message.hasOwnProperty("agentError"))
+                        $root.flyteidl.admin.AgentError.encode(message.agentError, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -24616,6 +24699,9 @@
                             break;
                         case 6:
                             message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.agentError = $root.flyteidl.admin.AgentError.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24682,6 +24768,11 @@
                         var error = $root.google.protobuf.Struct.verify(message.customInfo);
                         if (error)
                             return "customInfo." + error;
+                    }
+                    if (message.agentError != null && message.hasOwnProperty("agentError")) {
+                        var error = $root.flyteidl.admin.AgentError.verify(message.agentError);
+                        if (error)
+                            return "agentError." + error;
                     }
                     return null;
                 };
@@ -26577,6 +26668,175 @@
                 };
     
                 return GetTaskLogsResponse;
+            })();
+    
+            admin.AgentError = (function() {
+    
+                /**
+                 * Properties of an AgentError.
+                 * @memberof flyteidl.admin
+                 * @interface IAgentError
+                 * @property {string|null} [code] AgentError code
+                 * @property {flyteidl.admin.AgentError.Kind|null} [kind] AgentError kind
+                 * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] AgentError origin
+                 */
+    
+                /**
+                 * Constructs a new AgentError.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an AgentError.
+                 * @implements IAgentError
+                 * @constructor
+                 * @param {flyteidl.admin.IAgentError=} [properties] Properties to set
+                 */
+                function AgentError(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * AgentError code.
+                 * @member {string} code
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.code = "";
+    
+                /**
+                 * AgentError kind.
+                 * @member {flyteidl.admin.AgentError.Kind} kind
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.kind = 0;
+    
+                /**
+                 * AgentError origin.
+                 * @member {flyteidl.core.ExecutionError.ErrorKind} origin
+                 * @memberof flyteidl.admin.AgentError
+                 * @instance
+                 */
+                AgentError.prototype.origin = 0;
+    
+                /**
+                 * Creates a new AgentError instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {flyteidl.admin.IAgentError=} [properties] Properties to set
+                 * @returns {flyteidl.admin.AgentError} AgentError instance
+                 */
+                AgentError.create = function create(properties) {
+                    return new AgentError(properties);
+                };
+    
+                /**
+                 * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.admin.AgentError.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {flyteidl.admin.IAgentError} message AgentError message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                AgentError.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.code);
+                    if (message.kind != null && message.hasOwnProperty("kind"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
+                    if (message.origin != null && message.hasOwnProperty("origin"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an AgentError message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.AgentError} AgentError
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                AgentError.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AgentError();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.code = reader.string();
+                            break;
+                        case 3:
+                            message.kind = reader.int32();
+                            break;
+                        case 4:
+                            message.origin = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an AgentError message.
+                 * @function verify
+                 * @memberof flyteidl.admin.AgentError
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                AgentError.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        if (!$util.isString(message.code))
+                            return "code: string expected";
+                    if (message.kind != null && message.hasOwnProperty("kind"))
+                        switch (message.kind) {
+                        default:
+                            return "kind: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
+                    if (message.origin != null && message.hasOwnProperty("origin"))
+                        switch (message.origin) {
+                        default:
+                            return "origin: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                            break;
+                        }
+                    return null;
+                };
+    
+                /**
+                 * Kind enum.
+                 * @name flyteidl.admin.AgentError.Kind
+                 * @enum {string}
+                 * @property {number} NON_RECOVERABLE=0 NON_RECOVERABLE value
+                 * @property {number} RECOVERABLE=1 RECOVERABLE value
+                 */
+                AgentError.Kind = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "NON_RECOVERABLE"] = 0;
+                    values[valuesById[1] = "RECOVERABLE"] = 1;
+                    return values;
+                })();
+    
+                return AgentError;
             })();
     
             admin.ClusterAssignment = (function() {

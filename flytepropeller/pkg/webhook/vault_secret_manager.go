@@ -35,12 +35,12 @@ func (i VaultSecretManagerInjector) Type() config.SecretManagerType {
 }
 
 func (i VaultSecretManagerInjector) Inject(ctx context.Context, secret *coreIdl.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	if len(secret.Group) == 0 || len(secret.Key) == 0 {
+	if len(secret.GetGroup()) == 0 || len(secret.GetKey()) == 0 {
 		return nil, false, fmt.Errorf("Vault Secrets Webhook requires both key and group to be set. "+
 			"Secret: [%v]", secret)
 	}
 
-	switch secret.MountRequirement {
+	switch secret.GetMountRequirement() {
 	case coreIdl.Secret_ANY:
 		fallthrough
 	case coreIdl.Secret_FILE:
@@ -76,7 +76,7 @@ func (i VaultSecretManagerInjector) Inject(ctx context.Context, secret *coreIdl.
 	case coreIdl.Secret_ENV_VAR:
 		return p, false, fmt.Errorf("Env_Var is not a supported mount requirement for Vault Secret Manager")
 	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.GetMountRequirement().String(), secret.GetKey())
 		logger.Error(ctx, err)
 		return p, false, err
 	}

@@ -227,6 +227,7 @@ func (q *queue) Start(ctx context.Context) error {
 
 						wrapper.retryCount++
 						wrapper.err = err
+						// #nosec G115
 						if wrapper.retryCount >= uint(q.maxRetries) {
 							logger.Debugf(ctx, "WorkItem [%v] exhausted all retries. Last Error: %v.",
 								wrapper.ID(), err)

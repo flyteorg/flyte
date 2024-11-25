@@ -1,6 +1,13 @@
 package interfaces
 
 import (
+	"context"
+	"crypto/tls"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/Shopify/sarama"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
@@ -205,16 +212,16 @@ func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() *admin.WorkflowExecut
 	}
 
 	// For the others, we only add the field when the field is set in the config.
-	if a.GetSecurityContext().RunAs.GetK8SServiceAccount() != "" || a.GetSecurityContext().RunAs.GetIamRole() != "" {
+	if a.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" || a.GetSecurityContext().GetRunAs().GetIamRole() != "" {
 		wec.SecurityContext = a.GetSecurityContext()
 	}
-	if a.GetRawOutputDataConfig().OutputLocationPrefix != "" {
+	if a.GetRawOutputDataConfig().GetOutputLocationPrefix() != "" {
 		wec.RawOutputDataConfig = a.GetRawOutputDataConfig()
 	}
-	if len(a.GetLabels().Values) > 0 {
+	if len(a.GetLabels().GetValues()) > 0 {
 		wec.Labels = a.GetLabels()
 	}
-	if len(a.GetAnnotations().Values) > 0 {
+	if len(a.GetAnnotations().GetValues()) > 0 {
 		wec.Annotations = a.GetAnnotations()
 	}
 
@@ -231,11 +238,89 @@ type GCPConfig struct {
 	ProjectID string `json:"projectId"`
 }
 
+// This section holds SASL config for Kafka
+type SASLConfig struct {
+	// Whether to use SASL
+	Enabled bool `json:"enabled"`
+	// The username
+	User string `json:"user"`
+	// The password
+	Password     string `json:"password"`
+	PasswordPath string `json:"passwordPath"`
+	Handshake    bool   `json:"handshake"`
+	// Which SASL Mechanism to use. Defaults to PLAIN
+	Mechanism sarama.SASLMechanism `json:"mechanism"`
+}
+
+// This section holds TLS config for Kafka clients
+type TLSConfig struct {
+	// Whether to use TLS
+	Enabled bool `json:"enabled"`
+	// Whether to skip certificate verification
+	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+	// The location of the client certificate
+	CertPath string `json:"certPath"`
+	// The location of the client private key
+	KeyPath string `json:"keyPath"`
+}
+
+// This section holds configs for Kafka clients
 type KafkaConfig struct {
 	// The version of Kafka, e.g. 2.1.0, 0.8.2.0
 	Version string `json:"version"`
 	// kafka broker addresses
 	Brokers []string `json:"brokers"`
+	// sasl config
+	SASLConfig SASLConfig `json:"saslConfig"`
+	// tls config
+	TLSConfig TLSConfig `json:"tlsConfig"`
+}
+
+func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
+	var err error
+	s.Version, err = sarama.ParseKafkaVersion(k.Version)
+	if err != nil {
+		panic(err)
+	}
+
+	if k.SASLConfig.Enabled {
+		s.Net.SASL.Enable = true
+		s.Net.SASL.User = k.SASLConfig.User
+
+		if len(k.SASLConfig.PasswordPath) > 0 {
+			if _, err := os.Stat(k.SASLConfig.PasswordPath); os.IsNotExist(err) {
+				panic(fmt.Sprintf("missing kafka password at the specified path [%s]", k.SASLConfig.PasswordPath))
+			}
+			passwordVal, err := os.ReadFile(k.SASLConfig.PasswordPath)
+			if err != nil {
+				panic(fmt.Sprintf("failed to kafka password from path [%s] with err: %v", k.SASLConfig.PasswordPath, err))
+			}
+
+			s.Net.SASL.Password = strings.TrimSpace(string(passwordVal))
+		} else {
+			s.Net.SASL.Password = k.SASLConfig.Password
+		}
+		s.Net.SASL.Handshake = k.SASLConfig.Handshake
+
+		if k.SASLConfig.Mechanism == "" {
+			k.SASLConfig.Mechanism = sarama.SASLTypePlaintext
+		}
+		s.Net.SASL.Mechanism = k.SASLConfig.Mechanism
+	}
+
+	if k.TLSConfig.Enabled {
+		s.Net.TLS.Enable = true
+		s.Net.TLS.Config = &tls.Config{
+			InsecureSkipVerify: k.TLSConfig.InsecureSkipVerify,
+		}
+		if k.TLSConfig.KeyPath != "" && k.TLSConfig.CertPath != "" {
+			cert, err := tls.LoadX509KeyPair(k.TLSConfig.CertPath, k.TLSConfig.KeyPath)
+			if err != nil {
+				panic(err)
+			}
+			s.Net.TLS.Config.Certificates = []tls.Certificate{cert}
+		}
+	}
 }
 
 // This section holds configuration for the event scheduler used to schedule workflow executions.

@@ -1,11 +1,18 @@
 package validators
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/santhosh-tekuri/jsonschema"
+	"github.com/wI2L/jsondiff"
+	jscmp "gitlab.com/yvesf/json-schema-compare"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type typeChecker interface {
@@ -14,6 +21,85 @@ type typeChecker interface {
 
 type trivialChecker struct {
 	literalType *flyte.LiteralType
+}
+
+func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
+	// Check if the source schema is a supertype of the target schema, beyond simple inheritance.
+	// For custom types, we expect the JSON schemas in the metadata to come from the same JSON schema package,
+	// specifically draft 2020-12 from Mashumaro.
+
+	srcSchemaBytes, err := json.Marshal(sourceMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal source metadata: [%v]", err)
+		return false
+	}
+	tgtSchemaBytes, err := json.Marshal(targetMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal target metadata: [%v]", err)
+		return false
+	}
+
+	compiler := jsonschema.NewCompiler()
+
+	err = compiler.AddResource("src", bytes.NewReader(srcSchemaBytes))
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: [%v]", err)
+		return false
+	}
+	err = compiler.AddResource("tgt", bytes.NewReader(tgtSchemaBytes))
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to add resource to compiler: [%v]", err)
+		return false
+	}
+
+	srcSchema, err := compiler.Compile("src")
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compile source schema: [%v]", err)
+		return false
+	}
+	tgtSchema, err := compiler.Compile("tgt")
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compile target schema: [%v]", err)
+		return false
+	}
+
+	// Compare the two schemas
+	errs := jscmp.Compare(tgtSchema, srcSchema)
+
+	// Ignore the "not implemented" errors from json-schema-compare (additionalProperties, additionalItems, etc.)
+	// While handling nested structures, we might have multiple "not implemented" errors for a single field as well.
+	// If all the errors are "not implemented", we can consider the source schema as a supertype of the target schema.
+	for _, err := range errs {
+		if !strings.Contains(err.Error(), "not implemented") {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
+	srcSchemaBytes, err := json.Marshal(sourceMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal source metadata: [%v]", err)
+		return false
+	}
+
+	tgtSchemaBytes, err := json.Marshal(targetMetaData.GetFields())
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to marshal target metadata: [%v]", err)
+		return false
+	}
+
+	// Use jsondiff to compare the two schemas
+	patch, err := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	if err != nil {
+		logger.Infof(context.Background(), "Failed to compare JSON schemas: [%v]", err)
+		return false
+	}
+
+	// If the length of the patch is zero, the two JSON structures are identical
+	return len(patch) == 0
 }
 
 // CastsFrom is a trivial type checker merely checks if types match exactly.
@@ -33,6 +119,23 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 
 	if GetTagForType(upstreamType) != "" && GetTagForType(t.literalType) != GetTagForType(upstreamType) {
 		return false
+	}
+
+	// Related Issue: https://github.com/flyteorg/flyte/issues/5489
+	// RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md#flytepropeller
+	if upstreamType.GetSimple() == flyte.SimpleType_STRUCT && t.literalType.GetSimple() == flyte.SimpleType_STRUCT {
+		// Json Schema is stored in Metadata
+		upstreamMetaData := upstreamType.GetMetadata()
+		downstreamMetaData := t.literalType.GetMetadata()
+
+		// There's bug in flytekit's dataclass Transformer to generate JSON Scheam before,
+		// in some case, we the JSON Schema will be nil, so we can only pass it to support
+		// backward compatible. (reference task should be supported.)
+		if upstreamMetaData == nil || downstreamMetaData == nil {
+			return true
+		}
+
+		return isSameTypeInJSON(upstreamMetaData, downstreamMetaData) || isSuperTypeInJSON(upstreamMetaData, downstreamMetaData)
 	}
 
 	// Ignore metadata when comparing types.
@@ -136,7 +239,7 @@ func (t schemaTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	}
 
 	// Flyte Schema can only be serialized to parquet
-	if len(structuredDatasetType.Format) != 0 && !strings.EqualFold(structuredDatasetType.Format, "parquet") {
+	if len(structuredDatasetType.GetFormat()) != 0 && !strings.EqualFold(structuredDatasetType.GetFormat(), "parquet") {
 		return false
 	}
 
@@ -168,7 +271,7 @@ func (t structuredDatasetChecker) CastsFrom(upstreamType *flyte.LiteralType) boo
 	}
 	if schemaType != nil {
 		// Flyte Schema can only be serialized to parquet
-		format := t.literalType.GetStructuredDatasetType().Format
+		format := t.literalType.GetStructuredDatasetType().GetFormat()
 		if len(format) != 0 && !strings.EqualFold(format, "parquet") {
 			return false
 		}
@@ -179,22 +282,22 @@ func (t structuredDatasetChecker) CastsFrom(upstreamType *flyte.LiteralType) boo
 
 // Upstream (schema) -> downstream (schema)
 func schemaCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.SchemaType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 
 	nameToTypeMap := make(map[string]flyte.SchemaType_SchemaColumn_SchemaColumnType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.Type
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetType()
 	}
 
 	// Check that the downstream schema is a strict sub-set of the upstream schema.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if upstreamType != column.Type {
+		if upstreamType != column.GetType() {
 			return false
 		}
 	}
@@ -244,26 +347,26 @@ func (t unionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 // Upstream (structuredDatasetType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.StructuredDatasetType) bool {
 	// Skip the format check here when format is empty. https://github.com/flyteorg/flyte/issues/2864
-	if len(upstream.Format) != 0 && len(downstream.Format) != 0 && !strings.EqualFold(upstream.Format, downstream.Format) {
+	if len(upstream.GetFormat()) != 0 && len(downstream.GetFormat()) != 0 && !strings.EqualFold(upstream.GetFormat(), downstream.GetFormat()) {
 		return false
 	}
 
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 
 	nameToTypeMap := make(map[string]*flyte.LiteralType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.LiteralType
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetLiteralType()
 	}
 
 	// Check that the downstream structured dataset is a strict sub-set of the upstream structured dataset.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if !getTypeChecker(column.LiteralType).CastsFrom(upstreamType) {
+		if !getTypeChecker(column.GetLiteralType()).CastsFrom(upstreamType) {
 			return false
 		}
 	}
@@ -272,21 +375,21 @@ func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatase
 
 // Upstream (schemaType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *flyte.StructuredDatasetType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SchemaType_SchemaColumn_SchemaColumnType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.GetType()
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetType()
 	}
 
 	// Check that the downstream structuredDataset is a strict sub-set of the upstream schema.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}
-		if !schemaTypeIsMatchStructuredDatasetType(upstreamType, column.LiteralType.GetSimple()) {
+		if !schemaTypeIsMatchStructuredDatasetType(upstreamType, column.GetLiteralType().GetSimple()) {
 			return false
 		}
 	}
@@ -295,17 +398,17 @@ func structuredDatasetCastFromSchema(upstream *flyte.SchemaType, downstream *fly
 
 // Upstream (structuredDatasetType) -> downstream (schemaType)
 func schemaCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.SchemaType) bool {
-	if len(upstream.Columns) == 0 || len(downstream.Columns) == 0 {
+	if len(upstream.GetColumns()) == 0 || len(downstream.GetColumns()) == 0 {
 		return true
 	}
 	nameToTypeMap := make(map[string]flyte.SimpleType)
-	for _, column := range upstream.Columns {
-		nameToTypeMap[column.Name] = column.LiteralType.GetSimple()
+	for _, column := range upstream.GetColumns() {
+		nameToTypeMap[column.GetName()] = column.GetLiteralType().GetSimple()
 	}
 
 	// Check that the downstream schema is a strict sub-set of the upstream structuredDataset.
-	for _, column := range downstream.Columns {
-		upstreamType, ok := nameToTypeMap[column.Name]
+	for _, column := range downstream.GetColumns() {
+		upstreamType, ok := nameToTypeMap[column.GetName()]
 		if !ok {
 			return false
 		}

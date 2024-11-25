@@ -28,7 +28,9 @@ const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
 const defaultContainerTemplateName = "default"
+const defaultInitContainerTemplateName = "default-init"
 const primaryContainerTemplateName = "primary"
+const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
 
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
@@ -285,15 +287,15 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
-		if target.K8SPod.PodSpec == nil {
+		if target.K8SPod.GetPodSpec() == nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.GetPodSpec(), &podSpec)
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
+				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.GetPodSpec(), err.Error())
 		}
 
 		// get primary container name
@@ -304,9 +306,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod().Metadata != nil {
-			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
-			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
+		if taskTemplate.GetK8SPod().GetMetadata() != nil {
+			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
@@ -387,14 +389,17 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		dataLoadingConfig = pod.GetDataConfig()
 	}
 
+	primaryInitContainerName := ""
+
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+			primaryContainer, taskTemplate.GetInterface(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
-		if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
-			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
+		primaryInitContainerName, err = AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
+			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig)
+		if err != nil {
 			return nil, nil, err
 		}
 	}
@@ -406,7 +411,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// merge PodSpec and ObjectMeta with configuration pod template (if exists)
-	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName)
+	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -478,11 +483,11 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	}
 
 	var podTemplate *v1.PodTemplate
-	if taskTemplate.Metadata != nil && len(taskTemplate.Metadata.PodTemplateName) > 0 {
+	if taskTemplate.GetMetadata() != nil && len(taskTemplate.GetMetadata().GetPodTemplateName()) > 0 {
 		// retrieve PodTemplate by name from PodTemplateStore
-		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.Metadata.PodTemplateName)
+		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.GetMetadata().GetPodTemplateName())
 		if podTemplate == nil {
-			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.Metadata.PodTemplateName)
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.GetMetadata().GetPodTemplateName())
 		}
 	} else {
 		// check for default PodTemplate
@@ -495,7 +500,7 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 // MergeWithBasePodTemplate attempts to merge the provided PodSpec and ObjectMeta with the configuration PodTemplate for
 // this task.
 func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
-	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 
 	// attempt to retrieve base PodTemplate
 	podTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
@@ -507,7 +512,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge podSpec with podTemplate
-	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName)
+	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -524,7 +529,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 // mergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
 // set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
 // container-level configuration from the basePodSpec.
-func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string) (*v1.PodSpec, error) {
+func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
 	if basePodSpec == nil || podSpec == nil {
 		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
 	}
@@ -536,6 +541,16 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			defaultContainerTemplate = &basePodSpec.Containers[i]
 		} else if basePodSpec.Containers[i].Name == primaryContainerTemplateName {
 			primaryContainerTemplate = &basePodSpec.Containers[i]
+		}
+	}
+
+	// extract defaultInitContainerTemplate and primaryInitContainerTemplate
+	var defaultInitContainerTemplate, primaryInitContainerTemplate *v1.Container
+	for i := 0; i < len(basePodSpec.InitContainers); i++ {
+		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
+		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
 		}
 	}
 
@@ -580,6 +595,43 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	}
 
 	mergedPodSpec.Containers = mergedContainers
+
+	// merge PodTemplate init containers
+	var mergedInitContainers []v1.Container
+	for _, initContainer := range podSpec.InitContainers {
+		// if applicable start with defaultContainerTemplate
+		var mergedInitContainer *v1.Container
+		if defaultInitContainerTemplate != nil {
+			mergedInitContainer = defaultInitContainerTemplate.DeepCopy()
+		}
+
+		// if applicable merge with primaryInitContainerTemplate
+		if initContainer.Name == primaryInitContainerName && primaryInitContainerTemplate != nil {
+			if mergedInitContainer == nil {
+				mergedInitContainer = primaryInitContainerTemplate.DeepCopy()
+			} else {
+				err := mergo.Merge(mergedInitContainer, primaryInitContainerTemplate, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		// if applicable merge with existing init initContainer
+		if mergedInitContainer == nil {
+			mergedInitContainers = append(mergedInitContainers, initContainer)
+		} else {
+			err := mergo.Merge(mergedInitContainer, initContainer, mergo.WithOverride, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, err
+			}
+
+			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
+		}
+	}
+
+	mergedPodSpec.InitContainers = mergedInitContainers
+
 	return mergedPodSpec, nil
 }
 

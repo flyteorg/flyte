@@ -32,6 +32,6 @@ func TestLoadDefaultServiceAccountConfig(t *testing.T) {
 
 	t.Run("serviceAccount", func(t *testing.T) {
 		config := GetConfig()
-		assert.Equal(t, config.ServiceAccount, "default")
+		assert.Equal(t, config.ServiceAccount, "")
 	})
 }

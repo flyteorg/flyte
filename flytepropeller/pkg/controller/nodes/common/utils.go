@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"strconv"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -74,9 +76,30 @@ func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) 
 			// This doesn't feed a very important part of the node execution event, swallow it for now.
 			logger.Errorf(ctx, "Failed to get task [%v] with error [%v]", taskID, err)
 		}
-		targetEntity = taskID.CoreTask().Id
+		targetEntity = taskID.CoreTask().GetId()
 	}
 	return targetEntity
+}
+
+// ReadLargeLiteral reads the offloaded large literal needed by array node task
+func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
+	tobeRead *idlcore.Literal) error {
+	if tobeRead.GetOffloadedMetadata() == nil {
+		return fmt.Errorf("unsupported type for reading offloaded literal")
+	}
+	dataReference := tobeRead.GetOffloadedMetadata().GetUri()
+	if dataReference == "" {
+		return fmt.Errorf("uri is empty for offloaded literal")
+	}
+	// read the offloaded literal
+	size := tobeRead.GetOffloadedMetadata().GetSizeBytes()
+	if err := datastore.ReadProtobuf(ctx, storage.DataReference(dataReference), tobeRead); err != nil {
+		logger.Errorf(ctx, "Failed to  read the offloaded literal at location [%s] with error [%s]", dataReference, err)
+		return err
+	}
+
+	logger.Infof(ctx, "read offloaded literal at location [%s] with size [%s]", dataReference, size)
+	return nil
 }
 
 // OffloadLargeLiteral offloads the large literal if meets the threshold conditions
@@ -88,7 +111,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 	if literalSizeMB >= literalOffloadingConfig.MaxSizeInMBForOffloading {
 		errString := fmt.Sprintf("Literal size [%d] MB is larger than the max size [%d] MB for offloading", literalSizeMB, literalOffloadingConfig.MaxSizeInMBForOffloading)
 		logger.Errorf(ctx, errString)
-		return fmt.Errorf(errString)
+		return fmt.Errorf(errString) //nolint:govet,staticcheck
 	}
 	if literalSizeMB < literalOffloadingConfig.MinSizeInMBForOffloading {
 		logger.Debugf(ctx, "Literal size [%d] MB is smaller than the min size [%d] MB for offloading", literalSizeMB, literalOffloadingConfig.MinSizeInMBForOffloading)
@@ -99,7 +122,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 	if inferredType == nil {
 		errString := "Failed to determine literal type for offloaded literal"
 		logger.Errorf(ctx, errString)
-		return fmt.Errorf(errString)
+		return fmt.Errorf(errString) //nolint:govet,staticcheck
 	}
 
 	// offload the literal
@@ -108,11 +131,21 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 		return err
 	}
 
+	if toBeOffloaded.GetHash() == "" {
+		// compute the hash of the literal
+		literalDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to compute hash for offloaded literal with error [%s]", err)
+			return err
+		}
+		// Set the hash or else respect what the user set in the literal
+		toBeOffloaded.Hash = base64.RawURLEncoding.EncodeToString(literalDigest)
+	}
 	// update the literal with the offloaded URI, size and inferred type
 	toBeOffloaded.Value = &idlcore.Literal_OffloadedMetadata{
 		OffloadedMetadata: &idlcore.LiteralOffloadedMetadata{
 			Uri:          dataReference.String(),
-			SizeBytes:    uint64(literalSizeBytes),
+			SizeBytes:    uint64(literalSizeBytes), // #nosec G115
 			InferredType: inferredType,
 		},
 	}
