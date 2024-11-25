@@ -182,6 +182,18 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "no deckUrl found for request [%+v]", req)
 	}
 
+	// Check if the native url exists
+	metadata, err := s.dataStore.Head(ctx, storage.DataReference(nativeURL))
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Failed to check the existence of the URL [%s]. Error: %v", nativeURL, err)
+	}
+	if !metadata.Exists() {
+		return nil, errors.NewFlyteAdminErrorf(
+			codes.NotFound,
+			"URL [%s] does not exist yet. Please try again later. If you are using the real-time deck, this could be because the 'persist' function has not been called yet.",
+			nativeURL)
+	}
+
 	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(nativeURL), storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
 		ExpiresIn: req.GetExpiresIn().AsDuration(),
