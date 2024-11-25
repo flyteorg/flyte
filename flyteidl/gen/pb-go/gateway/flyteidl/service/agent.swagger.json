@@ -1814,6 +1814,10 @@
             "type": "string"
           },
           "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
         }
       },
       "title": "Task Metadata"
