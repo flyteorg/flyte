@@ -11,6 +11,7 @@ name = "unionai-actor-bridge"
 path = "src/main.rs"
 
 [dependencies]
+anyhow = "1.0"
 async-channel = "2.1"
 async-stream = "0.3"
 bincode = { workspace = true }
@@ -24,4 +25,5 @@ tokio-util = { workspace = true }
 tonic = "0.9"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+trait-variant = "0.1.2"
 uuid = { version = "1.4.1", features = ["v4"] }
