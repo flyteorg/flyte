@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -106,6 +107,12 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.Memory = old
+	})
+
+	t.Run("sidecar-container-name-change", func(t *testing.T) {
+		c, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, []string{"hello"})
+		assert.NoError(t, err)
+		assert.Equal(t, "uploader", strings.Split(c.Name, "-")[1])
 	})
 }
 
