@@ -36,16 +36,19 @@ type eventRecorder struct {
 func (e eventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
 	if err := e.taskEventRecorder.RecordTaskEvent(ctx, ev, eventConfig); err != nil {
 		if eventsErr.IsAlreadyExists(err) {
-			logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.Phase)
+			if eventConfig.ErrorOnAlreadyExists {
+				return err
+			}
+			logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.GetPhase())
 			return nil
 		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
-			if IsTerminalTaskPhase(ev.Phase) {
+			if IsTerminalTaskPhase(ev.GetPhase()) {
 				// Event is terminal and the stored value in flyteadmin is already terminal. This implies aborted case. So ignoring
-				logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.Phase)
+				logger.Warningf(ctx, "Failed to record taskEvent, error [%s]. Trying to record state: %s. Ignoring this error!", err.Error(), ev.GetPhase())
 				return nil
 			}
-			logger.Warningf(ctx, "Failed to record taskEvent in state: %s, error: %s", ev.Phase, err)
-			return errors.Wrapf(err, "failed to record task event, as it already exists in terminal state. Event state: %s", ev.Phase)
+			logger.Warningf(ctx, "Failed to record taskEvent in state: %s, error: %s", ev.GetPhase(), err)
+			return errors.Wrapf(err, "failed to record task event, as it already exists in terminal state. Event state: %s", ev.GetPhase())
 		}
 		return err
 	}
@@ -57,30 +60,30 @@ func (e eventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.Nod
 		return fmt.Errorf("event recording attempt of Nil Node execution event")
 	}
 
-	if nodeEvent.Id == nil {
+	if nodeEvent.GetId() == nil {
 		return fmt.Errorf("event recording attempt of with nil node Event ID")
 	}
 
-	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.Phase.String())
+	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.GetPhase().String())
 	err := e.nodeEventRecorder.RecordNodeEvent(ctx, nodeEvent, eventConfig)
 	if err != nil {
-		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
+		if nodeEvent.GetId().GetNodeId() == v1alpha1.EndNodeID {
 			return nil
 		}
 
 		if eventsErr.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Node event phase: %s, nodeId %s already exist",
-				nodeEvent.Phase.String(), nodeEvent.GetId().NodeId)
+				nodeEvent.GetPhase().String(), nodeEvent.GetId().GetNodeId())
 			return nil
 		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
-			if IsTerminalNodePhase(nodeEvent.Phase) {
+			if IsTerminalNodePhase(nodeEvent.GetPhase()) {
 				// Event was trying to record a different terminal phase for an already terminal event. ignoring.
 				logger.Infof(ctx, "Node event phase: %s, nodeId %s already in terminal phase. err: %s",
-					nodeEvent.Phase.String(), nodeEvent.GetId().NodeId, err.Error())
+					nodeEvent.GetPhase().String(), nodeEvent.GetId().GetNodeId(), err.Error())
 				return nil
 			}
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
-			return nodeerrors.Wrapf(nodeerrors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mismatch mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
+			return nodeerrors.Wrapf(nodeerrors.IllegalStateError, nodeEvent.GetId().GetNodeId(), err, "phase mismatch mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.GetPhase())
 		}
 	}
 	return err
@@ -119,20 +122,19 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 }
 
 type nodeExecContext struct {
-	store               *storage.DataStore
-	tr                  interfaces.TaskReader
-	md                  interfaces.NodeExecutionMetadata
-	eventRecorder       interfaces.EventRecorder
-	inputs              io.InputReader
-	node                v1alpha1.ExecutableNode
-	nodeStatus          v1alpha1.ExecutableNodeStatus
-	maxDatasetSizeBytes int64
-	nsm                 *nodeStateManager
-	enqueueOwner        func() error
-	rawOutputPrefix     storage.DataReference
-	shardSelector       ioutils.ShardSelector
-	nl                  executors.NodeLookup
-	ic                  executors.ExecutionContext
+	store           *storage.DataStore
+	tr              interfaces.TaskReader
+	md              interfaces.NodeExecutionMetadata
+	eventRecorder   interfaces.EventRecorder
+	inputs          io.InputReader
+	node            v1alpha1.ExecutableNode
+	nodeStatus      v1alpha1.ExecutableNodeStatus
+	nsm             *nodeStateManager
+	enqueueOwner    func() error
+	rawOutputPrefix storage.DataReference
+	shardSelector   ioutils.ShardSelector
+	nl              executors.NodeLookup
+	ic              executors.ExecutionContext
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -199,13 +201,9 @@ func (e nodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadat
 	return e.md
 }
 
-func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
-	return e.maxDatasetSizeBytes
-}
-
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
-	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
+	taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
 	md := nodeExecMetadata{
@@ -225,7 +223,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	}
 	nodeLabels[NodeIDLabel] = utils.SanitizeLabelValue(node.GetID())
 	if tr != nil && tr.GetTaskID() != nil {
-		nodeLabels[TaskNameLabel] = utils.SanitizeLabelValue(tr.GetTaskID().Name)
+		nodeLabels[TaskNameLabel] = utils.SanitizeLabelValue(tr.GetTaskID().GetName())
 	}
 	nodeLabels[NodeInterruptibleLabel] = strconv.FormatBool(interruptible)
 	md.nodeLabels = nodeLabels
@@ -240,14 +238,13 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 			taskEventRecorder: taskEventRecorder,
 			nodeEventRecorder: nodeEventRecorder,
 		},
-		maxDatasetSizeBytes: maxDatasetSize,
-		tr:                  tr,
-		nsm:                 nsm,
-		enqueueOwner:        enqueueOwner,
-		rawOutputPrefix:     rawOutputPrefix,
-		shardSelector:       outputShardSelector,
-		nl:                  nl,
-		ic:                  execContext,
+		tr:              tr,
+		nsm:             nsm,
+		enqueueOwner:    enqueueOwner,
+		rawOutputPrefix: rawOutputPrefix,
+		shardSelector:   outputShardSelector,
+		nl:              nl,
+		ic:              execContext,
 	}
 }
 
@@ -293,9 +290,9 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		// For the unified retry behavior we execute the last interruptibleFailureThreshold attempts on a non
 		// interruptible machine
-		maxAttempts := uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		maxAttempts := uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 		if n.GetRetryStrategy() != nil && n.GetRetryStrategy().MinAttempts != nil && *n.GetRetryStrategy().MinAttempts != 1 {
-			maxAttempts = uint32(*n.GetRetryStrategy().MinAttempts)
+			maxAttempts = uint32(*n.GetRetryStrategy().MinAttempts) // #nosec G115
 		}
 
 		// For interruptible nodes run at least one attempt on an interruptible machine (thus s.GetAttempts() > 0) even if there won't be any retries
@@ -331,7 +328,6 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		),
 		interruptible,
 		c.interruptibleFailureThreshold,
-		c.maxDatasetSizeBytes,
 		c.taskRecorder,
 		c.nodeRecorder,
 		tr,

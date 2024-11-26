@@ -4,6 +4,7 @@ package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
@@ -135,6 +136,9 @@ message LaunchPlanSpec {
 
     // Environment variables to be set for the execution.
     Envs envs = 21;
+
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvAssignment execution_env_assignments = 22;
 }
 
 // Values computed by the flyte platform after launch plan registration.

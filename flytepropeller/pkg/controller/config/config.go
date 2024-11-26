@@ -34,12 +34,17 @@
 package config
 
 import (
+	"context"
+	"fmt"
+	"regexp"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -115,49 +120,109 @@ var (
 		},
 		ClusterID:                "propeller",
 		CreateFlyteWorkflowCRD:   false,
-		ArrayNodeEventVersion:    0,
 		NodeExecutionWorkerCount: 8,
+		ArrayNode: ArrayNodeConfig{
+			EventVersion:               0,
+			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
+		},
+		LiteralOffloadingConfig: LiteralOffloadingConfig{
+			Enabled: false, // Default keep this disabled and we will followup when flytekit is released with the offloaded changes.
+			SupportedSDKVersions: map[string]string{ // The key is the SDK name (matches the supported SDK in core.RuntimeMetadata_RuntimeType)  and the value is the minimum supported version
+				"FLYTE_SDK": "1.13.5", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
+			},
+			MinSizeInMBForOffloading: 10,   // 10 MB is the default size for offloading
+			MaxSizeInMBForOffloading: 1000, // 1 GB is the default size before failing fast.
+		},
 	}
+
+	// This regex is used to sanitize semver versions passed to IsSupportedSDK checks for literal offloading feature.
+	// It matches against 1.13.3 in v1.13.3b0 (beta version) or 1.13.3 in 1.13.3.dev12+g990b450ea.d20240917(dev version)
+	sanitizeProtoRegex = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
 )
 
 // Config that uses the flytestdlib Config module to generate commandline and load config files. This configuration is
 // the base configuration to start propeller
 // NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 type Config struct {
-	KubeConfigPath           string               `json:"kube-config" pflag:",Path to kubernetes client config file."`
-	MasterURL                string               `json:"master"`
-	Workers                  int                  `json:"workers" pflag:",Number of threads to process workflows"`
-	WorkflowReEval           config.Duration      `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
-	DownstreamEval           config.Duration      `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
-	LimitNamespace           string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
-	ProfilerPort             config.Port          `json:"prof-port" pflag:",Profiler port"`
-	MetadataPrefix           string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
-	DefaultRawOutputPrefix   string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
-	Queue                    CompositeQueueConfig `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
-	MetricsPrefix            string               `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
-	MetricKeys               []string             `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
-	EnableAdminLauncher      bool                 `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
-	MaxWorkflowRetries       int                  `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
-	MaxTTLInHours            int                  `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
-	GCInterval               config.Duration      `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
-	LeaderElection           LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
-	PublishK8sEvents         bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
-	MaxDatasetSizeBytes      int64                `json:"max-output-size-bytes" pflag:",Deprecated! Use storage.limits.maxDownloadMBs instead"`
-	EnableGrpcLatencyMetrics bool                 `json:"enable-grpc-latency-metrics" pflag:",Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers."`
-	KubeConfig               KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
-	NodeConfig               NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
-	MaxStreakLength          int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
-	EventConfig              EventConfig          `json:"event-config,omitempty" pflag:",Configures execution event behavior."`
-	IncludeShardKeyLabel     []string             `json:"include-shard-key-label" pflag:",Include the specified shard key label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeShardKeyLabel     []string             `json:"exclude-shard-key-label" pflag:",Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector"`
-	IncludeProjectLabel      []string             `json:"include-project-label" pflag:",Include the specified project label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeProjectLabel      []string             `json:"exclude-project-label" pflag:",Exclude the specified project label from the k8s FlyteWorkflow CRD label selector"`
-	IncludeDomainLabel       []string             `json:"include-domain-label" pflag:",Include the specified domain label in the k8s FlyteWorkflow CRD label selector"`
-	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
-	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
-	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
-	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
-	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
+	KubeConfigPath           string                  `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	MasterURL                string                  `json:"master"`
+	Workers                  int                     `json:"workers" pflag:",Number of threads to process workflows"`
+	WorkflowReEval           config.Duration         `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
+	DownstreamEval           config.Duration         `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
+	LimitNamespace           string                  `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
+	ProfilerPort             config.Port             `json:"prof-port" pflag:",Profiler port"`
+	MetadataPrefix           string                  `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
+	DefaultRawOutputPrefix   string                  `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
+	Queue                    CompositeQueueConfig    `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
+	MetricsPrefix            string                  `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	MetricKeys               []string                `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
+	EnableAdminLauncher      bool                    `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
+	MaxWorkflowRetries       int                     `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
+	MaxTTLInHours            int                     `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
+	GCInterval               config.Duration         `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
+	LeaderElection           LeaderElectionConfig    `json:"leader-election,omitempty" pflag:",Config for leader election."`
+	PublishK8sEvents         bool                    `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
+	MaxDatasetSizeBytes      int64                   `json:"max-output-size-bytes" pflag:",Deprecated! Use storage.limits.maxDownloadMBs instead"`
+	EnableGrpcLatencyMetrics bool                    `json:"enable-grpc-latency-metrics" pflag:",Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers."`
+	KubeConfig               KubeClientConfig        `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
+	NodeConfig               NodeConfig              `json:"node-config,omitempty" pflag:",config for a workflow node"`
+	MaxStreakLength          int                     `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
+	EventConfig              EventConfig             `json:"event-config,omitempty" pflag:",Configures execution event behavior."`
+	IncludeShardKeyLabel     []string                `json:"include-shard-key-label" pflag:",Include the specified shard key label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeShardKeyLabel     []string                `json:"exclude-shard-key-label" pflag:",Exclude the specified shard key label from the k8s FlyteWorkflow CRD label selector"`
+	IncludeProjectLabel      []string                `json:"include-project-label" pflag:",Include the specified project label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeProjectLabel      []string                `json:"exclude-project-label" pflag:",Exclude the specified project label from the k8s FlyteWorkflow CRD label selector"`
+	IncludeDomainLabel       []string                `json:"include-domain-label" pflag:",Include the specified domain label in the k8s FlyteWorkflow CRD label selector"`
+	ExcludeDomainLabel       []string                `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
+	ClusterID                string                  `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
+	CreateFlyteWorkflowCRD   bool                    `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
+	NodeExecutionWorkerCount int                     `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
+	ArrayNode                ArrayNodeConfig         `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
+	LiteralOffloadingConfig  LiteralOffloadingConfig `json:"literal-offloading-config" pflag:",config used for literal offloading."`
+}
+
+type LiteralOffloadingConfig struct {
+	Enabled bool
+	// Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
+	SupportedSDKVersions map[string]string `json:"supported-sdk-versions" pflag:",Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals."`
+	// Default, 10Mbs. Determines the size of a literal at which to trigger offloading
+	MinSizeInMBForOffloading int64 `json:"min-size-in-mb-for-offloading" pflag:",Size of a literal at which to trigger offloading"`
+	// Fail fast threshold
+	MaxSizeInMBForOffloading int64 `json:"max-size-in-mb-for-offloading" pflag:",Size of a literal at which to fail fast"`
+}
+
+// IsSupportedSDKVersion returns true if the provided SDK and version are supported by the literal offloading config.
+func (l LiteralOffloadingConfig) IsSupportedSDKVersion(ctx context.Context, sdk string, versionString string) bool {
+	regexMatches := sanitizeProtoRegex.FindStringSubmatch(versionString)
+	if len(regexMatches) > 1 {
+		logger.Infof(ctx, "original: %s, semVer: %s", versionString, regexMatches[1])
+	} else {
+		logger.Warnf(ctx, "no match found for: %s", versionString)
+		return false
+	}
+	version, err := semver.NewVersion(regexMatches[1])
+	if err != nil {
+		logger.Warnf(ctx, "Failed to parse version %s", versionString)
+		return false
+	}
+	if leastSupportedVersion, ok := l.SupportedSDKVersions[sdk]; ok {
+		c, err := semver.NewConstraint(fmt.Sprintf(">= %s", leastSupportedVersion))
+		if err != nil {
+			// This should never happen
+			logger.Warnf(ctx, "Failed to parse version constraint %s", leastSupportedVersion)
+			return false
+		}
+		return c.Check(version)
+	}
+	return false
+}
+
+// GetSupportedSDKVersion returns the least supported version for the provided SDK.
+func (l LiteralOffloadingConfig) GetSupportedSDKVersion(sdk string) string {
+	if leastSupportedVersion, ok := l.SupportedSDKVersions[sdk]; ok {
+		return leastSupportedVersion
+	}
+	return ""
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -256,6 +321,34 @@ const (
 type EventConfig struct {
 	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
+	// only meant to be overridden for certain node types that have different eventing behavior such as ArrayNode
+	ErrorOnAlreadyExists bool `json:"-"`
+}
+
+// ParallelismBehavior defines how ArrayNode should handle subNode parallelism by default
+type ParallelismBehavior = string
+
+const (
+	// ParallelismBehaviorHybrid means that ArrayNode will adhere to the parallelism defined in the
+	// ArrayNode exactly. This means `nil` will use the workflow parallelism, and 0 will have
+	// unlimited parallelism.
+	ParallelismBehaviorHybrid ParallelismBehavior = "hybrid"
+
+	// ParallelismBehaviorUnlimited means that ArrayNode subNodes will be evaluated with unlimited
+	// parallelism for both nil and 0. If a non-default (ie. nil / zero) parallelism is set, then
+	// ArrayNode will adhere to that value.
+	ParallelismBehaviorUnlimited ParallelismBehavior = "unlimited"
+
+	// ParallelismBehaviorWorkflow means that ArrayNode subNodes will be evaluated using the
+	// configured workflow parallelism for both nil and 0. If a non-default (ie. nil / zero)
+	// parallelism is set, then ArrayNode will adhere to that value.
+	ParallelismBehaviorWorkflow ParallelismBehavior = "workflow"
+)
+
+type ArrayNodeConfig struct {
+	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
+	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
+	UseMapPluginLogs           bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.

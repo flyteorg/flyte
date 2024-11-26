@@ -1,0 +1,482 @@
+{
+  "primary": {
+    "template": {
+      "id": {
+        "resourceType": "WORKFLOW",
+        "project": "flytesnacks",
+        "domain": "development",
+        "name": "core.control_flow.subworkflows.parent_wf",
+        "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+      },
+      "metadata": {},
+      "interface": {
+        "inputs": {
+          "variables": {
+            "a": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "a"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o0"
+            },
+            "o1": {
+              "type": {
+                "simple": "STRING"
+              },
+              "description": "o1"
+            },
+            "o2": {
+              "type": {
+                "simple": "STRING"
+              },
+              "description": "o2"
+            }
+          }
+        }
+      },
+      "nodes": [
+        {
+          "id": "start-node"
+        },
+        {
+          "id": "end-node",
+          "inputs": [
+            {
+              "var": "o0",
+              "binding": {
+                "promise": {
+                  "nodeId": "node-t1-parent",
+                  "var": "t1_int_output"
+                }
+              }
+            },
+            {
+              "var": "o1",
+              "binding": {
+                "promise": {
+                  "nodeId": "n1",
+                  "var": "o0"
+                }
+              }
+            },
+            {
+              "var": "o2",
+              "binding": {
+                "promise": {
+                  "nodeId": "n1",
+                  "var": "o1"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "node-t1-parent",
+          "metadata": {
+            "name": "flytekit.core.python_function_task.core.control_flow.subworkflows.t1",
+            "retries": {},
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": "a",
+              "binding": {
+                "promise": {
+                  "nodeId": "start-node",
+                  "var": "a"
+                }
+              }
+            }
+          ],
+          "taskNode": {
+            "referenceId": {
+              "resourceType": "TASK",
+              "project": "flytesnacks",
+              "domain": "development",
+              "name": "core.control_flow.subworkflows.t1",
+              "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+            }
+          }
+        },
+        {
+          "id": "n1",
+          "metadata": {
+            "name": "flytekit.core.workflow.core.control_flow.subworkflows.my_subwf",
+            "retries": {},
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": "a",
+              "binding": {
+                "promise": {
+                  "nodeId": "node-t1-parent",
+                  "var": "t1_int_output"
+                }
+              }
+            }
+          ],
+          "upstreamNodeIds": [
+            "node-t1-parent"
+          ],
+          "workflowNode": {
+            "subWorkflowRef": {
+              "resourceType": "WORKFLOW",
+              "project": "flytesnacks",
+              "domain": "development",
+              "name": "core.control_flow.subworkflows.my_subwf",
+              "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "var": "o0",
+          "binding": {
+            "promise": {
+              "nodeId": "node-t1-parent",
+              "var": "t1_int_output"
+            }
+          }
+        },
+        {
+          "var": "o1",
+          "binding": {
+            "promise": {
+              "nodeId": "n1",
+              "var": "o0"
+            }
+          }
+        },
+        {
+          "var": "o2",
+          "binding": {
+            "promise": {
+              "nodeId": "n1",
+              "var": "o1"
+            }
+          }
+        }
+      ],
+      "metadataDefaults": {}
+    },
+    "connections": {
+      "downstream": {
+        "n1": {
+          "ids": [
+            "end-node"
+          ]
+        },
+        "node-t1-parent": {
+          "ids": [
+            "end-node",
+            "n1"
+          ]
+        },
+        "start-node": {
+          "ids": [
+            "node-t1-parent"
+          ]
+        }
+      },
+      "upstream": {
+        "end-node": {
+          "ids": [
+            "n1",
+            "node-t1-parent"
+          ]
+        },
+        "n1": {
+          "ids": [
+            "node-t1-parent"
+          ]
+        },
+        "node-t1-parent": {
+          "ids": [
+            "start-node"
+          ]
+        }
+      }
+    }
+  },
+  "subWorkflows": [
+    {
+      "template": {
+        "id": {
+          "resourceType": "WORKFLOW",
+          "project": "flytesnacks",
+          "domain": "development",
+          "name": "core.control_flow.subworkflows.my_subwf",
+          "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+        },
+        "metadata": {},
+        "interface": {
+          "inputs": {
+            "variables": {
+              "a": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "a"
+              }
+            }
+          },
+          "outputs": {
+            "variables": {
+              "o0": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "o0"
+              },
+              "o1": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "o1"
+              }
+            }
+          }
+        },
+        "nodes": [
+          {
+            "id": "start-node"
+          },
+          {
+            "id": "end-node",
+            "inputs": [
+              {
+                "var": "o0",
+                "binding": {
+                  "promise": {
+                    "nodeId": "n0",
+                    "var": "c"
+                  }
+                }
+              },
+              {
+                "var": "o1",
+                "binding": {
+                  "promise": {
+                    "nodeId": "n1",
+                    "var": "c"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "n0",
+            "metadata": {
+              "name": "flytekit.core.python_function_task.core.control_flow.subworkflows.t1",
+              "retries": {},
+              "interruptible": false
+            },
+            "inputs": [
+              {
+                "var": "a",
+                "binding": {
+                  "promise": {
+                    "nodeId": "start-node",
+                    "var": "a"
+                  }
+                }
+              }
+            ],
+            "taskNode": {
+              "referenceId": {
+                "resourceType": "TASK",
+                "project": "flytesnacks",
+                "domain": "development",
+                "name": "core.control_flow.subworkflows.t1",
+                "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+              }
+            }
+          },
+          {
+            "id": "n1",
+            "metadata": {
+              "name": "flytekit.core.python_function_task.core.control_flow.subworkflows.t1",
+              "retries": {},
+              "interruptible": false
+            },
+            "inputs": [
+              {
+                "var": "a",
+                "binding": {
+                  "promise": {
+                    "nodeId": "n0",
+                    "var": "t1_int_output"
+                  }
+                }
+              }
+            ],
+            "upstreamNodeIds": [
+              "n0"
+            ],
+            "taskNode": {
+              "referenceId": {
+                "resourceType": "TASK",
+                "project": "flytesnacks",
+                "domain": "development",
+                "name": "core.control_flow.subworkflows.t1",
+                "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+              }
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "var": "o0",
+            "binding": {
+              "promise": {
+                "nodeId": "n0",
+                "var": "c"
+              }
+            }
+          },
+          {
+            "var": "o1",
+            "binding": {
+              "promise": {
+                "nodeId": "n1",
+                "var": "c"
+              }
+            }
+          }
+        ],
+        "metadataDefaults": {}
+      },
+      "connections": {
+        "downstream": {
+          "n0": {
+            "ids": [
+              "end-node",
+              "n1"
+            ]
+          },
+          "n1": {
+            "ids": [
+              "end-node"
+            ]
+          },
+          "start-node": {
+            "ids": [
+              "n0"
+            ]
+          }
+        },
+        "upstream": {
+          "end-node": {
+            "ids": [
+              "n0",
+              "n1"
+            ]
+          },
+          "n0": {
+            "ids": [
+              "start-node"
+            ]
+          },
+          "n1": {
+            "ids": [
+              "n0"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "flytesnacks",
+          "domain": "development",
+          "name": "core.control_flow.subworkflows.t1",
+          "version": "d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "0.0.0+develop",
+            "flavor": "python"
+          },
+          "retries": {},
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+            "variables": {
+              "a": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "a"
+              }
+            }
+          },
+          "outputs": {
+            "variables": {
+              "c": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "c"
+              },
+              "t1_int_output": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "t1_int_output"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "flytecookbook:core-d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59",
+          "args": [
+            "pyflyte-execute",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}",
+            "--resolver",
+            "flytekit.core.python_auto_container.default_task_resolver",
+            "--",
+            "task-module",
+            "core.control_flow.subworkflows",
+            "task-name",
+            "t1"
+          ],
+          "resources": {},
+          "env": [
+            {
+              "key": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+              "value": "/root/sandbox.config"
+            },
+            {
+              "key": "FLYTE_INTERNAL_IMAGE",
+              "value": "flytecookbook:core-d5fa3ecfaca02f9b83957c68fd5fe3c9082ccc59"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
+

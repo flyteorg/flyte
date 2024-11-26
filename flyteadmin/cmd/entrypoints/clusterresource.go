@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -29,6 +30,17 @@ var controllerRunCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		// Serve profiling endpoints.
+		cfg := runtime.NewConfigurationProvider()
+		go func() {
+			err := profutils.StartProfilingServerWithDefaultHandlers(
+				ctx, cfg.ApplicationConfiguration().GetTopLevelConfig().GetProfilerPort(), nil)
+			if err != nil {
+				logger.Panicf(ctx, "Failed to Start profiling and Metrics server. Error, %v", err)
+			}
+		}()
+
 		clusterResourceController.Run()
 		logger.Infof(ctx, "ClusterResourceController started running successfully")
 		return nil

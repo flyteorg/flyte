@@ -15,6 +15,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+//go:generate mockery -all -case=underscore
+
 type TaskReader interface {
 	Read(ctx context.Context) (*core.TaskTemplate, error)
 	GetTaskType() v1alpha1.TaskType
@@ -37,6 +39,7 @@ type NodeExecutionMetadata interface {
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetInterruptibleFailureThreshold() int32
+	GetConsoleURL() string
 }
 
 type NodeExecutionContext interface {
@@ -61,7 +64,6 @@ type NodeExecutionContext interface {
 	NodeStateWriter() NodeStateWriter
 
 	NodeExecutionMetadata() NodeExecutionMetadata
-	MaxDatasetSizeBytes() int64
 
 	EnqueueOwnerFunc() func() error
 

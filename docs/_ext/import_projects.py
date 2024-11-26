@@ -1,5 +1,4 @@
 import inspect
-import os
 import re
 import shutil
 import subprocess
@@ -83,27 +82,23 @@ class ListTableToc(SphinxDirective):
 
 
 def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
+    flytekit_dir = Path(import_project_config.flytekit_api_dir).resolve(strict=True)
+    flytekit_src_dir = flytekit_dir / "flytekit"
+    plugins_dir = flytekit_dir / "plugins"
+
     # create flytekit/_version.py file manually
-    with open(
-        f"{import_project_config.flytekit_api_dir}/flytekit/_version.py", "w"
-    ) as f:
+    with (flytekit_src_dir / "_version.py").open("w") as f:
         f.write(f'__version__ = "dev"')
 
     # add flytekit to python path
-    flytekit_dir = os.path.abspath(import_project_config.flytekit_api_dir)
-    flytekit_src_dir = os.path.abspath(os.path.join(flytekit_dir, "flytekit"))
-    plugins_dir = os.path.abspath(os.path.join(flytekit_dir, "plugins"))
-
-    sys.path.insert(0, flytekit_src_dir)
-    sys.path.insert(0, flytekit_dir)
+    sys.path.insert(0, str(flytekit_src_dir))
+    sys.path.insert(0, str(flytekit_dir))
 
     # add plugins to python path
-    for possible_plugin_dir in os.listdir(plugins_dir):
-        dir_path = os.path.abspath((os.path.join(plugins_dir, possible_plugin_dir)))
-        plugin_path = os.path.abspath(os.path.join(dir_path, "flytekitplugins"))
-        if os.path.isdir(dir_path) and os.path.exists(plugin_path):
-            sys.path.insert(0, dir_path)
-
+    for possible_plugin_dir in plugins_dir.iterdir():
+        plugin_path = possible_plugin_dir / "flytekitplugins"
+        if possible_plugin_dir.is_dir() and plugin_path.exists():
+            sys.path.insert(0, str(possible_plugin_dir))
 
 def update_html_context(project: Project, tag: str, commit: str, config: Config):
     tag_url = "#" if tag == "dev" else f"{project.source}/releases/tag/{tag}"

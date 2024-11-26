@@ -182,7 +182,7 @@ func (r *NamedEntityRepo) List(ctx context.Context, input interfaces.ListNamedEn
 			"Cannot list entity names for resource type: %v", input.ResourceType)
 	}
 
-	tx := getSubQueryJoin(r.db, tableName, input)
+	tx := getSubQueryJoin(r.db.WithContext(ctx), tableName, input)
 
 	// Apply filters
 	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)

@@ -19,11 +19,11 @@ func TestSandboxProcessor_StartProcessingSuccess(t *testing.T) {
 	msgChan <- msg
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
-		assert.Equal(t, testEmail.Body, email.Body)
-		assert.Equal(t, testEmail.RecipientsEmail, email.RecipientsEmail)
-		assert.Equal(t, testEmail.SubjectLine, email.SubjectLine)
-		assert.Equal(t, testEmail.SenderEmail, email.SenderEmail)
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
+		assert.Equal(t, testEmail.GetBody(), email.GetBody())
+		assert.Equal(t, testEmail.GetRecipientsEmail(), email.GetRecipientsEmail())
+		assert.Equal(t, testEmail.GetSubjectLine(), email.GetSubjectLine())
+		assert.Equal(t, testEmail.GetSenderEmail(), email.GetSenderEmail())
 		return nil
 	}
 
@@ -43,7 +43,7 @@ func TestSandboxProcessor_StartProcessingError(t *testing.T) {
 	msgChan <- msg
 
 	emailError := errors.New("error running processor")
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
 	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
@@ -70,7 +70,7 @@ func TestSandboxProcessor_StartProcessingEmailError(t *testing.T) {
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 
 	emailError := errors.New("error sending email")
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
 

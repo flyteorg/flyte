@@ -2,17 +2,19 @@ package ray
 
 import (
 	"context"
+	"encoding/json"
+	"reflect"
 	"testing"
 	"time"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -105,7 +107,7 @@ func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate 
 	}
 }
 
-func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionContext {
+func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -147,7 +149,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
 	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
 	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
@@ -159,6 +161,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 		RunAs: &core.Identity{K8SServiceAccount: serviceAccount},
 	})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }
@@ -175,7 +178,8 @@ func TestBuildResourceRay(t *testing.T) {
 	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
 	assert.Nil(t, err)
 
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, ""))
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
 	assert.Nil(t, err)
 
 	assert.NotNil(t, RayResource)
@@ -206,6 +210,15 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+
+	// Make sure the default service account is being used if SA is not provided in the task context
+	rayCtx = dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", "")
+	RayResource, err = rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	assert.Nil(t, err)
+	assert.NotNil(t, RayResource)
+	ray, ok = RayResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
 }
 
 func TestBuildResourceRayContainerImage(t *testing.T) {
@@ -239,7 +252,7 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 	for _, f := range fixtures {
 		t.Run(f.name, func(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
-			taskContext := dummyRayTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride)
+			taskContext := dummyRayTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride, serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -370,7 +383,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 		t.Run(p.name, func(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
 			taskTemplate.ExtendedResources = p.extendedResourcesBase
-			taskContext := dummyRayTaskContext(taskTemplate, p.resources, p.extendedResourcesOverride, "")
+			taskContext := dummyRayTaskContext(taskTemplate, p.resources, p.extendedResourcesOverride, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -407,6 +420,123 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 	}
 }
 
+func TestBuildResourceRayCustomK8SPod(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	headResourceEntries := []*core.Resources_ResourceEntry{
+		{Name: core.Resources_CPU, Value: "10"},
+		{Name: core.Resources_MEMORY, Value: "10Gi"},
+		{Name: core.Resources_GPU, Value: "10"},
+	}
+	headResources := &core.Resources{Requests: headResourceEntries, Limits: headResourceEntries}
+
+	expectedHeadResources, err := flytek8s.ToK8sResourceRequirements(headResources)
+	require.NoError(t, err)
+
+	workerResourceEntries := []*core.Resources_ResourceEntry{
+		{Name: core.Resources_CPU, Value: "20"},
+		{Name: core.Resources_MEMORY, Value: "20Gi"},
+		{Name: core.Resources_GPU, Value: "20"},
+	}
+	workerResources := &core.Resources{Requests: workerResourceEntries, Limits: workerResourceEntries}
+
+	expectedWorkerResources, err := flytek8s.ToK8sResourceRequirements(workerResources)
+	require.NoError(t, err)
+
+	headPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-head",
+				Resources: *expectedHeadResources,
+			},
+		},
+	}
+	workerPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-worker",
+				Resources: *expectedWorkerResources,
+			},
+		},
+	}
+
+	params := []struct {
+		name                       string
+		taskResources              *corev1.ResourceRequirements
+		headK8SPod                 *core.K8SPod
+		workerK8SPod               *core.K8SPod
+		expectedSubmitterResources *corev1.ResourceRequirements
+		expectedHeadResources      *corev1.ResourceRequirements
+		expectedWorkerResources    *corev1.ResourceRequirements
+	}{
+		{
+			name:                       "task resources",
+			taskResources:              resourceRequirements,
+			expectedSubmitterResources: resourceRequirements,
+			expectedHeadResources:      resourceRequirements,
+			expectedWorkerResources:    resourceRequirements,
+		},
+		{
+			name:          "custom worker and head resources",
+			taskResources: resourceRequirements,
+			headK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, headPodSpec),
+			},
+			workerK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, workerPodSpec),
+			},
+			expectedSubmitterResources: resourceRequirements,
+			expectedHeadResources:      expectedHeadResources,
+			expectedWorkerResources:    expectedWorkerResources,
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			rayJobInput := dummyRayCustomObj()
+
+			if p.headK8SPod != nil {
+				rayJobInput.RayCluster.HeadGroupSpec.K8SPod = p.headK8SPod
+			}
+
+			if p.workerK8SPod != nil {
+				for _, spec := range rayJobInput.GetRayCluster().GetWorkerGroupSpec() {
+					spec.K8SPod = p.workerK8SPod
+				}
+			}
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
+			taskContext := dummyRayTaskContext(taskTemplate, p.taskResources, nil, "", serviceAccount)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1.RayJob)
+			assert.True(t, ok)
+
+			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
+			assert.EqualValues(t,
+				p.expectedSubmitterResources,
+				&submitterPodResources,
+			)
+
+			headPodResources := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Resources
+			assert.EqualValues(t,
+				p.expectedHeadResources,
+				&headPodResources,
+			)
+
+			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
+				workerPodResources := workerGroupSpec.Template.Spec.Containers[0].Resources
+				assert.EqualValues(t,
+					p.expectedWorkerResources,
+					&workerPodResources,
+				)
+			}
+		})
+	}
+}
+
 func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
@@ -429,7 +559,7 @@ func TestDefaultStartParameters(t *testing.T) {
 	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
 	assert.Nil(t, err)
 
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, ""))
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, RayResource)
@@ -635,7 +765,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{
 				LogsSidecar: p.logsSidecarCfg,
 			}))
-			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil, "")
+			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -675,7 +805,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}
 }
 
-func newPluginContext() k8s.PluginContext {
+func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
 	plg := &mocks2.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
@@ -702,6 +832,19 @@ func newPluginContext() k8s.PluginContext {
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
 	plg.OnTaskExecutionMetadata().Return(tskCtx)
+
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+
 	return plg
 }
 
@@ -719,7 +862,7 @@ func init() {
 func TestGetTaskPhase(t *testing.T) {
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 
 	testCases := []struct {
 		rayJobPhase       rayv1.JobDeploymentStatus
@@ -730,7 +873,8 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
 		{rayv1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
 		{rayv1.JobDeploymentStatusFailed, pluginsCore.PhasePermanentFailure, false},
-		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseUndefined, true},
+		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseQueued, false},
+		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
 	for _, tc := range testCases {
@@ -750,8 +894,28 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 }
 
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginCtx := newPluginContext(pluginState)
+
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+
+	assert.NoError(t, err)
+	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
 func TestGetEventInfo_LogTemplates(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -850,7 +1014,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 }
 
 func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -949,7 +1113,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1001,7 +1165,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1056,4 +1220,15 @@ func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
+}
+
+func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
+	data, err := json.Marshal(obj)
+	assert.Nil(t, err)
+	podSpecMap := make(map[string]interface{})
+	err = json.Unmarshal(data, &podSpecMap)
+	assert.Nil(t, err)
+	s, err := structpb.NewStruct(podSpecMap)
+	assert.Nil(t, err)
+	return s
 }

@@ -64,6 +64,8 @@ var (
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
+		UpdateBaseBackoffDuration: 10,
+		UpdateBackoffRetries:      5,
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -156,6 +158,9 @@ type K8sPluginConfig struct {
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
 
+	// ImagePullPolicy for the submitted pod.
+	ImagePullPolicy v1.PullPolicy `json:"image-pull-policy" pflag:"-,Image pull policy for all k8s pods created by FlytePropeller."`
+
 	// Time to wait while pod is in pending phase. If the pod is stuck in
 	// pending phase past this timeout, it will be inferred to be a permanent
 	// issue, and the corresponding task marked as failed
@@ -203,6 +208,12 @@ type K8sPluginConfig struct {
 
 	// SendObjectEvents indicates whether to send k8s object events in TaskExecutionEvent updates (similar to kubectl get events).
 	SendObjectEvents bool `json:"send-object-events" pflag:",If true, will send k8s object events in TaskExecutionEvent updates."`
+
+	// Initial delay in exponential backoff when updating a resource in milliseconds.
+	UpdateBaseBackoffDuration int `json:"update-base-backoff-duration" pflag:",Initial delay in exponential backoff when updating a resource in milliseconds."`
+
+	// Number of retries for exponential backoff when updating a resource.
+	UpdateBackoffRetries int `json:"update-backoff-retries" pflag:",Number of retries for exponential backoff when updating a resource."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

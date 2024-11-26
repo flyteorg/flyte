@@ -102,28 +102,24 @@ team maintains Helm charts that correspond with the latter two deployment paths.
    K3s bundled container.
 
 .. dropdown:: ``flyte-binary``: chart for the **Single Cluster** option.
-   :title: text-muted
 
    .. literalinclude:: ../../../charts/flyte-binary/Chart.yaml
       :language: yaml
       :caption: charts/flyte-binary/Chart.yaml
 
 .. dropdown:: ``flyte-core``: chart for the **Multiple Cluster** option.
-   :title: text-muted
 
    .. literalinclude:: ../../../charts/flyte-core/Chart.yaml
       :language: yaml
       :caption: charts/flyte-core/Chart.yaml
 
 .. dropdown:: ``flyte-deps``: chart that installs additional useful dependencies alongside Flyte.
-   :title: text-muted
   
    .. literalinclude:: ../../../charts/flyte-deps/Chart.yaml
       :language: yaml
       :caption: charts/flyte-deps/Chart.yaml
 
 .. dropdown:: ``flyte``: chart that depends on ``flyte-core``, installing additional dependencies to Flyte deployment.
-   :title: text-muted
 
    .. literalinclude:: ../../../charts/flyte/Chart.yaml
       :language: yaml

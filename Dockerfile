@@ -2,11 +2,11 @@ ARG FLYTECONSOLE_VERSION=latest
 FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
 
 
-FROM --platform=${BUILDPLATFORM} golang:1.21-bookworm AS flytebuilder
+FROM --platform=${BUILDPLATFORM} golang:1.22-bookworm AS flytebuilder
 
 ARG TARGETARCH
-ENV GOARCH "${TARGETARCH}"
-ENV GOOS linux
+ENV GOARCH="${TARGETARCH}"
+ENV GOOS=linux
 
 WORKDIR /flyteorg/build
 
@@ -29,10 +29,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/r
 FROM debian:bookworm-slim
 
 ARG FLYTE_VERSION
-ENV FLYTE_VERSION "${FLYTE_VERSION}"
+ENV FLYTE_VERSION="${FLYTE_VERSION}"
 
-ENV DEBCONF_NONINTERACTIVE_SEEN true
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install core packages
 RUN apt-get update && apt-get install --no-install-recommends --yes \

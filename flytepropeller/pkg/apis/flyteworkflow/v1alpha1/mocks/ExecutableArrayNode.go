@@ -84,7 +84,7 @@ type ExecutableArrayNode_GetParallelism struct {
 	*mock.Call
 }
 
-func (_m ExecutableArrayNode_GetParallelism) Return(_a0 int64) *ExecutableArrayNode_GetParallelism {
+func (_m ExecutableArrayNode_GetParallelism) Return(_a0 *uint32) *ExecutableArrayNode_GetParallelism {
 	return &ExecutableArrayNode_GetParallelism{Call: _m.Call.Return(_a0)}
 }
 
@@ -99,14 +99,16 @@ func (_m *ExecutableArrayNode) OnGetParallelismMatch(matchers ...interface{}) *E
 }
 
 // GetParallelism provides a mock function with given fields:
-func (_m *ExecutableArrayNode) GetParallelism() int64 {
+func (_m *ExecutableArrayNode) GetParallelism() *uint32 {
 	ret := _m.Called()
 
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
+	var r0 *uint32
+	if rf, ok := ret.Get(0).(func() *uint32); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(int64)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*uint32)
+		}
 	}
 
 	return r0

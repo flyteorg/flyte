@@ -44,11 +44,15 @@ type ResourceCache struct {
 // A wrapper for each item in the cache.
 type CacheItem struct {
 	State
-
 	Resource webapi.Resource
 }
 
 func (c CacheItem) IsTerminal() bool {
+	if c.Resource != nil {
+		if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
+			return resource.IsTerminal()
+		}
+	}
 	return c.State.Phase.IsTerminal()
 }
 
@@ -80,7 +84,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		logger.Debugf(ctx, "Sync loop - processing resource with cache key [%s]",
 			resource.GetID())
 
-		if cacheItem.State.Phase.IsTerminal() {
+		if cacheItem.IsTerminal() {
 			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
 				resource.GetID())
 			resp = append(resp, cache.ItemSyncResponse{
@@ -175,7 +179,7 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 		workqueue.NewMaxOfRateLimiter(
 			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
-		), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
+		), cfg.ResyncInterval.Duration, uint(cfg.Workers), uint(cfg.Size), // #nosec G115
 		scope.NewSubScope("cache"))
 
 	if err != nil {

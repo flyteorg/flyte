@@ -34,7 +34,7 @@ spec:
         ports:
           - containerPort: 8087
         resources: {{ toYaml .Values.redoc.resources | nindent 10 }}
-      {{- with .Values.minio.nodeSelector }}
+      {{- with .Values.redoc.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.redoc.affinity }}

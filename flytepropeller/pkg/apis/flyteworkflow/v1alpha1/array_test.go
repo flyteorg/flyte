@@ -16,12 +16,12 @@ func TestArrayNodeSpec_GetSubNodeSpec(t *testing.T) {
 }
 
 func TestArrayNodeSpec_GetParallelism(t *testing.T) {
-	parallelism := int64(5)
+	parallelism := uint32(5)
 	arrayNodeSpec := ArrayNodeSpec{
-		Parallelism: parallelism,
+		Parallelism: &parallelism,
 	}
 
-	if arrayNodeSpec.GetParallelism() != parallelism {
+	if arrayNodeSpec.GetParallelism() != &parallelism {
 		t.Errorf("Expected %d, but got %d", parallelism, arrayNodeSpec.GetParallelism())
 	}
 }

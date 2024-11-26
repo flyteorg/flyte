@@ -120,44 +120,44 @@ func (input Input) templateVars() []TemplateVar {
 			},
 			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,
-				strconv.FormatUint(uint64(taskExecutionIdentifier.RetryAttempt), 10),
+				strconv.FormatUint(uint64(taskExecutionIdentifier.GetRetryAttempt()), 10),
 			},
 		)
-		if taskExecutionIdentifier.TaskId != nil {
+		if taskExecutionIdentifier.GetTaskId() != nil {
 			vars = append(
 				vars,
 				TemplateVar{
 					defaultRegexes.TaskID,
-					taskExecutionIdentifier.TaskId.Name,
+					taskExecutionIdentifier.GetTaskId().GetName(),
 				},
 				TemplateVar{
 					defaultRegexes.TaskVersion,
-					taskExecutionIdentifier.TaskId.Version,
+					taskExecutionIdentifier.GetTaskId().GetVersion(),
 				},
 				TemplateVar{
 					defaultRegexes.TaskProject,
-					taskExecutionIdentifier.TaskId.Project,
+					taskExecutionIdentifier.GetTaskId().GetProject(),
 				},
 				TemplateVar{
 					defaultRegexes.TaskDomain,
-					taskExecutionIdentifier.TaskId.Domain,
+					taskExecutionIdentifier.GetTaskId().GetDomain(),
 				},
 			)
 		}
-		if taskExecutionIdentifier.NodeExecutionId != nil && taskExecutionIdentifier.NodeExecutionId.ExecutionId != nil {
+		if taskExecutionIdentifier.GetNodeExecutionId() != nil && taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId() != nil {
 			vars = append(
 				vars,
 				TemplateVar{
 					defaultRegexes.ExecutionName,
-					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Name,
+					taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetName(),
 				},
 				TemplateVar{
 					defaultRegexes.ExecutionProject,
-					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Project,
+					taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetProject(),
 				},
 				TemplateVar{
 					defaultRegexes.ExecutionDomain,
-					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Domain,
+					taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetDomain(),
 				},
 			)
 		}
@@ -200,9 +200,11 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
-			Uri:           replaceAll(templateURI, templateVars),
-			Name:          p.DisplayName + input.LogName,
-			MessageFormat: p.MessageFormat,
+			Uri:              replaceAll(templateURI, templateVars),
+			Name:             p.DisplayName + input.LogName,
+			MessageFormat:    p.MessageFormat,
+			ShowWhilePending: p.ShowWhilePending,
+			HideOnceFinished: p.HideOnceFinished,
 		})
 	}
 
@@ -217,9 +219,11 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 					}
 				}
 				taskLogs = append(taskLogs, &core.TaskLog{
-					Uri:           replaceAll(dynamicTemplateURI, templateVars),
-					Name:          p.DisplayName + input.LogName,
-					MessageFormat: p.MessageFormat,
+					Uri:              replaceAll(dynamicTemplateURI, templateVars),
+					Name:             p.DisplayName + input.LogName,
+					MessageFormat:    p.MessageFormat,
+					ShowWhilePending: p.ShowWhilePending,
+					HideOnceFinished: p.HideOnceFinished,
 				})
 			}
 		}

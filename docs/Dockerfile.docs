@@ -1,0 +1,21 @@
+FROM condaforge/mambaforge:latest
+
+ARG USER_UID
+ARG USER_GID
+
+RUN getent group "${USER_GID}" || groupadd --gid "${USER_GID}" flyte
+RUN getent passwd "${USER_UID}" || useradd --uid "${USER_UID}" --gid "${USER_GID}" -m flyte
+
+RUN conda install -c conda-forge conda-lock
+RUN --mount=type=bind,source=monodocs-environment.lock.yaml,target=monodocs-environment.lock.yaml \
+    conda-lock install -n monodocs-env monodocs-environment.lock.yaml
+
+ENV SETUPTOOLS_SCM_PRETEND_VERSION 2.0.0
+COPY flyteidl flyteidl
+SHELL ["conda", "run", "-n", "monodocs-env", "/bin/bash", "-c"]
+RUN python -m pip install sphinx-autobuild
+RUN python -m pip install ./flyteidl
+
+WORKDIR /flyte/docs
+USER ${USER_UID}
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env"]

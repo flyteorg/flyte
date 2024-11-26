@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,10 +15,14 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
+
+const MESSAGEPACK = "msgpack"
+const FlyteUseOldDcFormat = "FLYTE_USE_OLD_DC_FORMAT"
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
 	switch p := v.(type) {
@@ -144,6 +149,7 @@ func MakeBinaryLiteral(v []byte) *core.Literal {
 				Value: &core.Scalar_Binary{
 					Binary: &core.Binary{
 						Value: v,
+						Tag:   MESSAGEPACK,
 					},
 				},
 			},
@@ -300,20 +306,20 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 	case *core.LiteralType_Schema:
 		return MakeLiteralForType(typ, nil)
 	case *core.LiteralType_UnionType:
-		if len(t.UnionType.Variants) == 0 {
+		if len(t.UnionType.GetVariants()) == 0 {
 			return nil, errors.Errorf("Union type must have at least one variant")
 		}
 		// For union types, we just return the default for the first variant
-		val, err := MakeDefaultLiteralForType(t.UnionType.Variants[0])
+		val, err := MakeDefaultLiteralForType(t.UnionType.GetVariants()[0])
 		if err != nil {
-			return nil, errors.Errorf("Failed to create default literal for first union type variant [%v]", t.UnionType.Variants[0])
+			return nil, errors.Errorf("Failed to create default literal for first union type variant [%v]", t.UnionType.GetVariants()[0])
 		}
 		res := &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Union{
 						Union: &core.Union{
-							Type:  t.UnionType.Variants[0],
+							Type:  t.UnionType.GetVariants()[0],
 							Value: val,
 						},
 					},
@@ -377,7 +383,8 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	switch t {
 	case core.SimpleType_STRUCT:
 		st := &structpb.Struct{}
-		err := jsonpb.UnmarshalString(s, st)
+		unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+		err := unmarshaler.Unmarshal(strings.NewReader(s), st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to load generic type as json.")
 		}
@@ -388,7 +395,7 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		scalar.Value = &core.Scalar_Binary{
 			Binary: &core.Binary{
 				Value: []byte(s),
-				// TODO Tag not supported at the moment
+				Tag:   MESSAGEPACK,
 			},
 		}
 	case core.SimpleType_ERROR:
@@ -504,7 +511,7 @@ func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string) *
 
 func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, error) {
 	l := &core.Literal{}
-	switch newT := t.Type.(type) {
+	switch newT := t.GetType().(type) {
 	case *core.LiteralType_MapValueType:
 		newV, ok := v.(map[string]interface{})
 		if !ok {
@@ -558,12 +565,32 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			strValue = fmt.Sprintf("%.0f", math.Trunc(f))
 		}
 		if newT.Simple == core.SimpleType_STRUCT {
+			useOldFormat := strings.ToLower(os.Getenv(FlyteUseOldDcFormat))
 			if _, isValueStringType := v.(string); !isValueStringType {
-				byteValue, err := json.Marshal(v)
-				if err != nil {
-					return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+				if useOldFormat == "1" || useOldFormat == "t" || useOldFormat == "true" {
+					byteValue, err := json.Marshal(v)
+					if err != nil {
+						return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+					}
+					strValue = string(byteValue)
+				} else {
+					byteValue, err := msgpack.Marshal(v)
+					if err != nil {
+						return nil, fmt.Errorf("unable to marshal to msgpack bytes for struct value %v", v)
+					}
+					return &core.Literal{
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Binary{
+									Binary: &core.Binary{
+										Value: byteValue,
+										Tag:   MESSAGEPACK,
+									},
+								},
+							},
+						},
+					}, nil
 				}
-				strValue = string(byteValue)
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)
@@ -573,24 +600,24 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		return lv, nil
 
 	case *core.LiteralType_Blob:
-		isDir := newT.Blob.Dimensionality == core.BlobType_MULTIPART
-		lv := MakeLiteralForBlob(storage.DataReference(fmt.Sprintf("%v", v)), isDir, newT.Blob.Format)
+		isDir := newT.Blob.GetDimensionality() == core.BlobType_MULTIPART
+		lv := MakeLiteralForBlob(storage.DataReference(fmt.Sprintf("%v", v)), isDir, newT.Blob.GetFormat())
 		return lv, nil
 
 	case *core.LiteralType_Schema:
-		lv := MakeLiteralForSchema(storage.DataReference(fmt.Sprintf("%v", v)), newT.Schema.Columns)
+		lv := MakeLiteralForSchema(storage.DataReference(fmt.Sprintf("%v", v)), newT.Schema.GetColumns())
 		return lv, nil
 	case *core.LiteralType_StructuredDatasetType:
-		lv := MakeLiteralForStructuredDataSet(storage.DataReference(fmt.Sprintf("%v", v)), newT.StructuredDatasetType.Columns, newT.StructuredDatasetType.Format)
+		lv := MakeLiteralForStructuredDataSet(storage.DataReference(fmt.Sprintf("%v", v)), newT.StructuredDatasetType.GetColumns(), newT.StructuredDatasetType.GetFormat())
 		return lv, nil
 
 	case *core.LiteralType_EnumType:
 		var newV string
 		if v == nil {
-			if len(t.GetEnumType().Values) == 0 {
+			if len(t.GetEnumType().GetValues()) == 0 {
 				return nil, fmt.Errorf("enum types need at least one value")
 			}
-			newV = t.GetEnumType().Values[0]
+			newV = t.GetEnumType().GetValues()[0]
 		} else {
 			var ok bool
 			newV, ok = v.(string)
@@ -613,7 +640,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 	case *core.LiteralType_UnionType:
 		// Try different types in the variants, return the first one matched
 		found := false
-		for _, subType := range newT.UnionType.Variants {
+		for _, subType := range newT.UnionType.GetVariants() {
 			lv, err := MakeLiteralForType(subType, v)
 			if err == nil {
 				l = &core.Literal{
@@ -633,9 +660,8 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			}
 		}
 		if !found {
-			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
+			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.GetVariants())
 		}
-
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
 	}

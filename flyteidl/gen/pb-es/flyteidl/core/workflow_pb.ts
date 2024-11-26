@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
@@ -507,14 +507,20 @@ export class ArrayNode extends Message<ArrayNode> {
   node?: Node;
 
   /**
-   * parallelism defines the minimum number of instances to bring up concurrently at any given
-   * point. Note that this is an optimistic restriction and that, due to network partitioning or
-   * other failures, the actual number of currently running instances might be more. This has to
-   * be a positive number if assigned. Default value is size.
-   *
-   * @generated from field: int64 parallelism = 2;
+   * @generated from oneof flyteidl.core.ArrayNode.parallelism_option
    */
-  parallelism = protoInt64.zero;
+  parallelismOption: {
+    /**
+     * parallelism defines the minimum number of instances to bring up concurrently at any given
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
+     * other failures, the actual number of currently running instances might be more. This has to
+     * be a positive number if assigned. Default value is size.
+     *
+     * @generated from field: uint32 parallelism = 2;
+     */
+    value: number;
+    case: "parallelism";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
    * @generated from oneof flyteidl.core.ArrayNode.success_criteria
@@ -541,6 +547,13 @@ export class ArrayNode extends Message<ArrayNode> {
     case: "minSuccessRatio";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * execution_mode determines the execution path for ArrayNode.
+   *
+   * @generated from field: flyteidl.core.ArrayNode.ExecutionMode execution_mode = 5;
+   */
+  executionMode = ArrayNode_ExecutionMode.MINIMAL_STATE;
+
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -550,9 +563,10 @@ export class ArrayNode extends Message<ArrayNode> {
   static readonly typeName = "flyteidl.core.ArrayNode";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "node", kind: "message", T: Node },
-    { no: 2, name: "parallelism", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "parallelism_option" },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
+    { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -571,6 +585,32 @@ export class ArrayNode extends Message<ArrayNode> {
     return proto3.util.equals(ArrayNode, a, b);
   }
 }
+
+/**
+ * @generated from enum flyteidl.core.ArrayNode.ExecutionMode
+ */
+export enum ArrayNode_ExecutionMode {
+  /**
+   * Indicates the ArrayNode will store minimal state for the sub-nodes.
+   * This is more efficient, but only supports a subset of Flyte entities.
+   *
+   * @generated from enum value: MINIMAL_STATE = 0;
+   */
+  MINIMAL_STATE = 0,
+
+  /**
+   * Indicates the ArrayNode will store full state for the sub-nodes.
+   * This supports a wider range of Flyte entities.
+   *
+   * @generated from enum value: FULL_STATE = 1;
+   */
+  FULL_STATE = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ArrayNode_ExecutionMode)
+proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.ExecutionMode", [
+  { no: 0, name: "MINIMAL_STATE" },
+  { no: 1, name: "FULL_STATE" },
+]);
 
 /**
  * Defines extra information about the Node.

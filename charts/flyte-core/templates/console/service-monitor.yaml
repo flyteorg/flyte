@@ -1,0 +1,19 @@
+{{- if and .Values.flyteconsole.serviceMonitor.enabled .Values.flyteconsole.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+  {{- with .Values.flyteconsole.serviceMonitor.labels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    - interval: {{ .Values.flyteconsole.serviceMonitor.interval }}
+      port: http-metrics
+      path: /metrics
+      scrapeTimeout: {{ .Values.flyteconsole.serviceMonitor.scrapeTimeout }}
+  selector:
+    matchLabels: {{ include "flyteconsole.selectorLabels" . | nindent 6 }}
+{{- end }}

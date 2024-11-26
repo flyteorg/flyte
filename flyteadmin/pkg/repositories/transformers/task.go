@@ -14,23 +14,23 @@ import (
 
 // Transforms a TaskCreateRequest to a task model
 func CreateTaskModel(
-	request admin.TaskCreateRequest,
-	taskClosure admin.TaskClosure,
+	request *admin.TaskCreateRequest,
+	taskClosure *admin.TaskClosure,
 	digest []byte) (models.Task, error) {
-	closureBytes, err := proto.Marshal(&taskClosure)
+	closureBytes, err := proto.Marshal(taskClosure)
 	if err != nil {
 		return models.Task{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize task closure")
 	}
 	var taskType string
-	if taskClosure.CompiledTask != nil && taskClosure.CompiledTask.Template != nil {
-		taskType = taskClosure.CompiledTask.Template.Type
+	if taskClosure.GetCompiledTask() != nil && taskClosure.GetCompiledTask().GetTemplate() != nil {
+		taskType = taskClosure.GetCompiledTask().GetTemplate().GetType()
 	}
 	return models.Task{
 		TaskKey: models.TaskKey{
-			Project: request.Id.Project,
-			Domain:  request.Id.Domain,
-			Name:    request.Id.Name,
-			Version: request.Id.Version,
+			Project: request.GetId().GetProject(),
+			Domain:  request.GetId().GetDomain(),
+			Name:    request.GetId().GetName(),
+			Version: request.GetId().GetVersion(),
 		},
 		Closure: closureBytes,
 		Digest:  digest,

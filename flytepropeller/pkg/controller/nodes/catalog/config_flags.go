@@ -55,6 +55,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "insecure"), defaultConfig.Insecure, " Use insecure grpc connection")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "max-cache-age"), defaultConfig.MaxCacheAge.String(), " Cache entries past this age will incur cache miss. 0 means cache never expires")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "use-admin-auth"), defaultConfig.UseAdminAuth, " Use the same gRPC credentials option as the flyteadmin client")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-retries"), defaultConfig.MaxRetries, "The max number of retries for event recording.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "base-scalar"), defaultConfig.BackoffScalar, "The base/scalar backoff duration in milliseconds for event recording retries.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "backoff-jitter"), defaultConfig.BackoffJitter, "A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-service-config"), defaultConfig.DefaultServiceConfig, " Set the default service config for the catalog gRPC client")
 	return cmdFlags
 }

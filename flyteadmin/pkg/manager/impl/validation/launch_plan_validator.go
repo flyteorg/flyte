@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 
+	"github.com/robfig/cron/v3"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -16,38 +17,38 @@ import (
 )
 
 func ValidateLaunchPlan(ctx context.Context,
-	request admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
+	request *admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, workflowInterface *core.TypedInterface) error {
-	if err := ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
+	if err := ValidateIdentifier(request.GetId(), common.LaunchPlan); err != nil {
 		return err
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Id.Project, request.Id.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request.GetId().GetProject(), request.GetId().GetDomain()); err != nil {
 		return err
 	}
-	if request.Spec == nil {
+	if request.GetSpec() == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
 
-	if err := ValidateIdentifier(request.Spec.WorkflowId, common.Workflow); err != nil {
+	if err := ValidateIdentifier(request.GetSpec().GetWorkflowId(), common.Workflow); err != nil {
 		return err
 	}
-	if err := validateLabels(request.Spec.Labels); err != nil {
+	if err := validateLabels(request.GetSpec().GetLabels()); err != nil {
 		return err
 	}
 
-	if err := validateLiteralMap(request.Spec.FixedInputs, shared.FixedInputs); err != nil {
+	if err := validateLiteralMap(request.GetSpec().GetFixedInputs(), shared.FixedInputs); err != nil {
 		return err
 	}
 	if config.GetTopLevelConfig().FeatureGates.EnableArtifacts {
-		if err := validateParameterMapAllowArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+		if err := validateParameterMapAllowArtifacts(request.GetSpec().GetDefaultInputs(), shared.DefaultInputs); err != nil {
 			return err
 		}
 	} else {
-		if err := validateParameterMapDisableArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+		if err := validateParameterMapDisableArtifacts(request.GetSpec().GetDefaultInputs(), shared.DefaultInputs); err != nil {
 			return err
 		}
 	}
-	expectedInputs, err := checkAndFetchExpectedInputForLaunchPlan(workflowInterface.GetInputs(), request.Spec.FixedInputs, request.Spec.DefaultInputs)
+	expectedInputs, err := checkAndFetchExpectedInputForLaunchPlan(workflowInterface.GetInputs(), request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs())
 	if err != nil {
 		return err
 	}
@@ -57,8 +58,8 @@ func ValidateLaunchPlan(ctx context.Context,
 
 	// Augment default inputs with the unbound workflow inputs.
 	request.Spec.DefaultInputs = expectedInputs
-	if request.Spec.EntityMetadata != nil {
-		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
+	if request.GetSpec().GetEntityMetadata() != nil {
+		if err := validateNotifications(request.GetSpec().GetEntityMetadata().GetNotifications()); err != nil {
 			return err
 		}
 		if request.GetSpec().GetEntityMetadata().GetLaunchConditions() != nil {
@@ -70,10 +71,10 @@ func ValidateLaunchPlan(ctx context.Context,
 	return nil
 }
 
-func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
+func validateSchedule(request *admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
 	schedule := request.GetSpec().GetEntityMetadata().GetSchedule()
 	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil || schedule.GetCronSchedule() != nil {
-		for key, value := range expectedInputs.Parameters {
+		for key, value := range expectedInputs.GetParameters() {
 			if value.GetRequired() && key != schedule.GetKickoffTimeInputArg() {
 				return errors.NewFlyteAdminErrorf(
 					codes.InvalidArgument,
@@ -81,7 +82,7 @@ func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *cor
 			}
 		}
 		if schedule.GetKickoffTimeInputArg() != "" {
-			if param, ok := expectedInputs.Parameters[schedule.GetKickoffTimeInputArg()]; !ok {
+			if param, ok := expectedInputs.GetParameters()[schedule.GetKickoffTimeInputArg()]; !ok {
 				return errors.NewFlyteAdminErrorf(
 					codes.InvalidArgument,
 					"Cannot create a schedule with a KickoffTimeInputArg that does not point to a free input. [%v] is not free or does not exist.", schedule.GetKickoffTimeInputArg())
@@ -89,6 +90,19 @@ func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *cor
 				return errors.NewFlyteAdminErrorf(
 					codes.InvalidArgument,
 					"KickoffTimeInputArg must reference a datetime input. [%v] is a [%v]", schedule.GetKickoffTimeInputArg(), param.GetVar().GetType())
+			}
+		}
+
+		// validate cron expression
+		var cronExpression string
+		if schedule.GetCronExpression() != "" {
+			cronExpression = schedule.GetCronExpression()
+		} else if schedule.GetCronSchedule() != nil {
+			cronExpression = schedule.GetCronSchedule().GetSchedule()
+		}
+		if cronExpression != "" {
+			if _, err := cron.ParseStandard(cronExpression); err != nil {
+				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Invalid cron expression: %v", err)
 			}
 		}
 	}
@@ -111,7 +125,7 @@ func checkAndFetchExpectedInputForLaunchPlan(
 	}
 
 	// If there are no inputs that the workflow requires, there should be none at launch plan as well
-	if workflowVariableMap == nil || len(workflowVariableMap.Variables) == 0 {
+	if workflowVariableMap == nil || len(workflowVariableMap.GetVariables()) == 0 {
 		if len(defaultInputMap) > 0 {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"invalid launch plan default inputs, expected none but found %d", len(defaultInputMap))
@@ -125,7 +139,7 @@ func checkAndFetchExpectedInputForLaunchPlan(
 		}, nil
 	}
 
-	workflowExpectedInputMap = workflowVariableMap.Variables
+	workflowExpectedInputMap = workflowVariableMap.GetVariables()
 	for name, defaultInput := range defaultInputMap {
 		value, ok := workflowExpectedInputMap[name]
 		if !ok {
@@ -143,6 +157,10 @@ func checkAndFetchExpectedInputForLaunchPlan(
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unexpected fixed_input %s", name)
 		}
 		inputType := validators.LiteralTypeForLiteral(fixedInput)
+		err := validators.ValidateLiteralType(inputType)
+		if err != nil {
+			return nil, errors.NewInvalidLiteralTypeError(name, err)
+		}
 		if !validators.AreTypesCastable(inputType, value.GetType()) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"invalid fixed_input wrong type %s, expected %v, got %v instead", name, value.GetType(), inputType)

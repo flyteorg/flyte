@@ -194,6 +194,54 @@ func (_m *ComposedProtobufStore) Head(ctx context.Context, reference storage.Dat
 	return r0, r1
 }
 
+type ComposedProtobufStore_List struct {
+	*mock.Call
+}
+
+func (_m ComposedProtobufStore_List) Return(_a0 []storage.DataReference, _a1 storage.Cursor, _a2 error) *ComposedProtobufStore_List {
+	return &ComposedProtobufStore_List{Call: _m.Call.Return(_a0, _a1, _a2)}
+}
+
+func (_m *ComposedProtobufStore) OnList(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) *ComposedProtobufStore_List {
+	c_call := _m.On("List", ctx, reference, maxItems, cursor)
+	return &ComposedProtobufStore_List{Call: c_call}
+}
+
+func (_m *ComposedProtobufStore) OnListMatch(matchers ...interface{}) *ComposedProtobufStore_List {
+	c_call := _m.On("List", matchers...)
+	return &ComposedProtobufStore_List{Call: c_call}
+}
+
+// List provides a mock function with given fields: ctx, reference, maxItems, cursor
+func (_m *ComposedProtobufStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	ret := _m.Called(ctx, reference, maxItems, cursor)
+
+	var r0 []storage.DataReference
+	if rf, ok := ret.Get(0).(func(context.Context, storage.DataReference, int, storage.Cursor) []storage.DataReference); ok {
+		r0 = rf(ctx, reference, maxItems, cursor)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]storage.DataReference)
+		}
+	}
+
+	var r1 storage.Cursor
+	if rf, ok := ret.Get(1).(func(context.Context, storage.DataReference, int, storage.Cursor) storage.Cursor); ok {
+		r1 = rf(ctx, reference, maxItems, cursor)
+	} else {
+		r1 = ret.Get(1).(storage.Cursor)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, storage.DataReference, int, storage.Cursor) error); ok {
+		r2 = rf(ctx, reference, maxItems, cursor)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 type ComposedProtobufStore_ReadProtobuf struct {
 	*mock.Call
 }

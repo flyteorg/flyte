@@ -54,5 +54,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "file-path"), defaultConfig.FilePath, "For file types,  specify where the file should be located.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "rate"), defaultConfig.Rate, "Max rate at which events can be recorded per second.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "capacity"), defaultConfig.Capacity, "The max bucket size for event recording tokens.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-retries"), defaultConfig.MaxRetries, "The max number of retries for event recording.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "base-scalar"), defaultConfig.BackoffScalar, "The base/scalar backoff duration in milliseconds for event recording retries.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "backoff-jitter"), defaultConfig.BackoffJitter, "A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.")
 	return cmdFlags
 }

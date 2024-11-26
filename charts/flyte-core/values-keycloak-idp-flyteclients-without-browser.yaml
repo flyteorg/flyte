@@ -215,7 +215,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
@@ -298,9 +297,12 @@ deployRedoc: false
 
 secrets:
   adminOauthClientCredentials:
-    # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-    # If enabled is false, it's up to the user to create `flyte-secret-auth` as described in
+    # If enabled is true, and `clientSecret` is specified, helm will create and mount `flyte-secret-auth`.
+    # If enabled is true, and `clientSecret` is null, it's up to the user to create `flyte-secret-auth` as described in
     # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
+    # and helm will mount `flyte-secret-auth`.
+    # If enabled is false, auth is not turned on.
+    # Note: Unsupported combination: enabled.false and clientSecret.someValue
     enabled: true
     clientSecret: "<>" # put the secret for the confidential client flytepropeller defined in the IDP
     clientId: "flytepropeller" #use this client id and secret in the flytectl config with ClientSecret option
@@ -396,6 +398,8 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
 
 # Database configuration(These are the values for a pgdb instance with hostname of postgres-flyte and postgres/password creds)
 db:
@@ -671,6 +675,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar

@@ -9,7 +9,7 @@ import (
 )
 
 func TestHashIdentifier(t *testing.T) {
-	identifier := core.Identifier{
+	identifier := &core.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",

@@ -16,6 +16,11 @@ spec:
         {{- with .Values.cluster_resource_manager.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        prometheus.io/path: {{ .Values.cluster_resource_manager.prometheus.path | quote }}
+        prometheus.io/port: {{ .Values.cluster_resource_manager.prometheus.port | quote }}
+        {{- with .Values.cluster_resource_manager.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        {{- end }}
       labels: {{ include "flyteclusterresourcesync.podLabels" . | nindent 8 }}
     spec:
       containers:
@@ -54,6 +59,12 @@ spec:
           {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
           - mountPath: /var/run/credentials
             name: cluster-secrets
+          {{- end }}
+          {{- if .Values.cluster_resource_manager.prometheus.enabled }}
+          ports:
+          - containerPort: {{ .Values.cluster_resource_manager.prometheus.port }}
+            name: debug
+            protocol: TCP
           {{- end }}
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}

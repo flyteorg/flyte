@@ -29,12 +29,12 @@ func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) 
 
 func constructLiteralMap(inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
-	for name, literal := range inputs.Literals {
+	for name, literal := range inputs.GetLiterals() {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
-			if index >= len(literalCollection.Literals) {
+			if index >= len(literalCollection.GetLiterals()) {
 				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
 			}
-			literals[name] = literalCollection.Literals[index]
+			literals[name] = literalCollection.GetLiterals()[index]
 		} else {
 			literals[name] = literal
 		}
@@ -50,29 +50,33 @@ type arrayTaskReader struct {
 }
 
 func (a *arrayTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
-	taskTemplate, err := a.TaskReader.Read(ctx)
+	originalTaskTemplate, err := a.TaskReader.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// convert output list variable to singular
 	outputVariables := make(map[string]*core.Variable)
-	for key, value := range taskTemplate.Interface.Outputs.Variables {
-		switch v := value.Type.Type.(type) {
+	for key, value := range originalTaskTemplate.GetInterface().GetOutputs().GetVariables() {
+		switch v := value.GetType().GetType().(type) {
 		case *core.LiteralType_CollectionType:
 			outputVariables[key] = &core.Variable{
 				Type:        v.CollectionType,
-				Description: value.Description,
+				Description: value.GetDescription(),
 			}
 		default:
 			outputVariables[key] = value
 		}
 	}
 
-	taskTemplate.Interface.Outputs = &core.VariableMap{
-		Variables: outputVariables,
+	taskTemplate := *originalTaskTemplate
+	taskTemplate.Interface = &core.TypedInterface{
+		Inputs: originalTaskTemplate.GetInterface().GetInputs(),
+		Outputs: &core.VariableMap{
+			Variables: outputVariables,
+		},
 	}
-	return taskTemplate, nil
+	return &taskTemplate, nil
 }
 
 type arrayNodeExecutionContext struct {

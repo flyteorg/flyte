@@ -54,14 +54,14 @@ func (m *CatalogClient) GetDataset(ctx context.Context, key catalog.Key) (*datac
 		return nil, err
 	}
 
-	return datasetResponse.Dataset, nil
+	return datasetResponse.GetDataset(), nil
 }
 
 // GetArtifactByTag retrieves an artifact using the provided tag and dataset.
 func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, dataset *datacatalog.Dataset) (*datacatalog.Artifact, error) {
 	logger.Debugf(ctx, "Get Artifact by tag %v", tagName)
 	artifactQuery := &datacatalog.GetArtifactRequest{
-		Dataset: dataset.Id,
+		Dataset: dataset.GetId(),
 		QueryHandle: &datacatalog.GetArtifactRequest_TagName{
 			TagName: tagName,
 		},
@@ -73,21 +73,21 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 
 	// check artifact's age if the configuration specifies a max age
 	if m.maxCacheAge > time.Duration(0) {
-		artifact := response.Artifact
-		createdAt, err := ptypes.Timestamp(artifact.CreatedAt)
+		artifact := response.GetArtifact()
+		createdAt, err := ptypes.Timestamp(artifact.GetCreatedAt())
 		if err != nil {
-			logger.Errorf(ctx, "DataCatalog Artifact has invalid createdAt %+v, err: %+v", artifact.CreatedAt, err)
+			logger.Errorf(ctx, "DataCatalog Artifact has invalid createdAt %+v, err: %+v", artifact.GetCreatedAt(), err)
 			return nil, err
 		}
 
 		if time.Since(createdAt) > m.maxCacheAge {
 			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
-				artifact.Id, createdAt.String(), m.maxCacheAge)
+				artifact.GetId(), createdAt.String(), m.maxCacheAge)
 			return nil, status.Error(codes.NotFound, "Artifact over age limit")
 		}
 	}
 
-	return response.Artifact, nil
+	return response.GetArtifact(), nil
 }
 
 // Get the cached task execution from Catalog.
@@ -103,7 +103,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 	}
 
 	inputs := &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil {
+	if key.TypedInterface.GetInputs() != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return catalog.Entry{}, errors.Wrap(err, "failed to read inputs when trying to query catalog")
@@ -122,7 +122,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		logger.Debugf(ctx, "DataCatalog failed to get artifact by tag %+v, err: %+v", tag, err)
 		return catalog.Entry{}, err
 	}
-	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact, tag)
+	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact.GetId(), tag)
 
 	var relevantTag *datacatalog.Tag
 	if len(artifact.GetTags()) > 0 {
@@ -139,11 +139,11 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 
 	outputs, err := GenerateTaskOutputsFromArtifact(key.Identifier, key.TypedInterface, artifact)
 	if err != nil {
-		logger.Errorf(ctx, "DataCatalog failed to get outputs from artifact %+v, err: %+v", artifact.Id, err)
+		logger.Errorf(ctx, "DataCatalog failed to get outputs from artifact %+v, err: %+v", artifact.GetId(), err)
 		return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, md)), err
 	}
 
-	logger.Infof(ctx, "Retrieved %v outputs from artifact %v, tag: %v", len(outputs.Literals), artifact.Id, tag)
+	logger.Infof(ctx, "Retrieved %v outputs from artifact %v, tag: %v", len(outputs.GetLiterals()), artifact.GetId(), tag)
 	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
 }
 
@@ -178,7 +178,7 @@ func (m *CatalogClient) createDataset(ctx context.Context, key catalog.Key, meta
 func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog.Key, reader io.OutputReader) (inputs *core.LiteralMap, outputs *core.LiteralMap, err error) {
 	inputs = &core.LiteralMap{}
 	outputs = &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil && len(key.TypedInterface.Inputs.Variables) != 0 {
+	if key.TypedInterface.GetInputs() != nil && len(key.TypedInterface.GetInputs().GetVariables()) != 0 {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "DataCatalog failed to read inputs err: %s", err)
@@ -188,7 +188,7 @@ func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog
 		inputs = retInputs
 	}
 
-	if key.TypedInterface.Outputs != nil && len(key.TypedInterface.Outputs.Variables) != 0 {
+	if key.TypedInterface.GetOutputs() != nil && len(key.TypedInterface.GetOutputs().GetVariables()) != 0 {
 		retOutputs, retErr, err := reader.Read(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "DataCatalog failed to read outputs err: %s", err)
@@ -211,8 +211,8 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	// Create the artifact for the execution that belongs in the task
-	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
-	for name, value := range outputs.Literals {
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.GetLiterals()))
+	for name, value := range outputs.GetLiterals() {
 		artifactData := &datacatalog.ArtifactData{
 			Name:  name,
 			Value: value,
@@ -230,15 +230,15 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
 	_, err := m.client.CreateArtifact(ctx, createArtifactRequest)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact, err)
+		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact.GetId(), err)
 		return catalog.Status{}, err
 	}
-	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)
+	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.GetId(), len(artifactDataList), metadata)
 
 	// Tag the artifact since it is the cached artifact
 	tagName, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to generate tag for artifact %+v, err: %+v", cachedArtifact.Id, err)
+		logger.Errorf(ctx, "Failed to generate tag for artifact %+v, err: %+v", cachedArtifact.GetId(), err)
 		return catalog.Status{}, err
 	}
 	logger.Infof(ctx, "Cached exec tag: %v, task: %v", tagName, key.Identifier)
@@ -247,19 +247,19 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	tag := &datacatalog.Tag{
 		Name:       tagName,
 		Dataset:    datasetID,
-		ArtifactId: cachedArtifact.Id,
+		ArtifactId: cachedArtifact.GetId(),
 	}
 	_, err = m.client.AddTag(ctx, &datacatalog.AddTagRequest{Tag: tag})
 	if err != nil {
 		if status.Code(err) == codes.AlreadyExists {
-			logger.Warnf(ctx, "Tag %v already exists for Artifact %v (idempotent)", tagName, cachedArtifact.Id)
+			logger.Warnf(ctx, "Tag %v already exists for Artifact %v (idempotent)", tagName, cachedArtifact.GetId())
 		} else {
-			logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.Id, err)
+			logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.GetId(), err)
 			return catalog.Status{}, err
 		}
 	}
 
-	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
+	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact.GetId(), key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
 }
 
@@ -267,8 +267,8 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Updating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
-	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
-	for name, value := range outputs.Literals {
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.GetLiterals()))
+	for name, value := range outputs.GetLiterals() {
 		artifactData := &datacatalog.ArtifactData{
 			Name:  name,
 			Value: value,
@@ -305,7 +305,7 @@ func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, dat
 		return catalog.Status{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
 	}
 
-	logger.Debugf(ctx, "Successfully updated artifact with ID %v and %d outputs for key %+v, dataset %+v and execution %+v", tag.ArtifactId, len(artifactDataList), key, datasetID, metadata)
+	logger.Debugf(ctx, "Successfully updated artifact with ID %v and %d outputs for key %+v, dataset %+v and execution %+v", tag.GetArtifactId(), len(artifactDataList), key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, source)), nil
 }
 
@@ -382,7 +382,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 	}
 
 	inputs := &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil {
+	if key.TypedInterface.GetInputs() != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to read inputs when trying to query catalog")
@@ -409,7 +409,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 		return nil, err
 	}
 
-	return response.Reservation, nil
+	return response.GetReservation(), nil
 }
 
 // ReleaseReservation attempts to release a reservation for a cacheable task. If the reservation
@@ -422,7 +422,7 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 	}
 
 	inputs := &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil {
+	if key.TypedInterface.GetInputs() != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to read inputs when trying to query catalog")
@@ -452,16 +452,17 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 }
 
 // NewDataCatalog creates a new Datacatalog client for task execution caching
-func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration, useAdminAuth bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CatalogClient, error) {
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
+	useAdminAuth bool, defaultServiceConfig string, maxRetries uint, backoffScalar int, backoffJitter float64, authOpt ...grpc.DialOption) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
 	}
 
 	grpcOptions := []grpcRetry.CallOption{
-		grpcRetry.WithBackoff(grpcRetry.BackoffLinear(100 * time.Millisecond)),
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(backoffScalar)*time.Millisecond, backoffJitter)),
 		grpcRetry.WithCodes(codes.DeadlineExceeded, codes.Unavailable, codes.Canceled),
-		grpcRetry.WithMax(5),
+		grpcRetry.WithMax(maxRetries),
 	}
 
 	if insecureConnection {

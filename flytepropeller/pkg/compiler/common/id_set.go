@@ -7,7 +7,7 @@ import (
 )
 
 type Empty struct{}
-type Identifier = core.Identifier
+type Identifier = *core.Identifier
 type IdentifierSet map[string]Identifier
 
 // NewString creates a String from a list of values.
@@ -62,24 +62,24 @@ type sortableSliceOfString []Identifier
 func (s sortableSliceOfString) Len() int { return len(s) }
 func (s sortableSliceOfString) Less(i, j int) bool {
 	first, second := s[i], s[j]
-	if first.ResourceType != second.ResourceType {
-		return first.ResourceType < second.ResourceType
+	if first.GetResourceType() != second.GetResourceType() {
+		return first.GetResourceType() < second.GetResourceType()
 	}
 
-	if first.Project != second.Project {
-		return first.Project < second.Project
+	if first.GetProject() != second.GetProject() {
+		return first.GetProject() < second.GetProject()
 	}
 
-	if first.Domain != second.Domain {
-		return first.Domain < second.Domain
+	if first.GetDomain() != second.GetDomain() {
+		return first.GetDomain() < second.GetDomain()
 	}
 
-	if first.Name != second.Name {
-		return first.Name < second.Name
+	if first.GetName() != second.GetName() {
+		return first.GetName() < second.GetName()
 	}
 
-	if first.Version != second.Version {
-		return first.Version < second.Version
+	if first.GetVersion() != second.GetVersion() {
+		return first.GetVersion() < second.GetVersion()
 	}
 
 	return false

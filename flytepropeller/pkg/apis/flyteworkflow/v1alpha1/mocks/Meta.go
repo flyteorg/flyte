@@ -52,6 +52,38 @@ func (_m *Meta) GetAnnotations() map[string]string {
 	return r0
 }
 
+type Meta_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m Meta_GetConsoleURL) Return(_a0 string) *Meta_GetConsoleURL {
+	return &Meta_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Meta) OnGetConsoleURL() *Meta_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &Meta_GetConsoleURL{Call: c_call}
+}
+
+func (_m *Meta) OnGetConsoleURLMatch(matchers ...interface{}) *Meta_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &Meta_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *Meta) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type Meta_GetCreationTimestamp struct {
 	*mock.Call
 }

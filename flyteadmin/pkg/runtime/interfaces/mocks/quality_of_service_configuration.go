@@ -51,7 +51,7 @@ type QualityOfServiceConfiguration_GetTierExecutionValues struct {
 	*mock.Call
 }
 
-func (_m QualityOfServiceConfiguration_GetTierExecutionValues) Return(_a0 map[core.QualityOfService_Tier]core.QualityOfServiceSpec) *QualityOfServiceConfiguration_GetTierExecutionValues {
+func (_m QualityOfServiceConfiguration_GetTierExecutionValues) Return(_a0 map[core.QualityOfService_Tier]*core.QualityOfServiceSpec) *QualityOfServiceConfiguration_GetTierExecutionValues {
 	return &QualityOfServiceConfiguration_GetTierExecutionValues{Call: _m.Call.Return(_a0)}
 }
 
@@ -66,15 +66,15 @@ func (_m *QualityOfServiceConfiguration) OnGetTierExecutionValuesMatch(matchers 
 }
 
 // GetTierExecutionValues provides a mock function with given fields:
-func (_m *QualityOfServiceConfiguration) GetTierExecutionValues() map[core.QualityOfService_Tier]core.QualityOfServiceSpec {
+func (_m *QualityOfServiceConfiguration) GetTierExecutionValues() map[core.QualityOfService_Tier]*core.QualityOfServiceSpec {
 	ret := _m.Called()
 
-	var r0 map[core.QualityOfService_Tier]core.QualityOfServiceSpec
-	if rf, ok := ret.Get(0).(func() map[core.QualityOfService_Tier]core.QualityOfServiceSpec); ok {
+	var r0 map[core.QualityOfService_Tier]*core.QualityOfServiceSpec
+	if rf, ok := ret.Get(0).(func() map[core.QualityOfService_Tier]*core.QualityOfServiceSpec); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[core.QualityOfService_Tier]core.QualityOfServiceSpec)
+			r0 = ret.Get(0).(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec)
 		}
 	}
 

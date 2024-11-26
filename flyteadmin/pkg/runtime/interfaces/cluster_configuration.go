@@ -15,6 +15,7 @@ type ClusterConfig struct {
 	Auth             Auth                     `json:"auth"`
 	Enabled          bool                     `json:"enabled"`
 	KubeClientConfig *config.KubeClientConfig `json:"kubeClientConfig,omitempty"`
+	InCluster        bool                     `json:"inCluster"`
 }
 
 type Auth struct {

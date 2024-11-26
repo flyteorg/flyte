@@ -1,11 +1,13 @@
 ## Tracking issue
-_https://github.com/flyteorg/flyte/issues/<number>_
+<!--
+If your PR fixes an open issue, use `Closes #999` to link your PR with the issue.
+Example: Closes #999
 
-<!-- If your PR fixes an open issue, use `Closes #999` to link your PR with the issue. #999 stands for the issue number you are fixing -->
+If your PR is related to an issue or PR, use `Related to #999` to link your PR.
+Example: Related to #999
 
-<!-- Remove this section if not applicable -->
-
-<!-- Example: Closes #31 -->
+Remove this section if not applicable
+-->
 
 ## Why are the changes needed?
 

@@ -2,14 +2,9 @@ syntax = "proto3";
 
 package flyteidl.plugins.kubeflow;
 
-option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow";
 
-
-enum RestartPolicy {
-    RESTART_POLICY_NEVER = 0;
-    RESTART_POLICY_ON_FAILURE = 1;
-    RESTART_POLICY_ALWAYS = 2;
-}
+import public "flyteidl/plugins/common.proto";
 
 enum CleanPodPolicy {
     CLEANPOD_POLICY_NONE = 0;

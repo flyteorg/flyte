@@ -13,9 +13,13 @@ _sym_db = _symbol_database.Default()
 
 from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
 from flyteidl.plugins.kubeflow import common_pb2 as flyteidl_dot_plugins_dot_kubeflow_dot_common__pb2
+try:
+  flyteidl_dot_plugins_dot_common__pb2 = flyteidl_dot_plugins_dot_kubeflow_dot_common__pb2.flyteidl_dot_plugins_dot_common__pb2
+except AttributeError:
+  flyteidl_dot_plugins_dot_common__pb2 = flyteidl_dot_plugins_dot_kubeflow_dot_common__pb2.flyteidl.plugins.common_pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n#flyteidl/plugins/kubeflow/mpi.proto\x12\x19\x66lyteidl.plugins.kubeflow\x1a\x19\x66lyteidl/core/tasks.proto\x1a&flyteidl/plugins/kubeflow/common.proto\"\xc9\x02\n\x1a\x44istributedMPITrainingTask\x12\x65\n\x0fworker_replicas\x18\x01 \x01(\x0b\x32<.flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpecR\x0eworkerReplicas\x12i\n\x11launcher_replicas\x18\x02 \x01(\x0b\x32<.flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpecR\x10launcherReplicas\x12\x43\n\nrun_policy\x18\x03 \x01(\x0b\x32$.flyteidl.plugins.kubeflow.RunPolicyR\trunPolicy\x12\x14\n\x05slots\x18\x04 \x01(\x05R\x05slots\"\xf8\x01\n!DistributedMPITrainingReplicaSpec\x12\x1a\n\x08replicas\x18\x01 \x01(\x05R\x08replicas\x12\x14\n\x05image\x18\x02 \x01(\tR\x05image\x12\x36\n\tresources\x18\x03 \x01(\x0b\x32\x18.flyteidl.core.ResourcesR\tresources\x12O\n\x0erestart_policy\x18\x04 \x01(\x0e\x32(.flyteidl.plugins.kubeflow.RestartPolicyR\rrestartPolicy\x12\x18\n\x07\x63ommand\x18\x05 \x03(\tR\x07\x63ommandB\xee\x01\n\x1d\x63om.flyteidl.plugins.kubeflowB\x08MpiProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins\xa2\x02\x03\x46PK\xaa\x02\x19\x46lyteidl.Plugins.Kubeflow\xca\x02\x19\x46lyteidl\\Plugins\\Kubeflow\xe2\x02%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\xea\x02\x1b\x46lyteidl::Plugins::Kubeflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n#flyteidl/plugins/kubeflow/mpi.proto\x12\x19\x66lyteidl.plugins.kubeflow\x1a\x19\x66lyteidl/core/tasks.proto\x1a&flyteidl/plugins/kubeflow/common.proto\"\xc9\x02\n\x1a\x44istributedMPITrainingTask\x12\x65\n\x0fworker_replicas\x18\x01 \x01(\x0b\x32<.flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpecR\x0eworkerReplicas\x12i\n\x11launcher_replicas\x18\x02 \x01(\x0b\x32<.flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpecR\x10launcherReplicas\x12\x43\n\nrun_policy\x18\x03 \x01(\x0b\x32$.flyteidl.plugins.kubeflow.RunPolicyR\trunPolicy\x12\x14\n\x05slots\x18\x04 \x01(\x05R\x05slots\"\xbc\x02\n!DistributedMPITrainingReplicaSpec\x12\x1e\n\x08replicas\x18\x01 \x01(\x05\x42\x02\x18\x01R\x08replicas\x12\x18\n\x05image\x18\x02 \x01(\tB\x02\x18\x01R\x05image\x12:\n\tresources\x18\x03 \x01(\x0b\x32\x18.flyteidl.core.ResourcesB\x02\x18\x01R\tresources\x12J\n\x0erestart_policy\x18\x04 \x01(\x0e\x32\x1f.flyteidl.plugins.RestartPolicyB\x02\x18\x01R\rrestartPolicy\x12\x18\n\x07\x63ommand\x18\x05 \x03(\tR\x07\x63ommand\x12;\n\x06\x63ommon\x18\x06 \x01(\x0b\x32#.flyteidl.plugins.CommonReplicaSpecR\x06\x63ommonB\xf7\x01\n\x1d\x63om.flyteidl.plugins.kubeflowB\x08MpiProtoP\x01ZFgithub.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow\xa2\x02\x03\x46PK\xaa\x02\x19\x46lyteidl.Plugins.Kubeflow\xca\x02\x19\x46lyteidl\\Plugins\\Kubeflow\xe2\x02%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\xea\x02\x1b\x46lyteidl::Plugins::Kubeflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,9 +27,17 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.plugins.kubeflow.m
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  DESCRIPTOR._serialized_options = b'\n\035com.flyteidl.plugins.kubeflowB\010MpiProtoP\001Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins\242\002\003FPK\252\002\031Flyteidl.Plugins.Kubeflow\312\002\031Flyteidl\\Plugins\\Kubeflow\342\002%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\352\002\033Flyteidl::Plugins::Kubeflow'
+  DESCRIPTOR._serialized_options = b'\n\035com.flyteidl.plugins.kubeflowB\010MpiProtoP\001ZFgithub.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow\242\002\003FPK\252\002\031Flyteidl.Plugins.Kubeflow\312\002\031Flyteidl\\Plugins\\Kubeflow\342\002%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\352\002\033Flyteidl::Plugins::Kubeflow'
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['replicas']._options = None
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['replicas']._serialized_options = b'\030\001'
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['image']._options = None
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['image']._serialized_options = b'\030\001'
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['resources']._options = None
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['resources']._serialized_options = b'\030\001'
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['restart_policy']._options = None
+  _DISTRIBUTEDMPITRAININGREPLICASPEC.fields_by_name['restart_policy']._serialized_options = b'\030\001'
   _globals['_DISTRIBUTEDMPITRAININGTASK']._serialized_start=134
   _globals['_DISTRIBUTEDMPITRAININGTASK']._serialized_end=463
   _globals['_DISTRIBUTEDMPITRAININGREPLICASPEC']._serialized_start=466
-  _globals['_DISTRIBUTEDMPITRAININGREPLICASPEC']._serialized_end=714
+  _globals['_DISTRIBUTEDMPITRAININGREPLICASPEC']._serialized_end=782
 # @@protoc_insertion_point(module_scope)

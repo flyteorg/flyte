@@ -15,6 +15,7 @@ var jsonPbUnmarshaler = &jsonpb.Unmarshaler{
 	AllowUnknownFields: true,
 }
 
+// Deprecated: Use flytestdlib/utils.UnmarshalStructToPb instead.
 func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 	if structObj == nil {
 		return fmt.Errorf("nil Struct Object passed")
@@ -32,6 +33,7 @@ func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 	return nil
 }
 
+// Deprecated: Use flytestdlib/utils.MarshalPbToStruct instead.
 func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 	if out == nil {
 		return fmt.Errorf("nil Struct Object passed")
@@ -49,11 +51,12 @@ func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 	return nil
 }
 
+// Deprecated: Use flytestdlib/utils.MarshalToString instead.
 func MarshalToString(msg proto.Message) (string, error) {
 	return jsonPbMarshaler.MarshalToString(msg)
 }
 
-// TODO: Use the stdlib version in the future, or move there if not there.
+// Deprecated: Use flytestdlib/utils.MarshalObjToStruct instead.
 // Don't use this if input is a proto Message.
 func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 	b, err := json.Marshal(input)
@@ -69,6 +72,7 @@ func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 	return structObj, nil
 }
 
+// Deprecated: Use flytestdlib/utils.UnmarshalStructToObj instead.
 // Don't use this if the unmarshalled obj is a proto message.
 func UnmarshalStructToObj(structObj *structpb.Struct, obj interface{}) error {
 	if structObj == nil {

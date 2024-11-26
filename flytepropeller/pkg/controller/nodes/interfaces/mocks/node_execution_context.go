@@ -258,38 +258,6 @@ func (_m *NodeExecutionContext) InputReader() io.InputReader {
 	return r0
 }
 
-type NodeExecutionContext_MaxDatasetSizeBytes struct {
-	*mock.Call
-}
-
-func (_m NodeExecutionContext_MaxDatasetSizeBytes) Return(_a0 int64) *NodeExecutionContext_MaxDatasetSizeBytes {
-	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *NodeExecutionContext) OnMaxDatasetSizeBytes() *NodeExecutionContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes")
-	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-func (_m *NodeExecutionContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *NodeExecutionContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &NodeExecutionContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-// MaxDatasetSizeBytes provides a mock function with given fields:
-func (_m *NodeExecutionContext) MaxDatasetSizeBytes() int64 {
-	ret := _m.Called()
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
 type NodeExecutionContext_Node struct {
 	*mock.Call
 }

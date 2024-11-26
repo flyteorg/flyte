@@ -11,6 +11,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	serverConfig "github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -218,6 +219,7 @@ func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 		Domain:   c.domain,
 		MaxAge:   0,
 		HttpOnly: true,
+		Secure:   !serverConfig.GetConfig().Security.InsecureCookieHeader,
 		Expires:  time.Now().Add(-1 * time.Hour),
 	}
 }

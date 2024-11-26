@@ -54,7 +54,7 @@ func (m *RequestMetrics) Success() {
 func newResponseCodeMetrics(scope promutils.Scope) responseCodeMetrics {
 	responseCodeCounters := make(map[codes.Code]prometheus.Counter)
 	for i := 0; i < maxGRPCStatusCode; i++ {
-		code := codes.Code(i)
+		code := codes.Code(i) // #nosec G115
 		responseCodeCounters[code] = scope.MustNewCounter(code.String(),
 			fmt.Sprintf("count of responses returning: %s", code.String()))
 	}

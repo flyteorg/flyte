@@ -10,7 +10,7 @@ import { TaskNodeOverrides } from "../core/workflow_pb.js";
 import { Identity } from "../core/security_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
-import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
+import { ExecutionError_ErrorKind, TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
 import { ExecutionMetricResult } from "../core/metrics_pb.js";
 
 /**
@@ -637,6 +637,13 @@ export class Resource extends Message<Resource> {
    */
   customInfo?: Struct;
 
+  /**
+   * The error raised during execution
+   *
+   * @generated from field: flyteidl.admin.AgentError agent_error = 7;
+   */
+  agentError?: AgentError;
+
   constructor(data?: PartialMessage<Resource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -651,6 +658,7 @@ export class Resource extends Message<Resource> {
     { no: 4, name: "log_links", kind: "message", T: TaskLog, repeated: true },
     { no: 5, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 6, name: "custom_info", kind: "message", T: Struct },
+    { no: 7, name: "agent_error", kind: "message", T: AgentError },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resource {
@@ -1367,4 +1375,84 @@ export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
     return proto3.util.equals(GetTaskLogsResponse, a, b);
   }
 }
+
+/**
+ * Error message to propagate detailed errors from agent executions to the execution
+ * engine.
+ *
+ * @generated from message flyteidl.admin.AgentError
+ */
+export class AgentError extends Message<AgentError> {
+  /**
+   * A simplified code for errors, so that we can provide a glossary of all possible errors.
+   *
+   * @generated from field: string code = 1;
+   */
+  code = "";
+
+  /**
+   * An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
+   *
+   * @generated from field: flyteidl.admin.AgentError.Kind kind = 3;
+   */
+  kind = AgentError_Kind.NON_RECOVERABLE;
+
+  /**
+   * Defines the origin of the error (system, user, unknown).
+   *
+   * @generated from field: flyteidl.core.ExecutionError.ErrorKind origin = 4;
+   */
+  origin = ExecutionError_ErrorKind.UNKNOWN;
+
+  constructor(data?: PartialMessage<AgentError>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.AgentError";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "kind", kind: "enum", T: proto3.getEnumType(AgentError_Kind) },
+    { no: 4, name: "origin", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AgentError {
+    return new AgentError().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AgentError {
+    return new AgentError().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AgentError {
+    return new AgentError().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AgentError | PlainMessage<AgentError> | undefined, b: AgentError | PlainMessage<AgentError> | undefined): boolean {
+    return proto3.util.equals(AgentError, a, b);
+  }
+}
+
+/**
+ * Defines a generic error type that dictates the behavior of the retry strategy.
+ *
+ * @generated from enum flyteidl.admin.AgentError.Kind
+ */
+export enum AgentError_Kind {
+  /**
+   * @generated from enum value: NON_RECOVERABLE = 0;
+   */
+  NON_RECOVERABLE = 0,
+
+  /**
+   * @generated from enum value: RECOVERABLE = 1;
+   */
+  RECOVERABLE = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(AgentError_Kind)
+proto3.util.setEnumType(AgentError_Kind, "flyteidl.admin.AgentError.Kind", [
+  { no: 0, name: "NON_RECOVERABLE" },
+  { no: 1, name: "RECOVERABLE" },
+]);
 

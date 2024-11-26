@@ -99,8 +99,7 @@ Here's a breakdown of these mappings:
     * - ``@dataclass``
       - ``Struct``
       - Automatic
-      - The class should be a pure value class that inherits from Mashumaro's DataClassJSONMixin,
-        and be annotated with the ``@dataclass`` decorator.
+      - The class should be a pure value class annotated with the ``@dataclass`` decorator.
     * - ``np.ndarray``
       - File
       - Automatic
@@ -115,7 +114,7 @@ Here's a breakdown of these mappings:
       - Use ``pyspark.DataFrame`` as a type hint.
     * - ``pydantic.BaseModel``
       - ``Map``
-      - To utilize the type, install the ``flytekitplugins-pydantic`` plugin.
+      - To utilize the type, install the ``pydantic>2`` module.
       - Use ``pydantic.BaseModel`` as a type hint.
     * - ``torch.Tensor`` / ``torch.nn.Module``
       - File
@@ -145,8 +144,10 @@ flytefile
 flytedirectory
 structureddataset
 dataclass
+pydantic_basemodel
 accessing_attributes
 pytorch_type
 enum_type
 pickle_type
+tensorflow_type
 ```

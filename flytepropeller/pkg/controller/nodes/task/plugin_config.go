@@ -9,7 +9,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
@@ -25,7 +24,6 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	}
 
 	// Register the GRPC plugin after the config is loaded
-	once.Do(func() { agent.RegisterAgentPlugin() })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
 
 	if err != nil {

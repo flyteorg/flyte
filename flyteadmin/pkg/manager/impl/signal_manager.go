@@ -33,21 +33,21 @@ type SignalManager struct {
 }
 
 func getSignalContext(ctx context.Context, identifier *core.SignalIdentifier) context.Context {
-	ctx = contextutils.WithProjectDomain(ctx, identifier.ExecutionId.Project, identifier.ExecutionId.Domain)
-	ctx = contextutils.WithWorkflowID(ctx, identifier.ExecutionId.Name)
-	return contextutils.WithSignalID(ctx, identifier.SignalId)
+	ctx = contextutils.WithProjectDomain(ctx, identifier.GetExecutionId().GetProject(), identifier.GetExecutionId().GetDomain())
+	ctx = contextutils.WithWorkflowID(ctx, identifier.GetExecutionId().GetName())
+	return contextutils.WithSignalID(ctx, identifier.GetSignalId())
 }
 
-func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
+func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request *admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
 	if err := validation.ValidateSignalGetOrCreateRequest(ctx, request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
-	ctx = getSignalContext(ctx, request.Id)
+	ctx = getSignalContext(ctx, request.GetId())
 
-	signalModel, err := transformers.CreateSignalModel(request.Id, request.Type, nil)
+	signalModel, err := transformers.CreateSignalModel(request.GetId(), request.GetType(), nil)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to transform signal with id [%+v] and type [+%v] with err: %v", request.Id, request.Type, err)
+		logger.Errorf(ctx, "Failed to transform signal with id [%+v] and type [+%v] with err: %v", request.GetId(), request.GetType(), err)
 		return nil, err
 	}
 
@@ -62,41 +62,41 @@ func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request admin.Sig
 		return nil, err
 	}
 
-	return &signal, nil
+	return signal, nil
 }
 
-func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalListRequest) (*admin.SignalList, error) {
+func (s *SignalManager) ListSignals(ctx context.Context, request *admin.SignalListRequest) (*admin.SignalList, error) {
 	if err := validation.ValidateSignalListRequest(ctx, request); err != nil {
 		logger.Debugf(ctx, "ListSignals request [%+v] is invalid: %v", request, err)
 		return nil, err
 	}
-	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
+	ctx = getExecutionContext(ctx, request.GetWorkflowExecutionId())
 
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, request.GetWorkflowExecutionId(), common.Signal)
 	if err != nil {
 		return nil, err
 	}
 
-	filters, err := util.AddRequestFilters(request.Filters, common.Signal, identifierFilters)
+	filters, err := util.AddRequestFilters(request.GetFilters(), common.Signal, identifierFilters)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.SignalColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.SignalColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListSignals", request.Token)
+			"invalid pagination token %s for ListSignals", request.GetToken())
 	}
 
 	signalModelList, err := s.db.SignalRepo().List(ctx, repoInterfaces.ListResourceInput{
 		InlineFilters: filters,
 		Offset:        offset,
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		SortParameter: sortParameter,
 	})
 	if err != nil {
@@ -111,7 +111,7 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 		return nil, err
 	}
 	var token string
-	if len(signalList) == int(request.Limit) {
+	if len(signalList) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(signalList))
 	}
 	return &admin.SignalList{
@@ -120,15 +120,15 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	}, nil
 }
 
-func (s *SignalManager) SetSignal(ctx context.Context, request admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
+func (s *SignalManager) SetSignal(ctx context.Context, request *admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
 	if err := validation.ValidateSignalSetRequest(ctx, s.db, request); err != nil {
 		return nil, err
 	}
-	ctx = getSignalContext(ctx, request.Id)
+	ctx = getSignalContext(ctx, request.GetId())
 
-	signalModel, err := transformers.CreateSignalModel(request.Id, nil, request.Value)
+	signalModel, err := transformers.CreateSignalModel(request.GetId(), nil, request.GetValue())
 	if err != nil {
-		logger.Errorf(ctx, "Failed to transform signal with id [%+v] and value [+%v] with err: %v", request.Id, request.Value, err)
+		logger.Errorf(ctx, "Failed to transform signal with id [%+v] and value [+%v] with err: %v", request.GetId(), request.GetValue(), err)
 		return nil, err
 	}
 

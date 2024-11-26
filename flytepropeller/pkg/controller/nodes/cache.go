@@ -105,12 +105,12 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 		return entry, nil
 	}
 
-	logger.Infof(ctx, "Catalog CacheHit: for task [%s/%s/%s/%s]", catalogKey.Identifier.Project,
-		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
+	logger.Infof(ctx, "Catalog CacheHit: for task [%s/%s/%s/%s]", catalogKey.Identifier.GetProject(),
+		catalogKey.Identifier.GetDomain(), catalogKey.Identifier.GetName(), catalogKey.Identifier.GetVersion())
 	n.metrics.catalogHitCount.Inc(ctx)
 
 	iface := catalogKey.TypedInterface
-	if iface.Outputs != nil && len(iface.Outputs.Variables) > 0 {
+	if iface.GetOutputs() != nil && len(iface.GetOutputs().GetVariables()) > 0 {
 		// copy cached outputs to node outputs
 		o, ee, err := entry.GetOutputs().Read(ctx)
 		if err != nil {
@@ -157,15 +157,15 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 	}
 
 	var status core.CatalogReservation_Status
-	if reservation.OwnerId == ownerID {
+	if reservation.GetOwnerId() == ownerID {
 		status = core.CatalogReservation_RESERVATION_ACQUIRED
 	} else {
 		status = core.CatalogReservation_RESERVATION_EXISTS
 	}
 
 	n.metrics.reservationGetSuccessCount.Inc(ctx)
-	return catalog.NewReservationEntry(reservation.ExpiresAt.AsTime(),
-		reservation.HeartbeatInterval.AsDuration(), reservation.OwnerId, status), nil
+	return catalog.NewReservationEntry(reservation.GetExpiresAt().AsTime(),
+		reservation.GetHeartbeatInterval().AsDuration(), reservation.GetOwnerId(), status), nil
 }
 
 // ReleaseCatalogReservation attempts to release an artifact reservation if the task is cacheable
@@ -208,15 +208,15 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 	}
 
 	iface := catalogKey.TypedInterface
-	if iface.Outputs != nil && len(iface.Outputs.Variables) == 0 {
+	if iface.GetOutputs() != nil && len(iface.GetOutputs().GetVariables()) == 0 {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), nil
 	}
 
-	logger.Infof(ctx, "Catalog CacheEnabled. recording execution [%s/%s/%s/%s]", catalogKey.Identifier.Project,
-		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
+	logger.Infof(ctx, "Catalog CacheEnabled. recording execution [%s/%s/%s/%s]", catalogKey.Identifier.GetProject(),
+		catalogKey.Identifier.GetDomain(), catalogKey.Identifier.GetName(), catalogKey.Identifier.GetVersion())
 
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 	metadata := catalog.Metadata{
 		TaskExecutionIdentifier: task.GetTaskExecutionIdentifier(nCtx),
 	}

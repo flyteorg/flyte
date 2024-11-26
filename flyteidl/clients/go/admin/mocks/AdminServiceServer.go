@@ -507,6 +507,47 @@ func (_m *AdminServiceServer) GetDescriptionEntity(_a0 context.Context, _a1 *adm
 	return r0, r1
 }
 
+type AdminServiceServer_GetDomains struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminServiceServer_GetDomains {
+	return &AdminServiceServer_GetDomains{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetDomains(_a0 context.Context, _a1 *admin.GetDomainRequest) *AdminServiceServer_GetDomains {
+	c_call := _m.On("GetDomains", _a0, _a1)
+	return &AdminServiceServer_GetDomains{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetDomainsMatch(matchers ...interface{}) *AdminServiceServer_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminServiceServer_GetDomains{Call: c_call}
+}
+
+// GetDomains provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetDomains(_a0 context.Context, _a1 *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDomainRequest) *admin.GetDomainsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetDomainRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetDynamicNodeWorkflow struct {
 	*mock.Call
 }

@@ -7,6 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { BoolValue, Message, proto3 } from "@bufbuild/protobuf";
 import { SecurityContext } from "../core/security_pb.js";
 import { Annotations, Envs, Labels, RawOutputDataConfig } from "./common_pb.js";
+import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
 
@@ -499,6 +500,13 @@ export class WorkflowExecutionConfig extends Message<WorkflowExecutionConfig> {
    */
   envs?: Envs;
 
+  /**
+   * Execution environment assignments to be set for the execution.
+   *
+   * @generated from field: repeated flyteidl.core.ExecutionEnvAssignment execution_env_assignments = 9;
+   */
+  executionEnvAssignments: ExecutionEnvAssignment[] = [];
+
   constructor(data?: PartialMessage<WorkflowExecutionConfig>) {
     super();
     proto3.util.initPartial(data, this);
@@ -515,6 +523,7 @@ export class WorkflowExecutionConfig extends Message<WorkflowExecutionConfig> {
     { no: 6, name: "interruptible", kind: "message", T: BoolValue },
     { no: 7, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 8, name: "envs", kind: "message", T: Envs },
+    { no: 9, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionConfig {

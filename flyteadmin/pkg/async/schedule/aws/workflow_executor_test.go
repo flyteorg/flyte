@@ -26,14 +26,14 @@ import (
 const testKickoffTime = "kickoff time arg"
 
 var testKickoffTimestamp = time.Date(2017, 12, 22, 18, 43, 48, 0, time.UTC)
-var testIdentifier = admin.NamedEntityIdentifier{
+var testIdentifier = &admin.NamedEntityIdentifier{
 	Name:    "name",
 	Project: "project",
 	Domain:  "domain",
 }
 
 var protoTestTimestamp, _ = ptypes.TimestampProto(testKickoffTimestamp)
-var testKickoffTimeProtoLiteral = core.Literal{
+var testKickoffTimeProtoLiteral = &core.Literal{
 	Value: &core.Literal_Scalar{
 		Scalar: &core.Scalar{
 			Value: &core.Scalar_Primitive{
@@ -72,7 +72,7 @@ func TestResolveKickoffTimeArg(t *testing.T) {
 		KickoffTimeArg: testKickoffTime,
 		KickoffTime:    testKickoffTimestamp,
 	}
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Closure: &admin.LaunchPlanClosure{
 			ExpectedInputs: &core.ParameterMap{
 				Parameters: map[string]*core.Parameter{
@@ -81,20 +81,20 @@ func TestResolveKickoffTimeArg(t *testing.T) {
 			},
 		},
 	}
-	executionRequest := admin.ExecutionCreateRequest{
-		Project: testIdentifier.Project,
-		Domain:  testIdentifier.Domain,
-		Name:    testIdentifier.Name,
+	executionRequest := &admin.ExecutionCreateRequest{
+		Project: testIdentifier.GetProject(),
+		Domain:  testIdentifier.GetDomain(),
+		Name:    testIdentifier.GetName(),
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{},
 		},
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
-	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, &executionRequest)
+	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, executionRequest)
 	assert.Nil(t, err)
-	assert.Contains(t, executionRequest.Inputs.Literals, testKickoffTime)
+	assert.Contains(t, executionRequest.GetInputs().GetLiterals(), testKickoffTime)
 	assert.Equal(t, testKickoffTimeProtoLiteral,
-		*executionRequest.Inputs.Literals[testKickoffTime])
+		executionRequest.GetInputs().GetLiterals()[testKickoffTime])
 }
 
 func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
@@ -102,7 +102,7 @@ func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
 		KickoffTimeArg: testKickoffTime,
 		KickoffTime:    testKickoffTimestamp,
 	}
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Closure: &admin.LaunchPlanClosure{
 			ExpectedInputs: &core.ParameterMap{
 				Parameters: map[string]*core.Parameter{
@@ -111,18 +111,18 @@ func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
 			},
 		},
 	}
-	executionRequest := admin.ExecutionCreateRequest{
-		Project: testIdentifier.Project,
-		Domain:  testIdentifier.Domain,
-		Name:    testIdentifier.Name,
+	executionRequest := &admin.ExecutionCreateRequest{
+		Project: testIdentifier.GetProject(),
+		Domain:  testIdentifier.GetDomain(),
+		Name:    testIdentifier.GetName(),
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{},
 		},
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
-	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, &executionRequest)
+	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, executionRequest)
 	assert.Nil(t, err)
-	assert.NotContains(t, executionRequest.Inputs.Literals, testKickoffTime)
+	assert.NotContains(t, executionRequest.GetInputs().GetLiterals(), testKickoffTime)
 }
 
 func TestGetActiveLaunchPlanVersion(t *testing.T) {
@@ -132,19 +132,19 @@ func TestGetActiveLaunchPlanVersion(t *testing.T) {
 		Name:    "name",
 	}
 	launchPlanIdentifier := core.Identifier{
-		Project: launchPlanNamedIdentifier.Project,
-		Domain:  launchPlanNamedIdentifier.Domain,
-		Name:    launchPlanNamedIdentifier.Name,
+		Project: launchPlanNamedIdentifier.GetProject(),
+		Domain:  launchPlanNamedIdentifier.GetDomain(),
+		Name:    launchPlanNamedIdentifier.GetName(),
 		Version: "foo",
 	}
 
 	launchPlanManager := mocks.NewMockLaunchPlanManager()
 	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
-		func(ctx context.Context, request admin.ResourceListRequest) (
+		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
-			assert.True(t, proto.Equal(launchPlanNamedIdentifier, request.Id))
-			assert.Equal(t, "eq(state,1)", request.Filters)
-			assert.Equal(t, uint32(1), request.Limit)
+			assert.True(t, proto.Equal(launchPlanNamedIdentifier, request.GetId()))
+			assert.Equal(t, "eq(state,1)", request.GetFilters())
+			assert.Equal(t, uint32(1), request.GetLimit())
 			return &admin.LaunchPlanList{
 				LaunchPlans: []*admin.LaunchPlan{
 					{
@@ -156,7 +156,7 @@ func TestGetActiveLaunchPlanVersion(t *testing.T) {
 	testExecutor := newWorkflowExecutorForTest(nil, nil, launchPlanManager)
 	launchPlan, err := testExecutor.getActiveLaunchPlanVersion(launchPlanNamedIdentifier)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&launchPlanIdentifier, launchPlan.Id))
+	assert.True(t, proto.Equal(&launchPlanIdentifier, launchPlan.GetId()))
 }
 
 func TestGetActiveLaunchPlanVersion_ManagerError(t *testing.T) {
@@ -169,7 +169,7 @@ func TestGetActiveLaunchPlanVersion_ManagerError(t *testing.T) {
 	expectedErr := errors.New("expected error")
 	launchPlanManager := mocks.NewMockLaunchPlanManager()
 	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
-		func(ctx context.Context, request admin.ResourceListRequest) (
+		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
 			return nil, expectedErr
 		})
@@ -185,7 +185,7 @@ func TestFormulateExecutionCreateRequest(t *testing.T) {
 		Name:    "baz",
 		Version: "12345",
 	}
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Spec: &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "project",
@@ -198,13 +198,13 @@ func TestFormulateExecutionCreateRequest(t *testing.T) {
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
 	executionRequest := testExecutor.formulateExecutionCreateRequest(launchPlan, time.Unix(1543607788, 0))
-	assert.Equal(t, "foo", executionRequest.Project)
-	assert.Equal(t, "bar", executionRequest.Domain)
-	assert.Equal(t, "a2k4s9v5j246kwmdmh4t", executionRequest.Name)
+	assert.Equal(t, "foo", executionRequest.GetProject())
+	assert.Equal(t, "bar", executionRequest.GetDomain())
+	assert.Equal(t, "a2k4s9v5j246kwmdmh4t", executionRequest.GetName())
 
-	assert.True(t, proto.Equal(&launchPlanIdentifier, executionRequest.Spec.LaunchPlan))
-	assert.Equal(t, admin.ExecutionMetadata_SCHEDULED, executionRequest.Spec.Metadata.Mode)
-	assert.Equal(t, int64(1543607788), executionRequest.Spec.Metadata.ScheduledAt.Seconds)
+	assert.True(t, proto.Equal(&launchPlanIdentifier, executionRequest.GetSpec().GetLaunchPlan()))
+	assert.Equal(t, admin.ExecutionMetadata_SCHEDULED, executionRequest.GetSpec().GetMetadata().GetMode())
+	assert.Equal(t, int64(1543607788), executionRequest.GetSpec().GetMetadata().GetScheduledAt().GetSeconds())
 }
 
 func TestRun(t *testing.T) {
@@ -232,26 +232,26 @@ func TestRun(t *testing.T) {
 	testExecutionManager := mocks.MockExecutionManager{}
 	var messagesSeen int
 	testExecutionManager.SetCreateCallback(func(
-		ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
+		ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (
 		*admin.ExecutionCreateResponse, error) {
-		assert.Equal(t, "project", request.Project)
-		assert.Equal(t, "domain", request.Domain)
-		assert.Equal(t, "ar8fphnlc5wh9dksjncj", request.Name)
+		assert.Equal(t, "project", request.GetProject())
+		assert.Equal(t, "domain", request.GetDomain())
+		assert.Equal(t, "ar8fphnlc5wh9dksjncj", request.GetName())
 		if messagesSeen == 0 {
-			assert.Contains(t, request.Inputs.Literals, testKickoffTime)
-			assert.Equal(t, testKickoffTimeProtoLiteral, *request.Inputs.Literals[testKickoffTime])
+			assert.Contains(t, request.GetInputs().GetLiterals(), testKickoffTime)
+			assert.Equal(t, testKickoffTimeProtoLiteral, request.GetInputs().GetLiterals()[testKickoffTime])
 		}
 		messagesSeen++
 		return &admin.ExecutionCreateResponse{}, nil
 	})
 	launchPlanManager := mocks.NewMockLaunchPlanManager()
 	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
-		func(ctx context.Context, request admin.ResourceListRequest) (
+		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
-			assert.Equal(t, "project", request.Id.Project)
-			assert.Equal(t, "domain", request.Id.Domain)
-			assert.Equal(t, "eq(state,1)", request.Filters)
-			assert.Equal(t, uint32(1), request.Limit)
+			assert.Equal(t, "project", request.GetId().GetProject())
+			assert.Equal(t, "domain", request.GetId().GetDomain())
+			assert.Equal(t, "eq(state,1)", request.GetFilters())
+			assert.Equal(t, uint32(1), request.GetLimit())
 			return &admin.LaunchPlanList{
 				LaunchPlans: []*admin.LaunchPlan{
 					{

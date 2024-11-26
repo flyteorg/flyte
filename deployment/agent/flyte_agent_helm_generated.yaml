@@ -40,6 +40,7 @@ spec:
   - name: agent-grpc
     port: 8000
     protocol: TCP
+    appProtocol: TCP
     targetPort: agent-grpc
   selector: 
     app.kubernetes.io/name: flyteagent
@@ -78,7 +79,7 @@ spec:
         - pyflyte
         - serve
         - agent
-        image: "ghcr.io/flyteorg/flyteagent:1.11.0"
+        image: "cr.flyte.org/flyteorg/flyteagent:1.13.6"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -98,7 +99,7 @@ spec:
           limits:
             cpu: 500m
             ephemeral-storage: 200Mi
-            memory: 200Mi
+            memory: 300Mi
           requests:
             cpu: 500m
             ephemeral-storage: 200Mi

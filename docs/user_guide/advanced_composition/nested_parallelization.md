@@ -82,6 +82,27 @@ def multi_wf(l: typing.List[int], chunk: int) -> typing.List[int]:
     return level1(l=l, chunk=chunk)
 ```
 
+Overrides let you add additional arguments to the launch plan you are looping over in the dynamic. Here we add caching:
+
+```python
+@task
+def increment(num: int) -> int:
+    return num + 1
+
+@workflow
+def child(num: int) -> int:
+    return increment(num=num)
+
+child_lp = LaunchPlan.get_or_create(child)
+
+@dynamic
+def spawn(n: int) -> List[int]: 
+    l = []
+    for i in [1,2,3,4,5]:
+        l.append(child_lp(num=i).with_overrides(cache=True, cache_version="1.0.0"))
+    # you can also pass l to another task if you want
+    return l
+```
 
 ### Flyte console
 

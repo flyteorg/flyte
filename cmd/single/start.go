@@ -22,6 +22,7 @@ import (
 	datacatalog "github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	adminRepositoriesConfig "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyte/flyteadmin/pkg/server"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
@@ -75,8 +76,9 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	if len(cfg.SeedProjects) != 0 {
 		projects = cfg.SeedProjects
 	}
-	logger.Infof(ctx, "Seeding default projects...", projects)
-	if err := adminServer.SeedProjects(ctx, projects); err != nil {
+	seedProjects := adminRepositoriesConfig.MergeSeedProjectsWithUniqueNames(projects, cfg.SeedProjectsWithDetails)
+	logger.Infof(ctx, "Seeding default projects... %v", seedProjects)
+	if err := adminServer.SeedProjects(ctx, seedProjects); err != nil {
 		return err
 	}
 
@@ -202,7 +204,7 @@ var startCmd = &cobra.Command{
 		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
 			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
 			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
-			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			if err := otelutils.RegisterTracerProviderWithContext(ctx, serviceName, otelutils.GetConfig()); err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err
 			}
@@ -249,6 +251,6 @@ func init() {
 	RootCmd.AddCommand(startCmd)
 	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
+		contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
 		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey, storage.FailureTypeLabel)
 }

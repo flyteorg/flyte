@@ -20,17 +20,33 @@ spec:
     - name: http
       port: 80
       protocol: TCP
+      {{- if .Values.flyteadmin.service.appProtocols.enabled }}
+      appProtocol: TCP
+      {{- end }}
       targetPort: 8088
     - name: grpc
       port: 81
       protocol: TCP
+      # intentionally set to TCP instead of grpc
+      {{- if .Values.flyteadmin.service.appProtocols.enabled }}
+      appProtocol: TCP
+      {{- end }}
       targetPort: 8089
     - name: redoc
       protocol: TCP
+      {{- if .Values.flyteadmin.service.appProtocols.enabled }}
+      appProtocol: TCP
+      {{- end }}
       port: 87
       targetPort: 8087
     - name: http-metrics
       protocol: TCP
+      {{- if .Values.flyteadmin.service.appProtocols.enabled }}
+      appProtocol: TCP
+      {{- end }}
       port: 10254
+    {{- with .Values.flyteadmin.service.additionalPorts -}}
+    {{ tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
   selector: {{ include "flyteadmin.selectorLabels" . | nindent 4 }}
 {{- end }}

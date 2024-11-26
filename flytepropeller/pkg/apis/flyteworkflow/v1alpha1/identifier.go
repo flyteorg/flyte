@@ -1,28 +1,21 @@
 package v1alpha1
 
 import (
-	"bytes"
-
-	"github.com/golang/protobuf/jsonpb"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type Identifier struct {
 	*core.Identifier
 }
 
-func (in *Identifier) UnmarshalJSON(b []byte) error {
-	in.Identifier = &core.Identifier{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.Identifier)
+func (in *Identifier) MarshalJSON() ([]byte, error) {
+	return utils.MarshalPbToBytes(in.Identifier)
 }
 
-func (in *Identifier) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.Identifier); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+func (in *Identifier) UnmarshalJSON(b []byte) error {
+	in.Identifier = &core.Identifier{}
+	return utils.UnmarshalBytesToPb(b, in.Identifier)
 }
 
 func (in *Identifier) DeepCopyInto(out *Identifier) {

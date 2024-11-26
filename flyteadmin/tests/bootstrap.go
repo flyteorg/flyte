@@ -86,6 +86,7 @@ func truncateAllTablesForTestingOnly() {
 	TruncateSchedulableEntitiesSnapshots := fmt.Sprintf("TRUNCATE TABLE schedule_entities_snapshots;")
 	TruncateAdminTags := fmt.Sprintf("TRUNCATE TABLE admin_tags;")
 	TruncateExecutionAdminTags := fmt.Sprintf("TRUNCATE TABLE execution_admin_tags;")
+	TruncateExecutionTags := fmt.Sprintf("TRUNCATE TABLE execution_tags;")
 	ctx := context.Background()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	if err != nil {
@@ -116,6 +117,7 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateSchedulableEntitiesSnapshots)
 	db.Exec(TruncateAdminTags)
 	db.Exec(TruncateExecutionAdminTags)
+	db.Exec(TruncateExecutionTags)
 }
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {

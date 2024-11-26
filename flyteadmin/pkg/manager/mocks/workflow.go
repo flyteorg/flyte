@@ -6,8 +6,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type CreateWorkflowFunc func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error)
-type GetWorkflowFunc func(ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error)
+type CreateWorkflowFunc func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error)
+type GetWorkflowFunc func(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error)
 
 type MockWorkflowManager struct {
 	createWorkflowFunc CreateWorkflowFunc
@@ -20,7 +20,7 @@ func (r *MockWorkflowManager) SetCreateCallback(createFunction CreateWorkflowFun
 
 func (r *MockWorkflowManager) CreateWorkflow(
 	ctx context.Context,
-	request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+	request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 	if r.createWorkflowFunc != nil {
 		return r.createWorkflowFunc(ctx, request)
 	}
@@ -28,7 +28,7 @@ func (r *MockWorkflowManager) CreateWorkflow(
 }
 
 func (r *MockWorkflowManager) ListWorkflows(ctx context.Context,
-	request admin.ResourceListRequest) (*admin.WorkflowList, error) {
+	request *admin.ResourceListRequest) (*admin.WorkflowList, error) {
 	return nil, nil
 }
 
@@ -37,14 +37,14 @@ func (r *MockWorkflowManager) SetGetCallback(getFunction GetWorkflowFunc) {
 }
 
 func (r *MockWorkflowManager) GetWorkflow(
-	ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error) {
+	ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 	if r.getWorkflowFunc != nil {
 		return r.getWorkflowFunc(ctx, request)
 	}
 	return nil, nil
 }
 
-func (r *MockWorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (r *MockWorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	return nil, nil
 }

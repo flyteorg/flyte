@@ -12,12 +12,12 @@ jobs:
     name: Update Flyte components
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: "0"
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: Update references
         env:
           VERSION: ${{ github.event.inputs.next-version }}

@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="single-binary" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="flyte" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-tags console" />
+    <parameters value="start --config=flyte-single-binary-local.yaml" />
+    <kind value="PACKAGE" />
+    <package value="github.com/flyteorg/flyte/cmd" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>

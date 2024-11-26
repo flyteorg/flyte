@@ -21,8 +21,6 @@ import (
 
 //go:generate mockery -all
 
-var nilJSON, _ = json.Marshal(nil)
-
 type CustomState map[string]interface{}
 type WorkflowID = string
 type TaskID = string
@@ -258,7 +256,7 @@ type ExecutableGateNode interface {
 
 type ExecutableArrayNode interface {
 	GetSubNodeSpec() *NodeSpec
-	GetParallelism() int64
+	GetParallelism() *uint32
 	GetMinSuccesses() *uint32
 	GetMinSuccessRatio() *float32
 }
@@ -511,6 +509,7 @@ type Meta interface {
 	GetEventVersion() EventVersion
 	GetDefinitionVersion() WorkflowDefinitionVersion
 	GetRawOutputDataConfig() RawOutputDataConfig
+	GetConsoleURL() string
 }
 
 type TaskDetailsGetter interface {
@@ -553,6 +552,10 @@ type EnqueueWorkflow func(workflowID WorkflowID)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
 	return outputDir + "/outputs.pb"
+}
+
+func GetOutputsLiteralMetadataFile(literalKey string, outputDir DataReference) DataReference {
+	return outputDir + DataReference(fmt.Sprintf("/%s_offloaded_metadata.pb", literalKey))
 }
 
 func GetInputsFile(inputDir DataReference) DataReference {

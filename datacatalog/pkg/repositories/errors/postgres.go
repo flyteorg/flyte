@@ -62,7 +62,7 @@ func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
 	case undefinedTable:
 		return catalogErrors.NewDataCatalogErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
 	default:
-		return catalogErrors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message))
+		return catalogErrors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message)) //nolint
 	}
 }
 

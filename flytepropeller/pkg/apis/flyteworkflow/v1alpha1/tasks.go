@@ -1,11 +1,8 @@
 package v1alpha1
 
 import (
-	"bytes"
-
-	"github.com/golang/protobuf/jsonpb"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type TaskSpec struct {
@@ -27,14 +24,10 @@ func (in *TaskSpec) DeepCopyInto(out *TaskSpec) {
 }
 
 func (in *TaskSpec) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.TaskTemplate); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.TaskTemplate)
 }
 
 func (in *TaskSpec) UnmarshalJSON(b []byte) error {
 	in.TaskTemplate = &core.TaskTemplate{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.TaskTemplate)
+	return utils.UnmarshalBytesToPb(b, in.TaskTemplate)
 }
