@@ -178,6 +178,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables  e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>"  e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
+| flyteadmin.envFrom | list | `[]` | Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap) |
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |

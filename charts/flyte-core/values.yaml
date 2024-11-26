@@ -31,6 +31,8 @@ flyteadmin:
   #       name: sendgrid-secret
   #       key: api_key
   env: []
+  # -- Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap)
+  envFrom: []
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
