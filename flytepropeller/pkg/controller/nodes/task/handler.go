@@ -553,8 +553,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		} else {
 			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(),
 				&event.TaskNodeMetadata{
-					CacheStatus:   pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.GetCacheStatus(),
-					CatalogKey:    pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.GetCatalogKey(),
+					//CacheStatus:   pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.GetCacheStatus(),
+					//CatalogKey:    pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.GetCatalogKey(),
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		}
