@@ -191,7 +191,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
 | flyteadmin.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flyteadmin pod(s). |
-| flyteadmin.service | object | `{"additionalPorts":[],"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
+| flyteadmin.service | object | `{"additionalPorts":[],"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"appProtocols":{"enabled":false},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
 | flyteadmin.service.additionalPorts | list | `[]` | Appends additional ports to the service spec. |
 | flyteadmin.serviceAccount | object | `{"alwaysCreate":false,"annotations":{},"clusterRole":{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]},"create":true,"createClusterRole":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlyteAdmin |
 | flyteadmin.serviceAccount.alwaysCreate | bool | `false` | Should a service account always be created for flyteadmin even without an actual flyteadmin deployment running (e.g. for multi-cluster setups) |
@@ -234,7 +234,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.securityContext | object | `{"fsGroupChangePolicy":"OnRootMismatch","runAsNonRoot":true,"runAsUser":1000,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flyteconsole pod(s). |
-| flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
+| flyteconsole.service | object | `{"annotations":{},"appProtocols":{"enabled":false},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flyteconsole service monitor |
 | flyteconsole.serviceMonitor.enabled | bool | `false` | If enabled create the flyteconsole service monitor |
 | flyteconsole.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
