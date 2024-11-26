@@ -7,16 +7,11 @@ echo "Generating Helm"
 HELM_SKIP_INSTALL=${HELM_SKIP_INSTALL:-false}
 
 if [ "${HELM_SKIP_INSTALL}" != "true" ]; then
-<<<<<<< HEAD
   # Helm 3.16 broke dependencies resolution in Chart.yaml
   # Ref: https://github.com/helm/helm/issues/13324
 	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.4 bash
 ||||||| parent of e67aae054 (Add listing api to stow storage (#5741))
 	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-=======
-	# See https://github.com/helm/helm/issues/13324 for a breaking change in latest version of helm
-	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.4 bash
->>>>>>> e67aae054 (Add listing api to stow storage (#5741))
 fi
 
 helm version
