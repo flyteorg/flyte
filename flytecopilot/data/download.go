@@ -358,6 +358,10 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 			Scalar: s,
 		}}, nil
 	case *core.Literal_Collection:
+		err := os.MkdirAll(filePath, os.ModePerm)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", filePath)
+		}
 		v, c2, err := d.handleCollection(ctx, lit.GetCollection(), filePath, writeToFile)
 		if err != nil {
 			return nil, nil, err
@@ -391,10 +395,6 @@ func (d Downloader) handleCollection(ctx context.Context, c *core.LiteralCollect
 	litCollection := &core.LiteralCollection{}
 	for i, lit := range c.GetLiterals() {
 		filePath := path.Join(dir, strconv.Itoa(i))
-		err := os.MkdirAll(dir, os.ModePerm)
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", dir)
-		}
 		v, lit, err := d.handleLiteral(ctx, lit, filePath, writePrimitiveToFile)
 		if err != nil {
 			return nil, nil, err
@@ -424,7 +424,7 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 			if err := d.store.ReadProtobuf(ctx, storage.DataReference(offloadedMetadataURI), literal); err != nil {
 				errString := fmt.Sprintf("Failed to  read the object at location [%s] with error [%s]", offloadedMetadataURI, err)
 				logger.Error(ctx, errString)
-				return nil, nil, fmt.Errorf(errString)
+				return nil, nil, fmt.Errorf("%s", errString)
 			}
 			logger.Infof(ctx, "read object at location [%s]", offloadedMetadataURI)
 		}

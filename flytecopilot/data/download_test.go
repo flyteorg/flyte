@@ -224,6 +224,12 @@ func TestRecursiveDownload(t *testing.T) {
 		assert.NotNil(t, varMap)
 		assert.NotNil(t, lMap)
 		assert.Equal(t, []interface{}{"string1", "string2"}, varMap["input1"])
+		// Check if files were created and data written
+		for _, file := range []string{"0", "1"} {
+			if _, err := os.Stat(filepath.Join(toPath, "input1", file)); os.IsNotExist(err) {
+				t.Errorf("expected file %s to exist", file)
+			}
+		}
 	})
 
 	t.Run("OffloadedMetadataContainsMapOfStringString", func(t *testing.T) {
@@ -297,5 +303,11 @@ func TestRecursiveDownload(t *testing.T) {
 		assert.NotNil(t, lMap)
 		assert.Equal(t, "value1", varMap["input1"].(VarMap)["key1"])
 		assert.Equal(t, "value2", varMap["input1"].(VarMap)["key2"])
+
+		for _, file := range []string{"key1", "key2"} {
+			if _, err := os.Stat(filepath.Join(toPath, "input1", file)); os.IsNotExist(err) {
+				t.Errorf("expected file %s to exist", file)
+			}
+		}
 	})
 }
