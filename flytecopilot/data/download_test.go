@@ -152,3 +152,150 @@ func TestHandleBlobHTTP(t *testing.T) {
 		t.Errorf("expected file %s to exist", toPath)
 	}
 }
+
+func TestRecursiveDownload(t *testing.T) {
+	t.Run("OffloadedMetadataContainsCollectionOfStrings", func(t *testing.T) {
+		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		d := Downloader{store: s}
+
+		offloadedLiteral := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri: "s3://container/offloaded",
+				},
+			},
+		}
+
+		inputs := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"input1": offloadedLiteral,
+			},
+		}
+
+		// Mock reading the offloaded metadata
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: []*core.Literal{
+						{
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_StringValue{
+												StringValue: "string1",
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_StringValue{
+												StringValue: "string2",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+
+		toPath := "./inputs"
+		defer func() {
+			err := os.RemoveAll(toPath)
+			if err != nil {
+				t.Errorf("Failed to delete directory: %v", err)
+			}
+		}()
+
+		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, true)
+		assert.NoError(t, err)
+		assert.NotNil(t, varMap)
+		assert.NotNil(t, lMap)
+		assert.Equal(t, []interface{}{"string1", "string2"}, varMap["input1"])
+	})
+
+	t.Run("OffloadedMetadataContainsMapOfStringString", func(t *testing.T) {
+		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		d := Downloader{store: s}
+
+		offloadedLiteral := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri: "s3://container/offloaded",
+				},
+			},
+		}
+
+		inputs := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"input1": offloadedLiteral,
+			},
+		}
+
+		// Mock reading the offloaded metadata
+		err = s.WriteProtobuf(context.Background(), storage.DataReference("s3://container/offloaded"), storage.Options{}, &core.Literal{
+			Value: &core.Literal_Map{
+				Map: &core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"key1": {
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_StringValue{
+												StringValue: "value1",
+											},
+										},
+									},
+								},
+							},
+						},
+						"key2": {
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_StringValue{
+												StringValue: "value2",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+
+		toPath := "./inputs"
+		defer func() {
+			err := os.RemoveAll(toPath)
+			if err != nil {
+				t.Errorf("Failed to delete directory: %v", err)
+			}
+		}()
+
+		varMap, lMap, err := d.RecursiveDownload(context.Background(), inputs, toPath, true)
+		assert.NoError(t, err)
+		assert.NotNil(t, varMap)
+		assert.NotNil(t, lMap)
+		assert.Equal(t, "value1", varMap["input1"].(VarMap)["key1"])
+		assert.Equal(t, "value2", varMap["input1"].(VarMap)["key2"])
+	})
+}

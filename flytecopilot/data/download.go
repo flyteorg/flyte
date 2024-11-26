@@ -366,6 +366,10 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 			Collection: c2,
 		}}, nil
 	case *core.Literal_Map:
+		err := os.MkdirAll(filePath, os.ModePerm)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", filePath)
+		}
 		v, m, err := d.RecursiveDownload(ctx, lit.GetMap(), filePath, writeToFile)
 		if err != nil {
 			return nil, nil, err
@@ -387,6 +391,10 @@ func (d Downloader) handleCollection(ctx context.Context, c *core.LiteralCollect
 	litCollection := &core.LiteralCollection{}
 	for i, lit := range c.GetLiterals() {
 		filePath := path.Join(dir, strconv.Itoa(i))
+		err := os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", dir)
+		}
 		v, lit, err := d.handleLiteral(ctx, lit, filePath, writePrimitiveToFile)
 		if err != nil {
 			return nil, nil, err
@@ -410,6 +418,16 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 	}
 	f := make(FutureMap, len(inputs.GetLiterals()))
 	for variable, literal := range inputs.GetLiterals() {
+		if literal.GetOffloadedMetadata() != nil {
+			offloadedMetadataURI := literal.GetOffloadedMetadata().GetUri()
+			// literal will be overwritten with the contents of the offloaded data which contains the actual large literal.
+			if err := d.store.ReadProtobuf(ctx, storage.DataReference(offloadedMetadataURI), literal); err != nil {
+				errString := fmt.Sprintf("Failed to  read the object at location [%s] with error [%s]", offloadedMetadataURI, err)
+				logger.Error(ctx, errString)
+				return nil, nil, fmt.Errorf(errString)
+			}
+			logger.Infof(ctx, "read object at location [%s]", offloadedMetadataURI)
+		}
 		varPath := path.Join(dir, variable)
 		lit := literal
 		f[variable] = futures.NewAsyncFuture(childCtx, func(ctx2 context.Context) (interface{}, error) {
