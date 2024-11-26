@@ -190,26 +190,26 @@ func (p *pluginRequestedTransition) AddDeckURI(ctx context.Context, tCtx *taskEx
 	p.execInfo.OutputInfo.DeckURI = deckURI
 }
 
-// RemoveNonexistentDeckURI removes the deck URI from the plugin execution info if the URI does not exist in remote storage.
-func (p *pluginRequestedTransition) RemoveNonexistentDeckURI(ctx context.Context, tCtx *taskExecutionContext) error {
-	reader := tCtx.ow.GetReader()
-	if reader == nil && p.execInfo.OutputInfo != nil {
-		p.execInfo.OutputInfo.DeckURI = nil
-		return nil
-	}
-
-	exists, err := reader.DeckExists(ctx)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
-		return regErrors.Wrapf(err, "failed to check existence of deck file")
-	}
-
-	if !exists && p.execInfo.OutputInfo != nil {
-		p.execInfo.OutputInfo.DeckURI = nil
-	}
-
-	return nil
-}
+//// RemoveNonexistentDeckURI removes the deck URI from the plugin execution info if the URI does not exist in remote storage.
+//func (p *pluginRequestedTransition) RemoveNonexistentDeckURI(ctx context.Context, tCtx *taskExecutionContext) error {
+//	reader := tCtx.ow.GetReader()
+//	if reader == nil && p.execInfo.OutputInfo != nil {
+//		p.execInfo.OutputInfo.DeckURI = nil
+//		return nil
+//	}
+//
+//	exists, err := reader.DeckExists(ctx)
+//	if err != nil {
+//		logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+//		return regErrors.Wrapf(err, "failed to check existence of deck file")
+//	}
+//
+//	if !exists && p.execInfo.OutputInfo != nil {
+//		p.execInfo.OutputInfo.DeckURI = nil
+//	}
+//
+//	return nil
+//}
 
 // The plugin interface available especially for testing.
 type PluginRegistryIface interface {
@@ -509,11 +509,11 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
-		// This is to prevent the console from potentially checking the deck URI that does not exist if in final phase(PhaseSuccess).
-		err = pluginTrns.RemoveNonexistentDeckURI(ctx, tCtx)
-		if err != nil {
-			return pluginTrns, err
-		}
+		//// This is to prevent the console from potentially checking the deck URI that does not exist if in final phase(PhaseSuccess).
+		//err = pluginTrns.RemoveNonexistentDeckURI(ctx, tCtx)
+		//if err != nil {
+		//	return pluginTrns, err
+		//}
 
 		// -------------------------------------
 		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes
@@ -561,11 +561,11 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	case pluginCore.PhaseRetryableFailure:
 		fallthrough
 	case pluginCore.PhasePermanentFailure:
-		// This is to prevent the console from potentially checking the deck URI that does not exist if in final phase(PhaseFailure).
-		err = pluginTrns.RemoveNonexistentDeckURI(ctx, tCtx)
-		if err != nil {
-			return pluginTrns, err
-		}
+		//// This is to prevent the console from potentially checking the deck URI that does not exist if in final phase(PhaseFailure).
+		//err = pluginTrns.RemoveNonexistentDeckURI(ctx, tCtx)
+		//if err != nil {
+		//	return pluginTrns, err
+		//}
 		pluginTrns.ObservedFailure(
 			&event.TaskNodeMetadata{
 				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
