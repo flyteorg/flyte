@@ -31,6 +31,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+const (
+	// value is 3 days of seconds which is covered by 18 bits (262144)
+	MAX_DELTA_TIMESTAMP = 259200
+)
+
 var (
 	nilLiteral = &idlcore.Literal{
 		Value: &idlcore.Literal_Scalar{
@@ -257,7 +262,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
-			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 259200}, // max value is 3 days of seconds which is coverd by 18 bits (262144)
+			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
 		} {
 
 			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115

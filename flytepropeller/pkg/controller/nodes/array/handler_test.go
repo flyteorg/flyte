@@ -252,6 +252,7 @@ func TestAbort(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
 
 				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
@@ -348,6 +349,7 @@ func TestFinalize(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
 				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
@@ -858,6 +860,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
 				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
@@ -1301,6 +1304,7 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
 				*item.arrayReference, err = bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
