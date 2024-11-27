@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -57,6 +58,23 @@ func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Meta
 		exists: found, size: int64(len(data)),
 		etag: hex.EncodeToString(hash[:]),
 	}, nil
+}
+
+func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	var items []DataReference
+	prefix := strings.TrimSuffix(string(reference), "/") + "/"
+
+	for ref := range s.cache {
+		if strings.HasPrefix(ref.String(), prefix) {
+			items = append(items, ref)
+		}
+	}
+
+	if len(items) == 0 {
+		return nil, NewCursorAtEnd(), os.ErrNotExist
+	}
+
+	return items, NewCursorAtEnd(), nil
 }
 
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {

@@ -8,8 +8,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"strconv"
+	"sync"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
@@ -31,57 +33,187 @@ type Downloader struct {
 	mode core.IOStrategy_DownloadMode
 }
 
-// TODO add support for multipart blobs
-func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toFilePath string) (interface{}, error) {
-	ref := storage.DataReference(blob.Uri)
-	scheme, _, _, err := ref.Split()
+// TODO add timeout and rate limit
+// TODO use chunk to download
+func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
+	/*
+	   handleBlob handles the retrieval and local storage of blob data, including support for both single and multipart blob types.
+	   For multipart blobs, it lists all parts recursively and spawns concurrent goroutines to download each part while managing file I/O in parallel.
+
+	   - The function begins by validating the blob URI and categorizing the blob type (single or multipart).
+	   - In the multipart case, it recursively lists all blob parts and launches goroutines to download and save each part.
+	     Goroutine closure and I/O success tracking are managed to avoid resource leaks.
+	   - For single-part blobs, it directly downloads and writes the data to the specified path.
+
+	   Life Cycle:
+	   1. Blob URI                    -> Blob Metadata Type check       -> Recursive List parts if Multipart          -> Launch goroutines to download parts
+	      (input blob object)            (determine multipart/single)       (List API, handles recursive case)              (each part handled in parallel)
+	   2. Download part or full blob   -> Save locally with error checks -> Handle reader/writer closures             -> Return local path or error
+	      (download each part)             (error on write or directory)     (close streams safely, track success)        (completion or report missing closures)
+	*/
+
+	blobRef := storage.DataReference(blob.Uri)
+	scheme, _, _, err := blobRef.Split()
 	if err != nil {
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
-	var reader io.ReadCloser
-	if scheme == "http" || scheme == "https" {
-		reader, err = DownloadFileFromHTTP(ctx, ref)
-	} else {
-		if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
-			logger.Warnf(ctx, "Currently only single part blobs are supported, we will force multipart to be 'path/00000'")
-			ref, err = d.store.ConstructReference(ctx, ref, "000000")
-			if err != nil {
+
+	if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
+		// Collect all parts of the multipart blob recursively (List API handles nested directories)
+		// Set maxItems to 100 as a parameter for the List API, enabling batch retrieval of items until all are downloaded
+		maxItems := 100
+		cursor := storage.NewCursorAtStart()
+		var items []storage.DataReference
+		var absPaths []string
+		for {
+			items, cursor, err = d.store.List(ctx, blobRef, maxItems, cursor)
+			if err != nil || len(items) == 0 {
+				logger.Errorf(ctx, "failed to collect items from multipart blob [%s]", blobRef)
 				return nil, err
 			}
+			for _, item := range items {
+				absPaths = append(absPaths, item.String())
+			}
+			if storage.IsCursorEnd(cursor) {
+				break
+			}
 		}
-		reader, err = DownloadFileFromStorage(ctx, ref, d.store)
-	}
-	if err != nil {
-		logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
-		return nil, err
-	}
-	defer func() {
-		err := reader.Close()
-		if err != nil {
-			logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
-		}
-	}()
 
-	writer, err := os.Create(toFilePath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to open file at path %s", toFilePath)
-	}
-	defer func() {
-		err := writer.Close()
-		if err != nil {
-			logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+		// Track the count of successful downloads and the total number of items
+		downloadSuccess := 0
+		itemCount := len(absPaths)
+		// Track successful closures of readers and writers in deferred functions
+		readerCloseSuccessCount := 0
+		writerCloseSuccessCount := 0
+		// We use Mutex to avoid race conditions when updating counters and creating directories
+		var mu sync.Mutex
+		var wg sync.WaitGroup
+		for _, absPath := range absPaths {
+			absPath := absPath
+
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				defer func() {
+					if err := recover(); err != nil {
+						logger.Errorf(ctx, "recover receives error: [%s]", err)
+					}
+				}()
+
+				ref := storage.DataReference(absPath)
+				reader, err := DownloadFileFromStorage(ctx, ref, d.store)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
+					return
+				}
+				defer func() {
+					err := reader.Close()
+					if err != nil {
+						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s].\n"+
+							"Error: %s", ref, err)
+					}
+					mu.Lock()
+					readerCloseSuccessCount++
+					mu.Unlock()
+				}()
+
+				_, _, k, err := ref.Split()
+				if err != nil {
+					logger.Errorf(ctx, "Failed to parse ref [%s]", ref)
+					return
+				}
+				newPath := filepath.Join(toPath, k)
+				dir := filepath.Dir(newPath)
+
+				mu.Lock()
+				// os.MkdirAll creates the specified directory structure if it doesn’t already exist
+				// 0777: the directory can be read and written by anyone
+				err = os.MkdirAll(dir, 0777)
+				mu.Unlock()
+				if err != nil {
+					logger.Errorf(ctx, "failed to make dir at path [%s]", dir)
+					return
+				}
+
+				writer, err := os.Create(newPath)
+				if err != nil {
+					logger.Errorf(ctx, "failed to open file at path [%s]", newPath)
+					return
+				}
+				defer func() {
+					err := writer.Close()
+					if err != nil {
+						logger.Errorf(ctx, "failed to close File write stream.\n"+
+							"Error: [%s]", err)
+					}
+					mu.Lock()
+					writerCloseSuccessCount++
+					mu.Unlock()
+				}()
+
+				_, err = io.Copy(writer, reader)
+				if err != nil {
+					logger.Errorf(ctx, "failed to write remote data to local filesystem")
+					return
+				}
+				mu.Lock()
+				downloadSuccess++
+				mu.Unlock()
+			}()
 		}
-	}()
-	v, err := io.Copy(writer, reader)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to write remote data to local filesystem")
+		// Go routines are synchronized with a WaitGroup to prevent goroutine leaks.
+		wg.Wait()
+		if downloadSuccess != itemCount || readerCloseSuccessCount != itemCount || writerCloseSuccessCount != itemCount {
+			return nil, errors.Errorf(
+				"Failed to copy %d out of %d remote files from [%s] to local [%s].\n"+
+					"Failed to close %d readers\n"+
+					"Failed to close %d writers.",
+				itemCount-downloadSuccess, itemCount, blobRef, toPath, itemCount-readerCloseSuccessCount, itemCount-writerCloseSuccessCount,
+			)
+		}
+		logger.Infof(ctx, "successfully copied %d remote files from [%s] to local [%s]", downloadSuccess, blobRef, toPath)
+		return toPath, nil
+	} else if blob.GetMetadata().GetType().Dimensionality == core.BlobType_SINGLE {
+		// reader should be declared here (avoid being shared across all goroutines)
+		var reader io.ReadCloser
+		if scheme == "http" || scheme == "https" {
+			reader, err = DownloadFileFromHTTP(ctx, blobRef)
+		} else {
+			reader, err = DownloadFileFromStorage(ctx, blobRef, d.store)
+		}
+		if err != nil {
+			logger.Errorf(ctx, "Failed to download from ref [%s]", blobRef)
+			return nil, err
+		}
+		defer func() {
+			err := reader.Close()
+			if err != nil {
+				logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", blobRef, err)
+			}
+		}()
+
+		writer, err := os.Create(toPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to open file at path %s", toPath)
+		}
+		defer func() {
+			err := writer.Close()
+			if err != nil {
+				logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+			}
+		}()
+		v, err := io.Copy(writer, reader)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to write remote data to local filesystem")
+		}
+		logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, blobRef, toPath)
+		return toPath, nil
 	}
-	logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, ref, toFilePath)
-	return toFilePath, nil
+
+	return nil, errors.Errorf("unexpected Blob type encountered")
 }
 
 func (d Downloader) handleSchema(ctx context.Context, schema *core.Schema, toFilePath string) (interface{}, error) {
-	// TODO Handle schema type
 	return d.handleBlob(ctx, &core.Blob{Uri: schema.Uri, Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}}}, toFilePath)
 }
 
@@ -227,6 +359,10 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 			Scalar: s,
 		}}, nil
 	case *core.Literal_Collection:
+		err := os.MkdirAll(filePath, os.ModePerm)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", filePath)
+		}
 		v, c2, err := d.handleCollection(ctx, lit.GetCollection(), filePath, writeToFile)
 		if err != nil {
 			return nil, nil, err
@@ -235,6 +371,10 @@ func (d Downloader) handleLiteral(ctx context.Context, lit *core.Literal, filePa
 			Collection: c2,
 		}}, nil
 	case *core.Literal_Map:
+		err := os.MkdirAll(filePath, os.ModePerm)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to create directory [%s]", filePath)
+		}
 		v, m, err := d.RecursiveDownload(ctx, lit.GetMap(), filePath, writeToFile)
 		if err != nil {
 			return nil, nil, err
@@ -277,8 +417,18 @@ func (d Downloader) RecursiveDownload(ctx context.Context, inputs *core.LiteralM
 	if inputs == nil || len(inputs.Literals) == 0 {
 		return VarMap{}, nil, nil
 	}
-	f := make(FutureMap, len(inputs.Literals))
-	for variable, literal := range inputs.Literals {
+	f := make(FutureMap, len(inputs.GetLiterals()))
+	for variable, literal := range inputs.GetLiterals() {
+		if literal.GetOffloadedMetadata() != nil {
+			offloadedMetadataURI := literal.GetOffloadedMetadata().GetUri()
+			// literal will be overwritten with the contents of the offloaded data which contains the actual large literal.
+			if err := d.store.ReadProtobuf(ctx, storage.DataReference(offloadedMetadataURI), literal); err != nil {
+				errString := fmt.Sprintf("Failed to  read the object at location [%s] with error [%s]", offloadedMetadataURI, err)
+				logger.Error(ctx, errString)
+				return nil, nil, fmt.Errorf("%s", errString)
+			}
+			logger.Infof(ctx, "read object at location [%s]", offloadedMetadataURI)
+		}
 		varPath := path.Join(dir, variable)
 		lit := literal
 		f[variable] = futures.NewAsyncFuture(childCtx, func(ctx2 context.Context) (interface{}, error) {
