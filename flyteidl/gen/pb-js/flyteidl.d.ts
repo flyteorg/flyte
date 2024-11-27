@@ -5840,6 +5840,12 @@ export namespace flyteidl {
 
             /** TaskLog ttl */
             ttl?: (google.protobuf.IDuration|null);
+
+            /** TaskLog ShowWhilePending */
+            ShowWhilePending?: (boolean|null);
+
+            /** TaskLog HideOnceFinished */
+            HideOnceFinished?: (boolean|null);
         }
 
         /** Represents a TaskLog. */
@@ -5862,6 +5868,12 @@ export namespace flyteidl {
 
             /** TaskLog ttl. */
             public ttl?: (google.protobuf.IDuration|null);
+
+            /** TaskLog ShowWhilePending. */
+            public ShowWhilePending: boolean;
+
+            /** TaskLog HideOnceFinished. */
+            public HideOnceFinished: boolean;
 
             /**
              * Creates a new TaskLog instance using the specified properties.

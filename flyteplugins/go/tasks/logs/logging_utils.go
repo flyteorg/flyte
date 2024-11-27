@@ -32,9 +32,12 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 		return nil, nil
 	}
 
+	var containerID string
 	if uint32(len(pod.Spec.Containers)) <= index {
 		logger.Errorf(ctx, "container IndexOutOfBound, requested [%d], but total containers [%d] in pod phase [%v]", index, len(pod.Spec.Containers), pod.Status.Phase)
 		return nil, nil
+	} else {
+		containerID = pod.Status.ContainerStatuses[index].ContainerID
 	}
 
 	if uint32(len(pod.Status.ContainerStatuses)) <= index {
@@ -63,7 +66,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			PodUID:               string(pod.GetUID()),
 			Namespace:            pod.Namespace,
 			ContainerName:        pod.Spec.Containers[index].Name,
-			ContainerID:          pod.Status.ContainerStatuses[index].ContainerID,
+			ContainerID:          containerID,
 			LogName:              nameSuffix,
 			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
 			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
@@ -141,6 +144,8 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 				DisplayName:         dynamicLogLink.DisplayName,
 				DynamicTemplateURIs: dynamicLogLink.TemplateURIs,
 				MessageFormat:       core.TaskLog_JSON,
+				ShowWhilePending:    dynamicLogLink.ShowWhilePending,
+				HideOnceFinished:    dynamicLogLink.HideOnceFinished,
 			})
 	}
 

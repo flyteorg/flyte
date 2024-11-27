@@ -177,7 +177,12 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 		CustomInfo: statusDetails,
 	}
 
-	return common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return phaseInfo, phaseVersionUpdateErr
+	}
+	return phaseInfo, err
 }
 
 func init() {

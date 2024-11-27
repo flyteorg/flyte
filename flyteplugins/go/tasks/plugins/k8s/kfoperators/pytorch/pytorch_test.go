@@ -3,6 +3,7 @@ package pytorch
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -178,10 +179,21 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
-func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) *k8smocks.PluginContext {
+func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, pluginState k8s.PluginState) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -216,8 +228,6 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return(containerImage)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -235,6 +245,17 @@ func dummyPytorchPluginContext(taskTemplate *core.TaskTemplate, resources *corev
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -678,7 +699,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyPytorchJobResource(pytorchResourceHandler, 2, conditionType)
 	}
 
-	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, nil, "")
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, k8s.PluginState{})
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -721,7 +742,7 @@ func TestGetLogs(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, nil, "")
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, k8s.PluginState{})
 
 	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 
@@ -743,7 +764,7 @@ func TestGetLogsElastic(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, nil, "")
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, k8s.PluginState{})
 
 	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 
@@ -1115,4 +1136,21 @@ func TestGetReplicaCount(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.NotNil(t, common.GetReplicaCount(PytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker))
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, pluginState)
+
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, pluginContext, dummyPytorchJobResource(pytorchResourceHandler, 4, commonOp.JobCreated))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }

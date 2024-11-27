@@ -3,6 +3,7 @@ package tensorflow
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -173,10 +174,21 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
-func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) *k8smocks.PluginContext {
+func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, pluginState k8s.PluginState) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -230,6 +242,17 @@ func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *co
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 
@@ -582,7 +605,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, conditionType)
 	}
 
-	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil)
+	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, k8s.PluginState{})
 	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, dummyTensorFlowJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -627,7 +650,7 @@ func TestGetLogs(t *testing.T) {
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, evaluatorReplicas, commonOp.JobRunning)
-	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)), resourceRequirements, nil)
+	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)), resourceRequirements, nil, k8s.PluginState{})
 
 	jobLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, false,
 		workers, psReplicas, chiefReplicas, evaluatorReplicas)
@@ -965,4 +988,21 @@ func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
 
 	assert.NotContains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Template.Spec.Tolerations, gpuToleration)
 	assert.Contains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	taskCtx := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, pluginState)
+
+	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, commonOp.JobCreated))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
