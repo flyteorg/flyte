@@ -102,11 +102,19 @@ func (p *Plugin) GetProperties() core.PluginProperties {
 
 // buildExecutionEnvID creates an `ExecutionEnvID` from a task ID and an `ExecutionEnv`. This
 // collection of attributes is used to uniquely identify an execution environment.
-func buildExecutionEnvID(taskID *idlcore.Identifier, executionEnv *idlcore.ExecutionEnv) core.ExecutionEnvID {
+func buildExecutionEnvID(tCtx core.TaskExecutionContext, executionEnv *idlcore.ExecutionEnv) core.ExecutionEnvID {
+	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	labels := tCtx.TaskExecutionMetadata().GetLabels()
+	var org string
+	if organization, exists := labels[ORGANIZATION_LABEL]; exists {
+		org = organization
+	} else {
+		org = taskExecutionID.GetTaskId().GetOrg()
+	}
 	return core.ExecutionEnvID{
-		Org:     taskID.GetOrg(),
-		Project: taskID.GetProject(),
-		Domain:  taskID.GetDomain(),
+		Org:     org,
+		Project: taskExecutionID.GetTaskId().GetProject(),
+		Domain:  taskExecutionID.GetTaskId().GetDomain(),
 		Name:    executionEnv.GetName(),
 		Version: executionEnv.GetVersion(),
 	}
@@ -131,8 +139,7 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 	switch e := executionEnv.GetEnvironment().(type) {
 	case *idlcore.ExecutionEnv_Spec:
 		executionEnvClient := tCtx.GetExecutionEnvClient()
-		taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-		executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+		executionEnvID := buildExecutionEnvID(tCtx, executionEnv)
 
 		// if environment already exists then return it
 		if environment := executionEnvClient.Get(ctx, executionEnvID); environment != nil {
@@ -389,8 +396,7 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExecutionContext,
 	executionEnv *idlcore.ExecutionEnv, queueID string, pluginState *State) (core.PhaseInfo, error) {
 
-	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+	executionEnvID := buildExecutionEnvID(tCtx, executionEnv)
 	statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
 	if err != nil {
 		return core.PhaseInfoUndefined, err
@@ -497,8 +503,7 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext,
 	start, end time.Time, executionEnv *idlcore.ExecutionEnv, queueID, workerID string) (*core.TaskInfo, error) {
 
-	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+	executionEnvID := buildExecutionEnvID(tCtx, executionEnv)
 
 	assignmentInfo := &pb.FastTaskAssignment{
 		EnvironmentOrg:     executionEnvID.Org,
