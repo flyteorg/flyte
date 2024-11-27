@@ -230,13 +230,14 @@ const (
 
 type ArrayNodeStatus struct {
 	MutableStruct
-	Phase                 ArrayNodePhase        `json:"phase,omitempty"`
-	ExecutionError        *core.ExecutionError  `json:"executionError,omitempty"`
-	SubNodePhases         bitarray.CompactArray `json:"subphase,omitempty"`
-	SubNodeTaskPhases     bitarray.CompactArray `json:"subtphase,omitempty"`
-	SubNodeRetryAttempts  bitarray.CompactArray `json:"subattempts,omitempty"`
-	SubNodeSystemFailures bitarray.CompactArray `json:"subsysfailures,omitempty"`
-	TaskPhaseVersion      uint32                `json:"taskPhaseVersion,omitempty"`
+	Phase                  ArrayNodePhase        `json:"phase,omitempty"`
+	ExecutionError         *core.ExecutionError  `json:"executionError,omitempty"`
+	SubNodePhases          bitarray.CompactArray `json:"subphase,omitempty"`
+	SubNodeTaskPhases      bitarray.CompactArray `json:"subtphase,omitempty"`
+	SubNodeRetryAttempts   bitarray.CompactArray `json:"subattempts,omitempty"`
+	SubNodeSystemFailures  bitarray.CompactArray `json:"subsysfailures,omitempty"`
+	SubNodeDeltaTimestamps bitarray.CompactArray `json: "subtimestamps",omitempty"`
+	TaskPhaseVersion       uint32                `json:"taskPhaseVersion,omitempty"`
 }
 
 func (in *ArrayNodeStatus) GetArrayNodePhase() ArrayNodePhase {
@@ -302,6 +303,17 @@ func (in *ArrayNodeStatus) SetSubNodeSystemFailures(subNodeSystemFailures bitarr
 	if in.SubNodeSystemFailures != subNodeSystemFailures {
 		in.SetDirty()
 		in.SubNodeSystemFailures = subNodeSystemFailures
+	}
+}
+
+func (in *ArrayNodeStatus) GetSubNodeDeltaTimestamps() bitarray.CompactArray {
+	return in.SubNodeDeltaTimestamps
+}
+
+func (in *ArrayNodeStatus) SetSubNodeDeltaTimestamps(subNodeDeltaTimestamps bitarray.CompactArray) {
+ 	if in.SubNodeDeltaTimestamps != subNodeDeltaTimestamps {
+		in.SetDirty()
+		in.SubNodeDeltaTimestamps = subNodeDeltaTimestamps
 	}
 }
 

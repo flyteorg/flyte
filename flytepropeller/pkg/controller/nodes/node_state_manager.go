@@ -65,7 +65,7 @@ func (n *nodeStateManager) HasWorkflowNodeState() bool {
 }
 
 func (n *nodeStateManager) HasGateNodeState() bool {
-	return n.g != nil
+return n.g != nil
 }
 
 func (n *nodeStateManager) HasArrayNodeState() bool {
@@ -180,6 +180,11 @@ func (n nodeStateManager) GetArrayNodeState() handler.ArrayNodeState {
 		subNodeSystemFailures := an.GetSubNodeSystemFailures()
 		if subNodeSystemFailuresCopy := subNodeSystemFailures.DeepCopy(); subNodeSystemFailuresCopy != nil {
 			as.SubNodeSystemFailures = *subNodeSystemFailuresCopy
+		}
+
+		subNodeDeltaTimestamps := an.GetSubNodeDeltaTimestamps()
+		if subNodeDeltaTimestampsCopy := subNodeDeltaTimestamps.DeepCopy(); subNodeDeltaTimestampsCopy != nil {
+			as.SubNodeDeltaTimestamps = *subNodeDeltaTimestampsCopy
 		}
 	}
 	return as
