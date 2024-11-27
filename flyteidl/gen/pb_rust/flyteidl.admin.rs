@@ -706,6 +706,10 @@ pub struct EmailNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a pager duty notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -715,6 +719,10 @@ pub struct PagerDutyNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a slack notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -724,6 +732,10 @@ pub struct SlackNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Represents a structure for notifications based on execution status.
 /// The notification content is configured within flyte admin but can be templatized.
