@@ -116,10 +116,17 @@ func ToEmailMessageFromWorkflowExecutionEvent(
 	request *admin.WorkflowExecutionEventRequest,
 	execution *admin.Execution) *admin.EmailMessage {
 
+	var emailBody string
+	if emailNotification.Template != "" {
+		emailBody = emailNotification.Template
+	} else {
+		emailBody = config.NotificationsEmailerConfig.Body
+	}
+
 	return &admin.EmailMessage{
 		SubjectLine:     substituteEmailParameters(config.NotificationsEmailerConfig.Subject, request, execution),
 		SenderEmail:     config.NotificationsEmailerConfig.Sender,
 		RecipientsEmail: emailNotification.GetRecipientsEmail(),
-		Body:            substituteEmailParameters(config.NotificationsEmailerConfig.Body, request, execution),
+		Body:            substituteEmailParameters(emailBody, request, execution),
 	}
 }
