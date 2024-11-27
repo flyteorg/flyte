@@ -785,7 +785,6 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 
 	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
 	var startedAt *v1.Time
-	fmt.Printf("HAMERSAW - retrieving subNodeIndex %d/%d\n", subNodeIndex, arrayNodeState.SubNodeDeltaTimestamps.ItemsCount)
 	if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
 		startedAt = &v1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)}
 	}
