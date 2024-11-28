@@ -92,12 +92,17 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
+	var deckURI string
 	for _, nodeExecutionEvent := range e.nodeEvents {
 		switch target := nodeExecutionEvent.GetTargetMetadata().(type) {
 		case *event.NodeExecutionEvent_TaskNodeMetadata:
 			if target.TaskNodeMetadata != nil {
 				cacheStatus = target.TaskNodeMetadata.GetCacheStatus()
 			}
+		}
+
+		if len(nodeExecutionEvent.DeckUri) > 0 {
+			deckURI = nodeExecutionEvent.DeckUri
 		}
 	}
 
@@ -110,6 +115,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
 			CacheStatus:  cacheStatus,
+			DeckUri:      deckURI,
 		})
 	}
 
@@ -143,6 +149,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.GetPhase(),
 			CacheStatus:  cacheStatus,
+			DeckUri:      deckURI,
 		})
 	}
 

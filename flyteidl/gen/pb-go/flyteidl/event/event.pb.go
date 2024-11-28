@@ -1237,7 +1237,8 @@ type ExternalResourceInfo struct {
 	CacheStatus core.CatalogCacheStatus `protobuf:"varint,5,opt,name=cache_status,json=cacheStatus,proto3,enum=flyteidl.core.CatalogCacheStatus" json:"cache_status,omitempty"`
 	// log information for the external resource execution
 	Logs []*core.TaskLog `protobuf:"bytes,6,rep,name=logs,proto3" json:"logs,omitempty"`
-	// TODO @hamersaw - docs
+	// String location uniquely identifying where the deck HTML file is
+	// NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
 	DeckUri string `protobuf:"bytes,7,opt,name=deck_uri,json=deckUri,proto3" json:"deck_uri,omitempty"`
 }
 

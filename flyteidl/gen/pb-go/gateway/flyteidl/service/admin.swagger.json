@@ -8675,7 +8675,7 @@
         },
         "deck_uri": {
           "type": "string",
-          "title": "TODO @hamersaw - docs"
+          "title": "String location uniquely identifying where the deck HTML file is\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."

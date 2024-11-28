@@ -934,7 +934,8 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
   logs: TaskLog[] = [];
 
   /**
-   * TODO @hamersaw - docs
+   * String location uniquely identifying where the deck HTML file is
+   * NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
    *
    * @generated from field: string deck_uri = 7;
    */
