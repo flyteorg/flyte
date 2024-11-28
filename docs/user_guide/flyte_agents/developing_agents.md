@@ -49,7 +49,8 @@ When users use the `create` method to create a new job, with its job ID, they ca
 check the execution state is succeeded or not.
 
 Exceptional `delete` case:
-If users interrupt task during its running, FlytePropeller will invoke the `delete` method to the corresponding job.
+If users interrupt a task while it is running, FlytePropeller will invoke the `delete` method to the corresponding 
+job.
 
 ```
 
