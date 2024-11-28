@@ -287,6 +287,9 @@ message ExternalResourceInfo {
 
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
+
+    // TODO @hamersaw - docs
+    string deck_uri = 7;
 }
 
 

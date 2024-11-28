@@ -22534,6 +22534,7 @@
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] ExternalResourceInfo phase
                  * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] ExternalResourceInfo cacheStatus
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
+                 * @property {string|null} [deckUri] ExternalResourceInfo deckUri
                  */
     
                 /**
@@ -22601,6 +22602,14 @@
                 ExternalResourceInfo.prototype.logs = $util.emptyArray;
     
                 /**
+                 * ExternalResourceInfo deckUri.
+                 * @member {string} deckUri
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.deckUri = "";
+    
+                /**
                  * Creates a new ExternalResourceInfo instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.ExternalResourceInfo
@@ -22637,6 +22646,8 @@
                     if (message.logs != null && message.logs.length)
                         for (var i = 0; i < message.logs.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                        writer.uint32(/* id 7, wireType 2 =*/58).string(message.deckUri);
                     return writer;
                 };
     
@@ -22677,6 +22688,9 @@
                             if (!(message.logs && message.logs.length))
                                 message.logs = [];
                             message.logs.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
+                        case 7:
+                            message.deckUri = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22743,6 +22757,9 @@
                                 return "logs." + error;
                         }
                     }
+                    if (message.deckUri != null && message.hasOwnProperty("deckUri"))
+                        if (!$util.isString(message.deckUri))
+                            return "deckUri: string expected";
                     return null;
                 };
     

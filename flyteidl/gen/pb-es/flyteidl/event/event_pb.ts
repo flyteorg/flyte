@@ -933,6 +933,13 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
    */
   logs: TaskLog[] = [];
 
+  /**
+   * TODO @hamersaw - docs
+   *
+   * @generated from field: string deck_uri = 7;
+   */
+  deckUri = "";
+
   constructor(data?: PartialMessage<ExternalResourceInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -947,6 +954,7 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
     { no: 4, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 5, name: "cache_status", kind: "enum", T: proto3.getEnumType(CatalogCacheStatus) },
     { no: 6, name: "logs", kind: "message", T: TaskLog, repeated: true },
+    { no: 7, name: "deck_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceInfo {

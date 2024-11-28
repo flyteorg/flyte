@@ -8672,6 +8672,10 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "title": "log information for the external resource execution"
+        },
+        "deck_uri": {
+          "type": "string",
+          "title": "TODO @hamersaw - docs"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
