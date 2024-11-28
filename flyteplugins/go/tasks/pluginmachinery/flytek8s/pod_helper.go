@@ -348,6 +348,15 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
+	// Override pod template if necessary
+	if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+		podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+		if err != nil {
+			return nil, nil, err
+		}
+		primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName
+	}
+
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
 		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
@@ -426,14 +435,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// Override container image if necessary
 	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
-	}
-
-	// Override pod template if necessary
-	if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
-		podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
-		if err != nil {
-			return nil, nil, err
-		}
 	}
 
 	return podSpec, objectMeta, nil
