@@ -45,10 +45,11 @@ To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/fl
 
 ```{note}
 
-When users use create method to create a new job, with its job ID, they can use get method and job ID to check the execution state, if it is succeed or not.
+When users use the `create` method to create a new job, with its job ID, they can use the `get` method with job ID to 
+check the execution state is succeeded or not.
 
-Exceptional delete case:
-If users interrupt task during it's running, FlytePropeller will invoke delete method to corresponding job.
+Exceptional `delete` case:
+If users interrupt task during its running, FlytePropeller will invoke the `delete` method to the corresponding job.
 
 ```
 
