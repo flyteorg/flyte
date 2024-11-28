@@ -71,7 +71,7 @@ func getPluginMetricKey(pluginID, taskType string) string {
 	return taskType + "_" + pluginID
 }
 
-func (p *pluginRequestedTransition) AddDeckURI(ctx context.Context, tCtx *taskExecutionContext) {
+func (p *pluginRequestedTransition) AddDeckURI(tCtx *taskExecutionContext) {
 	var deckURI *storage.DataReference
 	deckURIValue := tCtx.ow.GetDeckPath()
 	deckURI = &deckURIValue
@@ -504,7 +504,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	// The deck should be accessible even if the task is still running or has failed.
 	// It's possible that the deck URI may not exist in remote storage yet or will never exist.
 	// So, it is console's responsibility to handle the case when the deck URI actually does not exist.
-	pluginTrns.AddDeckURI(ctx, tCtx)
+	pluginTrns.AddDeckURI(tCtx)
 
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
