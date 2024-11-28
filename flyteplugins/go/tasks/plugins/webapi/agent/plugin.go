@@ -45,6 +45,7 @@ type ResourceWrapper struct {
 	Message    string
 	LogLinks   []*flyteIdl.TaskLog
 	CustomInfo *structpb.Struct
+	AgentError *admin.AgentError
 }
 
 // IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
@@ -184,7 +185,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
-		logger.Errorf(ctx, "failed to write output with err %s", err.Error())
+		logger.Errorf(ctx, "failed to receive from server %s", err.Error())
 		return nil, nil, err
 	}
 	if in.GetHeader() == nil {
@@ -200,6 +201,7 @@ func (p *Plugin) ExecuteTaskSync(
 		Message:    resource.GetMessage(),
 		LogLinks:   resource.GetLogLinks(),
 		CustomInfo: resource.GetCustomInfo(),
+		AgentError: resource.GetAgentError(),
 	}, err
 }
 
@@ -260,6 +262,10 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
+	errorCode := pluginErrors.TaskFailedWithError
+	if resource.AgentError != nil && resource.AgentError.GetCode() != "" {
+		errorCode = resource.AgentError.GetCode()
+	}
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
@@ -278,11 +284,10 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase.\n"+resource.Message, taskInfo), nil
+		return core.PhaseInfoFailure(errorCode, "failed to run the job with aborted phase.", taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
+		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
-
 	// The default phase is undefined.
 	if resource.Phase != flyteIdl.TaskExecution_UNDEFINED {
 		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)

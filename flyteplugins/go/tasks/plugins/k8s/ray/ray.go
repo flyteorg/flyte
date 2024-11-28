@@ -374,6 +374,8 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		return v1.PodTemplateSpec{}, err
 	}
 
+	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
+
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,
 		ObjectMeta: *objectMeta,
@@ -501,6 +503,8 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
+
+	basePodSpec = flytek8s.AddTolerationsForExtendedResources(basePodSpec)
 
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *basePodSpec,

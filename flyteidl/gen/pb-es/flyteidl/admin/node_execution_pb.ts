@@ -337,6 +337,13 @@ export class NodeExecutionMetaData extends Message<NodeExecutionMetaData> {
    */
   isArray = false;
 
+  /**
+   * Whether this node is an eager node.
+   *
+   * @generated from field: bool is_eager = 6;
+   */
+  isEager = false;
+
   constructor(data?: PartialMessage<NodeExecutionMetaData>) {
     super();
     proto3.util.initPartial(data, this);
@@ -350,6 +357,7 @@ export class NodeExecutionMetaData extends Message<NodeExecutionMetaData> {
     { no: 3, name: "spec_node_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "is_dynamic", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 5, name: "is_array", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeExecutionMetaData {

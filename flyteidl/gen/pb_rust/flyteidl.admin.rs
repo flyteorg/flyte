@@ -177,6 +177,9 @@ pub struct Resource {
     /// Custom data specific to the agent.
     #[prost(message, optional, tag="6")]
     pub custom_info: ::core::option::Option<::prost_types::Struct>,
+    /// The error raised during execution
+    #[prost(message, optional, tag="7")]
+    pub agent_error: ::core::option::Option<AgentError>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -346,6 +349,51 @@ pub mod get_task_logs_response {
         Header(super::GetTaskLogsResponseHeader),
         #[prost(message, tag="2")]
         Body(super::GetTaskLogsResponseBody),
+    }
+}
+/// Error message to propagate detailed errors from agent executions to the execution
+/// engine.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AgentError {
+    /// A simplified code for errors, so that we can provide a glossary of all possible errors.
+    #[prost(string, tag="1")]
+    pub code: ::prost::alloc::string::String,
+    /// An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
+    #[prost(enumeration="agent_error::Kind", tag="3")]
+    pub kind: i32,
+    /// Defines the origin of the error (system, user, unknown).
+    #[prost(enumeration="super::core::execution_error::ErrorKind", tag="4")]
+    pub origin: i32,
+}
+/// Nested message and enum types in `AgentError`.
+pub mod agent_error {
+    /// Defines a generic error type that dictates the behavior of the retry strategy.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Kind {
+        NonRecoverable = 0,
+        Recoverable = 1,
+    }
+    impl Kind {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Kind::NonRecoverable => "NON_RECOVERABLE",
+                Kind::Recoverable => "RECOVERABLE",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "NON_RECOVERABLE" => Some(Self::NonRecoverable),
+                "RECOVERABLE" => Some(Self::Recoverable),
+                _ => None,
+            }
+        }
     }
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
@@ -2274,6 +2322,9 @@ pub struct NodeExecutionMetaData {
     /// array nodes from other nodes which can have is_parent_node as true.
     #[prost(bool, tag="5")]
     pub is_array: bool,
+    /// Whether this node is an eager node.
+    #[prost(bool, tag="6")]
+    pub is_eager: bool,
 }
 /// Request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
