@@ -1,3 +1,3 @@
 from setuptools import setup, find_packages
 
-setup(version='1.13.1')
+setup(version='1.13.7')
