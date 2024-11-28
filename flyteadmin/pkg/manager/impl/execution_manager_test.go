@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -238,8 +239,11 @@ func setDefaultTaskCallbackForExecTest(repository interfaces.Repository) {
 
 func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 	mockStorage := commonMocks.GetMockStorageClient()
+	var mtx sync.RWMutex
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		mtx.RLock()
+		defer mtx.RUnlock()
 		if val, ok := mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).Store[reference]; ok {
 			_ = proto.Unmarshal(val, msg)
 			return nil
@@ -252,6 +256,8 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 		if err != nil {
 			return err
 		}
+		mtx.Lock()
+		defer mtx.Unlock()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).Store[reference] = bytes
 		return nil
 	}
@@ -298,8 +304,7 @@ func TestCreateExecution(t *testing.T) {
 		}}
 	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {
-		return transformers.CreateProjectModel(&admin.Project{
-			Labels: &labels}), nil
+		return transformers.CreateProjectModel(&admin.Project{Labels: &labels}), nil
 	}
 
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
@@ -376,8 +381,6 @@ func TestCreateExecution(t *testing.T) {
 
 	mockConfig := getMockExecutionsConfigProvider()
 	mockConfig.(*runtimeMocks.MockConfigurationProvider).AddQualityOfServiceConfiguration(qosProvider)
-
-	execManager := NewExecutionManager(repository, r, mockConfig, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	request := testutils.GetExecutionRequest()
 	request.Spec.Metadata = &admin.ExecutionMetadata{
 		Principal: "unused - populated from authenticated context",
@@ -386,16 +389,18 @@ func TestCreateExecution(t *testing.T) {
 	request.Spec.ClusterAssignment = &clusterAssignment
 	request.Spec.ExecutionClusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 
+	execManager := NewExecutionManager(repository, r, mockConfig, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)
 	ctx := identity.WithContext(context.Background())
 	response, err := execManager.CreateExecution(ctx, request, requestedAt)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
 		Id: &executionIdentifier,
 	}
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.True(t, proto.Equal(expectedResponse.Id, response.Id))
 
 	// TODO: Check for offloaded inputs
@@ -626,7 +631,6 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 }
 
 func TestCreateExecutionPropellerFailure(t *testing.T) {
-	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABC")
@@ -660,7 +664,6 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 		Principal: "unused - populated from authenticated context",
 	}
 	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
-	request.Spec.ClusterAssignment = &clusterAssignment
 
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)
@@ -2001,6 +2004,10 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		return expectedErr
+	}
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+		return nil
 	}
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
@@ -5457,18 +5464,6 @@ func TestGetClusterAssignment(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &clusterAssignment))
 	})
-	t.Run("value from request", func(t *testing.T) {
-		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
-		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
-			Project: workflowIdentifier.Project,
-			Domain:  workflowIdentifier.Domain,
-			Spec: &admin.ExecutionSpec{
-				ClusterAssignment: &reqClusterAssignment,
-			},
-		})
-		assert.NoError(t, err)
-		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
-	})
 	t.Run("value from config", func(t *testing.T) {
 		customCP := "my_cp"
 		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
@@ -5492,6 +5487,103 @@ func TestGetClusterAssignment(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, customCP, ca.GetClusterPoolName())
+	})
+	t.Run("value from request matches value from config", func(t *testing.T) {
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
+		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ClusterAssignment: &reqClusterAssignment,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
+	})
+	t.Run("no value in DB nor in config, takes value from request", func(t *testing.T) {
+		mockConfig := getMockExecutionsConfigProvider()
+
+		executionManager := ExecutionManager{
+			resourceManager: &managerMocks.MockResourceManager{},
+			config:          mockConfig,
+		}
+
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
+		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ClusterAssignment: &reqClusterAssignment,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
+	})
+	t.Run("empty value in DB, takes value from request", func(t *testing.T) {
+		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
+		clusterPoolAsstProvider.OnGetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
+			workflowIdentifier.GetDomain(): runtimeInterfaces.ClusterPoolAssignment{
+				Pool: "",
+			},
+		})
+		mockConfig := getMockExecutionsConfigProvider()
+		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
+
+		executionManager := ExecutionManager{
+			resourceManager: &managerMocks.MockResourceManager{},
+			config:          mockConfig,
+		}
+
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
+		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ClusterAssignment: &reqClusterAssignment,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
+	})
+	t.Run("value from request doesn't match value from config", func(t *testing.T) {
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
+		_, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ClusterAssignment: &reqClusterAssignment,
+			},
+		})
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.InvalidArgument, st.Code())
+		assert.Equal(t, `execution with project "project" and domain "domain" cannot run on cluster pool "swimming-pool", because its configured to run on pool "gpu"`, st.Message())
+	})
+	t.Run("db error", func(t *testing.T) {
+		expected := errors.New("fail db")
+		resourceManager.GetResourceFunc = func(ctx context.Context,
+			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
+			})
+			return &managerInterfaces.ResourceResponse{
+				Attributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_ClusterAssignment{
+						ClusterAssignment: &clusterAssignment,
+					},
+				},
+			}, expected
+		}
+
+		_, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		})
+
+		assert.Equal(t, expected, err)
 	})
 }
 

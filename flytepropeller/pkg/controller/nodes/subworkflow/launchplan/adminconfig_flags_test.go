@@ -155,4 +155,18 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cache-resync-duration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultAdminConfig.CacheResyncDuration.String()
+
+			cmdFlags.Set("cache-resync-duration", testValue)
+			if vString, err := cmdFlags.GetString("cache-resync-duration"); err == nil {
+				testDecodeJson_AdminConfig(t, fmt.Sprintf("%v", vString), &actual.CacheResyncDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -63,7 +64,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If we fall in here, that means that the full path is deterministic and we should check for existence.
 	if len(req.Filename) > 0 && len(req.FilenameRoot) > 0 {
 		knownLocation, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-			req.Project, req.Domain, req.FilenameRoot, req.Filename)
+			req.Org, req.Project, req.Domain, req.FilenameRoot, req.Filename)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create storage location. Error %v", err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
@@ -125,7 +126,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		prefix = base32.StdEncoding.EncodeToString(req.ContentMd5)
 	}
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-		req.Project, req.Domain, prefix, req.Filename)
+		req.Org, req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create shardedStorageLocation. Error %v", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
@@ -181,7 +182,17 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "no deckUrl found for request [%+v]", req)
 	}
 
-	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(nativeURL), storage.SignedURLProperties{
+	ref := storage.DataReference(nativeURL)
+	meta, err := s.dataStore.Head(ctx, ref)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to head object before signing url. Error: %v", err)
+	}
+
+	if !meta.Exists() {
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "object not found")
+	}
+
+	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, ref, storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
 		ExpiresIn: req.ExpiresIn.AsDuration(),
 	})
@@ -287,6 +298,9 @@ func (s Service) validateCreateDownloadLinkRequest(req *service.CreateDownloadLi
 func createStorageLocation(ctx context.Context, store *storage.DataStore,
 	cfg config.DataProxyUploadConfig, keyParts ...string) (storage.DataReference, error) {
 
+	keyParts = lo.Filter(keyParts, func(key string, _ int) bool {
+		return key != ""
+	})
 	storagePath, err := store.ConstructReference(ctx, store.GetBaseContainerFQN(ctx),
 		append([]string{cfg.StoragePrefix}, keyParts...)...)
 	if err != nil {

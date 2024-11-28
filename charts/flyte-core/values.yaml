@@ -319,7 +319,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
@@ -610,6 +609,9 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
+    targetGCPercent: 70
 
 # Database configuration
 db:

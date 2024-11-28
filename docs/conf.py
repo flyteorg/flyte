@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import logging
 import sys
+import inspect
 
 import sphinx.application
 import sphinx.errors
@@ -58,8 +59,8 @@ extensions = [
     "sphinx.ext.graphviz",
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
+    "sphinx.ext.linkcode",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
     "sphinx-prompt",
     "sphinx_copybutton",
@@ -156,7 +157,8 @@ redirects = {
     "flyte_fundamentals/visualizing_task_input_and_output": "../user_guide/flyte_fundamentals/visualizing_task_input_and_output.html",
 
     # flytesnacks
-    "flytesnacks/contribute": "../community/contribute_docs.html",
+    "flytesnacks/contribute": "../community/contribute/contribute_docs.html",
+    "community/contribute": "community/contribute/contribute_code.html",
     "flytesnacks/integrations": "../flytesnacks/integrations/index.html",
     "flytesnacks/tutorials": "../flytesnacks/tutorials.html",
 
@@ -723,6 +725,67 @@ class CustomWarningSuppressor(logging.Filter):
             return False
 
         return True
+
+
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    if domain != "py":
+        return None
+
+    import flytekit
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    if inspect.isfunction(obj):
+        obj = inspect.unwrap(obj)
+    try:
+        fn = inspect.getsourcefile(obj)
+    except TypeError:
+        fn = None
+    if not fn or fn.endswith("__init__.py"):
+        try:
+            fn = inspect.getsourcefile(sys.modules[obj.__module__])
+        except (TypeError, AttributeError, KeyError):
+            fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except (OSError, TypeError):
+        lineno = None
+
+    linespec = f"#L{lineno:d}-L{lineno + len(source) - 1:d}" if lineno else ""
+
+    startdir = Path(flytekit.__file__).parent.parent
+    try:
+        fn = os.path.relpath(fn, start=startdir).replace(os.path.sep, "/")
+    except ValueError:
+        return None
+
+    if not fn.startswith("flytekit/"):
+        return None
+
+    if flytekit.__version__ == "dev":
+        tag = "master"
+    else:
+        tag = f"v{flytekit.__version__}"
+
+    return f"https://github.com/flyteorg/flytekit/blob/{tag}/{fn}{linespec}"
 
 
 def setup(app: sphinx.application.Sphinx) -> None:

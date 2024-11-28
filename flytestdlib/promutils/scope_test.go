@@ -60,7 +60,7 @@ func TestMetricsScope(t *testing.T) {
 	}
 	t.Run("Counter", func(t *testing.T) {
 		m := s.MustNewCounter("xc", description)
-		assert.Equal(t, `Desc{fqName: "test:xc", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xc", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewCounterVec("xcv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -73,7 +73,7 @@ func TestMetricsScope(t *testing.T) {
 
 	t.Run("Histogram", func(t *testing.T) {
 		m := s.MustNewHistogram("xh", description)
-		assert.Equal(t, `Desc{fqName: "test:xh", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xh", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewHistogramVec("xhv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -82,14 +82,20 @@ func TestMetricsScope(t *testing.T) {
 		assert.Panics(t, func() {
 			_ = s.MustNewHistogramVec("xhv", description)
 		})
+		buckets := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0}
+		mvo := s.MustNewHistogramVecWithOptions("xho", description, HistogramOptions{Buckets: buckets})
+		assert.NotNil(t, mvo)
+		assert.Panics(t, func() {
+			_ = s.MustNewHistogramVecWithOptions("xho", description, HistogramOptions{Buckets: buckets})
+		})
 	})
 
 	t.Run("Summary", func(t *testing.T) {
 		m := s.MustNewSummary("xs", description)
-		assert.Equal(t, `Desc{fqName: "test:xs", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xs", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mco, err := s.NewSummaryWithOptions("xsco", description, SummaryOptions{Objectives: map[float64]float64{0.5: 0.05, 1.0: 0.0}})
 		assert.Nil(t, err)
-		assert.Equal(t, `Desc{fqName: "test:xsco", help: "some x", constLabels: {}, variableLabels: []}`, mco.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xsco", help: "some x", constLabels: {}, variableLabels: {}}`, mco.Desc().String())
 		mv := s.MustNewSummaryVec("xsv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -102,7 +108,7 @@ func TestMetricsScope(t *testing.T) {
 
 	t.Run("Gauge", func(t *testing.T) {
 		m := s.MustNewGauge("xg", description)
-		assert.Equal(t, `Desc{fqName: "test:xg", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xg", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewGaugeVec("xgv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -117,7 +123,7 @@ func TestMetricsScope(t *testing.T) {
 		m := s.MustNewStopWatch("xt", description, time.Second)
 		asDesc, ok := m.Observer.(prometheus.Metric)
 		assert.True(t, ok)
-		assert.Equal(t, `Desc{fqName: "test:xt_s", help: "some x", constLabels: {}, variableLabels: []}`, asDesc.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xt_s", help: "some x", constLabels: {}, variableLabels: {}}`, asDesc.Desc().String())
 		assert.Panics(t, func() {
 			_ = s.MustNewStopWatch("xt", description, time.Second)
 		})
@@ -162,6 +168,46 @@ func TestStopWatchVec_WithLabelValues(t *testing.T) {
 	assert.NotNil(t, s)
 	i := s.Start()
 	assert.Equal(t, time.Millisecond, i.outputScale)
+	assert.NotNil(t, i.start)
+	i.Stop()
+}
+
+func TestHistogramStopWatch_Start(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	timer := stopwatch.Start()
+	assert.Equal(t, time.Second, timer.outputScale)
+	assert.NotNil(t, timer.start)
+}
+
+func TestHistogramStopWatch_Observe(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	stopwatch.Observe(time.Now(), time.Now().Add(time.Second))
+}
+
+func TestHistogramStopWatch_Time(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	stopwatch.Time(func() {
+	})
+}
+
+func TestHistogramStopWatchVec_WithLabelValues(t *testing.T) {
+	scope := NewTestScope()
+	vec, err := scope.NewHistogramStopWatchVec("yt"+rand.String(3), "timer", "workflow", "label")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, vec.outputScale)
+	stopwatch := vec.WithLabelValues("my_wf", "something")
+	assert.NotNil(t, stopwatch)
+	i := stopwatch.Start()
+	assert.Equal(t, time.Second, i.outputScale)
 	assert.NotNil(t, i.start)
 	i.Stop()
 }
