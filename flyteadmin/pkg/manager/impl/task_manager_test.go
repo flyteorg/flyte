@@ -105,10 +105,10 @@ func TestCreateTask_DuplicateTaskRegistration(t *testing.T) {
 		func(input interfaces.Identifier) (models.Task, error) {
 			return models.Task{
 				TaskKey: models.TaskKey{
-					Project: taskIdentifier.Project,
-					Domain:  taskIdentifier.Domain,
-					Name:    taskIdentifier.Name,
-					Version: taskIdentifier.Version,
+					Project: taskIdentifier.GetProject(),
+					Domain:  taskIdentifier.GetDomain(),
+					Name:    taskIdentifier.GetName(),
+					Version: taskIdentifier.GetVersion(),
 				},
 				Digest: []byte{
 					0xbf, 0x79, 0x61, 0x1c, 0xf5, 0xc1, 0xfb, 0x4c, 0xf8, 0xf4, 0xc4, 0x53, 0x5f, 0x8f, 0x73, 0xe2, 0x26, 0x5a,
