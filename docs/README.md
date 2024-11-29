@@ -2,35 +2,53 @@
 
 ## Prerequisites
 
-* `conda` (We recommend Miniconda installed with an [official installer](https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links))
+* `uv` 
 
-* [`conda-lock`](https://github.com/conda/conda-lock)
-
-
-## Set up the build environment
-
-In the `flyteorg/flyte` root directory do:
+For MacOS / Linux:
 
 ```bash
-$ conda-lock install --name monodocs-env monodocs-environment.lock.yaml
-$ conda activate monodocs-env
-$ pip install ./flyteidl
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-This creates a new environment called `monodocs-env` with all the dependencies needed to build the docs. You can choose a different environment name if you like.
+For Windows, use irm to download the script and execute it with iex:
 
+```bash
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.5.5/install.ps1 | iex"
+```
+
+To install via PyPi:
+
+```bash 
+
+pipx install uv
+```
+
+or  
+
+```bash 
+
+ pip install uv
+```
+
+
+## Setup the build environment
+
+```bash
+uv sync
+
+uv pip install ./flyteidl
+
+```
 
 ## Building the docs
 
-In the `flyteorg/flyte` root directory make sure you have activated the `monodocs-env` (or whatever you called it) environment and do:
-
 ```bash
-# need to set this to a fake value to build the docs locally
-$ export DOCSEARCH_API_KEY=fake-api-key
-```
+export DOCSEARCH_API_KEY=fake-api-key
+export FLYTEKIT_LOCAL_PATH=<PATH_TO_LOCAL_FLYTEKIT_REPO>
+export FLYTESNACKS_LOCAL_PATH=<PATH_TO_LOCAL_FLYTESNACKS_REPO>
 
-```bash
-$ make docs
+uv run make docs
 ```
-
 The resulting `html` files will be in `docs/_build/html`.
