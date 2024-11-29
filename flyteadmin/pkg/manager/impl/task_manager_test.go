@@ -99,6 +99,67 @@ func TestCreateTask(t *testing.T) {
 	assert.NotNil(t, response)
 }
 
+func TestCreateTask_DuplicateTaskRegistration(t *testing.T) {
+	mockRepository := getMockTaskRepository()
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
+		func(input interfaces.Identifier) (models.Task, error) {
+			return models.Task{
+				TaskKey: models.TaskKey{
+					Project: taskIdentifier.Project,
+					Domain:  taskIdentifier.Domain,
+					Name:    taskIdentifier.Name,
+					Version: taskIdentifier.Version,
+				},
+				Digest: []byte{
+					0xbf, 0x79, 0x61, 0x1c, 0xf5, 0xc1, 0xfb, 0x4c, 0xf8, 0xf4, 0xc4, 0x53, 0x5f, 0x8f, 0x73, 0xe2, 0x26, 0x5a,
+					0x18, 0x4a, 0xb7, 0x66, 0x98, 0x3c, 0xab, 0x2, 0x6c, 0x9, 0x9b, 0x90, 0xec, 0x8f},
+			}, nil
+		})
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetCreateCallback(func(input models.Task, descriptionEntity *models.DescriptionEntity) error {
+		return adminErrors.NewFlyteAdminErrorf(codes.AlreadyExists, "task already exists")
+	})
+	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
+		mockScope.NewTestScope())
+	request := testutils.GetValidTaskRequest()
+	_, err := taskManager.CreateTask(context.Background(), request)
+	assert.Error(t, err)
+	flyteErr, ok := err.(adminErrors.FlyteAdminError)
+	assert.True(t, ok, "Error should be of type FlyteAdminError")
+	assert.Equal(t, codes.AlreadyExists, flyteErr.Code(), "Error code should be AlreadyExists")
+	assert.Contains(t, flyteErr.Error(), "task with identical structure already exists")
+	differentTemplate := &core.TaskTemplate{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+		},
+		Type: "type",
+		Metadata: &core.TaskMetadata{
+			Runtime: &core.RuntimeMetadata{
+				Version: "runtime version 2",
+			},
+		},
+		Interface: &core.TypedInterface{},
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image: "image",
+				Command: []string{
+					"command",
+				},
+			},
+		},
+	}
+	request.Spec.Template = differentTemplate
+	_, err = taskManager.CreateTask(context.Background(), request)
+	assert.Error(t, err)
+	flyteErr, ok = err.(adminErrors.FlyteAdminError)
+	assert.True(t, ok, "Error should be of type FlyteAdminError")
+	assert.Equal(t, codes.InvalidArgument, flyteErr.Code(), "Error code should be InvalidArgument")
+	assert.Contains(t, flyteErr.Error(), "name task with different structure already exists.")
+}
+
 func TestCreateTask_ValidationError(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
