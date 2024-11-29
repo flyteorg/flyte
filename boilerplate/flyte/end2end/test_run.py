@@ -5,7 +5,7 @@ import time
 import traceback
 from typing import Dict, List, Optional
 
-import click
+import pytest
 import requests
 from flytekit.configuration import Config
 from flytekit.models.core.execution import WorkflowExecutionPhase
@@ -14,7 +14,6 @@ from flytekit.remote.executions import FlyteWorkflowExecution
 
 WAIT_TIME = 10
 MAX_ATTEMPTS = 200
-
 
 def execute_workflow(
     remote: FlyteRemote,
@@ -27,7 +26,6 @@ def execute_workflow(
     wf = remote.fetch_workflow(name=workflow_name, version=version)
     return remote.execute(wf, inputs=inputs, wait=False, cluster_pool=cluster_pool_name)
 
-
 def executions_finished(
     executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
 ) -> bool:
@@ -35,7 +33,6 @@ def executions_finished(
         if not all([execution.is_done for execution in executions]):
             return False
     return True
-
 
 def sync_executions(
     remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
@@ -50,12 +47,10 @@ def sync_executions(
         print("GOT TO THE EXCEPT")
         print("COUNT THIS!")
 
-
 def report_executions(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]):
     for executions in executions_by_wfgroup.values():
         for execution in executions:
             print(execution)
-
 
 def schedule_workflow_groups(
     tag: str,
@@ -65,10 +60,6 @@ def schedule_workflow_groups(
     parsed_manifest: List[dict],
     cluster_pool_name: Optional[str] = None,
 ) -> Dict[str, bool]:
-    """
-    Schedule workflows executions for all workflow groups and return True if all executions succeed, otherwise
-    return False.
-    """
     executions_by_wfgroup = {}
     # Schedule executions for each workflow group,
     for wf_group in workflow_groups:
@@ -120,7 +111,6 @@ def schedule_workflow_groups(
         results[wf_group] = len(non_succeeded_executions) == 0
     return results
 
-
 def valid(workflow_group, parsed_manifest):
     """
     Return True if a workflow group is contained in parsed_manifest,
@@ -128,21 +118,27 @@ def valid(workflow_group, parsed_manifest):
     """
     return workflow_group in set(wf_group["name"] for wf_group in parsed_manifest)
 
+def test_run(setup_flytesnacks_env):
 
-def run(
-    flytesnacks_release_tag: str,
-    priorities: List[str],
-    config_file_path,
-    terminate_workflow_on_failure: bool,
-    test_project_name: str,
-    test_project_domain: str,
-    cluster_pool_name: Optional[str] = None,
-) -> List[Dict[str, str]]:
+    env = setup_flytesnacks_env
+
+    flytesnacks_release_tag = env["flytesnacks_release_tag"]
+    priorities = env["priorities"]
+    config_file_path = env["config_file"]
+    terminate_workflow_on_failure = env["terminate_workflow_on_failure"]
+    test_project_name = env["test_project_name"]
+    test_project_domain = env["test_project_domain"]
+    cluster_pool_name = env["cluster_pool_name"]
+    return_non_zero_on_failure = env["return_non_zero_on_failure"]
+
     remote = FlyteRemote(
         Config.auto(config_file=config_file_path),
         test_project_name,
         test_project_domain,
     )
+
+    # assert flytesnacks_release_tag == "v1.0.0"
+    # assert config_file_path == "/path/to/config.yaml"
 
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
@@ -152,7 +148,6 @@ def run(
     )
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
-    workflow_groups = []
     workflow_groups = (
         ["lite"]
         if "lite" in priorities
@@ -210,75 +205,12 @@ def run(
             "color": background_color,
         }
         results.append(result)
-    return results
 
-
-@click.command()
-@click.argument("flytesnacks_release_tag")
-@click.argument("priorities")
-@click.argument("config_file")
-@click.option(
-    "--return_non_zero_on_failure",
-    default=False,
-    is_flag=True,
-    help="Return a non-zero exit status if any workflow fails",
-)
-@click.option(
-    "--terminate_workflow_on_failure",
-    default=False,
-    is_flag=True,
-    help="Abort failing workflows upon exit",
-)
-@click.option(
-    "--test_project_name",
-    default="flytesnacks",
-    type=str,
-    is_flag=False,
-    help="Name of project to run functional tests on",
-)
-@click.option(
-    "--test_project_domain",
-    default="development",
-    type=str,
-    is_flag=False,
-    help="Name of domain in project to run functional tests on",
-)
-@click.argument(
-    "cluster_pool_name",
-    required=False,
-    type=str,
-    default=None,
-)
-def cli(
-    flytesnacks_release_tag,
-    priorities,
-    config_file,
-    return_non_zero_on_failure,
-    terminate_workflow_on_failure,
-    test_project_name,
-    test_project_domain,
-    cluster_pool_name,
-):
-    print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
-    results = run(
-        flytesnacks_release_tag,
-        priorities,
-        config_file,
-        terminate_workflow_on_failure,
-        test_project_name,
-        test_project_domain,
-        cluster_pool_name,
-    )
-
-    # Write a json object in its own line describing the result of this run to stdout
     print(f"Result of run:\n{json.dumps(results)}")
 
-    # Return a non-zero exit code if core fails
     if return_non_zero_on_failure:
         for result in results:
             if result["status"] not in ("passing", "coming soon"):
-                sys.exit(1)
+                pytest.fail("Workflow execution failed")
 
-
-if __name__ == "__main__":
-    cli()
+    return results 
