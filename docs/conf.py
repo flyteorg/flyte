@@ -66,7 +66,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_docsearch",
     "sphinxext.remoteliteralinclude",
-    "sphinx_issues",
+    #"sphinx_issues",
     "sphinx_click",
     "sphinx_design",
     "sphinx_reredirects",
