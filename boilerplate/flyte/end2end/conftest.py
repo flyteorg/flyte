@@ -1,9 +1,9 @@
 import pytest
 
 def pytest_addoption(parser):
-    parser.addoption("--flytesnacks_release_tag", required=True, help="Flytesnacks 發行標籤")
-    parser.addoption("--priorities", required=True, help="測試優先級")
-    parser.addoption("--config_file", required=True, help="設定檔案路徑")
+    parser.addoption("--flytesnacks_release_tag", required=True)
+    parser.addoption("--priorities", required=True)
+    parser.addoption("--config_file", required=True)
     parser.addoption(
         "--return_non_zero_on_failure",
         action="store_true",
