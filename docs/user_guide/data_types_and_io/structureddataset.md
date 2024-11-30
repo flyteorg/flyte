@@ -68,7 +68,7 @@ First, initialize column types you want to extract from the `StructuredDataset`.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 31-32
+:lines: 36-37
 ```
 
 Define a task that opens a structured dataset by calling `all()`.
@@ -78,7 +78,7 @@ For instance, you can use ``pa.Table`` to convert the Pandas DataFrame to a PyAr
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 42-52
+:lines: 47-57
 ```
 
 The code may result in runtime failures if the columns do not match.
@@ -91,7 +91,7 @@ and enable the CSV serialization by annotating the structured dataset with the C
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 58-72
+:lines: 63-77
 ```
 
 ## Storage driver and location
@@ -230,14 +230,14 @@ and the byte format, which in this case is `PARQUET`.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 128-130
+:lines: 133-135
 ```
 
 You can now use `numpy.ndarray` to deserialize the parquet file to NumPy and serialize a task's output (NumPy array) to a parquet file.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 135-148
+:lines: 140-153
 ```
 
 :::{note}
@@ -248,7 +248,7 @@ You can run the code locally as follows:
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 152-156
+:lines: 157-161
 ```
 
 ### The nested typed columns
@@ -261,7 +261,7 @@ Nested field StructuredDataset should be run when flytekit version > 1.11.0.
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 158-285
+:lines: 163-290
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
