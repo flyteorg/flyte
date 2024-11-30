@@ -117,8 +117,8 @@ func ToEmailMessageFromWorkflowExecutionEvent(
 	execution *admin.Execution) *admin.EmailMessage {
 
 	var emailBody string
-	if emailNotification.Template != "" {
-		emailBody = emailNotification.Template
+	if emailNotification.GetTemplate() != "" {
+		emailBody = emailNotification.GetTemplate()
 	} else {
 		emailBody = config.NotificationsEmailerConfig.Body
 	}
