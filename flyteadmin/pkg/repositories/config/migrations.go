@@ -1285,6 +1285,25 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return nil
 		},
 	},
+	{
+		ID: "2024-11-30-add-friendly-name-to-execution-tags",
+		Migrate: func(tx *gorm.DB) error {
+			// Alter table and add new column `friendly_name`
+			if err := tx.Exec("ALTER TABLE execution_tags ADD COLUMN friendly_name varchar(255);").Error; err != nil {
+				return err
+			}
+	
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			// Drop the `friendly_name` column
+			if err := tx.Exec("ALTER TABLE execution_tags DROP COLUMN IF EXISTS friendly_name;").Error; err != nil {
+				return err
+			}
+	
+			return nil
+		},
+	},	
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)

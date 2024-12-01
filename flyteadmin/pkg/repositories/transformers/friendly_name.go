@@ -6,12 +6,12 @@ import (
 )
 
 // Length of the random string used for generating hash keys; can be any positive integer
-const RandStringLength = 20
+const defaultFriendlyNameLength = 20
 
 /* #nosec */
 func CreateFriendlyName(seed int64) string {
 	rand.Seed(seed)
-	hashKey := []byte(rand.String(RandStringLength))
+	hashKey := []byte(rand.String(defaultFriendlyNameLength))
 	// Ignoring the error as it's guaranteed hash key longer than result in this context.
 	result, _ := humanhash.Humanize(hashKey, 4)
 	return result
