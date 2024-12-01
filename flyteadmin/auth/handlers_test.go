@@ -396,22 +396,26 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	mockAuthCtx.OnCookieManager().Return(&cookieManager)
 	mockAuthCtx.OnOptions().Return(&config.Config{})
 	handler := GetHTTPRequestCookieToMetadataHandler(&mockAuthCtx)
-	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+
+	accessTokenCookie1, err := NewSecureCookie(accessTokenCookieNameSplitFirst, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 
-	accessTokenCookie, err := NewSecureCookie(accessTokenCookieNameSplitFirst, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookie2, err := NewSecureCookie(accessTokenCookieNameSplitSecond, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
-	req.AddCookie(&accessTokenCookie)
 
-	accessTokenCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplitSecond, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	idCookie, err := NewSecureCookie(idTokenCookieName, "x.y.z", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
-	req.AddCookie(&accessTokenCookieSplit)
 
-	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c.d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
-	assert.NoError(t, err)
-	req.AddCookie(&idCookie)
+	t.Run("access token and ID token cookies present", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/api/v1/projects", nil)
+		assert.NoError(t, err)
 
-	assert.Equal(t, "IDToken a.b.c.d.e.f", handler(ctx, req)["authorization"][0])
+		req.AddCookie(&accessTokenCookie1)
+		req.AddCookie(&accessTokenCookie2)
+		req.AddCookie(&idCookie)
+
+		assert.Equal(t, "Bearer a.b.c.d.e.f", handler(ctx, req)["authorization"][0])
+	})
 }
 
 func TestGetHTTPMetadataTaggingHandler(t *testing.T) {
