@@ -92,6 +92,30 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 	assert.Nil(t, p)
 }
 
+func TestGetLogsForContainerInPod_BadIndex_WithoutStatus(t *testing.T) {
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
+		IsCloudwatchEnabled: true,
+		CloudwatchRegion:    "us-east-1",
+		CloudwatchLogGroup:  "/kubernetes/flyte-production",
+	})
+	assert.NoError(t, err)
+
+	pod := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ContainerName",
+				},
+			},
+		},
+	}
+	pod.Name = podName
+
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	assert.NoError(t, err)
+	assert.Nil(t, p)
+}
+
 func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsCloudwatchEnabled: true,
