@@ -6564,6 +6564,10 @@
         "execution_mode": {
           "$ref": "#/definitions/coreArrayNodeExecutionMode",
           "description": "execution_mode determines the execution path for ArrayNode."
+        },
+        "is_original_sub_node_interface": {
+          "type": "boolean",
+          "title": "Indicates whether the sub node's original interface was altered"
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
