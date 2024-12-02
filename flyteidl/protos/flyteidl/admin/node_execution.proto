@@ -118,6 +118,9 @@ message NodeExecutionMetaData {
     // Boolean flag indicating if the node is an array node. This is intended to uniquely identify
     // array nodes from other nodes which can have is_parent_node as true.
     bool is_array = 5;
+
+    // Whether this node is an eager node.
+    bool is_eager = 6;
 }
 
 // Request structure to retrieve a list of node execution entities.

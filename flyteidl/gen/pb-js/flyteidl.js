@@ -15302,6 +15302,7 @@
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
+                 * @property {boolean|null} [isEager] TaskMetadata isEager
                  */
     
                 /**
@@ -15417,6 +15418,14 @@
                  */
                 TaskMetadata.prototype.cacheIgnoreInputVars = $util.emptyArray;
     
+                /**
+                 * TaskMetadata isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.isEager = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -15481,6 +15490,8 @@
                     if (message.cacheIgnoreInputVars != null && message.cacheIgnoreInputVars.length)
                         for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
                             writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
                     return writer;
                 };
     
@@ -15544,6 +15555,9 @@
                             if (!(message.cacheIgnoreInputVars && message.cacheIgnoreInputVars.length))
                                 message.cacheIgnoreInputVars = [];
                             message.cacheIgnoreInputVars.push(reader.string());
+                            break;
+                        case 14:
+                            message.isEager = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15618,6 +15632,9 @@
                             if (!$util.isString(message.cacheIgnoreInputVars[i]))
                                 return "cacheIgnoreInputVars: string[] expected";
                     }
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     
@@ -20578,6 +20595,7 @@
                  * @property {boolean|null} [isArray] NodeExecutionEvent isArray
                  * @property {flyteidl.core.IIdentifier|null} [targetEntity] NodeExecutionEvent targetEntity
                  * @property {boolean|null} [isInDynamicChain] NodeExecutionEvent isInDynamicChain
+                 * @property {boolean|null} [isEager] NodeExecutionEvent isEager
                  */
     
                 /**
@@ -20787,6 +20805,14 @@
                  */
                 NodeExecutionEvent.prototype.isInDynamicChain = false;
     
+                /**
+                 * NodeExecutionEvent isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.isEager = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -20895,6 +20921,8 @@
                         $root.flyteidl.core.Identifier.encode(message.targetEntity, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
                         writer.uint32(/* id 24, wireType 0 =*/192).bool(message.isInDynamicChain);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 25, wireType 0 =*/200).bool(message.isEager);
                     return writer;
                 };
     
@@ -20987,6 +21015,9 @@
                             break;
                         case 24:
                             message.isInDynamicChain = reader.bool();
+                            break;
+                        case 25:
+                            message.isEager = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -21143,6 +21174,9 @@
                     if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
                         if (typeof message.isInDynamicChain !== "boolean")
                             return "isInDynamicChain: boolean expected";
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     
@@ -41057,6 +41091,7 @@
                  * @property {string|null} [specNodeId] NodeExecutionMetaData specNodeId
                  * @property {boolean|null} [isDynamic] NodeExecutionMetaData isDynamic
                  * @property {boolean|null} [isArray] NodeExecutionMetaData isArray
+                 * @property {boolean|null} [isEager] NodeExecutionMetaData isEager
                  */
     
                 /**
@@ -41115,6 +41150,14 @@
                 NodeExecutionMetaData.prototype.isArray = false;
     
                 /**
+                 * NodeExecutionMetaData isEager.
+                 * @member {boolean} isEager
+                 * @memberof flyteidl.admin.NodeExecutionMetaData
+                 * @instance
+                 */
+                NodeExecutionMetaData.prototype.isEager = false;
+    
+                /**
                  * Creates a new NodeExecutionMetaData instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NodeExecutionMetaData
@@ -41148,6 +41191,8 @@
                         writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isDynamic);
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         writer.uint32(/* id 5, wireType 0 =*/40).bool(message.isArray);
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.isEager);
                     return writer;
                 };
     
@@ -41184,6 +41229,9 @@
                         case 5:
                             message.isArray = reader.bool();
                             break;
+                        case 6:
+                            message.isEager = reader.bool();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -41218,6 +41266,9 @@
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         if (typeof message.isArray !== "boolean")
                             return "isArray: boolean expected";
+                    if (message.isEager != null && message.hasOwnProperty("isEager"))
+                        if (typeof message.isEager !== "boolean")
+                            return "isEager: boolean expected";
                     return null;
                 };
     
