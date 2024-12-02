@@ -1211,8 +1211,8 @@ func TestValidateBindings(t *testing.T) {
 		assert.False(t, ok)
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
 		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Code: MismatchingTypes, Node Id: node1,")
-		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Variable [n2_out]")
-		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "(type [simple:INTEGER])")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Description: The output variable 'n2.n2_out'")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "has type [simple:INTEGER], but it's assigned to the input variable 'n.x' which has type")
 	})
 
 	t.Run("Union Promise Union Literal", func(t *testing.T) {
