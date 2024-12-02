@@ -10,7 +10,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
-	_ "google.golang.org/protobuf/types/known/wrapperspb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -785,6 +785,8 @@ type ArrayNode struct {
 	SuccessCriteria isArrayNode_SuccessCriteria `protobuf_oneof:"success_criteria"`
 	// execution_mode determines the execution path for ArrayNode.
 	ExecutionMode ArrayNode_ExecutionMode `protobuf:"varint,5,opt,name=execution_mode,json=executionMode,proto3,enum=flyteidl.core.ArrayNode_ExecutionMode" json:"execution_mode,omitempty"`
+	// Indicates whether the sub node's original interface was altered
+	IsOriginalSubNodeInterface *wrapperspb.BoolValue `protobuf:"bytes,6,opt,name=is_original_sub_node_interface,json=isOriginalSubNodeInterface,proto3" json:"is_original_sub_node_interface,omitempty"`
 }
 
 func (x *ArrayNode) Reset() {
@@ -866,6 +868,13 @@ func (x *ArrayNode) GetExecutionMode() ArrayNode_ExecutionMode {
 		return x.ExecutionMode
 	}
 	return ArrayNode_MINIMAL_STATE
+}
+
+func (x *ArrayNode) GetIsOriginalSubNodeInterface() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.IsOriginalSubNodeInterface
+	}
+	return nil
 }
 
 type isArrayNode_ParallelismOption interface {
@@ -1801,7 +1810,7 @@ var file_flyteidl_core_workflow_proto_rawDesc = []byte{
 	0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
 	0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x53, 0x6c, 0x65, 0x65, 0x70, 0x43, 0x6f, 0x6e, 0x64,
 	0x69, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x00, 0x52, 0x05, 0x73, 0x6c, 0x65, 0x65, 0x70, 0x42, 0x0b,
-	0x0a, 0x09, 0x63, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0xda, 0x02, 0x0a, 0x09,
+	0x0a, 0x09, 0x63, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0xba, 0x03, 0x0a, 0x09,
 	0x41, 0x72, 0x72, 0x61, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x27, 0x0a, 0x04, 0x6e, 0x6f, 0x64,
 	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
 	0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x04, 0x6e, 0x6f,
@@ -1817,7 +1826,13 @@ var file_flyteidl_core_workflow_proto_rawDesc = []byte{
 	0x01, 0x28, 0x0e, 0x32, 0x26, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63,
 	0x6f, 0x72, 0x65, 0x2e, 0x41, 0x72, 0x72, 0x61, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x2e, 0x45, 0x78,
 	0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x65, 0x52, 0x0d, 0x65, 0x78, 0x65,
-	0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x65, 0x22, 0x32, 0x0a, 0x0d, 0x45, 0x78,
+	0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x5e, 0x0a, 0x1e, 0x69, 0x73,
+	0x5f, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x61, 0x6c, 0x5f, 0x73, 0x75, 0x62, 0x5f, 0x6e, 0x6f,
+	0x64, 0x65, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42, 0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x1a,
+	0x69, 0x73, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x61, 0x6c, 0x53, 0x75, 0x62, 0x4e, 0x6f, 0x64,
+	0x65, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x22, 0x32, 0x0a, 0x0d, 0x45, 0x78,
 	0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x4d,
 	0x49, 0x4e, 0x49, 0x4d, 0x41, 0x4c, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x45, 0x10, 0x00, 0x12, 0x0e,
 	0x0a, 0x0a, 0x46, 0x55, 0x4c, 0x4c, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x45, 0x10, 0x01, 0x42, 0x14,
@@ -2020,13 +2035,14 @@ var file_flyteidl_core_workflow_proto_goTypes = []interface{}{
 	(*Identifier)(nil),                    // 23: flyteidl.core.Identifier
 	(*LiteralType)(nil),                   // 24: flyteidl.core.LiteralType
 	(*durationpb.Duration)(nil),           // 25: google.protobuf.Duration
-	(*RetryStrategy)(nil),                 // 26: flyteidl.core.RetryStrategy
-	(*Binding)(nil),                       // 27: flyteidl.core.Binding
-	(*QualityOfService)(nil),              // 28: flyteidl.core.QualityOfService
-	(*TypedInterface)(nil),                // 29: flyteidl.core.TypedInterface
-	(*Resources)(nil),                     // 30: flyteidl.core.Resources
-	(*ExtendedResources)(nil),             // 31: flyteidl.core.ExtendedResources
-	(*LiteralMap)(nil),                    // 32: flyteidl.core.LiteralMap
+	(*wrapperspb.BoolValue)(nil),          // 26: google.protobuf.BoolValue
+	(*RetryStrategy)(nil),                 // 27: flyteidl.core.RetryStrategy
+	(*Binding)(nil),                       // 28: flyteidl.core.Binding
+	(*QualityOfService)(nil),              // 29: flyteidl.core.QualityOfService
+	(*TypedInterface)(nil),                // 30: flyteidl.core.TypedInterface
+	(*Resources)(nil),                     // 31: flyteidl.core.Resources
+	(*ExtendedResources)(nil),             // 32: flyteidl.core.ExtendedResources
+	(*LiteralMap)(nil),                    // 33: flyteidl.core.LiteralMap
 }
 var file_flyteidl_core_workflow_proto_depIdxs = []int32{
 	21, // 0: flyteidl.core.IfBlock.condition:type_name -> flyteidl.core.BooleanExpression
@@ -2047,36 +2063,37 @@ var file_flyteidl_core_workflow_proto_depIdxs = []int32{
 	9,  // 15: flyteidl.core.GateNode.sleep:type_name -> flyteidl.core.SleepCondition
 	14, // 16: flyteidl.core.ArrayNode.node:type_name -> flyteidl.core.Node
 	0,  // 17: flyteidl.core.ArrayNode.execution_mode:type_name -> flyteidl.core.ArrayNode.ExecutionMode
-	25, // 18: flyteidl.core.NodeMetadata.timeout:type_name -> google.protobuf.Duration
-	26, // 19: flyteidl.core.NodeMetadata.retries:type_name -> flyteidl.core.RetryStrategy
-	12, // 20: flyteidl.core.Node.metadata:type_name -> flyteidl.core.NodeMetadata
-	27, // 21: flyteidl.core.Node.inputs:type_name -> flyteidl.core.Binding
-	13, // 22: flyteidl.core.Node.output_aliases:type_name -> flyteidl.core.Alias
-	5,  // 23: flyteidl.core.Node.task_node:type_name -> flyteidl.core.TaskNode
-	6,  // 24: flyteidl.core.Node.workflow_node:type_name -> flyteidl.core.WorkflowNode
-	4,  // 25: flyteidl.core.Node.branch_node:type_name -> flyteidl.core.BranchNode
-	10, // 26: flyteidl.core.Node.gate_node:type_name -> flyteidl.core.GateNode
-	11, // 27: flyteidl.core.Node.array_node:type_name -> flyteidl.core.ArrayNode
-	28, // 28: flyteidl.core.WorkflowMetadata.quality_of_service:type_name -> flyteidl.core.QualityOfService
-	1,  // 29: flyteidl.core.WorkflowMetadata.on_failure:type_name -> flyteidl.core.WorkflowMetadata.OnFailurePolicy
-	20, // 30: flyteidl.core.WorkflowMetadata.tags:type_name -> flyteidl.core.WorkflowMetadata.TagsEntry
-	23, // 31: flyteidl.core.WorkflowTemplate.id:type_name -> flyteidl.core.Identifier
-	15, // 32: flyteidl.core.WorkflowTemplate.metadata:type_name -> flyteidl.core.WorkflowMetadata
-	29, // 33: flyteidl.core.WorkflowTemplate.interface:type_name -> flyteidl.core.TypedInterface
-	14, // 34: flyteidl.core.WorkflowTemplate.nodes:type_name -> flyteidl.core.Node
-	27, // 35: flyteidl.core.WorkflowTemplate.outputs:type_name -> flyteidl.core.Binding
-	14, // 36: flyteidl.core.WorkflowTemplate.failure_node:type_name -> flyteidl.core.Node
-	16, // 37: flyteidl.core.WorkflowTemplate.metadata_defaults:type_name -> flyteidl.core.WorkflowMetadataDefaults
-	30, // 38: flyteidl.core.TaskNodeOverrides.resources:type_name -> flyteidl.core.Resources
-	31, // 39: flyteidl.core.TaskNodeOverrides.extended_resources:type_name -> flyteidl.core.ExtendedResources
-	23, // 40: flyteidl.core.LaunchPlanTemplate.id:type_name -> flyteidl.core.Identifier
-	29, // 41: flyteidl.core.LaunchPlanTemplate.interface:type_name -> flyteidl.core.TypedInterface
-	32, // 42: flyteidl.core.LaunchPlanTemplate.fixed_inputs:type_name -> flyteidl.core.LiteralMap
-	43, // [43:43] is the sub-list for method output_type
-	43, // [43:43] is the sub-list for method input_type
-	43, // [43:43] is the sub-list for extension type_name
-	43, // [43:43] is the sub-list for extension extendee
-	0,  // [0:43] is the sub-list for field type_name
+	26, // 18: flyteidl.core.ArrayNode.is_original_sub_node_interface:type_name -> google.protobuf.BoolValue
+	25, // 19: flyteidl.core.NodeMetadata.timeout:type_name -> google.protobuf.Duration
+	27, // 20: flyteidl.core.NodeMetadata.retries:type_name -> flyteidl.core.RetryStrategy
+	12, // 21: flyteidl.core.Node.metadata:type_name -> flyteidl.core.NodeMetadata
+	28, // 22: flyteidl.core.Node.inputs:type_name -> flyteidl.core.Binding
+	13, // 23: flyteidl.core.Node.output_aliases:type_name -> flyteidl.core.Alias
+	5,  // 24: flyteidl.core.Node.task_node:type_name -> flyteidl.core.TaskNode
+	6,  // 25: flyteidl.core.Node.workflow_node:type_name -> flyteidl.core.WorkflowNode
+	4,  // 26: flyteidl.core.Node.branch_node:type_name -> flyteidl.core.BranchNode
+	10, // 27: flyteidl.core.Node.gate_node:type_name -> flyteidl.core.GateNode
+	11, // 28: flyteidl.core.Node.array_node:type_name -> flyteidl.core.ArrayNode
+	29, // 29: flyteidl.core.WorkflowMetadata.quality_of_service:type_name -> flyteidl.core.QualityOfService
+	1,  // 30: flyteidl.core.WorkflowMetadata.on_failure:type_name -> flyteidl.core.WorkflowMetadata.OnFailurePolicy
+	20, // 31: flyteidl.core.WorkflowMetadata.tags:type_name -> flyteidl.core.WorkflowMetadata.TagsEntry
+	23, // 32: flyteidl.core.WorkflowTemplate.id:type_name -> flyteidl.core.Identifier
+	15, // 33: flyteidl.core.WorkflowTemplate.metadata:type_name -> flyteidl.core.WorkflowMetadata
+	30, // 34: flyteidl.core.WorkflowTemplate.interface:type_name -> flyteidl.core.TypedInterface
+	14, // 35: flyteidl.core.WorkflowTemplate.nodes:type_name -> flyteidl.core.Node
+	28, // 36: flyteidl.core.WorkflowTemplate.outputs:type_name -> flyteidl.core.Binding
+	14, // 37: flyteidl.core.WorkflowTemplate.failure_node:type_name -> flyteidl.core.Node
+	16, // 38: flyteidl.core.WorkflowTemplate.metadata_defaults:type_name -> flyteidl.core.WorkflowMetadataDefaults
+	31, // 39: flyteidl.core.TaskNodeOverrides.resources:type_name -> flyteidl.core.Resources
+	32, // 40: flyteidl.core.TaskNodeOverrides.extended_resources:type_name -> flyteidl.core.ExtendedResources
+	23, // 41: flyteidl.core.LaunchPlanTemplate.id:type_name -> flyteidl.core.Identifier
+	30, // 42: flyteidl.core.LaunchPlanTemplate.interface:type_name -> flyteidl.core.TypedInterface
+	33, // 43: flyteidl.core.LaunchPlanTemplate.fixed_inputs:type_name -> flyteidl.core.LiteralMap
+	44, // [44:44] is the sub-list for method output_type
+	44, // [44:44] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_core_workflow_proto_init() }
