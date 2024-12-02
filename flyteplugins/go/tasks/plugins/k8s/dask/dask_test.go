@@ -200,6 +200,17 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	overrides.OnGetContainerImage().Return("")
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
@@ -794,24 +805,24 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
-	assert.Nil(t, taskPhase.Info().Logs)
-	assert.Nil(t, taskPhase.Info().LogContext)
+	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
 	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
-	assert.Nil(t, taskPhase.Info().Logs)
-	assert.Nil(t, taskPhase.Info().LogContext)
+	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
 	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobClusterCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
-	assert.Nil(t, taskPhase.Info().Logs)
-	assert.Nil(t, taskPhase.Info().LogContext)
+	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
 	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobRunning))
@@ -819,7 +830,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
-	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
+	assert.Equal(t, expectedLogCtx.PrimaryPodName, taskPhase.Info().LogContext.PrimaryPodName)
 	assert.Nil(t, err)
 
 	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobSuccessful))
@@ -827,7 +838,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseSuccess)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
-	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
+	assert.Equal(t, expectedLogCtx.PrimaryPodName, taskPhase.Info().LogContext.PrimaryPodName)
 	assert.Nil(t, err)
 
 	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobFailed))
@@ -835,7 +846,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
-	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
+	assert.Equal(t, expectedLogCtx.PrimaryPodName, taskPhase.Info().LogContext.PrimaryPodName)
 	assert.Nil(t, err)
 }
 

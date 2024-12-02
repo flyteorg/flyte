@@ -459,13 +459,10 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		reportedAt = request.Event.OccurredAt
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
-	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
-	taskExecutionClosure.LogContext = mergeLogContexts(taskExecutionClosure.LogContext, request.Event.LogContext)
-
 	mergedLogs := mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
 	filteredLogs := filterLogsByPhase(mergedLogs, request.Event.Phase)
 	taskExecutionClosure.Logs = filteredLogs
-
+	taskExecutionClosure.LogContext = mergeLogContexts(taskExecutionClosure.LogContext, request.Event.LogContext)
 	if len(request.Event.Reasons) > 0 {
 		for _, reason := range request.Event.Reasons {
 			taskExecutionClosure.Reasons = append(
@@ -509,11 +506,9 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
 	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
-
 	if isPhaseChange && taskExecutionClosure.Metadata != nil && len(taskExecutionClosure.Metadata.ExternalResources) > 0 {
 		filterExternalResourceLogsByPhase(taskExecutionClosure.Metadata.ExternalResources, request.Event.Phase)
 	}
-
 	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
 		taskExecutionClosure.EventVersion = request.Event.EventVersion
 	}

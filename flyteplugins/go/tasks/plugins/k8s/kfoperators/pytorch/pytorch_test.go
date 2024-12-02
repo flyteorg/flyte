@@ -179,6 +179,17 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 

@@ -292,41 +292,31 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		OccurredAt: &occurredAt,
 	}
 
-	// There is a short period between the `DaskJob` resource being created and `Status.JobStatus` being set by the `dask-operator`.
-	// In that period, the `JobStatus` will be an empty string. We're treating this as Initializing/Queuing.
-	isQueued := status == "" ||
-		status == daskAPI.DaskJobCreated ||
-		status == daskAPI.DaskJobClusterCreated
-
-	if !isQueued {
-		taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-		o, err := logPlugin.GetTaskLogs(
-			tasklog.Input{
-				Namespace:       job.ObjectMeta.Namespace,
-				PodName:         job.Status.JobRunnerPodName,
-				LogName:         "(Dask Runner Logs)",
-				TaskExecutionID: taskExecID,
-			},
-		)
-		if err != nil {
-			return pluginsCore.PhaseInfoUndefined, err
-		}
-		info.Logs = o.TaskLogs
-		info.LogContext = &core.LogContext{
-			PrimaryPodName: job.Status.JobRunnerPodName,
-			Pods: []*core.PodLogContext{
-				{
-					Namespace:            job.ObjectMeta.Namespace,
-					PodName:              job.Status.JobRunnerPodName,
-					PrimaryContainerName: "job-runner",
-					Containers: []*core.ContainerContext{
-						{ContainerName: "job-runner"},
-					},
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
+	o, err := logPlugin.GetTaskLogs(
+		tasklog.Input{
+			Namespace:       job.ObjectMeta.Namespace,
+			PodName:         job.Status.JobRunnerPodName,
+			LogName:         "(User logs)",
+			TaskExecutionID: taskExecID,
+		},
+	)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+	info.Logs = o.TaskLogs
+	info.LogContext = &core.LogContext{
+		PrimaryPodName: job.Status.JobRunnerPodName,
+		Pods: []*core.PodLogContext{
+			{
+				PodName:              job.Status.JobRunnerPodName,
+				PrimaryContainerName: "job-runner",
+				Containers: []*core.ContainerContext{
+					{ContainerName: "job-runner"},
 				},
 			},
-		}
+		},
 	}
-
 	var phaseInfo pluginsCore.PhaseInfo
 	switch status {
 	case "":
@@ -343,12 +333,10 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 	default:
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
 	}
-
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr
 	}
-
 	return phaseInfo, nil
 }
 

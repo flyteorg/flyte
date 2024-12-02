@@ -6,6 +6,7 @@ use crate::common::{Executor, Response, Task};
 use crate::common::{TaskContext, FAILED, QUEUED, RUNNING};
 use crate::pb::fasttask::TaskStatus;
 
+use anyhow::{bail, Result};
 use async_channel::{self, Receiver, Sender, TryRecvError};
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
@@ -17,6 +18,7 @@ struct RunCommandResult {
 }
 
 pub async fn execute(
+    kill_rx: Receiver<()>,
     task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
     task_id: String,
     namespace: String,
@@ -33,7 +35,7 @@ pub async fn execute(
     executor_tx: Sender<Executor>,
     executor_rx: Receiver<Executor>,
     build_executor_tx: Sender<()>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<()> {
     // check if task may be executed or backlogged
     let (mut executor, backlogged) = is_executable(&executor_rx, &backlog_tx).await?;
 
@@ -49,26 +51,10 @@ pub async fn execute(
         return Ok(());
     }
 
-    // create and store new task context
-    let (kill_tx, kill_rx) = async_channel::bounded(1);
-    {
-        let mut task_contexts = task_contexts.write().unwrap();
-        task_contexts.insert(
-            task_id.clone(),
-            TaskContext {
-                kill_tx: kill_tx,
-                last_ack_timestamp: SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
-            },
-        );
-    }
-
     // if backlogged we wait until we can execute
     let (mut phase, mut reason) = (QUEUED, "".to_string());
     if backlogged {
-        executor = match wait_in_backlog(
+        executor = wait_in_backlog(
             task_contexts.clone(),
             &kill_rx,
             &task_id,
@@ -82,11 +68,7 @@ pub async fn execute(
             &executor_rx,
             &backlog_rx,
         )
-        .await
-        {
-            Ok(executor) => executor,
-            Err(e) => return Err(e),
-        };
+        .await?;
     }
 
     // execute task by running command - the only way that executor is None is if the task is
@@ -121,7 +103,7 @@ pub async fn execute(
             Ok(run_command_result) => run_command_result,
             Err(e) => {
                 executor_tx.send(executor).await?;
-                return Err(e.into());
+                bail!(e);
             }
         };
 
@@ -138,7 +120,7 @@ pub async fn execute(
 
     // if not closed then report terminal status
     if !killed {
-        if let Err(e) = report_terminal_status(
+        report_terminal_status(
             task_contexts.clone(),
             &kill_rx,
             &task_id,
@@ -150,16 +132,7 @@ pub async fn execute(
             &mut phase,
             &mut reason,
         )
-        .await
-        {
-            return Err(e);
-        }
-    }
-
-    // remove task context and open parallelism slot
-    {
-        let mut task_contexts = task_contexts.write().unwrap();
-        task_contexts.remove(&task_id);
+        .await?;
     }
 
     Ok(())
@@ -168,18 +141,14 @@ pub async fn execute(
 async fn is_executable<T>(
     executor_rx: &Receiver<T>,
     backlog_tx: &Sender<()>,
-) -> Result<(Option<T>, bool), String> {
+) -> Result<(Option<T>, bool)> {
     match executor_rx.try_recv() {
         Ok(executor) => return Ok((Some(executor), false)),
-        Err(TryRecvError::Closed) => return Err("executor_rx is closed".into()),
+        Err(TryRecvError::Closed) => bail!("executor_rx is closed"),
         Err(TryRecvError::Empty) => {}
     }
 
-    match backlog_tx.send(()).await {
-        Ok(_) => {}
-        Err(e) => return Err(format!("failed to send to backlog_tx: {:?}", e)),
-    }
-
+    backlog_tx.send(()).await?;
     Ok((None, true))
 }
 
@@ -194,7 +163,7 @@ async fn report_terminal_status(
     last_ack_grace_period_seconds: u64,
     phase: &mut i32,
     reason: &mut String,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<()> {
     // send completed task status until deleted
     let mut interval =
         tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
@@ -254,7 +223,7 @@ async fn run_command(
     phase: &mut i32,
     reason: &mut String,
     executor: &mut Executor,
-) -> Result<RunCommandResult, Box<dyn std::error::Error>> {
+) -> Result<RunCommandResult> {
     // execute command and monitor
     let task_start_ts = Instant::now();
 
@@ -368,7 +337,7 @@ async fn run_command(
     }
 }
 
-async fn wait_in_backlog(
+async fn wait_in_backlog<T>(
     task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
     kill_rx: &Receiver<()>,
     task_id: &str,
@@ -379,9 +348,9 @@ async fn wait_in_backlog(
     last_ack_grace_period_seconds: u64,
     phase: &mut i32,
     reason: &mut String,
-    executor_rx: &Receiver<Executor>,
+    executor_rx: &Receiver<T>,
     backlog_rx: &Receiver<()>,
-) -> Result<Option<Executor>, Box<dyn std::error::Error>> {
+) -> Result<Option<T>> {
     let mut interval =
         tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
     loop {
@@ -389,12 +358,10 @@ async fn wait_in_backlog(
             result = executor_rx.recv() => {
                 let executor = match result {
                     Ok(executor) => executor,
-                    Err(e) => return Err(format!("failed to retrieve executor: {:?}", e).into()),
+                    Err(e) => bail!(format!("failed to retrieve executor: {:?}", e)),
                 };
 
-                if let Err(_) = backlog_rx.recv().await {
-                    return Err("backlog_rx is closed".into());
-                }
+                backlog_rx.recv().await?;
 
                 *phase = RUNNING;
                 return Ok(Some(executor));
@@ -440,7 +407,9 @@ async fn wait_in_backlog(
 #[cfg(test)]
 mod tests {
     use super::*;
+
     use async_channel::unbounded;
+    use tokio::task::JoinHandle;
 
     #[tokio::test]
     async fn test_is_executable() {
@@ -474,5 +443,264 @@ mod tests {
         assert!(sender_executor.close());
         let result = is_executable(&receiver_executor, &sender_backlog).await;
         assert!(result.is_err());
+    }
+
+    async fn wait_in_backlog_setup<T: Send + 'static>(
+        last_ack_grace_period_seconds: u64,
+    ) -> (
+        Sender<T>,
+        Sender<()>,
+        Receiver<TaskStatus>,
+        JoinHandle<Result<Option<T>>>,
+    ) {
+        // initialize variables
+        let task_contexts = Arc::new(RwLock::new(HashMap::<String, TaskContext>::new()));
+        let (kill_tx, kill_rx) = async_channel::unbounded();
+        let (task_id, namespace, workflow_id) = (
+            "task_id".to_string(),
+            "namespace".to_string(),
+            "workflow_id".to_string(),
+        );
+        let (task_status_tx, task_status_rx) = async_channel::unbounded();
+        let (task_status_report_interval_seconds, last_ack_grace_period_seconds) =
+            (1, last_ack_grace_period_seconds);
+        let (mut phase, mut reason) = (QUEUED, "".to_string());
+        let (executor_tx, executor_rx) = async_channel::unbounded();
+        let (backlog_tx, backlog_rx) = async_channel::unbounded();
+
+        {
+            let mut task_contexts = task_contexts.write().unwrap();
+            task_contexts.insert(
+                task_id.clone(),
+                TaskContext {
+                    kill_tx: kill_tx.clone(),
+                    last_ack_timestamp: SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                },
+            );
+        }
+
+        let backlog_send_result = backlog_tx.send(()).await;
+        assert!(backlog_send_result.is_ok());
+
+        // execute `wait_in_backlog`
+        let wait_in_backlog_handle = tokio::spawn(async move {
+            wait_in_backlog(
+                task_contexts.clone(),
+                &kill_rx,
+                &task_id,
+                &namespace,
+                &workflow_id,
+                &task_status_tx,
+                task_status_report_interval_seconds,
+                last_ack_grace_period_seconds,
+                &mut phase,
+                &mut reason,
+                &executor_rx,
+                &backlog_rx,
+            )
+            .await
+        });
+
+        (executor_tx, kill_tx, task_status_rx, wait_in_backlog_handle)
+    }
+
+    #[tokio::test]
+    async fn wait_in_backlog_happy() {
+        // initialize wait_in_backlog env
+        let (executor_tx, _, task_status_rx, wait_in_backlog_handle) =
+            wait_in_backlog_setup(5).await;
+
+        // verify periodic task status' by capturing at least two timestamps over 3 seconds
+        // and validating the durations between each are < 1050ms (1 second with drift).
+        let mut sleep_counter = 0;
+        let mut task_status_counter = 0;
+        let mut instant: Option<Instant> = None;
+
+        while sleep_counter < 60 && task_status_counter < 3 {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            if !task_status_rx.is_empty() {
+                let task_status_result = task_status_rx.recv().await;
+                assert!(task_status_result.is_ok());
+
+                task_status_counter += 1;
+                if instant.is_some() {
+                    assert!(instant.unwrap().elapsed().as_millis() < 1050);
+                }
+
+                instant = Some(Instant::now());
+            }
+            sleep_counter += 1;
+        }
+
+        assert!(task_status_counter >= 2);
+
+        // executor available
+        let executor_send_result = executor_tx.send(()).await;
+        assert!(executor_send_result.is_ok());
+
+        let mut counter = 0;
+        while counter < 5 && !wait_in_backlog_handle.is_finished() {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+            counter += 1;
+        }
+
+        assert!(wait_in_backlog_handle.is_finished());
+
+        let result = wait_in_backlog_handle.await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn wait_in_backlog_kill() {
+        // initialize wait_in_backlog env
+        let (_, kill_tx, _, wait_in_backlog_handle) = wait_in_backlog_setup::<()>(5).await;
+
+        // use kill_tx to abort task
+        let kill_result = kill_tx.send(()).await;
+        assert!(kill_result.is_ok());
+
+        let mut counter = 0;
+        while counter < 5 && !wait_in_backlog_handle.is_finished() {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+            counter += 1;
+        }
+
+        assert!(wait_in_backlog_handle.is_finished());
+
+        let result = wait_in_backlog_handle.await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn wait_in_backlog_ack_timeout() {
+        // initialize wait_in_backlog env
+        let (_, _, _, wait_in_backlog_handle) = wait_in_backlog_setup::<()>(1).await;
+
+        // wait for ack timeout
+        let mut counter = 0;
+        while counter < 40 && !wait_in_backlog_handle.is_finished() {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            counter += 1;
+        }
+
+        assert!(wait_in_backlog_handle.is_finished());
+
+        let result = wait_in_backlog_handle.await;
+        assert!(result.is_ok());
+    }
+
+    fn report_terminal_status_setup(
+        last_ack_grace_period_seconds: u64,
+    ) -> (Sender<()>, JoinHandle<Result<()>>, Receiver<TaskStatus>) {
+        // initialize variables
+        let task_contexts = Arc::new(RwLock::new(HashMap::<String, TaskContext>::new()));
+        let (kill_tx, kill_rx) = async_channel::unbounded();
+        let (task_id, namespace, workflow_id) = (
+            "task_id".to_string(),
+            "namespace".to_string(),
+            "workflow_id".to_string(),
+        );
+        let (task_status_tx, task_status_rx) = async_channel::unbounded();
+        let (task_status_report_interval_seconds, last_ack_grace_period_seconds) =
+            (1, last_ack_grace_period_seconds);
+        let (mut phase, mut reason) = (QUEUED, "".to_string());
+
+        {
+            let mut task_contexts = task_contexts.write().unwrap();
+            task_contexts.insert(
+                task_id.clone(),
+                TaskContext {
+                    kill_tx: kill_tx.clone(),
+                    last_ack_timestamp: SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs(),
+                },
+            );
+        }
+
+        // execute `report_terminal_status`
+        let report_terminal_status_handle = tokio::spawn(async move {
+            report_terminal_status(
+                task_contexts.clone(),
+                &kill_rx,
+                &task_id,
+                &namespace,
+                &workflow_id,
+                &task_status_tx,
+                task_status_report_interval_seconds,
+                last_ack_grace_period_seconds,
+                &mut phase,
+                &mut reason,
+            )
+            .await
+        });
+
+        (kill_tx, report_terminal_status_handle, task_status_rx)
+    }
+
+    #[tokio::test]
+    async fn report_terminal_status_kill() {
+        let (kill_tx, report_terminal_status_handle, task_status_rx) =
+            report_terminal_status_setup(5);
+
+        // verify periodic task status' by capturing at least two timestamps over 3 seconds
+        // and validating the durations between each are < 1050ms (1 second with drift).
+        let mut sleep_counter = 0;
+        let mut task_status_counter = 0;
+        let mut instant: Option<Instant> = None;
+
+        while sleep_counter < 60 && task_status_counter < 3 {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            if !task_status_rx.is_empty() {
+                let task_status_result = task_status_rx.recv().await;
+                assert!(task_status_result.is_ok());
+
+                task_status_counter += 1;
+                if instant.is_some() {
+                    assert!(instant.unwrap().elapsed().as_millis() < 1050);
+                }
+
+                instant = Some(Instant::now());
+            }
+            sleep_counter += 1;
+        }
+
+        assert!(task_status_counter >= 2);
+
+        // kill_tx
+        let kill_send_result = kill_tx.send(()).await;
+        assert!(kill_send_result.is_ok());
+
+        let mut counter = 0;
+        while counter < 5 && !report_terminal_status_handle.is_finished() {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+            counter += 1;
+        }
+
+        assert!(report_terminal_status_handle.is_finished());
+
+        let result = report_terminal_status_handle.await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn report_terminal_status_ack_timeout() {
+        let (_, report_terminal_status_handle, _) = report_terminal_status_setup(1);
+
+        // wait for ack timeout
+        let mut counter = 0;
+        while counter < 40 && !report_terminal_status_handle.is_finished() {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+            counter += 1;
+        }
+
+        assert!(report_terminal_status_handle.is_finished());
+
+        let result = report_terminal_status_handle.await;
+        assert!(result.is_ok());
     }
 }

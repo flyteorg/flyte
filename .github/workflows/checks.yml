@@ -35,8 +35,7 @@ jobs:
           - datacatalog
           - fasttask/plugin
           - flyteadmin
-          # TODO(monorepo): Enable lint flytecopilot
-          # - flytecopilot
+          - flytecopilot
           - flytectl
           - flyteidl
           - flyteplugins

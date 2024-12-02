@@ -128,6 +128,14 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
 	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
+	generatedLinks = make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
+	assert.NoError(t, err)
+	assert.Len(t, info.Logs, 5)
+	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
+	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -203,14 +211,14 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
 	assert.NotNil(t, taskPhase.Info())
-	assert.Nil(t, taskPhase.Info().LogContext)
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
 	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
-	assert.Nil(t, taskPhase.Info().LogContext)
+	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
 	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
@@ -470,6 +478,17 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&k8s.PluginState{}).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = k8s.PluginState{}
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 

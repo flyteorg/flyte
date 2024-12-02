@@ -77,6 +77,10 @@ func NewCursorFromCustomPosition(customPosition string) Cursor {
 	}
 }
 
+func IsCursorEnd(cursor Cursor) bool {
+	return cursor.cursorState == AtEndCursorState
+}
+
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
 // Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {

@@ -513,6 +513,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 	})
 	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+	taskMetadata.OnGetLabels().Return(map[string]string{})
 
 	for _, test := range tests {
 		for _, taskTemplate := range taskTemplateTests {
@@ -748,6 +749,7 @@ func TestHandleRunning(t *testing.T) {
 	taskExecutionID.OnGetUniqueNodeID().Return("task-id")
 	taskExecutionID.OnGetGeneratedName().Return("task-name")
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+	taskMetadata.OnGetLabels().Return(map[string]string{})
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -929,6 +931,7 @@ func TestGetTaskInfo(t *testing.T) {
 		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
 		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.OnGetLabels().Return(map[string]string{})
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
 		taskTemplate := getBaseFasttaskTaskTemplate(t)
@@ -983,6 +986,7 @@ func TestGetTaskInfo(t *testing.T) {
 		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
 		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.OnGetLabels().Return(map[string]string{})
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
@@ -1030,6 +1034,7 @@ func TestGetTaskInfo(t *testing.T) {
 		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
 		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.OnGetLabels().Return(map[string]string{})
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)

@@ -1325,6 +1325,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "trait-variant"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70977707304198400eb4835a78f6a9f928bf41bba420deb8fdb175cd965d77a7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
+]
+
+[[package]]
 name = "try-lock"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1346,6 +1357,7 @@ checksum = "c7de7d73e1754487cb58364ee906a499937a0dfabd86bcb980fa99ec8c8fa2ce"
 name = "unionai_actor_bridge"
 version = "0.1.4"
 dependencies = [
+ "anyhow",
  "async-channel",
  "async-stream",
  "bincode",
@@ -1359,6 +1371,7 @@ dependencies = [
  "tonic",
  "tracing",
  "tracing-subscriber",
+ "trait-variant",
  "uuid",
 ]
 
