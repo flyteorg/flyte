@@ -6654,6 +6654,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars */
             cacheIgnoreInputVars?: (string[]|null);
+
+            /** TaskMetadata isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6700,6 +6703,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars. */
             public cacheIgnoreInputVars: string[];
+
+            /** TaskMetadata isEager. */
+            public isEager: boolean;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -8824,6 +8830,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain */
             isInDynamicChain?: (boolean|null);
+
+            /** NodeExecutionEvent isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -8906,6 +8915,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain. */
             public isInDynamicChain: boolean;
+
+            /** NodeExecutionEvent isEager. */
+            public isEager: boolean;
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -19203,6 +19215,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray */
             isArray?: (boolean|null);
+
+            /** NodeExecutionMetaData isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionMetaData. */
@@ -19228,6 +19243,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray. */
             public isArray: boolean;
+
+            /** NodeExecutionMetaData isEager. */
+            public isEager: boolean;
 
             /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.

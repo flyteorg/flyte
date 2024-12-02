@@ -47,6 +47,13 @@ func GetValidTaskRequest() admin.TaskCreateRequest {
 	}
 }
 
+func GetValidTaskRequestWithEager() admin.TaskCreateRequest {
+	taskRequest := GetValidTaskRequest()
+	// Add eager flag to the task
+	taskRequest.GetSpec().GetTemplate().GetMetadata().IsEager = true
+	return taskRequest
+}
+
 func GetValidTaskRequestWithOverrides(project string, domain string, name string, version string) admin.TaskCreateRequest {
 	return admin.TaskCreateRequest{
 		Id: &core.Identifier{

@@ -104,6 +104,33 @@ func TestCreateTask(t *testing.T) {
 	assert.NotNil(t, response)
 }
 
+func TestCreateEagerTask(t *testing.T) {
+	mockRepository := getMockTaskRepository()
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
+		func(input interfaces.Identifier) (models.Task, error) {
+			return models.Task{}, errors.New("foo")
+		})
+	var createCalled bool
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetCreateCallback(func(input models.Task, descriptionEntity *models.DescriptionEntity) error {
+		assert.Equal(t, []byte{
+			0x1, 0x18, 0x89, 0x29, 0x71, 0xdf, 0xa7, 0x30, 0xc0, 0xf4, 0xff, 0x87, 0xd7, 0xc5, 0x9c, 0x3e, 0xea, 0x1,
+			0x8d, 0x28, 0xb1, 0xa3, 0xc4, 0xa, 0xdb, 0x73, 0x22, 0xd2, 0x89, 0x8b, 0x13, 0xe2}, input.Digest)
+		createCalled = true
+		return nil
+	})
+	mockRepository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(
+		func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
+			return models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
+		})
+	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
+		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getNoopMockResourceManager())
+	request := testutils.GetValidTaskRequestWithEager()
+	response, err := taskManager.CreateTask(context.Background(), request)
+	assert.NoError(t, err)
+	assert.Equal(t, &admin.TaskCreateResponse{}, response)
+	assert.True(t, createCalled)
+}
+
 func TestCreateTask_ValidationError(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
