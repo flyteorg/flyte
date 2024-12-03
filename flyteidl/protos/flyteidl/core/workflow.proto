@@ -150,6 +150,17 @@ message ArrayNode {
 
     // Indicates whether the sub node's original interface was altered
     google.protobuf.BoolValue is_original_sub_node_interface = 6;
+
+    enum DataMode {
+        // Indicates the ArrayNode will utilize the passed in, single input file for all sub-nodes.
+        SINGLE_INPUT_FILE = 0;
+
+        // Indicates the ArrayNode will create input files for each sub-node.
+        INDIVIDUAL_INPUT_FILES = 1;
+    }
+
+    // data_mode determines how input data is passed to the sub-nodes
+    DataMode data_mode = 7;
 }
 
 // Defines extra information about the Node.

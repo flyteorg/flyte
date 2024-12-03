@@ -10983,6 +10983,7 @@
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
+                 * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
                  */
     
                 /**
@@ -11048,6 +11049,14 @@
                  */
                 ArrayNode.prototype.isOriginalSubNodeInterface = null;
     
+                /**
+                 * ArrayNode dataMode.
+                 * @member {flyteidl.core.ArrayNode.DataMode} dataMode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.dataMode = 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -11109,6 +11118,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
                     if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
                         $root.google.protobuf.BoolValue.encode(message.isOriginalSubNodeInterface, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.dataMode != null && message.hasOwnProperty("dataMode"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).int32(message.dataMode);
                     return writer;
                 };
     
@@ -11147,6 +11158,9 @@
                             break;
                         case 6:
                             message.isOriginalSubNodeInterface = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.dataMode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11203,6 +11217,14 @@
                         if (error)
                             return "isOriginalSubNodeInterface." + error;
                     }
+                    if (message.dataMode != null && message.hasOwnProperty("dataMode"))
+                        switch (message.dataMode) {
+                        default:
+                            return "dataMode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
     
@@ -11217,6 +11239,20 @@
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "MINIMAL_STATE"] = 0;
                     values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
+    
+                /**
+                 * DataMode enum.
+                 * @name flyteidl.core.ArrayNode.DataMode
+                 * @enum {string}
+                 * @property {number} SINGLE_INPUT_FILE=0 SINGLE_INPUT_FILE value
+                 * @property {number} INDIVIDUAL_INPUT_FILES=1 INDIVIDUAL_INPUT_FILES value
+                 */
+                ArrayNode.DataMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "SINGLE_INPUT_FILE"] = 0;
+                    values[valuesById[1] = "INDIVIDUAL_INPUT_FILES"] = 1;
                     return values;
                 })();
     
