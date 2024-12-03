@@ -197,6 +197,9 @@ jobs:
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flytesnacks/flyte_tests.txt
+      - name: Install Pytest
+        run: |
+          pip install pytest
       - name: End2End
         run: |
           make end2end_execute
