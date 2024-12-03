@@ -151,7 +151,7 @@ There are many ways to get involved in Flyte, including:
 - Submitting [bugs](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&template=bug_report.yaml&title=%5BBUG%5D+) and [feature requests](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2Cuntriaged&template=feature_request.yaml&title=%5BCore+feature%5D+) for various components.
 - Reviewing [the documentation](https://docs.flyte.org/en/latest/) and submitting [pull requests](https://github.com/flyteorg/flytesnacks) for anything from fixing typos to adding new content.
 - Speaking or writing about Flyte or any other ecosystem integration and [letting us know](https://flyte-org.slack.com/archives/C02JMT8KTEE)!
-- Taking on a [`help wanted`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+) or [`good-first-issue`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) and following the [CONTRIBUTING](https://docs.flyte.org/en/latest/community/contribute.html) guide to submit changes to the codebase.
+- Taking on a [`help wanted`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+) or [`good-first-issue`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) and following the [CONTRIBUTING](https://docs.flyte.org/en/latest/community/contribute/index.html) guide to submit changes to the codebase.
 - Upvoting [popular feature requests](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement+sort%3Areactions-%2B1-desc) to show your support.
 
 ### We :heart: our contributors
