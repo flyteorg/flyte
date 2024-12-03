@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -789,9 +789,12 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	}
 
 	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
-	var startedAt *v1.Time
-	if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
-		startedAt = &v1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)}
+	var startedAt *metav1.Time
+	subNodeIndexUint := uint(subNodeIndex) // #nosec G115
+	if arrayNodeState.SubNodeDeltaTimestamps.ItemsCount >= subNodeIndexUint {
+		if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
+			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
+		}
 	}
 
 	subNodeStatus := &v1alpha1.NodeStatus{

@@ -236,7 +236,7 @@ type ArrayNodeStatus struct {
 	SubNodeTaskPhases      bitarray.CompactArray `json:"subtphase,omitempty"`
 	SubNodeRetryAttempts   bitarray.CompactArray `json:"subattempts,omitempty"`
 	SubNodeSystemFailures  bitarray.CompactArray `json:"subsysfailures,omitempty"`
-	SubNodeDeltaTimestamps bitarray.CompactArray `json: "subtimestamps",omitempty"`
+	SubNodeDeltaTimestamps bitarray.CompactArray `json:"subtimestamps,omitempty"`
 	TaskPhaseVersion       uint32                `json:"taskPhaseVersion,omitempty"`
 }
 
@@ -311,7 +311,7 @@ func (in *ArrayNodeStatus) GetSubNodeDeltaTimestamps() bitarray.CompactArray {
 }
 
 func (in *ArrayNodeStatus) SetSubNodeDeltaTimestamps(subNodeDeltaTimestamps bitarray.CompactArray) {
- 	if in.SubNodeDeltaTimestamps != subNodeDeltaTimestamps {
+	if in.SubNodeDeltaTimestamps != subNodeDeltaTimestamps {
 		in.SetDirty()
 		in.SubNodeDeltaTimestamps = subNodeDeltaTimestamps
 	}

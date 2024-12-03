@@ -191,10 +191,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		Time: nowMinus,
 	}
 	nCtx.OnNodeStatus().Return(&v1alpha1.NodeStatus{
-		DataDir:   storage.DataReference("s3://bucket/data"),
-		OutputDir: storage.DataReference("s3://bucket/output"),
+		DataDir:              storage.DataReference("s3://bucket/data"),
+		OutputDir:            storage.DataReference("s3://bucket/output"),
 		LastAttemptStartedAt: &metav1NowMinus,
-		StartedAt: &metav1NowMinus,
+		StartedAt:            &metav1NowMinus,
 	})
 
 	return nCtx
@@ -516,27 +516,27 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                                string
-		parallelism                         *uint32
-		minSuccessRatio                     *float32
-		subNodePhases                       []v1alpha1.NodePhase
-		subNodeTaskPhases                   []core.Phase
-		subNodeDeltaTimestamps              []uint64
-		subNodeTransitions                  []handler.Transition
-		expectedArrayNodePhase              v1alpha1.ArrayNodePhase
-		expectedArrayNodeSubPhases          []v1alpha1.NodePhase
+		name                                    string
+		parallelism                             *uint32
+		minSuccessRatio                         *float32
+		subNodePhases                           []v1alpha1.NodePhase
+		subNodeTaskPhases                       []core.Phase
+		subNodeDeltaTimestamps                  []uint64
+		subNodeTransitions                      []handler.Transition
+		expectedArrayNodePhase                  v1alpha1.ArrayNodePhase
+		expectedArrayNodeSubPhases              []v1alpha1.NodePhase
 		expectedDiffArrayNodeSubDeltaTimestamps []bool
-		expectedTransitionPhase             handler.EPhase
-		expectedExternalResourcePhases      []idlcore.TaskExecution_Phase
-		currentWfParallelism                uint32
-		maxWfParallelism                    uint32
-		incrementParallelismCount           uint32
-		useFakeEventRecorder                bool
-		eventRecorderFailures               uint32
-		eventRecorderError                  error
-		expectedTaskPhaseVersion            uint32
-		expectHandleError                   bool
-		expectedEventingCalls               int
+		expectedTransitionPhase                 handler.EPhase
+		expectedExternalResourcePhases          []idlcore.TaskExecution_Phase
+		currentWfParallelism                    uint32
+		maxWfParallelism                        uint32
+		incrementParallelismCount               uint32
+		useFakeEventRecorder                    bool
+		eventRecorderFailures                   uint32
+		eventRecorderError                      error
+		expectedTaskPhaseVersion                uint32
+		expectHandleError                       bool
+		expectedEventingCalls                   int
 	}{
 		{
 			name:        "StartAllSubNodes",
@@ -906,7 +906,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			}
 
 			for i, deltaTimestmap := range test.subNodeDeltaTimestamps {
-				arrayNodeState.SubNodeDeltaTimestamps.SetItem(i, bitarray.Item(deltaTimestmap)) // #nosec G115
+				arrayNodeState.SubNodeDeltaTimestamps.SetItem(i, deltaTimestmap) // #nosec G115
 			}
 
 			nodeSpec := arrayNodeSpec

@@ -65,7 +65,7 @@ func (n *nodeStateManager) HasWorkflowNodeState() bool {
 }
 
 func (n *nodeStateManager) HasGateNodeState() bool {
-return n.g != nil
+	return n.g != nil
 }
 
 func (n *nodeStateManager) HasArrayNodeState() bool {
