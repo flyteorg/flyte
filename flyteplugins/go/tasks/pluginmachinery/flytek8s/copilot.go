@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "sidecar"
+	flyteSidecarContainerName = "uploader"
 	flyteInitContainerName    = "downloader"
 )
 
