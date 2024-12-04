@@ -307,6 +307,13 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
    */
   isInDynamicChain = false;
 
+  /**
+   * Whether this node launched an eager task.
+   *
+   * @generated from field: bool is_eager = 25;
+   */
+  isEager = false;
+
   constructor(data?: PartialMessage<NodeExecutionEvent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -339,6 +346,7 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
     { no: 22, name: "is_array", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 23, name: "target_entity", kind: "message", T: Identifier },
     { no: 24, name: "is_in_dynamic_chain", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 25, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeExecutionEvent {

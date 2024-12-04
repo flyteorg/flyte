@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -24,10 +25,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-const state = "state"
-
 var nonWorkspaceGeneratedTasksFilter, _ = common.NewSingleValueFilter(
-	common.NamedEntityMetadata, common.NotEqual, state, admin.NamedEntityState_WORKSPACE_GENERATED)
+	common.NamedEntityMetadata, common.NotEqual, shared.State, admin.NamedEntityState_WORKSPACE_GENERATED)
 var defaultTasksFilter, _ = common.NewWithDefaultValueFilter(
 	strconv.Itoa(int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)), nonWorkspaceGeneratedTasksFilter)
 
@@ -86,7 +85,7 @@ func (m *NamedEntityManager) getQueryFilters(referenceEntity core.ResourceType, 
 	}
 	sawStatusFilter := false
 	for _, filter := range additionalFilters {
-		if strings.Contains(filter.GetField(), state) {
+		if strings.Contains(filter.GetField(), shared.State) {
 			filterWithDefaultValue, err := common.NewWithDefaultValueFilter(
 				strconv.Itoa(int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)), filter)
 			if err != nil {

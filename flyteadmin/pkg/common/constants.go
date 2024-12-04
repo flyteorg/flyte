@@ -23,3 +23,6 @@ const MaxErrorResponseStatusBytes = 4 * 1024
 // DefaultProducerID is used in older versions of propeller which hard code this producer id.
 // See https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/pkg/controller/nodes/task/transformer.go#L114
 const DefaultProducerID = "propeller"
+
+// EagerSecretName #nosec G101
+const EagerSecretName = "EAGER_API_KEY" //nolint:gosec

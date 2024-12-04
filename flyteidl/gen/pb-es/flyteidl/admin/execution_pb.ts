@@ -936,6 +936,13 @@ export enum ExecutionMetadata_ExecutionMode {
    * @generated from enum value: TRIGGER = 6;
    */
   TRIGGER = 6,
+
+  /**
+   * Execution kicked off as part of a workspace
+   *
+   * @generated from enum value: WORKSPACE = 7;
+   */
+  WORKSPACE = 7,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ExecutionMetadata_ExecutionMode)
 proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.ExecutionMetadata.ExecutionMode", [
@@ -946,6 +953,7 @@ proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.Executi
   { no: 4, name: "CHILD_WORKFLOW" },
   { no: 5, name: "RECOVERED" },
   { no: 6, name: "TRIGGER" },
+  { no: 7, name: "WORKSPACE" },
 ]);
 
 /**

@@ -9563,6 +9563,10 @@
             "is_in_dynamic_chain": {
               "type": "boolean",
               "description": "Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of\nthe tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not\neven registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea\nif the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,\nas well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db."
+            },
+            "is_eager": {
+              "type": "boolean",
+              "description": "Whether this node launched an eager task."
             }
           },
           "description": "Details about the event that occurred.",
@@ -11098,10 +11102,11 @@
         "RELAUNCH",
         "CHILD_WORKFLOW",
         "RECOVERED",
-        "TRIGGER"
+        "TRIGGER",
+        "WORKSPACE"
       ],
       "default": "MANUAL",
-      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system"
+      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system\n - WORKSPACE: Execution kicked off as part of a workspace"
     },
     "adminExecutionQueueAttributes": {
       "type": "object",
@@ -11934,6 +11939,10 @@
         "is_array": {
           "type": "boolean",
           "description": "Boolean flag indicating if the node is an array node. This is intended to uniquely identify\narray nodes from other nodes which can have is_parent_node as true."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "Whether this node is an eager node."
         }
       },
       "title": "Represents additional attributes related to a Node Execution"
@@ -14740,6 +14749,10 @@
             "type": "string"
           },
           "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
         }
       },
       "title": "Task Metadata"
@@ -15246,6 +15259,10 @@
         "is_in_dynamic_chain": {
           "type": "boolean",
           "description": "Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of\nthe tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not\neven registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea\nif the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,\nas well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "Whether this node launched an eager task."
         }
       }
     },

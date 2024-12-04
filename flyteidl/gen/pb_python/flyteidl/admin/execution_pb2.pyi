@@ -162,6 +162,7 @@ class ExecutionMetadata(_message.Message):
         CHILD_WORKFLOW: _ClassVar[ExecutionMetadata.ExecutionMode]
         RECOVERED: _ClassVar[ExecutionMetadata.ExecutionMode]
         TRIGGER: _ClassVar[ExecutionMetadata.ExecutionMode]
+        WORKSPACE: _ClassVar[ExecutionMetadata.ExecutionMode]
     MANUAL: ExecutionMetadata.ExecutionMode
     SCHEDULED: ExecutionMetadata.ExecutionMode
     SYSTEM: ExecutionMetadata.ExecutionMode
@@ -169,6 +170,7 @@ class ExecutionMetadata(_message.Message):
     CHILD_WORKFLOW: ExecutionMetadata.ExecutionMode
     RECOVERED: ExecutionMetadata.ExecutionMode
     TRIGGER: ExecutionMetadata.ExecutionMode
+    WORKSPACE: ExecutionMetadata.ExecutionMode
     MODE_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     NESTING_FIELD_NUMBER: _ClassVar[int]

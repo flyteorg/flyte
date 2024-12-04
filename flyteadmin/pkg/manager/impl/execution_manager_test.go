@@ -3224,6 +3224,86 @@ func TestListExecutions(t *testing.T) {
 	assert.Empty(t, executionList.Token)
 }
 
+func TestListExecutions_Filters(t *testing.T) {
+	t.Run("with mode filter added", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+		sawModeFilter := false
+		executionListFunc := func(
+			ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+			for _, filter := range input.InlineFilters {
+				assert.Equal(t, common.Execution, filter.GetEntity())
+				queryExpr, _ := filter.GetGormQueryExpr()
+				if queryExpr.Args == admin.ExecutionMetadata_WORKSPACE && queryExpr.Query == "mode <> ?" {
+					sawModeFilter = true
+				}
+			}
+
+			return interfaces.ExecutionCollectionOutput{}, nil
+
+		}
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
+		r := getDefaultPluginRegistry()
+		mockResourceManager := getNoopMockResourceManager()
+		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
+
+		_, err := execManager.ListExecutions(context.Background(), admin.ResourceListRequest{
+			Id: &admin.NamedEntityIdentifier{
+				Project: projectValue,
+				Domain:  domainValue,
+			},
+			Limit: limit,
+			SortBy: &admin.Sort{
+				Direction: admin.Sort_ASCENDING,
+				Key:       "execution_domain",
+			},
+			Token: "2",
+		})
+		assert.NoError(t, err)
+		assert.True(t, sawModeFilter)
+	})
+	t.Run("without mode filter added", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+		sawUserSpecifiedModeFilter := false
+		sawWorkspaceExcludedModeFilter := false
+		executionListFunc := func(
+			ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+			for _, filter := range input.InlineFilters {
+				assert.Equal(t, common.Execution, filter.GetEntity())
+				queryExpr, _ := filter.GetGormQueryExpr()
+				if queryExpr.Query == "mode <> ?" && queryExpr.Args == admin.ExecutionMetadata_WORKSPACE {
+					sawWorkspaceExcludedModeFilter = true
+				} else if queryExpr.Query == "mode = ?" && queryExpr.Args == "3" {
+					sawUserSpecifiedModeFilter = true
+				}
+			}
+
+			return interfaces.ExecutionCollectionOutput{}, nil
+
+		}
+		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
+		r := getDefaultPluginRegistry()
+		mockResourceManager := getNoopMockResourceManager()
+		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
+
+		_, err := execManager.ListExecutions(context.Background(), admin.ResourceListRequest{
+			Id: &admin.NamedEntityIdentifier{
+				Project: projectValue,
+				Domain:  domainValue,
+			},
+			Limit: limit,
+			SortBy: &admin.Sort{
+				Direction: admin.Sort_ASCENDING,
+				Key:       "execution_domain",
+			},
+			Token:   "2",
+			Filters: "eq(mode, 3)",
+		})
+		assert.NoError(t, err)
+		assert.True(t, sawUserSpecifiedModeFilter)
+		assert.False(t, sawWorkspaceExcludedModeFilter)
+	})
+}
+
 func TestListExecutions_MissingParameters(t *testing.T) {
 	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()

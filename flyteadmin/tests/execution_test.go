@@ -145,19 +145,19 @@ func TestUpdateWorkflowExecution_InvalidPhaseTransitions(t *testing.T) {
 func populateWorkflowExecutionsForTestingOnly() {
 	insertExecutionStatements := []string{
 		// Insert a couple of executions with the same project + domain for the same launch plan & workflow
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z"),
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name2", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name2", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
 
 		// And one with a different launch plan
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name3", "RUNNING", 3, 2, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name3", "RUNNING", 3, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
 
 		// And another with a different workflow
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name4", "FAILED", 1, 4, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name4", "FAILED", 1, 4, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
 
 		// And a few in a whole different project + domain scope
 		// (still referencing the same launch plan and workflow just to avoid inserting additional values in the db).
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z"),
-		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
+		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL)),
 	}
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()

@@ -70,6 +70,17 @@ func (t *TaskManager) CreateTask(
 	}
 	ctx = getTaskContext(ctx, request.Id)
 	finalizedRequest, err := setDefaults(request)
+	// Add eager secret requests
+	if util.IsEagerTask(request) {
+		// This secret doesn't require any group as we use union secrets manager for storing the secret which doesn't use the group.
+		secretRequest := core.Secret{
+			Key: common.EagerSecretName,
+		}
+		if finalizedRequest.Spec.Template.GetSecurityContext() == nil {
+			finalizedRequest.Spec.Template.SecurityContext = &core.SecurityContext{}
+		}
+		finalizedRequest.Spec.Template.GetSecurityContext().Secrets = append(finalizedRequest.Spec.Template.GetSecurityContext().Secrets, &secretRequest)
+	}
 	if err != nil {
 		return nil, err
 	}
