@@ -389,8 +389,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 			arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
 
-			indexUint := uint(index) // #nosec G115
-			if arrayNodeState.SubNodeDeltaTimestamps.ItemsCount > indexUint {
+			if arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
 				startedAt := nCtx.NodeStatus().GetLastAttemptStartedAt()
 				subNodeStartedAt := subNodeStatus.GetLastAttemptStartedAt()
 				if subNodeStartedAt == nil {
@@ -793,8 +792,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 
 	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
 	var startedAt *metav1.Time
-	subNodeIndexUint := uint(subNodeIndex) // #nosec G115
-	if arrayNodeState.SubNodeDeltaTimestamps.ItemsCount > subNodeIndexUint {
+	if nCtx.NodeStatus().GetLastAttemptStartedAt() != nil && arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
 		if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
 			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
 		}
