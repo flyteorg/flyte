@@ -197,6 +197,11 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		case *core.ArrayNode_MinSuccessRatio:
 			nodeSpec.ArrayNode.MinSuccessRatio = &successCriteria.MinSuccessRatio
 		}
+
+		// TODO @hamersaw - tmp
+		nodeSpec.ActiveDeadline = nil
+		nodeSpec.ExecutionDeadline = nil
+		nodeSpec.RetryStrategy = nil
 	default:
 		if n.GetId() == v1alpha1.StartNodeID {
 			nodeSpec.Kind = v1alpha1.NodeKindStart
