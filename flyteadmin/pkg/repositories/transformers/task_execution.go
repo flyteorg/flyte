@@ -309,6 +309,9 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 		existing.CacheStatus = latest.GetCacheStatus()
 	}
 	existing.Logs = mergeLogs(existing.GetLogs(), latest.GetLogs())
+	if latest.GetDeckUri() != "" && existing.GetDeckUri() != latest.GetDeckUri() {
+		existing.DeckUri = latest.GetDeckUri()
+	}
 
 	return existing
 }

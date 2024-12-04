@@ -9202,6 +9202,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo deckUri */
+            deckUri?: (string|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9230,6 +9233,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo deckUri. */
+            public deckUri: string;
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
