@@ -468,7 +468,7 @@ func GetSubNodesFromParentNodeExecution(ctx context.Context, db repoInterfaces.R
 	return subNodeIds, nil
 }
 
-func IsEagerTask(request admin.TaskCreateRequest) bool {
+func IsEagerTask(request *admin.TaskCreateRequest) bool {
 	if request.GetSpec() == nil || request.GetSpec().GetTemplate() == nil || request.GetSpec().GetTemplate().GetMetadata() == nil {
 		return false
 	}

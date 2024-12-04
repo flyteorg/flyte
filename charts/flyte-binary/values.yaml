@@ -160,7 +160,7 @@ configuration:
     # image Configure image to use for CoPilot sidecar
     image:
       # repository CoPilot sidecar image repository
-      repository: cr.flyte.org/flyteorg/flytecopilot # FLYTECOPILOT_IMAGE
+      repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
       # tag CoPilot sidecar image tag
       tag: v1.13.3  # FLYTECOPILOT_TAG
   # agentService Flyte Agent configuration
@@ -210,9 +210,9 @@ deployment:
   # image Configure image to use for Flyte
   image:
     # repository Flyte image repository
-    repository: cr.flyte.org/flyteorg/flyte-binary # FLYTE_IMAGE
+    repository: cr.flyte.org/flyteorg/flyte-binary  # FLYTE_IMAGE
     # tag Flyte image tag
-    tag: latest # FLYTE_TAG
+    tag: latest  # FLYTE_TAG
     # pullPolicy Flyte image pull policy
     pullPolicy: IfNotPresent
   # extraEnvVars Array with extra environment variables to add to Flyte

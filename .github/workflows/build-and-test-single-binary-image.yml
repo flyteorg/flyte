@@ -10,6 +10,7 @@ on:
     branches:
       - master
       - rc/*
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -181,11 +182,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-<<<<<<< HEAD:.github/workflows/build-and-test-single-binary-image.yml
-          uv pip install --system flytekit==1.13.5 flytekitplugins-deck-standard==1.13.5 "numpy<2.0.0" pyarrow pandas
-=======
           uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow pandas
->>>>>>> 881d7a234 (v1.13.2 - Update Flyte components (#5791)):.github/workflows/single-binary.yml
           uv pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4

@@ -6,7 +6,6 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/enescakir/emoji"
-
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"

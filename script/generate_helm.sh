@@ -9,9 +9,7 @@ HELM_SKIP_INSTALL=${HELM_SKIP_INSTALL:-false}
 if [ "${HELM_SKIP_INSTALL}" != "true" ]; then
   # Helm 3.16 broke dependencies resolution in Chart.yaml
   # Ref: https://github.com/helm/helm/issues/13324
-	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.4 bash
-||||||| parent of e67aae054 (Add listing api to stow storage (#5741))
-	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | DESIRED_VERSION=v3.15.4 bash
 fi
 
 helm version
@@ -31,9 +29,9 @@ helm dep update ${DIR}/../charts/flyte/
 helm template flyte -n flyte ${DIR}/../charts/flyte/ -f ${DIR}/../charts/flyte/values.yaml ${HELM_CAPABILITIES} --debug >${DIR}/../deployment/sandbox/flyte_helm_generated.yaml
 
 for deployment in ${DEPLOYMENT_CORE}; do
-	helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
-	helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml -f ${DIR}/../charts/flyte-core/values-controlplane.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_controlplane_generated.yaml
-	helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml -f ${DIR}/../charts/flyte-core/values-dataplane.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_dataplane_generated.yaml
+  helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+  helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml -f ${DIR}/../charts/flyte-core/values-controlplane.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_controlplane_generated.yaml
+  helm template flyte -n flyte ${DIR}/../charts/flyte-core/ -f ${DIR}/../charts/flyte-core/values.yaml -f ${DIR}/../charts/flyte-core/values-${deployment}.yaml -f ${DIR}/../charts/flyte-core/values-dataplane.yaml ${HELM_CAPABILITIES} >${DIR}/../deployment/${deployment}/flyte_helm_dataplane_generated.yaml
 done
 
 # Generate manifest AWS Scheduler
@@ -50,7 +48,7 @@ helm template flyte -n flyte ${DIR}/../charts/flyteagent/ ${HELM_CAPABILITIES} -
 
 echo "Generating helm docs"
 if command -v helm-docs &>/dev/null; then
-	rm $(which helm-docs)
+  rm $(which helm-docs)
 fi
 
 # TODO: (https://github.com/flyteorg/flyte/issues/4994) Unpin when moving past go 1.21
@@ -60,16 +58,16 @@ ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
-	DIRTY=$(git status --porcelain)
-	if [ -n "$DIRTY" ]; then
-		echo "FAILED: helm code updated without committing generated code."
-		echo "Ensure make helm has run and all changes are committed."
-		DIFF=$(git diff)
-		echo "diff detected: $DIFF"
-		DIFF=$(git diff --name-only)
-		echo "files different: $DIFF"
-		exit 1
-	else
-		echo "SUCCESS: Generated code is up to date."
-	fi
+  DIRTY=$(git status --porcelain)
+  if [ -n "$DIRTY" ]; then
+    echo "FAILED: helm code updated without committing generated code."
+    echo "Ensure make helm has run and all changes are committed."
+    DIFF=$(git diff)
+    echo "diff detected: $DIFF"
+    DIFF=$(git diff --name-only)
+    echo "files different: $DIFF"
+    exit 1
+  else
+    echo "SUCCESS: Generated code is up to date."
+  fi
 fi

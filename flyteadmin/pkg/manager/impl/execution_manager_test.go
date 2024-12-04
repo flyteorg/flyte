@@ -3246,7 +3246,7 @@ func TestListExecutions_Filters(t *testing.T) {
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
-		_, err := execManager.ListExecutions(context.Background(), admin.ResourceListRequest{
+		_, err := execManager.ListExecutions(context.Background(), &admin.ResourceListRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Project: projectValue,
 				Domain:  domainValue,
@@ -3285,7 +3285,7 @@ func TestListExecutions_Filters(t *testing.T) {
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
-		_, err := execManager.ListExecutions(context.Background(), admin.ResourceListRequest{
+		_, err := execManager.ListExecutions(context.Background(), &admin.ResourceListRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Project: projectValue,
 				Domain:  domainValue,

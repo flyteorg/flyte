@@ -1,7 +1,7 @@
 name: Components Checks
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 on:
@@ -9,7 +9,6 @@ on:
   push:
     branches:
       - master
-      - 'release-v**'
 env:
   GO_VERSION: "1.22"
   PRIORITIES: "P0"
@@ -66,21 +65,35 @@ jobs:
     with:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  flyteadmin-int-tests-image-build:
+  docker-build:
     strategy:
       fail-fast: false
-    name: flyteadmin integration tests image 
+      matrix:
+        component:
+          - cacheservice
+          - datacatalog
+          - flyteadmin
+          - flytecopilot
+          - flytepropeller
+    name: Docker Build Images
     uses: ./.github/workflows/component_docker_build.yml
     with:
-      component: flyteadmin
+      component: ${{ matrix.component }}
 
-  flyteadmin-integration-tests:
+  # TODO(monorepo): these tests are broken. They never test an actual change.
+  # endtoend:
+  #   name: End2End Test
+  #   needs: [ docker-build ]
+  #   uses: ./.github/workflows/end2end.yml
+  #   with:
+  #     # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
+  #     cache_key: ${{ needs.docker-build.outputs.cache_key }}
+  #     priorities: "P0"
+
+  integration:
     name: Integration Test
     needs:
-      - flyteadmin-int-tests-image-build
+      - docker-build
       - unpack-envvars
     strategy:
       fail-fast: false
@@ -90,7 +103,7 @@ jobs:
     uses: ./.github/workflows/integration.yml
     with:
       component: ${{ matrix.component }}
-      cache_key: ${{ needs.flyteadmin-int-tests-image-build.outputs.cache_key }}
+      cache_key: ${{ needs.docker-build.outputs.cache_key }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
   generate:
@@ -112,39 +125,16 @@ jobs:
     with:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
   build_docker_images:
     name: Build Images
-    uses: ./.github/workflows/publish-images.yml
+    uses: ./.github/workflows/build-and-push-all-docker-images.yml
     with:
       push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
 
-  dry_run_goreleaser:
-    name: Dry Run Goreleaser
-    runs-on: ubuntu-latest
-    needs:
-      - unpack-envvars
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
-      - uses: actions/setup-go@v4
-        with:
-          go-version: ${{ needs.unpack-envvars.outputs.go-version }}
-      - name: Run GoReleaser dry run
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          distribution: goreleaser-pro
-          version: latest
-          args: --snapshot  --skip-publish --rm-dist -f flytectl/.goreleaser.yml
-        env:
-          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+  build_and_test_single_binary:
+    name: Build and Test Single Binary Image
+    uses: ./.github/workflows/build-and-test-single-binary-image.yml
 
   sandbox:
     name: Test Getting started

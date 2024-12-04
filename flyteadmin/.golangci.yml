@@ -7,25 +7,21 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - gas
     - gci
     - goconst
     - goimports
-    - golint
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
 
 linters-settings:
   gci:

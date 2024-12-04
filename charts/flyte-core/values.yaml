@@ -1102,12 +1102,6 @@ cluster_resource_manager:
                 value: "3000Mi"
   secretName: "unionCloudSecretAuth"
 
-
-  prometheus:
-    enabled: false
-    path: "/metrics"
-    port: 10254
-
   prometheus:
     enabled: false
     path: "/metrics"
