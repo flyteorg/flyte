@@ -235,6 +235,9 @@ message ExecutionMetadata {
 
         // Execution was kicked off by the artifact trigger system
         TRIGGER = 6;
+
+        // Execution kicked off as part of a workspace
+        WORKSPACE = 7;
     }
     ExecutionMode mode = 1;
 

@@ -42,4 +42,5 @@ const (
 	ExecutionCreatedAt = "execution_created_at"
 	ExecutionUpdatedAt = "execution_updated_at"
 	Configuration      = "configuration"
+	Mode               = "mode"
 )

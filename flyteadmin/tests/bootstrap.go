@@ -11,14 +11,15 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const insertExecutionQueryStr = `INSERT INTO "executions" ` +
-	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id","execution_created_at") ` +
-	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d', '%s')`
+	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id","execution_created_at", "mode") ` +
+	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%d')`
 
 const integrationTestConfigEnvVar = "USE_INTEGRATION_TEST_CONFIG"
 
@@ -122,7 +123,7 @@ func truncateAllTablesForTestingOnly() {
 }
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {
-	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2, "2020-01-01T00:00:00Z")
+	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2, "2020-01-01T00:00:00Z", int(admin.ExecutionMetadata_MANUAL))
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {

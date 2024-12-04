@@ -2178,6 +2178,25 @@ func (m *ExecutionManager) GetExecutionData(
 	return response, nil
 }
 
+func (m *ExecutionManager) addDefaultRequestFilters(ctx context.Context, filters []common.InlineFilter) []common.InlineFilter {
+	sawModeFilter := false
+	for _, filter := range filters {
+		if filter.GetField() == shared.Mode {
+			sawModeFilter = true
+			break
+		}
+	}
+	if sawModeFilter {
+		return filters
+	}
+	stateFilter, err := common.NewInlineFilter(common.Execution, "ne", shared.Mode, admin.ExecutionMetadata_WORKSPACE)
+	if err != nil {
+		logger.Errorf(ctx, "failed to generate mode filter to exclude workspace executions: %v", err)
+	}
+	filters = append(filters, stateFilter)
+	return filters
+}
+
 func (m *ExecutionManager) ListExecutions(
 	ctx context.Context, request admin.ResourceListRequest) (*admin.ExecutionList, error) {
 	// Check required fields
@@ -2196,6 +2215,7 @@ func (m *ExecutionManager) ListExecutions(
 	if err != nil {
 		return nil, err
 	}
+	filters = m.addDefaultRequestFilters(ctx, filters)
 
 	sortParameter, err := common.NewSortParameter(request.SortBy, models.ExecutionColumns)
 	if err != nil {

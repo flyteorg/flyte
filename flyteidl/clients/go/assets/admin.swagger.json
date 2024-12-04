@@ -11080,10 +11080,11 @@
         "RELAUNCH",
         "CHILD_WORKFLOW",
         "RECOVERED",
-        "TRIGGER"
+        "TRIGGER",
+        "WORKSPACE"
       ],
       "default": "MANUAL",
-      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system"
+      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system\n - WORKSPACE: Execution kicked off as part of a workspace"
     },
     "adminExecutionQueueAttributes": {
       "type": "object",
