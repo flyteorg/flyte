@@ -34,9 +34,9 @@ type cachedRawStore struct {
 }
 
 // Head gets metadata about the reference. This should generally be a lightweight operation.
-func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
+func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (_ Metadata, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/Head")
-	defer span.End()
+	defer span.EndErr(err)
 
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -51,9 +51,9 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 }
 
 // ReadRaw retrieves a byte array from the Blob store or an error
-func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
+func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (_ io.ReadCloser, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/ReadRaw")
-	defer span.End()
+	defer span.EndErr(err)
 
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
@@ -90,13 +90,13 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 }
 
 // WriteRaw stores a raw byte array.
-func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
+func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) (err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/WriteRaw")
-	defer span.End()
+	defer span.EndErr(err)
 
 	var buf bytes.Buffer
 	teeReader := io.TeeReader(raw, &buf)
-	err := s.RawStore.WriteRaw(ctx, reference, size, opts, teeReader)
+	err = s.RawStore.WriteRaw(ctx, reference, size, opts, teeReader)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 }
 
 // Delete removes the referenced data from the cache as well as underlying store.
-func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) error {
+func (s *cachedRawStore) Delete(ctx context.Context, reference DataReference) (err error) {
 	key := []byte(reference)
 	if deleted := s.cache.Del(key); deleted {
 		s.metrics.CacheHit.Inc()

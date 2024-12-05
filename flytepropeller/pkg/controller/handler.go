@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -177,10 +176,9 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 //	                  +---------+        +---------------------+        +--------+
 //
 // </pre>
-func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
-	var span trace.Span
-	ctx, span = otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/Handle")
-	defer span.End()
+func (p *Propeller) Handle(ctx context.Context, namespace, name string) (err error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/Handle")
+	defer span.EndErr(err)
 
 	logger.Infof(ctx, "Processing Workflow.")
 	defer logger.Infof(ctx, "Completed processing workflow.")
@@ -188,7 +186,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	// Get the FlyteWorkflow resource with this namespace/name
 	_, wfStoreGetSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Get")
 	w, fetchErr := p.wfStore.Get(ctx, namespace, name)
-	wfStoreGetSpan.End()
+	wfStoreGetSpan.EndErr(fetchErr)
 	if fetchErr != nil {
 		if workflowstore.IsNotFound(fetchErr) {
 			p.metrics.WorkflowNotFound.Inc()
@@ -221,7 +219,6 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	// static fields to the blobstore to reduce CRD size. we must read and parse the workflow
 	// closure so that these fields may be temporarily repopulated.
 	var wfClosureCrdFields *k8s.WfClosureCrdFields
-	var err error
 	if len(w.WorkflowClosureReference) > 0 {
 		wfClosureCrdFields, err = p.parseWorkflowClosureCrdFields(ctx, w.WorkflowClosureReference)
 		if err != nil {
@@ -253,15 +250,15 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 
 // parseWorkflowClosureCrdFields attempts to retrieve offloaded static workflow closure data from the specified
 // DataReference.
-func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataReference storage.DataReference) (*k8s.WfClosureCrdFields, error) {
+func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataReference storage.DataReference) (_ *k8s.WfClosureCrdFields, err error) {
 	_, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/parseWorkflowClosureCrdFields")
-	defer span.End()
+	defer span.EndErr(err)
 
 	t := p.metrics.WorkflowClosureReadTime.Start(ctx)
 	defer t.Stop()
 
 	wfClosure := &admin.WorkflowClosure{}
-	err := p.store.ReadProtobuf(ctx, dataReference, wfClosure)
+	err = p.store.ReadProtobuf(ctx, dataReference, wfClosure)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to retrieve workflow closure data from '%s' with error '%s'", dataReference, err)
 		return nil, err
@@ -278,9 +275,9 @@ func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataRefer
 
 // streak performs a single iteration of mutating a workflow returning the newly mutated workflow on success or nil if
 // the workflow was not updated.
-func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClosureCrdFields *k8s.WfClosureCrdFields) (*v1alpha1.FlyteWorkflow, error) {
+func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClosureCrdFields *k8s.WfClosureCrdFields) (_ *v1alpha1.FlyteWorkflow, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/streak")
-	defer span.End()
+	defer span.EndErr(err)
 
 	t := p.metrics.RoundTime.Start(ctx)
 	defer t.Stop()
@@ -376,7 +373,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 	// nothing other than resource status has been updated.
 	_, wfStoreUpdateSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Update")
 	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
-	wfStoreUpdateSpan.End()
+	wfStoreUpdateSpan.EndErr(updateErr)
 	if updateErr != nil {
 		// The update has failed, lets check if this is because the size is too large. If so
 		if workflowstore.IsWorkflowTooLarge(updateErr) {
