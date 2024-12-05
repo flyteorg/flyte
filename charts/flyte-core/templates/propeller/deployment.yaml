@@ -83,7 +83,11 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
+        {{- if and (.Values.flytepropeller.manager) (.Values.flytepropeller.manager_resources) }}
+        resources: {{- toYaml .Values.flytepropeller.manager_resources.resources | nindent 10 }}
+        {{- else }}
         resources: {{- toYaml .Values.flytepropeller.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
