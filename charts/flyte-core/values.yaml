@@ -851,6 +851,8 @@ configmap:
           type: bucket
           rate: 10
           capacity: 100
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /etc/webhook/certs
       serviceName: flyte-pod-webhook
