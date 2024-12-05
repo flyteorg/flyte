@@ -4249,6 +4249,15 @@
       },
       "title": "Sets custom attributes for a project, domain and workflow combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
+    "ArrayNodeDataMode": {
+      "type": "string",
+      "enum": [
+        "SINGLE_INPUT_FILE",
+        "INDIVIDUAL_INPUT_FILES"
+      ],
+      "default": "SINGLE_INPUT_FILE",
+      "description": " - SINGLE_INPUT_FILE: Indicates the ArrayNode will utilize the passed in, single input file for all sub-nodes.\n - INDIVIDUAL_INPUT_FILES: Indicates the ArrayNode will create input files for each sub-node."
+    },
     "BlobTypeBlobDimensionality": {
       "type": "string",
       "enum": [
@@ -6568,6 +6577,10 @@
         "is_original_sub_node_interface": {
           "type": "boolean",
           "title": "Indicates whether the sub node's original interface was altered"
+        },
+        "data_mode": {
+          "$ref": "#/definitions/ArrayNodeDataMode",
+          "title": "data_mode determines how input data is passed to the sub-nodes"
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
