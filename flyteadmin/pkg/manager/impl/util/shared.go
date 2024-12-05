@@ -22,8 +22,8 @@ import (
 )
 
 func GetExecutionName(request *admin.ExecutionCreateRequest) string {
-	if request.Name != "" {
-		return request.Name
+	if request.GetName() != "" {
+		return request.GetName()
 	}
 	return common.GetExecutionName(time.Now().UnixNano())
 }
@@ -46,10 +46,10 @@ func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier *co
 func GetWorkflowModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.Workflow, error) {
 	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
+		Version: identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.Workflow{}, err
@@ -87,7 +87,7 @@ func GetWorkflow(
 	if err != nil {
 		return nil, err
 	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
+	closure.CreatedAt = workflow.GetClosure().GetCreatedAt()
 	workflow.Closure = closure
 	return &workflow, nil
 }
@@ -95,10 +95,10 @@ func GetWorkflow(
 func GetLaunchPlanModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.LaunchPlan, error) {
 	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
+		Version: identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.LaunchPlan{}, err
@@ -119,9 +119,9 @@ func GetNamedEntityModel(
 	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier *admin.NamedEntityIdentifier) (models.NamedEntity, error) {
 	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
 		ResourceType: resourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
+		Project:      identifier.GetProject(),
+		Domain:       identifier.GetDomain(),
+		Name:         identifier.GetName(),
 	})
 	if err != nil {
 		return models.NamedEntity{}, err
@@ -142,11 +142,11 @@ func GetNamedEntity(
 func GetDescriptionEntityModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.DescriptionEntity, error) {
 	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, repoInterfaces.GetDescriptionEntityInput{
-		ResourceType: identifier.ResourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
-		Version:      identifier.Version,
+		ResourceType: identifier.GetResourceType(),
+		Project:      identifier.GetProject(),
+		Domain:       identifier.GetDomain(),
+		Name:         identifier.GetName(),
+		Version:      identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.DescriptionEntity{}, err
@@ -211,9 +211,9 @@ func GetExecutionModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier *core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
 	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
 	})
 	if err != nil {
 		return nil, err
@@ -236,10 +236,10 @@ func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, 
 func GetTaskModel(ctx context.Context, repo repoInterfaces.Repository, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
 	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: taskIdentifier.Project,
-		Domain:  taskIdentifier.Domain,
-		Name:    taskIdentifier.Name,
-		Version: taskIdentifier.Version,
+		Project: taskIdentifier.GetProject(),
+		Domain:  taskIdentifier.GetDomain(),
+		Name:    taskIdentifier.GetName(),
+		Version: taskIdentifier.GetVersion(),
 	})
 
 	if err != nil {
@@ -305,15 +305,15 @@ func MergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec
 	// Hence we do a deep check in the following conditions before assignment
 	if (workflowExecConfig.GetRawOutputDataConfig() == nil ||
 		len(workflowExecConfig.GetRawOutputDataConfig().GetOutputLocationPrefix()) == 0) &&
-		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().OutputLocationPrefix) > 0) {
+		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().GetOutputLocationPrefix()) > 0) {
 		workflowExecConfig.RawOutputDataConfig = spec.GetRawOutputDataConfig()
 	}
-	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().Values) == 0) &&
-		(spec.GetLabels() != nil && len(spec.GetLabels().Values) > 0) {
+	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().GetValues()) == 0) &&
+		(spec.GetLabels() != nil && len(spec.GetLabels().GetValues()) > 0) {
 		workflowExecConfig.Labels = spec.GetLabels()
 	}
-	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().Values) == 0) &&
-		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().Values) > 0) {
+	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().GetValues()) == 0) &&
+		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().GetValues()) > 0) {
 		workflowExecConfig.Annotations = spec.GetAnnotations()
 	}
 
@@ -325,8 +325,8 @@ func MergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec
 		workflowExecConfig.OverwriteCache = spec.GetOverwriteCache()
 	}
 
-	if (workflowExecConfig.GetEnvs() == nil || len(workflowExecConfig.GetEnvs().Values) == 0) &&
-		(spec.GetEnvs() != nil && len(spec.GetEnvs().Values) > 0) {
+	if (workflowExecConfig.GetEnvs() == nil || len(workflowExecConfig.GetEnvs().GetValues()) == 0) &&
+		(spec.GetEnvs() != nil && len(spec.GetEnvs().GetValues()) > 0) {
 		workflowExecConfig.Envs = spec.GetEnvs()
 	}
 

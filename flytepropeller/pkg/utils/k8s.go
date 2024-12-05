@@ -37,7 +37,7 @@ var invalidDNS1123Characters = regexp.MustCompile("[^-a-z0-9]+")
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 	envVars := make([]v1.EnvVar, 0, len(env))
 	for _, kv := range env {
-		envVars = append(envVars, v1.EnvVar{Name: kv.Key, Value: kv.Value})
+		envVars = append(envVars, v1.EnvVar{Name: kv.GetKey(), Value: kv.GetValue()})
 	}
 	return envVars
 }

@@ -135,6 +135,7 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+	make -C flytectl go-tidy
 
 .PHONY: lint-helm-charts
 lint-helm-charts:

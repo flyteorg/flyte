@@ -499,6 +499,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - FLYTE_PLATFORM_URL: 'flyte-sandbox-grpc.flyte:8089'
+        - FLYTE_PLATFORM_INSECURE: true
     storage:
       signedURL:
         stowConfigOverride:
@@ -801,7 +803,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UVc1NklJQVV6SUJrdWx4bw==
+  haSharedSecret: b3pESlBJbFBGdjBHQjUzTQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1199,7 +1201,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: c2649df6bcb523f120c73b0fdeec5d9516f555eab12e4eae78b04dea2cf2abae
+        checksum/configuration: 956d7a4502a3f977583a7b1bf4da2e985d64c09c94f357798ce289efa25facd7
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1365,7 +1367,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 8bb91d4715c3fa73d3ba293ae280b3712cdea39180b99789415d590927199169
+        checksum/secret: beed8c901d51f3266dcdb7285b489264504d92a294a89b70320a4160fbbe3692
       labels:
         app: docker-registry
         release: flyte-sandbox

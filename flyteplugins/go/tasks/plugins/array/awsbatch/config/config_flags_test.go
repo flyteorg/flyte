@@ -113,14 +113,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_jobStoreConfig.parallelizm", func(t *testing.T) {
+	t.Run("Test_jobStoreConfig.parallelism", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("jobStoreConfig.parallelizm", testValue)
-			if vInt, err := cmdFlags.GetInt("jobStoreConfig.parallelizm"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.JobStoreConfig.Parallelizm)
+			cmdFlags.Set("jobStoreConfig.parallelism", testValue)
+			if vInt, err := cmdFlags.GetInt("jobStoreConfig.parallelism"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.JobStoreConfig.Parallelism)
 
 			} else {
 				assert.FailNow(t, err.Error())

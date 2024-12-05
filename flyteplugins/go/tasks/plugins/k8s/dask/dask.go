@@ -20,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
@@ -66,7 +66,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	daskJob := plugins.DaskJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &daskJob)
+	err = utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &daskJob)
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -85,13 +85,13 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetAnnotations(), objectMeta.Annotations)
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetLabels(), objectMeta.Labels)
 
-	workerSpec, err := createWorkerSpec(*daskJob.Workers, podSpec, primaryContainerName)
+	workerSpec, err := createWorkerSpec(daskJob.GetWorkers(), podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	schedulerSpec, err := createSchedulerSpec(*daskJob.Scheduler, clusterName, nonInterruptiblePodSpec, primaryContainerName)
+	schedulerSpec, err := createSchedulerSpec(daskJob.GetScheduler(), clusterName, nonInterruptiblePodSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return job, nil
 }
 
-func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.WorkerSpec, error) {
+func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.WorkerSpec, error) {
 	workerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(workerPodSpec, primaryContainerName)
 	if err != nil {
@@ -128,7 +128,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	// Set custom resources
 	resources := &primaryContainer.Resources
 	clusterResources := cluster.GetResources()
-	if len(clusterResources.Requests) >= 1 || len(clusterResources.Limits) >= 1 {
+	if len(clusterResources.GetRequests()) >= 1 || len(clusterResources.GetLimits()) >= 1 {
 		resources, err = flytek8s.ToK8sResourceRequirements(cluster.GetResources())
 		if err != nil {
 			return nil, err
@@ -174,7 +174,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	}, nil
 }
 
-func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.SchedulerSpec, error) {
+func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)
 	if err != nil {
@@ -190,7 +190,7 @@ func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, po
 	// Override resources if applicable
 	resources := &primaryContainer.Resources
 	schedulerResources := scheduler.GetResources()
-	if len(schedulerResources.Requests) >= 1 || len(schedulerResources.Limits) >= 1 {
+	if len(schedulerResources.GetRequests()) >= 1 || len(schedulerResources.GetLimits()) >= 1 {
 		resources, err = flytek8s.ToK8sResourceRequirements(scheduler.GetResources())
 		if err != nil {
 			return nil, err

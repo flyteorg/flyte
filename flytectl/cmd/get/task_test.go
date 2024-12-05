@@ -244,7 +244,7 @@ func TestGetTaskFunc(t *testing.T) {
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
 	s.FetcherExt.OnFetchAllVerOfTaskMatch(mock.Anything, mock.Anything, mock.Anything,
-		mock.Anything, mock.Anything).Return(taskListResponse.Tasks, nil)
+		mock.Anything, mock.Anything).Return(taskListResponse.GetTasks(), nil)
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchAllVerOfTask", s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{})
@@ -329,7 +329,7 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
-	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.Tasks, nil)
+	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.GetTasks(), nil)
 	config.GetConfig().Output = "table"
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
@@ -455,7 +455,7 @@ func TestGetTasks(t *testing.T) {
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
-	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.Tasks, nil)
+	s.FetcherExt.OnFetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.GetTasks(), nil)
 
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
 	assert.Nil(t, err)
@@ -471,8 +471,8 @@ func TestGetTasksFilters(t *testing.T) {
 	}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
 	filteredTasks := []*admin.Task{}
-	for _, task := range taskListResponse.Tasks {
-		if task.Id.Name == "task1" && task.Id.Version == "v1" {
+	for _, task := range taskListResponse.GetTasks() {
+		if task.GetId().GetName() == "task1" && task.GetId().GetVersion() == "v1" {
 			filteredTasks = append(filteredTasks, task)
 		}
 	}

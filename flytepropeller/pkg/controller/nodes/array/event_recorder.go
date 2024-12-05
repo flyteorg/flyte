@@ -93,10 +93,10 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
 	for _, nodeExecutionEvent := range e.nodeEvents {
-		switch target := nodeExecutionEvent.TargetMetadata.(type) {
+		switch target := nodeExecutionEvent.GetTargetMetadata().(type) {
 		case *event.NodeExecutionEvent_TaskNodeMetadata:
 			if target.TaskNodeMetadata != nil {
-				cacheStatus = target.TaskNodeMetadata.CacheStatus
+				cacheStatus = target.TaskNodeMetadata.GetCacheStatus()
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(e.taskEvents) == 0 {
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
-			Index:        uint32(index),
+			Index:        uint32(index), // #nosec G115
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
 			CacheStatus:  cacheStatus,
@@ -122,7 +122,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	}
 
 	for _, taskExecutionEvent := range e.taskEvents {
-		if mapLogPlugin != nil && len(taskExecutionEvent.Logs) > 0 {
+		if mapLogPlugin != nil && len(taskExecutionEvent.GetLogs()) > 0 {
 			// override log links for subNode execution with map plugin
 			logs, err := getPluginLogs(mapLogPlugin, nCtx, index, retryAttempt)
 			if err != nil {
@@ -132,16 +132,16 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			}
 		}
 
-		for _, log := range taskExecutionEvent.Logs {
-			log.Name = fmt.Sprintf("%s-%d", log.Name, index)
+		for _, log := range taskExecutionEvent.GetLogs() {
+			log.Name = fmt.Sprintf("%s-%d", log.GetName(), index)
 		}
 
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
-			Index:        uint32(index),
-			Logs:         taskExecutionEvent.Logs,
+			Index:        uint32(index), // #nosec G115
+			Logs:         taskExecutionEvent.GetLogs(),
 			RetryAttempt: retryAttempt,
-			Phase:        taskExecutionEvent.Phase,
+			Phase:        taskExecutionEvent.GetPhase(),
 			CacheStatus:  cacheStatus,
 		})
 	}
@@ -175,7 +175,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 
 	nodeExecutionID := *nCtx.NodeExecutionMetadata().GetNodeExecutionID()
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
-		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
+		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.GetNodeId())
 		if err != nil {
 			return err
 		}
@@ -315,7 +315,7 @@ func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContex
 	extraLogTemplateVars := []tasklog.TemplateVar{
 		{
 			Regex: mapplugin.LogTemplateRegexes.ExecutionIndex,
-			Value: strconv.FormatUint(uint64(index), 10),
+			Value: strconv.FormatUint(uint64(index), 10), // #nosec G115
 		},
 		{
 			Regex: mapplugin.LogTemplateRegexes.RetryAttempt,
@@ -374,12 +374,12 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	taskExecutionEvent := &event.TaskExecutionEvent{
 		TaskId: &idlcore.Identifier{
 			ResourceType: idlcore.ResourceType_TASK,
-			Project:      workflowExecutionID.Project,
-			Domain:       workflowExecutionID.Domain,
+			Project:      workflowExecutionID.GetProject(),
+			Domain:       workflowExecutionID.GetDomain(),
 			Name:         fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, index), retryAttempt),
 			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
 		},
-		ParentNodeExecutionId: nodeExecutionEvent.Id,
+		ParentNodeExecutionId: nodeExecutionEvent.GetId(),
 		Phase:                 taskPhase,
 		TaskType:              "k8s-array",
 		OccurredAt:            timestamp,

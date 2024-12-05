@@ -206,6 +206,8 @@ message SystemMetadata {
 message ExecutionMetadata {
     // The method by which this execution was launched.
     enum ExecutionMode {
+	reserved 7;
+
         // The default execution mode, MANUAL implies that an execution was launched by an individual.
         MANUAL = 0;
 

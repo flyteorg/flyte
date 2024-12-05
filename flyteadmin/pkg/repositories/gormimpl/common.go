@@ -52,17 +52,14 @@ var entityToTableName = map[common.Entity]string{
 }
 
 var innerJoinExecToNodeExec = fmt.Sprintf(
-	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND "+
-		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
+	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND %[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
 	executionTableName, nodeExecutionTableName)
 var innerJoinExecToTaskExec = fmt.Sprintf(
-	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND "+
-		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
+	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND %[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
 	executionTableName, taskExecutionTableName)
 
 var innerJoinNodeExecToTaskExec = fmt.Sprintf(
-	"INNER JOIN %[1]s ON %s.node_id = %[1]s.node_id AND %[2]s.execution_project = %[1]s.execution_project AND "+
-		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
+	"INNER JOIN %[1]s ON %s.node_id = %[1]s.node_id AND %[2]s.execution_project = %[1]s.execution_project AND %[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name",
 	nodeExecutionTableName, taskExecutionTableName)
 
 // Because dynamic tasks do NOT necessarily register static task definitions, we use a left join to not exclude

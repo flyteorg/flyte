@@ -130,16 +130,16 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 
 		agentSupportedTaskCategories := make(map[string]struct{})
 		for _, agent := range res.GetAgents() {
-			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
+			deprecatedSupportedTaskTypes := agent.GetSupportedTaskTypes()
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.GetIsSync()}
 				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 				agentSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
-			supportedTaskCategories := agent.SupportedTaskCategories
+			supportedTaskCategories := agent.GetSupportedTaskCategories()
 			for _, supportedCategory := range supportedTaskCategories {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.GetIsSync()}
 				supportedCategoryName := supportedCategory.GetName()
 				newAgentRegistry[supportedCategoryName] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 				agentSupportedTaskCategories[supportedCategoryName] = struct{}{}

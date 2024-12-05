@@ -479,6 +479,37 @@ func TestTemplateLogPlugin(t *testing.T) {
 			},
 		},
 		{
+			"flyteinteractive",
+			TemplateLogPlugin{
+				Name:                "vscode",
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat:       core.TaskLog_JSON,
+				HideOnceFinished:    true,
+				ShowWhilePending:    true,
+			},
+			args{
+				input: Input{
+					PodName: "my-pod-name",
+					TaskTemplate: &core.TaskTemplate{
+						Config: map[string]string{
+							"link_type": "vscode",
+							"port":      "1234",
+						},
+					},
+				},
+			},
+			Output{
+				TaskLogs: []*core.TaskLog{
+					{
+						Uri:              "vscode://flyteinteractive:1234/my-pod-name",
+						MessageFormat:    core.TaskLog_JSON,
+						ShowWhilePending: true,
+						HideOnceFinished: true,
+					},
+				},
+			},
+		},
+		{
 			"flyteinteractive - no link_type in task template",
 			TemplateLogPlugin{
 				Name:                "vscode",

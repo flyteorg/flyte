@@ -89,7 +89,7 @@ func TestConcurrentAccess(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			execID := fmt.Sprintf("exec%d", id)
-			err := esh.AddOrUpdateEntry(execID, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)})
+			err := esh.AddOrUpdateEntry(execID, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)}) // #nosec G115
 			assert.NoError(t, err)
 		}(i)
 	}

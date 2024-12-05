@@ -12,7 +12,7 @@ func TestMarshaling(t *testing.T) {
 
 	unmarshaledMetadata, err := unmarshalMetadata(marshaledMetadata)
 	assert.NoError(t, err)
-	assert.EqualValues(t, unmarshaledMetadata.KeyMap, metadata.KeyMap)
+	assert.EqualValues(t, unmarshaledMetadata.GetKeyMap(), metadata.GetKeyMap())
 }
 
 func TestMarshalingWithNil(t *testing.T) {
@@ -21,5 +21,5 @@ func TestMarshalingWithNil(t *testing.T) {
 	var expectedKeymap map[string]string
 	unmarshaledMetadata, err := unmarshalMetadata(marshaledMetadata)
 	assert.NoError(t, err)
-	assert.EqualValues(t, expectedKeymap, unmarshaledMetadata.KeyMap)
+	assert.EqualValues(t, expectedKeymap, unmarshaledMetadata.GetKeyMap())
 }

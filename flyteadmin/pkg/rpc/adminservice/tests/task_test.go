@@ -49,7 +49,7 @@ func TestTaskError(t *testing.T) {
 	mockTaskManager.SetCreateCallback(
 		func(ctx context.Context,
 			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.Id)
+			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -77,7 +77,7 @@ func TestListUniqueTaskIds(t *testing.T) {
 	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error) {
 
-		assert.Equal(t, "staging", request.Domain)
+		assert.Equal(t, "staging", request.GetDomain())
 		return nil, nil
 	})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
