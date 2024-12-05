@@ -105,19 +105,33 @@ func (p *Plugin) GetProperties() core.PluginProperties {
 func buildExecutionEnvID(tCtx core.TaskExecutionContext, executionEnv *idlcore.ExecutionEnv) core.ExecutionEnvID {
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	labels := tCtx.TaskExecutionMetadata().GetLabels()
-	var org string
-	if organization, exists := labels[ORGANIZATION_LABEL]; exists {
-		org = organization
-	} else {
-		org = taskExecutionID.GetTaskId().GetOrg()
-	}
+
+	// we attempt to retrieve this metadata from the injected labels before the taskExecutionID
+	// because the fasttask plugin uses Pod labels to detect orphaned environments. in scenarios where
+	// the execution metadata differs from the task identifier metadata (ex. reference launchplans to
+	// a different project / domain) the can result in mistakenly identifying an orphaned environment
+	// which leads to prematurely deleting fasttask replicas.
+	organization := getLabelIfExists(labels, ORGANIZATION_LABEL, taskExecutionID.GetTaskId().GetOrg())
+	project := getLabelIfExists(labels, PROJECT_LABEL, taskExecutionID.GetTaskId().GetProject())
+	domain := getLabelIfExists(labels, DOMAIN_LABEL, taskExecutionID.GetTaskId().GetDomain())
+
 	return core.ExecutionEnvID{
-		Org:     org,
-		Project: taskExecutionID.GetTaskId().GetProject(),
-		Domain:  taskExecutionID.GetTaskId().GetDomain(),
+		Org:     organization,
+		Project: project,
+		Domain:  domain,
 		Name:    executionEnv.GetName(),
 		Version: executionEnv.GetVersion(),
 	}
+}
+
+// getLabelIfExists attempts to return the value from provided label, if it does not exist it
+// returns the provided default value
+func getLabelIfExists(labels map[string]string, label, value string) string {
+	if value, exists := labels[label]; exists {
+		return value
+	}
+
+	return value
 }
 
 // getExecutionEnv retrieves the execution environment for the task. If the environment does not
