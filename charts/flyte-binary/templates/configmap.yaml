@@ -41,6 +41,8 @@ data:
       level: {{ default 1 .Values.configuration.logging.level }}
     propeller:
       create-flyteworkflow-crd: {{ .Values.configuration.propeller.createCRDs }}
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true

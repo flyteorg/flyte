@@ -420,6 +420,8 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -803,7 +805,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VWxGQXNKU1RyMk5haUpZWA==
+  haSharedSecret: N1llTHNzSmRuUVNhZzVvTg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1201,7 +1203,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 956d7a4502a3f977583a7b1bf4da2e985d64c09c94f357798ce289efa25facd7
+        checksum/configuration: dc08b44088d4fd052cba8a322a4f66a369d96a504bf69d4029fd5180479e65a7
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1367,7 +1369,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 421896ac3426efc3fb1d427ce98c9c6d631de7dcc4599a53726fb37eb59e6aad
+        checksum/secret: 4000d50d85f9c82b901809737f9fed6bbdf6337661e63f0f5f2376553366b44f
       labels:
         app: docker-registry
         release: flyte-sandbox
