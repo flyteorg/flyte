@@ -64,6 +64,7 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
 | configuration.propeller.createCRDs | bool | `true` |  |
+| configuration.propeller.literalOffloadingConfigEnabled | bool | `true` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |
