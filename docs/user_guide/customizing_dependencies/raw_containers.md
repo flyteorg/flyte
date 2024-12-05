@@ -52,6 +52,13 @@ One of the benefits of raw container tasks is that Flytekit does not need to be 
 Raw containers can be run locally when flytekit version >= 1.11.0.
 :::
 
+### Raise User Error
+
+Raw containers handle errors by checking for the presence of an `_ERROR` file in the
+`output_data_dir` after the container's execution. If this file exists, Flyte treats it as
+a user-defined error and retries the task if `retries` parameter is set in the task
+metadata.
+
 ## Scripts
 
 The contents of each script specified in the `ContainerTask` is as follows:
