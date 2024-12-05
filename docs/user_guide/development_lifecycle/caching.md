@@ -152,7 +152,7 @@ The default behavior displayed by Flyte's memoization feature might not match th
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
-:lines: 39-54
+:lines: 44-59
 ```
 
 If run twice with the same inputs, one would expect that `bar` would trigger a cache hit, but it turns out that's not the case because of how dataframes are represented in Flyte.
@@ -161,7 +161,7 @@ For example, in order to cache the result of calls to `bar`, you can rewrite the
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
-:lines: 64-85
+:lines: 69-91
 ```
 
 Note how the output of task `foo` is annotated with an object of type `HashMethod`. Essentially, it represents a function that produces a hash that is used as part of the cache key calculation in calling the task `bar`.
@@ -177,7 +177,7 @@ Here's a complete example of the feature:
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
-:lines: 97-134
+:lines: 103-140
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
