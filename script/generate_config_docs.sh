@@ -18,7 +18,7 @@ make -C flytepropeller compile_flytepropeller
 mv flytepropeller/bin/flytepropeller ${GOBIN}/flytepropeller
 
 # Config files are needed to generate docs, so we generate an empty
-# file and re-use it to invoke the docs command in all components.
+# file and reuse it to invoke the docs command in all components.
 EMPTY_CONFIG_FILE=empty-config.yaml
 touch empty-config.yaml
 
