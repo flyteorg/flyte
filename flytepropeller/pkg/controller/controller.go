@@ -62,7 +62,7 @@ import (
 
 const (
 	// Finalizer is the global and domain-qualified Flyte finalizer
-	Finalizer = "flyte.lyft.com/finalizer"
+	Finalizer = "flyte.org/finalizer"
 	// OldFinalizer is the old non-domain-qualified finalizer, kept for backwards compatibility
 	// This should eventually be removed
 	OldFinalizer                      = "flyte-finalizer"
