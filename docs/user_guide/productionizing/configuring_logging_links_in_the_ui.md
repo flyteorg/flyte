@@ -57,13 +57,18 @@ The parameterization engine uses Golangs native templating format and hence uses
 task_logs:
   plugins:
     logs:
-      templates:
-        - displayName: <name-to-show>
-          templateUris:
-            - "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-            - "https://some-other-source/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-          messageFormat: 0 # this parameter is optional, but use 0 for "unknown", 1 for "csv", or 2 for "json"
+      cloudwatch-enabled: true
+      cloudwatch-template-uri:
+            -"https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
+            - "https://console.aws.amazon.com/cloudwatch/home?region={{.region}}#logEventViewer:group={{.logGroup}};stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
+      messageFormat: 0  # Optional: 0 = "unknown", 1 = "csv", 2 = "json"
+
 ```
+
+.. note::
+prerequisites:
+            - EKS Cluster enabled with CloudWatch Observability Add-on
+            - Ensure the pod emits logs to CloudWatch log streams
 
 :::{tip}
 Since helm chart uses the same templating syntax for args (like `{{ }}`), compiling the chart results in helm replacing Flyte log link templates as well. To avoid this, you can use escaped templating for Flyte logs in the helm chart.
