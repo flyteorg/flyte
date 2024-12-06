@@ -3,7 +3,7 @@
 set -e
 
 echo "Generating Flyte Configuration Documents"
-CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+CUR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR=${CUR_DIR}/..
 OUTPUT_DIR="${ROOT_DIR}"/docs/deployment/configuration/generated
 GOBIN=${GOPATH:-~/go}/bin
@@ -17,30 +17,35 @@ mv flyteadmin/bin/flytescheduler ${GOBIN}/scheduler
 make -C flytepropeller compile_flytepropeller
 mv flytepropeller/bin/flytepropeller ${GOBIN}/flytepropeller
 
-output_config () {
-CONFIG_NAME=$1
-COMPONENT=$2
-COMMAND=$3
-OUTPUT_PATH=${OUTPUT_DIR}/${COMMAND}_config.rst
+# Config files are needed to generate docs, so we generate an empty
+# file and re-use it to invoke the docs command in all components.
+EMPTY_CONFIG_FILE=empty-config.yaml
+touch empty-config.yaml
 
-if [ -z "$CONFIG_NAME" ]; then
-  log_err "output_config CONFIG_NAME value not specified in arg1"
-  return 1
-fi
+output_config() {
+  CONFIG_NAME=$1
+  COMPONENT=$2
+  COMMAND=$3
+  OUTPUT_PATH=${OUTPUT_DIR}/${COMMAND}_config.rst
 
-if [ -z "$COMPONENT" ]; then
-  log_err "output_config COMPONENT value not specified in arg2"
-  return 1
-fi
+  if [ -z "$CONFIG_NAME" ]; then
+    log_err "output_config CONFIG_NAME value not specified in arg1"
+    return 1
+  fi
 
-echo ".. _$COMPONENT-config-specification:
+  if [ -z "$COMPONENT" ]; then
+    log_err "output_config COMPONENT value not specified in arg2"
+    return 1
+  fi
+
+  echo ".. _$COMPONENT-config-specification:
 
 #########################################
 Flyte $CONFIG_NAME Configuration
 #########################################
-" > "${OUTPUT_PATH}"
+" >"${OUTPUT_PATH}"
 
-$GOBIN/$COMMAND config docs >> "${OUTPUT_PATH}"
+  $GOBIN/$COMMAND config --config $EMPTY_CONFIG_FILE docs >>"${OUTPUT_PATH}"
 }
 
 output_config "Admin" flyteadmin flyteadmin
