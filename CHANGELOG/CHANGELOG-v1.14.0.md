@@ -7,11 +7,13 @@ A significant update to the flytekit storage interface enables downloading multi
 Fixed
 
 - Better handling of CORS in TLS connections (#5855)
+
 When using Flyte with TLS certificates, CORS options were not enabled causing issues like the Flyte console UI not showing any project when multiple were created. This scenario came with relative frequency among users evaluating Flyte in non-production environments. Now, CORS will be enabled on TLS connections too.
 
 
 ## Changed
 - Enhanced flexibility for Ray plugin configurations (#5933)
+
 This release makes the configuration of RayJobs more flexible, letting you pass Pod specs independently for each Ray node type: Worker, Head, and Submitter. This enables you to declare configuration for each group to better align with your infrastructure requirements:
 ```yaml
 ray_config = RayJobConfig(
