@@ -28,7 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	utils "github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
