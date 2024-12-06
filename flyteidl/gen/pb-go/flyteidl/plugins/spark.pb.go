@@ -134,8 +134,8 @@ type SparkJob struct {
 	// This instance name can be set in either flytepropeller or flytekit.
 	DatabricksInstance string `protobuf:"bytes,9,opt,name=databricksInstance,proto3" json:"databricksInstance,omitempty"`
 
-	DriverPod *core.K8SPod `protobuf:"bytes,2,opt,name=driverPod,json=driverPod,proto3" json:"driverPod,omitempty"`
-	ExecutorPod *core.K8SPod `protobuf:"bytes,2,opt,name=executorPod,json=executorPod,proto3" json:"executorPod,omitempty"`
+	DriverPod *core.K8SPod `protobuf:"bytes,10,opt,name=driverPod,json=driverPod,proto3" json:"driverPod,omitempty"`
+	ExecutorPod *core.K8SPod `protobuf:"bytes,11,opt,name=executorPod,json=executorPod,proto3" json:"executorPod,omitempty"`
 }
 
 func (x *SparkJob) Reset() {
