@@ -136,10 +136,7 @@ def test_run(setup_flytesnacks_env):
         test_project_name,
         test_project_domain,
     )
-
-    # assert flytesnacks_release_tag == "v1.0.0"
-    # assert config_file_path == "/path/to/config.yaml"
-
+    
     # For a given release tag and priority, this function filters the workflow groups from the flytesnacks
     # manifest file. For example, for the release tag "v0.2.224" and the priority "P0" it returns [ "core" ].
     manifest_url = (
@@ -148,6 +145,7 @@ def test_run(setup_flytesnacks_env):
     )
     r = requests.get(manifest_url)
     parsed_manifest = r.json()
+    workflow_groups = []
     workflow_groups = (
         ["lite"]
         if "lite" in priorities
@@ -209,8 +207,11 @@ def test_run(setup_flytesnacks_env):
     print(f"Result of run:\n{json.dumps(results)}")
 
     if return_non_zero_on_failure:
-        for result in results:
-            if result["status"] not in ("passing", "coming soon"):
-                pytest.fail("Workflow execution failed")
+        fail_results = [result for result in results if result["status"] not in ("passing", "coming soon")]
+        if fail_results:
+            fail_msgs = [
+                f"Workflow '{r['label']}' failed with status '{r['status']}'" for r in fail_results
+            ]
+            pytest.fail("\n".join(fail_msgs))
 
-    return results 
+    assert results == [{"label": "core", "status": "passing", "color": "green"}]
