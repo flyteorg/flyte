@@ -88,19 +88,7 @@ func (t *TaskManager) CreateTask(
 		logger.Errorf(ctx, "failed to compute task digest with err %v", err)
 		return nil, err
 	}
-	// See if a task exists and confirm whether it's an identical task or one that with a separate definition.
-	existingTaskModel, err := util.GetTaskModel(ctx, t.db, request.GetSpec().GetTemplate().GetId())
-	if err == nil {
-		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
-			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, request)
-		}
-		existingTask, transformerErr := transformers.FromTaskModel(*existingTaskModel)
-		if transformerErr != nil {
-			logger.Errorf(ctx, "failed to transform task from task model")
-			return nil, transformerErr
-		}
-		return nil, errors.NewTaskExistsDifferentStructureError(ctx, request, existingTask.GetClosure().GetCompiledTask(), compiledTask)
-	}
+	// Create Task in DB
 	taskModel, err := transformers.CreateTaskModel(finalizedRequest, &admin.TaskClosure{
 		CompiledTask: compiledTask,
 		CreatedAt:    createdAt,
@@ -110,7 +98,6 @@ func (t *TaskManager) CreateTask(
 			"Failed to transform task model [%+v] with err: %v", finalizedRequest, err)
 		return nil, err
 	}
-
 	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.GetSpec().GetDescription(), request.GetId())
 	if err != nil {
 		logger.Errorf(ctx,
@@ -122,8 +109,27 @@ func (t *TaskManager) CreateTask(
 	}
 	err = t.db.TaskRepo().Create(ctx, taskModel, descriptionModel)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to create task model with id [%+v] with err %v", request.GetId(), err)
-		return nil, err
+		// See if an identical task already exists by checking the error code
+		flyteErr, ok := err.(errors.FlyteAdminError)
+		if !ok || flyteErr.Code() != codes.AlreadyExists {
+			logger.Errorf(ctx, "Failed to create task model with id [%+v] with err %v", request.GetId(), err)
+			return nil, err
+		}
+		// An identical task already exists. Fetch the existing task to verify if it has a different digest
+		existingTaskModel, fetchErr := util.GetTaskModel(ctx, t.db, request.GetSpec().GetTemplate().GetId())
+		if fetchErr != nil {
+			logger.Errorf(ctx, "Failed to fetch existing task model for id [%+v] with err %v", request.GetId(), fetchErr)
+			return nil, fetchErr
+		}
+		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
+			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, request)
+		}
+		existingTask, transformerErr := transformers.FromTaskModel(*existingTaskModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "Failed to transform task from task model for id [%+v]", request.GetId())
+			return nil, transformerErr
+		}
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, request, existingTask.GetClosure().GetCompiledTask(), compiledTask)
 	}
 	t.metrics.ClosureSizeBytes.Observe(float64(len(taskModel.Closure)))
 	if finalizedRequest.GetSpec().GetTemplate().GetMetadata() != nil {
