@@ -160,3 +160,41 @@ func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {
 	assert.True(t, emailMessage.GetSenderEmail() == expected.GetSenderEmail())
 	assert.True(t, len(emailMessage.GetRecipientsEmail()) == len(expected.GetRecipientsEmail()))
 }
+
+func TestToEmailMessageFromWorkflowExecutionEventWithTemplate(t *testing.T) {
+	notificationsConfig := runtimeInterfaces.NotificationsConfig{
+		NotificationsEmailerConfig: runtimeInterfaces.NotificationsEmailerConfig{
+			Body: "Execution \"{{ name }}\" has succeeded in \"{{ domain }}\". View details at " +
+				"<a href=\"https://example.com/executions/{{ project }}/{{ domain }}/{{ name }}\">" +
+				"https://example.com/executions/{{ project }}/{{ domain }}/{{ name }}</a>.",
+			Sender:  "no-reply@example.com",
+			Subject: "Notice: Execution \"{{ name }}\" has succeeded in \"{{ domain }}\".",
+		},
+	}
+	emailNotification := &admin.EmailNotification{
+		RecipientsEmail: []string{
+			"a@example.com", "b@example.org",
+		},
+		Template: "LP custom template: Execution \"{{ name }}\" has succeeded in \"{{ domain }}\". View details at " +
+			"<a href=\"https://example.com/executions/{{ project }}/{{ domain }}/{{ name }}\">" +
+			"https://example.com/executions/{{ project }}/{{ domain }}/{{ name }}</a>.",
+	}
+	request := &admin.WorkflowExecutionEventRequest{
+		Event: &event.WorkflowExecutionEvent{
+			Phase: core.WorkflowExecution_ABORTED,
+		},
+	}
+	emailMessage := ToEmailMessageFromWorkflowExecutionEvent(notificationsConfig, emailNotification, request, workflowExecution)
+	expected := &admin.EmailMessage{
+		RecipientsEmail: []string{
+			"a@example.com", "b@example.org",
+		},
+		SenderEmail: "no-reply@example.com",
+		SubjectLine: `Notice: Execution "e124" has succeeded in "prod".`,
+		Body:        `LP custom template: Execution "e124" has succeeded in "prod". View details at <a href="https://example.com/executions/proj/prod/e124">https://example.com/executions/proj/prod/e124</a>.`,
+	}
+	assert.True(t, emailMessage.GetBody() == expected.GetBody())
+	assert.True(t, emailMessage.GetSubjectLine() == expected.GetSubjectLine())
+	assert.True(t, emailMessage.GetSenderEmail() == expected.GetSenderEmail())
+	assert.True(t, len(emailMessage.GetRecipientsEmail()) == len(expected.GetRecipientsEmail()))
+}
