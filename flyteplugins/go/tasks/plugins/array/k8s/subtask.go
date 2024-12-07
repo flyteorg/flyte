@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -30,8 +31,11 @@ const (
 	ErrBuildPodTemplate       stdErrors.ErrorCode = "POD_TEMPLATE_FAILED"
 	ErrReplaceCmdTemplate     stdErrors.ErrorCode = "CMD_TEMPLATE_FAILED"
 	FlyteK8sArrayIndexVarName string              = "FLYTE_K8S_ARRAY_INDEX"
-	finalizer                 string              = "flyte/array"
-	JobIndexVarName           string              = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
+	finalizer                 string              = "flyte.lyft.com/finalizer-array"
+	// Old non-domain-qualified finalizer for backwards compatibility
+	// This should eventually be removed
+	oldFinalizer    string = "flyte/array"
+	JobIndexVarName string = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
 )
 
 var (
@@ -69,8 +73,7 @@ func addMetadata(stCtx SubTaskExecutionContext, cfg *Config, k8sPluginCfg *confi
 	}
 
 	if k8sPluginCfg.InjectFinalizer {
-		f := append(pod.GetFinalizers(), finalizer)
-		pod.SetFinalizers(f)
+		_ = controllerutil.AddFinalizer(pod, finalizer)
 	}
 
 	if len(cfg.DefaultScheduler) > 0 {
@@ -134,7 +137,7 @@ func abortSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Confi
 	}
 
 	if err != nil && !isK8sObjectNotExists(err) {
-		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
+		logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v",
 			resourceToFinalize.GetNamespace(), resourceToFinalize.GetName(), err)
 		return err
 	}
@@ -142,17 +145,20 @@ func abortSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Confi
 	return nil
 }
 
-// clearFinalizers removes finalizers (if they exist) from the k8s resource
-func clearFinalizers(ctx context.Context, o client.Object, kubeClient pluginsCore.KubeClient) error {
-	if len(o.GetFinalizers()) > 0 {
-		o.SetFinalizers([]string{})
+// clearFinalizer removes the Flyte finalizer (if it exists) from the k8s resource
+func clearFinalizer(ctx context.Context, o client.Object, kubeClient pluginsCore.KubeClient) error {
+	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
+	// Go does short-circuiting so we have to make sure both are removed
+	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
+	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
+	if finalizerRemoved || oldFinalizerRemoved {
 		err := kubeClient.GetClient().Update(ctx, o)
 		if err != nil && !isK8sObjectNotExists(err) {
-			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v", o.GetNamespace(), o.GetName(), err)
+			logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v", o.GetNamespace(), o.GetName(), err)
 			return err
 		}
 	} else {
-		logger.Debugf(ctx, "Finalizers are already empty for Resource with name: %v/%v", o.GetNamespace(), o.GetName())
+		logger.Debugf(ctx, "Finalizer is already cleared for Resource with name: %v/%v", o.GetNamespace(), o.GetName())
 	}
 	return nil
 }
@@ -211,7 +217,7 @@ func launchSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Conf
 }
 
 // finalizeSubtask performs operations to complete the k8s pod defined by the SubTaskExecutionContext
-// and Config. These may include removing finalizers and deleting the k8s resource.
+// and Config. These may include removing finalizer and deleting the k8s resource.
 func finalizeSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Config, kubeClient pluginsCore.KubeClient) error {
 	errs := stdErrors.ErrorCollection{}
 	var pod *v1.Pod
@@ -231,10 +237,10 @@ func finalizeSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Co
 		nsName = k8stypes.NamespacedName{Namespace: pod.GetNamespace(), Name: pod.GetName()}
 	}
 
-	// In InjectFinalizer is on, it means we may have added the finalizers when we launched this resource. Attempt to
-	// clear them to allow the object to be deleted/garbage collected. If InjectFinalizer was turned on (through config)
+	// In InjectFinalizer is on, it means we may have added the finalizer when we launched this resource. Attempt to
+	// clear it to allow the object to be deleted/garbage collected. If InjectFinalizer was turned on (through config)
 	// after the resource was created, we will not find any finalizers to clear and the object may have already been
-	// deleted at this point. Therefore, account for these cases and do not consider them errors.
+	// deleted at this point. Therefore, account for these cases and do not consider the errors.
 	if k8sPluginCfg.InjectFinalizer {
 		// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 		if err := kubeClient.GetClient().Get(ctx, nsName, pod); err != nil {
@@ -250,7 +256,7 @@ func finalizeSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Co
 		// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
 		// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
 		// the same event (idempotent) and then come here again...
-		err := clearFinalizers(ctx, pod, kubeClient)
+		err := clearFinalizer(ctx, pod, kubeClient)
 		if err != nil {
 			errs.Append(err)
 		}
@@ -308,10 +314,10 @@ func getSubtaskPhaseInfo(ctx context.Context, stCtx SubTaskExecutionContext, cfg
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if !phaseInfo.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
+	if !phaseInfo.Phase().IsTerminal() && !o.GetDeletionTimestamp().IsZero() {
 		// If the object has been deleted, that is, it has a deletion timestamp, but is not in a terminal state, we should
 		// mark the task as a retryable failure.  We've seen this happen when a kubelet disappears - all pods running on
-		// the node are marked with a deletionTimestamp, but our finalizers prevent the pod from being deleted.
+		// the node are marked with a deletionTimestamp, but our finalizer prevents the pod from being deleted.
 		// This can also happen when a user deletes a Pod directly.
 		failureReason := fmt.Sprintf("object [%s] terminated in the background, manually", nsName.String())
 		return pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil), nil
