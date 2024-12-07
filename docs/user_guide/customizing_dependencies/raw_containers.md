@@ -31,6 +31,11 @@ is `calculate_ellipse_area_shell`. This name has to be unique in the entire proj
 `inputs` and `outputs` specify the interface for the task; thus it should be an ordered dictionary of typed input and
 output variables.
 
+The `image` field specifies the container image for the task, either as an image name or
+an [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html).
+To access the file that is not included in the image, use `ImageSpec` to copy files or
+directories into container `/root`. 
+
 [Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
 
 ```{literalinclude} /examples/customizing_dependencies/customizing_dependencies/raw_container.py
