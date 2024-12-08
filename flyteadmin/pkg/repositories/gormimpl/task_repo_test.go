@@ -79,6 +79,28 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, version, output.Version)
 	assert.Equal(t, []byte{1, 2}, output.Closure)
 	assert.Equal(t, pythonTestTaskType, output.Type)
+
+	//When version is empty, return the latest task
+	GlobalMock = mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 ORDER BY "tasks"."version" DESC LIMIT 1`).
+		WithReply(tasks)
+	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+		Version: "",
+	})
+
+	assert.NoError(t, err)
+	assert.Equal(t, project, output.Project)
+	assert.Equal(t, domain, output.Domain)
+	assert.Equal(t, name, output.Name)
+	assert.Equal(t, version, output.Version)
+	assert.Equal(t, []byte{1, 2}, output.Closure)
+	assert.Equal(t, pythonTestTaskType, output.Type)
 }
 
 func TestListTasks(t *testing.T) {
