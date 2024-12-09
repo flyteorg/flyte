@@ -2438,6 +2438,9 @@ pub struct ArrayNode {
     /// Indicates whether the sub node's original interface was altered
     #[prost(message, optional, tag="6")]
     pub is_original_sub_node_interface: ::core::option::Option<bool>,
+    /// data_mode determines how input data is passed to the sub-nodes
+    #[prost(enumeration="array_node::DataMode", tag="7")]
+    pub data_mode: i32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -2471,6 +2474,34 @@ pub mod array_node {
             match value {
                 "MINIMAL_STATE" => Some(Self::MinimalState),
                 "FULL_STATE" => Some(Self::FullState),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum DataMode {
+        /// Indicates the ArrayNode will utilize the passed in, single input file for all sub-nodes.
+        SingleInputFile = 0,
+        /// Indicates the ArrayNode will create input files for each sub-node.
+        IndividualInputFiles = 1,
+    }
+    impl DataMode {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                DataMode::SingleInputFile => "SINGLE_INPUT_FILE",
+                DataMode::IndividualInputFiles => "INDIVIDUAL_INPUT_FILES",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "SINGLE_INPUT_FILE" => Some(Self::SingleInputFile),
+                "INDIVIDUAL_INPUT_FILES" => Some(Self::IndividualInputFiles),
                 _ => None,
             }
         }

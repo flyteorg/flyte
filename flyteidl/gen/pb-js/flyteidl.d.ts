@@ -4589,6 +4589,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface */
             isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode */
+            dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4617,6 +4620,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface. */
             public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode. */
+            public dataMode: flyteidl.core.ArrayNode.DataMode;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4663,6 +4669,12 @@ export namespace flyteidl {
             enum ExecutionMode {
                 MINIMAL_STATE = 0,
                 FULL_STATE = 1
+            }
+
+            /** DataMode enum. */
+            enum DataMode {
+                SINGLE_INPUT_FILE = 0,
+                INDIVIDUAL_INPUT_FILES = 1
             }
         }
 
