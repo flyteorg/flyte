@@ -1,20 +1,18 @@
 package get
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"sort"
 	"strconv"
 
+	"github.com/disiqueira/gotree"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/disiqueira/gotree"
-	"github.com/golang/protobuf/jsonpb"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var nodeExecutionColumns = []printer.Column{
@@ -51,18 +49,13 @@ type TaskExecution struct {
 
 // MarshalJSON overridden method to json marshalling to use jsonpb
 func (in *TaskExecution) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	marshaller := jsonpb.Marshaler{}
-	if err := marshaller.Marshal(&buf, in.TaskExecution); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.TaskExecution)
 }
 
 // UnmarshalJSON overridden method to json unmarshalling to use jsonpb
 func (in *TaskExecution) UnmarshalJSON(b []byte) error {
 	in.TaskExecution = &admin.TaskExecution{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.TaskExecution)
+	return utils.UnmarshalBytesToPb(b, in.TaskExecution)
 }
 
 type NodeExecution struct {
@@ -71,18 +64,13 @@ type NodeExecution struct {
 
 // MarshalJSON overridden method to json marshalling to use jsonpb
 func (in *NodeExecution) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	marshaller := jsonpb.Marshaler{}
-	if err := marshaller.Marshal(&buf, in.NodeExecution); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.NodeExecution)
 }
 
 // UnmarshalJSON overridden method to json unmarshalling to use jsonpb
 func (in *NodeExecution) UnmarshalJSON(b []byte) error {
 	*in = NodeExecution{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in)
+	return utils.UnmarshalBytesToPb(b, in.NodeExecution)
 }
 
 // NodeExecutionClosure forms a wrapper around admin.NodeExecution and also fetches the childnodes , task execs

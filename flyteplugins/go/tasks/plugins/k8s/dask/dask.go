@@ -318,7 +318,6 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		},
 	}
 	var phaseInfo pluginsCore.PhaseInfo
-
 	switch status {
 	case "":
 		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info)

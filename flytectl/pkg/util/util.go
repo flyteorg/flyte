@@ -9,10 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/enescakir/emoji"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
-
-	"github.com/enescakir/emoji"
 	hversion "github.com/hashicorp/go-version"
 )
 

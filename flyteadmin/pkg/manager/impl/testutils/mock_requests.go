@@ -8,8 +8,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func GetValidTaskRequest() admin.TaskCreateRequest {
-	return admin.TaskCreateRequest{
+func GetValidTaskRequest() *admin.TaskCreateRequest {
+	return &admin.TaskCreateRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      "project",
@@ -47,15 +47,15 @@ func GetValidTaskRequest() admin.TaskCreateRequest {
 	}
 }
 
-func GetValidTaskRequestWithEager() admin.TaskCreateRequest {
+func GetValidTaskRequestWithEager() *admin.TaskCreateRequest {
 	taskRequest := GetValidTaskRequest()
 	// Add eager flag to the task
 	taskRequest.GetSpec().GetTemplate().GetMetadata().IsEager = true
 	return taskRequest
 }
 
-func GetValidTaskRequestWithOverrides(project string, domain string, name string, version string) admin.TaskCreateRequest {
-	return admin.TaskCreateRequest{
+func GetValidTaskRequestWithOverrides(project string, domain string, name string, version string) *admin.TaskCreateRequest {
+	return &admin.TaskCreateRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      project,
@@ -90,7 +90,7 @@ func GetValidTaskSpecBytes() []byte {
 	return bytes
 }
 
-func GetWorkflowRequest() admin.WorkflowCreateRequest {
+func GetWorkflowRequest() *admin.WorkflowCreateRequest {
 	identifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
@@ -99,7 +99,7 @@ func GetWorkflowRequest() admin.WorkflowCreateRequest {
 		Version:      "version",
 		Org:          "org",
 	}
-	return admin.WorkflowCreateRequest{
+	return &admin.WorkflowCreateRequest{
 		Id: &identifier,
 		Spec: &admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
@@ -134,8 +134,8 @@ func GetWorkflowRequest() admin.WorkflowCreateRequest {
 	}
 }
 
-func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
-	return admin.LaunchPlanCreateRequest{
+func GetLaunchPlanRequest() *admin.LaunchPlanCreateRequest {
+	return &admin.LaunchPlanCreateRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_LAUNCH_PLAN,
 			Project:      "project",
@@ -174,7 +174,7 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 	}
 }
 
-func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) *admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
@@ -185,7 +185,7 @@ func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) admin.L
 	return lpRequest
 }
 
-func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) *admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
@@ -198,7 +198,7 @@ func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanC
 	return lpRequest
 }
 
-func GetLaunchPlanRequestWithFixedRateSchedule(testRateValue uint32, testRateUnit admin.FixedRateUnit) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithFixedRateSchedule(testRateValue uint32, testRateUnit admin.FixedRateUnit) *admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
@@ -213,8 +213,8 @@ func GetLaunchPlanRequestWithFixedRateSchedule(testRateValue uint32, testRateUni
 	return lpRequest
 }
 
-func GetExecutionRequest() admin.ExecutionCreateRequest {
-	return admin.ExecutionCreateRequest{
+func GetExecutionRequest() *admin.ExecutionCreateRequest {
+	return &admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
@@ -275,7 +275,7 @@ func GetExecutionRequestWithOffloadedInputs(inputParam string, literalValue *cor
 			},
 		},
 	}
-	return &execReq
+	return execReq
 }
 
 func GetSampleWorkflowSpecForTest() *admin.WorkflowSpec {
@@ -297,8 +297,8 @@ func GetSampleWorkflowSpecForTest() *admin.WorkflowSpec {
 	}
 }
 
-func GetSampleLpSpecForTest() admin.LaunchPlanSpec {
-	return admin.LaunchPlanSpec{
+func GetSampleLpSpecForTest() *admin.LaunchPlanSpec {
+	return &admin.LaunchPlanSpec{
 		WorkflowId: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "project",

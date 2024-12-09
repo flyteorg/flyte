@@ -55,11 +55,9 @@ workflow orchestrator implemented in [Go](https://go.dev/). It enables highly
 concurrent, scalable and reproducible workflows for data processing, machine
 learning and analytics.
 
-Created at [Lyft](https://www.lyft.com/) in collaboration with Spotify,
-Freenome, and many others, Flyte provides first-class support for
-{doc}`Python <api/flytekit/docs_index>`,
-[Java, and Scala](https://github.com/flyteorg/flytekit-java). Data Scientists
-and ML Engineers in the industry use Flyte to create:
+Flyte provides first-class support for
+{doc}`Python <api/flytekit/docs_index>` and has a community-driven [Java and Scala SDK](https://github.com/flyteorg/flytekit-java). 
+Data Scientists and ML Engineers in the industry use Flyte to create:
 
 - Data pipelines for processing petabyte-scale data.
 - Analytics workflows for business and finance use cases.

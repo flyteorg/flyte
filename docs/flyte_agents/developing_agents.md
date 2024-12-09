@@ -133,21 +133,20 @@ class FileSensor(BaseSensor):
 
 ### 2. Test the agent
 
-You can test your agent in a {ref}`local Python environment <testing_agents_locally>` or in a {ref}<local development cluster `testing_agents_in_a_local_development_cluster`>.
+You can test your agent in a {ref}`local Python environment <testing_agents_locally>` or in a {ref}`local development cluster <testing_agents_in_a_local_development_cluster>`.
 
 ### 3. Build a new Docker image
 
 The following is a sample Dockerfile for building an image for a Flyte agent:
 
 ```Dockerfile
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-bookworm
 
 MAINTAINER Flyte Team <users@flyte.org>
 LABEL org.opencontainers.image.source=https://github.com/flyteorg/flytekit
 
-WORKDIR /root
-ENV PYTHONPATH /root
-
+# additional dependencies for running in k8s
+RUN pip install prometheus-client grpcio-health-checking
 # flytekit will autoload the agent if package is installed.
 RUN pip install flytekitplugins-bigquery
 CMD pyflyte serve agent --port 8000
@@ -160,29 +159,15 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
 
 ### 4. Deploy Your Flyte agent
 
-1. Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
+Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
 
 ```bash
 kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:latest
 ```
 
-2. Update the FlytePropeller configmap:
-
-```YAML
- tasks:
-   task-plugins:
-     enabled-plugins:
-       - agent-service
-     default-for-task-types:
-       - bigquery_query_job_task: agent-service
-       - custom_task: agent-service
-```
-
-3. Restart FlytePropeller:
-
-```
-kubectl rollout restart deployment flytepropeller -n flyte
-```
+:::{note}
+Please make sure your propeller's image version is >= 1.13.0 so that the propeller can automatically fetch the supported task types from your agent deployment.
+:::
 
 ### 5. Canary deployment
 
@@ -193,15 +178,11 @@ By running agents independently, you can thoroughly test and validate your agent
 controlled environment before deploying them to the production cluster.
 
 By default, all agent requests will be sent to the default agent service. However,
-you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration. 
+you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration.
 
 ```yaml
  plugins:
    agent-service:
-     supportedTaskTypes:
-       - bigquery_query_job_task
-       - default_task
-       - custom_task
      # By default, all requests will be sent to the default agent.
      defaultAgent:
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"

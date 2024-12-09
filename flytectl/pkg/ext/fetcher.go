@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
@@ -35,7 +34,7 @@ type AdminFetcherExtInterface interface {
 	FetchAllVerOfLP(ctx context.Context, lpName, project, domain string, filter filters.Filters) ([]*admin.LaunchPlan, error)
 
 	// FetchLPLatestVersion fetches latest version of launch plan in a  project, domain
-	FetchLPLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.LaunchPlan, error)
+	FetchLPLatestVersion(ctx context.Context, name, project, domain string) (*admin.LaunchPlan, error)
 
 	// FetchLPVersion fetches particular version of launch plan in a  project, domain
 	FetchLPVersion(ctx context.Context, name, version, project, domain string) (*admin.LaunchPlan, error)
@@ -56,7 +55,7 @@ type AdminFetcherExtInterface interface {
 	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Workflow, error)
 
 	// FetchWorkflowLatestVersion fetches latest version of workflow in a  project, domain
-	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error)
+	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string) (*admin.Workflow, error)
 
 	// FetchWorkflowVersion fetches particular version of workflow in a  project, domain
 	FetchWorkflowVersion(ctx context.Context, name, version, project, domain string) (*admin.Workflow, error)
@@ -75,6 +74,8 @@ type AdminFetcherExtInterface interface {
 
 	// GetProjectByID fetches a single project by its identifier. If project does not exist, an error will be returned
 	GetProjectByID(ctx context.Context, projectID string) (*admin.Project, error)
+
+	GetDomains(ctx context.Context) (*admin.GetDomainsResponse, error)
 }
 
 // AdminFetcherExtClient is used for interacting with extended features used for fetching data from admin service

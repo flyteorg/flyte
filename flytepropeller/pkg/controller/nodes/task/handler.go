@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -249,13 +248,14 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 
+		if err != nil {
+			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
+		}
+
 		if cp.GetID() == agent.ID {
 			t.agentService.CorePlugin = cp
 		}
 
-		if err != nil {
-			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
-		}
 		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
 		// static definition includes that task type as something it is registered to handle.
 		for _, tt := range p.RegisteredTaskTypes {
@@ -836,23 +836,28 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		}
 	}
 
-	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
+	phaseInfo := pluginCore.PhaseInfoFailed(pluginCore.PhaseAborted, &core.ExecutionError{
+		Code:    "Task Aborted",
+		Message: reason,
+	}, nil)
+	evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+		TaskExecContext:       tCtx,
+		InputReader:           nCtx.InputReader(),
+		EventConfig:           t.eventConfig,
+		OutputWriter:          tCtx.ow,
+		Info:                  phaseInfo,
+		NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+		ExecContext:           nCtx.ExecutionContext(),
+		TaskType:              ttype,
+		PluginID:              p.GetID(),
+		ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
+		ClusterID:             t.clusterID,
+		OccurredAt:            time.Now(),
+	})
 	if err != nil {
 		return err
 	}
-	if err := evRecorder.RecordTaskEvent(ctx, &event.TaskExecutionEvent{
-		TaskId:                taskExecID.TaskId,
-		ParentNodeExecutionId: nodeExecutionID,
-		RetryAttempt:          nCtx.CurrentAttempt(),
-		Phase:                 core.TaskExecution_ABORTED,
-		OccurredAt:            ptypes.TimestampNow(),
-		OutputResult: &event.TaskExecutionEvent_Error{
-			Error: &core.ExecutionError{
-				Code:    "Task Aborted",
-				Message: reason,
-			}},
-	}, t.eventConfig); err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
+	if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
 		// If a prior workflow/node/task execution event has failed because of an invalid cluster error, don't stall the abort
 		// at this point in the clean-up.
 		logger.Errorf(ctx, "failed to send event to Admin. error: %s", err.Error())

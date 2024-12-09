@@ -25,7 +25,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 Consider the following example workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_schedules.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_schedules.py
 :caption: productionizing/lp_schedules.py
 :lines: 1-14
 ```
@@ -39,7 +39,7 @@ The `date_formatter_wf` workflow can be scheduled using either the `CronSchedule
 [Cron](https://en.wikipedia.org/wiki/Cron) expression strings use this {ref}`syntax <concepts-schedules>`.
 An incorrect cron schedule expression would lead to failure in triggering the schedule.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_schedules.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_schedules.py
 :caption: productionizing/lp_schedules.py
 :lines: 17-29
 ```
@@ -54,7 +54,7 @@ If you prefer to use an interval rather than a cron scheduler to schedule your w
 
 Here's an example:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_schedules.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_schedules.py
 :caption: productionizing/lp_schedules.py
 :lines: 34-57
 ```

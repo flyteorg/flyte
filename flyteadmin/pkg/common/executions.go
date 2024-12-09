@@ -7,10 +7,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-const ExecutionIDLength = utils.MaxUniqueIDLength
+const ExecutionIDLength = 20
 const ExecutionStringFormat = "a%s"
 
 /* #nosec */
@@ -19,7 +18,7 @@ func GetExecutionName(seed int64) string {
 	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1))
 }
 
-var TerminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
+var terminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
 	core.WorkflowExecution_SUCCEEDED: true,
 	core.WorkflowExecution_FAILED:    true,
 	core.WorkflowExecution_TIMED_OUT: true,
@@ -42,7 +41,7 @@ var terminalTaskExecutionPhases = map[core.TaskExecution_Phase]bool{
 }
 
 func IsExecutionTerminal(phase core.WorkflowExecution_Phase) bool {
-	return TerminalExecutionPhases[phase]
+	return terminalExecutionPhases[phase]
 }
 
 func IsNodeExecutionTerminal(phase core.NodeExecution_Phase) bool {

@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
@@ -30,6 +29,7 @@ import (
 	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const testImage = "image://"
@@ -100,7 +100,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(mpiObjJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(mpiObjJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -242,6 +242,7 @@ func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.Re
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
@@ -616,6 +617,23 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginContext := dummyMPIPluginContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, pluginState)
+
+	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, mpiOp.JobCreated))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
 func TestGetLogs(t *testing.T) {
 	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
 		IsKubernetesEnabled: true,
@@ -690,129 +708,191 @@ func TestReplicaCounts(t *testing.T) {
 func TestBuildResourceMPIV1(t *testing.T) {
 	launcherCommand := []string{"python", "launcher.py"}
 	workerCommand := []string{"/usr/sbin/sshd", "/.sshd_config"}
-	taskConfig := &kfplugins.DistributedMPITrainingTask{
-		LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-			Image: testImage,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "250Mi"},
+	taskConfigs := []*kfplugins.DistributedMPITrainingTask{
+		{
+			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Image: testImage,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "500Mi"},
-				},
+				Command: launcherCommand,
 			},
-			Command: launcherCommand,
-		},
-		WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-				},
+				Command: workerCommand,
 			},
-			Command: workerCommand,
+			Slots: int32(1),
 		},
-		Slots: int32(1),
+		{
+			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Image: testImage,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "250Mi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "500Mi"},
+						},
+					},
+				},
+				Command: launcherCommand,
+			},
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
+				},
+				Command: workerCommand,
+			},
+			Slots: int32(1),
+		},
 	}
 
-	launcherResourceRequirements := &corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("250m"),
-			corev1.ResourceMemory: resource.MustParse("250Mi"),
-		},
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("500m"),
-			corev1.ResourceMemory: resource.MustParse("500Mi"),
-		},
+	for _, taskConfig := range taskConfigs {
+		launcherResourceRequirements := &corev1.ResourceRequirements{
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("250m"),
+				corev1.ResourceMemory: resource.MustParse("250Mi"),
+			},
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("500Mi"),
+			},
+		}
+
+		workerResourceRequirements := &corev1.ResourceRequirements{
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("1024m"),
+				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("2048m"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
+			},
+		}
+
+		mpiResourceHandler := mpiOperatorResourceHandler{}
+
+		taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
+		taskTemplate.TaskTypeVersion = 1
+
+		resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
+
+		mpiJob, ok := resource.(*kubeflowv1.MPIJob)
+		assert.True(t, ok)
+		assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
+		assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
+		assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
+		assert.Equal(t, *launcherResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Resources)
+		assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
+		assert.Equal(t, launcherCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
+		assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 	}
-
-	workerResourceRequirements := &corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("1024m"),
-			corev1.ResourceMemory: resource.MustParse("1Gi"),
-		},
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("2048m"),
-			corev1.ResourceMemory: resource.MustParse("2Gi"),
-		},
-	}
-
-	mpiResourceHandler := mpiOperatorResourceHandler{}
-
-	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
-	taskTemplate.TaskTypeVersion = 1
-
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
-
-	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
-	assert.True(t, ok)
-	assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
-	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
-	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
-	assert.Equal(t, *launcherResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Resources)
-	assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
-	assert.Equal(t, launcherCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
-	assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 }
 
 func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 	workerCommand := []string{"/usr/sbin/sshd", "/.sshd_config"}
 
-	taskConfig := &kfplugins.DistributedMPITrainingTask{
-		WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
+	taskConfigs := []*kfplugins.DistributedMPITrainingTask{
+		{
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-				},
+				Command: []string{"/usr/sbin/sshd", "/.sshd_config"},
 			},
-			Command: []string{"/usr/sbin/sshd", "/.sshd_config"},
+			Slots: int32(1),
 		},
-		Slots: int32(1),
+		{
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
+				},
+				Command: []string{"/usr/sbin/sshd", "/.sshd_config"},
+			},
+			Slots: int32(1),
+		},
 	}
 
-	workerResourceRequirements := &corev1.ResourceRequirements{
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("1024m"),
-			corev1.ResourceMemory: resource.MustParse("1Gi"),
-		},
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse("2048m"),
-			corev1.ResourceMemory: resource.MustParse("2Gi"),
-		},
+	for _, taskConfig := range taskConfigs {
+		workerResourceRequirements := &corev1.ResourceRequirements{
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("1024m"),
+				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("2048m"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
+			},
+		}
+
+		mpiResourceHandler := mpiOperatorResourceHandler{}
+
+		taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
+		taskTemplate.TaskTypeVersion = 1
+
+		resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
+
+		mpiJob, ok := resource.(*kubeflowv1.MPIJob)
+		assert.True(t, ok)
+		assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
+		assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
+		assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
+		assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
+		assert.Equal(t, testArgs, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
+		assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 	}
-
-	mpiResourceHandler := mpiOperatorResourceHandler{}
-
-	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
-	taskTemplate.TaskTypeVersion = 1
-
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
-
-	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
-	assert.True(t, ok)
-	assert.Equal(t, int32(1), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
-	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
-	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
-	assert.Equal(t, *workerResourceRequirements, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Resources)
-	assert.Equal(t, testArgs, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
-	assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 }
 
 func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
@@ -829,50 +909,87 @@ func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
 		},
 	}))
 
-	taskConfig := &kfplugins.DistributedMPITrainingTask{
-		LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "250Mi"},
+	taskConfigs := []*kfplugins.DistributedMPITrainingTask{
+		{
+			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "500Mi"},
+			},
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
 				},
 			},
 		},
-		WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+		{
+			LauncherReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "250Mi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "500Mi"},
+						},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+			},
+			WorkerReplicas: &kfplugins.DistributedMPITrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+					},
 				},
 			},
 		},
 	}
 
-	mpiResourceHandler := mpiOperatorResourceHandler{}
+	for _, taskConfig := range taskConfigs {
+		mpiResourceHandler := mpiOperatorResourceHandler{}
 
-	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
-	taskTemplate.TaskTypeVersion = 1
+		taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
+		taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
+		resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
 
-	mpiJob, ok := resource.(*kubeflowv1.MPIJob)
-	assert.True(t, ok)
+		mpiJob, ok := resource.(*kubeflowv1.MPIJob)
+		assert.True(t, ok)
 
-	assert.NotContains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Tolerations, gpuToleration)
-	assert.Contains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
+		assert.NotContains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Tolerations, gpuToleration)
+		assert.Contains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
+	}
 }
 
 func TestGetReplicaCount(t *testing.T) {
@@ -887,21 +1004,4 @@ func TestGetReplicaCount(t *testing.T) {
 
 	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker))
 	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher))
-}
-
-func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
-	mpiResourceHandler := mpiOperatorResourceHandler{}
-	ctx := context.TODO()
-
-	pluginState := k8s.PluginState{
-		Phase:        pluginsCore.PhaseQueued,
-		PhaseVersion: pluginsCore.DefaultPhaseVersion,
-		Reason:       "task submitted to K8s",
-	}
-	taskCtx := dummyMPIPluginContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, pluginState)
-
-	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, mpiOp.JobCreated))
-
-	assert.NoError(t, err)
-	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }

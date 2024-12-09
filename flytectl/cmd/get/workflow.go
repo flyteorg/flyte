@@ -3,16 +3,14 @@ package get
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	workflowconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/ext"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyte/flytectl/cmd/config"
-	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/flyteorg/flyte/flytectl/pkg/printer"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const (
@@ -185,7 +183,7 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 	domain string) (workflows []*admin.Workflow, isList bool, err error) {
 	var workflow *admin.Workflow
 	if workflowconfig.DefaultConfig.Latest {
-		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain, workflowconfig.DefaultConfig.Filter); err != nil {
+		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain); err != nil {
 			return nil, false, err
 		}
 		workflows = append(workflows, workflow)

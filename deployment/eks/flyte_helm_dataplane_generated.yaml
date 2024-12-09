@@ -208,7 +208,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.0
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.3
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -269,6 +269,7 @@ data:
         - sidecar
         - k8s-array
         - agent-service
+        - echo
   k8s.yaml: | 
     plugins:
       k8s:
@@ -291,6 +292,11 @@ data:
         maxDownloadMBs: 10
       cache:
         max_size_mbs: 1024
+        target_gc_percent: 70
+  cache.yaml: |
+    storage:
+      cache:
+        max_size_mbs: 
         target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
@@ -541,7 +547,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "60aa44ad735bdd3fa480b48c1c825ea3e85895c0399a595837b1d49f80457f2"
+        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -569,7 +575,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.3"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -623,9 +629,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.12.0
+        app.kubernetes.io/version: v1.13.3
       annotations:
-        configChecksum: "60aa44ad735bdd3fa480b48c1c825ea3e85895c0399a595837b1d49f80457f2"
+        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
@@ -639,7 +645,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.3"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -666,7 +672,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.3"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -726,6 +732,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
   ingressClassName: 
   rules:
@@ -896,6 +903,7 @@ metadata:
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
   ingressClassName: 
   rules:

@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	callbackRelativeURL = config.MustParseURL("/callback")
+	callbackRelativeURL = config.MustParseURL("callback")
 	rootRelativeURL     = config.MustParseURL("/")
 )
 

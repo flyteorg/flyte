@@ -396,7 +396,7 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 		if err != nil {
 			return nil, core.PhaseInfoUndefined, err
 		}
-		phaseInfo = core.PhaseInfoQueuedWithTaskInfo(pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID), taskInfo)
+		phaseInfo = core.PhaseInfoQueuedWithTaskInfo(now, pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID), taskInfo)
 	} else {
 		// task was not submmitted, get the status from the replicas
 		phaseInfo, err = p.getPhaseInfoFromReplicas(ctx, tCtx, executionEnv, queueID, &pluginState)

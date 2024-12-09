@@ -21,9 +21,9 @@ agentSecret:
 replicaCount: 1
 image:
   # -- Docker image for flyteagent deployment
-  repository: ghcr.io/flyteorg/flyteagent
+  repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEAGENT_IMAGE
   # -- Docker image tag
-  tag: 1.11.0  # FLYTEAGENT_TAG
+  tag: 1.13.11  # FLYTEAGENT_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
@@ -34,7 +34,7 @@ resources:
   limits:
     cpu: 500m
     ephemeral-storage: 200Mi
-    memory: 200Mi
+    memory: 300Mi
   requests:
     cpu: 500m
     ephemeral-storage: 200Mi

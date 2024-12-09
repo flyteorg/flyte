@@ -15,7 +15,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.12.0  # FLYTEADMIN_TAG
+      tag: v1.13.3  # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
@@ -83,7 +83,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v1.12.0  # FLYTESCHEDULER_TAG
+      tag: v1.13.3  # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -128,7 +128,7 @@ flyte:
       # -- Docker image for Datacatalog deployment
       repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
       # -- Docker image tag
-      tag: v1.12.0  # DATACATALOG_TAG
+      tag: v1.13.3  # DATACATALOG_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Datacatalog deployment
@@ -225,7 +225,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.12.0  # FLYTEPROPELLER_TAG
+      tag: v1.13.3  # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -269,7 +269,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v1.12.2  # FLYTECONSOLE_TAG
+      tag: v1.18.0  # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
@@ -533,7 +533,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/flyteorg/flytecopilot:v1.12.0  # FLYTECOPILOT_IMAGE
+            image: cr.flyte.org/flyteorg/flytecopilot:v1.13.3  # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
@@ -590,6 +590,7 @@ flyte:
             - sidecar
             - k8s-array
             - agent-service
+            - echo
           default-for-task-types:
             container: container
             sidecar: sidecar
@@ -813,18 +814,18 @@ minio:
   affinity: {}
 
 redoc:
-  # --- enable or disable Minio deployment installation
+  # --- enable or disable redoc deployment installation
   enabled: true
-  # -- Replicas count for Minio deployment
+  # -- Replicas count for redoc deployment
   replicaCount: 1
   image:
-    # -- Docker image for Minio deployment
+    # -- Docker image for redoc deployment
     repository: docker.io/redocly/redoc
     # -- Docker image tag
     tag: latest
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Minio deployment
+  # -- Default resources requests and limits for redoc deployment
   resources:
     # -- Requests are the minimum set of resources needed for this pod
     requests:
@@ -834,16 +835,16 @@ redoc:
     limits:
       cpu: 200m
       memory: 512Mi
-  # -- Service settings for Minio
+  # -- Service settings for redoc
   service:
     type: ClusterIP
-  # -- Annotations for Minio pods
+  # -- Annotations for redoc pods
   podAnnotations: {}
-  # -- nodeSelector for Minio deployment
+  # -- nodeSelector for redoc deployment
   nodeSelector: {}
-  # -- tolerations for Minio deployment
+  # -- tolerations for redoc deployment
   tolerations: []
-  # -- affinity for Minio deployment
+  # -- affinity for redoc deployment
   affinity: {}
 
 #

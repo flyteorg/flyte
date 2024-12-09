@@ -20,7 +20,7 @@ func TestCreateExecutionEventModel(t *testing.T) {
 	timestamp := time.Now().UTC()
 	occurredAt, _ := ptypes.TimestampProto(timestamp)
 	executionEvent, err := CreateExecutionEventModel(
-		admin.WorkflowExecutionEventRequest{
+		&admin.WorkflowExecutionEventRequest{
 			RequestId: requestID,
 			Event: &event.WorkflowExecutionEvent{
 				ExecutionId: &core.WorkflowExecutionIdentifier{

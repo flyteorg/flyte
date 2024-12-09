@@ -93,11 +93,12 @@ type stowMetrics struct {
 	HeadLatency     labeled.StopWatch
 	HeadLatencyHist labeled.HistogramStopWatch
 
+	ListFailure labeled.Counter
+	ListLatency labeled.StopWatch
+
 	ReadFailure         labeled.Counter
 	ReadOpenLatency     labeled.StopWatch
 	ReadOpenLatencyHist labeled.HistogramStopWatch
-	ListFailure         labeled.Counter
-	ListLatency         labeled.StopWatch
 
 	WriteFailure     labeled.Counter
 	WriteLatency     labeled.StopWatch

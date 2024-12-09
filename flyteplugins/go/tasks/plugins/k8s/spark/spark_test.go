@@ -9,7 +9,6 @@ import (
 
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -27,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const sparkMainClass = "MainClass"
@@ -120,7 +120,14 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Equal(t, expectedLinks, generatedLinks)
 
 	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.SubmittedState))
+	generatedLinks = make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
 	assert.NoError(t, err)
+	assert.Len(t, info.Logs, 5)
+	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
+	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
 		generatedLinks = append(generatedLinks, l.Uri)
@@ -271,6 +278,23 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
 func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
 
 	return &sj.SparkApplication{
@@ -341,7 +365,7 @@ func dummySparkTaskTemplateContainer(id string, sparkConf map[string]string) *co
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -369,7 +393,7 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -528,6 +552,7 @@ func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
@@ -949,7 +974,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
-	assert.Equal(t, 9, len(sparkApp.Spec.Driver.Env))
+	assert.Equal(t, 10, len(sparkApp.Spec.Driver.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
 	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
@@ -986,7 +1011,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
-	assert.Equal(t, 9, len(sparkApp.Spec.Executor.Env))
+	assert.Equal(t, 10, len(sparkApp.Spec.Executor.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
 	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
 	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
@@ -1025,22 +1050,4 @@ func TestGetPropertiesSpark(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, sparkResourceHandler.GetProperties())
-}
-
-func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
-	sparkResourceHandler := sparkResourceHandler{}
-	ctx := context.TODO()
-
-	pluginState := k8s.PluginState{
-		Phase:        pluginsCore.PhaseInitializing,
-		PhaseVersion: pluginsCore.DefaultPhaseVersion,
-		Reason:       "task submitted to K8s",
-	}
-
-	taskCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
-
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SubmittedState))
-
-	assert.NoError(t, err)
-	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }

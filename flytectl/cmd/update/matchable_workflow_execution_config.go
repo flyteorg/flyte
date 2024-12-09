@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const (

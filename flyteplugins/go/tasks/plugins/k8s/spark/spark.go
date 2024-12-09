@@ -439,6 +439,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
+
 	customInfoMap := make(map[string]string)
 
 	// Spark UI.
@@ -492,7 +493,7 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	var phaseInfo pluginsCore.PhaseInfo
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
-		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "job queued", info)
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info)
 	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
 		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info)
 	case sparkOp.FailedSubmissionState:
@@ -506,10 +507,12 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	default:
 		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
 	}
+
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr
 	}
+
 	return phaseInfo, nil
 }
 

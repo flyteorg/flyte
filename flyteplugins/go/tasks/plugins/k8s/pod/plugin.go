@@ -198,6 +198,8 @@ func (plugin) GetProperties() k8s.PluginProperties {
 }
 
 func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	pluginState := k8s.PluginState{}
+	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
 	phaseInfo := pluginsCore.PhaseInfoUndefined
 	var err error
 
@@ -210,7 +212,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
@@ -255,6 +257,11 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 		}
 	}
 
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
 }
 

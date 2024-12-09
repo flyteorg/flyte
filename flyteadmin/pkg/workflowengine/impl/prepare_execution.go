@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,7 +29,9 @@ func addPermissions(securityCtx *core.SecurityContext, roleNameKey string, flyte
 	if securityCtx == nil || securityCtx.RunAs == nil {
 		return
 	}
-	flyteWf.SecurityContext = *securityCtx
+
+	securityCtxCopy, _ := proto.Clone(securityCtx).(*core.SecurityContext)
+	flyteWf.SecurityContext = *securityCtxCopy
 	if len(securityCtx.RunAs.IamRole) > 0 {
 		if flyteWf.Annotations == nil {
 			flyteWf.Annotations = map[string]string{}
@@ -149,6 +152,9 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	// add the acceptedAt timestamp so propeller can emit latency metrics.
 	acceptAtWrapper := v1.NewTime(data.ExecutionParameters.AcceptedAt)
 	flyteWorkflow.AcceptedAt = &acceptAtWrapper
+
+	// Add finalizer
+	flyteWorkflow.Finalizers = append(flyteWorkflow.Finalizers, "flyte-finalizer")
 
 	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
 	// have migrated over to security context

@@ -36,6 +36,8 @@ You can create different agent services that host different agents, e.g., a prod
   - Once you have tested your new agent in a local development cluster and want to use it in production, you should test it in the Flyte sandbox.
 * - {doc}`Implementing the agent metadata service <implementing_the_agent_metadata_service>`
   - If you want to develop an agent server in a language other than Python (e.g., Rust or Java), you must implement the agent metadata service in your agent server.
+* - {doc}`How secret works in agent <how_secret_works_in_agent>`
+  - Explain how secret works in your agent server.
 ```
 
 ```{toctree}
@@ -48,4 +50,5 @@ developing_agents
 testing_agents_in_a_local_development_cluster
 deploying_agents_to_the_flyte_sandbox
 implementing_the_agent_metadata_service
+how_secret_works_in_agent
 ```

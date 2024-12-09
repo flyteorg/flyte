@@ -266,8 +266,8 @@ func (_m AdminFetcherExtInterface_FetchLPLatestVersion) Return(_a0 *admin.Launch
 	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminFetcherExtInterface) OnFetchLPLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchLPLatestVersion {
-	c_call := _m.On("FetchLPLatestVersion", ctx, name, project, domain, filter)
+func (_m *AdminFetcherExtInterface) OnFetchLPLatestVersion(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchLPLatestVersion {
+	c_call := _m.On("FetchLPLatestVersion", ctx, name, project, domain)
 	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c_call}
 }
 
@@ -276,13 +276,13 @@ func (_m *AdminFetcherExtInterface) OnFetchLPLatestVersionMatch(matchers ...inte
 	return &AdminFetcherExtInterface_FetchLPLatestVersion{Call: c_call}
 }
 
-// FetchLPLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
-func (_m *AdminFetcherExtInterface) FetchLPLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) (*admin.LaunchPlan, error) {
-	ret := _m.Called(ctx, name, project, domain, filter)
+// FetchLPLatestVersion provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchLPLatestVersion(ctx context.Context, name string, project string, domain string) (*admin.LaunchPlan, error) {
+	ret := _m.Called(ctx, name, project, domain)
 
 	var r0 *admin.LaunchPlan
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, filters.Filters) *admin.LaunchPlan); ok {
-		r0 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *admin.LaunchPlan); ok {
+		r0 = rf(ctx, name, project, domain)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.LaunchPlan)
@@ -290,8 +290,8 @@ func (_m *AdminFetcherExtInterface) FetchLPLatestVersion(ctx context.Context, na
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, filters.Filters) error); ok {
-		r1 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -676,8 +676,8 @@ func (_m AdminFetcherExtInterface_FetchWorkflowLatestVersion) Return(_a0 *admin.
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
-	c_call := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain, filter)
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
+	c_call := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain)
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
@@ -686,13 +686,13 @@ func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersionMatch(matchers .
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
-// FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
-func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) (*admin.Workflow, error) {
-	ret := _m.Called(ctx, name, project, domain, filter)
+// FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) (*admin.Workflow, error) {
+	ret := _m.Called(ctx, name, project, domain)
 
 	var r0 *admin.Workflow
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, filters.Filters) *admin.Workflow); ok {
-		r0 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *admin.Workflow); ok {
+		r0 = rf(ctx, name, project, domain)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.Workflow)
@@ -700,8 +700,8 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Conte
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, filters.Filters) error); ok {
-		r1 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -743,6 +743,47 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowVersion(ctx context.Context, na
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
 		r1 = rf(ctx, name, version, project, domain)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminFetcherExtInterface_GetDomains struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminFetcherExtInterface_GetDomains {
+	return &AdminFetcherExtInterface_GetDomains{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnGetDomains(ctx context.Context) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", ctx)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
+}
+
+func (_m *AdminFetcherExtInterface) OnGetDomainsMatch(matchers ...interface{}) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
+}
+
+// GetDomains provides a mock function with given fields: ctx
+func (_m *AdminFetcherExtInterface) GetDomains(ctx context.Context) (*admin.GetDomainsResponse, error) {
+	ret := _m.Called(ctx)
+
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context) *admin.GetDomainsResponse); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}

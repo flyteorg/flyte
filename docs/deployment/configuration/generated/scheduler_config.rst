@@ -143,6 +143,18 @@ Max number of gRPC retries
   "4"
   
 
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 authType (uint8)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1751,6 +1763,7 @@ postgres (`database.PostgresConfig`_)
   password: postgres
   passwordPath: ""
   port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -1771,6 +1784,18 @@ host (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
 
 **Default Value**: 
 
@@ -2169,6 +2194,30 @@ Enable experimental features.
   enableArtifacts: false
   
 
+consoleUrl (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A URL pointing to the flyteconsole instance used to hit this flyteadmin instance.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+useOffloadedInputs (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use offloaded inputs for workflows.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 interfaces.FeatureGates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2359,6 +2408,11 @@ emailer (`interfaces.NotificationsEmailerConfig`_)
     apiKeyEnvVar: ""
     apiKeyFilePath: ""
     serviceName: ""
+    smtpPasswordSecretName: ""
+    smtpPort: ""
+    smtpServer: ""
+    smtpSkipTLSVerify: false
+    smtpUsername: ""
   sender: ""
   subject: ""
   
@@ -2396,6 +2450,11 @@ emailServerConfig (`interfaces.EmailServerConfig`_)
   apiKeyEnvVar: ""
   apiKeyFilePath: ""
   serviceName: ""
+  smtpPasswordSecretName: ""
+  smtpPort: ""
+  smtpServer: ""
+  smtpSkipTLSVerify: false
+  smtpUsername: ""
   
 
 subject (string)
@@ -2461,6 +2520,56 @@ apiKeyFilePath (string)
   ""
   
 
+smtpServer (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPort (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpSkipTLSVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+smtpUsername (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPasswordSecretName (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 interfaces.NotificationsProcessorConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2503,7 +2612,7 @@ Section: otel
 type (string)
 ------------------------------------------------------------------------------------------------------------------------
 
-Sets the type of exporter to configure [noop/file/jaeger].
+Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp].
 
 **Default Value**: 
 
@@ -2536,6 +2645,43 @@ Configuration for exporting telemetry traces to a jaeger
   endpoint: http://localhost:14268/api/traces
   
 
+otlpgrpc (`otelutils.OtlpGrpcConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP gRPC collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4317
+  
+
+otlphttp (`otelutils.OtlpHttpConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP HTTP collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4318/v1/traces
+  
+
+sampler (`otelutils.SamplerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for the sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  parentSampler: always
+  traceIdRatio: 0.01
+  
+
 otelutils.FileConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2564,6 +2710,61 @@ Endpoint for the jaeger telemetry trace ingestor
 .. code-block:: yaml
 
   http://localhost:14268/api/traces
+  
+
+otelutils.OtlpGrpcConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4317
+  
+
+otelutils.OtlpHttpConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4318/v1/traces
+  
+
+otelutils.SamplerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+parentSampler (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Sets the parent sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  always
+  
+
+traceIdRatio (float64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.01"
   
 
 Section: plugins
@@ -2640,6 +2841,8 @@ k8s (`config.K8sPluginConfig`_)
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
+  update-backoff-retries: 5
+  update-base-backoff-duration: 10
   
 
 catalog.Config
@@ -3110,6 +3313,30 @@ If true, will send k8s object events in TaskExecutionEvent updates.
 .. code-block:: yaml
 
   "false"
+  
+
+update-base-backoff-duration (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Initial delay in exponential backoff when updating a resource in milliseconds.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+update-backoff-retries (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Number of retries for exponential backoff when updating a resource.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
   
 
 config.FlyteCoPilotConfig
@@ -3754,6 +3981,23 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  use-map-plugin-logs: false
+  
+
+literal-offloading-config (`config.LiteralOffloadingConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+config used for literal offloading.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Enabled: false
+  max-size-in-mb-for-offloading: 1000
+  min-size-in-mb-for-offloading: 10
+  supported-sdk-versions:
+    FLYTE_SDK: 1.13.5
   
 
 config.ArrayNodeConfig
@@ -3781,6 +4025,18 @@ Default parallelism behavior for array nodes
 .. code-block:: yaml
 
   unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
@@ -3942,6 +4198,16 @@ Whether output data should be sent by reference when it is too large to be sent 
   "false"
   
 
+ErrorOnAlreadyExists (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 config.KubeClientConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4064,6 +4330,55 @@ Name (string)
 .. code-block:: yaml
 
   ""
+  
+
+config.LiteralOffloadingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+supported-sdk-versions (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_SDK: 1.13.5
+  
+
+min-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to trigger offloading
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+max-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to fail fast
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
   
 
 config.NodeConfig

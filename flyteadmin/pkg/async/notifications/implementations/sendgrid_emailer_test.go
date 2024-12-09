@@ -21,7 +21,7 @@ func TestAddresses(t *testing.T) {
 }
 
 func TestGetEmail(t *testing.T) {
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{

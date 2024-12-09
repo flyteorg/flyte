@@ -3,10 +3,9 @@ package sandbox
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/stretchr/testify/assert"

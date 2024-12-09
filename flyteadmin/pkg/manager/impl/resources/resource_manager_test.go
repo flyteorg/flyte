@@ -30,7 +30,7 @@ const python = "python"
 const hive = "hive"
 
 func TestUpdateWorkflowAttributes(t *testing.T) {
-	request := admin.WorkflowAttributesUpdateRequest{
+	request := &admin.WorkflowAttributesUpdateRequest{
 		Attributes: &admin.WorkflowAttributes{
 			Project:            project,
 			Domain:             domain,
@@ -58,7 +58,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 }
 
 func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
-	request := admin.WorkflowAttributesUpdateRequest{
+	request := &admin.WorkflowAttributesUpdateRequest{
 		Attributes: &admin.WorkflowAttributes{
 			Project:            project,
 			Domain:             domain,
@@ -149,7 +149,7 @@ func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
 }
 
 func TestGetWorkflowAttributes(t *testing.T) {
-	request := admin.WorkflowAttributesGetRequest{
+	request := &admin.WorkflowAttributesGetRequest{
 		Project:      project,
 		Domain:       domain,
 		Workflow:     workflow,
@@ -185,7 +185,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 }
 
 func TestDeleteWorkflowAttributes(t *testing.T) {
-	request := admin.WorkflowAttributesDeleteRequest{
+	request := &admin.WorkflowAttributesDeleteRequest{
 		Project:      project,
 		Domain:       domain,
 		Workflow:     workflow,
@@ -206,7 +206,7 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 }
 
 func TestUpdateProjectDomainAttributes(t *testing.T) {
-	request := admin.ProjectDomainAttributesUpdateRequest{
+	request := &admin.ProjectDomainAttributesUpdateRequest{
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            project,
 			Domain:             domain,
@@ -233,7 +233,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 }
 
 func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
-	request := admin.ProjectDomainAttributesUpdateRequest{
+	request := &admin.ProjectDomainAttributesUpdateRequest{
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            project,
 			Domain:             domain,
@@ -320,7 +320,7 @@ func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
 }
 
 func TestGetProjectDomainAttributes(t *testing.T) {
-	request := admin.ProjectDomainAttributesGetRequest{
+	request := &admin.ProjectDomainAttributesGetRequest{
 		Project:      project,
 		Domain:       domain,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
@@ -353,7 +353,7 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 }
 
 func TestDeleteProjectDomainAttributes(t *testing.T) {
-	request := admin.ProjectDomainAttributesDeleteRequest{
+	request := &admin.ProjectDomainAttributesDeleteRequest{
 		Project:      project,
 		Domain:       domain,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
@@ -372,7 +372,7 @@ func TestDeleteProjectDomainAttributes(t *testing.T) {
 }
 
 func TestUpdateProjectAttributes(t *testing.T) {
-	request := admin.ProjectAttributesUpdateRequest{
+	request := &admin.ProjectAttributesUpdateRequest{
 		Attributes: &admin.ProjectAttributes{
 			Project:            project,
 			MatchingAttributes: testutils.WorkflowExecutionConfigSample,
@@ -397,7 +397,7 @@ func TestUpdateProjectAttributes(t *testing.T) {
 	assert.True(t, createOrUpdateCalled)
 
 	// Test empty attributes
-	request = admin.ProjectAttributesUpdateRequest{Attributes: nil}
+	request = &admin.ProjectAttributesUpdateRequest{Attributes: nil}
 	_, err = manager.UpdateProjectAttributes(context.Background(), request)
 	assert.Error(t, err)
 
@@ -406,7 +406,7 @@ func TestUpdateProjectAttributes(t *testing.T) {
 		ctx context.Context, input models.Resource) error {
 		return errors.NewFlyteAdminErrorf(123, "123")
 	}
-	request = admin.ProjectAttributesUpdateRequest{
+	request = &admin.ProjectAttributesUpdateRequest{
 		Attributes: &admin.ProjectAttributes{
 			Project:            project,
 			MatchingAttributes: testutils.WorkflowExecutionConfigSample,
@@ -417,7 +417,7 @@ func TestUpdateProjectAttributes(t *testing.T) {
 }
 
 func TestUpdateProjectAttributes_CreateOrMerge(t *testing.T) {
-	request := admin.ProjectAttributesUpdateRequest{
+	request := &admin.ProjectAttributesUpdateRequest{
 		Attributes: &admin.ProjectAttributes{
 			Project:            project,
 			MatchingAttributes: commonTestUtils.GetPluginOverridesAttributes(map[string][]string{"python": {"plugin a"}}),
@@ -502,7 +502,7 @@ func TestUpdateProjectAttributes_CreateOrMerge(t *testing.T) {
 }
 
 func TestGetProjectAttributes(t *testing.T) {
-	request := admin.ProjectAttributesGetRequest{
+	request := &admin.ProjectAttributesGetRequest{
 		Project:      project,
 		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
 	}
@@ -544,7 +544,7 @@ func TestGetProjectAttributes(t *testing.T) {
 }
 
 func TestGetProjectAttributes_ConfigLookup(t *testing.T) {
-	request := admin.ProjectAttributesGetRequest{
+	request := &admin.ProjectAttributesGetRequest{
 		Project:      project,
 		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
 	}
@@ -651,7 +651,7 @@ func TestGetProjectAttributes_ConfigLookup(t *testing.T) {
 			OutputLocationPrefix: "s3://test-bucket",
 		}
 		config.SetTopLevelConfig(appConfig)
-		request := admin.ProjectAttributesGetRequest{
+		request := &admin.ProjectAttributesGetRequest{
 			Project:      project,
 			ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 		}
@@ -665,7 +665,7 @@ func TestGetProjectAttributes_ConfigLookup(t *testing.T) {
 }
 
 func TestDeleteProjectAttributes(t *testing.T) {
-	request := admin.ProjectAttributesDeleteRequest{
+	request := &admin.ProjectAttributesDeleteRequest{
 		Project:      project,
 		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
 	}
@@ -760,7 +760,7 @@ func TestListAllResources(t *testing.T) {
 		}, nil
 	}
 	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
-	response, err := manager.ListAll(context.Background(), admin.ListMatchableAttributesRequest{
+	response, err := manager.ListAll(context.Background(), &admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})
 	assert.Nil(t, err)

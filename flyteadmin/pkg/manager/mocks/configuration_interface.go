@@ -23,7 +23,7 @@ func (_m ConfigurationInterface_GetConfiguration) Return(_a0 *admin.Configuratio
 	return &ConfigurationInterface_GetConfiguration{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ConfigurationInterface) OnGetConfiguration(ctx context.Context, request admin.ConfigurationGetRequest) *ConfigurationInterface_GetConfiguration {
+func (_m *ConfigurationInterface) OnGetConfiguration(ctx context.Context, request *admin.ConfigurationGetRequest) *ConfigurationInterface_GetConfiguration {
 	c_call := _m.On("GetConfiguration", ctx, request)
 	return &ConfigurationInterface_GetConfiguration{Call: c_call}
 }
@@ -34,11 +34,11 @@ func (_m *ConfigurationInterface) OnGetConfigurationMatch(matchers ...interface{
 }
 
 // GetConfiguration provides a mock function with given fields: ctx, request
-func (_m *ConfigurationInterface) GetConfiguration(ctx context.Context, request admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error) {
+func (_m *ConfigurationInterface) GetConfiguration(ctx context.Context, request *admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ConfigurationGetResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ConfigurationGetRequest) *admin.ConfigurationGetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationGetRequest) *admin.ConfigurationGetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -47,7 +47,7 @@ func (_m *ConfigurationInterface) GetConfiguration(ctx context.Context, request 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ConfigurationGetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -60,7 +60,7 @@ type ConfigurationInterface_GetEditableActiveDocument struct {
 	*mock.Call
 }
 
-func (_m ConfigurationInterface_GetEditableActiveDocument) Return(_a0 admin.ConfigurationDocument, _a1 error) *ConfigurationInterface_GetEditableActiveDocument {
+func (_m ConfigurationInterface_GetEditableActiveDocument) Return(_a0 *admin.ConfigurationDocument, _a1 error) *ConfigurationInterface_GetEditableActiveDocument {
 	return &ConfigurationInterface_GetEditableActiveDocument{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -75,14 +75,16 @@ func (_m *ConfigurationInterface) OnGetEditableActiveDocumentMatch(matchers ...i
 }
 
 // GetEditableActiveDocument provides a mock function with given fields: ctx
-func (_m *ConfigurationInterface) GetEditableActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error) {
+func (_m *ConfigurationInterface) GetEditableActiveDocument(ctx context.Context) (*admin.ConfigurationDocument, error) {
 	ret := _m.Called(ctx)
 
-	var r0 admin.ConfigurationDocument
-	if rf, ok := ret.Get(0).(func(context.Context) admin.ConfigurationDocument); ok {
+	var r0 *admin.ConfigurationDocument
+	if rf, ok := ret.Get(0).(func(context.Context) *admin.ConfigurationDocument); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(admin.ConfigurationDocument)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ConfigurationDocument)
+		}
 	}
 
 	var r1 error
@@ -99,7 +101,7 @@ type ConfigurationInterface_GetReadOnlyActiveDocument struct {
 	*mock.Call
 }
 
-func (_m ConfigurationInterface_GetReadOnlyActiveDocument) Return(_a0 admin.ConfigurationDocument, _a1 error) *ConfigurationInterface_GetReadOnlyActiveDocument {
+func (_m ConfigurationInterface_GetReadOnlyActiveDocument) Return(_a0 *admin.ConfigurationDocument, _a1 error) *ConfigurationInterface_GetReadOnlyActiveDocument {
 	return &ConfigurationInterface_GetReadOnlyActiveDocument{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -114,14 +116,16 @@ func (_m *ConfigurationInterface) OnGetReadOnlyActiveDocumentMatch(matchers ...i
 }
 
 // GetReadOnlyActiveDocument provides a mock function with given fields: ctx
-func (_m *ConfigurationInterface) GetReadOnlyActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error) {
+func (_m *ConfigurationInterface) GetReadOnlyActiveDocument(ctx context.Context) (*admin.ConfigurationDocument, error) {
 	ret := _m.Called(ctx)
 
-	var r0 admin.ConfigurationDocument
-	if rf, ok := ret.Get(0).(func(context.Context) admin.ConfigurationDocument); ok {
+	var r0 *admin.ConfigurationDocument
+	if rf, ok := ret.Get(0).(func(context.Context) *admin.ConfigurationDocument); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(admin.ConfigurationDocument)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ConfigurationDocument)
+		}
 	}
 
 	var r1 error
@@ -142,7 +146,7 @@ func (_m ConfigurationInterface_UpdateConfiguration) Return(_a0 *admin.Configura
 	return &ConfigurationInterface_UpdateConfiguration{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ConfigurationInterface) OnUpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateConfiguration {
+func (_m *ConfigurationInterface) OnUpdateConfiguration(ctx context.Context, request *admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateConfiguration {
 	c_call := _m.On("UpdateConfiguration", ctx, request)
 	return &ConfigurationInterface_UpdateConfiguration{Call: c_call}
 }
@@ -153,11 +157,11 @@ func (_m *ConfigurationInterface) OnUpdateConfigurationMatch(matchers ...interfa
 }
 
 // UpdateConfiguration provides a mock function with given fields: ctx, request
-func (_m *ConfigurationInterface) UpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
+func (_m *ConfigurationInterface) UpdateConfiguration(ctx context.Context, request *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ConfigurationUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -166,7 +170,7 @@ func (_m *ConfigurationInterface) UpdateConfiguration(ctx context.Context, reque
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ConfigurationUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)

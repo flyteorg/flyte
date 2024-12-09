@@ -2,8 +2,6 @@
 package adminservice
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -67,6 +65,12 @@ type projectEndpointMetrics struct {
 	get      util.RequestMetrics
 }
 
+type domainEndpointMetrics struct {
+	scope promutils.Scope
+
+	get util.RequestMetrics
+}
+
 type attributeEndpointMetrics struct {
 	scope promutils.Scope
 
@@ -119,14 +123,14 @@ type configurationEndpointMetrics struct {
 }
 
 type AdminMetrics struct {
-	Scope        promutils.Scope
-	PanicCounter prometheus.Counter
+	Scope promutils.Scope
 
 	executionEndpointMetrics               executionEndpointMetrics
 	launchPlanEndpointMetrics              launchPlanEndpointMetrics
 	namedEntityEndpointMetrics             namedEntityEndpointMetrics
 	nodeExecutionEndpointMetrics           nodeExecutionEndpointMetrics
 	projectEndpointMetrics                 projectEndpointMetrics
+	domainEndpointMetrics                  domainEndpointMetrics
 	orgAttributesEndpointMetrics           attributeEndpointMetrics
 	projectAttributesEndpointMetrics       attributeEndpointMetrics
 	projectDomainAttributesEndpointMetrics attributeEndpointMetrics
@@ -142,8 +146,6 @@ type AdminMetrics struct {
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 	return AdminMetrics{
 		Scope: adminScope,
-		PanicCounter: adminScope.MustNewCounter("handler_panic",
-			"panics encountered while handling requests to the admin service"),
 
 		executionEndpointMetrics: executionEndpointMetrics{
 			scope:        adminScope,
@@ -193,6 +195,10 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:     util.NewRequestMetrics(adminScope, "list_projects"),
 			update:   util.NewRequestMetrics(adminScope, "update_project"),
 			get:      util.NewRequestMetrics(adminScope, "get_project"),
+		},
+		domainEndpointMetrics: domainEndpointMetrics{
+			scope: adminScope,
+			get:   util.NewRequestMetrics(adminScope, "get_domain"),
 		},
 		orgAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,

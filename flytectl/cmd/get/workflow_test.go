@@ -4,22 +4,17 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyte/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -179,9 +174,8 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
-	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflow1, nil)
+	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue).Return(workflow1, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
 	s.TearDownAndVerify(t, `

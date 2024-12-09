@@ -1,7 +1,7 @@
 name: Flyteidl Verification Tests
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - master
+      - 'release-v**'
 env:
   GO_VERSION: "1.22"
 jobs:

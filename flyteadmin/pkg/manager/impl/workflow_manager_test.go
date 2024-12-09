@@ -39,7 +39,7 @@ import (
 const remoteClosureIdentifier = "s3://flyte/metadata/admin/remote closure id"
 const returnWorkflowOnGet = true
 
-var workflowIdentifier = core.Identifier{
+var workflowIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_WORKFLOW,
 	Project:      "project",
 	Domain:       "domain",
@@ -50,7 +50,7 @@ var workflowIdentifier = core.Identifier{
 
 var storagePrefix = []string{"metadata", "admin"}
 
-var workflowClosure = admin.WorkflowClosure{
+var workflowClosure = &admin.WorkflowClosure{
 	CompiledWorkflow: &core.CompiledWorkflowClosure{
 		Primary: &core.CompiledWorkflow{
 			Template: &core.WorkflowTemplate{
@@ -72,7 +72,7 @@ var workflowClosure = admin.WorkflowClosure{
 		},
 	},
 }
-var workflowClosureBytes, _ = proto.Marshal(&workflowClosure)
+var workflowClosureBytes, _ = proto.Marshal(workflowClosure)
 
 func getMockWorkflowConfigProvider() runtimeInterfaces.Configuration {
 	mockWorkflowConfigProvider := runtimeMocks.NewMockConfigurationProvider(
@@ -133,7 +133,7 @@ func TestSetWorkflowDefaults(t *testing.T) {
 	request := testutils.GetWorkflowRequest()
 	finalizedRequest, err := workflowManager.(*WorkflowManager).setDefaults(request)
 	assert.NoError(t, err)
-	assert.True(t, proto.Equal(&workflowIdentifier, finalizedRequest.Spec.Template.Id))
+	assert.True(t, proto.Equal(workflowIdentifier, finalizedRequest.Spec.Template.Id))
 }
 
 func TestCreateWorkflow(t *testing.T) {
@@ -191,7 +191,7 @@ func TestCreateWorkflow_ExistingWorkflow(t *testing.T) {
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "workflow with different structure already exists:\n\t\t- /primary/template/id: <nil> -> map[domain:domain name:name org:org project:project resource_type:2 version:version]\n\t\t- /primary/template/interface/inputs: <nil> -> map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/interface/outputs: <nil> -> map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/nodes: <nil> -> [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
+	assert.EqualError(t, err, "name workflow with different structure already exists. (Please register a new version of the workflow):\n/primary/template/id:\n\t- <nil> \n\t+ map[domain:domain name:name org:org project:project resource_type:2 version:version]\n/primary/template/interface/inputs:\n\t- <nil> \n\t+ map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/interface/outputs:\n\t- <nil> \n\t+ map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/nodes:\n\t- <nil> \n\t+ [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
 	assert.Nil(t, response)
 }
 
@@ -209,7 +209,7 @@ func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
 
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "workflow with different structure already exists:\n\t\t- /primary/template/id: <nil> -> map[domain:domain name:name org:org project:project resource_type:2 version:version]\n\t\t- /primary/template/interface/inputs: <nil> -> map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/interface/outputs: <nil> -> map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/nodes: <nil> -> [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
+	assert.EqualError(t, err, "name workflow with different structure already exists. (Please register a new version of the workflow):\n/primary/template/id:\n\t- <nil> \n\t+ map[domain:domain name:name org:org project:project resource_type:2 version:version]\n/primary/template/interface/inputs:\n\t- <nil> \n\t+ map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/interface/outputs:\n\t- <nil> \n\t+ map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/nodes:\n\t- <nil> \n\t+ [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
 	flyteErr := err.(flyteErrors.FlyteAdminError)
 	assert.Equal(t, codes.InvalidArgument, flyteErr.Code())
 	assert.Nil(t, response)
@@ -231,7 +231,7 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
 	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" org:\"org\" ] with err %v", expectedErr.Error()), err.Error())
+			"name:\"name\" version:\"version\" org:\"org\" ] with err: %v", expectedErr.Error()), err.Error())
 	assert.Nil(t, response)
 }
 
@@ -255,7 +255,7 @@ func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 	assert.Equal(t, codes.InvalidArgument, s.Code())
 	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" org:\"org\" ] with err %v", expectedErr.Error()), err.Error())
+			"name:\"name\" version:\"version\" org:\"org\" ] with err: %v", expectedErr.Error()), err.Error())
 }
 
 func TestCreateWorkflow_DatabaseError(t *testing.T) {
@@ -354,8 +354,8 @@ func TestGetWorkflow(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
-	workflow, err := workflowManager.GetWorkflow(context.Background(), admin.ObjectGetRequest{
-		Id: &workflowIdentifier,
+	workflow, err := workflowManager.GetWorkflow(context.Background(), &admin.ObjectGetRequest{
+		Id: workflowIdentifier,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "project", workflow.Id.Project)
@@ -376,8 +376,8 @@ func TestGetWorkflow_DatabaseError(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(),
 		storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
-	workflow, err := workflowManager.GetWorkflow(context.Background(), admin.ObjectGetRequest{
-		Id: &workflowIdentifier,
+	workflow, err := workflowManager.GetWorkflow(context.Background(), &admin.ObjectGetRequest{
+		Id: workflowIdentifier,
 	})
 	assert.Nil(t, workflow)
 	assert.EqualError(t, err, expectedErr.Error())
@@ -412,8 +412,8 @@ func TestGetWorkflow_TransformerError(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
-	workflow, err := workflowManager.GetWorkflow(context.Background(), admin.ObjectGetRequest{
-		Id: &workflowIdentifier,
+	workflow, err := workflowManager.GetWorkflow(context.Background(), &admin.ObjectGetRequest{
+		Id: workflowIdentifier,
 	})
 	assert.Nil(t, workflow)
 	assert.Equal(t, codes.Internal, err.(adminErrors.FlyteAdminError).Code())
@@ -490,7 +490,7 @@ func TestListWorkflows(t *testing.T) {
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
-	workflowList, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
+	workflowList, err := workflowManager.ListWorkflows(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Org:     orgValue,
 			Project: projectValue,
@@ -533,7 +533,7 @@ func TestListWorkflows_MissingParameters(t *testing.T) {
 		repositoryMocks.NewMockRepository(),
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
-	_, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
+	_, err := workflowManager.ListWorkflows(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Domain: domainValue,
 			Name:   nameValue,
@@ -543,7 +543,7 @@ func TestListWorkflows_MissingParameters(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, codes.InvalidArgument, err.(adminErrors.FlyteAdminError).Code())
 
-	_, err = workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
+	_, err = workflowManager.ListWorkflows(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Name:    nameValue,
@@ -565,7 +565,7 @@ func TestListWorkflows_DatabaseError(t *testing.T) {
 	workflowManager := NewWorkflowManager(repository,
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
-	_, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
+	_, err := workflowManager.ListWorkflows(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -630,7 +630,7 @@ func TestWorkflowManager_ListWorkflowIdentifiers(t *testing.T) {
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	workflowList, err := workflowManager.ListWorkflowIdentifiers(context.Background(),
-		admin.NamedEntityIdentifierListRequest{
+		&admin.NamedEntityIdentifierListRequest{
 			Project: projectValue,
 			Domain:  domainValue,
 			Limit:   100,

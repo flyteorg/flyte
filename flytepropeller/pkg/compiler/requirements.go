@@ -69,10 +69,10 @@ func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskId
 	followSubworkflows bool, errs errors.CompileErrors) {
 
 	if taskN := node.GetTaskNode(); taskN != nil && taskN.GetReferenceId() != nil {
-		taskIds.Insert(*taskN.GetReferenceId())
+		taskIds.Insert(taskN.GetReferenceId())
 	} else if workflowNode := node.GetWorkflowNode(); workflowNode != nil {
 		if workflowNode.GetLaunchplanRef() != nil {
-			workflowIds.Insert(*workflowNode.GetLaunchplanRef())
+			workflowIds.Insert(workflowNode.GetLaunchplanRef())
 		} else if workflowNode.GetSubWorkflowRef() != nil && followSubworkflows {
 			if subWf, found := subWfs[workflowNode.GetSubWorkflowRef().String()]; !found {
 				errs.Collect(errors.NewWorkflowReferenceNotFoundErr(node.Id, workflowNode.GetSubWorkflowRef().String()))

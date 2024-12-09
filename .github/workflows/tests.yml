@@ -1,13 +1,14 @@
 name: tests
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
   push:
     branches:
       - master
+      - 'release-v**'
   pull_request:
 jobs:
   compile:

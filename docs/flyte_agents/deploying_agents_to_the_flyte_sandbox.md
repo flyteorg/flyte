@@ -52,30 +52,8 @@ image: localhost:30000/flyteagent:example
 3. Set up your secrets:
 Let's take Databricks agent as an example:
 ```bash
-kubectl edit secret flyteagent -n flyte
-```
-Get your `BASE64_ENCODED_DATABRICKS_TOKEN`:
-```bash
-echo -n "<DATABRICKS_TOKEN>" | base64
-```
-Add your token to the `data` field:
-```yaml
-apiVersion: v1
-data:
-  flyte_databricks_access_token: <BASE64_ENCODED_DATABRICKS_TOKEN>
-kind: Secret
-metadata:
-  annotations:
-    meta.helm.sh/release-name: flyteagent
-    meta.helm.sh/release-namespace: flyte
-  creationTimestamp: "2023-10-04T04:09:03Z"
-  labels:
-    app.kubernetes.io/managed-by: Helm
-  name: flyteagent
-  namespace: flyte
-  resourceVersion: "753"
-  uid: 5ac1e1b6-2a4c-4e26-9001-d4ba72c39e54
-type: Opaque
+SECRET_VALUE=$(echo -n "<DATABRICKS_TOKEN>" | base64) && \
+kubectl patch secret flyteagent -n flyte --patch "{\"data\":{\"flyte_databricks_access_token\":\"$SECRET_VALUE\"}}"
 ```
 :::{note}
 Please ensure two things:
@@ -85,7 +63,7 @@ Please ensure two things:
 
 4. Restart development:
 ```bash
-kubectl rollout restart deployment flyte-sandbox -n flyte
+kubectl rollout restart deployment flyteagent -n flyte
 ```
 
 5. Test your agent remotely in the Flyte sandbox:

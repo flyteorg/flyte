@@ -104,7 +104,7 @@ func TestGetTaskExecution(t *testing.T) {
 		WithReply(taskExecutions)
 
 	output, err := taskExecutionRepo.Get(context.Background(), interfaces.GetTaskExecutionInput{
-		TaskExecutionID: core.TaskExecutionIdentifier{
+		TaskExecutionID: &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "project",

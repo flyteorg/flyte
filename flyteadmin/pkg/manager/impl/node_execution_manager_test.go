@@ -38,7 +38,7 @@ import (
 var occurredAt = time.Now().UTC()
 var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
 
-var dynamicWorkflowClosure = core.CompiledWorkflowClosure{
+var dynamicWorkflowClosure = &core.CompiledWorkflowClosure{
 	Primary: &core.CompiledWorkflow{
 		Template: &core.WorkflowTemplate{
 			Id: &core.Identifier{
@@ -52,7 +52,7 @@ var dynamicWorkflowClosure = core.CompiledWorkflowClosure{
 	},
 }
 
-var request = admin.NodeExecutionEventRequest{
+var request = &admin.NodeExecutionEventRequest{
 	RequestId: "request id",
 	Event: &event.NodeExecutionEvent{
 		ProducerId: "propeller",
@@ -73,7 +73,7 @@ var request = admin.NodeExecutionEventRequest{
 			TaskNodeMetadata: &event.TaskNodeMetadata{
 				DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
 					Id:               dynamicWorkflowClosure.Primary.Template.Id,
-					CompiledWorkflow: &dynamicWorkflowClosure,
+					CompiledWorkflow: dynamicWorkflowClosure,
 				},
 			},
 		},
@@ -128,7 +128,7 @@ func TestCreateNodeEvent(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 	expectedClosure := admin.NodeExecutionClosure{
@@ -183,7 +183,7 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -289,7 +289,7 @@ func TestCreateNodeEvent_UpdateDatabaseError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -324,7 +324,7 @@ func TestCreateNodeEvent_UpdateTerminalEventError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -359,7 +359,7 @@ func TestCreateNodeEvent_UpdateDuplicateEventError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -388,7 +388,7 @@ func TestCreateNodeEvent_FirstEventIsTerminal(t *testing.T) {
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
-	succeededRequest := admin.NodeExecutionEventRequest{
+	succeededRequest := &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
 			ProducerId: "propeller",
@@ -425,7 +425,7 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 	t.Run("event version 0", func(t *testing.T) {
 		repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
 			func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-				assert.True(t, proto.Equal(nodeExecID, &input.NodeExecutionIdentifier))
+				assert.True(t, proto.Equal(nodeExecID, input.NodeExecutionIdentifier))
 				return models.NodeExecution{
 					NodeExecutionKey: models.NodeExecutionKey{
 						NodeID: "node id",
@@ -499,7 +499,7 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 		expectedErr := flyteAdminErrors.NewFlyteAdminError(codes.Internal, "foo")
 		repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
 			func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-				assert.True(t, proto.Equal(nodeExecID, &input.NodeExecutionIdentifier))
+				assert.True(t, proto.Equal(nodeExecID, input.NodeExecutionIdentifier))
 				return models.NodeExecution{}, expectedErr
 			})
 
@@ -576,7 +576,7 @@ func TestGetNodeExecution(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -595,7 +595,7 @@ func TestGetNodeExecution(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -629,7 +629,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -659,7 +659,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -694,7 +694,7 @@ func TestGetNodeExecutionEventVersion0(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -713,7 +713,7 @@ func TestGetNodeExecutionEventVersion0(t *testing.T) {
 		})
 
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -733,7 +733,7 @@ func TestGetNodeExecution_DatabaseError(t *testing.T) {
 			return models.NodeExecution{}, expectedErr
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, nodeExecution)
@@ -761,7 +761,7 @@ func TestGetNodeExecution_TransformerError(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, nodeExecution)
@@ -861,7 +861,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Org:     org,
 			Project: "project",
@@ -970,7 +970,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Org:     org,
 			Project: "project",
@@ -1103,7 +1103,7 @@ func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Org:     org,
 			Project: "project",
@@ -1139,17 +1139,17 @@ func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
 
 func TestListNodeExecutions_InvalidParams(t *testing.T) {
 	nodeExecManager := NewNodeExecutionManager(nil, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Filters: "eq(execution.project, project)",
 	})
 	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
 
-	_, err = nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err = nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Limit: 1,
 	})
 	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
 
-	_, err = nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err = nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Limit:   1,
 		Filters: "foo",
 	})
@@ -1165,7 +1165,7 @@ func TestListNodeExecutions_DatabaseError(t *testing.T) {
 			return interfaces.NodeExecutionCollectionOutput{}, expectedErr
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1204,7 +1204,7 @@ func TestListNodeExecutions_TransformerError(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1233,7 +1233,7 @@ func TestListNodeExecutions_NothingToReturn(t *testing.T) {
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
 
-	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1328,7 +1328,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
-	nodeExecutions, err := nodeExecManager.ListNodeExecutionsForTask(context.Background(), admin.NodeExecutionForTaskListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutionsForTask(context.Background(), &admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -1400,7 +1400,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -1419,16 +1419,16 @@ func TestGetNodeExecutionData(t *testing.T) {
 		})
 
 	mockNodeExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockNodeExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	mockNodeExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		switch uri {
 		case inputURI, outputURI:
-			return admin.UrlBlob{
+			return &admin.UrlBlob{
 				Url:   uri,
 				Bytes: 100,
 			}, nil
 		}
 
-		return admin.UrlBlob{}, errors.New("unexpected input")
+		return &admin.UrlBlob{}, errors.New("unexpected input")
 	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
@@ -1453,7 +1453,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
 		} else if reference.String() == dynamicWorkflowClosureRef {
-			marshalled, _ := proto.Marshal(&dynamicWorkflowClosure)
+			marshalled, _ := proto.Marshal(dynamicWorkflowClosure)
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
 		}
@@ -1461,7 +1461,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 	}
 	r := plugins.NewRegistry()
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, r)
-	dataResponse, err := nodeExecManager.GetNodeExecutionData(context.Background(), admin.NodeExecutionGetDataRequest{
+	dataResponse, err := nodeExecManager.GetNodeExecutionData(context.Background(), &admin.NodeExecutionGetDataRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.NoError(t, err)
@@ -1478,7 +1478,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 		FullOutputs: fullOutputs,
 		DynamicWorkflow: &admin.DynamicWorkflowNodeMetadata{
 			Id:               dynamicWorkflowClosure.Primary.Template.Id,
-			CompiledWorkflow: &dynamicWorkflowClosure,
+			CompiledWorkflow: dynamicWorkflowClosure,
 		},
 		FlyteUrls: &admin.FlyteURLs{
 			Inputs:  "flyte://v1/project/domain/name/node id/i",
@@ -1490,7 +1490,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 
 func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
 	repo := repositoryMocks.NewMockRepository()
-	nodeExecID := core.NodeExecutionIdentifier{
+	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -1524,7 +1524,7 @@ func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
 		CompiledWorkflow: expectedClosure,
 	}
 
-	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
 
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(expected, resp))
@@ -1532,7 +1532,7 @@ func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
 
 func Test_GetDynamicNodeWorkflow_DBError(t *testing.T) {
 	repo := repositoryMocks.NewMockRepository()
-	nodeExecID := core.NodeExecutionIdentifier{
+	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -1557,7 +1557,7 @@ func Test_GetDynamicNodeWorkflow_DBError(t *testing.T) {
 		&eventWriterMocks.NodeExecutionEventWriter{},
 		nil)
 
-	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
 
 	assert.Equal(t, expectedErr, err)
 	assert.Empty(t, resp)
@@ -1565,7 +1565,7 @@ func Test_GetDynamicNodeWorkflow_DBError(t *testing.T) {
 
 func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
 	repo := repositoryMocks.NewMockRepository()
-	nodeExecID := core.NodeExecutionIdentifier{
+	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -1589,7 +1589,7 @@ func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
 		&eventWriterMocks.NodeExecutionEventWriter{},
 		nil)
 
-	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
 
 	st, ok := status.FromError(err)
 	assert.True(t, ok)
@@ -1600,7 +1600,7 @@ func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
 
 func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
 	repo := repositoryMocks.NewMockRepository()
-	nodeExecID := core.NodeExecutionIdentifier{
+	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -1628,7 +1628,7 @@ func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
 		&eventWriterMocks.NodeExecutionEventWriter{},
 		nil)
 
-	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
 
 	st, ok := status.FromError(err)
 	assert.True(t, ok)

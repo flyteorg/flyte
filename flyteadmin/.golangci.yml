@@ -1,7 +1,5 @@
-issues:
-  exclude:
-    - copylocks
-  exclude-files:
+run:
+  skip-files:
     # because we're skipping TLS verification - for now
     - cmd/entrypoints/serve.go
     - pkg/async/messages/sqs.go
@@ -10,7 +8,7 @@ linters:
   disable-all: true
   enable:
     - errcheck
-    - gosec
+    - gas
     - gci
     - goconst
     - goimports
@@ -33,3 +31,7 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
+issues:
+  exclude-rules:
+    - path: pkg/workflowengine/impl/prepare_execution.go
+      text: "copies lock"

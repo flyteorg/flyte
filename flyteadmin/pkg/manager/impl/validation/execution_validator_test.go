@@ -68,6 +68,25 @@ func TestValidateExecInvalidProjectAndDomain(t *testing.T) {
 	assert.EqualError(t, err, "failed to validate that project [project] is registered, err: [foo]")
 }
 
+func TestValidateExecInvalidLabels(t *testing.T) {
+	request := testutils.GetExecutionRequest()
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"foo": "#bar",
+		},
+	}
+	err := ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
+	assert.ErrorContains(t, err, "invalid label value [#bar]:")
+
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"#foo": "bar",
+		},
+	}
+	err = ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
+	assert.ErrorContains(t, err, "invalid label key [#foo]:")
+}
+
 func TestGetExecutionInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
@@ -77,7 +96,7 @@ func TestGetExecutionInputs(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value-1"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -85,7 +104,7 @@ func TestGetExecutionInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
 }
 
 func TestGetExecutionWithOffloadedInputs(t *testing.T) {
@@ -181,7 +200,7 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -189,7 +208,7 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
 }
 
 func TestValidateExecUnknownIDLInputs(t *testing.T) {
@@ -249,14 +268,14 @@ func TestValidExecutionIdInvalidChars(t *testing.T) {
 }
 
 func TestValidateCreateWorkflowEventRequest(t *testing.T) {
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 	}
 	err := ValidateCreateWorkflowEventRequest(request, maxOutputSizeInBytes)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Workflow event handler was called without event")
 
-	request = admin.WorkflowExecutionEventRequest{
+	request = &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
 			Phase:        core.WorkflowExecution_FAILED,
@@ -297,7 +316,7 @@ func TestValidateWorkflowExecutionIdentifier_Error(t *testing.T) {
 }
 
 func TestValidateCreateLaunchPlanFromNodeRequest(t *testing.T) {
-	unsupportedNumberOfSubNodeIDs := admin.CreateLaunchPlanFromNodeRequest{
+	unsupportedNumberOfSubNodeIDs := &admin.CreateLaunchPlanFromNodeRequest{
 		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
 			SubNodeIds: &admin.SubNodeList{
 				SubNodeIds: []*admin.SubNodeIdAsList{
@@ -314,7 +333,7 @@ func TestValidateCreateLaunchPlanFromNodeRequest(t *testing.T) {
 	err := ValidateCreateLaunchPlanFromNodeRequest(unsupportedNumberOfSubNodeIDs)
 	assert.EqualError(t, err, "relaunching multiple nodes is not supported")
 
-	emptyListSubNodeIDs := admin.CreateLaunchPlanFromNodeRequest{
+	emptyListSubNodeIDs := &admin.CreateLaunchPlanFromNodeRequest{
 		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
 			SubNodeIds: &admin.SubNodeList{
 				SubNodeIds: []*admin.SubNodeIdAsList{},
@@ -324,13 +343,13 @@ func TestValidateCreateLaunchPlanFromNodeRequest(t *testing.T) {
 	err = ValidateCreateLaunchPlanFromNodeRequest(emptyListSubNodeIDs)
 	assert.EqualError(t, err, "subNodeIDs cannot be empty")
 
-	emptyListSubNodeSpecs := admin.CreateLaunchPlanFromNodeRequest{
+	emptyListSubNodeSpecs := &admin.CreateLaunchPlanFromNodeRequest{
 		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{},
 	}
 	err = ValidateCreateLaunchPlanFromNodeRequest(emptyListSubNodeSpecs)
 	assert.EqualError(t, err, "subNodeSpecs and subNodeIDs cannot be empty")
 
-	request := admin.CreateLaunchPlanFromNodeRequest{
+	request := &admin.CreateLaunchPlanFromNodeRequest{
 		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
 			SubNodeIds: &admin.SubNodeList{
 				SubNodeIds: []*admin.SubNodeIdAsList{
@@ -351,7 +370,7 @@ func TestValidateCreateLaunchPlanFromNodeRequest(t *testing.T) {
 	err = ValidateCreateLaunchPlanFromNodeRequest(request)
 	assert.Nil(t, err)
 
-	request = admin.CreateLaunchPlanFromNodeRequest{
+	request = &admin.CreateLaunchPlanFromNodeRequest{
 		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{
 			SubNodeSpec: &core.Node{Id: "1"},
 		},

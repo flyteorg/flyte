@@ -12,9 +12,9 @@ import (
 // of this one as Admin already has a dependency on the Propeller compiler.
 type LaunchPlanInterfaceProvider struct {
 	identifier      *core.Identifier
-	expectedInputs  core.ParameterMap
-	fixedInputs     core.LiteralMap
-	expectedOutputs core.VariableMap
+	expectedInputs  *core.ParameterMap
+	fixedInputs     *core.LiteralMap
+	expectedOutputs *core.VariableMap
 }
 
 func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
@@ -22,22 +22,22 @@ func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
 }
 
 func (p *LaunchPlanInterfaceProvider) GetExpectedInputs() *core.ParameterMap {
-	return &p.expectedInputs
+	return p.expectedInputs
 }
 
 func (p *LaunchPlanInterfaceProvider) GetFixedInputs() *core.LiteralMap {
-	return &p.fixedInputs
+	return p.fixedInputs
 }
 
 func (p *LaunchPlanInterfaceProvider) GetExpectedOutputs() *core.VariableMap {
-	return &p.expectedOutputs
+	return p.expectedOutputs
 }
 
-func NewLaunchPlanInterfaceProvider(launchPlan admin.LaunchPlan) *LaunchPlanInterfaceProvider {
+func NewLaunchPlanInterfaceProvider(launchPlan *admin.LaunchPlan) *LaunchPlanInterfaceProvider {
 	return &LaunchPlanInterfaceProvider{
 		identifier:      launchPlan.Id,
-		expectedInputs:  *launchPlan.Closure.ExpectedInputs,
-		fixedInputs:     *launchPlan.Spec.FixedInputs,
-		expectedOutputs: *launchPlan.Closure.ExpectedOutputs,
+		expectedInputs:  launchPlan.Closure.ExpectedInputs,
+		fixedInputs:     launchPlan.Spec.FixedInputs,
+		expectedOutputs: launchPlan.Closure.ExpectedOutputs,
 	}
 }

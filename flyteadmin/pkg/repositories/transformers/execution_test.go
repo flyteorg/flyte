@@ -76,7 +76,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("successful execution", func(t *testing.T) {
 		execRequest.Spec.Labels = &admin.Labels{Values: map[string]string{"parent-cluster": "foo"}}
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -139,7 +139,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with unknown error", func(t *testing.T) {
 		execErr := fmt.Errorf("bla-bla")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -209,7 +209,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with invalid argument error", func(t *testing.T) {
 		execErr := errors.NewFlyteAdminError(codes.InvalidArgument, "task validation failed")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -279,7 +279,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with internal error", func(t *testing.T) {
 		execErr := errors.NewFlyteAdminError(codes.Internal, "db failed")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -369,7 +369,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 
 	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
-	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_RUNNING,
 			OccurredAt: occurredAtProto,
@@ -434,7 +434,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 		Kind:    ek,
 		Message: "bar baz",
 	}
-	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_ABORTED,
 			OccurredAt: occurredAtProto,
@@ -523,7 +523,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	}
 
 	t.Run("output URI set", func(t *testing.T) {
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -574,7 +574,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 				},
 			},
 		}
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -626,7 +626,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			assert.Equal(t, reference.String(), "s3://bucket/metadata/org/project/domain/name/offloaded_outputs")
 			return nil
 		}
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -966,7 +966,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
 	t.Run("update", func(t *testing.T) {
 		executionModel.Cluster = altCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_QUEUED,
 				OccurredAt: occurredAtProto,
@@ -978,7 +978,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 		executionModel.Cluster = testCluster
 	})
 	t.Run("do not update", func(t *testing.T) {
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -989,7 +989,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	})
 	t.Run("matches recorded", func(t *testing.T) {
 		executionModel.Cluster = testCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -1000,7 +1000,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	})
 	t.Run("default cluster value", func(t *testing.T) {
 		executionModel.Cluster = testCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -1109,8 +1109,8 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 		assert.Nil(t, err)
 		stateInt := int32(admin.ExecutionState_EXECUTION_ARCHIVED)
 		assert.Equal(t, execModel.State, &stateInt)
-		var closure admin.ExecutionClosure
-		err = proto.Unmarshal(execModel.Closure, &closure)
+		closure := &admin.ExecutionClosure{}
+		err = proto.Unmarshal(execModel.Closure, closure)
 		assert.Nil(t, err)
 		assert.NotNil(t, closure)
 		assert.NotNil(t, closure.StateChangeDetails)

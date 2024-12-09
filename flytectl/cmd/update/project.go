@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const (
@@ -74,7 +73,7 @@ For example, to archive a project:
 
 ::
 
-    $ uctl update project --file update.yaml --archive
+    $ flytectl update project --file update.yaml --archive
 
 And to activate (unarchive) the same project:
 
@@ -86,7 +85,7 @@ And to activate (unarchive) the same project:
 
 ::
 
-    $ uctl update project --file update.yaml --archive
+    $ flytectl update project --file update.yaml --archive
 
 Note that when using a *yaml* file, the *activate* flag is not used.
 Instead, the *archive* flag is used for *both* archiving and activating (unarchiving) with the difference being in the *state* field of the *yaml* file.

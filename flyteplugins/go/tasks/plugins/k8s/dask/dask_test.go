@@ -7,7 +7,6 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -26,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
@@ -123,7 +123,7 @@ func dummyDaskTaskTemplate(customImage string, resources *core.Resources, podTem
 	}
 
 	structObj := structpb.Struct{}
-	err = jsonpb.UnmarshalString(daskJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(daskJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -265,6 +265,7 @@ func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.Resou
 	overrides.OnGetContainerImage().Return("")
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
@@ -859,8 +860,8 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 		Reason:       "task submitted to K8s",
 	}
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, nil, false, pluginState)
 
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, nil, false, pluginState)
 	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobCreated))
 
 	assert.NoError(t, err)

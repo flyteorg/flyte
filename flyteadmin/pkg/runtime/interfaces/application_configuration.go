@@ -210,10 +210,10 @@ func (a *ApplicationConfig) GetExecutionEnvAssignments() []*core.ExecutionEnvAss
 }
 
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object
-func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() admin.WorkflowExecutionConfig {
+func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() *admin.WorkflowExecutionConfig {
 	// These values should always be set as their fallback values equals to their zero value or nil,
 	// providing a sensible default even if the actual value was not set.
-	wec := admin.WorkflowExecutionConfig{
+	wec := &admin.WorkflowExecutionConfig{
 		MaxParallelism: a.GetMaxParallelism(),
 		OverwriteCache: a.GetOverwriteCache(),
 		Interruptible:  a.GetInterruptible(),
@@ -506,8 +506,13 @@ type NotificationsProcessorConfig struct {
 type EmailServerConfig struct {
 	ServiceName string `json:"serviceName"`
 	// Only one of these should be set.
-	APIKeyEnvVar   string `json:"apiKeyEnvVar"`
-	APIKeyFilePath string `json:"apiKeyFilePath"`
+	APIKeyEnvVar           string `json:"apiKeyEnvVar"`
+	APIKeyFilePath         string `json:"apiKeyFilePath"`
+	SMTPServer             string `json:"smtpServer"`
+	SMTPPort               string `json:"smtpPort"`
+	SMTPSkipTLSVerify      bool   `json:"smtpSkipTLSVerify"`
+	SMTPUsername           string `json:"smtpUsername"`
+	SMTPPasswordSecretName string `json:"smtpPasswordSecretName"`
 }
 
 // This section handles the configuration of notifications emails.

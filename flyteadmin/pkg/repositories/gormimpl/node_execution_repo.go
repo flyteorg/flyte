@@ -47,7 +47,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &input.NodeExecutionIdentifier)
+			adminErrors.GetMissingEntityError("node execution", input.NodeExecutionIdentifier)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -72,7 +72,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &input.NodeExecutionIdentifier)
+			adminErrors.GetMissingEntityError("node execution", input.NodeExecutionIdentifier)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

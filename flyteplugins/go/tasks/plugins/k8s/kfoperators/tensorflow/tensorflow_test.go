@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
@@ -30,6 +29,7 @@ import (
 	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const testImage = "image://"
@@ -101,7 +101,7 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(tfObjJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(tfObjJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -242,6 +242,7 @@ func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *co
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
@@ -251,8 +252,8 @@ func dummyTensorFlowPluginContext(taskTemplate *core.TaskTemplate, resources *co
 		func(v interface{}) error {
 			return nil
 		})
-
 	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+
 	return pCtx
 }
 
@@ -358,9 +359,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 
 	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)
 	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
-
 	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
-
 	if err != nil {
 		panic(err)
 	}
@@ -544,55 +543,81 @@ func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
 	}
 
 	v0TaskTemplate := dummyTensorFlowTaskTemplate("v0", dummyTensorFlowCustomObj(100, 50, 1, 1))
-	v1TaskTemplate := dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
-		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 1,
-		},
-		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 100,
-		},
-		PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 50,
-		},
-		EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 1,
-		},
-	})
-	v1TaskTemplate.TaskTypeVersion = 1
-	testConfigs := []struct {
-		name         string
-		taskTemplate *core.TaskTemplate
-	}{
-		{"v0", v0TaskTemplate},
-		{"v1", v1TaskTemplate},
+	v1TaskTemplates := []*core.TaskTemplate{
+		dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 1,
+			},
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 100,
+			},
+			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 50,
+			},
+			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 1,
+			},
+		}),
+		dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 1,
+				},
+			},
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+				},
+			},
+			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 50,
+				},
+			},
+			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 1,
+				},
+			},
+		}),
 	}
+	for _, v1TaskTemplate := range v1TaskTemplates {
+		v1TaskTemplate.TaskTypeVersion = 1
+		testConfigs := []struct {
+			name         string
+			taskTemplate *core.TaskTemplate
+		}{
+			{"v0", v0TaskTemplate},
+			{"v1", v1TaskTemplate},
+		}
 
-	for _, tCfg := range testConfigs {
-		for _, f := range fixtures {
-			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
-				taskTemplate := *tCfg.taskTemplate
-				taskTemplate.ExtendedResources = f.extendedResourcesBase
-				tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-				taskContext := dummyTensorFlowTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
-				r, err := tensorflowResourceHandler.BuildResource(context.TODO(), taskContext)
-				assert.NoError(t, err)
-				assert.NotNil(t, r)
-				tensorflowJob, ok := r.(*kubeflowv1.TFJob)
-				assert.True(t, ok)
+		for _, tCfg := range testConfigs {
+			for _, f := range fixtures {
+				t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
+					taskTemplate := *tCfg.taskTemplate
+					taskTemplate.ExtendedResources = f.extendedResourcesBase
+					tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+					taskContext := dummyTensorFlowTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+					r, err := tensorflowResourceHandler.BuildResource(context.TODO(), taskContext)
+					assert.NoError(t, err)
+					assert.NotNil(t, r)
+					tensorflowJob, ok := r.(*kubeflowv1.TFJob)
+					assert.True(t, ok)
 
-				for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
-					assert.EqualValues(
-						t,
-						f.expectedNsr,
-						replicaSpec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-					)
-					assert.EqualValues(
-						t,
-						f.expectedTol,
-						replicaSpec.Template.Spec.Tolerations,
-					)
-				}
-			})
+					for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
+						assert.EqualValues(
+							t,
+							f.expectedNsr,
+							replicaSpec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+						)
+						assert.EqualValues(
+							t,
+							f.expectedTol,
+							replicaSpec.Template.Spec.Tolerations,
+						)
+					}
+				})
+			}
 		}
 	}
 }
@@ -635,6 +660,23 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, pluginState)
+
+	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, pluginContext, dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, commonOp.JobCreated))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
 func TestGetLogs(t *testing.T) {
@@ -724,208 +766,307 @@ func TestReplicaCounts(t *testing.T) {
 }
 
 func TestBuildResourceTensorFlowV1(t *testing.T) {
-	taskConfig := &kfplugins.DistributedTensorflowTrainingTask{
-		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 1,
-			Image:    testImage,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
+	taskConfigs := []*kfplugins.DistributedTensorflowTrainingTask{
+		{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 1,
+				Image:    testImage,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
+				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+			},
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
 				},
 			},
-			RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
-		},
-		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
-				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 50,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
 			},
-		},
-		PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 50,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
+			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 1,
+				Image:    testImage,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-				},
+				RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+			},
+			RunPolicy: &kfplugins.RunPolicy{
+				CleanPodPolicy:        kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL,
+				ActiveDeadlineSeconds: int32(100),
 			},
 		},
-		EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 1,
-			Image:    testImage,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
-				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
+		{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 1,
+					Image:    testImage,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
+					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
 				},
 			},
-			RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
-		},
-		RunPolicy: &kfplugins.RunPolicy{
-			CleanPodPolicy:        kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL,
-			ActiveDeadlineSeconds: int32(100),
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+					},
+				},
+			},
+			PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 50,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
+				},
+			},
+			EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 1,
+					Image:    testImage,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
+					RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+				},
+			},
+			RunPolicy: &kfplugins.RunPolicy{
+				CleanPodPolicy:        kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL,
+				ActiveDeadlineSeconds: int32(100),
+			},
 		},
 	}
+	for _, taskConfig := range taskConfigs {
 
-	resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
-		kubeflowv1.TFJobReplicaTypeChief: {
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("250m"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
+		resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
+			kubeflowv1.TFJobReplicaTypeChief: {
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("250m"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("500m"),
+					corev1.ResourceMemory: resource.MustParse("2Gi"),
+				},
 			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("500m"),
-				corev1.ResourceMemory: resource.MustParse("2Gi"),
+			kubeflowv1.TFJobReplicaTypeWorker: {
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:         resource.MustParse("1024m"),
+					corev1.ResourceMemory:      resource.MustParse("1Gi"),
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:         resource.MustParse("2048m"),
+					corev1.ResourceMemory:      resource.MustParse("2Gi"),
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
 			},
-		},
-		kubeflowv1.TFJobReplicaTypeWorker: {
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:         resource.MustParse("1024m"),
-				corev1.ResourceMemory:      resource.MustParse("1Gi"),
-				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+			kubeflowv1.TFJobReplicaTypePS: {
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("250m"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("500m"),
+					corev1.ResourceMemory: resource.MustParse("2Gi"),
+				},
 			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:         resource.MustParse("2048m"),
-				corev1.ResourceMemory:      resource.MustParse("2Gi"),
-				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+			kubeflowv1.TFJobReplicaTypeEval: {
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("250m"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("500m"),
+					corev1.ResourceMemory: resource.MustParse("2Gi"),
+				},
 			},
-		},
-		kubeflowv1.TFJobReplicaTypePS: {
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("250m"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
-			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("500m"),
-				corev1.ResourceMemory: resource.MustParse("2Gi"),
-			},
-		},
-		kubeflowv1.TFJobReplicaTypeEval: {
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("250m"),
-				corev1.ResourceMemory: resource.MustParse("1Gi"),
-			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    resource.MustParse("500m"),
-				corev1.ResourceMemory: resource.MustParse("2Gi"),
-			},
-		},
-	}
-
-	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-
-	taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
-	taskTemplate.TaskTypeVersion = 1
-
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
-
-	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
-	assert.True(t, ok)
-	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
-	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas)
-	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas)
-	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeEval].Replicas)
-
-	for replicaType, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
-		var hasContainerWithDefaultTensorFlowName = false
-
-		for _, container := range replicaSpec.Template.Spec.Containers {
-			if container.Name == kubeflowv1.TFJobDefaultContainerName {
-				hasContainerWithDefaultTensorFlowName = true
-				assert.Equal(t, *resourceRequirementsMap[replicaType], container.Resources)
-			}
 		}
 
-		assert.True(t, hasContainerWithDefaultTensorFlowName)
+		tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+		taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
+		taskTemplate.TaskTypeVersion = 1
+
+		resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
+
+		tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+		assert.True(t, ok)
+		assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
+		assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas)
+		assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas)
+		assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeEval].Replicas)
+
+		for replicaType, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
+			var hasContainerWithDefaultTensorFlowName = false
+
+			for _, container := range replicaSpec.Template.Spec.Containers {
+				if container.Name == kubeflowv1.TFJobDefaultContainerName {
+					hasContainerWithDefaultTensorFlowName = true
+					assert.Equal(t, *resourceRequirementsMap[replicaType], container.Resources)
+				}
+			}
+
+			assert.True(t, hasContainerWithDefaultTensorFlowName)
+		}
+		assert.Equal(t, commonOp.CleanPodPolicyAll, *tensorflowJob.Spec.RunPolicy.CleanPodPolicy)
+		assert.Equal(t, int64(100), *tensorflowJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 	}
-	assert.Equal(t, commonOp.CleanPodPolicyAll, *tensorflowJob.Spec.RunPolicy.CleanPodPolicy)
-	assert.Equal(t, int64(100), *tensorflowJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 }
 
 func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
-	taskConfig := &kfplugins.DistributedTensorflowTrainingTask{
-		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+	taskConfigs := []*kfplugins.DistributedTensorflowTrainingTask{
+		{
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+			},
+		},
+		{
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+					},
 				},
 			},
 		},
 	}
 
-	resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
-		kubeflowv1.TFJobReplicaTypeWorker: {
-			Requests: corev1.ResourceList{
-				corev1.ResourceCPU:         resource.MustParse("1024m"),
-				corev1.ResourceMemory:      resource.MustParse("1Gi"),
-				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+	for _, taskConfig := range taskConfigs {
+		resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
+			kubeflowv1.TFJobReplicaTypeWorker: {
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:         resource.MustParse("1024m"),
+					corev1.ResourceMemory:      resource.MustParse("1Gi"),
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:         resource.MustParse("2048m"),
+					corev1.ResourceMemory:      resource.MustParse("2Gi"),
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
 			},
-			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:         resource.MustParse("2048m"),
-				corev1.ResourceMemory:      resource.MustParse("2Gi"),
-				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
-			},
-		},
-	}
-
-	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-
-	taskTemplate := dummyTensorFlowTaskTemplate("v1 with only worker replica", taskConfig)
-	taskTemplate.TaskTypeVersion = 1
-
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
-
-	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
-	assert.True(t, ok)
-	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
-	assert.Nil(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief])
-	assert.Nil(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS])
-
-	for replicaType, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
-		var hasContainerWithDefaultTensorFlowName = false
-
-		for _, container := range replicaSpec.Template.Spec.Containers {
-			if container.Name == kubeflowv1.TFJobDefaultContainerName {
-				hasContainerWithDefaultTensorFlowName = true
-				assert.Equal(t, *resourceRequirementsMap[replicaType], container.Resources)
-			}
 		}
 
-		assert.True(t, hasContainerWithDefaultTensorFlowName)
+		tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+		taskTemplate := dummyTensorFlowTaskTemplate("v1 with only worker replica", taskConfig)
+		taskTemplate.TaskTypeVersion = 1
+
+		resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
+
+		tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+		assert.True(t, ok)
+		assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
+		assert.Nil(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief])
+		assert.Nil(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS])
+
+		for replicaType, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
+			var hasContainerWithDefaultTensorFlowName = false
+
+			for _, container := range replicaSpec.Template.Spec.Containers {
+				if container.Name == kubeflowv1.TFJobDefaultContainerName {
+					hasContainerWithDefaultTensorFlowName = true
+					assert.Equal(t, *resourceRequirementsMap[replicaType], container.Resources)
+				}
+			}
+
+			assert.True(t, hasContainerWithDefaultTensorFlowName)
+		}
 	}
 }
 
@@ -943,66 +1084,88 @@ func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
 		},
 	}))
 
-	taskConfig := &kfplugins.DistributedTensorflowTrainingTask{
-		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 1,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "250m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
+	taskConfigs := []*kfplugins.DistributedTensorflowTrainingTask{
+		{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 1,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "500m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
+			},
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Replicas: 100,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "1024m"},
+						{Name: core.Resources_MEMORY, Value: "1Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "2048m"},
+						{Name: core.Resources_MEMORY, Value: "2Gi"},
+						{Name: core.Resources_GPU, Value: "1"},
+					},
 				},
 			},
 		},
-		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
-			Replicas: 100,
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "1024m"},
-					{Name: core.Resources_MEMORY, Value: "1Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+		{
+			ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 1,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "250m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "500m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+						},
+					},
 				},
-				Limits: []*core.Resources_ResourceEntry{
-					{Name: core.Resources_CPU, Value: "2048m"},
-					{Name: core.Resources_MEMORY, Value: "2Gi"},
-					{Name: core.Resources_GPU, Value: "1"},
+			},
+			WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+				Common: &kfplugins.CommonReplicaSpec{
+					Replicas: 100,
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "1024m"},
+							{Name: core.Resources_MEMORY, Value: "1Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+						Limits: []*core.Resources_ResourceEntry{
+							{Name: core.Resources_CPU, Value: "2048m"},
+							{Name: core.Resources_MEMORY, Value: "2Gi"},
+							{Name: core.Resources_GPU, Value: "1"},
+						},
+					},
 				},
 			},
 		},
 	}
 
-	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	for _, taskConfig := range taskConfigs {
 
-	taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
-	taskTemplate.TaskTypeVersion = 1
+		tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
-	assert.NoError(t, err)
-	assert.NotNil(t, resource)
+		taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
+		taskTemplate.TaskTypeVersion = 1
 
-	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
-	assert.True(t, ok)
+		resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+		assert.NoError(t, err)
+		assert.NotNil(t, resource)
 
-	assert.NotContains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Template.Spec.Tolerations, gpuToleration)
-	assert.Contains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
-}
+		tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+		assert.True(t, ok)
 
-func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
-	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-	ctx := context.TODO()
-
-	pluginState := k8s.PluginState{
-		Phase:        pluginsCore.PhaseQueued,
-		PhaseVersion: pluginsCore.DefaultPhaseVersion,
-		Reason:       "task submitted to K8s",
+		assert.NotContains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Template.Spec.Tolerations, gpuToleration)
+		assert.Contains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
 	}
-	taskCtx := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, pluginState)
-
-	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, commonOp.JobCreated))
-
-	assert.NoError(t, err)
-	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }

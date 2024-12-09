@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	DeckFile = "deck.html"
+	OutputsFile = "outputs.pb"
+	DeckFile    = "deck.html"
 )
 
 type GetObjectRequest struct {
@@ -39,12 +40,12 @@ type ObjectStore interface {
 	GetObject(context.Context, GetObjectRequest) (GetObjectResponse, error)
 }
 
-func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob) bool {
+func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
 		urlBlob.Bytes < config.MaxSizeInBytes
 }
 
-func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob, outputURI string) bool {
+func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob, outputURI string) bool {
 	return len(outputURI) > 0 && shouldFetchData(config, urlBlob)
 }
 
@@ -56,11 +57,11 @@ func GetInputs(ctx context.Context,
 	cluster, org, project, domain, inputURI string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
-	var inputsURLBlob admin.UrlBlob
+	inputsURLBlob := &admin.UrlBlob{}
 	var fullInputs core.LiteralMap
 
 	if len(inputURI) == 0 {
-		return &fullInputs, &inputsURLBlob, nil
+		return &fullInputs, inputsURLBlob, nil
 	}
 
 	var err error
@@ -78,7 +79,7 @@ func GetInputs(ctx context.Context,
 			err = readFromDataPlane(ctx, objectStore, cluster, org, project, domain, inputURI, &fullInputs)
 		}
 	}
-	return &fullInputs, &inputsURLBlob, err
+	return &fullInputs, inputsURLBlob, err
 }
 
 // ExecutionClosure defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
@@ -126,10 +127,10 @@ func GetOutputs(ctx context.Context,
 	cluster, org, project, domain string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
-	var outputsURLBlob admin.UrlBlob
+	outputsURLBlob := &admin.UrlBlob{}
 	var fullOutputs = &core.LiteralMap{}
 	if closure == nil {
-		return fullOutputs, &outputsURLBlob, nil
+		return fullOutputs, outputsURLBlob, nil
 	}
 
 	var err error
@@ -153,7 +154,7 @@ func GetOutputs(ctx context.Context,
 			err = readFromDataPlane(ctx, objectStore, cluster, org, project, domain, closure.GetOutputUri(), fullOutputs)
 		}
 	}
-	return fullOutputs, &outputsURLBlob, err
+	return fullOutputs, outputsURLBlob, err
 }
 
 func IsLocalURI(ctx context.Context, store *storage.DataStore, uri string) bool {

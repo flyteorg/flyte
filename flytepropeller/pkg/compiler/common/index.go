@@ -35,7 +35,7 @@ func NewTaskIndex(tasks ...Task) TaskIndex {
 	res := make(TaskIndex, len(tasks))
 	for _, task := range tasks {
 		id := task.GetID()
-		res[(&id).String()] = task
+		res[(id).String()] = task
 	}
 
 	return res

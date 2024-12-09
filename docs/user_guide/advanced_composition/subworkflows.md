@@ -24,7 +24,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 Here's an example illustrating the calculation of slope, intercept and the corresponding y-value:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :lines: 1-35
 ```
@@ -34,7 +34,7 @@ Subsequently, the `regression_line_wf` triggers `slope_intercept_wf` and then co
 
 To execute the workflow locally, use the following:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :lines: 39-40
 ```
@@ -43,14 +43,14 @@ It's possible to nest a workflow that contains a subworkflow within another work
 Workflows can be easily constructed from other workflows, even if they function as standalone entities.
 Each workflow in this module has the capability to exist and run independently:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :pyobject: nested_regression_line_wf
 ```
 
 You can run the nested workflow locally as well:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :lines: 52-53
 ```
@@ -71,7 +71,7 @@ external workflows may offer a way to distribute the workload of a workflow acro
 
 Here's an example that illustrates the concept of external workflows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :lines: 61-71
 ```
@@ -85,7 +85,7 @@ In the console screenshot above, note that the launch plan execution ID differs 
 
 You can run a workflow containing an external workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py
 :caption: advanced_composition/subworkflow.py
 :lines: 75-76
 ```
@@ -96,19 +96,19 @@ To run the provided workflows on a Flyte cluster, use the following commands:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py \
   regression_line_wf
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py \
   nested_regression_line_wf
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/subworkflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/subworkflow.py \
   nested_regression_line_lp
 ```
 

@@ -847,6 +847,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
 	plg.OnTaskExecutionMetadata().Return(tskCtx)
+
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
@@ -858,6 +859,7 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 		})
 
 	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+
 	return plg
 }
 
@@ -941,6 +943,26 @@ func TestGetTaskPhase(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginCtx := rayPluginContext(pluginState)
+
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+
+	assert.NoError(t, err)
+	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
 func TestGetEventInfo_LogTemplates(t *testing.T) {
@@ -1304,26 +1326,6 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	reader := fake.NewFakeClient(podList...)
 	pluginCtx.OnK8sReader().Return(reader)
 	return pluginCtx
-}
-
-func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
-	rayJobResourceHandler := rayJobResourceHandler{}
-
-	ctx := context.TODO()
-
-	pluginState := k8s.PluginState{
-		Phase:        pluginsCore.PhaseInitializing,
-		PhaseVersion: pluginsCore.DefaultPhaseVersion,
-		Reason:       "task submitted to K8s",
-	}
-	pluginCtx := rayPluginContext(pluginState)
-
-	rayObject := &rayv1.RayJob{}
-	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
-	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
-
-	assert.NoError(t, err)
-	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {

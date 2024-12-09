@@ -174,7 +174,7 @@ func TestGetDbFilters(t *testing.T) {
 
 func TestGetWorkflowExecutionIdentifierFilters(t *testing.T) {
 	identifierFilters, err := GetWorkflowExecutionIdentifierFilters(
-		context.Background(), core.WorkflowExecutionIdentifier{
+		context.Background(), &core.WorkflowExecutionIdentifier{
 			Org:     "ex org",
 			Project: "ex project",
 			Domain:  "ex domain",
@@ -207,7 +207,7 @@ func TestGetWorkflowExecutionIdentifierFilters(t *testing.T) {
 
 func TestGetNodeExecutionIdentifierFilters(t *testing.T) {
 	identifierFilters, err := GetNodeExecutionIdentifierFilters(
-		context.Background(), core.NodeExecutionIdentifier{
+		context.Background(), &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Org:     "ex org",
 				Project: "ex project",

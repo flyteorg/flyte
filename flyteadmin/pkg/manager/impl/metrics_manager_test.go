@@ -36,7 +36,7 @@ func addTimestamp(ts *timestamp.Timestamp, seconds int64) *timestamp.Timestamp {
 func getMockExecutionManager(execution *admin.Execution) interfaces.ExecutionInterface {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetGetCallback(
-		func(ctx context.Context, request admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
+		func(ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
 			return execution, nil
 		})
 
@@ -48,13 +48,13 @@ func getMockNodeExecutionManager(nodeExecutions []*admin.NodeExecution,
 
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetListNodeExecutionsFunc(
-		func(ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
+		func(ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 			return &admin.NodeExecutionList{
 				NodeExecutions: nodeExecutions,
 			}, nil
 		})
 	mockNodeExecutionManager.SetGetNodeExecutionDataFunc(
-		func(ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+		func(ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 			return &admin.NodeExecutionGetDataResponse{
 				DynamicWorkflow: dynamicWorkflow,
 			}, nil
@@ -66,7 +66,7 @@ func getMockNodeExecutionManager(nodeExecutions []*admin.NodeExecution,
 func getMockTaskExecutionManager(taskExecutions []*admin.TaskExecution) interfaces.TaskExecutionInterface {
 	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 	mockTaskExecutionManager.SetListTaskExecutionsCallback(
-		func(ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+		func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return &admin.TaskExecutionList{
 				TaskExecutions: taskExecutions,
 			}, nil
@@ -78,7 +78,7 @@ func getMockTaskExecutionManager(taskExecutions []*admin.TaskExecution) interfac
 func getMockWorkflowManager(workflow *admin.Workflow) interfaces.WorkflowInterface {
 	mockWorkflowManager := mocks.MockWorkflowManager{}
 	mockWorkflowManager.SetGetCallback(
-		func(ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error) {
+		func(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 			return workflow, nil
 		})
 

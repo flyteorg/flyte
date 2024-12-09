@@ -67,7 +67,7 @@ func TestFromProjectModel(t *testing.T) {
 		Domains:     domains,
 		State:       admin.Project_ACTIVE,
 		Org:         testOrg,
-	}, &project))
+	}, project))
 }
 
 func TestFromProjectModels(t *testing.T) {

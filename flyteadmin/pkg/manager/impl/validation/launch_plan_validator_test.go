@@ -13,6 +13,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
+const (
+	foo = "foo"
+)
+
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 // Define constant for reused string
@@ -89,7 +93,7 @@ func TestGetLpExpectedInputs(t *testing.T) {
 		},
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
 				Var: &core.Variable{
@@ -103,7 +107,7 @@ func TestGetLpExpectedInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualExpectedMap)
-	assert.EqualValues(t, expectedMap, *actualExpectedMap)
+	assert.EqualValues(t, expectedMap, actualExpectedMap)
 }
 
 func TestValidateLpDefaultInputsWrongType(t *testing.T) {
@@ -293,7 +297,7 @@ func TestGetLpExpectedNoFixedInput(t *testing.T) {
 		nil, request.GetSpec().GetDefaultInputs(),
 	)
 
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
 				Var: &core.Variable{
@@ -307,7 +311,7 @@ func TestGetLpExpectedNoFixedInput(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualMap)
-	assert.EqualValues(t, expectedMap, *actualMap)
+	assert.EqualValues(t, expectedMap, actualMap)
 }
 
 func TestGetLpExpectedNoDefaultInput(t *testing.T) {
@@ -323,12 +327,12 @@ func TestGetLpExpectedNoDefaultInput(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), nil,
 	)
 
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{},
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualMap)
-	assert.EqualValues(t, expectedMap, *actualMap)
+	assert.EqualValues(t, expectedMap, actualMap)
 }
 
 func TestValidateSchedule_NoSchedule(t *testing.T) {
@@ -397,7 +401,7 @@ func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -417,7 +421,7 @@ func TestValidateSchedule_NoRequired(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -436,7 +440,7 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}},
 				},
@@ -446,7 +450,7 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 			},
 		},
 	}
-	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = "foo"
+	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
 
 	err := validateSchedule(request, inputMap)
 	assert.Nil(t, err)

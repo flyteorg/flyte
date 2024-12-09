@@ -278,7 +278,7 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 	switch resource.Status.State {
 	case bigqueryStatusPending:
-		return core.PhaseInfoQueuedWithTaskInfo(version, "Query is PENDING", taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), version, "Query is PENDING", taskInfo), nil
 
 	case bigqueryStatusRunning:
 		return core.PhaseInfoRunning(version, taskInfo), nil

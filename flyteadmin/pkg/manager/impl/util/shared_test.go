@@ -38,7 +38,7 @@ const remoteClosureIdentifier = "remote closure id"
 var errExpected = errors.New("expected error")
 
 func TestPopulateExecutionID(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name := GetExecutionName(&admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 	})
@@ -47,7 +47,7 @@ func TestPopulateExecutionID(t *testing.T) {
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name := GetExecutionName(&admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
@@ -73,7 +73,7 @@ func TestGetTask(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -94,7 +94,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 		return models.Task{}, errExpected
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -123,7 +123,7 @@ func TestGetTask_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -153,7 +153,7 @@ func TestGetWorkflowModel(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	workflow, err := GetWorkflowModel(context.Background(), repository, core.Identifier{
+	workflow, err := GetWorkflowModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",
@@ -174,7 +174,7 @@ func TestGetWorkflowModel_DatabaseError(t *testing.T) {
 		return models.Workflow{}, errExpected
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	workflow, err := GetWorkflowModel(context.Background(), repository, core.Identifier{
+	workflow, err := GetWorkflowModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",
@@ -241,7 +241,7 @@ func TestGetWorkflow(t *testing.T) {
 			return nil
 		}
 	workflow, err := GetWorkflow(
-		context.Background(), repository, mockStorageClient, core.Identifier{
+		context.Background(), repository, mockStorageClient, &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "project",
 			Domain:       "domain",
@@ -269,7 +269,7 @@ func TestGetLaunchPlanModel(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -290,7 +290,7 @@ func TestGetLaunchPlanModel_DatabaseError(t *testing.T) {
 		return models.LaunchPlan{}, errExpected
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -318,7 +318,7 @@ func TestGetLaunchPlan(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlan(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlan(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -351,7 +351,7 @@ func TestGetLaunchPlan_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlan(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlan(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -384,7 +384,7 @@ func TestGetNamedEntityModel(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	entity, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -406,7 +406,7 @@ func TestGetNamedEntityModel_DatabaseError(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	launchPlan, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -437,7 +437,7 @@ func TestGetNamedEntity(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	entity, err := GetNamedEntity(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -579,7 +579,7 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	t.Run("Get Description Entity model", func(t *testing.T) {
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -597,7 +597,7 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -613,7 +613,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	t.Run("Get Description Entity", func(t *testing.T) {
 		entity, err := GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -631,7 +631,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err := GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -646,7 +646,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err = GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -659,13 +659,13 @@ func TestGetDescriptionEntity(t *testing.T) {
 }
 
 func TestMergeIntoExecConfig(t *testing.T) {
-	var res admin.WorkflowExecutionConfig
+	var res *admin.WorkflowExecutionConfig
 	parameters := []struct {
-		higher, lower, expected admin.WorkflowExecutionConfig
+		higher, lower, expected *admin.WorkflowExecutionConfig
 	}{
 		// Max Parallelism taken from higher
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 5,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://test-bucket",
@@ -677,7 +677,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 0,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
@@ -686,7 +686,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"lab1": "oldvalue"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 5,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://test-bucket",
@@ -702,7 +702,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Values that are set to empty in higher priority get overwritten
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "",
 				},
@@ -713,7 +713,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -724,7 +724,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -739,8 +739,8 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Values that are not set at all get merged in
 		{
-			admin.WorkflowExecutionConfig{},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{},
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -751,7 +751,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -766,17 +766,17 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Interruptible
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: false,
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: true,
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: false,
 				},
@@ -786,8 +786,8 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 	for i := range parameters {
 		t.Run(fmt.Sprintf("Testing [%v]", i), func(t *testing.T) {
-			res = MergeIntoExecConfig(parameters[i].higher, &parameters[i].lower)
-			assert.True(t, proto.Equal(&parameters[i].expected, &res))
+			res = MergeIntoExecConfig(parameters[i].higher, parameters[i].lower)
+			assert.True(t, proto.Equal(parameters[i].expected, res))
 		})
 	}
 }

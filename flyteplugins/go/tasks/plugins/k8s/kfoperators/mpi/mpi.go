@@ -188,10 +188,12 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 	}
 
 	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
 		return phaseInfo, phaseVersionUpdateErr
 	}
+
 	return phaseInfo, err
 }
 

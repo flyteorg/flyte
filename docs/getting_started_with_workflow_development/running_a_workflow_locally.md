@@ -89,6 +89,10 @@ To download manually, see the [flytectl releases](https://github.com/flyteorg/fl
 :::{tab-item} Linux
 To use `curl`, on the command line, run the following:
 
+```{warning}
+[jq](https://jqlang.github.io/jq) is a dependency of this script.
+```
+
 ```{prompt} bash $
 curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin
 ```

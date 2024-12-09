@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.12.0  # FLYTEADMIN_TAG
+    tag: v1.13.3  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -144,7 +144,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.12.0  # FLYTESCHEDULER_TAG
+    tag: v1.13.3  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -210,7 +210,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.12.0  # DATACATALOG_TAG
+    tag: v1.13.3  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -350,10 +350,17 @@ flyteagent:
   enabled: false
   plugin_config:
     plugins:
-      agentService:
+      # -- Agent service configuration for propeller.
+      agent-service:
+        # -- The default agent service to use for plugin tasks.
         defaultAgent:
+          # -- The agent service endpoint propeller should connect to.
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
+        # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
+        # need to be configured.
+        supportedTaskTypes: []
   # -- Labels for flyteagent pods
   podLabels: {}
 
@@ -371,7 +378,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.12.0  # FLYTEPROPELLER_TAG
+    tag: v1.13.3  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -447,8 +454,6 @@ flytepropeller:
 
   prometheus:
     enabled: false
-    path: "/metrics"
-    port: 10254
 
 #
 # FLYTECONSOLE SETTINGS
@@ -461,7 +466,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
-    tag: v1.12.2  # FLYTECONSOLE_TAG
+    tag: v1.18.0  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -560,6 +565,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook pods
+  podAnnotations: {}
+  # -- Additional webhook container environment variables
+  podEnv: {}
+  # -- Labels for webhook pods
+  podLabels: {}
+  # -- nodeSelector for webhook deployment
+  nodeSelector: {}
   # -- Sets securityContext for webhook pod(s).
   securityContext:
     fsGroup: 65534
@@ -595,8 +608,6 @@ webhook:
 
   prometheus:
     enabled: false
-    path: "/metrics"
-    port: 10254
 
 # ------------------------------------------------
 #
@@ -624,6 +635,7 @@ common:
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/app-root: /console
+      nginx.ingress.kubernetes.io/service-upstream: "true"
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
@@ -875,7 +887,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.0  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.3  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -937,6 +949,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -1088,7 +1101,6 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "3000Mi"
   secretName: "unionCloudSecretAuth"
-
 
   prometheus:
     enabled: false

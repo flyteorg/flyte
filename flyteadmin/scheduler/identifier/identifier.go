@@ -25,7 +25,7 @@ const (
 
 // GetScheduleName generate the schedule name to be used as unique identification string within the scheduler
 func GetScheduleName(ctx context.Context, s models.SchedulableEntity) string {
-	return strconv.FormatUint(hashIdentifier(ctx, core.Identifier{
+	return strconv.FormatUint(hashIdentifier(ctx, &core.Identifier{
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    s.Name,
@@ -34,7 +34,7 @@ func GetScheduleName(ctx context.Context, s models.SchedulableEntity) string {
 }
 
 // GetExecutionIdentifier returns UUID using the hashed value of the schedule identifier and the scheduledTime
-func GetExecutionIdentifier(ctx context.Context, identifier core.Identifier, scheduledTime time.Time) (uuid.UUID, error) {
+func GetExecutionIdentifier(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) (uuid.UUID, error) {
 	hashValue := hashScheduledTimeStamp(ctx, identifier, scheduledTime)
 	b := make([]byte, 16)
 	binary.LittleEndian.PutUint64(b, hashValue)
@@ -51,9 +51,9 @@ func getIdentifierString(identifier *core.Identifier) string {
 }
 
 // hashIdentifier returns the hash of the identifier
-func hashIdentifier(ctx context.Context, identifier core.Identifier) uint64 {
+func hashIdentifier(ctx context.Context, identifier *core.Identifier) uint64 {
 	h := fnv.New64()
-	_, err := h.Write([]byte(getIdentifierString(&identifier)))
+	_, err := h.Write([]byte(getIdentifierString(identifier)))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,
@@ -69,10 +69,10 @@ func getExecutionIDInputsFormat(identifier *core.Identifier, scheduleTime time.T
 }
 
 // hashScheduledTimeStamp return the hash of the identifier and the scheduledTime
-func hashScheduledTimeStamp(ctx context.Context, identifier core.Identifier, scheduledTime time.Time) uint64 {
+func hashScheduledTimeStamp(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) uint64 {
 	h := fnv.New64()
 
-	_, err := h.Write(getExecutionIDInputsFormat(&identifier, scheduledTime))
+	_, err := h.Write(getExecutionIDInputsFormat(identifier, scheduledTime))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,

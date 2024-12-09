@@ -1689,7 +1689,6 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		execContext := mocks4.ExecutionContext{}
 		execContext.OnIsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
-
 		execContext.OnGetRawOutputDataConfig().Return(r)
 		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
 		execContext.OnGetLabels().Return(nil)
@@ -1710,6 +1709,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		parentInfo.OnGetUniqueID().Return("someunique1")
 		parentInfo.OnCurrentAttempt().Return(uint32(1))
 		parentInfo.OnIsInDynamicChain().Return(false)
+		execContext.OnGetParentInfo().Return(parentInfo)
 		execContext.OnGetParentInfo().Return(parentInfo)
 
 		// code that I added

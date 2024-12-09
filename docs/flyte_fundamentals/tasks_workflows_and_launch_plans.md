@@ -263,15 +263,11 @@ Learn more about chaining flyte entities in the {ref}`User Guide <chain_flyte_en
 
 ## Launch plans
 
-A Flyte {py:class}`~flytekit.LaunchPlan` is a partial or complete binding of
-inputs necessary to launch a workflow. You can think of it like
-the {py:func}`~functools.partial` function in the Python standard library where
-you can define default (overridable) and fixed (non-overridable) inputs.
-
-```{note}
-Additionally, `LaunchPlan` provides an interface for specifying run-time
-overrides such as notifications, schedules, and more.
-```
+A launch plan in Flyte is a mechanism to define and manage the execution of workflows with 
+predefined or fixed inputs, schedules, and runtime overrides, like notifications. Launch plans allow
+workflows to be executed with specific configurations and can be shared for consistent and 
+reproducible executions. Each workflow has a default launch plan generated upon registration, with the same name as the workflow, 
+but custom launch plans can also be created to meet different requirements.
 
 Create a launch plan like so:
 

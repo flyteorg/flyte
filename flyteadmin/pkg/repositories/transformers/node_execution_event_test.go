@@ -16,7 +16,7 @@ import (
 func TestCreateNodeExecutionEventModel(t *testing.T) {
 	occurredAt := time.Now().UTC()
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
-	request := admin.NodeExecutionEventRequest{
+	request := &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
 			Id: &core.NodeExecutionIdentifier{

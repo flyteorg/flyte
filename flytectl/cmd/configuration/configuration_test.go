@@ -9,14 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-
-	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
-
 	initConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/config"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
-
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/stretchr/testify/assert"
 )
 

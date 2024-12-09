@@ -44,35 +44,35 @@ const (
 	readOnly
 )
 
-func (m *ConfigurationManager) GetEditableActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error) {
+func (m *ConfigurationManager) GetEditableActiveDocument(ctx context.Context) (*admin.ConfigurationDocument, error) {
 	return m.getActiveDocument(ctx, editable)
 }
 
-func (m *ConfigurationManager) GetReadOnlyActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error) {
+func (m *ConfigurationManager) GetReadOnlyActiveDocument(ctx context.Context) (*admin.ConfigurationDocument, error) {
 	return m.getActiveDocument(ctx, readOnly)
 }
 
 // Note: This function should not be called directly. Use GetReadOnlyActiveDocument or GetEditableActiveDocument instead.
-func (m *ConfigurationManager) getActiveDocument(ctx context.Context, mode documentMode) (admin.ConfigurationDocument, error) {
+func (m *ConfigurationManager) getActiveDocument(ctx context.Context, mode documentMode) (*admin.ConfigurationDocument, error) {
 	// Get the active configuration
 	activeMetadata, err := m.db.ConfigurationRepo().GetActive(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "failed to get active configuration document: %v", err)
-		return admin.ConfigurationDocument{}, err
+		return &admin.ConfigurationDocument{}, err
 	}
 
 	// If the cache is valid, return the cached document
 	cacheDoc, ok := m.getCache(activeMetadata.Version, mode)
 	if ok {
 		logger.Debugf(ctx, "returning cached configuration document")
-		return *cacheDoc, nil
+		return cacheDoc, nil
 	}
 
 	// Get the active document from the storage
 	activeDocument := &admin.ConfigurationDocument{}
 	if err := m.storageClient.ReadProtobuf(ctx, activeMetadata.DocumentLocation, activeDocument); err != nil {
 		logger.Errorf(ctx, "failed to read configuration document: %v", err)
-		return admin.ConfigurationDocument{}, err
+		return &admin.ConfigurationDocument{}, err
 	}
 
 	// Since an empty map will be serialized as nil, we need to initialize the map if it is nil
@@ -83,11 +83,11 @@ func (m *ConfigurationManager) getActiveDocument(ctx context.Context, mode docum
 	// Set the cache
 	m.setCache(activeDocument)
 
-	return *activeDocument, nil
+	return activeDocument, nil
 }
 
 func (m *ConfigurationManager) GetConfiguration(
-	ctx context.Context, request admin.ConfigurationGetRequest) (
+	ctx context.Context, request *admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
 	// Set the configuration ID if it is not set.
 	// This is because org can be empty and if it is empty, the ID will be nil.
@@ -107,9 +107,9 @@ func (m *ConfigurationManager) GetConfiguration(
 	// Get the configuration
 	var configuration *admin.ConfigurationWithSource
 	if request.GetOnlyGetLowerLevelConfiguration() {
-		configuration, err = util.GetConfigurationOnlyLowerLevel(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
+		configuration, err = util.GetConfigurationOnlyLowerLevel(ctx, activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
 	} else {
-		configuration, err = util.GetConfiguration(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
+		configuration, err = util.GetConfiguration(ctx, activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
 	}
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (m *ConfigurationManager) GetConfiguration(
 }
 
 func (m *ConfigurationManager) UpdateConfiguration(
-	ctx context.Context, request admin.ConfigurationUpdateRequest) (
+	ctx context.Context, request *admin.ConfigurationUpdateRequest) (
 	*admin.ConfigurationUpdateResponse, error) {
 	// Validate the request
 	if err := m.validator.ValidateUpdateRequest(ctx, request); err != nil {
@@ -149,7 +149,7 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Update the document with the new configuration
-	updatedDocument, err := util.UpdateConfigurationToDocument(ctx, &activeDocument, request.Configuration, request.Id)
+	updatedDocument, err := util.UpdateConfigurationToDocument(ctx, activeDocument, request.Configuration, request.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (m *ConfigurationManager) UpdateConfiguration(
 // Note: this function will update the version of a document.
 func (m *ConfigurationManager) getDocumentMetadata(ctx context.Context, document *admin.ConfigurationDocument) (*models.ConfigurationDocumentMetadata, error) {
 	// Use string digest as version
-	version, err := util.GetConfigurationDocumentStringDigest(ctx, *document)
+	version, err := util.GetConfigurationDocumentStringDigest(ctx, document)
 	if err != nil {
 		logger.Errorf(ctx, "failed to generate version for document %+v:, error: %v", document.Configurations, err)
 		return nil, err
@@ -230,10 +230,10 @@ func (m *ConfigurationManager) updateDocumentMetadata(ctx context.Context, docum
 func (m *ConfigurationManager) bootstrapOrUpdateDefaultConfigurationDocument(ctx context.Context, config runtimeInterfaces.Configuration) error {
 	document, err := m.GetEditableActiveDocument(ctx)
 	if err != nil && errors.IsDoesNotExistError(err) {
-		document = admin.ConfigurationDocument{
+		document = &admin.ConfigurationDocument{
 			Configurations: make(map[string]*admin.Configuration),
 		}
-		updatedDocument, err := util.UpdateDefaultConfigurationToDocument(ctx, &document, config)
+		updatedDocument, err := util.UpdateDefaultConfigurationToDocument(ctx, document, config)
 		if err != nil {
 			logger.Errorf(ctx, "failed to update default configuration to document: %v", err)
 			return err
@@ -250,7 +250,7 @@ func (m *ConfigurationManager) bootstrapOrUpdateDefaultConfigurationDocument(ctx
 	}
 
 	versionToUpdate := document.Version
-	updatedDocument, err := util.UpdateDefaultConfigurationToDocument(ctx, &document, config)
+	updatedDocument, err := util.UpdateDefaultConfigurationToDocument(ctx, document, config)
 	if err != nil {
 		logger.Errorf(ctx, "failed to update default configuration to document: %v", err)
 		return err
@@ -264,14 +264,14 @@ func (m *ConfigurationManager) bootstrapOrUpdateDefaultConfigurationDocument(ctx
 	return m.updateDocumentMetadata(ctx, updatedDocument, metadata, versionToUpdate)
 }
 
-func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request admin.ConfigurationUpdateRequest, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) error {
+func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request *admin.ConfigurationUpdateRequest, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) error {
 	// Check if the configuration is editing non-mutable attributes
 	document, err := m.GetReadOnlyActiveDocument(ctx)
 	if err != nil {
 		return err
 	}
 
-	currentConfiguration, err := util.GetConfigurationFromDocument(ctx, &document, request.Id)
+	currentConfiguration, err := util.GetConfigurationFromDocument(ctx, document, request.Id)
 	if err != nil {
 		return err
 	}

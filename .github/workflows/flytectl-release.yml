@@ -1,0 +1,27 @@
+name: Flytectl release
+
+on:
+  push:
+    tags:
+      - flytectl/v*.*.*
+
+jobs:
+  release:
+    name: Goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser-pro
+          args: release --rm-dist -f flytectl/.goreleaser.yml
+        env:
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}

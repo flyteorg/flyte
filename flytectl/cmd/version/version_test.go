@@ -8,16 +8,13 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
-	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-
-	"github.com/spf13/cobra"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,6 +55,7 @@ func TestVersionCommand(t *testing.T) {
 func TestVersionCommandFunc(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion
@@ -70,6 +68,7 @@ func TestVersionCommandFunc(t *testing.T) {
 func TestVersionCommandFuncError(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = "v"
@@ -82,6 +81,7 @@ func TestVersionCommandFuncError(t *testing.T) {
 func TestVersionCommandFuncErr(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion

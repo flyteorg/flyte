@@ -3000,6 +3000,11 @@ pub struct OrgAttributesDeleteRequest {
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct OrgAttributesDeleteResponse {
 }
+/// Empty request for GetDomain
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct GetDomainRequest {
+}
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -3011,6 +3016,13 @@ pub struct Domain {
     /// Display name.
     #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
+}
+/// Represents a list of domains.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDomainsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub domains: ::prost::alloc::vec::Vec<Domain>,
 }
 /// Top-level namespace used to classify different entities like workflows and executions.
 #[allow(clippy::derive_partial_eq_without_eq)]

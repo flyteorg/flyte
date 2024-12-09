@@ -121,8 +121,8 @@ func GetMatchingAttributesFromConfiguration(configuration *admin.Configuration, 
 }
 
 // FromWorkflowAttributesUpdateRequest transform WorkflowAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromWorkflowAttributesUpdateRequest(request *admin.WorkflowAttributesUpdateRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, &configuration)
+func FromWorkflowAttributesUpdateRequest(request *admin.WorkflowAttributesUpdateRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +139,8 @@ func FromWorkflowAttributesUpdateRequest(request *admin.WorkflowAttributesUpdate
 }
 
 // FromWorkflowAttributesDeleteRequest transform WorkflowAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromWorkflowAttributesDeleteRequest(request *admin.WorkflowAttributesDeleteRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), &configuration)
+func FromWorkflowAttributesDeleteRequest(request *admin.WorkflowAttributesDeleteRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +157,8 @@ func FromWorkflowAttributesDeleteRequest(request *admin.WorkflowAttributesDelete
 }
 
 // FromProjectDomainAttributesUpdateRequest transform ProjectDomainAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttributesUpdateRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, &configuration)
+func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttributesUpdateRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -174,8 +174,8 @@ func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttrib
 }
 
 // FromProjectDomainAttributesDeleteRequest transform ProjectDomainAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttributesDeleteRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), &configuration)
+func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttributesDeleteRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -191,8 +191,8 @@ func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttrib
 }
 
 // FromProjectAttributesUpdateRequest transform ProjectAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, &configuration)
+func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -207,8 +207,8 @@ func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRe
 }
 
 // FromProjectAttributesDeleteRequest transform ProjectAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromProjectAttributesDeleteRequest(request *admin.ProjectAttributesDeleteRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), &configuration)
+func FromProjectAttributesDeleteRequest(request *admin.ProjectAttributesDeleteRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -223,8 +223,8 @@ func FromProjectAttributesDeleteRequest(request *admin.ProjectAttributesDeleteRe
 }
 
 // FromOrgAttributesUpdateRequest transform OrgAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromOrgAttributesUpdateRequest(request *admin.OrgAttributesUpdateRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, &configuration)
+func FromOrgAttributesUpdateRequest(request *admin.OrgAttributesUpdateRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := UpdateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -238,8 +238,8 @@ func FromOrgAttributesUpdateRequest(request *admin.OrgAttributesUpdateRequest, c
 }
 
 // FromOrgAttributesDeleteRequest transform OrgAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromOrgAttributesDeleteRequest(request *admin.OrgAttributesDeleteRequest, configuration admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
-	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), &configuration)
+func FromOrgAttributesDeleteRequest(request *admin.OrgAttributesDeleteRequest, configuration *admin.Configuration, version string) (*admin.ConfigurationUpdateRequest, error) {
+	newConfiguration, err := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	if err != nil {
 		return nil, err
 	}

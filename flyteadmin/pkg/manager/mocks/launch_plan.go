@@ -7,22 +7,22 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type CreateLaunchPlanFunc func(ctx context.Context, request admin.LaunchPlanCreateRequest) (
+type CreateLaunchPlanFunc func(ctx context.Context, request *admin.LaunchPlanCreateRequest) (
 	*admin.LaunchPlanCreateResponse, error)
-type UpdateLaunchPlanFunc func(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
+type UpdateLaunchPlanFunc func(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error)
-type GetLaunchPlanFunc func(ctx context.Context, request admin.ObjectGetRequest) (
+type GetLaunchPlanFunc func(ctx context.Context, request *admin.ObjectGetRequest) (
 	*admin.LaunchPlan, error)
-type GetActiveLaunchPlanFunc func(ctx context.Context, request admin.ActiveLaunchPlanRequest) (
+type GetActiveLaunchPlanFunc func(ctx context.Context, request *admin.ActiveLaunchPlanRequest) (
 	*admin.LaunchPlan, error)
-type ListLaunchPlansFunc func(ctx context.Context, request admin.ResourceListRequest) (
+type ListLaunchPlansFunc func(ctx context.Context, request *admin.ResourceListRequest) (
 	*admin.LaunchPlanList, error)
-type ListLaunchPlanIdsFunc func(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+type ListLaunchPlanIdsFunc func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error)
-type ListActiveLaunchPlansFunc func(ctx context.Context, request admin.ActiveLaunchPlanListRequest) (
+type ListActiveLaunchPlansFunc func(ctx context.Context, request *admin.ActiveLaunchPlanListRequest) (
 	*admin.LaunchPlanList, error)
 type CreateLaunchPlanFromNodeFunc func(
-	ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (
+	ctx context.Context, request *admin.CreateLaunchPlanFromNodeRequest) (
 	*admin.CreateLaunchPlanFromNodeResponse, error)
 
 type MockLaunchPlanManager struct {
@@ -42,7 +42,7 @@ func (r *MockLaunchPlanManager) SetCreateCallback(createFunction CreateLaunchPla
 
 func (r *MockLaunchPlanManager) CreateLaunchPlan(
 	ctx context.Context,
-	request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+	request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 	if r.createLaunchPlanFunc != nil {
 		return r.createLaunchPlanFunc(ctx, request)
 	}
@@ -53,7 +53,7 @@ func (r *MockLaunchPlanManager) SetUpdateLaunchPlan(updateFunction UpdateLaunchP
 	r.updateLaunchPlanFunc = updateFunction
 }
 
-func (r *MockLaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
+func (r *MockLaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	if r.updateLaunchPlanFunc != nil {
 		return r.updateLaunchPlanFunc(ctx, request)
@@ -61,7 +61,7 @@ func (r *MockLaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request ad
 	return nil, nil
 }
 
-func (r *MockLaunchPlanManager) GetLaunchPlan(ctx context.Context, request admin.ObjectGetRequest) (
+func (r *MockLaunchPlanManager) GetLaunchPlan(ctx context.Context, request *admin.ObjectGetRequest) (
 	*admin.LaunchPlan, error) {
 	if r.getLaunchPlanFunc != nil {
 		return r.getLaunchPlanFunc(ctx, request)
@@ -73,7 +73,7 @@ func (r *MockLaunchPlanManager) SetGetActiveLaunchPlanCallback(plansFunc GetActi
 	r.getActiveLaunchPlanFunc = plansFunc
 }
 
-func (r *MockLaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request admin.ActiveLaunchPlanRequest) (
+func (r *MockLaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request *admin.ActiveLaunchPlanRequest) (
 	*admin.LaunchPlan, error) {
 	if r.getActiveLaunchPlanFunc != nil {
 		return r.getActiveLaunchPlanFunc(ctx, request)
@@ -85,7 +85,7 @@ func (r *MockLaunchPlanManager) SetListLaunchPlansCallback(listLaunchPlansFunc L
 	r.listLaunchPlansFunc = listLaunchPlansFunc
 }
 
-func (r *MockLaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.ResourceListRequest) (
+func (r *MockLaunchPlanManager) ListLaunchPlans(ctx context.Context, request *admin.ResourceListRequest) (
 	*admin.LaunchPlanList, error) {
 	if r.listLaunchPlansFunc != nil {
 		return r.listLaunchPlansFunc(ctx, request)
@@ -97,7 +97,7 @@ func (r *MockLaunchPlanManager) SetListActiveLaunchPlansCallback(plansFunc ListA
 	r.listActiveLaunchPlansFunc = plansFunc
 }
 
-func (r *MockLaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request admin.ActiveLaunchPlanListRequest) (
+func (r *MockLaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request *admin.ActiveLaunchPlanListRequest) (
 	*admin.LaunchPlanList, error) {
 	if r.listActiveLaunchPlansFunc != nil {
 		return r.listActiveLaunchPlansFunc(ctx, request)
@@ -105,7 +105,7 @@ func (r *MockLaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, reque
 	return nil, nil
 }
 
-func (r *MockLaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (r *MockLaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	if r.listLaunchPlanIdsFunc != nil {
 		return r.ListLaunchPlanIds(ctx, request)
@@ -117,7 +117,7 @@ func (r *MockLaunchPlanManager) SetCreateLaunchPlanFromNode(createFunction Creat
 	r.createLaunchPlanFromNodeFunc = createFunction
 }
 
-func (m *MockLaunchPlanManager) CreateLaunchPlanFromNode(ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+func (m *MockLaunchPlanManager) CreateLaunchPlanFromNode(ctx context.Context, request *admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
 	if m.createLaunchPlanFromNodeFunc != nil {
 		return m.createLaunchPlanFromNodeFunc(ctx, request)
 	}

@@ -170,6 +170,19 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		)
 	}
 	executionContext.OnCurrentParallelism().Return(currentParallelism)
+	executionContext.OnGetTask(taskRef).Return(
+		&v1alpha1.TaskSpec{
+			TaskTemplate: &idlcore.TaskTemplate{
+				Interface: &idlcore.TypedInterface{
+					Outputs: &idlcore.VariableMap{
+						Variables: outputVariableMap,
+					},
+				},
+			},
+		},
+		nil,
+	)
+	executionContext.OnCurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
 	executionContext.OnIncrementNodeExecutionCount().Return(1)
 	executionContext.OnIncrementTaskExecutionCount().Return(1)
@@ -238,6 +251,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 func TestAbort(t *testing.T) {
 	ctx := context.Background()
+
+	nodeHandler := &mocks.NodeHandler{}
+	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	tests := []struct {
 		name                           string
@@ -350,6 +367,9 @@ func TestAbort(t *testing.T) {
 
 func TestFinalize(t *testing.T) {
 	ctx := context.Background()
+
+	nodeHandler := &mocks.NodeHandler{}
+	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	tests := []struct {
 		name                  string
@@ -1396,6 +1416,10 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 
 func TestHandleArrayNodePhaseFailing(t *testing.T) {
 	ctx := context.Background()
+
+	nodeHandler := &mocks.NodeHandler{}
+	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	tests := []struct {
 		name                    string

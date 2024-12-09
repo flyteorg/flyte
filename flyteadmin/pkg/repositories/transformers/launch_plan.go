@@ -12,10 +12,10 @@ import (
 )
 
 func CreateLaunchPlan(
-	request admin.LaunchPlanCreateRequest,
-	expectedOutputs *core.VariableMap) admin.LaunchPlan {
+	request *admin.LaunchPlanCreateRequest,
+	expectedOutputs *core.VariableMap) *admin.LaunchPlan {
 
-	return admin.LaunchPlan{
+	return &admin.LaunchPlan{
 		Id:   request.Id,
 		Spec: request.Spec,
 		Closure: &admin.LaunchPlanClosure{
@@ -27,7 +27,7 @@ func CreateLaunchPlan(
 
 // Transforms a admin.LaunchPlan object to a LaunchPlan model
 func CreateLaunchPlanModel(
-	launchPlan admin.LaunchPlan,
+	launchPlan *admin.LaunchPlan,
 	workflowRepoID uint,
 	digest []byte,
 	initState admin.LaunchPlanState) (models.LaunchPlan, error) {
