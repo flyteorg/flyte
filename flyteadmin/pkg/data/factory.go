@@ -50,7 +50,11 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 		return &remoteDataHandler{
 			remoteURL: implementations.NewGCPRemoteURL(cfg.SigningPrincipal, signedURLDuration),
 		}
-
+	case common.Azure:
+		signedURLDuration := time.Minute * time.Duration(cfg.SignedURLDurationMinutes)
+		return &remoteDataHandler{
+			remoteURL: implementations.NewAzureRemoteURL(*cfg.RemoteDataStoreClient, signedURLDuration),
+		}
 	case common.Local:
 		logger.Infof(context.TODO(), "setting up local signer ----- ")
 		// Since minio = aws s3, we are creating the same client but using the config primitives from aws
