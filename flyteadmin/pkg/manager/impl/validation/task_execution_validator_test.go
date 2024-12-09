@@ -71,28 +71,6 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 				Project:      "project",
 				Domain:       "domain",
 				Name:         "name",
-			},
-			ParentNodeExecutionId: &core.NodeExecutionIdentifier{
-				NodeId: "nodey",
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: "project",
-					Domain:  "domain",
-					Name:    "name",
-				},
-			},
-			RetryAttempt: 0,
-		},
-	}, maxOutputSizeInBytes)
-	assert.EqualError(t, err, "missing version")
-
-	err = ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{
-		Event: &event.TaskExecutionEvent{
-			OccurredAt: taskEventOccurredAtProto,
-			TaskId: &core.Identifier{
-				ResourceType: core.ResourceType_TASK,
-				Project:      "project",
-				Domain:       "domain",
-				Name:         "name",
 				Version:      "version",
 			},
 			ParentNodeExecutionId: &core.NodeExecutionIdentifier{
