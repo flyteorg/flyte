@@ -334,6 +334,10 @@ pub struct ExternalResourceInfo {
     /// log information for the external resource execution
     #[prost(message, repeated, tag="6")]
     pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// String location uniquely identifying where the deck HTML file is
+    /// NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+    #[prost(string, tag="7")]
+    pub deck_uri: ::prost::alloc::string::String,
 }
 /// This message holds task execution metadata specific to resource allocation used to manage concurrent
 /// executions for a project namespace.
