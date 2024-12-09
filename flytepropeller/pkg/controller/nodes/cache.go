@@ -116,9 +116,9 @@ func updatePhaseCacheInfo(phaseInfo handler.PhaseInfo, cacheStatus *catalog.Stat
 
 // CheckCatalogCache uses the handler and contexts to check if cached outputs for the current node
 // exist. If the exist, this function also copies the outputs to this node.
-func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Entry, error) {
+func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (_ catalog.Entry, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/CheckCatalogCache")
-	defer span.End()
+	defer span.EndErr(err)
 	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.Entry{}, errors.Wrapf(err, "failed to initialize the cacheKey")
@@ -247,9 +247,9 @@ func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx inter
 
 // WriteCatalogCache relays the outputs of this node to the cache. This allows future executions
 // to reuse these data to avoid recomputation.
-func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Status, error) {
+func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (_ catalog.Status, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/WriteCatalogCache")
-	defer span.End()
+	defer span.EndErr(err)
 	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the cacheKey")

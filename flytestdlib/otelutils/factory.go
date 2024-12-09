@@ -3,9 +3,11 @@ package otelutils
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/jaeger" // nolint:staticcheck
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -140,8 +142,19 @@ func GetTracerProvider(serviceName string) rawtrace.TracerProvider {
 	return noopTracerProvider
 }
 
+type SpanWrapper struct {
+	rawtrace.Span
+}
+
+func (s SpanWrapper) EndErr(err error) {
+	if err != nil && err != io.EOF {
+		s.Span.SetStatus(codes.Error, err.Error())
+	}
+	s.Span.End()
+}
+
 // NewSpan creates a new span with the given service name and span name.
-func NewSpan(ctx context.Context, serviceName string, spanName string) (context.Context, rawtrace.Span) {
+func NewSpan(ctx context.Context, serviceName string, spanName string) (context.Context, SpanWrapper) {
 	var attributes []attribute.KeyValue
 	for key, value := range contextutils.GetLogFields(ctx) {
 		if value, ok := value.(string); ok {
@@ -150,5 +163,6 @@ func NewSpan(ctx context.Context, serviceName string, spanName string) (context.
 	}
 
 	tracerProvider := GetTracerProvider(serviceName)
-	return tracerProvider.Tracer("default").Start(ctx, spanName, rawtrace.WithAttributes(attributes...))
+	ctx, span := tracerProvider.Tracer("default").Start(ctx, spanName, rawtrace.WithAttributes(attributes...))
+	return ctx, SpanWrapper{Span: span}
 }

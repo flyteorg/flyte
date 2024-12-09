@@ -1346,9 +1346,9 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	return interfaces.NodeStatusPending, nil
 }
 
-func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (_ interfaces.NodeStatus, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/handleNode")
-	defer span.End()
+	defer span.EndErr(err)
 
 	logger.Debugf(ctx, "Handling Node [%s]", nCtx.NodeID())
 	defer logger.Debugf(ctx, "Completed node [%s]", nCtx.NodeID())

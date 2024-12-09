@@ -528,9 +528,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	return pluginTrns, nil
 }
 
-func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
+func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (_ handler.Transition, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.task.Handler/HandleTask")
-	defer span.End()
+	defer span.EndErr(err)
 
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
