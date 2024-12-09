@@ -59,6 +59,7 @@ dependencies:
   - openai                      # chatgpt
   - wandb                       # wandb
   - neptune                     # neptune
+  - memray                      # memray
 
   - pip:
     - flytekit>=1.12.1b2
