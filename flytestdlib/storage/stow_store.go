@@ -263,7 +263,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 }
 
 func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
-	_, containerName, key, err := reference.Split()
+	protocol, containerName, key, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
 		return nil, NewCursorAtEnd(), err
@@ -291,7 +291,17 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			results[index] = DataReference(item.URL().String())
+			// We don't use `item.URL()` because e.g. listing a google cloud storage
+			// bucket `gs://some-bucket/...` will result in items with URLs like
+			// `google://storage.googleapis.com/download/storage/v1/b/some-bucket/...`
+			// which subsequently cannot be found by the stow store.
+
+			u := url.URL{
+				Scheme: protocol,
+				Host:   containerName,
+				Path:   item.Name(),
+			}
+			results[index] = DataReference(u.String())
 		}
 		if stow.IsCursorEnd(stowCursor) {
 			cursor = NewCursorAtEnd()
