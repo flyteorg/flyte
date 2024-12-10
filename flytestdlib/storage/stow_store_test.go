@@ -97,8 +97,8 @@ func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item,
 	numItems := endIndexExc - startIndex
 	results := make([]stow.Item, numItems)
 	for index, itemKey := range itemKeys[startIndex:endIndexExc] {
-		url := fmt.Sprintf("s3://%s/%s", m.id, m.items[itemKey].url)
-		results[index] = mockStowItem{url: url, size: m.items[itemKey].size}
+		url := fmt.Sprintf("s3://%s/%s", m.id, m.items[itemKey].name)
+		results[index] = mockStowItem{url: url, size: m.items[itemKey].size, name: m.items[itemKey].name}
 	}
 
 	if endIndexExc == len(m.items) {
@@ -123,7 +123,7 @@ func (m *mockStowContainer) Put(name string, r io.Reader, size int64, metadata m
 	if m.putCB != nil {
 		return m.putCB(name, r, size, metadata)
 	}
-	item := mockStowItem{url: name, size: size}
+	item := mockStowItem{url: name, name: name, size: size}
 	m.items[name] = item
 	return item, nil
 }
@@ -137,6 +137,7 @@ func newMockStowContainer(id string) *mockStowContainer {
 
 type mockStowItem struct {
 	url  string
+	name string
 	size int64
 }
 
@@ -145,7 +146,7 @@ func (m mockStowItem) ID() string {
 }
 
 func (m mockStowItem) Name() string {
-	return m.url
+	return m.name
 }
 
 func (m mockStowItem) URL() *url.URL {
