@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -45,7 +46,7 @@ func GetWorkflowDigest(ctx context.Context, workflowClosure *core.CompiledWorkfl
 	// and launchplan caching support. this is not the proper fix, the correct approach is to
 	// include a compiler version in workflow version to ensure CompiledWorkflowClosures will
 	// seamlessly re-register upon compiler updates.
-	strippedWorkflowClosure := workflowClosure
+	strippedWorkflowClosure := proto.Clone(workflowClosure).(*core.CompiledWorkflowClosure)
 	strippedWorkflowClosure.LaunchPlans = nil
 
 	workflowDigest, err := pbhash.ComputeHash(ctx, strippedWorkflowClosure)
