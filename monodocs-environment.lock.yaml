@@ -13,8 +13,8 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: d9c5e8f9f72be6dc0890439823013f20b75a91695591122a46b87515d44730e9
-    osx-arm64: a1778e6712d7038b4d3cd7283d55df371201a5356fca0a436882341a1c159b7b
+    linux-64: 211880a3c070823b7621aa26fd744fa5790125420f51f6e94992be9a3a09e253
+    osx-arm64: 880d77880d7e4891e4671eaa557079d6d0bd8da6691f7284a30cf96b4ed0d85d
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -10332,11 +10332,11 @@ package:
   manager: conda
   platform: linux-64
   dependencies:
-    python: '>=3.6'
-  url: https://conda.anaconda.org/conda-forge/noarch/namex-0.0.8-pyhd8ed1ab_0.conda
+    python: '>=3.9'
+  url: https://conda.anaconda.org/conda-forge/noarch/namex-0.0.8-pyhd8ed1ab_1.conda
   hash:
-    md5: b96883bd4ee5a6aef4636674783a6d57
-    sha256: 9ed4061868dfd2b97363ae3ee08f192b822d1f7f999c7c081deed43310b3e5af
+    md5: 6427624437ca3bcd8634f35dc74716fc
+    sha256: 6194f52e8ce2853174f3e3702e1d980718473277ed8b6a9f9e7148ceefbf35bf
   category: main
   optional: false
 - name: namex
@@ -10344,11 +10344,11 @@ package:
   manager: conda
   platform: osx-arm64
   dependencies:
-    python: '>=3.6'
-  url: https://conda.anaconda.org/conda-forge/noarch/namex-0.0.8-pyhd8ed1ab_0.conda
+    python: '>=3.9'
+  url: https://conda.anaconda.org/conda-forge/noarch/namex-0.0.8-pyhd8ed1ab_1.conda
   hash:
-    md5: b96883bd4ee5a6aef4636674783a6d57
-    sha256: 9ed4061868dfd2b97363ae3ee08f192b822d1f7f999c7c081deed43310b3e5af
+    md5: 6427624437ca3bcd8634f35dc74716fc
+    sha256: 6194f52e8ce2853174f3e3702e1d980718473277ed8b6a9f9e7148ceefbf35bf
   category: main
   optional: false
 - name: nbclient
@@ -17719,7 +17719,7 @@ package:
   category: main
   optional: false
 - name: flytekit
-  version: 1.14.0
+  version: 1.15.0a0
   manager: pip
   platform: linux-64
   dependencies:
@@ -17759,13 +17759,13 @@ package:
     statsd: '>=3.0.0'
     typing-extensions: '*'
     urllib3: '>=1.22'
-  url: https://files.pythonhosted.org/packages/ee/9d/5414cd0af03426439061d1678762227e9ece337bc3e0f29e6114934b102a/flytekit-1.14.0-py3-none-any.whl
+  url: https://files.pythonhosted.org/packages/4f/a9/4d49bd25e6c9e48ae41a7b70df5ef83fd6f8f536433a80725d02837c1eb4/flytekit-1.15.0a0-py3-none-any.whl
   hash:
-    sha256: 84d94506df497af8bf2aa2012a2175b9bb59b3468000ecf36c527386507cee7c
+    sha256: 7ef7e147285834f3cdc4779d077b2bc9c781568db266f4ad6bb5b899424927e2
   category: main
   optional: false
 - name: flytekit
-  version: 1.14.0
+  version: 1.15.0a0
   manager: pip
   platform: osx-arm64
   dependencies:
@@ -17805,9 +17805,9 @@ package:
     statsd: '>=3.0.0'
     typing-extensions: '*'
     urllib3: '>=1.22'
-  url: https://files.pythonhosted.org/packages/ee/9d/5414cd0af03426439061d1678762227e9ece337bc3e0f29e6114934b102a/flytekit-1.14.0-py3-none-any.whl
+  url: https://files.pythonhosted.org/packages/4f/a9/4d49bd25e6c9e48ae41a7b70df5ef83fd6f8f536433a80725d02837c1eb4/flytekit-1.15.0a0-py3-none-any.whl
   hash:
-    sha256: 84d94506df497af8bf2aa2012a2175b9bb59b3468000ecf36c527386507cee7c
+    sha256: 7ef7e147285834f3cdc4779d077b2bc9c781568db266f4ad6bb5b899424927e2
   category: main
   optional: false
 - name: flytekitplugins-deck-standard
