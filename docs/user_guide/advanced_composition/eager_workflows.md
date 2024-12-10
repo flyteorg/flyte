@@ -7,7 +7,7 @@
 ```
 
 ```{important}
-This feature is experimental and the API is subject to breaking changes.
+This feature is in beta and the API is still subject to minor changes.
 If you encounter any issues please consider submitting a
 [bug report](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&projects=&template=bug_report.yaml&title=%5BBUG%5D+).
 ```
@@ -57,8 +57,7 @@ tasks, static subworkflows, and even other eager subworkflows in an _eager_
 fashion such that we can materialize their outputs and use them inside the
 parent eager workflow itself.
 
-In the `simple_eager_workflow` function, we can see that we're `await`ing
-the output of the `add_one` task and assigning it to the `out` variable. If
+In the `simple_eager_workflow` function, we can call the `add_one` task and assigning it to the `out` variable. If
 `out` is a negative integer, the workflow will return `-1`. Otherwise, it
 will double the output of `add_one` and return it.
 
@@ -67,12 +66,17 @@ the Python integer that is the result of `x + 1` and not a promise.
 
 ## How it works
 
-When you decorate a function with `@eager`, any function invoked within it
-that's decorated with `@task`, `@workflow`, or `@eager` becomes
-an [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables)
-object within the lifetime of the parent eager workflow execution. Note that
-this happens automatically and you don't need to use the `async` keyword when
-defining a task or workflow that you want to invoke within an eager workflow.
+### Parallels to Python `asyncio`
+The eager paradigm was written around Python's native `async` functionality. As such, it follows the same rules and
+constructs and if you're used to working with async functions, you should be able to apply the exact same understanding to work with eager tasks.
+
+In the example above, the tasks `add_one` and `double` are normal Flyte tasks and the functions being decorated are normal Python functions. This means that in the execution of the async task `simple_eager_workflow` will block on each of these functions just like Python would if these were simply just Python functions.
+
+If you want to run functions in parallel, you will need to use `async` marked tasks, just like you would in normal Python.
+
+Note that `eager` tasks share the same limitation as Python async functions.  You can only call an `async` function inside another `async` function, or within a special handler (like `asyncio.run`). This means that until the `@workflow` decorator supports async workflow function definitions, which is doesn't today, you will not be able to call eager tasks or other async Python function tasks, inside workflows. This functionality is slated to be added in future releases. For the time being, you will need to run the tasks directly, either from FlyteRemote or the Flyte UI.
+
+Unlike Python async however, when an `eager` task runs `async` sub-tasks in a real backend execution (not a local execution), it is doing real, wall-clock time parallelism, not just concurrency (assuming your K8s cluster is appropriately sized).
 
 ```{important}
 With eager workflows, you basically have access to the Python `asyncio`
@@ -85,10 +89,10 @@ We're leveraging Python's native `async` capabilities in order to:
 1. Materialize the output of flyte tasks and subworkflows so you can operate
    on them without spinning up another pod and also determine the shape of the
    workflow graph in an extremely flexible manner.
-2. Provide an alternative way of achieving concurrency in Flyte. Flyte has
+2. Provide an alternative way of achieving wall-time parallelism in Flyte. Flyte has
    concurrency built into it, so all tasks/subworkflows will execute concurrently
-   assuming that they don't have any dependencies on each other. However, eager
-   workflows provide a python-native way of doing this, with the main downside
+   assuming that they don't have any dependencies on each other. However, `eager`
+   tasks provide a Python-native way of doing this, with the main downside
    being that you lose the benefits of statically compiled workflows such as
    compile-time analysis and first-class data lineage tracking.
 ```
@@ -142,7 +146,7 @@ to check if `out` is negative, but we're also using the `gt_100` task in the
 
 ### Loops
 
-You can also gather the outputs of multiple tasks or subworkflows into a list:
+You can also gather the outputs of multiple tasks or subworkflows into a list. Keep in mind that in this case, you will need to use an `async` function task, since normal tasks will block.
 
 ```{literalinclude} /examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
