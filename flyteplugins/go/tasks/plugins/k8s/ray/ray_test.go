@@ -486,7 +486,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 		{
 			name:                       "task resources",
 			taskResources:              resourceRequirements,
-			expectedSubmitterResources: resourceRequirements,
+			expectedSubmitterResources: &submitterDefaultResourceRequirements,
 			expectedHeadResources:      resourceRequirements,
 			expectedWorkerResources:    resourceRequirements,
 		},
@@ -499,7 +499,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			workerK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, workerPodSpec),
 			},
-			expectedSubmitterResources: resourceRequirements,
+			expectedSubmitterResources: &submitterDefaultResourceRequirements,
 			expectedHeadResources:      expectedHeadResources,
 			expectedWorkerResources:    expectedWorkerResources,
 		},

@@ -14,6 +14,7 @@ import (
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,6 +51,19 @@ var logTemplateRegexes = struct {
 }{
 	tasklog.MustCreateRegex("rayClusterName"),
 	tasklog.MustCreateRegex("rayJobID"),
+}
+
+// Copy it from KubeRay to avoid adding a new dependency to go.mod.
+// https://github.com/ray-project/kuberay/blob/1ced2b968eabcfee4dcfa61391d307b60e46a2ed/ray-operator/controllers/ray/common/job.go#L122-L145
+var submitterDefaultResourceRequirements = v1.ResourceRequirements{
+	Limits: v1.ResourceList{
+		v1.ResourceCPU:    resource.MustParse("1"),
+		v1.ResourceMemory: resource.MustParse("1Gi"),
+	},
+	Requests: v1.ResourceList{
+		v1.ResourceCPU:    resource.MustParse("500m"),
+		v1.ResourceMemory: resource.MustParse("200Mi"),
+	},
 }
 
 type rayJobResourceHandler struct{}
@@ -218,8 +232,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
-	submitterPodSpec := taskPodSpec.DeepCopy()
-	submitterPodTemplate := buildSubmitterPodTemplate(submitterPodSpec, objectMeta, taskCtx)
+	submitterPodTemplate := buildSubmitterPodTemplate(&rayClusterSpec)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
@@ -388,18 +401,20 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	return podTemplateSpec, nil
 }
 
-func buildSubmitterPodTemplate(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
-	submitterPodSpec := podSpec.DeepCopy()
+func buildSubmitterPodTemplate(rayClusterSpec *rayv1.RayClusterSpec) v1.PodTemplateSpec {
 
-	podTemplateSpec := v1.PodTemplateSpec{
-		ObjectMeta: *objectMeta,
-		Spec:       *submitterPodSpec,
+	submitterPodSpec := rayClusterSpec.HeadGroupSpec.Template.DeepCopy()
+
+	submitterPodSpec.Spec.Containers = []v1.Container{
+		{
+			Name: "ray-job-submitter",
+			// Use the image of the Ray head to be defensive against version mismatch issues
+			Image:     rayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Image,
+			Resources: submitterDefaultResourceRequirements,
+		},
 	}
 
-	cfg := config.GetK8sPluginConfig()
-	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
-	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
-	return podTemplateSpec
+	return *submitterPodSpec
 }
 
 func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, spec *plugins.WorkerGroupSpec) (v1.PodTemplateSpec, error) {
