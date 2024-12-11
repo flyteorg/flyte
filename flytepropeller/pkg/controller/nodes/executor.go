@@ -1444,23 +1444,26 @@ func (c *nodeExecutor) replaceRemotePathsForMap(ctx context.Context, inputs *cor
 }
 
 func (c *nodeExecutor) replaceRemotePathsForLiteral(ctx context.Context, literal *core.Literal) {
-	initialURI := ""
+	initialURI, replacedURI := "", ""
 	switch v := literal.GetValue().(type) {
 	case *core.Literal_Scalar:
 		switch s := v.Scalar.GetValue().(type) {
 		case *core.Scalar_Blob:
 			initialURI = s.Blob.GetUri()
-			s.Blob.Uri = c.replaceRemotePrefix(ctx, initialURI)
+			replacedURI = c.replaceRemotePrefix(ctx, initialURI)
+			s.Blob.Uri = replacedURI
 		case *core.Scalar_Schema:
 			initialURI = s.Schema.GetUri()
-			s.Schema.Uri = c.replaceRemotePrefix(ctx, initialURI)
+			replacedURI = c.replaceRemotePrefix(ctx, initialURI)
+			s.Schema.Uri = replacedURI
 		case *core.Scalar_StructuredDataset:
 			initialURI = s.StructuredDataset.GetUri()
-			s.StructuredDataset.Uri = c.replaceRemotePrefix(ctx, initialURI)
+			replacedURI = c.replaceRemotePrefix(ctx, initialURI)
+			s.StructuredDataset.Uri = replacedURI
 		case *core.Scalar_Union:
 			c.replaceRemotePathsForLiteral(ctx, s.Union.GetValue())
 		}
-		if initialURI != "" {
+		if replacedURI != initialURI {
 			if literal.Metadata == nil {
 				literal.Metadata = map[string]string{}
 			}

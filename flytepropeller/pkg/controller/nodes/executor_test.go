@@ -2908,6 +2908,14 @@ func Test_replaceRemotePathsForMap(t *testing.T) {
 				},
 				Metadata: map[string]string{"foo": "bar"},
 			},
+			"different-s3-blob": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://wrong/blob1"}},
+					},
+				},
+				Metadata: map[string]string{"foo": "bar"},
+			},
 			"binary": {
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
@@ -3041,6 +3049,14 @@ func Test_replaceRemotePathsForMap(t *testing.T) {
 					"foo":         "bar",
 					"initial_uri": "s3://path/blob1",
 				},
+			},
+			"different-s3-blob": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://wrong/blob1"}},
+					},
+				},
+				Metadata: map[string]string{"foo": "bar"},
 			},
 			"binary": {
 				Value: &core.Literal_Scalar{
