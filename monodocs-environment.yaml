@@ -61,7 +61,7 @@ dependencies:
   - neptune                     # neptune
 
   - pip:
-    - flytekit>=1.15.0a0
+    - flytekit>=1.15.0a1
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
