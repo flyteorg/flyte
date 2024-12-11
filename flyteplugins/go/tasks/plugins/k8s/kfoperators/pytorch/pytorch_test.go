@@ -26,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -724,8 +725,14 @@ func TestGetLogsElastic(t *testing.T) {
 }
 
 func TestGetProperties(t *testing.T) {
+	config := k8sConfig.GetK8sPluginConfig()
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	expected := k8s.PluginProperties{
+
+	expected := k8s.PluginProperties{}
+	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
+
+	config.EnableDistributedErrorAggregation = true
+	expected = k8s.PluginProperties{
 		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
 	}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
@@ -861,6 +868,8 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			},
 		}
 
+		config := k8sConfig.GetK8sPluginConfig()
+		config.EnableDistributedErrorAggregation = true
 		pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
 		taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
