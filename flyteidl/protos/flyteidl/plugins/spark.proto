@@ -1,10 +1,11 @@
 syntax = "proto3";
 
 package flyteidl.plugins;
-import "google/protobuf/struct.proto";
-import "flyteidl/core/tasks.proto";
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
+
+import "google/protobuf/struct.proto";
+import "flyteidl/core/tasks.proto";
 
 message SparkApplication {
     enum Type {
