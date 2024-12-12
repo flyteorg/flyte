@@ -8387,6 +8387,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -8415,6 +8418,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -8469,6 +8475,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventNodeExecution. */
@@ -8497,6 +8506,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventNodeExecution instance using the specified properties.
@@ -8536,6 +8548,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent */
             rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -8549,6 +8564,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent. */
             public rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.

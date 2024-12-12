@@ -106,7 +106,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 	}
 
 	if cloudEventsConfig.CloudEventVersion == runtimeInterfaces.CloudEventVersionv2 {
-		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
+		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig, cloudEventsConfig.EventsPublisherConfig)
 	}
 
 	return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)

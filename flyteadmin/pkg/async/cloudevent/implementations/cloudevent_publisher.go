@@ -114,12 +114,13 @@ func (p *Publisher) shouldPublishEvent(notificationType string) bool {
 }
 
 type CloudEventWrappedPublisher struct {
-	db               repositoryInterfaces.Repository
-	sender           interfaces.Sender
-	systemMetrics    implementations.EventPublisherSystemMetrics
-	storageClient    *storage.DataStore
-	urlData          dataInterfaces.RemoteURLInterface
-	remoteDataConfig runtimeInterfaces.RemoteDataConfig
+	db                   repositoryInterfaces.Repository
+	sender               interfaces.Sender
+	systemMetrics        implementations.EventPublisherSystemMetrics
+	storageClient        *storage.DataStore
+	urlData              dataInterfaces.RemoteURLInterface
+	remoteDataConfig     runtimeInterfaces.RemoteDataConfig
+	eventPublisherConfig runtimeInterfaces.EventsPublisherConfig
 }
 
 func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context.Context, rawEvent *event.WorkflowExecutionEvent) (*event.CloudEventWorkflowExecution, error) {
@@ -133,8 +134,8 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		return nil, fmt.Errorf("nil execution id in event [%+v]", rawEvent)
 	}
 
-	// For now, don't append any additional information unless succeeded
-	if rawEvent.Phase != core.WorkflowExecution_SUCCEEDED {
+	// For now, don't append any additional information unless succeeded or otherwise configured
+	if rawEvent.Phase != core.WorkflowExecution_SUCCEEDED && !c.eventPublisherConfig.EnrichAllWorkflowEventTypes {
 		return &event.CloudEventWorkflowExecution{
 			RawEvent: rawEvent,
 		}, nil
@@ -161,7 +162,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
 	}
 
-	if ex.GetSpec().GetLaunchPlan().GetResourceType() == core.ResourceType_TASK {
+	if ex.GetSpec().GetLaunchPlan().GetResourceType() == core.ResourceType_TASK && !c.eventPublisherConfig.EnrichAllWorkflowEventTypes {
 		logger.Debugf(ctx, "skipping single task execution workflow event [%+v]", rawEvent.ExecutionId)
 		return &event.CloudEventWorkflowExecution{
 			RawEvent: rawEvent,
@@ -204,6 +205,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		ReferenceExecution: spec.GetMetadata().GetReferenceExecution(),
 		Principal:          spec.GetMetadata().Principal,
 		LaunchPlanId:       spec.LaunchPlan,
+		Labels:             spec.GetLabels().GetValues(),
 	}, nil
 }
 
@@ -321,6 +323,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 			ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
 			Principal:       spec.GetMetadata().Principal,
 			LaunchPlanId:    spec.LaunchPlan,
+			Labels:          spec.GetLabels().GetValues(),
 		}, nil
 
 	} else if rawEvent.GetIsParent() && rawEvent.GetTargetEntity() != nil &&
@@ -420,8 +423,27 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 		return nil, fmt.Errorf("nothing to publish, TaskExecution event is nil")
 	}
 
+	// This gets the parent workflow execution metadata
+	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     rawEvent.ParentNodeExecutionId.ExecutionId.Org,
+		Project: rawEvent.ParentNodeExecutionId.ExecutionId.Project,
+		Domain:  rawEvent.ParentNodeExecutionId.ExecutionId.Domain,
+		Name:    rawEvent.ParentNodeExecutionId.ExecutionId.Name,
+	})
+	if err != nil {
+		logger.Infof(ctx, "couldn't find execution [%+v] for cloud event processing", rawEvent.ParentNodeExecutionId.ExecutionId)
+		return nil, err
+	}
+
+	spec := &admin.ExecutionSpec{}
+	err = proto.Unmarshal(executionModel.Spec, spec)
+	if err != nil {
+		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
+	}
+
 	return &event.CloudEventTaskExecution{
 		RawEvent: rawEvent,
+		Labels:   spec.GetLabels().GetValues(),
 	}, nil
 }
 
@@ -566,14 +588,15 @@ func NewCloudEventsPublisher(sender interfaces.Sender, scope promutils.Scope, ev
 }
 
 func NewCloudEventsWrappedPublisher(
-	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
+	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig, eventPublisherConfig runtimeInterfaces.EventsPublisherConfig) interfaces.Publisher {
 
 	return &CloudEventWrappedPublisher{
-		db:               db,
-		sender:           sender,
-		systemMetrics:    implementations.NewEventPublisherSystemMetrics(scope.NewSubScope("cloudevents_publisher")),
-		storageClient:    storageClient,
-		urlData:          urlData,
-		remoteDataConfig: remoteDataConfig,
+		db:                   db,
+		sender:               sender,
+		systemMetrics:        implementations.NewEventPublisherSystemMetrics(scope.NewSubScope("cloudevents_publisher")),
+		storageClient:        storageClient,
+		urlData:              urlData,
+		remoteDataConfig:     remoteDataConfig,
+		eventPublisherConfig: eventPublisherConfig,
 	}
 }

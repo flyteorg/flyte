@@ -273,7 +273,8 @@ func TestCloudEventsPublisher_TransformWorkflow(t *testing.T) {
 
 	mockURLData := mocks.NewMockRemoteURL()
 	dummyDataConfig := interfaces.RemoteDataConfig{}
-	cloudEventPublisher := NewCloudEventsWrappedPublisher(nil, mockPubSubSender, testScope, nil, mockURLData, dummyDataConfig)
+	dummyEventPublisherConfig := interfaces.EventsPublisherConfig{}
+	cloudEventPublisher := NewCloudEventsWrappedPublisher(nil, mockPubSubSender, testScope, nil, mockURLData, dummyDataConfig, dummyEventPublisherConfig)
 
 	t.Run("single task should skip", func(t *testing.T) {
 		mockExecutionRepo := repoMocks.NewMockExecutionRepo()
