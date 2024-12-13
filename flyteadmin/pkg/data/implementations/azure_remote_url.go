@@ -19,7 +19,7 @@ type AzureRemoteURL struct {
 func (n *AzureRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	metadata, err := n.remoteDataStoreClient.Head(ctx, storage.DataReference(uri))
 	if err != nil {
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return *admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to get metadata for uri: %s with err: %v", uri, err)
 	}
 
@@ -28,11 +28,11 @@ func (n *AzureRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, e
 		ExpiresIn: n.presignDuration,
 	})
 	if err != nil {
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return *admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to get metadata for uri: %s with err: %v", uri, err)
 	}
 
-	return admin.UrlBlob{
+	return *admin.UrlBlob{
 		Url:   signedUri.URL.String(),
 		Bytes: metadata.Size(),
 	}, nil
