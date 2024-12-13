@@ -25,6 +25,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+const (
+	// value is 3 days of seconds which is covered by 18 bits (262144)
+	MAX_DELTA_TIMESTAMP = 259200
+)
+
 var (
 	nilLiteral = &idlcore.Literal{
 		Value: &idlcore.Literal_Scalar{

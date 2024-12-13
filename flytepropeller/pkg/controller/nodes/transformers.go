@@ -314,6 +314,7 @@ func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.N
 		t.SetSubNodeTaskPhases(na.SubNodeTaskPhases)
 		t.SetSubNodeRetryAttempts(na.SubNodeRetryAttempts)
 		t.SetSubNodeSystemFailures(na.SubNodeSystemFailures)
+		t.SetSubNodeDeltaTimestamps(na.SubNodeDeltaTimestamps)
 		t.SetTaskPhaseVersion(na.TaskPhaseVersion)
 	}
 }

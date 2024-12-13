@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -153,6 +156,7 @@ func (m *minStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailur
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
 	} {
 		var err error
 		*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
@@ -173,6 +177,20 @@ func (m *minStateStore) persistArraySubNodeState(ctx context.Context, nCtx inter
 	}
 	m.arrayNodeStateCopy.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 	m.arrayNodeStateCopy.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+
+	if m.arrayNodeStateCopy.SubNodeDeltaTimestamps.BitSet != nil {
+		startedAt := nCtx.NodeStatus().GetLastAttemptStartedAt()
+		subNodeStartedAt := subNodeStatus.GetLastAttemptStartedAt()
+		if subNodeStartedAt == nil {
+			// subNodeStartedAt == nil indicates either (1) node has not started or (2) node status has
+			// been reset (ex. retryable failure). in both cases we set the delta timestamp to 0
+			m.arrayNodeStateCopy.SubNodeDeltaTimestamps.SetItem(index, 0)
+		} else if startedAt != nil && m.arrayNodeStateCopy.SubNodeDeltaTimestamps.GetItem(index) == 0 {
+			// otherwise if `SubNodeDeltaTimestamps` is unset, we compute the delta and set it
+			deltaDuration := uint64(subNodeStartedAt.Time.Sub(startedAt.Time).Seconds())
+			m.arrayNodeStateCopy.SubNodeDeltaTimestamps.SetItem(index, deltaDuration)
+		}
+	}
 }
 
 // buildArrayNodeContext creates a custom environment to execute the ArrayNode subnode. This is uniquely required for
@@ -225,6 +243,14 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
+	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
+	var startedAt *metav1.Time
+	if nCtx.NodeStatus().GetLastAttemptStartedAt() != nil && m.arrayNodeStateCopy.SubNodeDeltaTimestamps.BitSet != nil {
+		if deltaSeconds := m.arrayNodeStateCopy.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
+			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
+		}
+	}
+
 	subNodeStatus := &v1alpha1.NodeStatus{
 		Phase:          nodePhase,
 		DataDir:        subDataDir,
@@ -235,6 +261,7 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 			Phase:       taskPhase,
 			PluginState: pluginStateBytes,
 		},
+		LastAttemptStartedAt: startedAt,
 	}
 
 	// initialize mocks

@@ -181,6 +181,10 @@ func (n nodeStateManager) GetArrayNodeState() handler.ArrayNodeState {
 		if subNodeSystemFailuresCopy := subNodeSystemFailures.DeepCopy(); subNodeSystemFailuresCopy != nil {
 			as.SubNodeSystemFailures = *subNodeSystemFailuresCopy
 		}
+		subNodeDeltaTimestamps := an.GetSubNodeDeltaTimestamps()
+		if subNodeDeltaTimestampsCopy := subNodeDeltaTimestamps.DeepCopy(); subNodeDeltaTimestampsCopy != nil {
+			as.SubNodeDeltaTimestamps = *subNodeDeltaTimestampsCopy
+		}
 	}
 	return as
 }
