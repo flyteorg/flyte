@@ -1,7 +1,8 @@
+import os
+
 from flytekit import workflow
 
 from union.actor import ActorEnvironment
-import os
 
 actor = ActorEnvironment(
     name="simple-actor",

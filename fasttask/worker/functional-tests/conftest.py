@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
-from flytekit.remote import FlyteRemote
-from flytekit.configuration import Config
 
 import pytest
+from flytekit.configuration import Config
+from flytekit.remote import FlyteRemote
 
 
 @pytest.fixture(scope="session")

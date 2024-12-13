@@ -1,8 +1,6 @@
-from flytekit import workflow
-
-
-from env import resolve_environment_config
 import okta_tasks
+from env import resolve_environment_config
+from flytekit import workflow
 
 
 @workflow

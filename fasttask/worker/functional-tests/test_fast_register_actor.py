@@ -1,18 +1,16 @@
-from typing import Optional
-from pathlib import Path
-import re
 import os
-from string import ascii_lowercase
-from random import choice
-
+import re
 from datetime import timedelta
 from functools import partial
+from pathlib import Path
+from random import choice
+from string import Template, ascii_lowercase
 from subprocess import run
-from string import Template
 from textwrap import dedent
+from typing import Optional
+
 from flytekit import WorkflowExecutionPhase
 from flytekit.remote import FlyteRemote
-
 
 _run = partial(run, capture_output=True, text=True)
 
@@ -113,9 +111,7 @@ def test_fast_register_actor(config_path, union_image, remote, tmp_path):
             RANDOM_NAME=random_name,
         )
         task_file.write_text(task_code)
-        _run_and_check(
-            config_path, workflows_dir, remote, phase, idx, task_code, expected_output
-        )
+        _run_and_check(config_path, workflows_dir, remote, phase, idx, task_code, expected_output)
 
 
 def _run_and_check(

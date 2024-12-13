@@ -1,10 +1,8 @@
 import os
+from dataclasses import dataclass
 from enum import Enum
 
-
 from union.actor import ActorEnvironment
-
-from dataclasses import dataclass
 
 
 class ServerlessEnvironmentType(str, Enum):

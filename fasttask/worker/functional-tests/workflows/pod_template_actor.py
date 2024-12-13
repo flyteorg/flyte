@@ -1,9 +1,11 @@
 import os
+
 from flytekit import PodTemplate
 from kubernetes.client.models import (
-    V1PodSpec,
     V1Container,
+    V1PodSpec,
 )
+
 from union.actor import ActorEnvironment
 
 pod_template = PodTemplate(
