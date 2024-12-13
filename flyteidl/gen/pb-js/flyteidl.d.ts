@@ -5157,6 +5157,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
+
+            /** TaskNodeOverrides podTemplate */
+            podTemplate?: (flyteidl.core.IK8sPod|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5176,6 +5179,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
+
+            /** TaskNodeOverrides podTemplate. */
+            public podTemplate?: (flyteidl.core.IK8sPod|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
