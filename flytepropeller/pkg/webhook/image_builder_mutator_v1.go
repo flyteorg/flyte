@@ -99,9 +99,18 @@ func (i *ImageBuilderMutatorV1) Mutate(ctx context.Context, pod *corev1.Pod) (ne
 		return nil, false, &admissionResponse
 	}
 	pod.Spec.Containers = *newContainers
+
+	newInitContainers, initContainersChanged, err := i.replaceHostnames(ctx, pod.Name, pod.Namespace, pod.Spec.InitContainers, hr)
+	if err != nil { // Failed to replace or validate
+		logger.Warnf(ctx, "Failed to replace init container image names for pod [%v/%v] due to error: %w", pod.Namespace, pod.Name, err)
+		i.metrics.Failures.Inc()
+		admissionResponse := admission.Errored(http.StatusForbidden, err)
+		return nil, false, &admissionResponse
+	}
+	pod.Spec.InitContainers = *newInitContainers
 	logger.Debugf(ctx, "Finished replacing hostname [%v] with [%v] for relevant Pod [%v/%v] containers",
 		hr.Existing, hr.Replacement, pod.Namespace, pod.Name)
-	return pod, changed, nil
+	return pod, changed || initContainersChanged, nil
 }
 
 func (i *ImageBuilderMutatorV1) LabelSelector() *metav1.LabelSelector {
