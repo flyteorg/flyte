@@ -6,6 +6,7 @@ import (
 	"github.com/go-test/deep"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -245,6 +246,99 @@ func TestStripTypeMetadata(t *testing.T) {
 							},
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "cache-key-metadata set",
+			args: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"cache-key-metadata": {
+								Kind: &_struct.Value_StructValue{
+									StructValue: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
+											"foo": {
+												Kind: &_struct.Value_StringValue{
+													StringValue: "bar",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Metadata: &_struct.Struct{
+					Fields: map[string]*_struct.Value{
+						"foo": {
+							Kind: &_struct.Value_StringValue{
+								StringValue: "bar",
+							},
+						},
+					},
+				},
+			},
+			want: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"cache-key-metadata": {
+								Kind: &_struct.Value_StructValue{
+									StructValue: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
+											"foo": {
+												Kind: &_struct.Value_StringValue{
+													StringValue: "bar",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "cache-key-metadata not present in annotation",
+			args: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"some-key": {
+								Kind: &_struct.Value_StringValue{
+									StringValue: "some-value",
+								},
+							},
+						},
+					},
+				},
+				Metadata: &_struct.Struct{
+					Fields: map[string]*_struct.Value{
+						"foo": {
+							Kind: &_struct.Value_StringValue{
+								StringValue: "bar",
+							},
+						},
+					},
+				},
+			},
+			want: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
 				},
 			},
 		},
