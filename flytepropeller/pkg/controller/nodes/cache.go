@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -77,6 +78,8 @@ func updatePhaseCacheInfo(phaseInfo handler.PhaseInfo, cacheStatus *catalog.Stat
 // CheckCatalogCache uses the handler and contexts to check if cached outputs for the current node
 // exist. If the exist, this function also copies the outputs to this node.
 func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Entry, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/CheckCatalogCache")
+	defer span.End()
 	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
 	if err != nil {
 		return catalog.Entry{}, errors.Wrapf(err, "failed to initialize the catalogKey")
@@ -102,12 +105,12 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 		return entry, nil
 	}
 
-	logger.Infof(ctx, "Catalog CacheHit: for task [%s/%s/%s/%s]", catalogKey.Identifier.Project,
-		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
+	logger.Infof(ctx, "Catalog CacheHit: for task [%s/%s/%s/%s]", catalogKey.Identifier.GetProject(),
+		catalogKey.Identifier.GetDomain(), catalogKey.Identifier.GetName(), catalogKey.Identifier.GetVersion())
 	n.metrics.catalogHitCount.Inc(ctx)
 
 	iface := catalogKey.TypedInterface
-	if iface.Outputs != nil && len(iface.Outputs.Variables) > 0 {
+	if iface.GetOutputs() != nil && len(iface.GetOutputs().GetVariables()) > 0 {
 		// copy cached outputs to node outputs
 		o, ee, err := entry.GetOutputs().Read(ctx)
 		if err != nil {
@@ -154,15 +157,15 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 	}
 
 	var status core.CatalogReservation_Status
-	if reservation.OwnerId == ownerID {
+	if reservation.GetOwnerId() == ownerID {
 		status = core.CatalogReservation_RESERVATION_ACQUIRED
 	} else {
 		status = core.CatalogReservation_RESERVATION_EXISTS
 	}
 
 	n.metrics.reservationGetSuccessCount.Inc(ctx)
-	return catalog.NewReservationEntry(reservation.ExpiresAt.AsTime(),
-		reservation.HeartbeatInterval.AsDuration(), reservation.OwnerId, status), nil
+	return catalog.NewReservationEntry(reservation.GetExpiresAt().AsTime(),
+		reservation.GetHeartbeatInterval().AsDuration(), reservation.GetOwnerId(), status), nil
 }
 
 // ReleaseCatalogReservation attempts to release an artifact reservation if the task is cacheable
@@ -197,21 +200,23 @@ func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx inter
 // WriteCatalogCache relays the outputs of this node to the cache. This allows future executions
 // to reuse these data to avoid recomputation.
 func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Status, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/WriteCatalogCache")
+	defer span.End()
 	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
 	if err != nil {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the catalogKey")
 	}
 
 	iface := catalogKey.TypedInterface
-	if iface.Outputs != nil && len(iface.Outputs.Variables) == 0 {
+	if iface.GetOutputs() != nil && len(iface.GetOutputs().GetVariables()) == 0 {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), nil
 	}
 
-	logger.Infof(ctx, "Catalog CacheEnabled. recording execution [%s/%s/%s/%s]", catalogKey.Identifier.Project,
-		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
+	logger.Infof(ctx, "Catalog CacheEnabled. recording execution [%s/%s/%s/%s]", catalogKey.Identifier.GetProject(),
+		catalogKey.Identifier.GetDomain(), catalogKey.Identifier.GetName(), catalogKey.Identifier.GetVersion())
 
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 	metadata := catalog.Metadata{
 		TaskExecutionIdentifier: task.GetTaskExecutionIdentifier(nCtx),
 	}

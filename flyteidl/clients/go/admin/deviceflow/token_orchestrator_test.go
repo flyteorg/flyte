@@ -10,22 +10,20 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/json"
-
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
+	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestFetchFromAuthFlow(t *testing.T) {
 	ctx := context.Background()
 	t.Run("fetch from auth flow", func(t *testing.T) {
-		tokenCache := &cache.TokenCacheInMemoryProvider{}
+		tokenCache := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{
@@ -87,6 +85,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 					Token: oauth2.Token{
 						AccessToken: "access_token",
 					},
+					ExpiresIn: 300,
 				}
 				darBytes, err := json.Marshal(dar)
 				assert.Nil(t, err)
@@ -98,7 +97,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		}))
 		defer fakeServer.Close()
 
-		tokenCache := &cache.TokenCacheInMemoryProvider{}
+		tokenCache := cache.NewTokenCacheInMemoryProvider()
 		orchestrator, err := NewDeviceFlowTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{
@@ -121,5 +120,6 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, authToken)
 		assert.Equal(t, "access_token", authToken.AccessToken)
+		assert.True(t, authToken.Expiry.After(time.Now().Add(time.Second*200)))
 	})
 }

@@ -17,14 +17,14 @@ func ValidateInterface(nodeID c.NodeID, iface *core.TypedInterface, errs errors.
 	}
 
 	// validate InputsRef/OutputsRef parameters required attributes are set
-	if iface.Inputs != nil && iface.Inputs.Variables != nil {
-		validateVariables(nodeID, iface.Inputs, errs.NewScope())
+	if iface.GetInputs() != nil && iface.Inputs.Variables != nil {
+		validateVariables(nodeID, iface.GetInputs(), errs.NewScope())
 	} else {
 		iface.Inputs = &core.VariableMap{Variables: map[string]*core.Variable{}}
 	}
 
-	if iface.Outputs != nil && iface.Outputs.Variables != nil {
-		validateVariables(nodeID, iface.Outputs, errs.NewScope())
+	if iface.GetOutputs() != nil && iface.Outputs.Variables != nil {
+		validateVariables(nodeID, iface.GetOutputs(), errs.NewScope())
 	} else {
 		iface.Outputs = &core.VariableMap{Variables: map[string]*core.Variable{}}
 	}
@@ -42,7 +42,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 	case *core.Node_TaskNode:
 		if node.GetTaskNode().GetReferenceId() == nil {
 			errs.Collect(errors.NewValueRequiredErr(node.GetId(), "TaskNode.ReferenceId"))
-		} else if task, taskOk := w.GetTask(*node.GetTaskNode().GetReferenceId()); taskOk {
+		} else if task, taskOk := w.GetTask(node.GetTaskNode().GetReferenceId()); taskOk {
 			iface = task.GetInterface()
 			if iface == nil {
 				// Default value for no interface is nil, initialize an empty interface
@@ -55,13 +55,13 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 			errs.Collect(errors.NewTaskReferenceNotFoundErr(node.GetId(), node.GetTaskNode().GetReferenceId().String()))
 		}
 	case *core.Node_WorkflowNode:
-		if node.GetWorkflowNode().GetLaunchplanRef().String() == w.GetCoreWorkflow().Template.Id.String() {
-			iface = w.GetCoreWorkflow().Template.Interface
+		if node.GetWorkflowNode().GetLaunchplanRef().String() == w.GetCoreWorkflow().GetTemplate().GetId().String() {
+			iface = w.GetCoreWorkflow().GetTemplate().GetInterface()
 			if iface == nil {
 				errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.Interface"))
 			}
 		} else if node.GetWorkflowNode().GetLaunchplanRef() != nil {
-			if launchPlan, launchPlanOk := w.GetLaunchPlan(*node.GetWorkflowNode().GetLaunchplanRef()); launchPlanOk {
+			if launchPlan, launchPlanOk := w.GetLaunchPlan(node.GetWorkflowNode().GetLaunchplanRef()); launchPlanOk {
 				inputs := launchPlan.GetExpectedInputs()
 				if inputs == nil {
 					errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.ExpectedInputs"))
@@ -75,11 +75,11 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 				// Compute exposed inputs as the union of all required inputs and any input overwritten by the node.
 				exposedInputs := map[string]*core.Variable{}
 				if inputs != nil && inputs.Parameters != nil {
-					for name, p := range inputs.Parameters {
+					for name, p := range inputs.GetParameters() {
 						if p.GetRequired() {
-							exposedInputs[name] = p.Var
+							exposedInputs[name] = p.GetVar()
 						} else if containsBindingByVariableName(node.GetInputs(), name) {
-							exposedInputs[name] = p.Var
+							exposedInputs[name] = p.GetVar()
 						}
 						// else, the param has a default value and is not being overwritten by the node
 					}
@@ -97,11 +97,11 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 					fmt.Sprintf("%v", node.GetWorkflowNode().GetLaunchplanRef())))
 			}
 		} else if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-			if wf, wfOk := w.GetSubWorkflow(*node.GetWorkflowNode().GetSubWorkflowRef()); wfOk {
-				if wf.Template == nil {
+			if wf, wfOk := w.GetSubWorkflow(node.GetWorkflowNode().GetSubWorkflowRef()); wfOk {
+				if wf.GetTemplate() == nil {
 					errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.Template"))
 				} else {
-					iface = wf.Template.Interface
+					iface = wf.GetTemplate().GetInterface()
 					if iface == nil {
 						errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.Template.Interface"))
 					}
@@ -155,7 +155,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 		}
 	case *core.Node_ArrayNode:
 		arrayNode := node.GetArrayNode()
-		underlyingNodeBuilder := w.GetOrCreateNodeBuilder(arrayNode.Node)
+		underlyingNodeBuilder := w.GetOrCreateNodeBuilder(arrayNode.GetNode())
 		if underlyingIface, ok := ValidateUnderlyingInterface(w, underlyingNodeBuilder, errs.NewScope()); ok {
 			// ArrayNode interface should be inferred from the underlying node interface. flytekit
 			// will correct wrap variables in collections as needed, leaving partials as is.

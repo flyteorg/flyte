@@ -94,7 +94,6 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		nCtx.OnInputReader().Return(ir)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
 		nCtx.OnDataStore().Return(dataStore)
@@ -500,6 +499,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			int64(1501),
 			storage.Options{},
 			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
+		composedPBStore.OnWriteProtobufMatch(
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			storage.DataReference("s3://my-s3-bucket/foo/bar/dynamic_compiled.pb"),
+			storage.Options{},
+			mock.MatchedBy(func(pb *core.CompiledWorkflowClosure) bool { return true })).Return(nil)
 
 		referenceConstructor := storageMocks.ReferenceConstructor{}
 		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures.pb").Return(
@@ -528,7 +532,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 		mockLPLauncher := &mocks5.Reader{}
 		mockLPLauncher.OnGetLaunchPlanMatch(mock.Anything, mock.MatchedBy(func(id *core.Identifier) bool {
-			return lpID.Name == id.Name && lpID.Domain == id.Domain && lpID.Project == id.Project && lpID.ResourceType == id.ResourceType
+			return lpID.GetName() == id.GetName() && lpID.GetDomain() == id.GetDomain() && lpID.GetProject() == id.GetProject() && lpID.GetResourceType() == id.GetResourceType()
 		})).Return(&admin.LaunchPlan{
 			Id: lpID,
 			Closure: &admin.LaunchPlanClosure{
@@ -583,6 +587,10 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 }
 
 type existsMetadata struct{}
+
+func (e existsMetadata) ContentMD5() string {
+	return ""
+}
 
 func (e existsMetadata) Exists() bool {
 	return false

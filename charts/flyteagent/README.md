@@ -19,16 +19,21 @@ A Helm chart for Flyte agent
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
-| image.tag | string | `"1.10.2"` | Docker image tag |
+| image.repository | string | `"cr.flyte.org/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
+| image.tag | string | `"1.13.14"` | Docker image tag |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| podEnv | object | `{}` | Additional flyteagent pod container environment variables |
+| podLabels | object | `{}` | Labels for flyteagent pods |
+| podSecurityContext | object | `{}` | Security context for pod |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"agent-grpc"` |  |
 | priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
+| readinessProbe | object | `{"grpc":{"port":8000},"initialDelaySeconds":1,"periodSeconds":3}` | https://kubernetes.io/blog/2022/05/13/grpc-probes-now-in-beta/#trying-the-feature-out |
 | replicaCount | int | `1` | Replicas count for flyteagent deployment |
-| resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"200Mi"},"requests":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"200Mi"}}` | Default resources requests and limits for flyteagent deployment |
+| resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"300Mi"},"requests":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"200Mi"}}` | Default resources requests and limits for flyteagent deployment |
+| securityContext | object | `{"allowPrivilegeEscalation":false}` | Security context for container |
 | service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
 | serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
 | serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |

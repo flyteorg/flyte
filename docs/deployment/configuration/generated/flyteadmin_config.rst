@@ -30,6 +30,8 @@ Flyte Admin Configuration
 
 - `notifications <#section-notifications>`_
 
+- `otel <#section-otel>`_
+
 - `plugins <#section-plugins>`_
 
 - `propeller <#section-propeller>`_
@@ -139,6 +141,18 @@ Max number of gRPC retries
 .. code-block:: yaml
 
   "4"
+  
+
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 authType (uint8)
@@ -657,6 +671,7 @@ Defines Auth options for users.
     domain: ""
     sameSitePolicy: DefaultMode
   httpProxyURL: ""
+  idpQueryParameter: ""
   openId:
     baseUrl: ""
     clientId: ""
@@ -1242,6 +1257,18 @@ settings used by cookies created for user auth
   sameSitePolicy: DefaultMode
   
 
+idpQueryParameter (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+idp query parameter used for selecting a particular IDP for doing user authentication. Eg: for Okta passing idp=<IDP-ID> forces the authentication to happen with IDP-ID
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 config.CookieSettings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1374,6 +1401,18 @@ kafka (`interfaces.KafkaConfig`_)
 .. code-block:: yaml
 
   brokers: null
+  saslConfig:
+    enabled: false
+    handshake: false
+    mechanism: ""
+    password: ""
+    passwordPath: ""
+    user: ""
+  tlsConfig:
+    certPath: ""
+    enabled: false
+    insecureSkipVerify: false
+    keyPath: ""
   version: ""
   
 
@@ -1406,6 +1445,16 @@ reconnectDelaySeconds (int)
 .. code-block:: yaml
 
   "0"
+  
+
+cloudEventVersion (uint8)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  v1
   
 
 interfaces.AWSConfig
@@ -1478,6 +1527,140 @@ brokers ([]string)
 .. code-block:: yaml
 
   null
+  
+
+saslConfig (`interfaces.SASLConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  handshake: false
+  mechanism: ""
+  password: ""
+  passwordPath: ""
+  user: ""
+  
+
+tlsConfig (`interfaces.TLSConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  certPath: ""
+  enabled: false
+  insecureSkipVerify: false
+  keyPath: ""
+  
+
+interfaces.SASLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+user (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+handshake (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+mechanism (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.TLSConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureSkipVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+certPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+keyPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: cluster_resources
@@ -1721,11 +1904,12 @@ postgres (`database.PostgresConfig`_)
 
   dbname: postgres
   debug: false
-  host: postgres
+  host: localhost
   options: sslmode=disable
-  password: ""
+  password: postgres
   passwordPath: ""
-  port: 5432
+  port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -1751,7 +1935,19 @@ The host name of the database server
 
 .. code-block:: yaml
 
-  postgres
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
   
 
 port (int)
@@ -1763,7 +1959,7 @@ The port name of the database server
 
 .. code-block:: yaml
 
-  "5432"
+  "30001"
   
 
 dbname (string)
@@ -1799,7 +1995,7 @@ The database password.
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 passwordPath (string)
@@ -2132,6 +2328,57 @@ envs (map[string]string)
   null
   
 
+featureGates (`interfaces.FeatureGates`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Enable experimental features.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enableArtifacts: false
+  
+
+consoleUrl (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A URL pointing to the flyteconsole instance used to hit this flyteadmin instance.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+useOffloadedInputs (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use offloaded inputs for workflows.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+interfaces.FeatureGates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enableArtifacts (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable artifacts feature.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: logger
 ========================================================================================================================
 
@@ -2307,6 +2554,11 @@ emailer (`interfaces.NotificationsEmailerConfig`_)
     apiKeyEnvVar: ""
     apiKeyFilePath: ""
     serviceName: ""
+    smtpPasswordSecretName: ""
+    smtpPort: ""
+    smtpServer: ""
+    smtpSkipTLSVerify: false
+    smtpUsername: ""
   sender: ""
   subject: ""
   
@@ -2344,6 +2596,11 @@ emailServerConfig (`interfaces.EmailServerConfig`_)
   apiKeyEnvVar: ""
   apiKeyFilePath: ""
   serviceName: ""
+  smtpPasswordSecretName: ""
+  smtpPort: ""
+  smtpServer: ""
+  smtpSkipTLSVerify: false
+  smtpUsername: ""
   
 
 subject (string)
@@ -2409,6 +2666,56 @@ apiKeyFilePath (string)
   ""
   
 
+smtpServer (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPort (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpSkipTLSVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+smtpUsername (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPasswordSecretName (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 interfaces.NotificationsProcessorConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2445,6 +2752,167 @@ topicName (string)
   ""
   
 
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otlpgrpc (`otelutils.OtlpGrpcConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP gRPC collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4317
+  
+
+otlphttp (`otelutils.OtlpHttpConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP HTTP collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4318/v1/traces
+  
+
+sampler (`otelutils.SamplerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for the sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  parentSampler: always
+  traceIdRatio: 0.01
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemetry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
+otelutils.OtlpGrpcConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4317
+  
+
+otelutils.OtlpHttpConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4318/v1/traces
+  
+
+otelutils.SamplerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+parentSampler (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Sets the parent sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  always
+  
+
+traceIdRatio (float64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.01"
+  
+
 Section: plugins
 ========================================================================================================================
 
@@ -2472,6 +2940,7 @@ k8s (`config.K8sPluginConfig`_)
 
 .. code-block:: yaml
 
+  add-tolerations-for-extended-resources: []
   co-pilot:
     cpu: 500m
     default-input-path: /var/flyte/inputs
@@ -2483,10 +2952,13 @@ k8s (`config.K8sPluginConfig`_)
     output-vol-name: flyte-outputs
     start-timeout: 1m40s
     storage: ""
+  create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   default-cpus: "1"
+  default-env-from-configmaps: null
+  default-env-from-secrets: null
   default-env-vars: null
   default-env-vars-from-env: null
   default-labels: null
@@ -2506,14 +2978,18 @@ k8s (`config.K8sPluginConfig`_)
   gpu-unpartitioned-node-selector-requirement: null
   gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
+  image-pull-policy: ""
   inject-finalizer: false
   interruptible-node-selector: null
   interruptible-node-selector-requirement: null
   interruptible-tolerations: null
   non-interruptible-node-selector-requirement: null
+  pod-pending-timeout: 0s
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
+  update-backoff-retries: 5
+  update-base-backoff-duration: 10
   
 
 catalog.Config
@@ -2632,6 +3108,26 @@ default-env-vars (map[string]string)
   
 
 default-env-vars-from-env (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-from-configmaps ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-from-secrets ([]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -2800,6 +3296,16 @@ create-container-error-grace-period (`config.Duration`_)
   3m0s
   
 
+create-container-config-error-grace-period (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
+  
+
 image-pull-backoff-grace-period (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2808,6 +3314,26 @@ image-pull-backoff-grace-period (`config.Duration`_)
 .. code-block:: yaml
 
   3m0s
+  
+
+image-pull-policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+pod-pending-timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 gpu-device-node-label (string)
@@ -2934,6 +3460,42 @@ If true, will send k8s object events in TaskExecutionEvent updates.
 .. code-block:: yaml
 
   "false"
+  
+
+update-base-backoff-duration (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Initial delay in exponential backoff when updating a resource in milliseconds.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+update-backoff-retries (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Number of retries for exponential backoff when updating a resource.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+add-tolerations-for-extended-resources ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the extended resources for which tolerations should be added.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
   
 
 config.FlyteCoPilotConfig
@@ -3379,13 +3941,13 @@ Enable events publishing to K8s events API.
 max-output-size-bytes (int64)
 ------------------------------------------------------------------------------------------------------------------------
 
-Maximum size of outputs per task
+Deprecated! Use storage.limits.maxDownloadMBs instead
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "10485760"
+  "-1"
   
 
 enable-grpc-latency-metrics (bool)
@@ -3428,6 +3990,7 @@ config for a workflow node
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
   default-max-attempts: 1
+  enable-cr-debug-metadata: false
   ignore-retry-cause: false
   interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
@@ -3554,8 +4117,53 @@ Enable creation of the FlyteWorkflow CRD on startup
   "false"
   
 
-array-node-event-version (int)
+node-execution-worker-count (int)
 ------------------------------------------------------------------------------------------------------------------------
+
+Number of workers to evaluate node executions, currently only used for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "8"
+  
+
+array-node-config (`config.ArrayNodeConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-parallelism-behavior: unlimited
+  event-version: 0
+  use-map-plugin-logs: false
+  
+
+literal-offloading-config (`config.LiteralOffloadingConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+config used for literal offloading.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Enabled: false
+  max-size-in-mb-for-offloading: 1000
+  min-size-in-mb-for-offloading: 10
+  supported-sdk-versions:
+    FLYTE_SDK: 1.13.14
+  
+
+config.ArrayNodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+event-version (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
 
@@ -3564,6 +4172,30 @@ ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => 
 .. code-block:: yaml
 
   "0"
+  
+
+default-parallelism-behavior (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default parallelism behavior for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
@@ -3725,6 +4357,16 @@ Whether output data should be sent by reference when it is too large to be sent 
   "false"
   
 
+ErrorOnAlreadyExists (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 config.KubeClientConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3849,6 +4491,55 @@ Name (string)
   ""
   
 
+config.LiteralOffloadingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+supported-sdk-versions (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_SDK: 1.13.14
+  
+
+min-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to trigger offloading
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+max-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to fail fast
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
 config.NodeConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3906,6 +4597,18 @@ ignore-retry-cause (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+enable-cr-debug-metadata (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd.
 
 **Default Value**: 
 
@@ -4508,6 +5211,7 @@ security (`config.ServerSecurityOptions`_)
   allowedOrigins:
   - '*'
   auditAccess: false
+  insecureCookieHeader: false
   secure: false
   ssl:
     certificateFile: ""
@@ -4522,7 +5226,7 @@ grpc (`config.GrpcConfig`_)
 
 .. code-block:: yaml
 
-  enableGrpcHistograms: false
+  enableGrpcLatencyMetrics: false
   maxMessageSizeBytes: 0
   port: 8089
   serverReflection: true
@@ -4723,10 +5427,10 @@ The max size in bytes for incoming gRPC messages
   "0"
   
 
-enableGrpcHistograms (bool)
+enableGrpcLatencyMetrics (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Enable grpc histograms
+Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.
 
 **Default Value**: 
 
@@ -4799,6 +5503,16 @@ ssl (`config.SslOptions`_)
   
 
 useAuth (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureCookieHeader (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -5182,7 +5896,6 @@ defaults (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "0"
   memory: 200Mi
-  storage: "0"
   
 
 limits (`interfaces.TaskResourceSet`_)
@@ -5196,7 +5909,6 @@ limits (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "1"
   memory: 1Gi
-  storage: "0"
   
 
 interfaces.TaskResourceSet
@@ -5230,16 +5942,6 @@ memory (`resource.Quantity`_)
 .. code-block:: yaml
 
   200Mi
-  
-
-storage (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
   
 
 ephemeralStorage (`resource.Quantity`_)

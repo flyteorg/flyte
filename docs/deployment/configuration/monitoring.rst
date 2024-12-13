@@ -5,7 +5,7 @@ Monitoring
 
 .. tags:: Infrastructure, Advanced
 
-.. tip:: The Flyte core team publishes and maintains Grafana dashboards built using Prometheus data sources, which can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`__.
+.. tip:: The Flyte core team publishes and maintains Grafana dashboards built using Prometheus data sources. You can import them to your Grafana instance from the `Grafana marketplace <https://grafana.com/orgs/flyteorg/dashboards>`__.
 
 Metrics for Executions
 ======================
@@ -85,15 +85,83 @@ Use Published Dashboards to Monitor Flyte Deployment
 
 Flyte Backend is written in Golang and exposes stats using Prometheus. The stats are labeled with workflow, task, project & domain, wherever appropriate.
 
-The dashboards are divided into two types:
+Both ``flyteadmin`` and ``flytepropeller`` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
 
-- **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
-  The user-facing dashboard is published under Grafana marketplace ID `13980 <https://grafana.com/grafana/dashboards/13980>`__.
+- **User-facing dashboard**: it can be used to investigate performance and characteristics of workflow and task executions. It's published under ID `22146 <https://grafana.com/grafana/dashboards/22146-flyte-user-dashboard-via-prometheus/>`__ in the Grafana marketplace.
 
-- **System Dashboards**: Dashboards that are useful for the system maintainer to maintain their Flyte deployments. These are further divided into:
-        - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`__
-        - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
+- **System Dashboards**: Dashboards that are useful for the system maintainer to investigate the status and performance of their Flyte deployments. These are further divided into:
+        - Data plane (``flytepropeller``) - `21719 <https://grafana.com/grafana/dashboards/21719-flyte-propeller-dashboard-via-prometheus/>`__: execution engine status and performance.
+        - Control plane (``flyteadmin``) - `21720 <https://grafana.com/grafana/dashboards/21720-flyteadmin-dashboard-via-prometheus/>`__: API-level monitoring.
 
-The above mentioned are basic dashboards and do no include all the metrics exposed by Flyte.
-Please help us improve the dashboards by contributing to them 🙏.
-Refer to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.
+The corresponding JSON files for each dashboard are also located in the ``flyte`` repository at `deployment/stats/prometheus <https://github.com/flyteorg/flyte/tree/master/deployment/stats/prometheus>`__.
+
+.. note::
+
+    The dashboards are basic dashboards and do not include all the metrics exposed by Flyte.
+    Feel free to use the scripts provided `here <https://github.com/flyteorg/flyte/tree/master/stats>`__ to improve and -hopefully- contribute the improved dashboards.
+
+Setup instructions
+~~~~~~~~~~~~~~~~~~
+
+The dashboards rely on a working Prometheus deployment with access to your Kubernetes cluster and Flyte pods.
+Additionally, the user dashboard uses metrics that come from ``kube-state-metrics``. Both of these requirements can be fulfilled by installing the `kube-prometheus-stack <https://github.com/kubernetes/kube-state-metrics>`__.
+
+Once the prerequisites are in place, follow the instructions in this section to configure metrics scraping for the corresponding Helm chart:
+
+.. tabs::
+
+   .. group-tab:: flyte-core
+
+      Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
+
+      .. code-block:: yaml
+
+         flyteadmin:
+           serviceMonitor:
+           enabled: true
+           labels:
+             release: kube-prometheus-stack #This is particular to the kube-prometheus-stacl
+           selectorLabels:
+             - app.kubernetes.io/name: flyteadmin
+         flytepropeller:
+           serviceMonitor:
+             enabled: true
+             labels:
+               release: kube-prometheus-stack
+             selectorLabels:
+               - app.kubernetes.io/name: flytepropeller
+           service:
+             enabled: true
+
+      The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+
+   .. group-tab:: flyte-binary
+
+      Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
+
+      .. code-block:: yaml
+
+         configuration:
+           inline:
+             propeller:
+               prof-port: 10254
+               metrics-prefix: "flyte:"
+             scheduler:
+               profilerPort: 10254
+               metricsScope: "flyte:"
+             flyteadmin:
+               profilerPort: 10254
+         service:
+           extraPorts:
+           - name: http-metrics
+             protocol: TCP
+             port: 10254
+
+      The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+       
+.. note::
+
+   By default, the ``ServiceMonitor`` is configured with a ``scrapeTimeout`` of 30s and ``interval`` of 60s. You can customize these values if needed.
+
+With the above configuration completed, you should be able to import the dashboards in your Grafana instance.
+

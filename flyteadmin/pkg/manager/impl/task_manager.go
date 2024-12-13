@@ -6,12 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
@@ -38,53 +36,52 @@ type taskMetrics struct {
 }
 
 type TaskManager struct {
-	db               repoInterfaces.Repository
-	config           runtimeInterfaces.Configuration
-	compiler         workflowengine.Compiler
-	metrics          taskMetrics
-	resourceManager  interfaces.ResourceInterface
-	artifactRegistry *artifacts.ArtifactRegistry
+	db              repoInterfaces.Repository
+	config          runtimeInterfaces.Configuration
+	compiler        workflowengine.Compiler
+	metrics         taskMetrics
+	resourceManager interfaces.ResourceInterface
 }
 
 func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
-	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
-	return contextutils.WithTaskID(ctx, identifier.Name)
+	ctx = contextutils.WithProjectDomain(ctx, identifier.GetProject(), identifier.GetDomain())
+	return contextutils.WithTaskID(ctx, identifier.GetName())
 }
 
-func setDefaults(request admin.TaskCreateRequest) (admin.TaskCreateRequest, error) {
-	if request.Id == nil {
+func setDefaults(request *admin.TaskCreateRequest) (*admin.TaskCreateRequest, error) {
+	if request.GetId() == nil {
 		return request, errors.NewFlyteAdminError(codes.InvalidArgument,
 			"missing identifier for TaskCreateRequest")
 	}
 
-	request.Spec.Template.Id = request.Id
+	request.Spec.Template.Id = request.GetId()
 	return request, nil
 }
 
 func (t *TaskManager) CreateTask(
 	ctx context.Context,
-	request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
-	platformTaskResources := util.GetTaskResources(ctx, request.Id, t.resourceManager, t.config.TaskResourceConfiguration())
+	request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+	platformTaskResources := util.GetTaskResources(ctx, request.GetId(), t.resourceManager, t.config.TaskResourceConfiguration())
 	if err := validation.ValidateTask(ctx, request, t.db, platformTaskResources,
 		t.config.WhitelistConfiguration(), t.config.ApplicationConfiguration()); err != nil {
-		logger.Debugf(ctx, "Task [%+v] failed validation with err: %v", request.Id, err)
+		logger.Debugf(ctx, "Task [%+v] failed validation with err: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = getTaskContext(ctx, request.Id)
+	ctx = getTaskContext(ctx, request.GetId())
 	finalizedRequest, err := setDefaults(request)
 	if err != nil {
 		return nil, err
 	}
 	// Compile task and store the compiled version in the database.
-	compiledTask, err := t.compiler.CompileTask(finalizedRequest.Spec.Template)
+	compiledTask, err := t.compiler.CompileTask(finalizedRequest.GetSpec().GetTemplate())
 	if err != nil {
-		logger.Debugf(ctx, "Failed to compile task with id [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to compile task with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	createdAt, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"Failed to serialize CreatedAt: %v when creating task: %+v", err, request.Id)
+			"Failed to serialize CreatedAt: %v when creating task: %+v", err, request.GetId())
 	}
 	taskDigest, err := util.GetTaskDigest(ctx, compiledTask)
 	if err != nil {
@@ -92,16 +89,19 @@ func (t *TaskManager) CreateTask(
 		return nil, err
 	}
 	// See if a task exists and confirm whether it's an identical task or one that with a separate definition.
-	existingTask, err := util.GetTaskModel(ctx, t.db, request.Spec.Template.Id)
+	existingTaskModel, err := util.GetTaskModel(ctx, t.db, request.GetSpec().GetTemplate().GetId())
 	if err == nil {
-		if bytes.Equal(taskDigest, existingTask.Digest) {
-			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
-				"identical task already exists with id %s", request.Id)
+		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
+			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, request)
 		}
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"task with different structure already exists with id %v", request.Id)
+		existingTask, transformerErr := transformers.FromTaskModel(*existingTaskModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "failed to transform task from task model")
+			return nil, transformerErr
+		}
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, request, existingTask.GetClosure().GetCompiledTask(), compiledTask)
 	}
-	taskModel, err := transformers.CreateTaskModel(finalizedRequest, admin.TaskClosure{
+	taskModel, err := transformers.CreateTaskModel(finalizedRequest, &admin.TaskClosure{
 		CompiledTask: compiledTask,
 		CreatedAt:    createdAt,
 	}, taskDigest)
@@ -111,10 +111,10 @@ func (t *TaskManager) CreateTask(
 		return nil, err
 	}
 
-	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, *request.Id)
+	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.GetSpec().GetDescription(), request.GetId())
 	if err != nil {
 		logger.Errorf(ctx,
-			"Failed to transform description model [%+v] with err: %v", request.Spec.Description, err)
+			"Failed to transform description model [%+v] with err: %v", request.GetSpec().GetDescription(), err)
 		return nil, err
 	}
 	if descriptionModel != nil {
@@ -122,59 +122,47 @@ func (t *TaskManager) CreateTask(
 	}
 	err = t.db.TaskRepo().Create(ctx, taskModel, descriptionModel)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to create task model with id [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to create task model with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	t.metrics.ClosureSizeBytes.Observe(float64(len(taskModel.Closure)))
-	if finalizedRequest.Spec.Template.Metadata != nil {
+	if finalizedRequest.GetSpec().GetTemplate().GetMetadata() != nil {
 		contextWithRuntimeMeta := context.WithValue(
-			ctx, common.RuntimeTypeKey, finalizedRequest.Spec.Template.Metadata.Runtime.Type.String())
+			ctx, common.RuntimeTypeKey, finalizedRequest.GetSpec().GetTemplate().GetMetadata().GetRuntime().GetType().String())
 		contextWithRuntimeMeta = context.WithValue(
-			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
+			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.GetSpec().GetTemplate().GetMetadata().GetRuntime().GetVersion())
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
-	}
-	// TODO: Artifact feature gate, remove when ready
-	if t.artifactRegistry.GetClient() != nil {
-		tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
-		go func() {
-			ceCtx := context.TODO()
-			if finalizedRequest.Spec.Template.Interface == nil {
-				logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
-				return
-			}
-			t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
-		}()
 	}
 
 	return &admin.TaskCreateResponse{}, nil
 }
 
-func (t *TaskManager) GetTask(ctx context.Context, request admin.ObjectGetRequest) (*admin.Task, error) {
-	if err := validation.ValidateIdentifier(request.Id, common.Task); err != nil {
-		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
+func (t *TaskManager) GetTask(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Task, error) {
+	if err := validation.ValidateIdentifier(request.GetId(), common.Task); err != nil {
+		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.GetId(), err)
 	}
-	ctx = getTaskContext(ctx, request.Id)
-	task, err := util.GetTask(ctx, t.db, *request.Id)
+	ctx = getTaskContext(ctx, request.GetId())
+	task, err := util.GetTask(ctx, t.db, request.GetId())
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get task with id [%+v] with err %v", err, request.Id)
+		logger.Debugf(ctx, "Failed to get task with id [%+v] with err %v", err, request.GetId())
 		return nil, err
 	}
 	return task, nil
 }
 
-func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListRequest) (*admin.TaskList, error) {
+func (t *TaskManager) ListTasks(ctx context.Context, request *admin.ResourceListRequest) (*admin.TaskList, error) {
 	// Check required fields
 	if err := validation.ValidateResourceListRequest(request); err != nil {
 		logger.Debugf(ctx, "Invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	ctx = contextutils.WithTaskID(ctx, request.Id.Name)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetId().GetProject(), request.GetId().GetDomain())
+	ctx = contextutils.WithTaskID(ctx, request.GetId().GetName())
 	spec := util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
+		Project:        request.GetId().GetProject(),
+		Domain:         request.GetId().GetDomain(),
+		Name:           request.GetId().GetName(),
+		RequestFilters: request.GetFilters(),
 	}
 
 	filters, err := util.GetDbFilters(spec, common.Task)
@@ -182,26 +170,26 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.TaskColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListTasks", request.Token)
+			"invalid pagination token %s for ListTasks", request.GetToken())
 	}
 	// And finally, query the database
 	listTasksInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
 	}
 	output, err := t.db.TaskRepo().List(ctx, listTasksInput)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to list tasks with id [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to list tasks with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
 	taskList, err := transformers.FromTaskModels(output.Tasks)
@@ -212,7 +200,7 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	}
 
 	var token string
-	if len(taskList) == int(request.Limit) {
+	if len(taskList) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(taskList))
 	}
 	return &admin.TaskList{
@@ -223,33 +211,33 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 
 // This queries the unique tasks for the given query parameters.  At least the project and domain must be specified.
 // It will return all tasks, but only the one of each even if there are multiple versions.
-func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	if err := validation.ValidateNamedEntityIdentifierListRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetProject(), request.GetDomain())
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project: request.Project,
-		Domain:  request.Domain,
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
 	}, common.Task)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.TaskColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListUniqueTaskIdentifiers", request.Token)
+			"invalid pagination token %s for ListUniqueTaskIdentifiers", request.GetToken())
 	}
 	listTasksInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -258,13 +246,13 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 	output, err := t.db.TaskRepo().ListTaskIdentifiers(ctx, listTasksInput)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list tasks ids with project: %s and domain: %s with err %v",
-			request.Project, request.Domain, err)
+			request.GetProject(), request.GetDomain(), err)
 		return nil, err
 	}
 
 	idList := transformers.FromTaskModelsToIdentifiers(output.Tasks)
 	var token string
-	if len(idList) == int(request.Limit) {
+	if len(idList) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(idList))
 	}
 	return &admin.NamedEntityIdentifierList{
@@ -276,8 +264,7 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
-	scope promutils.Scope,
-	artifactRegistry *artifacts.ArtifactRegistry) interfaces.TaskInterface {
+	scope promutils.Scope) interfaces.TaskInterface {
 
 	metrics := taskMetrics{
 		Scope:            scope,
@@ -286,11 +273,10 @@ func NewTaskManager(
 	}
 	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &TaskManager{
-		db:               db,
-		config:           config,
-		compiler:         compiler,
-		metrics:          metrics,
-		resourceManager:  resourceManager,
-		artifactRegistry: artifactRegistry,
+		db:              db,
+		config:          config,
+		compiler:        compiler,
+		metrics:         metrics,
+		resourceManager: resourceManager,
 	}
 }

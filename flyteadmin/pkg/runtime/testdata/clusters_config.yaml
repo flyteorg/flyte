@@ -13,3 +13,6 @@ clusters:
       type: "file_path"
       tokenPath: "/path/to/testcluster2/token"
       certPath: "/path/to/testcluster2/cert"
+  - name: "testcluster3"
+    enabled: true
+    inCluster: true

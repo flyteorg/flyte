@@ -52,12 +52,12 @@ func (a *AWSRemoteURL) splitURI(ctx context.Context, uri string) (AWSS3Object, e
 	}, nil
 }
 
-func (a *AWSRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+func (a *AWSRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	logger.Debugf(ctx, "Getting signed url for - %s", uri)
 	s3URI, err := a.splitURI(ctx, uri)
 	if err != nil {
 		logger.Debugf(ctx, "failed to extract s3 bucket and key from uri: %s", uri)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid uri: %s", uri)
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid uri: %s", uri)
 	}
 	// First, get the size of the url blob.
 	headResult, err := a.s3Client.HeadObject(&s3.HeadObjectInput{
@@ -66,7 +66,7 @@ func (a *AWSRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, erro
 	})
 	if err != nil {
 		logger.Debugf(ctx, "failed to get object size for %s with %v", uri, err)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(
 			codes.Internal, "failed to get object size for %s with %v", uri, err)
 	}
 
@@ -79,14 +79,14 @@ func (a *AWSRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, erro
 	if err != nil {
 		logger.Warning(ctx,
 			"failed to presign url for uri [%s] for %v with err %v", uri, a.presignDuration, err)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to presign url for uri [%s] for %v with err %v", uri, a.presignDuration, err)
 	}
 	var contentLength int64
 	if headResult.ContentLength != nil {
 		contentLength = *headResult.ContentLength
 	}
-	return admin.UrlBlob{
+	return &admin.UrlBlob{
 		Url:   urlStr,
 		Bytes: contentLength,
 	}, nil

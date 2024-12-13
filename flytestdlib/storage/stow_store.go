@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,9 +28,8 @@ import (
 	"github.com/flyteorg/stow/swift"
 )
 
-const (
-	FailureTypeLabel contextutils.Key = "failure_type"
-)
+const FailureTypeLabel contextutils.Key = "failure_type"
+const FlyteContentMD5 = "flyteContentMD5"
 
 var fQNFn = map[string]func(string) DataReference{
 	s3.Kind: func(bucket string) DataReference {
@@ -89,24 +89,33 @@ type stowMetrics struct {
 	BadReference labeled.Counter
 	BadContainer labeled.Counter
 
-	HeadFailure labeled.Counter
-	HeadLatency labeled.StopWatch
+	HeadFailure     labeled.Counter
+	HeadLatency     labeled.StopWatch
+	HeadLatencyHist labeled.HistogramStopWatch
 
-	ReadFailure     labeled.Counter
-	ReadOpenLatency labeled.StopWatch
+	ListFailure     labeled.Counter
+	ListLatency     labeled.StopWatch
+	ListLatencyHist labeled.HistogramStopWatch
 
-	WriteFailure labeled.Counter
-	WriteLatency labeled.StopWatch
+	ReadFailure         labeled.Counter
+	ReadOpenLatency     labeled.StopWatch
+	ReadOpenLatencyHist labeled.HistogramStopWatch
 
-	DeleteFailure labeled.Counter
-	DeleteLatency labeled.StopWatch
+	WriteFailure     labeled.Counter
+	WriteLatency     labeled.StopWatch
+	WriteLatencyHist labeled.HistogramStopWatch
+
+	DeleteFailure     labeled.Counter
+	DeleteLatency     labeled.StopWatch
+	DeleteLatencyHist labeled.HistogramStopWatch
 }
 
 // StowMetadata that will be returned
 type StowMetadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
 }
 
 func (s StowMetadata) Size() int64 {
@@ -119,6 +128,10 @@ func (s StowMetadata) Exists() bool {
 
 func (s StowMetadata) Etag() string {
 	return s.etag
+}
+
+func (s StowMetadata) ContentMD5() string {
+	return s.contentMD5
 }
 
 // Implements DataStore to talk to stow location store.
@@ -212,8 +225,12 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 		return nil, err
 	}
 
-	t := s.metrics.HeadLatency.Start(ctx)
+	t1 := s.metrics.HeadLatency.Start(ctx)
+	t2 := s.metrics.HeadLatencyHist.Start(ctx)
 	item, err := container.Item(k)
+	t1.Stop()
+	t2.Stop()
+
 	if err == nil {
 		if _, err = item.Metadata(); err != nil {
 			// Err will be caught below
@@ -221,12 +238,18 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			// Err will be caught below
 		} else if etag, err := item.ETag(); err != nil {
 			// Err will be caught below
+		} else if metadata, err := item.Metadata(); err != nil {
+			// Err will be caught below
 		} else {
-			t.Stop()
+			contentMD5, ok := metadata[strings.ToLower(FlyteContentMD5)].(string)
+			if !ok {
+				logger.Infof(ctx, "Failed to cast contentMD5 [%v] to string", contentMD5)
+			}
 			return StowMetadata{
-				exists: true,
-				size:   size,
-				etag:   etag,
+				exists:     true,
+				size:       size,
+				etag:       etag,
+				contentMD5: contentMD5,
 			}, nil
 		}
 	}
@@ -237,6 +260,49 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 
 	incFailureCounterForError(ctx, s.metrics.HeadFailure, err)
 	return StowMetadata{exists: false}, errs.Wrapf(err, "path:%v", k)
+}
+
+func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	_, containerName, key, err := reference.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return nil, NewCursorAtEnd(), err
+	}
+
+	container, err := s.getContainer(ctx, locationIDMain, containerName)
+	if err != nil {
+		return nil, NewCursorAtEnd(), err
+	}
+
+	t1 := s.metrics.ListLatency.Start(ctx)
+	t2 := s.metrics.ListLatencyHist.Start(ctx)
+	var stowCursor string
+	if cursor.cursorState == AtStartCursorState {
+		stowCursor = stow.CursorStart
+	} else if cursor.cursorState == AtEndCursorState {
+		return nil, NewCursorAtEnd(), fmt.Errorf("Cursor cannot be at end for the List call")
+	} else {
+		stowCursor = cursor.customPosition
+	}
+	items, stowCursor, err := container.Items(key, stowCursor, maxItems)
+	t1.Stop()
+	t2.Stop()
+
+	if err == nil {
+		results := make([]DataReference, len(items))
+		for index, item := range items {
+			results[index] = DataReference(item.URL().String())
+		}
+		if stow.IsCursorEnd(stowCursor) {
+			cursor = NewCursorAtEnd()
+		} else {
+			cursor = NewCursorFromCustomPosition(stowCursor)
+		}
+		return results, cursor, nil
+	}
+
+	incFailureCounterForError(ctx, s.metrics.ListFailure, err)
+	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", key)
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
@@ -251,13 +317,16 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		return nil, err
 	}
 
-	t := s.metrics.ReadOpenLatency.Start(ctx)
+	t1 := s.metrics.ReadOpenLatency.Start(ctx)
+	t2 := s.metrics.ReadOpenLatencyHist.Start(ctx)
 	item, err := container.Item(k)
+	t1.Stop()
+	t2.Stop()
+
 	if err != nil {
 		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
 		return nil, err
 	}
-	t.Stop()
 
 	sizeBytes, err := item.Size()
 	if err != nil {
@@ -266,7 +335,7 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 
 	if GetConfig().Limits.GetLimitMegabytes != 0 {
 		if sizeBytes > GetConfig().Limits.GetLimitMegabytes*MiB {
-			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %.6fmb > %vmb.", float64(sizeBytes)/float64(MiB), GetConfig().Limits.GetLimitMegabytes)
+			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %.6fmb > %vmb. You can increase the limit by setting maxDownloadMBs.", float64(sizeBytes)/float64(MiB), GetConfig().Limits.GetLimitMegabytes)
 		}
 	}
 
@@ -285,8 +354,12 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
-	t := s.metrics.WriteLatency.Start(ctx)
+	t1 := s.metrics.WriteLatency.Start(ctx)
+	t2 := s.metrics.WriteLatencyHist.Start(ctx)
 	_, err = container.Put(k, raw, size, opts.Metadata)
+	t1.Stop()
+	t2.Stop()
+
 	if err != nil {
 		// If this error is due to the bucket not existing, first attempt to create it and retry the getContainer call.
 		if IsNotFound(err) || awsBucketIsNotFound(err) {
@@ -300,8 +373,6 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 			return errs.Wrapf(err, "Failed to write data [%vb] to path [%v].", size, k)
 		}
 	}
-
-	t.Stop()
 
 	return nil
 }
@@ -319,8 +390,8 @@ func (s *StowStore) Delete(ctx context.Context, reference DataReference) error {
 		return err
 	}
 
-	t := s.metrics.DeleteLatency.Start(ctx)
-	defer t.Stop()
+	defer s.metrics.DeleteLatency.Start(ctx).Stop()
+	defer s.metrics.DeleteLatencyHist.Start(ctx).Stop()
 
 	if err := container.RemoveItem(k); err != nil {
 		incFailureCounterForError(ctx, s.metrics.DeleteFailure, err)
@@ -345,22 +416,24 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
-		ExpiresIn:  properties.ExpiresIn,
-		ContentMD5: properties.ContentMD5,
+	res, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
+		ExpiresIn:             properties.ExpiresIn,
+		ContentMD5:            properties.ContentMD5,
+		AddContentMD5Metadata: properties.AddContentMD5Metadata,
 	})
 
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
-	urlVal, err := url.Parse(urlStr)
+	urlVal, err := url.Parse(res.Url)
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
 	return SignedURLResponse{
-		URL: *urlVal,
+		URL:                    *urlVal,
+		RequiredRequestHeaders: res.RequiredRequestHeaders,
 	}, nil
 }
 
@@ -372,7 +445,8 @@ const (
 )
 
 func (l locationID) String() string {
-	return strconv.Itoa(int(l))
+	return strconv.Itoa(int(l)) // #nosec G115
+
 }
 
 func (s *StowStore) getLocation(id locationID) stow.Location {
@@ -417,17 +491,25 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 		BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", scope, labeled.EmitUnlabeledMetric),
 		BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", scope, labeled.EmitUnlabeledMetric),
 
-		HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
-		HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		HeadFailure:     labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
+		HeadLatency:     labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		HeadLatencyHist: labeled.NewHistogramStopWatch("head", "Indicates time to fetch metadata using the Head API", scope, labeled.EmitUnlabeledMetric),
 
-		ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ListFailure:     labeled.NewCounter("list_failure", "Indicates failure in item listing for a given reference", scope, labeled.EmitUnlabeledMetric),
+		ListLatency:     labeled.NewStopWatch("list", "Indicates time to fetch item listing using the List API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ListLatencyHist: labeled.NewHistogramStopWatch("list", "Indicates time to fetch item listing using the List API", scope, labeled.EmitUnlabeledMetric),
 
-		WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ReadFailure:         labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		ReadOpenLatency:     labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ReadOpenLatencyHist: labeled.NewHistogramStopWatch("read_open", "Indicates time to first byte when reading", scope, labeled.EmitUnlabeledMetric),
 
-		DeleteFailure: labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		DeleteLatency: labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		WriteFailure:     labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		WriteLatency:     labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		WriteLatencyHist: labeled.NewHistogramStopWatch("write", "Time to write an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
+
+		DeleteFailure:     labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		DeleteLatency:     labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		DeleteLatencyHist: labeled.NewHistogramStopWatch("delete", "Time to delete an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
 	}
 }
 

@@ -20,6 +20,7 @@ const (
 	Signal              = "s"
 	AdminTag            = "at"
 	ExecutionAdminTag   = "eat"
+	ExecutionTag        = "et"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters

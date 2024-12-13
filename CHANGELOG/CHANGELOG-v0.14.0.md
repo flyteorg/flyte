@@ -1,7 +1,7 @@
 # Flyte v0.14.0
 
 ## Platform
-- Update to the Flyte Compiler, to supported nested branches and more. Better
+- Update to the Flyte Compiler, to support nested branches and more. Better
   regression tests
 - support for iam roles and k8s serviceaccounts
 - customizable pod specs for pod tasks (add labels and annotations)
@@ -11,7 +11,7 @@
 - performance improvement for dynamic workflows
 
 ## Flyteconsole
- - Bug fixes 
+ - Bug fixes
  - More updates coming soon
 
 ## Flytekit
@@ -27,6 +27,6 @@
      - More use case driven examples in flytesnacks
 
 ## flytectl
- - flytectl is ready for BETA. check it out - https://docs.flyte.org/projects/flytectl/en/latest/
+ - flytectl is ready for BETA. check it out - https://docs.flyte.org/en/latest/flytectl/overview.html
 
 Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/tag/v0.18.0) for the full list and more details.

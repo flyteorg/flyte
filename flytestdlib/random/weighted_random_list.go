@@ -84,7 +84,7 @@ func NewWeightedRandom(ctx context.Context, entries []Entry) (WeightedRandomList
 			currentTotal += 1.0 / float32(numberOfEntries)
 		} else if e.Weight == 0 {
 			// Entries which have zero weight are ignored
-			logger.Debug(ctx, "ignoring entry due to empty weight %v", e)
+			logger.Debugf(ctx, "ignoring entry due to empty weight %v", e)
 			continue
 		}
 

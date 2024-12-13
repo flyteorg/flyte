@@ -33,10 +33,10 @@ you'll need to add the configuration settings under the `inline` section in the 
   - Migration guide to move to Admin's own authorization server.
 * - {ref}`Understanding Authentication <deployment-configuration-auth-appendix>`
   - Migration guide to move to Admin's own authorization server.
-* - {ref}`Configuring Custom K8s Resources <deployment-configuration-general>`
+* - {ref}`Configuring task pods with K8s PodTemplates <deployment-configuration-general>`
   - Use Flyte's cluster-resource-controller to control specific Kubernetes resources and administer project/domain-specific CPU/GPU/memory resource quotas.
-* - {ref}`Adding New Customizable Resources <deployment-configuration-customizable-resources>`
-  - Create new default configurations or overriding certain values for specific combinations of user projects, domains and workflows through Flyte APIs.
+* - {ref}`Customizing project, domain, and workflow resources with flytectl <deployment-configuration-customizable-resources>`
+  - Use the Flyte APIs to create new default configurations to override certain values for specific combinations of user projects, domains and workflows.
 * - {ref}`Notifications <deployment-configuration-notifications>`
   - Guide to setting up and configuring notifications.
 * - {ref}`External Events <deployment-configuration-cloud-event>`
@@ -47,6 +47,8 @@ you'll need to add the configuration settings under the `inline` section in the 
   - Improve the performance of the core Flyte engine.
 * - {ref}`Platform Events <deployment-configuration-eventing>`
   - Configure Flyte to to send events to external pub/sub systems.
+* - {ref}`Resource Manager <deployment-configuration-resource-manager>`
+  - Manage external resource pooling
 ```
 
 ```{toctree}
@@ -63,4 +65,5 @@ monitoring
 notifications
 performance
 cloud_event
+resource_manager
 ```

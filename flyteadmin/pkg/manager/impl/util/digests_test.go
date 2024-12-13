@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes/duration"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var testLaunchPlanDigest = []byte{
@@ -92,7 +92,7 @@ func getCompiledWorkflow() (*core.CompiledWorkflowClosure, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = jsonpb.UnmarshalString(string(workflowJSON), &compiledWorkflow)
+	err = utils.UnmarshalBytesToPb(workflowJSON, &compiledWorkflow)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func TestGetWorkflowDigest_Unequal(t *testing.T) {
 	workflowWithDifferentNodes, err := getCompiledWorkflow()
 	assert.Nil(t, err)
 	workflowWithDifferentNodes.Primary.Template.Nodes = append(
-		workflowWithDifferentNodes.Primary.Template.Nodes, &core.Node{
+		workflowWithDifferentNodes.GetPrimary().GetTemplate().GetNodes(), &core.Node{
 			Id: "unexpected",
 		})
 	workflowDigest, err := GetWorkflowDigest(context.Background(), workflowWithDifferentNodes)

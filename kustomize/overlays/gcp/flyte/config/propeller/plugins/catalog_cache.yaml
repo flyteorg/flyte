@@ -1,6 +1,0 @@
-plugins:
-  catalogCache:  
-    reader:
-      maxItems: 10000
-    writer:
-      maxItems: 10000

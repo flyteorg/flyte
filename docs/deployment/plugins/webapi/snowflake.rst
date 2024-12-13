@@ -154,7 +154,7 @@ Then, add the Snowflake JWT token to FlytePropeller.
 
       .. group-tab:: Helm chart
 
-        Create an external secret as follows:
+        Create a secret as follows (or add to it if it already exists from other plugins):
 
         .. code-block:: bash
 
@@ -162,7 +162,7 @@ Then, add the Snowflake JWT token to FlytePropeller.
           apiVersion: v1
           kind: Secret
           metadata:
-            name: flyte-binary-client-secrets-external-secret
+            name: flyte-binary-external-services
             namespace: flyte
           type: Opaque
           stringData:
@@ -170,16 +170,15 @@ Then, add the Snowflake JWT token to FlytePropeller.
           EOF
         
         Reference the newly created secret in 
-        ``.Values.configuration.auth.clientSecretsExternalSecretRef``
+        ``.Values.configuration.inlineSecretRef``
         in your YAML file as follows:
 
         .. code-block:: yaml
-          :emphasize-lines: 3
+          :emphasize-lines: 2
 
           configuration:
-            auth:
-              clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret 
-      
+            inlineSecretRef: flyte-binary-external-services
+
     Replace ``<JWT_TOKEN>`` with your JWT token.
 
   .. group-tab:: Flyte core
@@ -241,3 +240,5 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block::
 
   kubectl get pods -n flyte
+
+  For Snowflake plugin on the Flyte cluster, please refer to `Snowflake Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_plugin/snowflake.html>`_

@@ -4,7 +4,10 @@ userSettings:
   certificateArn: <CERTIFICATE_ARN>
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
-  bucketName: <BUCKET_NAME>
+# These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
+# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data 
+  bucketName: <METADATA_BUCKET_NAME> 
+  rawDataBucketName: <RAW_DATA_BUCKET_NAME>  
   logGroup: <LOG_GROUP_NAME>
   redisHostUrl: <REDIS_HOST_URL>
   redisHostKey: <REDIS_HOST_KEY>
@@ -99,7 +102,6 @@ flytepropeller:
       cpu: 1
       ephemeral-storage: 1Gi
       memory: 2Gi
-  cacheSizeMbs: 1024
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: "system-cluster-critical"
   affinity:
@@ -147,7 +149,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip 
+      alb.ingress.kubernetes.io/target-type: ip
       # -- This is the certificate arn of the cert imported in AWS certificate manager.
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -188,6 +190,8 @@ storage:
   bucketName: "{{ .Values.userSettings.bucketName }}"
   s3:
     region: "{{ .Values.userSettings.accountRegion }}"
+  cache:
+    maxSizeMBs: 1024
 
 db:
   datacatalog:
@@ -216,7 +220,8 @@ configmap:
   adminServer:
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         secure: false
         useAuth: false
@@ -238,7 +243,7 @@ configmap:
 
   core:
     propeller:
-      rawoutput-prefix: "s3://{{ .Values.userSettings.bucketName }}/"
+      rawoutput-prefix: "s3://{{ .Values.userSettings.rawDataBucketName }}/"
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
@@ -277,6 +282,8 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
+          - echo
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training

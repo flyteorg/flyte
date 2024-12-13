@@ -815,8 +815,36 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 		}
 		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
-		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, nil).Once()
+		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailing
+		}), mock.Anything).Return(nil, nil).Once()
+		err := p.Handle(ctx, namespace, name)
+		assert.NoError(t, err)
+	})
 
+	t.Run("too-large-terminal", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
+		wf := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+		}
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", nil)
+			return nil
+		}
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
+		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !HasFinalizer(w) && HasCompletedLabel(w)
+		}), mock.Anything).Return(nil, nil).Once()
 		err := p.Handle(ctx, namespace, name)
 		assert.NoError(t, err)
 	})

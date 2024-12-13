@@ -27,7 +27,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	//   1. A collection of literals or
 	//   2. A map of literals
 	if literal.GetCollection() != nil {
-		literals := literal.GetCollection().Literals
+		literals := literal.GetCollection().GetLiterals()
 		literalsHash := make([]*core.Literal, 0)
 		for _, lit := range literals {
 			literalsHash = append(literalsHash, hashify(lit))
@@ -42,7 +42,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	}
 	if literal.GetMap() != nil {
 		literalsMap := make(map[string]*core.Literal)
-		for key, lit := range literal.GetMap().Literals {
+		for key, lit := range literal.GetMap().GetLiterals() {
 			literalsMap[key] = hashify(lit)
 		}
 		return &core.Literal{
@@ -58,14 +58,14 @@ func hashify(literal *core.Literal) *core.Literal {
 }
 
 func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
-	if literalMap == nil || len(literalMap.Literals) == 0 {
+	if literalMap == nil || len(literalMap.GetLiterals()) == 0 {
 		literalMap = &emptyLiteralMap
 	}
 
 	// Hashify, i.e. generate a copy of the literal map where each literal value is removed
 	// in case the corresponding hash is set.
-	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.Literals))
-	for name, literal := range literalMap.Literals {
+	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.GetLiterals()))
+	for name, literal := range literalMap.GetLiterals() {
 		if !slices.Contains(cacheIgnoreInputVars, name) {
 			hashifiedLiteralMap[name] = hashify(literal)
 		}

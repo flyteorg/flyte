@@ -44,7 +44,6 @@ func TestLoadConfig(t *testing.T) {
 		}, k8sConfig.DefaultEnvVars)
 		assert.NotNil(t, k8sConfig.ResourceTolerations)
 		assert.Contains(t, k8sConfig.ResourceTolerations, v1.ResourceName("nvidia.com/gpu"))
-		assert.Contains(t, k8sConfig.ResourceTolerations, v1.ResourceStorage)
 		tolGPU := v1.Toleration{
 			Key:      "flyte/gpu",
 			Value:    "dedicated",
@@ -52,15 +51,7 @@ func TestLoadConfig(t *testing.T) {
 			Effect:   v1.TaintEffectNoSchedule,
 		}
 
-		tolStorage := v1.Toleration{
-			Key:      "storage",
-			Value:    "special",
-			Operator: v1.TolerationOpEqual,
-			Effect:   v1.TaintEffectPreferNoSchedule,
-		}
-
 		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations[v1.ResourceName("nvidia.com/gpu")])
-		assert.Equal(t, []v1.Toleration{tolStorage}, k8sConfig.ResourceTolerations[v1.ResourceStorage])
 		expectedCPU := resource.MustParse("1000m")
 		assert.True(t, expectedCPU.Equal(k8sConfig.DefaultCPURequest))
 		expectedMemory := resource.MustParse("1024Mi")

@@ -1,7 +1,0 @@
-database:
-  port: 5432
-  username: flyte
-  # TODO Change this to match aurora or rds postgres endpoint
-  host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
-  dbname: flytedatacatalog
-  passwordPath: /etc/db/pass.txt

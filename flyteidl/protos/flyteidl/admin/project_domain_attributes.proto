@@ -14,7 +14,10 @@ message ProjectDomainAttributes {
     // Unique domain id for which this set of attributes will be applied.
     string domain                  = 2;
 
-    MatchingAttributes matching_attributes = 3; 
+    MatchingAttributes matching_attributes = 3;
+
+    // Optional, org key applied to the attributes.
+    string org = 4;
 }
 
 // Sets custom attributes for a project-domain combination.
@@ -42,6 +45,9 @@ message ProjectDomainAttributesGetRequest {
     // Which type of matchable attributes to return.
     // +required
     MatchableResource resource_type = 3;
+
+    // Optional, org key applied to the attributes.
+    string org = 4;
 }
 
 // Response to get an individual project domain attribute override.
@@ -64,6 +70,9 @@ message ProjectDomainAttributesDeleteRequest {
     // Which type of matchable attributes to delete.
     // +required
     MatchableResource resource_type = 3;
+
+    // Optional, org key applied to the attributes.
+    string org = 4;
 }
 
 // Purposefully empty, may be populated in the future.

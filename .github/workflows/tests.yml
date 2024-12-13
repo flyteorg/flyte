@@ -1,24 +1,25 @@
 name: tests
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
   push:
     branches:
       - master
+      - 'release-v**'
   pull_request:
 jobs:
   compile:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: Compile
         run: make compile
       - name: Run tests
@@ -27,19 +28,38 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch the code
+      - name: Fetch flyte code
         uses: actions/checkout@v4
+        with:
+          path: flyte
+      - name: 'Clear action cache'
+        uses: ./flyte/.github/actions/clear-action-cache
+      - name: Fetch flytekit code
+        uses: actions/checkout@v4
+        with:
+          repository: flyteorg/flytekit
+          path: flytekit
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: 3.9
       - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
         run: |
           conda install -c conda-forge conda-lock
+          cat monodocs-environment.lock.yaml
           conda-lock install -n monodocs-env monodocs-environment.lock.yaml
       - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
         run: |
           conda activate monodocs-env
+          export SETUPTOOLS_SCM_PRETEND_VERSION="2.0.0"
+          pip install -e ./flyteidl
+      - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flytekit
+        run: |
+          conda activate monodocs-env
+          pip install -e .
           conda info
           conda list
           conda config --show-sources
@@ -48,27 +68,21 @@ jobs:
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v1
       - name: Build the documentation
+        working-directory: ${{ github.workspace }}/flyte
         shell: bash -el {0}
+        env:
+          # this is a fake key for algolia docsearch to make docs build process pass
+          DOCSEARCH_API_KEY: fake_docsearch_api_key
         run: |
           conda activate monodocs-env
           make docs
 
-  generate_kustomize:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: "1.21"
-      - name: Kustomize and diff
-        run: DELTA_CHECK=true make kustomize
-
   generate_helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: Helm and diff
         run: DELTA_CHECK=true make helm

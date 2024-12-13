@@ -1,3 +1,0 @@
-plugins:
-  qubole:
-    quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"

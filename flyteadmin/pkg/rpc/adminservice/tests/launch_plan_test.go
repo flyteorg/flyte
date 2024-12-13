@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestCreateLaunchPlanHappyCase(t *testing.T) {
@@ -18,7 +19,7 @@ func TestCreateLaunchPlanHappyCase(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 			return &admin.LaunchPlanCreateResponse{}, nil
 		},
 	)
@@ -45,8 +46,8 @@ func TestCreateLaunchPlanError(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.Id)
+			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -63,8 +64,8 @@ func TestCreateLaunchPlanError(t *testing.T) {
 		},
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type LAUNCH_PLAN with "+
-		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type LAUNCH_PLAN with "+
+		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\"", err.Error())
 }
 
 func TestGetActiveLaunchPlan(t *testing.T) {
@@ -73,7 +74,7 @@ func TestGetActiveLaunchPlan(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
+			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return &admin.LaunchPlan{}, nil
 		},
 	)
@@ -98,7 +99,7 @@ func TestGetActiveLaunchPlan_Error(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
+			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return nil, errors.GetInvalidInputError("invalid input")
 		},
 	)
@@ -123,7 +124,7 @@ func TestListActiveLaunchPlans(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
+			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return &admin.LaunchPlanList{}, nil
 		},
 	)
@@ -145,7 +146,7 @@ func TestListActiveLaunchPlans_Error(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
+			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return nil, errors.GetInvalidInputError("oops")
 		},
 	)

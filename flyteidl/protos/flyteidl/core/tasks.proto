@@ -134,6 +134,9 @@ message TaskMetadata {
 
     // cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     repeated string cache_ignore_input_vars  = 13;
+    // is_eager indicates whether the task is eager or not.
+    // This would be used by CreateTask endpoint.
+    bool is_eager = 14;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -332,8 +335,6 @@ message K8sObjectMetadata {
 message Sql {
     // The actual query to run, the query can have templated parameters.
     // We use Flyte's Golang templating format for Query templating.
-    // Refer to the templating documentation.
-    // https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
     // For example,
     // insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
     // select *

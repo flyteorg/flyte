@@ -12,6 +12,7 @@ import (
 type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
+	GetContainerImage() string
 	GetConfig() *v1.ConfigMap
 }
 
@@ -26,7 +27,7 @@ type TaskExecutionID interface {
 	GetGeneratedNameWith(minLength, maxLength int) (string, error)
 
 	// GetID returns the underlying idl task identifier.
-	GetID() core.TaskExecutionIdentifier
+	GetID() core.TaskExecutionIdentifier // TODO (whynopointer)
 
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.
@@ -47,9 +48,10 @@ type TaskExecutionMetadata interface {
 	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
-	GetSecurityContext() core.SecurityContext
+	GetSecurityContext() core.SecurityContext // TODO (whynopointer)
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+	GetConsoleURL() string
 }

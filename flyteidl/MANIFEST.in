@@ -1,0 +1,43 @@
+include NOTICE
+include README.md
+include pyproject.toml
+include setup.cfg
+include setup.py
+include MANIFEST.in
+
+recursive-include gen/pb_python *
+global-exclude */__pycache__/*
+global-exclude *.pyc
+
+recursive-exclude _templates *
+recursive-exclude boilerplate *
+recursive-exclude build *
+recursive-exclude clients *
+recursive-exclude dist *
+recursive-exclude docs *
+recursive-exclude jsonschema *
+recursive-exclude protos *
+recursive-exclude scripts *
+
+recursive-exclude gen/pb_rust *
+recursive-exclude gen/pb-es *
+recursive-exclude gen/pb-go *
+recursive-exclude gen/pb-js *
+
+exclude .golangci.yml
+exclude .goreleaser.yml
+exclude .readthedocs.yml
+exclude .swagger-codegen-ignore
+exclude CODE_OF_CONDUCT.md
+exclude Makefile
+exclude buf.gen.yaml
+exclude buf.work.yaml
+exclude conf.py
+exclude doc-requirements.in
+exclude doc-requirements.txt
+exclude generate_mocks.sh
+exclude generate_protos.sh
+exclude go.mod
+exclude go.sum
+exclude index.rst
+exclude package.json

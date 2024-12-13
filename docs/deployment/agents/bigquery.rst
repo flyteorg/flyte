@@ -1,6 +1,6 @@
 .. _deployment-agent-setup-bigquery:
 
-Google BigQuery Agent
+Google BigQuery agent
 ======================
 
 This guide provides an overview of setting up BigQuery agent in your Flyte deployment.
@@ -29,7 +29,7 @@ Specify agent configuration
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
   
         tasks:
           task-plugins:
@@ -42,11 +42,6 @@ Specify agent configuration
               - container: container
               - container_array: k8s-array
               - bigquery_query_job_task: agent-service
-        
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - bigquery_query_job_task
 
     .. group-tab:: Flyte core
 
@@ -71,10 +66,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   bigquery_query_job_task: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - bigquery_query_job_task
 
 Ensure that the propeller has the correct service account for BigQuery.
 
@@ -102,3 +93,5 @@ Upgrade the Flyte Helm release
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
+
+For BigQuery agent on the Flyte cluster, see `BigQuery agent <https://docs.flyte.org/en/latest/flytesnacks/examples/bigquery_agent/index.html>`_.

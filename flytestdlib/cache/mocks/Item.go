@@ -8,3 +8,35 @@ import mock "github.com/stretchr/testify/mock"
 type Item struct {
 	mock.Mock
 }
+
+type Item_IsTerminal struct {
+	*mock.Call
+}
+
+func (_m Item_IsTerminal) Return(_a0 bool) *Item_IsTerminal {
+	return &Item_IsTerminal{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Item) OnIsTerminal() *Item_IsTerminal {
+	c_call := _m.On("IsTerminal")
+	return &Item_IsTerminal{Call: c_call}
+}
+
+func (_m *Item) OnIsTerminalMatch(matchers ...interface{}) *Item_IsTerminal {
+	c_call := _m.On("IsTerminal", matchers...)
+	return &Item_IsTerminal{Call: c_call}
+}
+
+// IsTerminal provides a mock function with given fields:
+func (_m *Item) IsTerminal() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}

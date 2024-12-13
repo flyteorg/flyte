@@ -1,0 +1,90 @@
+name: Validate helm charts & manifests
+
+on:
+  pull_request:
+    branches:
+      - master
+      - 'release-v**'
+    paths:
+      - "charts/**"
+      - "deployment/**"
+      - "docker/sandbox-bundled/manifests/**"
+
+jobs:
+  lint-and-test-charts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: charts
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          check-latest: true
+
+      - uses: unionai/flytectl-setup-action@v0.0.3
+        name: Setup flytectl
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2
+
+      - name: Detect charts changed (list-changed)
+        id: charts-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run chart-testing (lint)
+        if: steps.charts-changed.outputs.changed == 'true'
+        run: |
+          ct lint \
+            --target-branch ${{ github.event.repository.default_branch }} \
+            --validate-maintainers=false \
+            --check-version-increment=false \
+            --chart-repos spark-operator=https://kubeflow.github.io/spark-operator \
+            --chart-repos dask=https://helm.dask.org \
+            --chart-repos bitnami=https://charts.bitnami.com/bitnami \
+            --chart-repos twuni=https://helm.twun.io \
+            --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
+
+  validate-manifests:
+    needs:
+      - lint-and-test-charts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        k8s_versions: [ "1.29.2", "1.28.7", "1.27.11" ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            deployment
+            docker/sandbox-bundled/manifests
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Install kubeconform
+        run: |
+          curl -L -o kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/download/v0.6.4/kubeconform-linux-amd64.tar.gz
+          tar -zvxf kubeconform.tar.gz
+          chmod +x kubeconform
+          sudo mv kubeconform /usr/local/bin/kubeconform
+
+      - name: Validate manifests
+        run: |
+          kubeconform -strict -summary -skip CustomResourceDefinition -ignore-filename-pattern "deployment/stats/prometheus/*" -kubernetes-version ${{ matrix.k8s_versions }} ./deployment ./docker/sandbox-bundled/manifests

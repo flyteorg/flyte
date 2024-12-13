@@ -18,18 +18,19 @@ type TaskResources struct {
 }
 
 type ExecutionParameters struct {
-	Inputs              *core.LiteralMap
-	AcceptedAt          time.Time
-	Labels              map[string]string
-	Annotations         map[string]string
-	TaskPluginOverrides []*admin.PluginOverride
-	ExecutionConfig     *admin.WorkflowExecutionConfig
-	RecoveryExecution   *core.WorkflowExecutionIdentifier
-	TaskResources       *TaskResources
-	EventVersion        int
-	RoleNameKey         string
-	RawOutputDataConfig *admin.RawOutputDataConfig
-	ClusterAssignment   *admin.ClusterAssignment
+	Inputs                *core.LiteralMap
+	AcceptedAt            time.Time
+	Labels                map[string]string
+	Annotations           map[string]string
+	TaskPluginOverrides   []*admin.PluginOverride
+	ExecutionConfig       *admin.WorkflowExecutionConfig
+	RecoveryExecution     *core.WorkflowExecutionIdentifier
+	TaskResources         *TaskResources
+	EventVersion          int
+	RoleNameKey           string
+	RawOutputDataConfig   *admin.RawOutputDataConfig
+	ClusterAssignment     *admin.ClusterAssignment
+	ExecutionClusterLabel *admin.ExecutionClusterLabel
 }
 
 // ExecutionData includes all parameters required to create an execution CRD object.
@@ -48,6 +49,8 @@ type ExecutionData struct {
 	WorkflowClosureReference storage.DataReference
 	// Additional parameters used to build a workflow execution
 	ExecutionParameters ExecutionParameters
+	// Storage data reference of the execution inputs
+	OffloadedInputsReference storage.DataReference
 }
 
 // ExecutionResponse is returned when a Flyte workflow execution is successfully created.

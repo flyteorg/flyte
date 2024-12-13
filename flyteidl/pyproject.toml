@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flyteidl"
+dynamic = ["version"]
+authors = [{ name = "Flyte Contributors", email = "admin@flyte.org" }]
+description = "IDL for Flyte Platform"
+license = { text = "Apache-2.0" }
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8,<3.13"
+dependencies = [
+    'googleapis-common-protos',
+    'protoc-gen-openapiv2',
+    'protobuf>=4.21.1',
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/flyteorg/flyte/tree/master/flyteidl"
+
+[tool.setuptools_scm]
+root = "../"
+git_describe_command = "git describe --dirty --tags --long --match flyteidl/* --first-parent"
+tag_regex = '^flyteidl/(?P<version>[vV]?\d+(?:\.\d+){0,2}[^\+]*)(?:\+.*)?$'
+
+[tool.setuptools.packages.find]
+where = ["gen/pb_python"]
+include = ["flyteidl*"]

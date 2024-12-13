@@ -2,6 +2,7 @@ from flyteidl.admin import cluster_assignment_pb2 as _cluster_assignment_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
+from flyteidl.core import execution_envs_pb2 as _execution_envs_pb2
 from flyteidl.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import metrics_pb2 as _metrics_pb2
@@ -9,6 +10,7 @@ from flyteidl.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
+from flyteidl.admin import matchable_resource_pb2 as _matchable_resource_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -25,18 +27,20 @@ EXECUTION_ACTIVE: ExecutionState
 EXECUTION_ARCHIVED: ExecutionState
 
 class ExecutionCreateRequest(_message.Message):
-    __slots__ = ["project", "domain", "name", "spec", "inputs"]
+    __slots__ = ["project", "domain", "name", "spec", "inputs", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
     spec: ExecutionSpec
     inputs: _literals_pb2.LiteralMap
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ExecutionRelaunchRequest(_message.Message):
     __slots__ = ["id", "name", "overwrite_cache"]
@@ -154,12 +158,14 @@ class ExecutionMetadata(_message.Message):
         RELAUNCH: _ClassVar[ExecutionMetadata.ExecutionMode]
         CHILD_WORKFLOW: _ClassVar[ExecutionMetadata.ExecutionMode]
         RECOVERED: _ClassVar[ExecutionMetadata.ExecutionMode]
+        TRIGGER: _ClassVar[ExecutionMetadata.ExecutionMode]
     MANUAL: ExecutionMetadata.ExecutionMode
     SCHEDULED: ExecutionMetadata.ExecutionMode
     SYSTEM: ExecutionMetadata.ExecutionMode
     RELAUNCH: ExecutionMetadata.ExecutionMode
     CHILD_WORKFLOW: ExecutionMetadata.ExecutionMode
     RECOVERED: ExecutionMetadata.ExecutionMode
+    TRIGGER: ExecutionMetadata.ExecutionMode
     MODE_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     NESTING_FIELD_NUMBER: _ClassVar[int]
@@ -185,7 +191,7 @@ class NotificationList(_message.Message):
     def __init__(self, notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ...) -> None: ...
 
 class ExecutionSpec(_message.Message):
-    __slots__ = ["launch_plan", "inputs", "metadata", "notifications", "disable_all", "labels", "annotations", "security_context", "auth_role", "quality_of_service", "max_parallelism", "raw_output_data_config", "cluster_assignment", "interruptible", "overwrite_cache", "envs", "tags"]
+    __slots__ = ["launch_plan", "inputs", "metadata", "notifications", "disable_all", "labels", "annotations", "security_context", "auth_role", "quality_of_service", "max_parallelism", "raw_output_data_config", "cluster_assignment", "interruptible", "overwrite_cache", "envs", "tags", "execution_cluster_label", "execution_env_assignments"]
     LAUNCH_PLAN_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -203,6 +209,8 @@ class ExecutionSpec(_message.Message):
     OVERWRITE_CACHE_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
+    EXECUTION_CLUSTER_LABEL_FIELD_NUMBER: _ClassVar[int]
+    EXECUTION_ENV_ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
     launch_plan: _identifier_pb2.Identifier
     inputs: _literals_pb2.LiteralMap
     metadata: ExecutionMetadata
@@ -220,7 +228,9 @@ class ExecutionSpec(_message.Message):
     overwrite_cache: bool
     envs: _common_pb2.Envs
     tags: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, launch_plan: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., metadata: _Optional[_Union[ExecutionMetadata, _Mapping]] = ..., notifications: _Optional[_Union[NotificationList, _Mapping]] = ..., disable_all: bool = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ...) -> None: ...
+    execution_cluster_label: _matchable_resource_pb2.ExecutionClusterLabel
+    execution_env_assignments: _containers.RepeatedCompositeFieldContainer[_execution_envs_pb2.ExecutionEnvAssignment]
+    def __init__(self, launch_plan: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., metadata: _Optional[_Union[ExecutionMetadata, _Mapping]] = ..., notifications: _Optional[_Union[NotificationList, _Mapping]] = ..., disable_all: bool = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., execution_cluster_label: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ...) -> None: ...
 
 class ExecutionTerminateRequest(_message.Message):
     __slots__ = ["id", "cause"]

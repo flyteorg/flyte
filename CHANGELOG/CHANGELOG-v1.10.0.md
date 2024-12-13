@@ -8,9 +8,9 @@ Programmatically consuming inputs and outputs using flyteremote became a lot eas
 
 ![Usage snippet](./images/v1.10.0-flyteconsole-programmatic-access.png)
 
-You'll now be able to use offloaded types in [eager workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/eager_workflows.html#id1).
+You'll now be able to use offloaded types in [eager workflows](https://docs.flyte.org/en/latest/user_guide/advanced_composition/eager_workflows.html).
 
-More ergonomic improvements to [pyflyte](https://docs.flyte.org/projects/flytekit/en/latest/pyflyte.html#pyflyte-cli), including the inclusion of a progress bar, the ability to activate launchplans, and the ability to interact with gate nodes in local executions.
+More ergonomic improvements to [pyflyte](https://docs.flyte.org/en/latest/api/flytekit/pyflyte.html), including the inclusion of a progress bar, the ability to activate launchplans, and the ability to interact with gate nodes in local executions.
 
 And much more. Here's the exhaustive list of changes:
 

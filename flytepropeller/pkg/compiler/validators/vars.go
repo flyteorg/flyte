@@ -40,7 +40,7 @@ func validateInputVar(n c.NodeBuilder, paramName string, requireParamType bool, 
 func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 	expectedType *flyte.LiteralType, errs errors.CompileErrors) (ok bool) {
 	if param.GetType().String() != expectedType.String() {
-		errs.Collect(errors.NewMismatchingTypesErr(nodeID, paramName, param.GetType().String(), expectedType.String()))
+		errs.Collect(errors.NewMismatchingTypesErr(nodeID, paramName, c.LiteralTypeToStr(param.GetType()), c.LiteralTypeToStr(expectedType)))
 	}
 
 	return !errs.HasErrors()
@@ -48,12 +48,12 @@ func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 
 // Validate parameters have their required attributes set
 func validateVariables(nodeID c.NodeID, params *flyte.VariableMap, errs errors.CompileErrors) {
-	for paramName, param := range params.Variables {
+	for paramName, param := range params.GetVariables() {
 		if len(paramName) == 0 {
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "paramName"))
 		}
 
-		if param.Type == nil {
+		if param.GetType() == nil {
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "param.Type"))
 		}
 	}

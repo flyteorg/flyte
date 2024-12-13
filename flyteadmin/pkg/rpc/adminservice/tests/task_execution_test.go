@@ -18,14 +18,14 @@ import (
 )
 
 func TestTaskExecution(t *testing.T) {
-	executionID := core.WorkflowExecutionIdentifier{
+	executionID := &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
 	}
-	nodeExecutionID := core.NodeExecutionIdentifier{
+	nodeExecutionID := &core.NodeExecutionIdentifier{
 		NodeId:      "node id",
-		ExecutionId: &executionID,
+		ExecutionId: executionID,
 	}
 
 	taskID := &core.Identifier{
@@ -45,13 +45,13 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestCreateTaskEvent", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetCreateTaskEventCallback(
-			func(ctx context.Context, request admin.TaskExecutionEventRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionEventRequest) (
 				*admin.TaskExecutionEventResponse, error) {
-				assert.Equal(t, requestID, request.RequestId)
-				assert.NotNil(t, request.Event)
-				assert.True(t, proto.Equal(taskID, request.Event.TaskId))
-				assert.Equal(t, phase, request.Event.Phase)
-				assert.Equal(t, retryAttempt, request.Event.RetryAttempt)
+				assert.Equal(t, requestID, request.GetRequestId())
+				assert.NotNil(t, request.GetEvent())
+				assert.True(t, proto.Equal(taskID, request.GetEvent().GetTaskId()))
+				assert.Equal(t, phase, request.GetEvent().GetPhase())
+				assert.Equal(t, retryAttempt, request.GetEvent().GetRetryAttempt())
 				return &admin.TaskExecutionEventResponse{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -61,7 +61,7 @@ func TestTaskExecution(t *testing.T) {
 			RequestId: requestID,
 			Event: &event.TaskExecutionEvent{
 				TaskId:                taskID,
-				ParentNodeExecutionId: &nodeExecutionID,
+				ParentNodeExecutionId: nodeExecutionID,
 				RetryAttempt:          retryAttempt,
 				Phase:                 phase,
 				OccurredAt:            occurredAt,
@@ -141,11 +141,11 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestGetTaskExecution", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetGetTaskExecutionCallback(
-			func(ctx context.Context, request admin.TaskExecutionGetRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
-				assert.Equal(t, taskID, request.Id.TaskId)
-				assert.Equal(t, nodeExecutionID, *request.Id.NodeExecutionId)
-				assert.Equal(t, retryAttempt, request.Id.RetryAttempt)
+				assert.Equal(t, taskID, request.GetId().GetTaskId())
+				assert.Equal(t, nodeExecutionID, request.GetId().GetNodeExecutionId())
+				assert.Equal(t, retryAttempt, request.GetId().GetRetryAttempt())
 				return &admin.TaskExecution{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -154,7 +154,7 @@ func TestTaskExecution(t *testing.T) {
 		resp, err := mockServer.GetTaskExecution(context.Background(), &admin.TaskExecutionGetRequest{
 			Id: &core.TaskExecutionIdentifier{
 				TaskId:          taskID,
-				NodeExecutionId: &nodeExecutionID,
+				NodeExecutionId: nodeExecutionID,
 				RetryAttempt:    retryAttempt,
 			},
 		})
@@ -165,7 +165,7 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestGetTaskExecutionErr", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetGetTaskExecutionCallback(
-			func(ctx context.Context, request admin.TaskExecutionGetRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				return nil, errors.New("expected error")
 			})
@@ -175,7 +175,7 @@ func TestTaskExecution(t *testing.T) {
 		resp, err := mockServer.GetTaskExecution(context.Background(), &admin.TaskExecutionGetRequest{
 			Id: &core.TaskExecutionIdentifier{
 				TaskId:          taskID,
-				NodeExecutionId: &nodeExecutionID,
+				NodeExecutionId: nodeExecutionID,
 				RetryAttempt:    retryAttempt,
 			},
 		})
@@ -187,7 +187,7 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestGetTaskExecutionMissingId", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetGetTaskExecutionCallback(
-			func(ctx context.Context, request admin.TaskExecutionGetRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				t.Fatal("Parameters should be checked before this call")
 				return nil, nil
@@ -197,7 +197,7 @@ func TestTaskExecution(t *testing.T) {
 		})
 		resp, err := mockServer.GetTaskExecution(context.Background(), &admin.TaskExecutionGetRequest{
 			Id: &core.TaskExecutionIdentifier{
-				NodeExecutionId: &nodeExecutionID,
+				NodeExecutionId: nodeExecutionID,
 				RetryAttempt:    1,
 			},
 		})
@@ -208,7 +208,7 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestGetTaskExecutionMissingNodeExecutionId", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetGetTaskExecutionCallback(
-			func(ctx context.Context, request admin.TaskExecutionGetRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				t.Fatal("Parameters should be checked before this call")
 				return nil, nil
@@ -230,10 +230,10 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestListTaskExecutions", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetListTaskExecutionsCallback(
-			func(ctx context.Context, request admin.TaskExecutionListRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
-				assert.Equal(t, "1", request.Token)
-				assert.Equal(t, uint32(99), request.Limit)
+				assert.Equal(t, "1", request.GetToken())
+				assert.Equal(t, uint32(99), request.GetLimit())
 				assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 					NodeId: "nodey",
 					ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -241,7 +241,7 @@ func TestTaskExecution(t *testing.T) {
 						Domain:  "domain",
 						Name:    "name",
 					},
-				}, request.NodeExecutionId))
+				}, request.GetNodeExecutionId()))
 				return &admin.TaskExecutionList{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -266,7 +266,7 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestListTaskExecutions_NoLimit", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetListTaskExecutionsCallback(
-			func(ctx context.Context, request admin.TaskExecutionListRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
 				return &admin.TaskExecutionList{}, nil
 			})
@@ -291,7 +291,7 @@ func TestTaskExecution(t *testing.T) {
 	t.Run("TestListTaskExecutions_NoFilters", func(t *testing.T) {
 		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 		mockTaskExecutionManager.SetListTaskExecutionsCallback(
-			func(ctx context.Context, request admin.TaskExecutionListRequest) (
+			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
 				return &admin.TaskExecutionList{}, nil
 			})
@@ -310,7 +310,7 @@ func TestTaskExecution(t *testing.T) {
 func TestGetTaskExecutionData(t *testing.T) {
 	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
 	mockTaskExecutionManager.SetGetTaskExecutionDataCallback(
-		func(ctx context.Context, request admin.TaskExecutionGetDataRequest) (
+		func(ctx context.Context, request *admin.TaskExecutionGetDataRequest) (
 			*admin.TaskExecutionGetDataResponse, error) {
 			return &admin.TaskExecutionGetDataResponse{
 				Inputs: &admin.UrlBlob{
@@ -344,9 +344,9 @@ func TestGetTaskExecutionData(t *testing.T) {
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "inputs",
 		Bytes: 100,
-	}, resp.Inputs))
+	}, resp.GetInputs()))
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "outputs",
 		Bytes: 200,
-	}, resp.Outputs))
+	}, resp.GetOutputs()))
 }

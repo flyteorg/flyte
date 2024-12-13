@@ -4,6 +4,7 @@ package flyteidl.core;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
+import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
 
 
@@ -12,30 +13,66 @@ message ArtifactKey {
   string project = 1;
   string domain = 2;
   string name = 3;
+  string org = 4;
 }
 
 // Only valid for triggers
 message ArtifactBindingData {
-  uint32 index = 1;
-
+  reserved 1 to 4;
   // These two fields are only relevant in the partition value case
-  string partition_key = 2;
-  string transform = 3;
+  oneof partition_data {
+    string partition_key = 5;
+    bool bind_to_time_partition = 6;
+  }
+
+  // This is only relevant in the time partition case
+  TimeTransform time_transform = 7;
+}
+
+enum Granularity {
+  UNSET = 0;
+  MINUTE = 1;
+  HOUR = 2;
+  DAY = 3; // default
+  MONTH = 4;
+}
+
+enum Operator {
+  MINUS = 0;
+  PLUS = 1;
+}
+
+message TimeTransform {
+  string transform = 1;
+  Operator op = 2;
 }
 
 message InputBindingData {
   string var = 1;
 }
 
+message RuntimeBinding {}
+
 message LabelValue {
   oneof value {
+    // The string static value is for use in the Partitions object
     string static_value = 1;
-    ArtifactBindingData triggered_binding = 2;
-    InputBindingData input_binding = 3;
+
+    // The time value is for use in the TimePartition case
+    google.protobuf.Timestamp time_value = 2;
+    ArtifactBindingData triggered_binding = 3;
+    InputBindingData input_binding = 4;
+    RuntimeBinding runtime_binding = 5;
   }
 }
+
 message Partitions {
   map<string, LabelValue> value = 1;
+}
+
+message TimePartition {
+  LabelValue value = 1;
+  Granularity granularity = 2;
 }
 
 message ArtifactID {
@@ -45,13 +82,10 @@ message ArtifactID {
 
   // Think of a partition as a tag on an Artifact, except it's a key-value pair.
   // Different partitions naturally have different versions (execution ids).
-  // This is a oneof because of partition querying... we need a way to distinguish between
-  // a user not-specifying partitions when searching, and specifically searching for an Artifact
-  // that is not partitioned (this can happen if an Artifact goes from partitioned to non-
-  // partitioned across executions).
-  oneof dimensions {
-    Partitions partitions = 3;
-  }
+  Partitions partitions = 3;
+
+  // There is no such thing as an empty time partition - if it's not set, then there is no time partition.
+  TimePartition time_partition = 4;
 }
 
 message ArtifactTag {
@@ -75,13 +109,4 @@ message ArtifactQuery {
     // artifacts, or a partition value derived from a triggering artifact.
     ArtifactBindingData binding = 4;
   }
-}
-
-message Trigger {
-  // This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-  Identifier trigger_id = 1;
-
-  // These are partial artifact IDs that will be triggered on
-  // Consider making these ArtifactQuery instead.
-  repeated core.ArtifactID triggers = 2;
 }

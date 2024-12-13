@@ -17,6 +17,7 @@ import (
 
 // TODO: add a way to get these list of tables directly from the gorm loaded models
 var (
+	// Tables are ordererd by creation. Migration code relies on this ordering.
 	tables = []string{"execution_events", "executions", "launch_plans", "named_entity_metadata",
 		"node_execution_events", "node_executions", "projects", "resources", "schedulable_entities",
 		"schedule_entities_snapshots", "task_executions", "tasks", "workflows", "description_entities"}
@@ -347,6 +348,7 @@ var LegacyMigrations = []*gormigrate.Migration{
 
 	// For any new table, Please use the following pattern due to a bug
 	// in the postgres gorm layer https://github.com/go-gorm/postgres/issues/65
+	// The 13th table in tables was created before this migration.
 	{
 		ID: "2022-01-11-id-to-bigint",
 		Migrate: func(tx *gorm.DB) error {
@@ -354,14 +356,14 @@ var LegacyMigrations = []*gormigrate.Migration{
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "bigint")
+			return alterTableColumnType(db, "id", "bigint", tables[:13])
 		},
 		Rollback: func(tx *gorm.DB) error {
 			db, err := tx.DB()
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "int")
+			return alterTableColumnType(db, "id", "int", tables[:13])
 		},
 	},
 
@@ -1182,9 +1184,113 @@ var NoopMigrations = []*gormigrate.Migration{
 	},
 }
 
-var Migrations = append(LegacyMigrations, NoopMigrations...)
+// ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we
+// wrote to bring the then-existing migrations up to the Gorm standard, which is to write from scratch, each struct
+// that we want auto-migrated, inside each function. Previously we had not been doing that. The idea is that we will
+// one day delete the migrations prior to the no-op series. New migrations should continue in this array here, again
+// using the proper Gorm methodology of including the struct definitions inside each migration function.
+var ContinuedMigrations = []*gormigrate.Migration{
+	{
+		ID: "pg-continue-2024-02-launchplan",
+		Migrate: func(tx *gorm.DB) error {
+			type LaunchPlanScheduleType string
+			type LaunchConditionType string
 
-func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
+			type LaunchPlan struct {
+				ID         uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt  time.Time  `gorm:"type:time"`
+				UpdatedAt  time.Time  `gorm:"type:time"`
+				DeletedAt  *time.Time `gorm:"index"`
+				Project    string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Domain     string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Name       string     `gorm:"primary_key;index:lp_project_domain_name_idx" valid:"length(0|255)"`
+				Version    string     `gorm:"primary_key" valid:"length(0|255)"`
+				Spec       []byte     `gorm:"not null"`
+				WorkflowID uint       `gorm:"index"`
+				Closure    []byte     `gorm:"not null"`
+				// GORM doesn't save the zero value for ints, so we use a pointer for the State field
+				State *int32 `gorm:"default:0"`
+				// Hash of the launch plan
+				Digest       []byte
+				ScheduleType LaunchPlanScheduleType
+				// store the type of event that this launch plan is triggered by, can be empty, or SCHED
+				LaunchConditionType *LaunchConditionType `gorm:"type:varchar(32);index:idx_launch_plans_launch_conditions,where:launch_condition_type is not null"`
+			}
+			return tx.AutoMigrate(&LaunchPlan{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
+		},
+	},
+
+	{
+		ID: "2024-06-06-execution-tags",
+		Migrate: func(tx *gorm.DB) error {
+			type ExecutionKey struct {
+				Project string `gorm:"primary_key;column:execution_project;size:255"`
+				Domain  string `gorm:"primary_key;column:execution_domain;size:255"`
+				Name    string `gorm:"primary_key;column:execution_name;size:255"`
+			}
+
+			type ExecutionTag struct {
+				ID        uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt time.Time  `gorm:"type:time"`
+				UpdatedAt time.Time  `gorm:"type:time"`
+				DeletedAt *time.Time `gorm:"index"`
+				ExecutionKey
+				Key   string `gorm:"primary_key;index:tag_key;size:255"`
+				Value string `gorm:"primary_key;index:tag_value;size:255"`
+			}
+
+			return tx.Transaction(func(_ *gorm.DB) error {
+				// Create an execution_tags Table
+				if err := tx.AutoMigrate(&ExecutionTag{}); err != nil {
+					return err
+				}
+				// Drop execution_admin_tags and admin_tags tables, and create a new table execution_tags
+				// to store tags associated with executions.
+				sql := "INSERT INTO execution_tags (execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, key, value)" +
+					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, '' as value" +
+					" FROM execution_admin_tags" +
+					" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
+				if err := tx.Exec(sql).Error; err != nil {
+					return err
+				}
+				return nil
+			})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_tags")
+		},
+	},
+	{
+		ID: "2024-06-06-drop-execution_admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_admin_tags")
+		},
+	},
+	{
+		ID: "2024-06-06-drop-admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("admin_tags")
+		},
+	},
+	{
+		ID: "2024-08-08-remove-input-uri-for-start-nodes",
+		Migrate: func(db *gorm.DB) error {
+			return db.Exec("UPDATE node_executions SET input_uri = '' WHERE node_id = 'start-node'").Error
+		},
+		Rollback: func(db *gorm.DB) error {
+			// can't rollback missing data
+			return nil
+		},
+	},
+}
+
+var m = append(LegacyMigrations, NoopMigrations...)
+var Migrations = append(m, ContinuedMigrations...)
+
+func alterTableColumnType(db *sql.DB, columnName, columnType string, tables []string) error {
 	var err error
 	for _, table := range tables {
 		if _, err = db.Exec(fmt.Sprintf(`ALTER TABLE IF EXISTS %s ALTER COLUMN "%s" TYPE %s`, table, columnName,

@@ -14,7 +14,7 @@ import (
 )
 
 // Internal
-func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID pluginsCore.TaskExecutionID, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme, taskTemplate *core.TaskTemplate) ([]*core.TaskLog, error) {
+func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID pluginsCore.TaskExecutionID, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVars []tasklog.TemplateVar, taskTemplate *core.TaskTemplate) ([]*core.TaskLog, error) {
 	if logPlugin == nil {
 		return nil, nil
 	}
@@ -24,14 +24,25 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 		return nil, nil
 	}
 
+	// #nosec G115
 	if uint32(len(pod.Spec.Containers)) <= index {
 		logger.Errorf(ctx, "container IndexOutOfBound, requested [%d], but total containers [%d] in pod phase [%v]", index, len(pod.Spec.Containers), pod.Status.Phase)
 		return nil, nil
 	}
 
+	containerID := v1.ContainerStatus{}.ContainerID
+	// #nosec G115
 	if uint32(len(pod.Status.ContainerStatuses)) <= index {
-		logger.Errorf(ctx, "containerStatus IndexOutOfBound, requested [%d], but total containerStatuses [%d] in pod phase [%v]", index, len(pod.Status.ContainerStatuses), pod.Status.Phase)
-		return nil, nil
+		msg := fmt.Sprintf("containerStatus IndexOutOfBound, requested [%d], but total containerStatuses [%d] in pod phase [%v]", index, len(pod.Status.ContainerStatuses), pod.Status.Phase)
+		if pod.Status.Phase == v1.PodPending {
+			// If the pod is pending, the container status may not be available yet. Log as debug.
+			logger.Debugf(ctx, msg)
+		} else {
+			// In other phases, this is unexpected. Log as error.
+			logger.Errorf(ctx, msg)
+		}
+	} else {
+		containerID = pod.Status.ContainerStatuses[index].ContainerID
 	}
 
 	startTime := pod.CreationTimestamp.Unix()
@@ -39,19 +50,20 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
-			PodName:                   pod.Name,
-			PodUID:                    string(pod.GetUID()),
-			Namespace:                 pod.Namespace,
-			ContainerName:             pod.Spec.Containers[index].Name,
-			ContainerID:               pod.Status.ContainerStatuses[index].ContainerID,
-			LogName:                   nameSuffix,
-			PodRFC3339StartTime:       time.Unix(startTime, 0).Format(time.RFC3339),
-			PodRFC3339FinishTime:      time.Unix(finishTime, 0).Format(time.RFC3339),
-			PodUnixStartTime:          startTime,
-			PodUnixFinishTime:         finishTime,
-			TaskExecutionID:           taskExecID,
-			ExtraTemplateVarsByScheme: extraLogTemplateVarsByScheme,
-			TaskTemplate:              taskTemplate,
+			PodName:              pod.Name,
+			PodUID:               string(pod.GetUID()),
+			Namespace:            pod.Namespace,
+			ContainerName:        pod.Spec.Containers[index].Name,
+			ContainerID:          containerID,
+			LogName:              nameSuffix,
+			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
+			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
+			ExtraTemplateVars:    extraLogTemplateVars,
+			TaskTemplate:         taskTemplate,
+			HostName:             pod.Spec.Hostname,
 		},
 	)
 
@@ -63,13 +75,14 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 }
 
 type templateLogPluginCollection struct {
-	plugins []tasklog.TemplateLogPlugin
+	plugins        []tasklog.TemplateLogPlugin
+	dynamicPlugins []tasklog.TemplateLogPlugin
 }
 
 func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.Output, error) {
 	var taskLogs []*core.TaskLog
 
-	for _, plugin := range t.plugins {
+	for _, plugin := range append(t.plugins, t.dynamicPlugins...) {
 		o, err := plugin.GetTaskLogs(input)
 		if err != nil {
 			return tasklog.Output{}, err
@@ -84,39 +97,45 @@ func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.O
 func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	// Use a list to maintain order.
 	var plugins []tasklog.TemplateLogPlugin
+	var dynamicPlugins []tasklog.TemplateLogPlugin
 
 	if cfg.IsKubernetesEnabled {
 		if len(cfg.KubernetesTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{cfg.KubernetesTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", TemplateURIs: []tasklog.TemplateURI{cfg.KubernetesTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
 	if cfg.IsCloudwatchEnabled {
 		if len(cfg.CloudwatchTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{cfg.CloudwatchTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", TemplateURIs: []tasklog.TemplateURI{cfg.CloudwatchTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
 	if cfg.IsStackDriverEnabled {
 		if len(cfg.StackDriverTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{cfg.StackDriverTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", TemplateURIs: []tasklog.TemplateURI{cfg.StackDriverTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", Scheme: tasklog.TemplateSchemePod, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
-	if cfg.IsFlyinEnabled {
-		if len(cfg.FlyinTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeFlyin, TemplateURIs: []tasklog.TemplateURI{cfg.FlyinTemplateURI}, MessageFormat: core.TaskLog_JSON})
-		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeFlyin, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://flyin.%s/logs/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}", cfg.GCPProjectName)}, MessageFormat: core.TaskLog_JSON})
-		}
+	for logLinkType, dynamicLogLink := range cfg.DynamicLogLinks {
+		dynamicPlugins = append(
+			dynamicPlugins,
+			tasklog.TemplateLogPlugin{
+				Name:                logLinkType,
+				DisplayName:         dynamicLogLink.DisplayName,
+				DynamicTemplateURIs: dynamicLogLink.TemplateURIs,
+				MessageFormat:       core.TaskLog_JSON,
+				ShowWhilePending:    dynamicLogLink.ShowWhilePending,
+				HideOnceFinished:    dynamicLogLink.HideOnceFinished,
+			})
 	}
 
 	plugins = append(plugins, cfg.Templates...)
-	return templateLogPluginCollection{plugins: plugins}, nil
+	return templateLogPluginCollection{plugins: plugins, dynamicPlugins: dynamicPlugins}, nil
 }

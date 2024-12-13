@@ -6,12 +6,14 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ProjectAttributes(_message.Message):
-    __slots__ = ["project", "matching_attributes"]
+    __slots__ = ["project", "matching_attributes", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     MATCHING_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     matching_attributes: _matchable_resource_pb2.MatchingAttributes
-    def __init__(self, project: _Optional[str] = ..., matching_attributes: _Optional[_Union[_matchable_resource_pb2.MatchingAttributes, _Mapping]] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., matching_attributes: _Optional[_Union[_matchable_resource_pb2.MatchingAttributes, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ProjectAttributesUpdateRequest(_message.Message):
     __slots__ = ["attributes"]
@@ -24,12 +26,14 @@ class ProjectAttributesUpdateResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ProjectAttributesGetRequest(_message.Message):
-    __slots__ = ["project", "resource_type"]
+    __slots__ = ["project", "resource_type", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     resource_type: _matchable_resource_pb2.MatchableResource
-    def __init__(self, project: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ProjectAttributesGetResponse(_message.Message):
     __slots__ = ["attributes"]
@@ -38,12 +42,14 @@ class ProjectAttributesGetResponse(_message.Message):
     def __init__(self, attributes: _Optional[_Union[ProjectAttributes, _Mapping]] = ...) -> None: ...
 
 class ProjectAttributesDeleteRequest(_message.Message):
-    __slots__ = ["project", "resource_type"]
+    __slots__ = ["project", "resource_type", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     resource_type: _matchable_resource_pb2.MatchableResource
-    def __init__(self, project: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ProjectAttributesDeleteResponse(_message.Message):
     __slots__ = []

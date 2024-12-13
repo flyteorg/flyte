@@ -87,7 +87,6 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnInputReader().Return(ir)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
 	nCtx.OnTaskReader().Return(tr)
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 	nCtx.OnNodeStatus().Return(ns)
 	nCtx.OnNodeID().Return(nodeID)
 	nCtx.OnEventsRecorder().Return(nil)
@@ -162,17 +161,16 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.NotNil(t, got.psm.newState)
 
 	assert.NotNil(t, got.TaskReader())
-	assert.Equal(t, got.MaxDatasetSizeBytes(), int64(1))
 	assert.NotNil(t, got.SecretManager())
 
 	assert.NotNil(t, got.OutputWriter())
 	assert.Equal(t, got.TaskExecutionMetadata().GetOverrides().GetResources(), resources)
 
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "name-n1-1")
-	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId, taskID)
-	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt, uint32(1))
-	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)
-	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID)
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId, taskID)                             //nolint:protogetter
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt, uint32(1))                    //nolint:protogetter
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)        //nolint:protogetter
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID) //nolint:protogetter
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetUniqueNodeID(), nodeID)
 
 	assert.EqualValues(t, got.ResourceManager().(resourcemanager.TaskResourceManager).GetResourcePoolInfo(), make([]*event.ResourcePoolInfo, 0))
@@ -381,14 +379,12 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			CPU:              resource.MustParse("1"),
 			Memory:           resource.MustParse("2"),
 			EphemeralStorage: resource.MustParse("3"),
-			Storage:          resource.MustParse("4"),
 			GPU:              resource.MustParse("5"),
 		},
 		Limits: v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("10"),
 			Memory:           resource.MustParse("20"),
 			EphemeralStorage: resource.MustParse("30"),
-			Storage:          resource.MustParse("40"),
 			GPU:              resource.MustParse("50"),
 		},
 	})
@@ -397,14 +393,12 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			corev1.ResourceCPU:              resource.MustParse("1"),
 			corev1.ResourceMemory:           resource.MustParse("2"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("3"),
-			corev1.ResourceStorage:          resource.MustParse("4"),
 			utils.ResourceNvidiaGPU:         resource.MustParse("5"),
 		},
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:              resource.MustParse("10"),
 			corev1.ResourceMemory:           resource.MustParse("20"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("30"),
-			corev1.ResourceStorage:          resource.MustParse("40"),
 			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
 		},
 	}, resourceRequirements)

@@ -13,6 +13,7 @@ import "flyteidl/core/tasks.proto";
 import "flyteidl/core/types.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
 
 // Defines a condition and the execution unit that should be executed if the condition is satisfied.
 message IfBlock {
@@ -114,11 +115,13 @@ message ArrayNode {
     // node is the sub-node that will be executed for each element in the array.
     Node node = 1;
 
-    // parallelism defines the minimum number of instances to bring up concurrently at any given
-    // point. Note that this is an optimistic restriction and that, due to network partitioning or
-    // other failures, the actual number of currently running instances might be more. This has to
-    // be a positive number if assigned. Default value is size.
-    uint32 parallelism = 2;
+    oneof parallelism_option {
+        // parallelism defines the minimum number of instances to bring up concurrently at any given
+        // point. Note that this is an optimistic restriction and that, due to network partitioning or
+        // other failures, the actual number of currently running instances might be more. This has to
+        // be a positive number if assigned. Default value is size.
+        uint32 parallelism = 2;
+    }
 
     oneof success_criteria {
         // min_successes is an absolute number of the minimum number of successful completions of
@@ -131,6 +134,22 @@ message ArrayNode {
         // to determine when an ArrayNode can be marked successful.
         float min_success_ratio = 4;
     }
+
+    enum ExecutionMode {
+        // Indicates the ArrayNode will store minimal state for the sub-nodes.
+        // This is more efficient, but only supports a subset of Flyte entities.
+        MINIMAL_STATE = 0;
+
+        // Indicates the ArrayNode will store full state for the sub-nodes.
+        // This supports a wider range of Flyte entities.
+        FULL_STATE = 1;
+    }
+
+    // execution_mode determines the execution path for ArrayNode.
+    ExecutionMode execution_mode = 5;
+
+    // Indicates whether the sub node's original interface was altered
+    google.protobuf.BoolValue is_original_sub_node_interface = 6;
 }
 
 // Defines extra information about the Node.
@@ -149,6 +168,20 @@ message NodeMetadata {
         bool interruptible = 6;
     };
 
+    // Identify whether a node should have it's outputs cached.
+    oneof cacheable_value {
+        bool cacheable = 7;
+    }
+
+    // The version of the cache to use.
+    oneof cache_version_value {
+        string cache_version = 8;
+    }
+
+    // Identify whether caching operations involving this node should be serialized.
+    oneof cache_serializable_value {
+        bool cache_serializable = 9;
+    }
 }
 
 // Links a variable to an alias.
@@ -283,4 +316,19 @@ message TaskNodeOverrides {
     // Overrides for all non-standard resources, not captured by
     // v1.ResourceRequirements, to allocate to a task.
     ExtendedResources extended_resources = 2;
+
+    // Override for the image used by task pods.
+    string container_image = 3;
+}
+
+// A structure that uniquely identifies a launch plan in the system.
+message LaunchPlanTemplate {
+    // A globally unique identifier for the launch plan.
+    Identifier id = 1;
+
+    // The input and output interface for the launch plan
+    TypedInterface interface = 2;
+
+    // A collection of input literals that are fixed for the launch plan
+    LiteralMap fixed_inputs = 3;
 }

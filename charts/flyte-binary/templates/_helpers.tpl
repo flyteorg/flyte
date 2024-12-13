@@ -177,6 +177,24 @@ Get the Flyte service GRPC port.
 {{- end -}}
 
 {{/*
+Get the Flyte service GRPC paths.
+*/}}
+{{- define "flyte-binary.ingress.grpcPaths" -}}
+- /flyteidl.service.AdminService
+- /flyteidl.service.AdminService/*
+- /flyteidl.service.AuthMetadataService
+- /flyteidl.service.AuthMetadataService/*
+- /flyteidl.service.DataProxyService
+- /flyteidl.service.DataProxyService/*
+- /flyteidl.service.IdentityService
+- /flyteidl.service.IdentityService/*
+- /flyteidl.service.SignalService
+- /flyteidl.service.SignalService/*
+- /grpc.health.v1.Health
+- /grpc.health.v1.Health/*
+{{- end -}}
+
+{{/*
 Get the Flyte agent service GRPC port.
 */}}
 {{- define "flyte-binary.flyteagent.grpc.port" -}}

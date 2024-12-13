@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const pythonTestTaskType = "python-task"
@@ -57,7 +58,7 @@ func TestGetTask(t *testing.T) {
 		Version: version,
 	})
 	assert.Empty(t, output)
-	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\"", err.Error())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true

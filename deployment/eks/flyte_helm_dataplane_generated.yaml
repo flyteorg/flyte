@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.6
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.14.0
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -119,6 +119,8 @@ data:
         renew-deadline: 10s
         retry-period: 2s
       limit-namespace: all
+      literal-offloading-config:
+        enabled: true
       max-workflow-retries: 50
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
@@ -137,7 +139,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -154,6 +156,8 @@ data:
         - container
         - sidecar
         - k8s-array
+        - agent-service
+        - echo
   k8s.yaml: | 
     plugins:
       k8s:
@@ -167,17 +171,16 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
-  cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       logs:
@@ -427,17 +430,19 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fd3294c2987d4c2863e13a84abd65a284f69332d97a698c833c27e5c9f5417a"
+        configChecksum: "7c75b4d396049b3c0c3d425f22aaa11c5517e44d62a4e4a9e181327cd4693f5"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
       priorityClassName: system-cluster-critical
       containers:
       - command:
@@ -453,7 +458,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.6"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -507,18 +512,23 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.10.6
+        app.kubernetes.io/version: v1.14.0
       annotations:
-        configChecksum: "fd3294c2987d4c2863e13a84abd65a284f69332d97a698c833c27e5c9f5417a"
+        configChecksum: "7c75b4d396049b3c0c3d425f22aaa11c5517e44d62a4e4a9e181327cd4693f5"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.6"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -536,12 +546,16 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -558,6 +572,17 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+          ports:
+          - containerPort: 9443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 200m
+              ephemeral-storage: 500Mi
+              memory: 500Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -590,7 +615,9 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:
@@ -746,9 +773,10 @@ kind: Ingress
 metadata:
   name: flyte-core-grpc
   namespace: flyte
-  annotations:
+  annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -757,9 +785,10 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
-    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
+  ingressClassName: 
   rules:
     - host: null
       http:

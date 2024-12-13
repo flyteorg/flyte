@@ -150,6 +150,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.FromString,
                 )
+        self.GetDynamicNodeWorkflow = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+                request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.FromString,
+                )
         self.ListNodeExecutions = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListNodeExecutions',
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionListRequest.SerializeToString,
@@ -175,10 +180,20 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.FromString,
                 )
+        self.GetProject = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetProject',
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
+                )
         self.ListProjects = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListProjects',
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_project__pb2.Projects.FromString,
+                )
+        self.GetDomains = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDomains',
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.FromString,
                 )
         self.CreateWorkflowEvent = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateWorkflowEvent',
@@ -317,7 +332,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListTaskIds(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -474,6 +489,13 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetDynamicNodeWorkflow(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def ListNodeExecutions(self, request, context):
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
         """
@@ -503,7 +525,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UpdateProject(self, request, context):
-        """Updates an existing :ref:`ref_flyteidl.admin.Project` 
+        """Updates an existing :ref:`ref_flyteidl.admin.Project`
         flyteidl.admin.Project should be passed but the domains property should be empty;
         it will be ignored in the handler as domains cannot be updated via this API.
         """
@@ -511,9 +533,22 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ListProjects(self, request, context):
-        """Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+    def GetProject(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.Project`
         """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListProjects(self, request, context):
+        """Fetches a list of :ref:`ref_flyteidl.admin.Project`
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetDomains(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -801,6 +836,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.SerializeToString,
             ),
+            'GetDynamicNodeWorkflow': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDynamicNodeWorkflow,
+                    request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.SerializeToString,
+            ),
             'ListNodeExecutions': grpc.unary_unary_rpc_method_handler(
                     servicer.ListNodeExecutions,
                     request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionListRequest.FromString,
@@ -826,10 +866,20 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
                     response_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.SerializeToString,
             ),
+            'GetProject': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetProject,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
+            ),
             'ListProjects': grpc.unary_unary_rpc_method_handler(
                     servicer.ListProjects,
                     request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_project__pb2.Projects.SerializeToString,
+            ),
+            'GetDomains': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDomains,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.SerializeToString,
             ),
             'CreateWorkflowEvent': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateWorkflowEvent,
@@ -1367,6 +1417,23 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def GetDynamicNodeWorkflow(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+            flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+            flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def ListNodeExecutions(request,
             target,
             options=(),
@@ -1452,6 +1519,23 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def GetProject(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetProject',
+            flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.Project.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def ListProjects(request,
             target,
             options=(),
@@ -1465,6 +1549,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListProjects',
             flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
             flyteidl_dot_admin_dot_project__pb2.Projects.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDomains(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDomains',
+            flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

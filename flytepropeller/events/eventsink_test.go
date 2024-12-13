@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -62,11 +62,11 @@ func TestFileEvent(t *testing.T) {
 	taskEvent := &event.TaskExecutionEvent{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
-			Project:      executionID.Project,
-			Domain:       executionID.Domain,
-			Name:         executionID.Name,
+			Project:      executionID.GetProject(),
+			Domain:       executionID.GetDomain(),
+			Name:         executionID.GetName(),
 		},
-		ParentNodeExecutionId: nodeEvent.Id,
+		ParentNodeExecutionId: nodeEvent.GetId(),
 		Phase:                 core.TaskExecution_FAILED,
 		OccurredAt:            now,
 	}
@@ -75,13 +75,13 @@ func TestFileEvent(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := []string{
-		"[--WF EVENT--] project:\"FlyteTest\" domain:\"FlyteStaging\" name:\"Name\" , " +
-			"Phase: SUCCEEDED, OccuredAt: " + ptypes.TimestampString(now),
-		"[--NODE EVENT--] node_id:\"node1\" execution_id:<project:\"FlyteTest\" " +
-			"domain:\"FlyteStaging\" name:\"Name\" > , Phase: RUNNING, OccuredAt: " + ptypes.TimestampString(now),
-		"[--TASK EVENT--] resource_type:TASK project:\"FlyteTest\" domain:\"FlyteStaging\" " +
-			"name:\"Name\" ,node_id:\"node1\" execution_id:<project:\"FlyteTest\" domain:\"FlyteStaging\" " +
-			"name:\"Name\" > , Phase: FAILED, OccuredAt: " + ptypes.TimestampString(now),
+		"[--WF EVENT--] project:\"FlyteTest\"  domain:\"FlyteStaging\"  name:\"Name\", " +
+			"Phase: SUCCEEDED, OccuredAt: " + now.AsTime().String(),
+		"[--NODE EVENT--] node_id:\"node1\"  execution_id:{project:\"FlyteTest\" " +
+			" domain:\"FlyteStaging\"  name:\"Name\"}, Phase: RUNNING, OccuredAt: " + now.AsTime().String(),
+		"[--TASK EVENT--] resource_type:TASK  project:\"FlyteTest\"  domain:\"FlyteStaging\" " +
+			" name:\"Name\",node_id:\"node1\"  execution_id:{project:\"FlyteTest\"  domain:\"FlyteStaging\" " +
+			" name:\"Name\"}, Phase: FAILED, OccuredAt: " + now.AsTime().String(),
 	}
 
 	actual, err := readLinesFromFile(file)
@@ -89,7 +89,13 @@ func TestFileEvent(t *testing.T) {
 		assert.FailNow(t, "failed to read file "+err.Error())
 	}
 
-	assert.True(t, reflect.DeepEqual(expected, actual), "Expected %v\nActual %v", expected, actual)
+	re := regexp.MustCompile(`\s+`)
+	for i, line := range actual {
+		// Replace consecutive spaces with a single space
+		actualLine := re.ReplaceAllString(line, " ")
+		expectedLine := re.ReplaceAllString(expected[i], " ")
+		assert.True(t, expectedLine == actualLine, "Expected\n%s\nvs Actual\n%s", expectedLine, actualLine)
+	}
 }
 
 func readLinesFromFile(name string) ([]string, error) {

@@ -163,6 +163,38 @@ func (_m *ExecutableWorkflow) GetConnections() *v1alpha1.Connections {
 	return r0
 }
 
+type ExecutableWorkflow_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetConsoleURL) Return(_a0 string) *ExecutableWorkflow_GetConsoleURL {
+	return &ExecutableWorkflow_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetConsoleURL() *ExecutableWorkflow_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &ExecutableWorkflow_GetConsoleURL{Call: c_call}
+}
+
+func (_m *ExecutableWorkflow) OnGetConsoleURLMatch(matchers ...interface{}) *ExecutableWorkflow_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &ExecutableWorkflow_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_GetCreationTimestamp struct {
 	*mock.Call
 }

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -77,6 +78,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	taskExecutionID.On("GetGeneratedName").Return("per_retry_unique_key")
 	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 	taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+	taskMetadata.On("GetNamespace").Return("test-namespace")
 
 	t.Run("empty cmd", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{}, Parameters{})
@@ -572,6 +574,38 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"--checkpoint=s3://new-checkpoint/prefix",
 		}, actual)
 	})
+
+	t.Run("namespace embedded replacement", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: "s3://raw-data/prefix/{{ .Namespace }}",
+				prevCheckpointPath:  "s3://prev-checkpoint/prefix/{{ .Namespace}}",
+				checkpointPath:      "s3://new-checkpoint/prefix/{{.namespace}}",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+			"--prev={{ .prevcheckpointprefix }}",
+			"--checkpoint={{ .checkpointoutputprefix }}",
+			"--raw-data-output={{ .rawoutputdataprefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+			"--prev=s3://prev-checkpoint/prefix/test-namespace",
+			"--checkpoint=s3://new-checkpoint/prefix/test-namespace",
+			"--raw-data-output=s3://raw-data/prefix/test-namespace",
+		}, actual)
+	})
 }
 
 func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
@@ -588,6 +622,7 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		taskExecutionID.On("GetGeneratedName").Return("per-retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+		taskMetadata.On("GetNamespace").Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		actual, err := Render(context.TODO(), []string{
@@ -611,6 +646,7 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		taskExecutionID.On("GetGeneratedName").Return("33 per retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+		taskMetadata.On("GetNamespace").Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		testString := "doesn't start with a number"
@@ -711,4 +747,56 @@ func TestSerializeLiteral(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "s3://some-bucket/fdsa/x.parquet", interpolated)
 	})
+}
+
+func TestSerializeLiteralScalar_BinaryMessagePack(t *testing.T) {
+	// Create a simple map to be serialized into MessagePack format
+	testMap := map[string]interface{}{
+		"a": 1,
+		"b": true,
+		"c": 1.1,
+		"d": "string",
+	}
+
+	// Serialize the map using MessagePack
+	encodedData, err := msgpack.Marshal(testMap)
+	assert.NoError(t, err)
+
+	// Create the core.Scalar_Binary with the encoded MessagePack data and MESSAGEPACK tag
+	binaryScalar := &core.Scalar{
+		Value: &core.Scalar_Binary{
+			Binary: &core.Binary{
+				Value: encodedData,
+				Tag:   coreutils.MESSAGEPACK,
+			},
+		},
+	}
+
+	// Call the function we want to test
+	result, err := serializeLiteralScalar(binaryScalar)
+	assert.NoError(t, err)
+
+	// Since the map should be decoded back, we expect a simple string representation of the map
+	expectedResult := "map[a:1 b:true c:1.1 d:string]"
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestSerializeLiteralScalar_BinaryUnsupportedTag(t *testing.T) {
+	// Create some binary data for testing
+	binaryData := []byte{0x01, 0x02, 0x03}
+
+	// Create a core.Scalar_Binary with an unsupported tag
+	binaryScalar := &core.Scalar{
+		Value: &core.Scalar_Binary{
+			Binary: &core.Binary{
+				Value: binaryData,
+				Tag:   "unsupported-tag",
+			},
+		},
+	}
+
+	// Call the function and expect an error because the tag is unsupported
+	_, err := serializeLiteralScalar(binaryScalar)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unsupported binary tag")
 }

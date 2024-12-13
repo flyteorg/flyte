@@ -1,13 +1,13 @@
 .. _deployment-agent-setup-sensor:
 
-Sensor Agent
+Sensor agent
 =================
 
-Sensor enables users to continuously check for a file or a condition to be met periodically.
+The `sensor agent <https://docs.flyte.org/en/latest/flytesnacks/examples/sensor/index.html>`_ enables users to continuously check for a file or a condition to be met periodically.
 
 When the condition is met, the sensor will complete.
 
-This guide provides an overview of how to set up Sensor in your Flyte deployment.
+This guide provides an overview of how to set up the sensor agent in your Flyte deployment.
 
 Spin up a cluster
 -----------------
@@ -43,7 +43,7 @@ Spin up a cluster
 Specify agent configuration
 ----------------------------
 
-Enable the Sensor agent by adding the following config to the relevant YAML file(s):
+Enable the sensor agent by adding the following config to the relevant YAML file(s):
 
 .. tabs::
 
@@ -56,7 +56,7 @@ Enable the Sensor agent by adding the following config to the relevant YAML file
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
   
         tasks:
           task-plugins:
@@ -69,15 +69,10 @@ Enable the Sensor agent by adding the following config to the relevant YAML file
               - container: container
               - container_array: k8s-array
               - sensor: agent-service
-        
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - sensor
 
     .. group-tab:: Flyte core
 
-      Create a file named ``values-override.yaml`` and add the following configuration to it.
+      Create a file named ``values-override.yaml`` and add the following configuration to it:
 
       .. code-block:: yaml
 
@@ -98,10 +93,6 @@ Enable the Sensor agent by adding the following config to the relevant YAML file
                   sidecar: sidecar
                   container_array: k8s-array
                   sensor: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - sensor
 
 
 Upgrade the deployment

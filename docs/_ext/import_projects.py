@@ -1,5 +1,4 @@
 import inspect
-import os
 import re
 import shutil
 import subprocess
@@ -26,6 +25,7 @@ class ImportProjectsConfig:
     flytekit_api_dir: str
     source_regex_mapping: dict = field(default_factory=dict)
     list_table_toc: List[str] = field(default_factory=list)
+    dev_build: bool = False
 
 
 @dataclass
@@ -52,6 +52,8 @@ TABLE_TEMPLATE = """
 {content}
 ```
 """
+
+VERSION_PATTERN = r"^v[0-9]+.[0-9]+.[0-9]+$"
 
 
 class ListTableToc(SphinxDirective):
@@ -80,29 +82,26 @@ class ListTableToc(SphinxDirective):
 
 
 def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
+    flytekit_dir = Path(import_project_config.flytekit_api_dir).resolve(strict=True)
+    flytekit_src_dir = flytekit_dir / "flytekit"
+    plugins_dir = flytekit_dir / "plugins"
+
     # create flytekit/_version.py file manually
-    with open(f"{import_project_config.flytekit_api_dir}/flytekit/_version.py", "w") as f:
+    with (flytekit_src_dir / "_version.py").open("w") as f:
         f.write(f'__version__ = "dev"')
 
-
     # add flytekit to python path
-    flytekit_dir = os.path.abspath(import_project_config.flytekit_api_dir)
-    flytekit_src_dir = os.path.abspath(os.path.join(flytekit_dir, "flytekit"))
-    plugins_dir = os.path.abspath(os.path.join(flytekit_dir, "plugins"))
-
-    sys.path.insert(0, flytekit_src_dir)
-    sys.path.insert(0, flytekit_dir)
+    sys.path.insert(0, str(flytekit_src_dir))
+    sys.path.insert(0, str(flytekit_dir))
 
     # add plugins to python path
-    for possible_plugin_dir in os.listdir(plugins_dir):
-        dir_path = os.path.abspath((os.path.join(plugins_dir, possible_plugin_dir)))
-        plugin_path = os.path.abspath(os.path.join(dir_path, "flytekitplugins"))
-        if os.path.isdir(dir_path) and os.path.exists(plugin_path):
-            sys.path.insert(0, dir_path)
-
+    for possible_plugin_dir in plugins_dir.iterdir():
+        plugin_path = possible_plugin_dir / "flytekitplugins"
+        if possible_plugin_dir.is_dir() and plugin_path.exists():
+            sys.path.insert(0, str(possible_plugin_dir))
 
 def update_html_context(project: Project, tag: str, commit: str, config: Config):
-    tag_url = f"{project.source}/releases/tag/{tag}"
+    tag_url = "#" if tag == "dev" else f"{project.source}/releases/tag/{tag}"
     commit_url = f"{project.source}/tree/{commit}"
 
     config.html_context[f"{project.name}_tag"] = tag
@@ -146,10 +145,14 @@ def import_projects(app: Sphinx, config: Config):
         dest_docs_dir = srcdir / project.dest
 
         if repo:
-            tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
-            if not tags:
-                # If tags don't exist just use the current commit. This occurs
-                # when the git repo is a shallow clone.
+            tags = sorted(
+                [t for t in repo.tags if re.match(VERSION_PATTERN, t.name)],
+                key=lambda t: t.commit.committed_datetime,
+            )
+            if not tags or import_projects_config.dev_build:
+                # If dev_build is specified or the tags don't exist just use the
+                # current commit. This occurs when the git repo is a shallow
+                # clone.
                 tag_str = "dev"
                 commit = str(repo.head.commit)[:7]
             else:
@@ -180,7 +183,9 @@ def import_projects(app: Sphinx, config: Config):
     update_sys_path_for_flytekit(import_projects_config)
 
     # add functions to clean up source and docstring refs
-    for i, (patt, repl) in enumerate(import_projects_config.source_regex_mapping.items()):
+    for i, (patt, repl) in enumerate(
+        import_projects_config.source_regex_mapping.items()
+    ):
         app.connect(
             "source-read",
             partial(replace_refs_in_files, patt, repl),
@@ -193,7 +198,9 @@ def import_projects(app: Sphinx, config: Config):
         )
 
 
-def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, source: List[str]):
+def replace_refs_in_files(
+    patt: str, repl: str, app: Sphinx, docname: str, source: List[str]
+):
     text = source[0]
 
     if re.search(patt, text):
@@ -204,7 +211,14 @@ def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, sourc
 
 
 def replace_refs_in_docstrings(
-    patt: str, repl: str, app: Sphinx, what: str, name: str, obj: str, options: dict, lines: List[str],
+    patt: str,
+    repl: str,
+    app: Sphinx,
+    what: str,
+    name: str,
+    obj: str,
+    options: dict,
+    lines: List[str],
 ):
     replace = {}
     for i, text in enumerate(lines):

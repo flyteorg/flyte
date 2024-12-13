@@ -7,6 +7,7 @@ import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/metrics.proto";
@@ -14,6 +15,7 @@ import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "flyteidl/admin/matchable_resource.proto";
 
 // Request to launch an execution with the given project, domain and optionally-assigned name.
 message ExecutionCreateRequest {
@@ -39,6 +41,9 @@ message ExecutionCreateRequest {
     // included in this map. If not required and not provided, defaults apply.
     // +optional
     core.LiteralMap inputs = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Request to relaunch the referenced execution.
@@ -201,6 +206,8 @@ message SystemMetadata {
 message ExecutionMetadata {
     // The method by which this execution was launched.
     enum ExecutionMode {
+	reserved 7;
+
         // The default execution mode, MANUAL implies that an execution was launched by an individual.
         MANUAL = 0;
 
@@ -218,6 +225,9 @@ message ExecutionMetadata {
 
         // This execution was recovered from another execution.
         RECOVERED = 5;
+
+        // Execution was kicked off by the artifact trigger system
+        TRIGGER = 6;
     }
     ExecutionMode mode = 1;
 
@@ -323,7 +333,13 @@ message ExecutionSpec {
     Envs envs = 23;
 
     // Tags to be set for the execution.
-    repeated string tags = 24;
+    repeated string tags = 24 [deprecated = true];
+
+    // Execution cluster label to be set for the execution.
+    ExecutionClusterLabel execution_cluster_label = 25;
+
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvAssignment execution_env_assignments = 26;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

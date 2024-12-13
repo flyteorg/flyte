@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-const _PhaseName = "PhaseUndefinedPhaseNotReadyPhaseWaitingForResourcesPhaseQueuedPhaseInitializingPhaseRunningPhaseSuccessPhaseRetryableFailurePhasePermanentFailurePhaseWaitingForCache"
+const _PhaseName = "PhaseUndefinedPhaseNotReadyPhaseWaitingForResourcesPhaseQueuedPhaseInitializingPhaseRunningPhaseSuccessPhaseRetryableFailurePhasePermanentFailurePhaseWaitingForCachePhaseAborted"
 
-var _PhaseIndex = [...]uint8{0, 14, 27, 51, 62, 79, 91, 103, 124, 145, 165}
+var _PhaseIndex = [...]uint8{0, 14, 27, 51, 62, 79, 91, 103, 124, 145, 165, 177}
 
 func (i Phase) String() string {
 	if i < 0 || i >= Phase(len(_PhaseIndex)-1) {
@@ -17,7 +17,7 @@ func (i Phase) String() string {
 	return _PhaseName[_PhaseIndex[i]:_PhaseIndex[i+1]]
 }
 
-var _PhaseValues = []Phase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+var _PhaseValues = []Phase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 var _PhaseNameToValueMap = map[string]Phase{
 	_PhaseName[0:14]:    0,
@@ -30,6 +30,7 @@ var _PhaseNameToValueMap = map[string]Phase{
 	_PhaseName[103:124]: 7,
 	_PhaseName[124:145]: 8,
 	_PhaseName[145:165]: 9,
+	_PhaseName[165:177]: 10,
 }
 
 // PhaseString retrieves an enum value from the enum constants string name.

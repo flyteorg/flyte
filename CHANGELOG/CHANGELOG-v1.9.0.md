@@ -1,11 +1,11 @@
 # Flyte v1.9.0 Release
 
-In this release we're announcing two experimental features, namely (1) ArrayNode map tasks, and (2) Execution Tags. 
+In this release we're announcing two experimental features, namely (1) ArrayNode map tasks, and (2) Execution Tags.
 
 
 ### ArrayNode map tasks
 
-ArrayNodes are described more fully in [RFC 3346](https://github.com/flyteorg/flyte/blob/master/rfc/system/3346-array-node.md), but the summary is that ArrayNode map tasks are a drop-in replacement for [regular map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/map_task.html#map-tasks), the only difference being the submodule used to import the `map_task` function. 
+ArrayNodes are described more fully in [RFC 3346](https://github.com/flyteorg/flyte/blob/master/rfc/system/3346-array-node.md), but the summary is that ArrayNode map tasks are a drop-in replacement for [regular map tasks](https://docs.flyte.org/en/latest/user-guide/advanced_composition/map_tasks.html), the only difference being the submodule used to import the `map_task` function.
 More explicitly, let's say you have this code:
 
 ```python
@@ -15,7 +15,7 @@ from flytekit import map_task, task, workflow
 @task
 def t(a: int) -> int:
     ...
-    
+
 @workflow
 def wf(xs: List[int]) -> List[int]:
     return map_task(t)(a=xs)
@@ -31,7 +31,7 @@ from flytekit.experimental import map_task
 @task
 def t(a: int) -> int:
     ...
-    
+
 @workflow
 def wf(xs: List[int]) -> List[int]:
     return map_task(t)(a=xs)
@@ -42,7 +42,7 @@ def wf(xs: List[int]) -> List[int]:
 
 Execution tags allow users to can discover their executions and other flyte entities more easily, by creating smarter groupings. The feature is described in this [RFC](https://github.com/flyteorg/flyte/blob/master/rfc/system/0001-flyte-execution-tags.md).
 
-As mentioned before, this feature is shipped in an experimental capacity, the idea being that we're going to incorporate the feedback of the community as we iterate. More work is expected to give prominence to the feature in flyteconsole, in the meanwhile, the feature is supported via [Remote](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/remote_access/index.html).
+As mentioned before, this feature is shipped in an experimental capacity, the idea being that we're going to incorporate the feedback of the community as we iterate. More work is expected to give prominence to the feature in flyteconsole, in the meanwhile, the feature is supported via [Remote](https://docs.flyte.org/en/latest/api/flytekit/remote.html#remote-access).
 
 
 ## Flytekit
@@ -119,7 +119,7 @@ As mentioned before, this feature is shipped in an experimental capacity, the id
 * chore: remove release git step by @FrankFlitton in https://github.com/flyteorg/flyteconsole/pull/811
 * fix: union value handling in launch form by @ursucarina in https://github.com/flyteorg/flyteconsole/pull/812
 
-## New Contributors 
+## New Contributors
 * @Nan2018 made their first contribution in https://github.com/flyteorg/flytekit/pull/1751
 * @oliverhu made their first contribution in https://github.com/flyteorg/flytekit/pull/1727
 * @DavidMertz made their first contribution in https://github.com/flyteorg/flytekit/pull/1761

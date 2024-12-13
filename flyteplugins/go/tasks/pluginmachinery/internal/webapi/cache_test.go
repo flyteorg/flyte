@@ -21,13 +21,14 @@ func TestNewResourceCache(t *testing.T) {
 	t.Run("Simple", func(t *testing.T) {
 		c, err := NewResourceCache(context.Background(), "Cache1", &mocks.Client{}, webapi.CachingConfig{
 			Size: 10,
-		}, promutils.NewTestScope())
+		}, webapi.RateLimiterConfig{QPS: 1, Burst: 1}, promutils.NewTestScope())
 		assert.NoError(t, err)
 		assert.NotNil(t, c)
 	})
 
 	t.Run("Error", func(t *testing.T) {
 		_, err := NewResourceCache(context.Background(), "Cache1", &mocks.Client{}, webapi.CachingConfig{},
+			webapi.RateLimiterConfig{},
 			promutils.NewTestScope())
 		assert.Error(t, err)
 	})

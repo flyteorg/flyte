@@ -21,7 +21,7 @@ const (
 	minCacheSize       = 10
 	maxCacheSize       = 500000
 	minWorkers         = 1
-	maxWorkers         = 100
+	maxWorkers         = 10000
 	minSyncDuration    = 5 * time.Second
 	maxSyncDuration    = time.Hour
 	minBurst           = 5
@@ -117,13 +117,19 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 }
 
 func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
+	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	err := c.cache.DeleteDelayed(cacheItemID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to delete resource [%v] from cache. Error: %v", cacheItemID, err)
+		return fmt.Errorf("failed to delete resource [%v] from cache. Error: %v", cacheItemID, err)
+	}
+
 	if len(c.p.GetConfig().ResourceQuotas) == 0 {
 		// If there are no defined quotas, there is nothing to cleanup.
 		return nil
 	}
 
-	logger.Infof(ctx, "Attempting to finalize resource [%v].",
-		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	logger.Infof(ctx, "Attempting to finalize resource [%v].", cacheItemID)
 
 	return c.tokenAllocator.releaseToken(ctx, c.p, tCtx, c.metrics)
 }
@@ -191,7 +197,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 			}
 
 			resourceCache, err := NewResourceCache(ctx, pluginEntry.ID, p, p.GetConfig().Caching,
-				iCtx.MetricsScope().NewSubScope("cache"))
+				p.GetConfig().ReadRateLimiter, iCtx.MetricsScope().NewSubScope("cache"))
 
 			if err != nil {
 				return nil, err

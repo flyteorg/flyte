@@ -110,15 +110,15 @@ func TestAsyncClientImpl_Download(t *testing.T) {
 func TestAsyncClientImpl_Upload(t *testing.T) {
 	ctx := context.Background()
 
-	inputHash1 := "{UNSPECIFIED     {} [] 0}:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
-	inputHash2 := "{UNSPECIFIED     {} [] 0}:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
+	inputHash1 := "{{{} [] [] <nil>} 0 [] UNSPECIFIED     }:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
+	inputHash2 := "{{{} [] [] <nil>} 0 [] UNSPECIFIED     }:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
 
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}
 	info.OnItem().Return(NewReaderWorkItem(Key{}, &mocks2.OutputWriter{}))
 	info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-	q.OnGet(inputHash1).Return(info, true, nil)
-	q.OnGet(inputHash2).Return(info, true, nil)
+	q.OnGetMatch(mock.Anything).Return(info, true, nil)
+	q.OnGetMatch(mock.Anything).Return(info, true, nil)
 	q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	inputReader1 := &mocks2.InputReader{}
@@ -176,7 +176,7 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 				}
 			}
 			if !reflect.DeepEqual(gottenWorkItemIDs, expectedWorkItemIDs) {
-				t.Errorf("Retrieved workitem IDs = %v, want %v", gottenWorkItemIDs, expectedWorkItemIDs)
+				t.Errorf("Retrieved workitem IDs = \n|%v|, want \n|%v|", gottenWorkItemIDs, expectedWorkItemIDs)
 			}
 		})
 	}

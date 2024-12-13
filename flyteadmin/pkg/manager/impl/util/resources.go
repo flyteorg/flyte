@@ -31,16 +31,16 @@ func getTaskResourcesAsSet(ctx context.Context, identifier *core.Identifier,
 
 	result := runtimeInterfaces.TaskResourceSet{}
 	for _, entry := range resourceEntries {
-		switch entry.Name {
+		switch entry.GetName() {
 		case core.Resources_CPU:
-			result.CPU = parseQuantityNoError(ctx, identifier.String(), fmt.Sprintf("%v.cpu", resourceName), entry.Value)
+			result.CPU = parseQuantityNoError(ctx, identifier.String(), fmt.Sprintf("%v.cpu", resourceName), entry.GetValue())
 		case core.Resources_MEMORY:
-			result.Memory = parseQuantityNoError(ctx, identifier.String(), fmt.Sprintf("%v.memory", resourceName), entry.Value)
+			result.Memory = parseQuantityNoError(ctx, identifier.String(), fmt.Sprintf("%v.memory", resourceName), entry.GetValue())
 		case core.Resources_EPHEMERAL_STORAGE:
 			result.EphemeralStorage = parseQuantityNoError(ctx, identifier.String(),
-				fmt.Sprintf("%v.ephemeral storage", resourceName), entry.Value)
+				fmt.Sprintf("%v.ephemeral storage", resourceName), entry.GetValue())
 		case core.Resources_GPU:
-			result.GPU = parseQuantityNoError(ctx, identifier.String(), "gpu", entry.Value)
+			result.GPU = parseQuantityNoError(ctx, identifier.String(), "gpu", entry.GetValue())
 		}
 	}
 
@@ -50,32 +50,28 @@ func getTaskResourcesAsSet(ctx context.Context, identifier *core.Identifier,
 // GetCompleteTaskResourceRequirements parses the resource requests and limits from the `TaskTemplate` Container.
 func GetCompleteTaskResourceRequirements(ctx context.Context, identifier *core.Identifier, task *core.CompiledTask) workflowengineInterfaces.TaskResources {
 	return workflowengineInterfaces.TaskResources{
-		Defaults: getTaskResourcesAsSet(ctx, identifier, task.GetTemplate().GetContainer().Resources.Requests, "requests"),
-		Limits:   getTaskResourcesAsSet(ctx, identifier, task.GetTemplate().GetContainer().Resources.Limits, "limits"),
+		Defaults: getTaskResourcesAsSet(ctx, identifier, task.GetTemplate().GetContainer().GetResources().GetRequests(), "requests"),
+		Limits:   getTaskResourcesAsSet(ctx, identifier, task.GetTemplate().GetContainer().GetResources().GetLimits(), "limits"),
 	}
 }
 
 // fromAdminProtoTaskResourceSpec parses the flyteidl `TaskResourceSpec` message into a `TaskResourceSet`.
 func fromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourceSpec) runtimeInterfaces.TaskResourceSet {
 	result := runtimeInterfaces.TaskResourceSet{}
-	if len(spec.Cpu) > 0 {
-		result.CPU = parseQuantityNoError(ctx, "project", "cpu", spec.Cpu)
+	if len(spec.GetCpu()) > 0 {
+		result.CPU = parseQuantityNoError(ctx, "project", "cpu", spec.GetCpu())
 	}
 
-	if len(spec.Memory) > 0 {
-		result.Memory = parseQuantityNoError(ctx, "project", "memory", spec.Memory)
+	if len(spec.GetMemory()) > 0 {
+		result.Memory = parseQuantityNoError(ctx, "project", "memory", spec.GetMemory())
 	}
 
-	if len(spec.Storage) > 0 {
-		result.Storage = parseQuantityNoError(ctx, "project", "storage", spec.Storage)
+	if len(spec.GetEphemeralStorage()) > 0 {
+		result.EphemeralStorage = parseQuantityNoError(ctx, "project", "ephemeral storage", spec.GetEphemeralStorage())
 	}
 
-	if len(spec.EphemeralStorage) > 0 {
-		result.EphemeralStorage = parseQuantityNoError(ctx, "project", "ephemeral storage", spec.EphemeralStorage)
-	}
-
-	if len(spec.Gpu) > 0 {
-		result.GPU = parseQuantityNoError(ctx, "project", "gpu", spec.Gpu)
+	if len(spec.GetGpu()) > 0 {
+		result.GPU = parseQuantityNoError(ctx, "project", "gpu", spec.GetGpu())
 	}
 
 	return result
@@ -90,14 +86,14 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 	request := interfaces.ResourceRequest{
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	}
-	if id != nil && len(id.Project) > 0 {
-		request.Project = id.Project
+	if id != nil && len(id.GetProject()) > 0 {
+		request.Project = id.GetProject()
 	}
-	if id != nil && len(id.Domain) > 0 {
-		request.Domain = id.Domain
+	if id != nil && len(id.GetDomain()) > 0 {
+		request.Domain = id.GetDomain()
 	}
-	if id != nil && id.ResourceType == core.ResourceType_WORKFLOW && len(id.Name) > 0 {
-		request.Workflow = id.Name
+	if id != nil && id.GetResourceType() == core.ResourceType_WORKFLOW && len(id.GetName()) > 0 {
+		request.Workflow = id.GetName()
 	}
 
 	resource, err := resourceManager.GetResource(ctx, request)
@@ -109,8 +105,8 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 	logger.Debugf(ctx, "Assigning task requested resources for [%+v]", id)
 	var taskResourceAttributes = workflowengineInterfaces.TaskResources{}
 	if resource != nil && resource.Attributes != nil && resource.Attributes.GetTaskResourceAttributes() != nil {
-		taskResourceAttributes.Defaults = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Defaults)
-		taskResourceAttributes.Limits = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Limits)
+		taskResourceAttributes.Defaults = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().GetDefaults())
+		taskResourceAttributes.Limits = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().GetLimits())
 	} else {
 		taskResourceAttributes = workflowengineInterfaces.TaskResources{
 			Defaults: taskResourceConfig.GetDefaults(),

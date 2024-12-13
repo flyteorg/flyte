@@ -293,7 +293,8 @@ data:
   server.yaml: |
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         # Controls whether to serve requests over SSL/TLS.
         secure: false
@@ -428,6 +429,8 @@ data:
           - container
           - sidecar
           - k8s-array
+          - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar

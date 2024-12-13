@@ -27,7 +27,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
+		lValue = nodeInputs.GetLiterals()[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
@@ -39,7 +39,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
+		rValue = nodeInputs.GetLiterals()[expr.GetRightValue().GetVar()]
 		if rValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}
@@ -129,12 +129,14 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 		}
 		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
-		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", nil)
+		// We hard code enableCRDebugMetadata=true because it has no effect when setting phase to
+		// NodePhaseSkipped. This saves us passing the config all the way down from the nodeExecutor.
+		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", true, nil)
 	}
 
 	if selectedNodeID == nil {
 		if node.GetElseFail() != nil {
-			return nil, errors.Errorf(ErrorCodeUserProvidedError, node.GetElseFail().Message)
+			return nil, errors.Errorf(ErrorCodeUserProvidedError, node.GetElseFail().GetMessage()) //nolint:govet,staticcheck
 		}
 		return nil, errors.Errorf(ErrorCodeMalformedBranch, "No branch satisfied")
 	}

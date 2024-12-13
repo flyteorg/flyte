@@ -155,7 +155,7 @@ func unmarshalQueryJobConfig(structObj *structpb.Struct) (*QueryJobConfig, error
 }
 
 func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.LiteralMap) (*bigquery.JobConfigurationQuery, error) {
-	queryParameters, err := getQueryParameters(inputs.Literals)
+	queryParameters, err := getQueryParameters(inputs.GetLiterals())
 
 	if err != nil {
 		return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unable build query parameters [%v]", err.Error())
@@ -216,7 +216,7 @@ func getQueryParameters(literalMap map[string]*flyteIdlCore.Literal) ([]*bigquer
 func getQueryParameter(literal *flyteIdlCore.Literal) (*bigquery.QueryParameterType, *bigquery.QueryParameterValue, error) {
 	if scalar := literal.GetScalar(); scalar != nil {
 		if primitive := scalar.GetPrimitive(); primitive != nil {
-			switch primitive.Value.(type) {
+			switch primitive.GetValue().(type) {
 			case *flyteIdlCore.Primitive_Integer:
 				integerType := bigquery.QueryParameterType{Type: "INT64"}
 				integerValue := bigquery.QueryParameterValue{

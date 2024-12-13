@@ -4,7 +4,7 @@
 ### User Improvements
 Support for [Optional types](https://github.com/flyteorg/flyte/issues/2426). With the inclusion of Union types in flytekit, we can now support optional types.
 
-[Flyte Deck](https://github.com/flyteorg/flyte/issues/2175) is now available. Please take a look at the [documentation](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/deck.html#sphx-glr-auto-core-flyte-basics-deck-py) and also the [OSS presentation](https://www.youtube.com/watch?v=KqyBYIaAZ7c) that was done a few weeks back.
+[Flyte Deck](https://github.com/flyteorg/flyte/issues/2175) is now available. Please take a look at the [documentation](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/decks.html) and also the [OSS presentation](https://www.youtube.com/watch?v=KqyBYIaAZ7c) that was done a few weeks back.
 
 
 ### Backend Improvements
@@ -17,7 +17,7 @@ Support for [Optional types](https://github.com/flyteorg/flyte/issues/2426). Wit
 
 ### Bug Fixes
 * [Propeller](https://github.com/flyteorg/flyte/issues/2298) calling finalize rather than abort
-* [Propeller](https://github.com/flyteorg/flyte/issues/2404) correctly identify error when requesting a launch plan that does not exist.
+* [Propeller](https://github.com/flyteorg/flyte/issues/2404) correctly identifies an error when requesting a launch plan that does not exist.
 * Better handle [execution CRDs](https://github.com/flyteorg/flyte/issues/2275) that don't exist in Admin.
 * [Fix panic](https://github.com/flyteorg/flyte/issues/2597) when creating additional label options.
 * Check [validity](https://github.com/flyteorg/flyte/issues/2601) of notifications.

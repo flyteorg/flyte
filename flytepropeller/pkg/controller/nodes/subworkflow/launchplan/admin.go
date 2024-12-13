@@ -3,7 +3,6 @@ package launchplan
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
@@ -15,10 +14,13 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var isRecovery = true
@@ -31,8 +33,10 @@ func IsWorkflowTerminated(p core.WorkflowExecution_Phase) bool {
 
 // Executor for Launchplans that executes on a remote FlyteAdmin service (if configured)
 type adminLaunchPlanExecutor struct {
-	adminClient service.AdminServiceClient
-	cache       cache.AutoRefresh
+	adminClient     service.AdminServiceClient
+	cache           cache.AutoRefresh
+	store           *storage.DataStore
+	enqueueWorkflow v1alpha1.EnqueueWorkflow
 }
 
 type executionCacheItem struct {
@@ -40,13 +44,14 @@ type executionCacheItem struct {
 	ExecutionClosure *admin.ExecutionClosure
 	SyncError        error
 	ExecutionOutputs *core.LiteralMap
+	ParentWorkflowID v1alpha1.WorkflowID
 }
 
 func (e executionCacheItem) IsTerminal() bool {
 	if e.ExecutionClosure == nil {
 		return false
 	}
-	return e.ExecutionClosure.Phase == core.WorkflowExecution_ABORTED || e.ExecutionClosure.Phase == core.WorkflowExecution_FAILED || e.ExecutionClosure.Phase == core.WorkflowExecution_SUCCEEDED
+	return e.ExecutionClosure.GetPhase() == core.WorkflowExecution_ABORTED || e.ExecutionClosure.GetPhase() == core.WorkflowExecution_FAILED || e.ExecutionClosure.GetPhase() == core.WorkflowExecution_SUCCEEDED
 }
 
 func (e executionCacheItem) ID() string {
@@ -58,7 +63,7 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 
 	statusCode := status.Code(err)
 	if isRecovery && statusCode == codes.NotFound {
-		logger.Warnf(ctx, "failed to recover workflow [%s] with err %+v. will attempt to launch instead", launchPlanRef.Name, err)
+		logger.Warnf(ctx, "failed to recover workflow [%s] with err %+v. will attempt to launch instead", launchPlanRef.GetName(), err)
 		return nil
 	}
 	switch statusCode {
@@ -68,21 +73,22 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 			logger.Errorf(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 		}
 
-		return stdErr.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
+		return stdErr.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.GetName())
 	case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
-		return stdErr.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
+		return stdErr.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.GetName())
 	default:
 		return stdErr.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
 	}
 }
 
-func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
-	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier,
+	launchPlanRef *core.Identifier, inputs *core.LiteralMap, parentWorkflowID v1alpha1.WorkflowID) error {
+
 	var err error
 	if launchCtx.RecoveryExecution != nil {
 		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
 			Id:   launchCtx.RecoveryExecution,
-			Name: executionID.Name,
+			Name: executionID.GetName(),
 			Metadata: &admin.ExecutionMetadata{
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
@@ -112,10 +118,19 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		})
 	}
 
+	// Make a copy of the labels with shard-key removed. This ensures that the shard-key is re-computed for each
+	// instead of being copied from the parent.
+	labels := make(map[string]string)
+	for key, value := range launchCtx.Labels {
+		if key != k8s.ShardKeyLabel {
+			labels[key] = value
+		}
+	}
+
 	req := &admin.ExecutionCreateRequest{
-		Project: executionID.Project,
-		Domain:  executionID.Domain,
-		Name:    executionID.Name,
+		Project: executionID.GetProject(),
+		Domain:  executionID.GetDomain(),
+		Name:    executionID.GetName(),
 		Inputs:  inputs,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlanRef,
@@ -125,10 +140,10 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 				Principal:           launchCtx.Principal,
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
-			Labels:              &admin.Labels{Values: launchCtx.Labels},
+			Labels:              &admin.Labels{Values: labels},
 			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
 			SecurityContext:     &launchCtx.SecurityContext,
-			MaxParallelism:      int32(launchCtx.MaxParallelism),
+			MaxParallelism:      int32(launchCtx.MaxParallelism), // #nosec G115
 			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
 			Interruptible:       interruptible,
 			OverwriteCache:      launchCtx.OverwriteCache,
@@ -144,9 +159,9 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
-	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID, ParentWorkflowID: parentWorkflowID})
 	if err != nil {
-		logger.Info(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
+		logger.Infof(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}
 
 	return nil
@@ -220,8 +235,8 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 
 		// Is workflow already terminated, then no need to fetch information, also the item can be dropped from the cache
 		if exec.ExecutionClosure != nil {
-			if IsWorkflowTerminated(exec.ExecutionClosure.Phase) {
-				logger.Debugf(ctx, "Workflow [%s] is already completed, will not fetch execution information", exec.ExecutionClosure.WorkflowId)
+			if IsWorkflowTerminated(exec.ExecutionClosure.GetPhase()) {
+				logger.Debugf(ctx, "Workflow [%s] is already completed, will not fetch execution information", exec.ExecutionClosure.GetWorkflowId())
 				resp = append(resp, cache.ItemSyncResponse{
 					ID:     obj.GetID(),
 					Item:   exec,
@@ -241,7 +256,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			// TODO: Define which error codes are system errors (and return the error) vs user stdErr.
 
 			if status.Code(err) == codes.NotFound {
-				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.Name)
+				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.GetName())
 			} else {
 				err = stdErr.Wrapf(RemoteErrorSystem, err, "system error")
 			}
@@ -251,6 +266,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				Item: executionCacheItem{
 					WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 					SyncError:                   err,
+					ParentWorkflowID:            exec.ParentWorkflowID,
 				},
 				Action: cache.Update,
 			})
@@ -258,7 +274,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			continue
 		}
 
-		var outputs *core.LiteralMap
+		var outputs = &core.LiteralMap{}
 		// Retrieve potential outputs only when the workflow succeeded.
 		// TODO: We can optimize further by only retrieving the outputs when the workflow has output variables in the
 		// 	interface.
@@ -266,21 +282,32 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			execData, err := a.adminClient.GetExecutionData(ctx, &admin.WorkflowExecutionGetDataRequest{
 				Id: &exec.WorkflowExecutionIdentifier,
 			})
+			if err != nil || execData.GetFullOutputs() == nil || execData.GetFullOutputs().GetLiterals() == nil {
+				outputURI := res.GetClosure().GetOutputs().GetUri()
+				// attempt remote storage read on GetExecutionData failure
+				if outputURI != "" {
+					err = a.store.ReadProtobuf(ctx, storage.DataReference(outputURI), outputs)
+					if err != nil {
+						logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputURI, err)
+					}
+				}
+				if err != nil {
+					resp = append(resp, cache.ItemSyncResponse{
+						ID: obj.GetID(),
+						Item: executionCacheItem{
+							WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+							SyncError:                   err,
+							ParentWorkflowID:            exec.ParentWorkflowID,
+						},
+						Action: cache.Update,
+					})
 
-			if err != nil {
-				resp = append(resp, cache.ItemSyncResponse{
-					ID: obj.GetID(),
-					Item: executionCacheItem{
-						WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-						SyncError:                   err,
-					},
-					Action: cache.Update,
-				})
+					continue
+				}
 
-				continue
+			} else {
+				outputs = execData.GetFullOutputs()
 			}
-
-			outputs = execData.GetFullOutputs()
 		}
 
 		// Update the cache with the retrieved status
@@ -288,24 +315,37 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			ID: obj.GetID(),
 			Item: executionCacheItem{
 				WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-				ExecutionClosure:            res.Closure,
+				ExecutionClosure:            res.GetClosure(),
 				ExecutionOutputs:            outputs,
+				ParentWorkflowID:            exec.ParentWorkflowID,
 			},
 			Action: cache.Update,
 		})
+	}
+
+	// wait until all responses have been processed to enqueue parent workflows. if we do it
+	// prematurely, there is a chance the parent workflow evaluates before the cache is updated.
+	for _, itemSyncResponse := range resp {
+		exec := itemSyncResponse.Item.(executionCacheItem)
+		if exec.ExecutionClosure != nil && IsWorkflowTerminated(exec.ExecutionClosure.GetPhase()) {
+			a.enqueueWorkflow(exec.ParentWorkflowID)
+		}
 	}
 
 	return resp, nil
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope) (FlyteAdmin, error) {
+	cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore, enqueueWorkflow v1alpha1.EnqueueWorkflow) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
-		adminClient: client,
+		adminClient:     client,
+		store:           store,
+		enqueueWorkflow: enqueueWorkflow,
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, syncPeriod, cfg.Workers, cfg.MaxCacheSize, scope)
+	// #nosec G115
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, uint(cfg.Workers), uint(cfg.MaxCacheSize), scope)
 	if err != nil {
 		return nil, err
 	}

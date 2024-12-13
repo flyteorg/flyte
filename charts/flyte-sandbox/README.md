@@ -1,6 +1,6 @@
 # flyte-sandbox
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.1](https://img.shields.io/badge/AppVersion-1.16.1-informational?style=flat-square)
 
 A Helm chart for the Flyte local sandbox
 
@@ -9,8 +9,8 @@ A Helm chart for the Flyte local sandbox
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../flyte-binary | flyte-binary | v0.1.10 |
-| https://charts.bitnami.com/bitnami | minio | 12.1.1 |
-| https://charts.bitnami.com/bitnami | postgresql | 12.1.9 |
+| https://charts.bitnami.com/bitnami | minio | 12.6.7 |
+| https://charts.bitnami.com/bitnami | postgresql | 12.8.1 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 
@@ -30,6 +30,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[3].FLYTE_PLATFORM_URL | string | `"{{ printf \"%s-grpc\" .Release.Name }}.{{ .Release.Namespace }}:8089"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[4].FLYTE_PLATFORM_INSECURE | bool | `true` |  |
 | flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.inline.task_resources.defaults.cpu | string | `"500m"` |  |
 | flyte-binary.configuration.inline.task_resources.defaults.ephemeralStorage | int | `0` |  |

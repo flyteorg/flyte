@@ -4,6 +4,7 @@ package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
@@ -135,6 +136,9 @@ message LaunchPlanSpec {
 
     // Environment variables to be set for the execution.
     Envs envs = 21;
+
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvAssignment execution_env_assignments = 22;
 }
 
 // Values computed by the flyte platform after launch plan registration.
@@ -193,7 +197,7 @@ message ActiveLaunchPlanRequest {
     NamedEntityIdentifier id = 1;
 }
 
-// Represents a request structure to list active launch plans within a project/domain.
+// Represents a request structure to list active launch plans within a project/domain and optional org.
 // See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message ActiveLaunchPlanListRequest {
     // Name of the project that contains the identifiers.
@@ -216,4 +220,7 @@ message ActiveLaunchPlanListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }

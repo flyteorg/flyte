@@ -23,7 +23,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.1.1
+    helm.sh/chart: minio-12.6.7
   name: flyte-sandbox-minio
   namespace: flyte
 secrets:
@@ -479,7 +479,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy-config
   namespace: flyte
@@ -499,7 +499,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RjVjd3lFdXVJRllyTzlTNA==
+  haSharedSecret: ZGk5bzRzSnplTWNLVHlnUQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -536,7 +536,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.1.1
+    helm.sh/chart: minio-12.6.7
   name: flyte-sandbox-minio
   namespace: flyte
 type: Opaque
@@ -550,7 +550,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.9
+    helm.sh/chart: postgresql-12.8.1
   name: flyte-sandbox-postgresql
   namespace: flyte
 type: Opaque
@@ -588,7 +588,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-local
   namespace: flyte
@@ -659,7 +659,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-local
   namespace: flyte
@@ -683,7 +683,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.1.1
+    helm.sh/chart: minio-12.6.7
   name: flyte-sandbox-minio
   namespace: flyte
 spec:
@@ -709,7 +709,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.9
+    helm.sh/chart: postgresql-12.8.1
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
@@ -734,7 +734,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.9
+    helm.sh/chart: postgresql-12.8.1
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
   name: flyte-sandbox-postgresql-hl
   namespace: flyte
@@ -758,7 +758,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy
   namespace: flyte
@@ -781,7 +781,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-db-storage
   namespace: flyte
@@ -801,7 +801,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-minio-storage
   namespace: flyte
@@ -821,7 +821,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-db-storage
   namespace: flyte
@@ -841,7 +841,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-minio-storage
   namespace: flyte
@@ -861,7 +861,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-buildkit
   namespace: flyte
@@ -934,7 +934,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 048f8e7e067f646dce51250b72fe31919755c8fa62f7f4f4ccc054e20a719d9e
+        checksum/secret: d86467374e961665a29122da7914335160316a6b8843182b193f477205651890
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1071,7 +1071,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: minio
-    helm.sh/chart: minio-12.1.1
+    helm.sh/chart: minio-12.6.7
   name: flyte-sandbox-minio
   namespace: flyte
 spec:
@@ -1084,12 +1084,12 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/credentials-secret: c199ac45f9d95d97966921c814d6c8b38cbf7416458e19cbe6d001a04c264448
+        checksum/credentials-secret: ecce809e3af19025d134846a9a81e163dd41df7e26abf2c6657895d9d13607a9
       labels:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: minio
-        helm.sh/chart: minio-12.1.1
+        helm.sh/chart: minio-12.6.7
     spec:
       affinity:
         nodeAffinity: null
@@ -1175,7 +1175,7 @@ spec:
         - -ec
         - |
           chown -R 1001:1001 /data
-        image: docker.io/bitnami/bitnami-shell:sandbox
+        image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: volume-permissions
         resources:
@@ -1201,7 +1201,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy
   namespace: flyte
@@ -1249,7 +1249,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    helm.sh/chart: postgresql-12.1.9
+    helm.sh/chart: postgresql-12.8.1
   name: flyte-sandbox-postgresql
   namespace: flyte
 spec:
@@ -1262,13 +1262,12 @@ spec:
   serviceName: flyte-sandbox-postgresql-hl
   template:
     metadata:
-      annotations: null
       labels:
         app.kubernetes.io/component: primary
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: postgresql
-        helm.sh/chart: postgresql-12.1.9
+        helm.sh/chart: postgresql-12.8.1
       name: flyte-sandbox-postgresql
     spec:
       affinity:
@@ -1352,7 +1351,15 @@ spec:
             cpu: 250m
             memory: 256Mi
         securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 0
+          runAsNonRoot: true
           runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /bitnami/postgresql
           name: data
@@ -1368,14 +1375,18 @@ spec:
           chmod 700 /bitnami/postgresql/data
           find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
             xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/bitnami-shell:sandbox
+        image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: init-chmod-data
         resources:
           limits: {}
           requests: {}
         securityContext:
+          runAsGroup: 0
+          runAsNonRoot: false
           runAsUser: 0
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /bitnami/postgresql
           name: data

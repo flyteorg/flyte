@@ -507,6 +507,88 @@ func (_m *AdminServiceServer) GetDescriptionEntity(_a0 context.Context, _a1 *adm
 	return r0, r1
 }
 
+type AdminServiceServer_GetDomains struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminServiceServer_GetDomains {
+	return &AdminServiceServer_GetDomains{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetDomains(_a0 context.Context, _a1 *admin.GetDomainRequest) *AdminServiceServer_GetDomains {
+	c_call := _m.On("GetDomains", _a0, _a1)
+	return &AdminServiceServer_GetDomains{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetDomainsMatch(matchers ...interface{}) *AdminServiceServer_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminServiceServer_GetDomains{Call: c_call}
+}
+
+// GetDomains provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetDomains(_a0 context.Context, _a1 *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDomainRequest) *admin.GetDomainsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetDomainRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_GetDynamicNodeWorkflow struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetDynamicNodeWorkflow) Return(_a0 *admin.DynamicNodeWorkflowResponse, _a1 error) *AdminServiceServer_GetDynamicNodeWorkflow {
+	return &AdminServiceServer_GetDynamicNodeWorkflow{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetDynamicNodeWorkflow(_a0 context.Context, _a1 *admin.GetDynamicNodeWorkflowRequest) *AdminServiceServer_GetDynamicNodeWorkflow {
+	c_call := _m.On("GetDynamicNodeWorkflow", _a0, _a1)
+	return &AdminServiceServer_GetDynamicNodeWorkflow{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetDynamicNodeWorkflowMatch(matchers ...interface{}) *AdminServiceServer_GetDynamicNodeWorkflow {
+	c_call := _m.On("GetDynamicNodeWorkflow", matchers...)
+	return &AdminServiceServer_GetDynamicNodeWorkflow{Call: c_call}
+}
+
+// GetDynamicNodeWorkflow provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetDynamicNodeWorkflow(_a0 context.Context, _a1 *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.DynamicNodeWorkflowResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDynamicNodeWorkflowRequest) *admin.DynamicNodeWorkflowResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.DynamicNodeWorkflowResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetDynamicNodeWorkflowRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetExecution struct {
 	*mock.Call
 }
@@ -786,6 +868,47 @@ func (_m *AdminServiceServer) GetNodeExecutionData(_a0 context.Context, _a1 *adm
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.NodeExecutionGetDataRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_GetProject struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetProject) Return(_a0 *admin.Project, _a1 error) *AdminServiceServer_GetProject {
+	return &AdminServiceServer_GetProject{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetProject(_a0 context.Context, _a1 *admin.ProjectGetRequest) *AdminServiceServer_GetProject {
+	c_call := _m.On("GetProject", _a0, _a1)
+	return &AdminServiceServer_GetProject{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetProjectMatch(matchers ...interface{}) *AdminServiceServer_GetProject {
+	c_call := _m.On("GetProject", matchers...)
+	return &AdminServiceServer_GetProject{Call: c_call}
+}
+
+// GetProject provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetProject(_a0 context.Context, _a1 *admin.ProjectGetRequest) (*admin.Project, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.Project
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectGetRequest) *admin.Project); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.Project)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectGetRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

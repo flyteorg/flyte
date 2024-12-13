@@ -6,7 +6,7 @@
 
 ## 1 Executive Summary
 
-Task resource allocation in Flyte includes the process of setting *CPU, memory, GPU* and *ephemeral storage* requests and limits for containers running Flyte tasks on [kubernetes](https://docs.flyte.org/projects/cookbook/en/latest/native_backend_plugins.html#native-backend-plugins). These resource selections affect pod scheduling decisions and as such sensible defaults ought to be applied when a user doesn't specify requests or limits. This fallback behavior currently exists in Flyte but has been configured and modified organically such that the default value assignment has grown convoluted and unfortunately error-prone.
+Task resource allocation in Flyte includes the process of setting *CPU, memory, GPU* and *ephemeral storage* requests and limits for containers running Flyte tasks on [kubernetes](https://docs.flyte.org/en/latest/flytesnacks/integrations.html#native-backend-plugins). These resource selections affect pod scheduling decisions and as such sensible defaults ought to be applied when a user doesn't specify requests or limits. This fallback behavior currently exists in Flyte but has been configured and modified organically such that the default value assignment has grown convoluted and unfortunately error-prone.
 
 ## 2 Motivation
 
@@ -18,7 +18,7 @@ Background
 ----------
 Kubernetes allows users to specify both [requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/). **Requests** are used to schedule pods onto nodes. **Limits** are hard stops that running containers are not permitted to exceed.
 
-In the context of what a Flyte user can specify, flytekit [task decorators](https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task) permit setting both requests and limits. Furthermore, in their workflow definitions, users can specify node-level overrides which supersede static task definition resource values.
+In the context of what a Flyte user can specify, flytekit [task decorators](https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.task.html#flytekit-task) permit setting both requests and limits. Furthermore, in their workflow definitions, users can specify node-level overrides which supersede static task definition resource values.
 
 In the Flyte back-end, **default** values can be applied as requests and limits when a user omits them from a task specification. Furthermore, **max** values are used to enforce that either user-specified resource requests or limits do not exceed a configured threshold.
 
@@ -34,7 +34,7 @@ The `ExecutionConfig` already stores the [admin-resolved values](https://github.
 When building a task container, the default container task plugin will use user-specified resource values and verify they do not exceed the platform-supplied **max** values. When a request and/or limit for a specific resource (e.g. CPU, memory, etc) is not user-supplied the platform-supplied **default** values will be used. After this resolution is performed, the plugin handler will finally make sure that no resource requests exceed resource limits, leading to an impossible-to-schedule situation.
 
 ### K8s Pod Plugin Behavior
-This will behave similarly to the default container plugin behavior. Platform-supplied **max** values will be enforced for *all* containers defined in a k8s pod spec for a task. However, platform-supplied **default** values will only be substituted for primary container tasks (see more [here](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/pod.html#sphx-glr-auto-integrations-kubernetes-pod-pod-py)).
+This will behave similarly to the default container plugin behavior. Platform-supplied **max** values will be enforced for *all* containers defined in a k8s pod spec for a task. However, platform-supplied **default** values will only be substituted for primary container tasks (see more [here](https://docs.flyte.org/en/latest/flytesnacks/examples/k8s_pod_plugin/index.html)).
 
 
 
@@ -51,7 +51,7 @@ Introducing this change as always, has the potential for leading to bugs and con
 ## 7 Potential Impact and Dependencies
 
 ### Fallback Behavior
-Introducing this revamped task resource resolution should not result in existing executions failing! In this case, we must build with backwards compatibility in mind and not depend on the `GetPlatformTaskResourceValues()` method necessarily being populated with values. 
+Introducing this revamped task resource resolution should not result in existing executions failing! In this case, we must build with backwards compatibility in mind and not depend on the `GetPlatformTaskResourceValues()` method necessarily being populated with values.
 
 ## 8 Unresolved questions
 

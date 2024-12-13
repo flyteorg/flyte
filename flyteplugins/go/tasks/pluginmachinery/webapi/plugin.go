@@ -22,7 +22,7 @@ import (
 // that the plugin loader will be called before any Handle/Abort/Finalize functions are invoked
 type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (AsyncPlugin, error)
 
-// PluginEntry is a structure that is used to indicate to the system a K8s plugin
+// PluginEntry is a structure that is used to indicate to the system a WebAPI plugin
 type PluginEntry struct {
 	// ID/Name of the plugin. This will be used to identify this plugin and has to be unique in the entire system
 	// All functions like enabling and disabling a plugin use this ID
@@ -72,9 +72,6 @@ type TaskExecutionContext interface {
 
 	// Provides the raw datastore to enable persisting outputs.
 	DataStore() *storage.DataStore
-
-	// Returns the max allowed dataset size that the outputwriter will accept
-	MaxDatasetSizeBytes() int64
 }
 
 type GetContext interface {

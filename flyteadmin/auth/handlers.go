@@ -5,22 +5,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/textproto"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -30,6 +34,8 @@ const (
 	FromHTTPKey          = "from_http"
 	FromHTTPVal          = "true"
 )
+
+var XRequestID = textproto.CanonicalMIMEHeaderKey(contextutils.RequestIDKey.String())
 
 type PreRedirectHookError struct {
 	Message string
@@ -50,7 +56,7 @@ func (e *PreRedirectHookError) Error() string {
 type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
 type LogoutHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) error
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
-type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
+type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m proto.Message) error
 
 type AuthenticatedClientMeta struct {
 	ClientIds     []string
@@ -139,8 +145,13 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 
 		state := HashCsrfState(csrfToken)
 		logger.Debugf(ctx, "Setting CSRF state cookie to %s and state to %s\n", csrfToken, state)
-		url := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
+		urlString := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
 		queryParams := request.URL.Query()
+		if !GetRedirectURLAllowed(ctx, queryParams.Get(RedirectURLParameter), authCtx.Options()) {
+			logger.Infof(ctx, "unauthorized redirect URI")
+			writer.WriteHeader(http.StatusForbidden)
+			return
+		}
 		if flowEndRedirectURL := queryParams.Get(RedirectURLParameter); flowEndRedirectURL != "" {
 			redirectCookie := NewRedirectCookie(ctx, flowEndRedirectURL)
 			if redirectCookie != nil {
@@ -149,7 +160,23 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 				logger.Errorf(ctx, "Was not able to create a redirect cookie")
 			}
 		}
-		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
+
+		idpURL, err := url.Parse(urlString)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse url %q: %v", urlString, err)
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+
+		// Add the IDPQueryParameter to the URL if it is present in the request
+		idpQueryParam := authCtx.Options().UserAuth.IDPQueryParameter
+		if len(idpQueryParam) > 0 && queryParams.Get(idpQueryParam) != "" {
+			logger.Infof(ctx, "Adding IDP Query Parameter to the URL")
+			query := idpURL.Query() // Gets a copy of query parameters
+			query.Add(idpQueryParam, queryParams.Get(idpQueryParam))
+			// Updates the rawquery with the new query parameters
+			idpURL.RawQuery = query.Encode()
+		}
+		http.Redirect(writer, request, idpURL.String(), http.StatusTemporaryRedirect)
 	}
 }
 
@@ -238,9 +265,10 @@ func GetAuthenticationCustomMetadataInterceptor(authCtx interfaces.Authenticatio
 		if authCtx.Options().GrpcAuthorizationHeader != DefaultAuthorizationHeader {
 			md, ok := metadata.FromIncomingContext(ctx)
 			if ok {
-				existingHeader := md.Get(authCtx.Options().GrpcAuthorizationHeader)
+				grpcAuthzHeader := authCtx.Options().GrpcAuthorizationHeader
+				existingHeader := md.Get(grpcAuthzHeader)
 				if len(existingHeader) > 0 {
-					logger.Debugf(ctx, "Found existing metadata %s", existingHeader[0])
+					logger.Debugf(ctx, "Found existing metadata header %s", grpcAuthzHeader)
 					newAuthorizationMetadata := metadata.Pairs(DefaultAuthorizationHeader, existingHeader[0])
 					joinedMetadata := metadata.Join(md, newAuthorizationMetadata)
 					newCtx := metadata.NewIncomingContext(ctx, joinedMetadata)
@@ -273,23 +301,25 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		fromHTTP := metautils.ExtractIncoming(ctx).Get(FromHTTPKey)
 		isFromHTTP := fromHTTP == FromHTTPVal
 
-		identityContext, err := GRPCGetIdentityFromAccessToken(ctx, authCtx)
-		if err == nil {
+		identityContext, accessTokenErr := GRPCGetIdentityFromAccessToken(ctx, authCtx)
+		if accessTokenErr == nil {
 			return SetContextForIdentity(ctx, identityContext), nil
 		}
 
-		logger.Infof(ctx, "Failed to parse Access Token from context. Will attempt to find IDToken. Error: %v", err)
+		logger.Infof(ctx, "Failed to parse Access Token from context. Will attempt to find IDToken. Error: %v", accessTokenErr)
 
-		identityContext, err = GRPCGetIdentityFromIDToken(ctx, authCtx.Options().UserAuth.OpenID.ClientID,
+		identityContext, idTokenErr := GRPCGetIdentityFromIDToken(ctx, authCtx.Options().UserAuth.OpenID.ClientID,
 			authCtx.OidcProvider())
 
-		if err == nil {
+		if idTokenErr == nil {
 			return SetContextForIdentity(ctx, identityContext), nil
 		}
+		logger.Debugf(ctx, "Failed to parse ID Token from context. Error: %v", idTokenErr)
 
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
+			err := fmt.Errorf("id token err: %w, access token err: %w", fmt.Errorf("access token err: %w", accessTokenErr), idTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 
@@ -462,7 +492,7 @@ func QueryUserInfoUsingAccessToken(ctx context.Context, originalRequest *http.Re
 // See https://tools.ietf.org/html/rfc8414 for more information.
 func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.ResolveReference(authCtx.GetOIdCMetadataURL())
+		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.JoinPath("/").ResolveReference(authCtx.GetOIdCMetadataURL())
 		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
 	}
 }
@@ -491,11 +521,11 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 }
 
 func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
-	return func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error {
+	return func(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
-			if info.AdditionalClaims != nil {
-				for k, v := range info.AdditionalClaims.GetFields() {
+			if info.GetAdditionalClaims() != nil {
+				for k, v := range info.GetAdditionalClaims().GetFields() {
 					jsonBytes, err := v.MarshalJSON()
 					if err != nil {
 						logger.Warningf(ctx, "failed to marshal claim [%s] to json: %v", k, err)
@@ -505,8 +535,23 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 					w.Header().Set(header, string(jsonBytes))
 				}
 			}
-			w.Header().Set("X-User-Subject", info.Subject)
+			w.Header().Set("X-User-Subject", info.GetSubject())
 		}
 		return nil
+	}
+}
+
+func GetCustomHeaderMatcher(pluginRegistry *plugins.Registry) runtime.HeaderMatcherFunc {
+	if fn := plugins.Get[runtime.HeaderMatcherFunc](pluginRegistry, plugins.PluginIDCustomerHeaderMatcher); fn != nil {
+		return fn
+	}
+	return func(key string) (string, bool) {
+		canonicalKey := textproto.CanonicalMIMEHeaderKey(key)
+		switch canonicalKey {
+		case XRequestID:
+			return canonicalKey, true
+		default:
+			return runtime.DefaultHeaderMatcher(key)
+		}
 	}
 }

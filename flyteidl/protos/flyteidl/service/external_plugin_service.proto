@@ -4,7 +4,6 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
-import "flyteidl/core/interface.proto";
 
 // ExternalPluginService defines an RPC Service that allows propeller to send the request to the backend plugin server.
 service ExternalPluginService {

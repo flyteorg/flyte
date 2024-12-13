@@ -11,6 +11,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestCreateProject(t *testing.T) {
@@ -29,8 +30,8 @@ func TestCreateProject(t *testing.T) {
 			ResourceType: core.ResourceType_TASK,
 		},
 	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = missing entity of type TASK"+
-		" with identifier project:\"potato\" domain:\"development\" name:\"task\" version:\"1234\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "rpc error: code = NotFound desc = missing entity of type TASK"+
+		" with identifier project:\"potato\"  domain:\"development\"  name:\"task\"  version:\"1234\" ", err.Error())
 	assert.Empty(t, task)
 
 	req := admin.ProjectRegisterRequest{
@@ -225,4 +226,18 @@ func TestUpdateProjectLabels_BadLabels(t *testing.T) {
 
 	// Assert that update went through without an error.
 	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = invalid label value [#bar]: [a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')]")
+}
+
+func TestGetDomains(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	domains, err := client.GetDomains(ctx, &admin.GetDomainRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, domains.Domains)
+	for _, domain := range domains.Domains {
+		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Id)
+		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Name)
+	}
 }

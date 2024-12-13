@@ -14,21 +14,21 @@ func CreateSignalModel(signalID *core.SignalIdentifier, signalType *core.Literal
 	signalModel := models.Signal{}
 	if signalID != nil {
 		signalKey := &signalModel.SignalKey
-		if signalID.ExecutionId != nil {
+		if signalID.GetExecutionId() != nil {
 			executionKey := &signalKey.ExecutionKey
-			if len(signalID.ExecutionId.Project) > 0 {
-				executionKey.Project = signalID.ExecutionId.Project
+			if len(signalID.GetExecutionId().GetProject()) > 0 {
+				executionKey.Project = signalID.GetExecutionId().GetProject()
 			}
-			if len(signalID.ExecutionId.Domain) > 0 {
-				executionKey.Domain = signalID.ExecutionId.Domain
+			if len(signalID.GetExecutionId().GetDomain()) > 0 {
+				executionKey.Domain = signalID.GetExecutionId().GetDomain()
 			}
-			if len(signalID.ExecutionId.Name) > 0 {
-				executionKey.Name = signalID.ExecutionId.Name
+			if len(signalID.GetExecutionId().GetName()) > 0 {
+				executionKey.Name = signalID.GetExecutionId().GetName()
 			}
 		}
 
-		if len(signalID.SignalId) > 0 {
-			signalKey.SignalID = signalID.SignalId
+		if len(signalID.GetSignalId()) > 0 {
+			signalKey.SignalID = signalID.GetSignalId()
 		}
 	}
 
@@ -67,8 +67,8 @@ func initWorkflowExecutionIdentifier(id *core.WorkflowExecutionIdentifier) *core
 	return id
 }
 
-func FromSignalModel(signalModel models.Signal) (admin.Signal, error) {
-	signal := admin.Signal{}
+func FromSignalModel(signalModel models.Signal) (*admin.Signal, error) {
+	signal := &admin.Signal{}
 
 	var executionID *core.WorkflowExecutionIdentifier
 	if len(signalModel.SignalKey.ExecutionKey.Project) > 0 {
@@ -102,7 +102,7 @@ func FromSignalModel(signalModel models.Signal) (admin.Signal, error) {
 		var typeDeserialized core.LiteralType
 		err := proto.Unmarshal(signalModel.Type, &typeDeserialized)
 		if err != nil {
-			return admin.Signal{}, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal signal type")
+			return &admin.Signal{}, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal signal type")
 		}
 		signal.Type = &typeDeserialized
 	}
@@ -111,7 +111,7 @@ func FromSignalModel(signalModel models.Signal) (admin.Signal, error) {
 		var valueDeserialized core.Literal
 		err := proto.Unmarshal(signalModel.Value, &valueDeserialized)
 		if err != nil {
-			return admin.Signal{}, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal signal value")
+			return &admin.Signal{}, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal signal value")
 		}
 		signal.Value = &valueDeserialized
 	}
@@ -126,7 +126,7 @@ func FromSignalModels(signalModels []models.Signal) ([]*admin.Signal, error) {
 		if err != nil {
 			return nil, err
 		}
-		signals[idx] = &signal
+		signals[idx] = signal
 	}
 	return signals, nil
 }

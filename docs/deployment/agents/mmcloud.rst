@@ -57,22 +57,20 @@ Enable the MMCloud agent by adding the following config to the relevant YAML fil
 .. code-block:: yaml
 
   tasks:
-    task-agents:
-      enabled-agents:
+    task-plugins:
+      enabled-plugins:
         - agent-service
       default-for-task-types:
         - mmcloud_task: agent-service
 
 .. code-block:: yaml
 
-  agents:
+  plugins:
     agent-service:
       agents:
         mmcloud-agent:
           endpoint: <AGENT_ENDPOINT>
           insecure: true
-      supportedTaskTypes:
-      - mmcloud_task
       agentForTaskTypes:
       - mmcloud_task: mmcloud-agent
 
@@ -117,3 +115,5 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block::
 
   kubectl get pods -n flyte
+
+For MMCloud agent on the Flyte cluster, see `MMCloud agent <https://docs.flyte.org/en/latest/flytesnacks/examples/mmcloud_agent/index.html>`_.

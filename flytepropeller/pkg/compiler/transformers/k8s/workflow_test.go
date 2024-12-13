@@ -1,11 +1,9 @@
 package k8s
 
 import (
-	"bytes"
 	"io/ioutil"
 	"testing"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -13,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func createSampleMockWorkflow() *mockWorkflow {
@@ -329,15 +328,13 @@ func TestBuildFlyteWorkflow_withBranch(t *testing.T) {
 	c, err := ioutil.ReadFile("testdata/compiled_closure_branch_nested.json")
 	assert.NoError(t, err)
 
-	r := bytes.NewReader(c)
-
 	w := &core.CompiledWorkflowClosure{}
-	assert.NoError(t, jsonpb.Unmarshal(r, w))
+	assert.NoError(t, utils.UnmarshalBytesToPb(c, w))
 
-	assert.Len(t, w.Primary.Connections.Downstream, 2)
-	ids := w.Primary.Connections.Downstream["start-node"]
-	assert.Len(t, ids.Ids, 1)
-	assert.Equal(t, ids.Ids[0], "n0")
+	assert.Len(t, w.GetPrimary().GetConnections().GetDownstream(), 2)
+	ids := w.GetPrimary().GetConnections().GetDownstream()["start-node"]
+	assert.Len(t, ids.GetIds(), 1)
+	assert.Equal(t, ids.GetIds()[0], "n0")
 
 	wf, err := BuildFlyteWorkflow(
 		w,

@@ -95,17 +95,17 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err, "unable to get bigquery client")
 	}
 
-	if taskTemplate.Type == bigqueryQueryJobTask {
+	if taskTemplate.GetType() == bigqueryQueryJobTask {
 		job, err = createQueryJob(jobID, taskTemplate.GetCustom(), inputs)
 	} else {
-		err = pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unexpected task type [%v]", taskTemplate.Type)
+		err = pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unexpected task type [%v]", taskTemplate.GetType())
 	}
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	job.Configuration.Query.Query = taskTemplate.GetSql().Statement
+	job.Configuration.Query.Query = taskTemplate.GetSql().GetStatement()
 	job.Configuration.Labels = taskCtx.TaskExecutionMetadata().GetLabels()
 
 	resp, err := client.Jobs.Insert(job.JobReference.ProjectId, job).Do()
@@ -256,7 +256,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 
-	logger.Info(ctx, "Cancelled job [%s]", formatJobReference(resourceMeta.JobReference))
+	logger.Infof(ctx, "Cancelled job [%s]", formatJobReference(resourceMeta.JobReference))
 
 	return nil
 }
@@ -278,7 +278,7 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 	switch resource.Status.State {
 	case bigqueryStatusPending:
-		return core.PhaseInfoQueuedWithTaskInfo(version, "Query is PENDING", taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), version, "Query is PENDING", taskInfo), nil
 
 	case bigqueryStatusRunning:
 		return core.PhaseInfoRunning(version, taskInfo), nil
@@ -317,12 +317,12 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation 
 		return err
 	}
 
-	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+	if taskTemplate.GetInterface() == nil || taskTemplate.GetInterface().GetOutputs() == nil || taskTemplate.Interface.Outputs.Variables == nil {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
 	}
 
-	resultsStructuredDatasetType, exists := taskTemplate.Interface.Outputs.Variables["results"]
+	resultsStructuredDatasetType, exists := taskTemplate.GetInterface().GetOutputs().GetVariables()["results"]
 	if !exists {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil

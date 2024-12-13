@@ -45,11 +45,11 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 	} else if taskTemplate == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
-	retry := toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries)
+	retry := toRetryStrategy(ctx, toBackoffLimit(taskTemplate.GetMetadata()), cfg.MinRetries, cfg.MaxRetries)
 
 	// If job isn't currently being monitored (recovering from a restart?), add it to the sync-cache and return
 	if job == nil {
-		logger.Info(ctx, "Job not found in cache, adding it. [%v]", jobName)
+		logger.Infof(ctx, "Job not found in cache, adding it. [%v]", jobName)
 
 		_, err = jobStore.GetOrCreate(jobName, &Job{
 			ID:             *currentState.ExternalJobID,
@@ -67,7 +67,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 	msg := errorcollector.NewErrorMessageCollector()
 	newArrayStatus := arraystatus.ArrayStatus{
 		Summary:  arraystatus.ArraySummary{},
-		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
+		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())), // #nosec G115
 	}
 
 	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
@@ -126,7 +126,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 			}
 		}
 
-		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
+		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase)) // #nosec G115
 		newArrayStatus.Summary.Inc(actualPhase)
 		parentState.RetryAttempts.SetItem(childIdx, bitarray.Item(len(subJob.Attempts)))
 	}

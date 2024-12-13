@@ -32,7 +32,7 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 	mockAwsEmail := mocks.SESClient{}
 	var awsSES sesiface.SESAPI = &mockAwsEmail
 	expectedSenderEmail := "no-reply@example.com"
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -46,18 +46,18 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 
 	sendEmailValidationFunc := func(input *ses.SendEmailInput) (*ses.SendEmailOutput, error) {
 		assert.Equal(t, *input.Source, expectedSenderEmail)
-		assert.Equal(t, *input.Message.Body.Html.Data, emailNotification.Body)
-		assert.Equal(t, *input.Message.Subject.Data, emailNotification.SubjectLine)
+		assert.Equal(t, *input.Message.Body.Html.Data, emailNotification.GetBody())
+		assert.Equal(t, *input.Message.Subject.Data, emailNotification.GetSubjectLine())
 		for _, toEmail := range input.Destination.ToAddresses {
 			var foundEmail = false
-			for _, verifyToEmail := range emailNotification.RecipientsEmail {
+			for _, verifyToEmail := range emailNotification.GetRecipientsEmail() {
 				if *toEmail == verifyToEmail {
 					foundEmail = true
 				}
 			}
 			assert.Truef(t, foundEmail, "To Email address [%s] wasn't apart of original inputs.", *toEmail)
 		}
-		assert.Equal(t, len(input.Destination.ToAddresses), len(emailNotification.RecipientsEmail))
+		assert.Equal(t, len(input.Destination.ToAddresses), len(emailNotification.GetRecipientsEmail()))
 		return &ses.SendEmailOutput{}, nil
 	}
 	mockAwsEmail.SetSendEmailFunc(sendEmailValidationFunc)
@@ -67,7 +67,7 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 }
 
 func TestFlyteEmailToSesEmailInput(t *testing.T) {
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -80,8 +80,8 @@ func TestFlyteEmailToSesEmailInput(t *testing.T) {
 	}
 
 	sesEmailInput := FlyteEmailToSesEmailInput(emailNotification)
-	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[0], emailNotification.RecipientsEmail[0])
-	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[1], emailNotification.RecipientsEmail[1])
+	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[0], emailNotification.GetRecipientsEmail()[0])
+	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[1], emailNotification.GetRecipientsEmail()[1])
 	assert.Equal(t, *sesEmailInput.Message.Subject.Data, "Notice: Execution \"name\" has succeeded in \"domain\".")
 }
 
@@ -97,7 +97,7 @@ func TestAwsEmailer_SendEmailError(t *testing.T) {
 
 	testEmail := NewAwsEmailer(getNotificationsConfig(), promutils.NewTestScope(), awsSES)
 
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -125,7 +125,7 @@ func TestAwsEmailer_SendEmailEmailOutput(t *testing.T) {
 
 	testEmail := NewAwsEmailer(getNotificationsConfig(), promutils.NewTestScope(), awsSES)
 
-	emailNotification := admin.EmailMessage{
+	emailNotification := &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{

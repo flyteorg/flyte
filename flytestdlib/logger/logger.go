@@ -23,7 +23,7 @@ const (
 var noopLogger = NoopLogger{}
 
 func onConfigUpdated(cfg Config) {
-	logrus.SetLevel(logrus.Level(cfg.Level))
+	logrus.SetLevel(logrus.Level(cfg.Level)) // #nosec G115
 
 	switch cfg.Formatter.Type {
 	case FormatterText:
@@ -41,7 +41,8 @@ func onConfigUpdated(cfg Config) {
 	default:
 		if _, isJSON := logrus.StandardLogger().Formatter.(*logrus.JSONFormatter); !isJSON {
 			logrus.SetFormatter(&logrus.JSONFormatter{
-				DataKey: jsonDataKey,
+				DataKey:           jsonDataKey,
+				DisableHTMLEscape: true,
 				FieldMap: logrus.FieldMap{
 					logrus.FieldKeyTime: "ts",
 				},
@@ -78,7 +79,7 @@ func getLogger(ctx context.Context) logrus.FieldLogger {
 		entry = entry.WithField(sourceCodeKey, getSourceLocation())
 	}
 
-	entry.Level = logrus.Level(cfg.Level)
+	entry.Level = logrus.Level(cfg.Level) // #nosec G115
 
 	return entry
 }

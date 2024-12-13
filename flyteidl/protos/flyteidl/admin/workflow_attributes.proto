@@ -18,6 +18,9 @@ message WorkflowAttributes {
     string workflow                = 3;
 
     MatchingAttributes matching_attributes = 4;
+
+    // Optional, org key applied to the attributes.
+    string org = 5;
 }
 
 // Sets custom attributes for a project, domain and workflow combination.
@@ -48,6 +51,9 @@ message WorkflowAttributesGetRequest {
     // Which type of matchable attributes to return.
     // +required
     MatchableResource resource_type = 4;
+
+    // Optional, org key applied to the attributes.
+    string org = 5;
 }
 
 // Response to get an individual workflow attribute override.
@@ -73,6 +79,9 @@ message WorkflowAttributesDeleteRequest {
     // Which type of matchable attributes to delete.
     // +required
     MatchableResource resource_type = 4;
+
+    // Optional, org key applied to the attributes.
+    string org = 5;
 }
 
 // Purposefully empty, may be populated in the future.

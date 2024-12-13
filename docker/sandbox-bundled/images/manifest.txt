@@ -1,4 +1,4 @@
-docker.io/bitnami/bitnami-shell:sandbox=bitnami/bitnami-shell:11-debian-11-r76
+docker.io/bitnami/os-shell:sandbox=bitnami/os-shell:11-debian-11
 docker.io/bitnami/minio:sandbox=bitnami/minio:2023.1.25-debian-11-r0
 docker.io/bitnami/postgresql:sandbox=bitnami/postgresql:15.1.0-debian-11-r20
 docker.io/envoyproxy/envoy:sandbox=envoyproxy/envoy:v1.23-latest

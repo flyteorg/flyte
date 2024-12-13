@@ -8,6 +8,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -34,6 +35,49 @@ type Metadata interface {
 	Exists() bool
 	Size() int64
 	Etag() string
+	// ContentMD5 retrieves the value of a special metadata tag added by the system that
+	// contains the MD5 of the uploaded file. If there is no metadata attached
+	// or that `FlyteContentMD5` key isn't set, ContentMD5 will return empty.
+	ContentMD5() string
+}
+
+type CursorState int
+
+const (
+	// Enum representing state of the cursor
+	AtStartCursorState     CursorState = 0
+	AtEndCursorState       CursorState = 1
+	AtCustomPosCursorState CursorState = 2
+)
+
+type Cursor struct {
+	cursorState    CursorState
+	customPosition string
+}
+
+func NewCursorAtStart() Cursor {
+	return Cursor{
+		cursorState:    AtStartCursorState,
+		customPosition: "",
+	}
+}
+
+func NewCursorAtEnd() Cursor {
+	return Cursor{
+		cursorState:    AtEndCursorState,
+		customPosition: "",
+	}
+}
+
+func NewCursorFromCustomPosition(customPosition string) Cursor {
+	return Cursor{
+		cursorState:    AtCustomPosCursorState,
+		customPosition: customPosition,
+	}
+}
+
+func IsCursorEnd(cursor Cursor) bool {
+	return cursor.cursorState == AtEndCursorState
 }
 
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
@@ -52,10 +96,13 @@ type SignedURLProperties struct {
 	ExpiresIn time.Duration
 	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
 	ContentMD5 string
+	// AddContentMD5Metadata Add ContentMD5 to the metadata of signed URL if true.
+	AddContentMD5Metadata bool
 }
 
 type SignedURLResponse struct {
-	URL url.URL
+	URL                    url.URL
+	RequiredRequestHeaders map[string]string
 }
 
 //go:generate mockery -name RawStore -case=underscore
@@ -70,6 +117,9 @@ type RawStore interface {
 
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
+
+	// List gets a list of items (relative path to the reference input) given a prefix, using a paginated API
+	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
@@ -125,4 +175,8 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 
 func (r DataReference) String() string {
 	return string(r)
+}
+
+func NewDataReference(scheme string, container string, key string) DataReference {
+	return DataReference(fmt.Sprintf("%s://%s/%s", scheme, container, key))
 }

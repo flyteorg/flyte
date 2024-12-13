@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -35,7 +36,7 @@ func dumpIdentifierNames(ids []common.Identifier) []string {
 	res := make([]string, 0, len(ids))
 
 	for _, id := range ids {
-		res = append(res, id.Name)
+		res = append(res, id.GetName())
 	}
 
 	return res
@@ -97,7 +98,7 @@ func ExampleCompileWorkflow_basic() {
 	for _, task := range tasks {
 		compiledTask, err := CompileTask(task)
 		if err != nil {
-			fmt.Printf("failed to compile task [%v]. Error: %v", task.Id, err)
+			fmt.Printf("failed to compile task [%v]. Error: %v", task.GetId(), err)
 			return
 		}
 
@@ -105,12 +106,12 @@ func ExampleCompileWorkflow_basic() {
 	}
 
 	output, errs := CompileWorkflow(inputWorkflow, subWorkflows, compiledTasks, workflows)
-	fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.Primary))
+	fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.GetPrimary()))
 	fmt.Printf("Compile Errors: %v\n", errs)
 
 	// Output:
 	// Needed Tasks: [task_123], Needed Workflows []
-	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo" "];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "FirstNode()" [label="execution",style="dashed"];"FirstNode()" -> "end-node(end)" [label="execution",style="dashed"];}
+	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo""];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "FirstNode()" [label="execution",style="dashed"];"FirstNode()" -> "end-node(end)" [label="execution",style="dashed"];}
 	// Compile Errors: <nil>
 }
 
@@ -149,7 +150,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	subWorkflows := make([]*core.WorkflowTemplate, 0)
 	reqs, err := GetRequirements(inputWorkflow, subWorkflows)
 	assert.Nil(t, err)
-	assert.Equal(t, reqs.taskIds, []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}})
+	assert.True(t, proto.Equal(reqs.taskIds[0], []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[0]))
+	assert.True(t, proto.Equal(reqs.taskIds[1], []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[1]))
 
 	// Replace with logic to satisfy the requirements
 	workflows := make([]common.InterfaceProvider, 0)
@@ -193,8 +195,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	}
 
 	output, errs := CompileWorkflow(inputWorkflow, subWorkflows, compiledTasks, workflows)
-	assert.Equal(t, output.Primary.Template.FailureNode.Id, "FailureNode")
-	assert.NotNil(t, output.Primary.Template.FailureNode.GetTaskNode())
+	assert.Equal(t, output.GetPrimary().GetTemplate().GetFailureNode().GetId(), "FailureNode")
+	assert.NotNil(t, output.GetPrimary().GetTemplate().GetFailureNode().GetTaskNode())
 	assert.Nil(t, errs)
 }
 
@@ -285,7 +287,7 @@ func ExampleCompileWorkflow_inputsOutputsBinding() {
 	for _, task := range inputTasks {
 		compiledTask, err := CompileTask(task)
 		if err != nil {
-			fmt.Printf("Failed to compile task [%v]. Error: %v", task.Id, err)
+			fmt.Printf("Failed to compile task [%v]. Error: %v", task.GetId(), err)
 			return
 		}
 
@@ -296,12 +298,12 @@ func ExampleCompileWorkflow_inputsOutputsBinding() {
 	if errs != nil {
 		fmt.Printf("Compile Errors: %v\n", errs)
 	} else {
-		fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.Primary))
+		fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.GetPrimary()))
 	}
 
 	// Output:
 	// Needed Tasks: [task_123], Needed Graphs []
-	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo" "];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "node_1()" [label="wf_input",style="solid"];"node_1()" -> "node_2()" [label="x",style="solid"];"static" -> "node_1()" [label=""];"node_2()" -> "end-node(end)" [label="n2_output",style="solid"];"static" -> "node_2()" [label=""];}
+	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo""];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "node_1()" [label="wf_input",style="solid"];"node_1()" -> "node_2()" [label="x",style="solid"];"static" -> "node_1()" [label=""];"node_2()" -> "end-node(end)" [label="n2_output",style="solid"];"static" -> "node_2()" [label=""];}
 }
 
 func ExampleCompileWorkflow_compileErrors() {
@@ -344,7 +346,7 @@ func ExampleCompileWorkflow_compileErrors() {
 	// Output:
 	// Needed Tasks: [task_123], Needed Workflows []
 	// Compile Errors: Collected Errors: 1
-	// 	Error 0: Code: TaskReferenceNotFound, Node Id: start-node, Description: Referenced Task [name:"task_123" ] not found.
+	// 	Error 0: Code: TaskReferenceNotFound, Node Id: start-node, Description: Referenced Task [name:"task_123"] not found.
 }
 
 func newIntegerPrimitive(value int64) *core.Primitive {
@@ -573,7 +575,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 
 	parentT.Run("TaskNode", func(t *testing.T) {
 		errs := errors.NewCompileErrors()
-		iface, ifaceOk := v.ValidateUnderlyingInterface(&g, &nodeBuilder{flyteNode: inputWorkflow.Nodes[0]}, errs)
+		iface, ifaceOk := v.ValidateUnderlyingInterface(&g, &nodeBuilder{flyteNode: inputWorkflow.GetNodes()[0]}, errs)
 		assert.True(t, ifaceOk)
 		assert.False(t, errs.HasErrors())
 		assert.Equal(t, taskIface, iface)
@@ -585,7 +587,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 			Target: &core.Node_WorkflowNode{
 				WorkflowNode: &core.WorkflowNode{
 					Reference: &core.WorkflowNode_SubWorkflowRef{
-						SubWorkflowRef: inputWorkflow.Id,
+						SubWorkflowRef: inputWorkflow.GetId(),
 					},
 				},
 			},
@@ -603,7 +605,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 					BranchNode: &core.BranchNode{
 						IfElse: &core.IfElseBlock{
 							Case: &core.IfBlock{
-								ThenNode: inputWorkflow.Nodes[0],
+								ThenNode: inputWorkflow.GetNodes()[0],
 							},
 						},
 					},
@@ -611,7 +613,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 			}}, errs)
 			assert.True(t, ifaceOk)
 			assert.False(t, errs.HasErrors())
-			assert.Equal(t, taskIface.Outputs, iface.Outputs)
+			assert.Equal(t, taskIface.GetOutputs(), iface.GetOutputs())
 		})
 
 		branchT.Run("TwoCases", func(t *testing.T) {
@@ -621,7 +623,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 					BranchNode: &core.BranchNode{
 						IfElse: &core.IfElseBlock{
 							Case: &core.IfBlock{
-								ThenNode: inputWorkflow.Nodes[0],
+								ThenNode: inputWorkflow.GetNodes()[0],
 							},
 							Other: []*core.IfBlock{
 								{
@@ -629,7 +631,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 										Target: &core.Node_WorkflowNode{
 											WorkflowNode: &core.WorkflowNode{
 												Reference: &core.WorkflowNode_SubWorkflowRef{
-													SubWorkflowRef: inputWorkflow.Id,
+													SubWorkflowRef: inputWorkflow.GetId(),
 												},
 											},
 										},
@@ -718,9 +720,9 @@ func TestCompileWorkflow(t *testing.T) {
 	assert.NoError(t, errs)
 	assert.NotNil(t, output)
 	if output != nil {
-		t.Logf("Graph Repr: %v", visualize.ToGraphViz(output.Primary))
+		t.Logf("Graph Repr: %v", visualize.ToGraphViz(output.GetPrimary()))
 
-		assert.Equal(t, []string{"node_123"}, output.Primary.Connections.Upstream["node_456"].Ids)
+		assert.Equal(t, []string{"node_123"}, output.GetPrimary().GetConnections().GetUpstream()["node_456"].GetIds())
 	}
 }
 

@@ -41,6 +41,9 @@ type State struct {
 	// Phase current phase of the resource.
 	Phase Phase `json:"phase,omitempty"`
 
+	// PhaseVersion is the version of the phase. This is used to detect if the phase has changed since the last time
+	PhaseVersion uint32
+
 	// ResourceMeta contain metadata about resource this task created. This can be a complex structure or a simple type
 	// (e.g. a string). It should contain enough information for the plugin to interact (retrieve, check status, delete)
 	// with the resource through the remote service.
@@ -50,9 +53,6 @@ type State struct {
 	// the sync function is entirely opaque. Note that this field is completely orthogonal to Flyte system/node/task
 	// level retries, just errors from hitting API, inside the sync loop
 	SyncFailureCount int `json:"syncFailureCount,omitempty"`
-
-	// In creating the resource, this is the number of failures
-	CreationFailureCount int `json:"creationFailureCount,omitempty"`
 
 	// The time the execution first requests for an allocation token
 	AllocationTokenRequestStartTime time.Time `json:"allocationTokenRequestStartTime,omitempty"`

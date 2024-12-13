@@ -6,11 +6,12 @@ define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --tags --long --match "v*" --first-parent)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
-PACKAGE ?=github.com/flyteorg/flytestdlib
+PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+TMP_BUILD_DIR := .tmp_build
 
 .PHONY: cmd/single/dist
 cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
@@ -20,7 +21,7 @@ cmd/single/dist:
 .PHONY: compile
 compile: cmd/single/dist
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
-	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
+	mv ./flyte ${GOPATH}/bin/ || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
 linux_compile: cmd/single/dist
@@ -30,13 +31,10 @@ linux_compile: cmd/single/dist
 update_boilerplate:
 	@boilerplate/update.sh
 
-.PHONY: kustomize
-kustomize:
-	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
-
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
+	make -C docker/sandbox-bundled manifests
 
 .PHONY: release_automation
 release_automation:
@@ -46,16 +44,12 @@ release_automation:
 	$(MAKE) -C docker/sandbox-bundled manifests
 
 .PHONY: deploy_sandbox
-deploy_sandbox: 
+deploy_sandbox:
 	bash script/deploy.sh
 
 .PHONY: install-piptools
 install-piptools: ## Install pip-tools
 	pip install -U pip-tools
-
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
 
 .PHONY: install-conda-lock
 install-conda-lock:
@@ -63,7 +57,9 @@ install-conda-lock:
 
 .PHONY: conda-lock
 conda-lock: install-conda-lock
-	conda-lock -f monodocs-environment.yaml --without-cuda --lockfile monodocs-environment.lock.yaml
+	conda-lock -f monodocs-environment.yaml --without-cuda \
+		--lockfile monodocs-environment.lock.yaml \
+		--platform=osx-64 --platform=osx-arm64 --platform=linux-64
 
 .PHONY: stats
 stats:
@@ -87,9 +83,29 @@ helm_install: ## Install helm charts
 helm_upgrade: ## Upgrade helm charts
 	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
+# Used in CI
 .PHONY: docs
 docs:
 	make -C docs clean html SPHINXOPTS=-W
+
+$(TMP_BUILD_DIR):
+	mkdir $@
+
+$(TMP_BUILD_DIR)/conda-lock-image: docs/Dockerfile.conda-lock | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f docs/Dockerfile.conda-lock .
+	touch $(TMP_BUILD_DIR)/conda-lock-image
+
+monodocs-environment.lock.yaml: monodocs-environment.yaml $(TMP_BUILD_DIR)/conda-lock-image
+	docker run --platform=linux/amd64 --rm --pull never -v ./:/flyte flyte-conda-lock:latest lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml
+
+$(TMP_BUILD_DIR)/dev-docs-image: docs/Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f docs/Dockerfile.docs .
+	touch $(TMP_BUILD_DIR)/dev-docs-image
+
+# Build docs in docker container for local development
+.PHONY: dev-docs
+dev-docs: $(TMP_BUILD_DIR)/dev-docs-image
+	bash script/local_build_docs.sh
 
 .PHONY: help
 help: SHELL := /bin/sh
@@ -119,3 +135,17 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+	make -C flytectl go-tidy
+
+.PHONY: lint-helm-charts
+lint-helm-charts:
+	# This pressuposes that you have act installed
+	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+
+.PHONY: spellcheck
+spellcheck:
+	act pull_request --container-architecture linux/amd64 -W .github/workflows/codespell.yml
+
+.PHONY: clean
+clean: ## Remove the HTML files related to the Flyteconsole and Makefile
+	rm -rf cmd/single/dist .tmp_build

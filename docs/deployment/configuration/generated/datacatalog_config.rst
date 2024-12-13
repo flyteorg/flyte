@@ -12,6 +12,8 @@ Flyte Datacatalog Configuration
 
 - `logger <#section-logger>`_
 
+- `otel <#section-otel>`_
+
 - `storage <#section-storage>`_
 
 Section: application
@@ -217,11 +219,12 @@ postgres (`database.PostgresConfig`_)
 
   dbname: postgres
   debug: false
-  host: postgres
+  host: localhost
   options: sslmode=disable
-  password: ""
+  password: postgres
   passwordPath: ""
-  port: 5432
+  port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -260,7 +263,19 @@ The host name of the database server
 
 .. code-block:: yaml
 
-  postgres
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
   
 
 port (int)
@@ -272,7 +287,7 @@ The port name of the database server
 
 .. code-block:: yaml
 
-  "5432"
+  "30001"
   
 
 dbname (string)
@@ -308,7 +323,7 @@ The database password.
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 passwordPath (string)
@@ -489,6 +504,167 @@ Sets logging format type.
 .. code-block:: yaml
 
   json
+  
+
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otlpgrpc (`otelutils.OtlpGrpcConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP gRPC collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4317
+  
+
+otlphttp (`otelutils.OtlpHttpConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to an OTLP HTTP collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:4318/v1/traces
+  
+
+sampler (`otelutils.SamplerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for the sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  parentSampler: always
+  traceIdRatio: 0.01
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemetry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
+otelutils.OtlpGrpcConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4317
+  
+
+otelutils.OtlpHttpConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the OTLP telemetry trace collector
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:4318/v1/traces
+  
+
+otelutils.SamplerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+parentSampler (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Sets the parent sampler to use for the tracer
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  always
+  
+
+traceIdRatio (float64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.01"
   
 
 Section: storage

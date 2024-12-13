@@ -1,4 +1,5 @@
-{{- if .Values.ingress.create }}
+{{- if and .Values.ingress.create .Values.ingress.separateGrpcIngress }}
+{{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -38,90 +39,22 @@ spec:
       {{- if .Values.ingress.grpcExtraPaths.prepend }}
       {{- tpl ( .Values.ingress.grpcExtraPaths.prepend | toYaml ) . | nindent 6 }}
       {{- end }}
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.AdminService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.AdminService/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.DataProxyService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.DataProxyService/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.AuthMetadataService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.AuthMetadataService/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.IdentityService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.IdentityService/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /grpc.health.v1.Health
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /grpc.health.v1.Health/*
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.SignalService
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: {{ include "flyte-binary.service.grpc.name" . }}
-            port:
-              number: {{ include "flyte-binary.service.grpc.port" . }}
-        path: /flyteidl.service.SignalService/*
-        pathType: ImplementationSpecific
+      {{- range $path := $paths }}
+        - path: {{ $path }}
+          {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+          pathType: ImplementationSpecific
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: {{ include "flyte-binary.service.grpc.name" $ }}
+              port:
+                number: {{ include "flyte-binary.service.grpc.port" $ }}
+            {{- else }}
+            serviceName: {{ include "flyte-binary.service.grpc.name" $ }}
+            servicePort: {{ include "flyte-binary.service.grpc.port" $ }}
+            {{- end }}
+      {{- end }}
       {{- if .Values.ingress.grpcExtraPaths.append }}
       {{- tpl ( .Values.ingress.grpcExtraPaths.append | toYaml ) . | nindent 6 }}
       {{- end }}

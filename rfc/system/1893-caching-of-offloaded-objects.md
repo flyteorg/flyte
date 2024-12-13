@@ -6,7 +6,7 @@
 
 ## 1 Executive Summary
 
-We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for certain categories of objects.
+We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html), enabling cache-by-value semantics for certain categories of objects.
 
 ## 2 Motivation
 
@@ -22,10 +22,10 @@ def foo(a: int, b: str) -> pd.DataFrame:
 @task(cached=True, version="1.0")
 def bar(df: pd.Dataframe) -> int:
     ...
-    
+
 @workflow
 def wf(a: int, b: str):
-    df = foo(a=a, b=b) 
+    df = foo(a=a, b=b)
     v = bar(df=df)
 ```
 
@@ -41,15 +41,15 @@ First we're going to enumerate the problems tackled in this proposal and discuss
 
 ### Problem 1: Cache-by-value semantics for non-Flyte objects
 
-For a certain category of objects, for example pandas dataframes, in order to pass data around in a performant way, Flyte writes the actual data to an object in the configured blob store and uses the path to this random object as part of the representation of the object. In other words, from the perspective of the backend, for all intents and purposes we offer cache-by-reference semantics for these objects. 
+For a certain category of objects, for example pandas dataframes, in order to pass data around in a performant way, Flyte writes the actual data to an object in the configured blob store and uses the path to this random object as part of the representation of the object. In other words, from the perspective of the backend, for all intents and purposes we offer cache-by-reference semantics for these objects.
 
 So how to offer a cache-by-value semantics for the case of these offloaded objects? We're going to expose a way for users to override the hash of objects and use that hash as part of the caching computation.
 
 #### Exposing a hash in Literals
 
-We will expose a new field in [Literal](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79) objects called `hash`, which will be used to represent that literal in cache key calculations. 
+We will expose a new field in [Literal](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L68-L79) objects called `hash`, which will be used to represent that literal in cache key calculations.
 
-Each client will then define the mechanics of setting that field when it's appropriate. Specifically for flytekit, we are going to use the extensions to the typing module proposed in https://www.python.org/dev/peps/pep-0593/, more specifically [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated). 
+Each client will then define the mechanics of setting that field when it's appropriate. Specifically for flytekit, we are going to use the extensions to the typing module proposed in https://www.python.org/dev/peps/pep-0593/, more specifically [`typing.Annotated`](https://docs.python.org/3/library/typing.html#typing.Annotated).
 
 The following example illustrates how these annotated return objects are going to look like:
 
@@ -64,7 +64,7 @@ def foo(a: int, b: str) -> Annotated[pd.DataFrame, HashMethod(hash_pandas_datafr
 @task(cached=True, version="1.0")
 def bar(df: pd.Dataframe) -> int:
     ...
-    
+
 @workflow
 def wf(a: int, b: str):
     df = foo(a=a, b=b)
@@ -72,7 +72,7 @@ def wf(a: int, b: str):
     #   1. the return type of `foo` wraps around a pandas datataframe and adds some metadata to it.
     #   2. the task `bar` is marked as cached and since the dataframe returned by `foo` overrides its hash
     #      we will check the cache using the dataframe's hash as opposed to the literal representation.
-    v = bar(df=df) 
+    v = bar(df=df)
 ```
 
 It's worth noting that this is a strictly opt-in feature, controlled at the level of Type Transformers. In other words, annotating types for which Type Transformers are not marked as opted in will be a no-op.
@@ -102,7 +102,7 @@ message Literal {
 }
 ```
 
-#### Flytekit 
+#### Flytekit
 
 The crux of the mechanics in flytekit revolves around how to expose enough flexibility to allow for arbitrary hash functions to be used, while at the same time providing enough information to flytekit. We propose the use of a `HashMethod` metadata object used in annotated return types. The idea being that during the process of converting from a python value to a literal we apply that hash method and set it in the literal.
 
@@ -120,7 +120,7 @@ Although nothing prevents the adoption of this feature in other clients, flyteki
 
 ### Problem 2: Bubbling up caching information
 
-A natural question to ask is in what ways we can help users in the process of authoring and visualizing workflows that use these hash-annotated objects? 
+A natural question to ask is in what ways we can help users in the process of authoring and visualizing workflows that use these hash-annotated objects?
 
 First of all, we're going to augment the [`LiteralType` metadata](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/types.proto#L91) with a `hashable` field. Setting this field will indicate that for that type we expect the hash to be overridden in case that type is used as an input in a cacheable task.
 
@@ -140,13 +140,13 @@ def foo(a: int, b: str) -> pd.DataFrame:
 @task(cached=True, version="1.0")
 def bar(df: pd.Dataframe) -> int:
     ...
-    
+
 @workflow
 def wf(a: int, b: str):
     df = foo(a=a, b=b)
     # At registration time we will be able to signal to the user that calls to the task `bar` will never be cached, since that even though the hashable bit is set,
     # the upstream task is not returning a hash-annotated object.
-    v = bar(df=df) 
+    v = bar(df=df)
     ...
 ```
 
@@ -163,13 +163,13 @@ N/A?
 
 ## 5 Drawbacks
 
-Although this feature does *not* impact the other aspects of how the cache works, for example,  changes to the version or the signature of the task invalidate the cache entries, it still might cause confusion since from the perspective of a task execution we will not be able to tell if an object will have its hash overridden. 
+Although this feature does *not* impact the other aspects of how the cache works, for example,  changes to the version or the signature of the task invalidate the cache entries, it still might cause confusion since from the perspective of a task execution we will not be able to tell if an object will have its hash overridden.
 
 ## 6 Alternatives
 
 A few options were discussed in https://github.com/flyteorg/flyte/issues/1581:
 
-**Expose a `hash` method in Type Transformers and annotate the task in case the type transformer does not contain a hash function:** The major drawbacks of this alternative are two-fold: 
+**Expose a `hash` method in Type Transformers and annotate the task in case the type transformer does not contain a hash function:** The major drawbacks of this alternative are two-fold:
     (1) There's no way to opt-out, i.e. all objects produced by that Type Transformer will be cached.
     (2) The UX is a bit clunky in the case of user-defined hash functions for two reasons:
         - the return type does not contain any indication that the object is being cached, i.e. we'd have to look in the parameters set in the @task decorator

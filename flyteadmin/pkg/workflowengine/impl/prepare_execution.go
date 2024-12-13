@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -25,18 +26,20 @@ func addMapValues(overrides map[string]string, defaultValues map[string]string) 
 }
 
 func addPermissions(securityCtx *core.SecurityContext, roleNameKey string, flyteWf *v1alpha1.FlyteWorkflow) {
-	if securityCtx == nil || securityCtx.RunAs == nil {
+	if securityCtx == nil || securityCtx.GetRunAs() == nil {
 		return
 	}
-	flyteWf.SecurityContext = *securityCtx
-	if len(securityCtx.RunAs.IamRole) > 0 {
+
+	securityCtxCopy, _ := proto.Clone(securityCtx).(*core.SecurityContext)
+	flyteWf.SecurityContext = *securityCtxCopy
+	if len(securityCtx.GetRunAs().GetIamRole()) > 0 {
 		if flyteWf.Annotations == nil {
 			flyteWf.Annotations = map[string]string{}
 		}
-		flyteWf.Annotations[roleNameKey] = securityCtx.RunAs.IamRole
+		flyteWf.Annotations[roleNameKey] = securityCtx.GetRunAs().GetIamRole()
 	}
-	if len(securityCtx.RunAs.K8SServiceAccount) > 0 {
-		flyteWf.ServiceAccountName = securityCtx.RunAs.K8SServiceAccount
+	if len(securityCtx.GetRunAs().GetK8SServiceAccount()) > 0 {
+		flyteWf.ServiceAccountName = securityCtx.GetRunAs().GetK8SServiceAccount()
 	}
 }
 
@@ -50,14 +53,14 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		},
 	}
 	for _, override := range taskPluginOverrides {
-		executionConfig.TaskPluginImpls[override.TaskType] = v1alpha1.TaskPluginOverride{
-			PluginIDs:             override.PluginId,
-			MissingPluginBehavior: override.MissingPluginBehavior,
+		executionConfig.TaskPluginImpls[override.GetTaskType()] = v1alpha1.TaskPluginOverride{
+			PluginIDs:             override.GetPluginId(),
+			MissingPluginBehavior: override.GetMissingPluginBehavior(),
 		}
 
 	}
 	if workflowExecutionConfig != nil {
-		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism)
+		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.GetMaxParallelism()) // #nosec G115
 
 		if workflowExecutionConfig.GetInterruptible() != nil {
 			interruptible := workflowExecutionConfig.GetInterruptible().GetValue()
@@ -68,8 +71,8 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 
 		envs := make(map[string]string)
 		if workflowExecutionConfig.GetEnvs() != nil {
-			for _, v := range workflowExecutionConfig.GetEnvs().Values {
-				envs[v.Key] = v.Value
+			for _, v := range workflowExecutionConfig.GetEnvs().GetValues() {
+				envs[v.GetKey()] = v.GetValue()
 			}
 			executionConfig.EnvironmentVariables = envs
 		}
@@ -85,9 +88,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		if !taskResources.Defaults.EphemeralStorage.IsZero() {
 			requests.EphemeralStorage = taskResources.Defaults.EphemeralStorage
 		}
-		if !taskResources.Defaults.Storage.IsZero() {
-			requests.Storage = taskResources.Defaults.Storage
-		}
 		if !taskResources.Defaults.GPU.IsZero() {
 			requests.GPU = taskResources.Defaults.GPU
 		}
@@ -101,9 +101,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 		if !taskResources.Limits.EphemeralStorage.IsZero() {
 			limits.EphemeralStorage = taskResources.Limits.EphemeralStorage
-		}
-		if !taskResources.Limits.Storage.IsZero() {
-			limits.Storage = taskResources.Limits.Storage
 		}
 		if !taskResources.Limits.GPU.IsZero() {
 			limits.GPU = taskResources.Limits.GPU
@@ -132,9 +129,12 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	acceptAtWrapper := v1.NewTime(data.ExecutionParameters.AcceptedAt)
 	flyteWorkflow.AcceptedAt = &acceptAtWrapper
 
+	// Add finalizer
+	flyteWorkflow.Finalizers = append(flyteWorkflow.Finalizers, "flyte-finalizer")
+
 	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
 	// have migrated over to security context
-	addPermissions(data.ExecutionParameters.ExecutionConfig.SecurityContext,
+	addPermissions(data.ExecutionParameters.ExecutionConfig.GetSecurityContext(),
 		data.ExecutionParameters.RoleNameKey, flyteWorkflow)
 
 	labels := addMapValues(data.ExecutionParameters.Labels, flyteWorkflow.Labels)

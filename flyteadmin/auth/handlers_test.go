@@ -245,16 +245,49 @@ func TestGetLoginHandler(t *testing.T) {
 		Scopes:   []string{"openid", "other"},
 	}
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.OnOptions().Return(&config.Config{
+		UserAuth: config.UserAuthConfig{
+			IDPQueryParameter: "idp",
+		},
+	})
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
 	handler := GetLoginHandler(ctx, &mockAuthCtx)
-	req, err := http.NewRequest("GET", "/login", nil)
-	assert.NoError(t, err)
-	w := httptest.NewRecorder()
-	handler(w, req)
-	assert.Equal(t, 307, w.Code)
-	assert.True(t, strings.Contains(w.Header().Get("Location"), "response_type=code&scope=openid+other"))
-	assert.True(t, strings.Contains(w.Header().Get("Set-Cookie"), "flyte_csrf_state="))
+
+	type test struct {
+		name               string
+		url                string
+		expectedStatusCode int
+		expectedLocation   string
+		expectedSetCookie  string
+	}
+	tests := []test{
+		{
+			name:               "no idp parameter",
+			url:                "/login",
+			expectedStatusCode: 307,
+			expectedLocation:   "response_type=code&scope=openid+other",
+			expectedSetCookie:  "flyte_csrf_state=",
+		},
+		{
+			name:               "with idp parameter config",
+			url:                "/login?idp=dummyIDP",
+			expectedStatusCode: 307,
+			expectedLocation:   "dummyIDP",
+			expectedSetCookie:  "flyte_csrf_state=",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest("GET", tt.url, nil)
+			assert.NoError(t, err)
+			w := httptest.NewRecorder()
+			handler(w, req)
+			assert.Equal(t, tt.expectedStatusCode, w.Code)
+			assert.True(t, strings.Contains(w.Header().Get("Location"), tt.expectedLocation))
+			assert.True(t, strings.Contains(w.Header().Get("Set-Cookie"), tt.expectedSetCookie))
+		})
+	}
 }
 
 func TestGetLogoutHandler(t *testing.T) {
@@ -272,7 +305,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 		authCtx.AssertExpectations(t)
 	})
 
@@ -290,7 +323,7 @@ func TestGetLogoutHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 		authCtx.AssertExpectations(t)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 	})
 
 	t.Run("with_hook_with_redirect", func(t *testing.T) {
@@ -316,7 +349,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
 
 		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 		authCtx.AssertExpectations(t)
 		hook.AssertExpectations(t)
 	})
@@ -366,15 +399,19 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
 
-	accessTokenCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookie, err := NewSecureCookie(accessTokenCookieNameSplitFirst, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&accessTokenCookie)
 
-	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplitSecond, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	assert.NoError(t, err)
+	req.AddCookie(&accessTokenCookieSplit)
+
+	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c.d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&idCookie)
 
-	assert.Equal(t, "IDToken a.b.c", handler(ctx, req)["authorization"][0])
+	assert.Equal(t, "IDToken a.b.c.d.e.f", handler(ctx, req)["authorization"][0])
 }
 
 func TestGetHTTPMetadataTaggingHandler(t *testing.T) {
@@ -412,24 +449,60 @@ func TestGetHTTPRequestCookieToMetadataHandler_CustomHeader(t *testing.T) {
 
 func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 	ctx := context.Background()
-	metadataPath := mustParseURL(t, OIdCMetadataEndpoint)
-	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{
-		UserAuth: config.UserAuthConfig{
-			OpenID: config.OpenIDOptions{
-				BaseURL: stdConfig.URL{URL: mustParseURL(t, "http://www.google.com")},
-			},
+	type test struct {
+		name                     string
+		baseURL                  string
+		metadataPath             string
+		expectedRedirectLocation string
+	}
+	tests := []test{
+		{
+			name:                     "base_url_without_path",
+			baseURL:                  "http://www.google.com",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "http://www.google.com/.well-known/openid-configuration",
 		},
-	})
+		{
+			name:                     "base_url_with_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
+		},
+		{
+			name:                     "base_url_with_trailing_slash_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
+		},
+		{
+			name:                     "absolute_metadata_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
+			metadataPath:             "/.well-known/openid-configuration",
+			expectedRedirectLocation: "https://login.microsoftonline.com/.well-known/openid-configuration",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			metadataPath := mustParseURL(t, tt.metadataPath)
+			mockAuthCtx := mocks.AuthenticationContext{}
+			mockAuthCtx.OnOptions().Return(&config.Config{
+				UserAuth: config.UserAuthConfig{
+					OpenID: config.OpenIDOptions{
+						BaseURL: stdConfig.URL{URL: mustParseURL(t, tt.baseURL)},
+					},
+				},
+			})
 
-	mockAuthCtx.OnGetOIdCMetadataURL().Return(&metadataPath)
-	handler := GetOIdCMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
-	req, err := http.NewRequest("GET", "/xyz", nil)
-	assert.NoError(t, err)
-	w := httptest.NewRecorder()
-	handler(w, req)
-	assert.Equal(t, http.StatusSeeOther, w.Code)
-	assert.Equal(t, "http://www.google.com/.well-known/openid-configuration", w.Header()["Location"][0])
+			mockAuthCtx.OnGetOIdCMetadataURL().Return(&metadataPath)
+			handler := GetOIdCMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
+			req, err := http.NewRequest("GET", "/xyz", nil)
+			assert.NoError(t, err)
+			w := httptest.NewRecorder()
+			handler(w, req)
+			assert.Equal(t, http.StatusSeeOther, w.Code)
+			assert.Equal(t, tt.expectedRedirectLocation, w.Header()["Location"][0])
+		})
+	}
 }
 
 func TestUserInfoForwardResponseHander(t *testing.T) {

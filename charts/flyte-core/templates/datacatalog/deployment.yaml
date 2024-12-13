@@ -16,12 +16,11 @@ spec:
         {{- with .Values.datacatalog.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "datacatalog.labels" . | nindent 8 }}
+      labels: {{ include "datacatalog.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        fsGroup: 1001
-        runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
+      {{- with .Values.datacatalog.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.datacatalog.priorityClassName }}
       priorityClassName: {{ .Values.datacatalog.priorityClassName }}
       {{- end }}
@@ -38,6 +37,16 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        {{- if .Values.datacatalog.podEnv }}
+        env:
+          {{- with .Values.datacatalog.podEnv }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
       containers:
       - command:
         - datacatalog
@@ -47,13 +56,23 @@ spec:
         {{- with .Values.datacatalog.extraArgs }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
+        {{- if .Values.datacatalog.podEnv }}
+        env:
+          {{- with .Values.datacatalog.podEnv }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
         image: "{{ .Values.datacatalog.image.repository }}:{{ .Values.datacatalog.image.tag }}"
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
         name: datacatalog
         ports:
-        - containerPort: 8088
-        - containerPort: 8089
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.httpPort }}
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.grpcPort }}
         - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: {{- toYaml .Values.datacatalog.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config

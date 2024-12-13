@@ -9,6 +9,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+//go:generate mockery -all -case=underscore
+
 // An interface to access a remote/sharable location that contains the serialized TaskTemplate
 type TaskTemplatePath interface {
 	// Returns the path
@@ -33,9 +35,6 @@ type TaskExecutionContext interface {
 
 	// Returns a method that allows a plugin to indicate that the task has a new update and can be invoked again to check for updates
 	TaskRefreshIndicator() SignalAsync
-
-	// Returns the max allowed dataset size that the outputwriter will accept
-	MaxDatasetSizeBytes() int64
 
 	// Returns a handle to the currently configured storage backend that can be used to communicate with the tasks or write metadata
 	DataStore() *storage.DataStore

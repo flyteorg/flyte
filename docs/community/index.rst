@@ -30,35 +30,13 @@ Please join us on:
 Open Source Community Meeting 
 -----------------------------
 
-When: every other Tuesday, 9:00 AM Pacific Time.
+When: Every other Thursday, 11:00 AM Pacific Time.
 You're welcome to join and learn from other community members sharing their experiences with Flyte or any other technology from the AI ecosystem.
 Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
 .. image:: https://img.shields.io/badge/Join-Zoom-blue?style=for-the-badge
     :target: https://www.addevent.com/event/EA7823958
     :alt: Zoom Link
-
-Office Hours
-------------
-
-`Book a 30 minutes session <https://calendly.com/flyte-office-hours-01/30min>`_ with a Flyte maintainer and get your questions answered!   
-
-Schedule your session depending on the topic to secure the availability of a maintainer with expertise in the area:
-
-- **7:00a.m. PT**: 
-   - Anything flytekit-related
-   - Flyte releases
-   - flytepropeller features
-   - Plugin implementation
-   - Platform configuration
-- **1:00p.m. PT**:
-   - Flyte deployment, auth
-- **9:00p.m. PT**:
-   - Flytekit-related
-   - Use cases 
-   - Getting started (workflow onboarding)
-   - Integrations
-
 
 Newsletter
 ----------
@@ -124,4 +102,11 @@ If you want to promote a product or service, go to the #shameless-promotion chan
 
 Messages that don't follow these rules will be deleted.
 
+.. toctree::
+    :maxdepth: 1
+    :hidden:
 
+    Contributing to Flyte <contribute/index>
+    Roadmap <roadmap>
+    Frequently asked questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
+    Troubleshooting guide <troubleshoot>

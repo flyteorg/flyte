@@ -6,13 +6,19 @@ package logger
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func init() {
+	initLogger()
+}
+
+func initLogger() {
 	if err := SetConfig(&Config{
 		Level:             InfoLevel,
 		IncludeSourceCode: true,
@@ -585,4 +591,32 @@ func Test_onConfigUpdated(t *testing.T) {
 			onConfigUpdated(tt.args.cfg)
 		})
 	}
+	initLogger()
+}
+
+type loggerHook struct {
+	messages []string
+}
+
+func (h *loggerHook) Levels() []logrus.Level {
+	return logrus.AllLevels
+}
+
+func (h *loggerHook) Fire(entry *logrus.Entry) error {
+	s, err := entry.String()
+	if err != nil {
+		panic(err)
+	}
+	h.messages = append(h.messages, s)
+	return nil
+}
+
+func TestConfigFormatterJson_DontEscapeHTML(t *testing.T) {
+	ctx := context.TODO()
+	hook := &loggerHook{}
+	logrus.AddHook(hook)
+
+	Info(ctx, "foo&bar")
+	require.Len(t, hook.messages, 1)
+	assert.True(t, strings.Contains(hook.messages[0], "foo&bar"), hook.messages[0])
 }

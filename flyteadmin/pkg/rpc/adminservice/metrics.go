@@ -2,8 +2,6 @@
 package adminservice
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -46,12 +44,13 @@ type namedEntityEndpointMetrics struct {
 type nodeExecutionEndpointMetrics struct {
 	scope promutils.Scope
 
-	createEvent  util.RequestMetrics
-	get          util.RequestMetrics
-	getData      util.RequestMetrics
-	getMetrics   util.RequestMetrics
-	list         util.RequestMetrics
-	listChildren util.RequestMetrics
+	createEvent            util.RequestMetrics
+	get                    util.RequestMetrics
+	getData                util.RequestMetrics
+	getMetrics             util.RequestMetrics
+	list                   util.RequestMetrics
+	listChildren           util.RequestMetrics
+	getDynamicNodeWorkflow util.RequestMetrics
 }
 
 type projectEndpointMetrics struct {
@@ -60,6 +59,13 @@ type projectEndpointMetrics struct {
 	register util.RequestMetrics
 	list     util.RequestMetrics
 	update   util.RequestMetrics
+	get      util.RequestMetrics
+}
+
+type domainEndpointMetrics struct {
+	scope promutils.Scope
+
+	get util.RequestMetrics
 }
 
 type attributeEndpointMetrics struct {
@@ -107,14 +113,14 @@ type descriptionEntityEndpointMetrics struct {
 }
 
 type AdminMetrics struct {
-	Scope        promutils.Scope
-	PanicCounter prometheus.Counter
+	Scope promutils.Scope
 
 	executionEndpointMetrics               executionEndpointMetrics
 	launchPlanEndpointMetrics              launchPlanEndpointMetrics
 	namedEntityEndpointMetrics             namedEntityEndpointMetrics
 	nodeExecutionEndpointMetrics           nodeExecutionEndpointMetrics
 	projectEndpointMetrics                 projectEndpointMetrics
+	domainEndpointMetrics                  domainEndpointMetrics
 	projectAttributesEndpointMetrics       attributeEndpointMetrics
 	projectDomainAttributesEndpointMetrics attributeEndpointMetrics
 	workflowAttributesEndpointMetrics      attributeEndpointMetrics
@@ -128,8 +134,6 @@ type AdminMetrics struct {
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 	return AdminMetrics{
 		Scope: adminScope,
-		PanicCounter: adminScope.MustNewCounter("handler_panic",
-			"panics encountered while handling requests to the admin service"),
 
 		executionEndpointMetrics: executionEndpointMetrics{
 			scope:       adminScope,
@@ -161,19 +165,25 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			update: util.NewRequestMetrics(adminScope, "update_named_entity"),
 		},
 		nodeExecutionEndpointMetrics: nodeExecutionEndpointMetrics{
-			scope:        adminScope,
-			createEvent:  util.NewRequestMetrics(adminScope, "create_node_execution_event"),
-			get:          util.NewRequestMetrics(adminScope, "get_node_execution"),
-			getData:      util.NewRequestMetrics(adminScope, "get_node_execution_data"),
-			getMetrics:   util.NewRequestMetrics(adminScope, "get_node_execution_metrics"),
-			list:         util.NewRequestMetrics(adminScope, "list_node_execution"),
-			listChildren: util.NewRequestMetrics(adminScope, "list_children_node_executions"),
+			scope:                  adminScope,
+			createEvent:            util.NewRequestMetrics(adminScope, "create_node_execution_event"),
+			get:                    util.NewRequestMetrics(adminScope, "get_node_execution"),
+			getData:                util.NewRequestMetrics(adminScope, "get_node_execution_data"),
+			getMetrics:             util.NewRequestMetrics(adminScope, "get_node_execution_metrics"),
+			list:                   util.NewRequestMetrics(adminScope, "list_node_execution"),
+			listChildren:           util.NewRequestMetrics(adminScope, "list_children_node_executions"),
+			getDynamicNodeWorkflow: util.NewRequestMetrics(adminScope, "get_dynamic_node_workflow"),
 		},
 		projectEndpointMetrics: projectEndpointMetrics{
 			scope:    adminScope,
 			register: util.NewRequestMetrics(adminScope, "register_project"),
 			list:     util.NewRequestMetrics(adminScope, "list_projects"),
 			update:   util.NewRequestMetrics(adminScope, "update_project"),
+			get:      util.NewRequestMetrics(adminScope, "get_project"),
+		},
+		domainEndpointMetrics: domainEndpointMetrics{
+			scope: adminScope,
+			get:   util.NewRequestMetrics(adminScope, "get_domain"),
 		},
 		projectAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,

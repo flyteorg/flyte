@@ -1,7 +1,7 @@
 # Flyte 1.2 Release
 
 ## Platform
-- Support for Ray (https://github.com/flyteorg/flyte/issues/2641) - Also see the [blog post](https://blog.flyte.org/ray-and-flyte). 
+- Support for Ray (https://github.com/flyteorg/flyte/issues/2641) - Also see the [blog post](https://blog.flyte.org/ray-and-flyte).
 - Execution names can be longer now, up to 63 characters (https://github.com/flyteorg/flyteadmin/pull/466)
 - Offloading FlyteWorkflow CRD static workflow spec (https://github.com/flyteorg/flyte/issues/2705)
 - Enabled FlytePropeller subqueue - this means that every time a pod is updated in the workflow it reevals for faster downstream scheduling
@@ -18,9 +18,9 @@
 - dbt plugin (https://github.com/flyteorg/flyte/issues/2202)
 - cache overriding behavior is now open to all types (https://github.com/flyteorg/flyte/issues/2912)
 - Bug: Fallback to pickling in the case of unknown types used Unions (https://github.com/flyteorg/flyte/issues/2823)
-- [pyflyte run](https://docs.flyte.org/projects/flytekit/en/latest/design/clis.html#pyflyte-run) now supports [imperative workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/imperative_wf_style.html#sphx-glr-auto-core-flyte-basics-imperative-wf-style-py)
+- [pyflyte run](https://docs.flyte.org/en/latest/api/flytekit/design/clis.html#pyflyte-run) now supports [imperative workflows](https://docs.flyte.org/en/latest/user_guide/basics/imperative_workflows.html)
 - Newlines are now stripped from client secrets (https://github.com/flyteorg/flytekit/pull/1163)
-- Ensure repeatability in the generation of cache keys in the case of dictionaries (https://github.com/flyteorg/flytekit/pull/1126) 
+- Ensure repeatability in the generation of cache keys in the case of dictionaries (https://github.com/flyteorg/flytekit/pull/1126)
 - Support for multiple images in the yaml config file (https://github.com/flyteorg/flytekit/pull/1106)
 
 And more. See the full changelog in https://github.com/flyteorg/flytekit/releases/tag/v1.2.0
@@ -29,7 +29,7 @@ And more. See the full changelog in https://github.com/flyteorg/flytekit/release
 ## Flyteconsole
 - fix: Make sure groups used in graph aren't undefined [#545](https://github.com/flyteorg/flyteconsole/pull/545)
 - fix: Graph Center on initial render [#541](https://github.com/flyteorg/flyteconsole/pull/541)
-- fix: Graph edge overlaps nodes [#542](https://github.com/flyteorg/flyteconsole/pull/542) 
+- fix: Graph edge overlaps nodes [#542](https://github.com/flyteorg/flyteconsole/pull/542)
 - Fix searchbar X button [#564](https://github.com/flyteorg/flyteconsole/pull/564)
 - fix: Update timeline view to show dynamic wf internals on first render [#562](https://github.com/flyteorg/flyteconsole/pull/562)
 - fix: Webmanifest missing crossorigin attribute [#566](https://github.com/flyteorg/flyteconsole/pull/566)

@@ -4,17 +4,22 @@ package flyteidl.plugins;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
+import "flyteidl/core/tasks.proto";
+
 // RayJobSpec defines the desired state of RayJob
 message RayJob {
   // RayClusterSpec is the cluster template to run the job
   RayCluster ray_cluster = 1;
   // runtime_env is base64 encoded.
   // Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
-  string runtime_env = 2;
+  string runtime_env = 2 [deprecated = true];
   // shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
   bool shutdown_after_job_finishes = 3;
   // ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
   int32 ttl_seconds_after_finished = 4;
+  // RuntimeEnvYAML represents the runtime environment configuration
+  // provided as a multi-line YAML string.
+  string runtime_env_yaml = 5;
 }
 
 // Define Ray cluster defines the desired state of RayCluster
@@ -32,6 +37,8 @@ message HeadGroupSpec {
   // Optional. RayStartParams are the params of the start command: address, object-store-memory.
   // Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start
   map<string, string> ray_start_params = 1;
+  // Pod Spec for the ray head pod
+  core.K8sPod k8s_pod = 2;
 }
 
 // WorkerGroupSpec are the specs for the worker pods
@@ -47,4 +54,6 @@ message WorkerGroupSpec {
   // Optional. RayStartParams are the params of the start command: address, object-store-memory.
   // Refer to https://docs.ray.io/en/latest/ray-core/package-ref.html#ray-start
   map<string, string> ray_start_params = 5;
+  // Pod Spec for ray worker pods
+  core.K8sPod k8s_pod = 6;
 }

@@ -5,8 +5,73 @@ import grpc
 from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
 
 
+class SyncAgentServiceStub(object):
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.ExecuteTaskSync = channel.stream_stream(
+                '/flyteidl.service.SyncAgentService/ExecuteTaskSync',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncResponse.FromString,
+                )
+
+
+class SyncAgentServiceServicer(object):
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """
+
+    def ExecuteTaskSync(self, request_iterator, context):
+        """ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_SyncAgentServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'ExecuteTaskSync': grpc.stream_stream_rpc_method_handler(
+                    servicer.ExecuteTaskSync,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'flyteidl.service.SyncAgentService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class SyncAgentService(object):
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """
+
+    @staticmethod
+    def ExecuteTaskSync(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/flyteidl.service.SyncAgentService/ExecuteTaskSync',
+            flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncRequest.SerializeToString,
+            flyteidl_dot_admin_dot_agent__pb2.ExecuteTaskSyncResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
 class AsyncAgentServiceStub(object):
-    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
     """
 
     def __init__(self, channel):
@@ -30,14 +95,24 @@ class AsyncAgentServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
                 )
+        self.GetTaskMetrics = channel.unary_unary(
+                '/flyteidl.service.AsyncAgentService/GetTaskMetrics',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.FromString,
+                )
+        self.GetTaskLogs = channel.unary_stream(
+                '/flyteidl.service.AsyncAgentService/GetTaskLogs',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
+                )
 
 
 class AsyncAgentServiceServicer(object):
-    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
     """
 
     def CreateTask(self, request, context):
-        """Send a task create request to the agent server.
+        """CreateTask sends a task create request to the agent service.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -52,6 +127,24 @@ class AsyncAgentServiceServicer(object):
 
     def DeleteTask(self, request, context):
         """Delete the task resource.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTaskMetrics(self, request, context):
+        """GetTaskMetrics returns one or more task execution metrics, if available.
+
+        Errors include
+        * OutOfRange if metrics are not available for the specified task time range
+        * various other errors
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTaskLogs(self, request, context):
+        """GetTaskLogs returns task execution logs, if available.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -75,6 +168,16 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.SerializeToString,
             ),
+            'GetTaskMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskMetrics,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.SerializeToString,
+            ),
+            'GetTaskLogs': grpc.unary_stream_rpc_method_handler(
+                    servicer.GetTaskLogs,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'flyteidl.service.AsyncAgentService', rpc_method_handlers)
@@ -83,7 +186,7 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class AsyncAgentService(object):
-    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
     """
 
     @staticmethod
@@ -134,6 +237,40 @@ class AsyncAgentService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/DeleteTask',
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTaskMetrics',
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.SerializeToString,
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/flyteidl.service.AsyncAgentService/GetTaskLogs',
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

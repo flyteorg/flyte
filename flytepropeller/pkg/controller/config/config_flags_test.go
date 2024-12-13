@@ -743,6 +743,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_node-config.enable-cr-debug-metadata", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.enable-cr-debug-metadata", testValue)
+			if vBool, err := cmdFlags.GetBool("node-config.enable-cr-debug-metadata"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.NodeConfig.EnableCRDebugMetadata)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_max-streak-length", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -779,6 +793,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("event-config.fallback-to-output-reference", testValue)
 			if vBool, err := cmdFlags.GetBool("event-config.fallback-to-output-reference"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EventConfig.FallbackToOutputReference)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_event-config.-", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("event-config.-", testValue)
+			if vBool, err := cmdFlags.GetBool("event-config.-"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EventConfig.ErrorOnAlreadyExists)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -897,20 +925,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_array-node-event-version", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("array-node-event-version", testValue)
-			if vInt, err := cmdFlags.GetInt("array-node-event-version"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ArrayNodeEventVersion)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_node-execution-worker-count", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -919,6 +933,104 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("node-execution-worker-count", testValue)
 			if vInt, err := cmdFlags.GetInt("node-execution-worker-count"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NodeExecutionWorkerCount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node-config.event-version", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-config.event-version", testValue)
+			if vInt, err := cmdFlags.GetInt("array-node-config.event-version"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ArrayNode.EventVersion)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node-config.default-parallelism-behavior", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-config.default-parallelism-behavior", testValue)
+			if vString, err := cmdFlags.GetString("array-node-config.default-parallelism-behavior"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ArrayNode.DefaultParallelismBehavior)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node-config.use-map-plugin-logs", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-config.use-map-plugin-logs", testValue)
+			if vBool, err := cmdFlags.GetBool("array-node-config.use-map-plugin-logs"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.ArrayNode.UseMapPluginLogs)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literal-offloading-config.Enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literal-offloading-config.Enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("literal-offloading-config.Enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LiteralOffloadingConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literal-offloading-config.supported-sdk-versions", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "a=1,b=2"
+
+			cmdFlags.Set("literal-offloading-config.supported-sdk-versions", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("literal-offloading-config.supported-sdk-versions"); err == nil {
+				testDecodeRaw_Config(t, vStringToString, &actual.LiteralOffloadingConfig.SupportedSDKVersions)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literal-offloading-config.min-size-in-mb-for-offloading", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literal-offloading-config.min-size-in-mb-for-offloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literal-offloading-config.min-size-in-mb-for-offloading"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MinSizeInMBForOffloading)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literal-offloading-config.max-size-in-mb-for-offloading", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literal-offloading-config.max-size-in-mb-for-offloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literal-offloading-config.max-size-in-mb-for-offloading"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MaxSizeInMBForOffloading)
 
 			} else {
 				assert.FailNow(t, err.Error())

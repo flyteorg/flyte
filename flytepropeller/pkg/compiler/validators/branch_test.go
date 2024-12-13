@@ -56,7 +56,7 @@ func Test_validateBranchInterface(t *testing.T) {
 	task.OnGetInterface().Return(&core.TypedInterface{})
 
 	wf := &mocks.WorkflowBuilder{}
-	wf.OnGetTask(identifier).Return(task, true)
+	wf.On("GetTask", mock.Anything).Return(task, true)
 
 	errs := compilerErrors.NewCompileErrors()
 	wf.OnGetOrCreateNodeBuilder(coreN2).Return(n2)

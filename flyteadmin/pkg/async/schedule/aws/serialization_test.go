@@ -15,7 +15,7 @@ import (
 
 const testKickoffTimeArg = "kickoff time arg"
 
-var testLaunchPlanIdentifier = admin.NamedEntityIdentifier{
+var testLaunchPlanIdentifier = &admin.NamedEntityIdentifier{
 	Name:    "name",
 	Project: "project",
 	Domain:  "domain",
@@ -38,7 +38,7 @@ func TestDeserializeScheduleWorkflowPayload(t *testing.T) {
 		time.Date(2017, 12, 22, 18, 43, 48, 0, time.UTC),
 		scheduledWorkflowExecutionRequest.KickoffTime)
 	assert.Equal(t, testKickoffTimeArg, scheduledWorkflowExecutionRequest.KickoffTimeArg)
-	assert.True(t, proto.Equal(&testLaunchPlanIdentifier, &scheduledWorkflowExecutionRequest.LaunchPlanIdentifier),
+	assert.True(t, proto.Equal(testLaunchPlanIdentifier, scheduledWorkflowExecutionRequest.LaunchPlanIdentifier),
 		fmt.Sprintf("scheduledWorkflowExecutionRequest.LaunchPlanIdentifier %v", &scheduledWorkflowExecutionRequest.LaunchPlanIdentifier))
 }
 

@@ -2,13 +2,10 @@ package admin
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"testing"
 	"time"
 
@@ -24,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -231,15 +229,11 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		RedirectUri:              "http://localhost:54545/callback",
 	}
 	http.DefaultServeMux = http.NewServeMux()
-	plan, _ := os.ReadFile("tokenorchestrator/testdata/token.json")
-	var tokenData oauth2.Token
-	err := json.Unmarshal(plan, &tokenData)
-	assert.NoError(t, err)
-	tokenData.Expiry = time.Now().Add(time.Minute)
+	tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(time.Minute))
 	t.Run("cache hit", func(t *testing.T) {
 		mockTokenCache := new(cachemocks.TokenCache)
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
-		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
+		mockTokenCache.OnGetTokenMatch().Return(tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
 		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
@@ -249,12 +243,14 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		assert.NotNil(t, dialOption)
 		assert.Nil(t, err)
 	})
-	tokenData.Expiry = time.Now().Add(-time.Minute)
 	t.Run("cache miss auth failure", func(t *testing.T) {
+		tokenData = utils.GenTokenWithCustomExpiry(t, time.Now().Add(-time.Minute))
 		mockTokenCache := new(cachemocks.TokenCache)
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
-		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
+		mockTokenCache.OnGetTokenMatch().Return(tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
+		mockTokenCache.On("Lock").Return()
+		mockTokenCache.On("Unlock").Return()
 		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		tokenSourceProvider, err := NewTokenSourceProvider(ctx, adminServiceConfig, mockTokenCache, mockAuthClient)
@@ -282,14 +278,11 @@ func Test_getPkceAuthTokenSource(t *testing.T) {
 	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("cached token expired", func(t *testing.T) {
-		plan, _ := ioutil.ReadFile("tokenorchestrator/testdata/token.json")
-		var tokenData oauth2.Token
-		err := json.Unmarshal(plan, &tokenData)
-		assert.NoError(t, err)
+		tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(-time.Minute))
 
 		// populate the cache
-		tokenCache := &cache.TokenCacheInMemoryProvider{}
-		assert.NoError(t, tokenCache.SaveToken(&tokenData))
+		tokenCache := cache.NewTokenCacheInMemoryProvider()
+		assert.NoError(t, tokenCache.SaveToken(tokenData))
 
 		baseOrchestrator := tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{

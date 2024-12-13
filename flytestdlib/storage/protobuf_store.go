@@ -46,7 +46,7 @@ func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataRe
 	defer func() {
 		err = rc.Close()
 		if err != nil {
-			logger.Warn(ctx, "Failed to close reference [%v]. Error: %v", reference, err)
+			logger.Warnf(ctx, "Failed to close reference [%v]. Error: %v", reference, err)
 		}
 	}()
 

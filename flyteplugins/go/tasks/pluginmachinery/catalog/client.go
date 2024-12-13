@@ -49,6 +49,13 @@ func (s Status) GetMetadata() *core.CatalogMetadata {
 	return s.metadata
 }
 
+func NewPutFailureStatus(key *Key) Status {
+	md := &core.CatalogMetadata{
+		DatasetId: &key.Identifier,
+	}
+	return Status{cacheStatus: core.CatalogCacheStatus_CACHE_PUT_FAILURE, metadata: md}
+}
+
 func NewStatus(cacheStatus core.CatalogCacheStatus, md *core.CatalogMetadata) Status {
 	return Status{cacheStatus: cacheStatus, metadata: md}
 }

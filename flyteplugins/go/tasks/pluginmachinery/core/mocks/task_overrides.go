@@ -48,6 +48,38 @@ func (_m *TaskOverrides) GetConfig() *v1.ConfigMap {
 	return r0
 }
 
+type TaskOverrides_GetContainerImage struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetContainerImage) Return(_a0 string) *TaskOverrides_GetContainerImage {
+	return &TaskOverrides_GetContainerImage{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetContainerImage() *TaskOverrides_GetContainerImage {
+	c_call := _m.On("GetContainerImage")
+	return &TaskOverrides_GetContainerImage{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetContainerImageMatch(matchers ...interface{}) *TaskOverrides_GetContainerImage {
+	c_call := _m.On("GetContainerImage", matchers...)
+	return &TaskOverrides_GetContainerImage{Call: c_call}
+}
+
+// GetContainerImage provides a mock function with given fields:
+func (_m *TaskOverrides) GetContainerImage() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type TaskOverrides_GetExtendedResources struct {
 	*mock.Call
 }

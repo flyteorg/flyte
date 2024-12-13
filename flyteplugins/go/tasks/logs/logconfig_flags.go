@@ -61,7 +61,5 @@ func (cfg LogConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gcp-project"), DefaultConfig.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-logresourcename"), DefaultConfig.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-template-uri"), DefaultConfig.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "flyin-enabled"), DefaultConfig.IsFlyinEnabled, "Enable Log-links to flyin logs")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "flyin-template-uri"), DefaultConfig.FlyinTemplateURI, "Template Uri to use when building flyin log links")
 	return cmdFlags
 }

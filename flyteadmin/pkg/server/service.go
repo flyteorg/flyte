@@ -13,7 +13,7 @@ import (
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -23,6 +23,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
@@ -34,10 +35,14 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/middleware"
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/assets"
+	grpcService "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/gateway/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -77,7 +82,7 @@ func SetMetricKeys(appConfig *runtimeIfaces.ApplicationConfig) {
 // Creates a new gRPC Server with all the configuration
 func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
 	storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
-	scope promutils.Scope, opts ...grpc.ServerOption) (*grpc.Server, error) {
+	scope promutils.Scope, sm core.SecretManager, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
@@ -95,11 +100,17 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		otelgrpc.WithPropagators(propagation.TraceContext{}),
 	)
 
+	adminScope := scope.NewSubScope("admin")
+	recoveryInterceptor := middleware.NewRecoveryInterceptor(adminScope)
+
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
 	if cfg.Security.UseAuth {
 		logger.Infof(ctx, "Creating gRPC server with authentication")
 		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(grpcprometheus.UnaryServerInterceptor,
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+			// recovery interceptor should always be first in order to handle any panics in the middleware or server
+			recoveryInterceptor.UnaryServerInterceptor(),
+			grpcprometheus.UnaryServerInterceptor,
 			otelUnaryServerInterceptor,
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
@@ -108,15 +119,26 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		)
 	} else {
 		logger.Infof(ctx, "Creating gRPC server without authentication")
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(grpcprometheus.UnaryServerInterceptor, otelUnaryServerInterceptor)
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+			// recovery interceptor should always be first in order to handle any panics in the middleware or server
+			recoveryInterceptor.UnaryServerInterceptor(),
+			grpcprometheus.UnaryServerInterceptor,
+			otelUnaryServerInterceptor,
+		)
 	}
 
+	chainedStreamInterceptors := grpcmiddleware.ChainStreamServer(
+		// recovery interceptor should always be first in order to handle any panics in the middleware or server
+		recoveryInterceptor.StreamServerInterceptor(),
+		grpcprometheus.StreamServerInterceptor,
+	)
+
 	serverOpts := []grpc.ServerOption{
-		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		grpc.StreamInterceptor(chainedStreamInterceptors),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
 	if cfg.GrpcConfig.MaxMessageSizeBytes > 0 {
-		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
+		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes), grpc.MaxSendMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
 	}
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
@@ -128,11 +150,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	configuration := runtime2.NewConfigurationProvider()
-	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
-	service.RegisterAdminServiceServer(grpcServer, adminServer)
+	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, adminScope, sm)
+	grpcService.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
-		service.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
-		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
+		grpcService.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
+		grpcService.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
 	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient, adminServer.TaskExecutionManager)
@@ -141,9 +163,9 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	pluginRegistry.RegisterDefault(plugins.PluginIDDataProxy, dataProxySvc)
-	service.RegisterDataProxyServiceServer(grpcServer, plugins.Get[service.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
+	grpcService.RegisterDataProxyServiceServer(grpcServer, plugins.Get[grpcService.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
 
-	service.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
+	grpcService.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
 
 	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
 	if additionalService != nil {
@@ -164,16 +186,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 func GetHandleOpenapiSpec(ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		swaggerBytes, err := service.Asset("admin.swagger.json")
+		// TODO: find a better way to point to admin.swagger.json
+		w.WriteHeader(http.StatusOK)
+		_, err := w.Write(assets.AdminSwaggerFile)
 		if err != nil {
-			logger.Warningf(ctx, "Err %v", err)
-			w.WriteHeader(http.StatusFailedDependency)
-		} else {
-			w.WriteHeader(http.StatusOK)
-			_, err := w.Write(swaggerBytes)
-			if err != nil {
-				logger.Errorf(ctx, "failed to write openAPI information, error: %s", err.Error())
-			}
+			logger.Errorf(ctx, "failed to write openAPI information, error: %s", err.Error())
 		}
 	}
 }
@@ -204,9 +221,25 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	var gwmuxOptions = make([]runtime.ServeMuxOption, 0)
 	// This option means that http requests are served with protobufs, instead of json. We always want this.
 	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/octet-stream", &runtime.ProtoMarshaller{}))
+	// grpc-gateway v2 switched the marshaller used to encode JSON messages in 2.5.0. This changed the
+	// default encoding from snake_case (the v1 behavior) to lowerCamelCase, which is the case recommended
+	// by protobuf. However the protobuf docs do mention that JSON printers may provide a way to use
+	// the proto names as field names instead. This option in grpc-gateway v2 does just that,
+	// by setting a custom marshaler. We are enabling this narrowly however, by applying it only for
+	// the application/json content type.
+	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/json", &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames:     true,
+			EmitUnpopulated:   true,
+			EmitDefaultValues: true,
+		},
+	}))
 
 	// This option sets subject in the user info response
 	gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetUserInfoForwardResponseHandler()))
+
+	// Use custom header matcher to allow additional headers to be passed through
+	gwmuxOptions = append(gwmuxOptions, runtime.WithIncomingHeaderMatcher(auth.GetCustomHeaderMatcher(pluginRegistry)))
 
 	if cfg.Security.UseAuth {
 		// Add HTTP handlers for OIDC endpoints
@@ -304,16 +337,19 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	// This will parse configuration and create the necessary objects for dealing with auth
 	var authCtx interfaces.AuthenticationContext
 	var err error
+
+	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 	// This code is here to support authentication without SSL. This setup supports a network topology where
 	// Envoy does the SSL termination. The final hop is made over localhost only on a trusted machine.
 	// Warning: Running authentication without SSL in any other topology is a severe security flaw.
 	// See the auth.Config object for additional settings as well.
 	if cfg.Security.UseAuth {
-		sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm)
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
 			if err != nil {
 				logger.Errorf(ctx, "Error creating authorization server %s", err)
 				return err
@@ -338,7 +374,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope)
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope, sm)
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}
@@ -413,17 +449,18 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
 	scope promutils.Scope) error {
 	certPool, cert, err := GetSslCredentials(ctx, cfg.Security.Ssl.CertificateFile, cfg.Security.Ssl.KeyFile)
+	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 	if err != nil {
 		return err
 	}
 	// This will parse configuration and create the necessary objects for dealing with auth
 	var authCtx interfaces.AuthenticationContext
 	if cfg.Security.UseAuth {
-		sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm)
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
 			if err != nil {
 				logger.Errorf(ctx, "Error creating authorization server %s", err)
 				return err
@@ -448,7 +485,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, sm, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}
@@ -476,9 +513,19 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		panic(err)
 	}
 
+	handler := grpcHandlerFunc(grpcServer, httpServer)
+	if cfg.Security.AllowCors {
+		handler = handlers.CORS(
+			handlers.AllowCredentials(),
+			handlers.AllowedOrigins(cfg.Security.AllowedOrigins),
+			handlers.AllowedHeaders(append(defaultCorsHeaders, cfg.Security.AllowedHeaders...)),
+			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "HEAD", "PUT", "PATCH"}),
+		)(handler)
+	}
+
 	srv := &http.Server{
 		Addr:    cfg.GetHostAddress(),
-		Handler: grpcHandlerFunc(grpcServer, httpServer),
+		Handler: handler,
 		// #nosec G402
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*cert},

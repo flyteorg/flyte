@@ -69,24 +69,29 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 		return core.NodeExecution_FAILED
 	case handler.EPhaseRecovered:
 		return core.NodeExecution_RECOVERED
+	case handler.EPhaseTimedout:
+		return core.NodeExecution_TIMED_OUT
 	default:
 		return core.NodeExecution_UNDEFINED
 	}
 }
 
-func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
+func ToNodeExecutionEvent(
+	nodeExecID *core.NodeExecutionIdentifier,
 	info handler.PhaseInfo,
 	inputPath string,
 	status v1alpha1.ExecutableNodeStatus,
 	eventVersion v1alpha1.EventVersion,
 	parentInfo executors.ImmutableParentInfo,
 	node v1alpha1.ExecutableNode, clusterID string, dynamicNodePhase v1alpha1.DynamicNodePhase,
-	eventConfig *config.EventConfig) (*event.NodeExecutionEvent, error) {
+	eventConfig *config.EventConfig,
+	targetEntity *core.Identifier) (*event.NodeExecutionEvent, error) {
+
 	if info.GetPhase() == handler.EPhaseNotReady {
 		return nil, nil
 	}
 	if info.GetPhase() == handler.EPhaseUndefined {
-		return nil, fmt.Errorf("illegal state, undefined phase received for node [%s]", nodeExecID.NodeId)
+		return nil, fmt.Errorf("illegal state, undefined phase received for node [%s]", nodeExecID.GetNodeId())
 	}
 	occurredTime, err := ptypes.TimestampProto(info.GetOccurredAt())
 	if err != nil {
@@ -99,10 +104,18 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		phase = core.NodeExecution_RUNNING
 	}
 
+	// At some point, the entity that this event corresponds to came from a dynamic task. See the IDL for more info.
+	var dynamicChain = false
+	if parentInfo != nil && parentInfo.IsInDynamicChain() {
+		dynamicChain = true
+	}
+
+	eInfo := info.GetInfo()
 	var nev *event.NodeExecutionEvent
-	// Start node is special case where the Inputs and Outputs are the same and hence here we copy the Output file
+	// Start node is special case where the Outputs are the same and hence here we copy the Output file
 	// into the OutputResult and in admin we copy it over into input as well.
-	if nodeExecID.NodeId == v1alpha1.StartNodeID {
+	// Start node doesn't have inputs.
+	if nodeExecID.GetNodeId() == v1alpha1.StartNodeID {
 		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
 		nev = &event.NodeExecutionEvent{
 			Id:    nodeExecID,
@@ -110,19 +123,35 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			OutputResult: ToNodeExecOutput(&handler.OutputInfo{
 				OutputURI: outputsFile,
 			}),
-			OccurredAt:   occurredTime,
-			ProducerId:   clusterID,
-			EventVersion: nodeExecutionEventVersion,
-			ReportedAt:   ptypes.TimestampNow(),
+			OccurredAt:       occurredTime,
+			ProducerId:       clusterID,
+			EventVersion:     nodeExecutionEventVersion,
+			ReportedAt:       ptypes.TimestampNow(),
+			TargetEntity:     targetEntity,
+			IsInDynamicChain: dynamicChain,
 		}
 	} else {
+		// include target_entity from function caller.
 		nev = &event.NodeExecutionEvent{
-			Id:           nodeExecID,
-			Phase:        phase,
-			OccurredAt:   occurredTime,
-			ProducerId:   clusterID,
-			EventVersion: nodeExecutionEventVersion,
-			ReportedAt:   ptypes.TimestampNow(),
+			Id:               nodeExecID,
+			Phase:            phase,
+			OccurredAt:       occurredTime,
+			ProducerId:       clusterID,
+			EventVersion:     nodeExecutionEventVersion,
+			ReportedAt:       ptypes.TimestampNow(),
+			TargetEntity:     targetEntity,
+			IsInDynamicChain: dynamicChain,
+		}
+		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
+			if eInfo != nil {
+				nev.InputValue = &event.NodeExecutionEvent_InputData{
+					InputData: eInfo.Inputs,
+				}
+			}
+		} else {
+			nev.InputValue = &event.NodeExecutionEvent_InputUri{
+				InputUri: inputPath,
+			}
 		}
 	}
 
@@ -133,7 +162,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	}
 
 	if eventVersion != v1alpha1.EventVersion0 {
-		currentNodeUniqueID, err := common.GenerateUniqueID(parentInfo, nev.Id.NodeId)
+		currentNodeUniqueID, err := common.GenerateUniqueID(parentInfo, nev.GetId().GetNodeId())
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +177,6 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.NodeName = node.GetName()
 	}
 
-	eInfo := info.GetInfo()
 	if eInfo != nil {
 		if eInfo.WorkflowNodeInfo != nil {
 			v := ToNodeExecWorkflowNodeMetadata(eInfo.WorkflowNodeInfo)
@@ -176,25 +204,17 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	if node.GetKind() == v1alpha1.NodeKindWorkflow && node.GetWorkflowNode() != nil && node.GetWorkflowNode().GetSubWorkflowRef() != nil {
 		nev.IsParent = true
 	} else if node.GetKind() == v1alpha1.NodeKindArray {
-		nev.IsParent = true
 		nev.IsArray = true
+		if config.GetConfig().ArrayNode.EventVersion == 1 {
+			nev.IsParent = true
+		}
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
 		nev.IsDynamic = true
-		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {
+		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().GetDynamicWorkflow() != nil {
 			nev.IsParent = true
 		}
 	}
-	if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
-		if eInfo != nil {
-			nev.InputValue = &event.NodeExecutionEvent_InputData{
-				InputData: eInfo.Inputs,
-			}
-		}
-	} else {
-		nev.InputValue = &event.NodeExecutionEvent_InputUri{
-			InputUri: inputPath,
-		}
-	}
+
 	return nev, nil
 }
 
@@ -228,10 +248,10 @@ func ToK8sTime(t time.Time) v1.Time {
 	return v1.Time{Time: t}
 }
 
-func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus) {
+func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus, enableCRDebugMetadata bool) {
 	// We update the phase and / or reason only if they are not already updated
 	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
-		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), p.GetErr())
+		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), enableCRDebugMetadata, p.GetErr())
 	}
 	// Update TaskStatus
 	if n.HasTaskNodeState() {
@@ -294,6 +314,7 @@ func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.N
 		t.SetSubNodeTaskPhases(na.SubNodeTaskPhases)
 		t.SetSubNodeRetryAttempts(na.SubNodeRetryAttempts)
 		t.SetSubNodeSystemFailures(na.SubNodeSystemFailures)
+		t.SetSubNodeDeltaTimestamps(na.SubNodeDeltaTimestamps)
 		t.SetTaskPhaseVersion(na.TaskPhaseVersion)
 	}
 }

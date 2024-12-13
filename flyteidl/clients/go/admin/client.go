@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -31,7 +30,6 @@ type Clientset struct {
 	identityServiceClient     service.IdentityServiceClient
 	dataProxyServiceClient    service.DataProxyServiceClient
 	signalServiceClient       service.SignalServiceClient
-	artifactServiceClient     artifact.ArtifactRegistryClient
 }
 
 // AdminClient retrieves the AdminServiceClient
@@ -61,10 +59,6 @@ func (c Clientset) SignalServiceClient() service.SignalServiceClient {
 	return c.signalServiceClient
 }
 
-func (c Clientset) ArtifactServiceClient() artifact.ArtifactRegistryClient {
-	return c.artifactServiceClient
-}
-
 func NewAdminClient(ctx context.Context, conn *grpc.ClientConn) service.AdminServiceClient {
 	logger.Infof(ctx, "Initialized Admin client")
 	return service.NewAdminServiceClient(conn)
@@ -79,12 +73,16 @@ func GetAdditionalAdminClientConfigOptions(cfg *Config) []grpc.DialOption {
 	opts = append(opts, grpc.WithBackoffConfig(backoffConfig))
 
 	timeoutDialOption := grpcRetry.WithPerRetryTimeout(cfg.PerRetryTimeout.Duration)
-	maxRetriesOption := grpcRetry.WithMax(uint(cfg.MaxRetries))
+	maxRetriesOption := grpcRetry.WithMax(uint(cfg.MaxRetries)) // #nosec G115
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(timeoutDialOption, maxRetriesOption)
 
 	// We only make unary calls in this client, no streaming calls.  We can add a streaming interceptor if admin
 	// ever has those endpoints
 	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor, retryInterceptor))
+
+	if cfg.MaxMessageSizeBytes > 0 {
+		opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.MaxMessageSizeBytes)))
+	}
 
 	return opts
 }
@@ -103,7 +101,7 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourcePr
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
 		}
-		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+		authorizationMetadataKey = clientMetadata.GetAuthorizationMetadataKey()
 	}
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
@@ -159,7 +157,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, proxyCredentialsFuture
 
 	opts = append(opts, GetAdditionalAdminClientConfigOptions(cfg)...)
 
-	if cfg.ProxyCommand != nil && len(cfg.ProxyCommand) > 0 {
+	if len(cfg.ProxyCommand) > 0 {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(NewProxyAuthInterceptor(cfg, proxyCredentialsFuture)))
 		opts = append(opts, grpc.WithPerRPCCredentials(proxyCredentialsFuture))
 	}
@@ -185,8 +183,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	credentialsFuture := NewPerRPCCredentialsFuture()
 	proxyCredentialsFuture := NewPerRPCCredentialsFuture()
 
+	authInterceptor := NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 	opts = append(opts,
-		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)),
+		grpc.WithChainUnaryInterceptor(authInterceptor),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
 	if cfg.DefaultServiceConfig != "" {
@@ -205,7 +204,6 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
-	cs.artifactServiceClient = artifact.NewArtifactRegistryClient(adminConnection)
 
 	return &cs, nil
 }

@@ -10,7 +10,9 @@ build:
     python: "mambaforge-22.9"
   jobs:
     post_install:
+      - cat monodocs-environment.lock.yaml
       - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
+      - pip install ./flyteidl
       - conda info
       - conda env list
       - conda list

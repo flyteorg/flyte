@@ -2,60 +2,27 @@ package agent
 
 import (
 	"context"
-	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/exp/maps"
-	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
-	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func TestSyncTask(t *testing.T) {
-	tCtx := getTaskContext(t)
-	taskReader := new(pluginCoreMocks.TaskReader)
-
-	template := flyteIdlCore.TaskTemplate{
-		Type: "api_task",
-	}
-
-	taskReader.On("Read", mock.Anything).Return(&template, nil)
-
-	tCtx.OnTaskReader().Return(taskReader)
-
-	agentPlugin := newMockSyncAgentPlugin()
-	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
-	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
-	assert.NoError(t, err)
-
-	inputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
-	assert.NoError(t, err)
-	basePrefix := storage.DataReference("fake://bucket/prefix/")
-	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(basePrefix)
-	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
-	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
-	tCtx.OnInputReader().Return(inputReader)
-
-	phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, nil)
-	assert.Equal(t, true, phase.Phase().IsSuccess())
-}
+const defaultAgentEndpoint = "localhost:8000"
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
@@ -64,13 +31,16 @@ func TestPlugin(t *testing.T) {
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-	cfg.DefaultAgent = Agent{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
-	cfg.Agents = map[string]*Agent{"spark_agent": {Endpoint: "localhost:80"}}
+	cfg.DefaultAgent = Deployment{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
+	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
+	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
+		registry:    agentRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -85,67 +55,47 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newMockAgentPlugin()
+		p := newMockAsyncAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
-		agent := getFinalAgent("spark", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, "localhost:80")
-		agent = getFinalAgent("foo", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
-		agent = getFinalAgent("bar", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
-	})
-
-	t.Run("test getAgentMetadataClientFunc", func(t *testing.T) {
-		client, err := getAgentMetadataClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-	})
-
-	t.Run("test getClientFunc", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-	})
-
-	t.Run("test getClientFunc more config", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-	})
-
-	t.Run("test getClientFunc cache hit", func(t *testing.T) {
-		connectionCache := make(map[*Agent]*grpc.ClientConn)
-		agent := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
-
-		client, err := getClientFunc(context.Background(), agent, connectionCache)
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-		assert.NotNil(t, client, connectionCache[agent])
-
-		cachedClient, err := getClientFunc(context.Background(), agent, connectionCache)
-		assert.NoError(t, err)
-		assert.NotNil(t, cachedClient)
-		assert.Equal(t, client, cachedClient)
+		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
+		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
+		agentDeployment, _ := plugin.getFinalAgent(spark, &cfg)
+		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
+		agentDeployment, _ = plugin.getFinalAgent(foo, &cfg)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
+		agentDeployment, _ = plugin.getFinalAgent(bar, &cfg)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
-		timeout := getFinalTimeout("CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		timeout := getFinalTimeout("CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
-		timeout = getFinalTimeout("DeleteTask", &Agent{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
+		timeout = getFinalTimeout("GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+		timeout = getFinalTimeout("DeleteTask", &Deployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
 		assert.Equal(t, 10*time.Second, timeout.Duration)
+		timeout = getFinalTimeout("ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
 	})
 
 	t.Run("test getFinalContext", func(t *testing.T) {
-		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Agent{})
+
+		ctx, _ := getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
 		assert.Equal(t, context.TODO(), ctx)
 
-		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		ctx, _ = getFinalContext(context.TODO(), "ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 10 * time.Second}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
 
@@ -165,17 +115,24 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
+		simpleStruct := structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"foo": {Kind: &structpb.Value_StringValue{StringValue: "foo"}},
+			},
+		}
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:    admin.State_RUNNING,
-			Outputs:  nil,
-			Message:  "Job is running",
-			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			State:      admin.State_RUNNING,
+			Outputs:    nil,
+			Message:    "Job is running",
+			LogLinks:   []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			CustomInfo: &simpleStruct,
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		assert.Equal(t, &simpleStruct, phase.Info().CustomInfo)
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
@@ -219,35 +176,182 @@ func TestPlugin(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
+
+	t.Run("test TaskExecution_UNDEFINED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_UNDEFINED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_QUEUED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_QUEUED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_WAITING_FOR_RESOURCES Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_WAITING_FOR_RESOURCES,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_INITIALIZING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_INITIALIZING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_RUNNING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_RUNNING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_ABORTED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_ABORTED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_FAILED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_FAILED,
+			Outputs:  nil,
+			Message:  "boom",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			AgentError: &admin.AgentError{
+				Code: "ERROR: 500",
+			},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+		assert.Equal(t, "ERROR: 500", phase.Err().GetCode())
+		assert.Equal(t, "failed to run the job: boom", phase.Err().GetMessage())
+	})
+
+	t.Run("test TaskExecution_FAILED Status Without Agent Error", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdlCore.TaskExecution_FAILED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+		assert.Equal(t, pluginErrors.TaskFailedWithError, phase.Err().GetCode())
+	})
+
+	t.Run("test UNDEFINED Phase", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			State:    8,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.Error(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
+	})
 }
 
-func TestInitializeAgentRegistry(t *testing.T) {
-	mockClient := new(agentMocks.AgentMetadataServiceClient)
+func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
+	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
+	supportedTaskCategories := make([]*admin.TaskCategory, 3)
+	supportedTaskCategories[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
-				Name:               "test-agent",
-				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+				Name:                    "test-agent",
+				SupportedTaskCategories: supportedTaskCategories,
 			},
 		},
 	}
 
-	mockClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
-	getAgentMetadataClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
-		return mockClient, nil
+	mockMetadataServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	return mockMetadataServiceClient
+}
+
+func TestInitializeAgentRegistry(t *testing.T) {
+	agentClients := make(map[string]service.AsyncAgentServiceClient)
+	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
+	agentClients[defaultAgentEndpoint] = &agentMocks.AsyncAgentServiceClient{}
+	agentMetadataClients[defaultAgentEndpoint] = getMockMetadataServiceClient()
+
+	cs := &ClientSet{
+		asyncAgentClients:    agentClients,
+		agentMetadataClients: agentMetadataClients,
 	}
 
 	cfg := defaultConfig
-	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
+	cfg.AgentDeployments = map[string]*Deployment{"custom_agent": {Endpoint: defaultAgentEndpoint}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
-	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getAgentMetadataClientFunc)
+	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 
-	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistry := getAgentRegistry(context.Background(), cs)
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	sort.Strings(agentRegistryKeys)
+	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
 
-	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
+	for _, key := range expectedKeys {
+		assert.Contains(t, agentRegistryKeys, key)
+	}
 }

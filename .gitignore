@@ -2,6 +2,7 @@
 _build/
 _bin/
 build/
+.tmp_build/
 .vscode/
 *.swp
 *.swo
@@ -20,8 +21,6 @@ __pycache__/
 /charts/flyteagent/Chart.lock
 /charts/flyte-deps/Chart.lock
 /charts/flyte-core/Chart.lock
-/docker/sandbox-lite/storage/charts
-/docker/sandbox-lite/storage/Chart.lock
 **/*.bak-
 .python-version
 dist/
@@ -31,12 +30,12 @@ vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
 docs/_tags/
-docs/flytectl
-docs/protos
-docs/flytekit
+docs/api/flytectl
+docs/api/flytekit
+docs/api/flyteidl
 docs/flytesnacks
 docs/examples
 docs/_src
 docs/_projects
-docs/api
 docs/tests
+empty-config.yaml

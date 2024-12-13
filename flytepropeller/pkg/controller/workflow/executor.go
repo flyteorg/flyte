@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -59,15 +60,16 @@ func StatusFailed(err *core.ExecutionError) Status {
 }
 
 type workflowExecutor struct {
-	enqueueWorkflow v1alpha1.EnqueueWorkflow
-	store           *storage.DataStore
-	wfRecorder      events.WorkflowEventRecorder
-	k8sRecorder     record.EventRecorder
-	metadataPrefix  storage.DataReference
-	nodeExecutor    interfaces.Node
-	metrics         *workflowMetrics
-	eventConfig     *config.EventConfig
-	clusterID       string
+	enqueueWorkflow  v1alpha1.EnqueueWorkflow
+	store            *storage.DataStore
+	wfRecorder       events.WorkflowEventRecorder
+	k8sRecorder      record.EventRecorder
+	metadataPrefix   storage.DataReference
+	nodeExecutor     interfaces.Node
+	metrics          *workflowMetrics
+	eventConfig      *config.EventConfig
+	clusterID        string
+	activeExecutions *workflowstore.ExecutionStatsHolder
 }
 
 func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, w *v1alpha1.FlyteWorkflow) (storage.DataReference, error) {
@@ -98,9 +100,23 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 			Message: err.Error()}), nil
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
-	var inputs *core.LiteralMap
+	inputs := &core.LiteralMap{}
 	if w.Inputs != nil {
+		if len(w.OffloadedInputs) > 0 {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    errors.BadSpecificationError.String(),
+				Message: "cannot specify inline inputs AND offloaded inputs"}), nil
+		}
 		inputs = w.Inputs.LiteralMap
+	} else if len(w.OffloadedInputs) > 0 {
+		err = c.store.ReadProtobuf(ctx, w.OffloadedInputs, inputs)
+		if err != nil {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    "OffloadedInputsReadFailure",
+				Message: err.Error()}), nil
+		}
 	}
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
@@ -135,6 +151,18 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	return StatusRunning, nil
 }
 
+func (c *workflowExecutor) updateExecutionStats(ctx context.Context, execcontext executors.ExecutionContext) {
+	execStats := workflowstore.SingleExecutionStats{
+		ActiveNodeCount: execcontext.CurrentNodeExecutionCount(),
+		ActiveTaskCount: execcontext.CurrentTaskExecutionCount()}
+	logger.Debugf(ctx, "execution stats -  execution count [%v], task execution count [%v], execution-id [%v], ",
+		execStats.ActiveNodeCount, execStats.ActiveTaskCount, execcontext.GetExecutionID())
+	statErr := c.activeExecutions.AddOrUpdateEntry(execcontext.GetExecutionID().String(), execStats)
+	if statErr != nil {
+		logger.Errorf(ctx, "error updating active executions stats: %v", statErr)
+	}
+}
+
 func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	startNode := w.StartNode()
 	if startNode == nil {
@@ -144,10 +172,11 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 			Message: "Start node not found"}), nil
 	}
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	state, handlerErr := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	c.updateExecutionStats(ctx, execcontext)
 
-	if err != nil {
-		return StatusRunning, err
+	if handlerErr != nil {
+		return StatusRunning, handlerErr
 	}
 	if state.HasFailed() {
 		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.String())
@@ -175,9 +204,11 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 
 	failureNodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
 	failureNodeLookup := executors.NewFailureNodeLookup(w, failureNode, failureNodeStatus)
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
-	if err != nil {
-		return StatusFailureNode(execErr), err
+	state, handlerErr := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
+	c.updateExecutionStats(ctx, execcontext)
+
+	if handlerErr != nil {
+		return StatusFailureNode(execErr), handlerErr
 	}
 
 	switch state.NodePhase {
@@ -264,7 +295,7 @@ func (c *workflowExecutor) IdempotentReportEvent(ctx context.Context, e *event.W
 	err := c.wfRecorder.RecordWorkflowEvent(ctx, e, c.eventConfig)
 	if err != nil && eventsErr.IsAlreadyExists(err) {
 		logger.Infof(ctx, "Workflow event phase: %s, executionId %s already exist",
-			e.Phase.String(), e.ExecutionId)
+			e.GetPhase().String(), e.GetExecutionId())
 		return nil
 	}
 	return err
@@ -339,21 +370,21 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 
 		if recordingErr := c.IdempotentReportEvent(ctx, wfEvent); recordingErr != nil {
 			if eventsErr.IsAlreadyExists(recordingErr) {
-				logger.Warningf(ctx, "Failed to record workflowEvent, error [%s]. Trying to record state: %s. Ignoring this error!", recordingErr.Error(), wfEvent.Phase)
+				logger.Warningf(ctx, "Failed to record workflowEvent, error [%s]. Trying to record state: %s. Ignoring this error!", recordingErr.Error(), wfEvent.GetPhase())
 				return nil
 			}
 			if eventsErr.IsEventAlreadyInTerminalStateError(recordingErr) {
 				// Move to WorkflowPhaseFailed for state mismatch
-				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
+				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.GetPhase().String(), wfEvent.GetExecutionId())
 				logger.Warningf(ctx, msg)
 				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, nil)
 				return nil
 			}
-			if (wfEvent.Phase == core.WorkflowExecution_FAILING || wfEvent.Phase == core.WorkflowExecution_FAILED) &&
+			if (wfEvent.GetPhase() == core.WorkflowExecution_FAILING || wfEvent.GetPhase() == core.WorkflowExecution_FAILED) &&
 				(eventsErr.IsNotFound(recordingErr) || eventsErr.IsEventIncompatibleClusterError(recordingErr)) {
 				// Don't stall the workflow transition to terminated (so that resources can be cleaned up) since these events
 				// are being discarded by the back-end anyways.
-				logger.Infof(ctx, "Failed to record %s workflowEvent, error [%s]. Ignoring this error!", wfEvent.Phase.String(), recordingErr.Error())
+				logger.Infof(ctx, "Failed to record %s workflowEvent, error [%s]. Ignoring this error!", wfEvent.GetPhase().String(), recordingErr.Error())
 				return nil
 			}
 			logger.Warningf(ctx, "Event recording failed. Error [%s]", recordingErr.Error())
@@ -430,7 +461,7 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 	case v1alpha1.WorkflowPhaseHandlingFailureNode:
 		newStatus, err := c.handleFailureNode(ctx, w)
 		if err != nil {
-			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, err.Error())
+			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, err.Error()) //nolint:govet,staticcheck
 		}
 		failureErr := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus)
 		// Ignore ExecutionNotFound and IncompatibleCluster errors to allow graceful failure
@@ -504,7 +535,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 
 func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor interfaces.Node, eventConfig *config.EventConfig,
-	clusterID string, scope promutils.Scope) (executors.Workflow, error) {
+	clusterID string, scope promutils.Scope, activeExecutions *workflowstore.ExecutionStatsHolder) (executors.Workflow, error) {
 	basePrefix := store.GetBaseContainerFQN(ctx)
 	if metadataPrefix != "" {
 		var err error
@@ -518,15 +549,16 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 	workflowScope := scope.NewSubScope("workflow")
 
 	return &workflowExecutor{
-		nodeExecutor:    nodeExecutor,
-		store:           store,
-		enqueueWorkflow: enQWorkflow,
-		wfRecorder:      events.NewWorkflowEventRecorder(eventSink, workflowScope, store),
-		k8sRecorder:     k8sEventRecorder,
-		metadataPrefix:  basePrefix,
-		metrics:         newMetrics(workflowScope),
-		eventConfig:     eventConfig,
-		clusterID:       clusterID,
+		nodeExecutor:     nodeExecutor,
+		store:            store,
+		enqueueWorkflow:  enQWorkflow,
+		wfRecorder:       events.NewWorkflowEventRecorder(eventSink, workflowScope, store),
+		k8sRecorder:      k8sEventRecorder,
+		metadataPrefix:   basePrefix,
+		metrics:          newMetrics(workflowScope),
+		eventConfig:      eventConfig,
+		clusterID:        clusterID,
+		activeExecutions: activeExecutions,
 	}, nil
 }
 

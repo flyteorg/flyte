@@ -84,7 +84,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	config := task.GetConfig()
 
 	outputs, err := template.Render(ctx, []string{
-		task.GetSql().Statement,
+		task.GetSql().GetStatement(),
 	}, template.Parameters{
 		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
 		Inputs:           taskCtx.InputReader(),
@@ -179,7 +179,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 	defer resp.Body.Close()
-	logger.Info(ctx, "Deleted query execution [%v]", resp)
+	logger.Infof(ctx, "Deleted query execution [%v]", resp)
 
 	return nil
 }

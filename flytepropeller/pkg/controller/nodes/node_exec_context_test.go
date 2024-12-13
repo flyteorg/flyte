@@ -19,6 +19,8 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	mocks3 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -107,7 +109,7 @@ func Test_NodeContext(t *testing.T) {
 	s, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	p := parentInfo{}
 	execContext := executors.NewExecutionContext(w1, nil, nil, p, nil)
-	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, 2, nil, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, nil, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}))
 	assert.Equal(t, "id", nCtx.NodeExecutionMetadata().GetLabels()["node-id"])
 	assert.Equal(t, "false", nCtx.NodeExecutionMetadata().GetLabels()["interruptible"])
 	assert.Equal(t, "task-name", nCtx.NodeExecutionMetadata().GetLabels()["task-name"])
@@ -127,7 +129,6 @@ func Test_NodeContextDefault(t *testing.T) {
 
 	nodeExecutor := nodeExecutor{
 		interruptibleFailureThreshold: 0,
-		maxDatasetSizeBytes:           0,
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
@@ -143,6 +144,52 @@ func Test_NodeContextDefault(t *testing.T) {
 	nodeExecContext, err = nodeExecutor.BuildNodeExecutionContext(context.Background(), execContext, nodeLookup, "node-a")
 	assert.NoError(t, err)
 	assert.Equal(t, "s3://bucket-b", nodeExecContext.RawOutputPrefix().String())
+
+	// Test that retrieving task nodes
+	taskIdentifier := common.GetTargetEntity(ctx, nodeExecContext)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetProject(), taskIdentifier.GetProject())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetDomain(), taskIdentifier.GetDomain())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetName(), taskIdentifier.GetName())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetVersion(), taskIdentifier.GetVersion())
+}
+
+func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
+	id := &core.Identifier{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Project:      "proj",
+		Domain:       "domain",
+		Name:         "sub-lp",
+		Version:      "v2",
+	}
+
+	subWfNode := &mocks.ExecutableWorkflowNode{}
+	subWfNode.OnGetSubWorkflowRef().Return(nil)
+	subWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
+
+	n := &mocks.ExecutableNode{}
+	n.OnGetWorkflowNode().Return(subWfNode)
+
+	nCtx := &mocks3.NodeExecutionContext{}
+	nCtx.OnNode().Return(n)
+
+	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
+	assert.Equal(t, id.GetProject(), fetchedID.GetProject())
+	assert.Equal(t, id.GetDomain(), fetchedID.GetDomain())
+	assert.Equal(t, id.GetName(), fetchedID.GetName())
+	assert.Equal(t, id.GetVersion(), fetchedID.GetVersion())
+}
+
+func TestGetTargetEntity_EmptyTask(t *testing.T) {
+	n := &mocks.ExecutableNode{}
+	n.OnGetWorkflowNode().Return(nil)
+	taskID := ""
+	n.OnGetTaskID().Return(&taskID)
+
+	nCtx := &mocks3.NodeExecutionContext{}
+	nCtx.OnNode().Return(n)
+
+	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
+	assert.Nil(t, fetchedID)
 }
 
 func Test_NodeContextDefaultInterruptible(t *testing.T) {
@@ -152,7 +199,6 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
 	nodeExecutor := nodeExecutor{
 		interruptibleFailureThreshold: 10,
-		maxDatasetSizeBytes:           0,
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
@@ -414,7 +460,6 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 			nodeExecutor := nodeExecutor{
 				interruptibleFailureThreshold:   tt.interruptibleFailureThreshold,
 				maxNodeRetriesForSystemFailures: tt.maxSystemFailures,
-				maxDatasetSizeBytes:             0,
 				defaultDataSandbox:              "s3://bucket-a",
 				store:                           dataStore,
 				shardSelector:                   ioutils.NewConstantShardSelector([]string{"x"}),

@@ -23,17 +23,37 @@ var (
 			Name:       "artifactName",
 		},
 	}
+	key = &Key{
+		Identifier: core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+			Version: "1.0.0",
+		},
+		CacheVersion: "1.0.0",
+		TypedInterface: core.TypedInterface{
+			Inputs:  nil,
+			Outputs: nil,
+		},
+	}
 )
+
+func TestNewPutFailureStatus(t *testing.T) {
+	status := NewPutFailureStatus(key)
+
+	assert.Equal(t, status.GetCacheStatus(), core.CatalogCacheStatus_CACHE_PUT_FAILURE)
+	assert.EqualValues(t, status.GetMetadata().GetDatasetId(), &key.Identifier)
+}
 
 func TestStatus(t *testing.T) {
 	status := NewStatus(cacheStatus, &catalogMetadata)
 
 	assert.Equal(t, status.GetCacheStatus(), cacheStatus)
-	assert.Equal(t, status.GetMetadata().DatasetId.Project, catalogMetadata.DatasetId.Project)
-	assert.Equal(t, status.GetMetadata().DatasetId.Domain, catalogMetadata.DatasetId.Domain)
-	assert.Equal(t, status.GetMetadata().DatasetId.Name, catalogMetadata.DatasetId.Name)
-	assert.Equal(t, status.GetMetadata().ArtifactTag.ArtifactId, catalogMetadata.ArtifactTag.ArtifactId)
-	assert.Equal(t, status.GetMetadata().ArtifactTag.Name, catalogMetadata.ArtifactTag.Name)
+	assert.Equal(t, status.GetMetadata().GetDatasetId().GetProject(), catalogMetadata.GetDatasetId().GetProject())
+	assert.Equal(t, status.GetMetadata().GetDatasetId().GetDomain(), catalogMetadata.GetDatasetId().GetDomain())
+	assert.Equal(t, status.GetMetadata().GetDatasetId().GetName(), catalogMetadata.GetDatasetId().GetName())
+	assert.Equal(t, status.GetMetadata().GetArtifactTag().GetArtifactId(), catalogMetadata.GetArtifactTag().GetArtifactId())
+	assert.Equal(t, status.GetMetadata().GetArtifactTag().GetName(), catalogMetadata.GetArtifactTag().GetName())
 }
 
 func TestEntry(t *testing.T) {
@@ -55,11 +75,11 @@ func TestEntry(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			status := tt.entry.GetStatus()
 			assert.Equal(t, status.GetCacheStatus(), cacheStatus)
-			assert.Equal(t, status.GetMetadata().DatasetId.Project, catalogMetadata.DatasetId.Project)
-			assert.Equal(t, status.GetMetadata().DatasetId.Domain, catalogMetadata.DatasetId.Domain)
-			assert.Equal(t, status.GetMetadata().DatasetId.Name, catalogMetadata.DatasetId.Name)
-			assert.Equal(t, status.GetMetadata().ArtifactTag.ArtifactId, catalogMetadata.ArtifactTag.ArtifactId)
-			assert.Equal(t, status.GetMetadata().ArtifactTag.Name, catalogMetadata.ArtifactTag.Name)
+			assert.Equal(t, status.GetMetadata().GetDatasetId().GetProject(), catalogMetadata.GetDatasetId().GetProject())
+			assert.Equal(t, status.GetMetadata().GetDatasetId().GetDomain(), catalogMetadata.GetDatasetId().GetDomain())
+			assert.Equal(t, status.GetMetadata().GetDatasetId().GetName(), catalogMetadata.GetDatasetId().GetName())
+			assert.Equal(t, status.GetMetadata().GetArtifactTag().GetArtifactId(), catalogMetadata.GetArtifactTag().GetArtifactId())
+			assert.Equal(t, status.GetMetadata().GetArtifactTag().GetName(), catalogMetadata.GetArtifactTag().GetName())
 		})
 	}
 }

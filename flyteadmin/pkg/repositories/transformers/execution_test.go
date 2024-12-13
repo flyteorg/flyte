@@ -71,17 +71,16 @@ func TestCreateExecutionModel(t *testing.T) {
 		},
 	}
 	namespace := "ns"
-	t.Run("running", func(t *testing.T) {
+	t.Run("successful execution", func(t *testing.T) {
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
 			},
-			RequestSpec:           execRequest.Spec,
+			RequestSpec:           execRequest.GetSpec(),
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -103,7 +102,8 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
-		expectedSpec := execRequest.Spec
+		assert.Equal(t, execution.Phase, core.WorkflowExecution_UNDEFINED.String())
+		expectedSpec := execRequest.GetSpec()
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 			ExecutionCluster: cluster,
@@ -116,9 +116,8 @@ func TestCreateExecutionModel(t *testing.T) {
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
-			Phase:      core.WorkflowExecution_RUNNING,
+			Phase:      core.WorkflowExecution_UNDEFINED,
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -132,15 +131,14 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with unknown error", func(t *testing.T) {
 		execErr := fmt.Errorf("bla-bla")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
 			},
-			RequestSpec:           execRequest.Spec,
+			RequestSpec:           execRequest.GetSpec(),
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -163,7 +161,8 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
-		expectedSpec := execRequest.Spec
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
+		expectedSpec := execRequest.GetSpec()
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 			ExecutionCluster: cluster,
@@ -185,7 +184,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -199,15 +197,14 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with invalid argument error", func(t *testing.T) {
 		execErr := errors.NewFlyteAdminError(codes.InvalidArgument, "task validation failed")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
 			},
-			RequestSpec:           execRequest.Spec,
+			RequestSpec:           execRequest.GetSpec(),
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -230,7 +227,8 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
-		expectedSpec := execRequest.Spec
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
+		expectedSpec := execRequest.GetSpec()
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 			ExecutionCluster: cluster,
@@ -252,7 +250,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -266,15 +263,14 @@ func TestCreateExecutionModel(t *testing.T) {
 	t.Run("failed with internal error", func(t *testing.T) {
 		execErr := errors.NewFlyteAdminError(codes.Internal, "db failed")
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
-			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+			WorkflowExecutionID: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
 			},
-			RequestSpec:           execRequest.Spec,
+			RequestSpec:           execRequest.GetSpec(),
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -297,7 +293,8 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
-		expectedSpec := execRequest.Spec
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
+		expectedSpec := execRequest.GetSpec()
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 			ExecutionCluster: cluster,
@@ -319,7 +316,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -345,7 +341,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 		Phase:     core.WorkflowExecution_UNDEFINED,
 		CreatedAt: createdAtProto,
 	}
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	startedAt := time.Now()
@@ -353,7 +349,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 
 	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
-	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_RUNNING,
 			OccurredAt: occurredAtProto,
@@ -405,7 +401,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	}
 	ec := "foo"
 	ek := core.ExecutionError_SYSTEM
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
@@ -417,7 +413,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 		Kind:    ek,
 		Message: "bar baz",
 	}
-	err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+	err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_ABORTED,
 			OccurredAt: occurredAtProto,
@@ -478,7 +474,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startedAtProto,
 	}
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
@@ -504,7 +500,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	}
 
 	t.Run("output URI set", func(t *testing.T) {
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -555,7 +551,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 				},
 			},
 		}
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -607,7 +603,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/offloaded_outputs")
 			return nil
 		}
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -696,7 +692,7 @@ func TestGetExecutionIdentifier(t *testing.T) {
 }
 
 func TestFromExecutionModel(t *testing.T) {
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	phase := core.WorkflowExecution_RUNNING.String()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
@@ -704,7 +700,7 @@ func TestFromExecutionModel(t *testing.T) {
 	startedAtProto, _ := ptypes.TimestampProto(startedAt)
 	createdAtProto, _ := ptypes.TimestampProto(createdAt)
 	closure := admin.ExecutionClosure{
-		ComputedInputs: spec.Inputs,
+		ComputedInputs: spec.GetInputs(),
 		Phase:          core.WorkflowExecution_RUNNING,
 		StartedAt:      startedAtProto,
 		StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -762,15 +758,15 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 	}
 	execution, err := FromExecutionModel(context.TODO(), executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
-	assert.Equal(t, core.WorkflowExecution_ABORTED, execution.Closure.Phase)
+	assert.Equal(t, core.WorkflowExecution_ABORTED, execution.GetClosure().GetPhase())
 	assert.True(t, proto.Equal(&admin.AbortMetadata{
 		Cause: abortCause,
-	}, execution.Closure.GetAbortMetadata()))
+	}, execution.GetClosure().GetAbortMetadata()))
 
 	executionModel.Phase = core.WorkflowExecution_RUNNING.String()
 	execution, err = FromExecutionModel(context.TODO(), executionModel, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
-	assert.Empty(t, execution.Closure.GetAbortCause())
+	assert.Empty(t, execution.GetClosure().GetAbortCause())
 }
 
 func TestFromExecutionModel_Error(t *testing.T) {
@@ -799,8 +795,8 @@ func TestFromExecutionModel_Error(t *testing.T) {
 	expectedExecErr := execErr
 	expectedExecErr.Message = string(make([]byte, trimmedErrMessageLen))
 	assert.Nil(t, err)
-	assert.Equal(t, core.WorkflowExecution_FAILED, execution.Closure.Phase)
-	assert.True(t, proto.Equal(expectedExecErr, execution.Closure.GetError()))
+	assert.Equal(t, core.WorkflowExecution_FAILED, execution.GetClosure().GetPhase())
+	assert.True(t, proto.Equal(expectedExecErr, execution.GetClosure().GetError()))
 }
 
 func TestFromExecutionModel_ValidUTF8TrimmedErrorMsg(t *testing.T) {
@@ -847,11 +843,11 @@ func TestFromExecutionModel_OverwriteNamespace(t *testing.T) {
 		DefaultNamespace: overwrittenNamespace,
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, execution.GetSpec().GetMetadata().GetSystemMetadata().Namespace, overwrittenNamespace)
+	assert.Equal(t, execution.GetSpec().GetMetadata().GetSystemMetadata().GetNamespace(), overwrittenNamespace)
 }
 
 func TestFromExecutionModels(t *testing.T) {
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	phase := core.WorkflowExecution_SUCCEEDED.String()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
@@ -861,7 +857,7 @@ func TestFromExecutionModels(t *testing.T) {
 	duration := 2 * time.Minute
 	durationProto := ptypes.DurationProto(duration)
 	closure := admin.ExecutionClosure{
-		ComputedInputs: spec.Inputs,
+		ComputedInputs: spec.GetInputs(),
 		Phase:          core.WorkflowExecution_RUNNING,
 		StartedAt:      startedAtProto,
 		Duration:       durationProto,
@@ -918,7 +914,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 		Phase:     core.WorkflowExecution_UNDEFINED,
 		CreatedAt: createdAtProto,
 	}
-	spec := testutils.GetExecutionRequest().Spec
+	spec := testutils.GetExecutionRequest().GetSpec()
 	specBytes, _ := proto.Marshal(spec)
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	startedAt := time.Now()
@@ -930,7 +926,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
 	t.Run("update", func(t *testing.T) {
 		executionModel.Cluster = altCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_QUEUED,
 				OccurredAt: occurredAtProto,
@@ -942,7 +938,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 		executionModel.Cluster = testCluster
 	})
 	t.Run("do not update", func(t *testing.T) {
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -953,7 +949,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	})
 	t.Run("matches recorded", func(t *testing.T) {
 		executionModel.Cluster = testCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -964,7 +960,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	})
 	t.Run("default cluster value", func(t *testing.T) {
 		executionModel.Cluster = testCluster
-		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
+		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_RUNNING,
 				OccurredAt: occurredAtProto,
@@ -986,7 +982,7 @@ func TestReassignCluster(t *testing.T) {
 	}
 
 	t.Run("happy case", func(t *testing.T) {
-		spec := testutils.GetExecutionRequest().Spec
+		spec := testutils.GetExecutionRequest().GetSpec()
 		spec.Metadata = &admin.ExecutionMetadata{
 			SystemMetadata: &admin.SystemMetadata{
 				ExecutionCluster: oldCluster,
@@ -1004,10 +1000,10 @@ func TestReassignCluster(t *testing.T) {
 		var updatedSpec admin.ExecutionSpec
 		err = proto.Unmarshal(executionModel.Spec, &updatedSpec)
 		assert.NoError(t, err)
-		assert.Equal(t, newCluster, updatedSpec.Metadata.SystemMetadata.ExecutionCluster)
+		assert.Equal(t, newCluster, updatedSpec.GetMetadata().GetSystemMetadata().GetExecutionCluster())
 	})
 	t.Run("happy case - initialize cluster", func(t *testing.T) {
-		spec := testutils.GetExecutionRequest().Spec
+		spec := testutils.GetExecutionRequest().GetSpec()
 		specBytes, _ := proto.Marshal(spec)
 		executionModel := models.Execution{
 			Spec: specBytes,
@@ -1019,7 +1015,7 @@ func TestReassignCluster(t *testing.T) {
 		var updatedSpec admin.ExecutionSpec
 		err = proto.Unmarshal(executionModel.Spec, &updatedSpec)
 		assert.NoError(t, err)
-		assert.Equal(t, newCluster, updatedSpec.Metadata.SystemMetadata.ExecutionCluster)
+		assert.Equal(t, newCluster, updatedSpec.GetMetadata().GetSystemMetadata().GetExecutionCluster())
 	})
 	t.Run("invalid existing spec", func(t *testing.T) {
 		executionModel := models.Execution{
@@ -1044,9 +1040,9 @@ func TestGetExecutionStateFromModel(t *testing.T) {
 		executionStatus, err := PopulateDefaultStateChangeDetails(executionModel)
 		assert.Nil(t, err)
 		assert.NotNil(t, executionStatus)
-		assert.Equal(t, admin.ExecutionState_EXECUTION_ACTIVE, executionStatus.State)
-		assert.NotNil(t, executionStatus.OccurredAt)
-		assert.Equal(t, createdAtProto, executionStatus.OccurredAt)
+		assert.Equal(t, admin.ExecutionState_EXECUTION_ACTIVE, executionStatus.GetState())
+		assert.NotNil(t, executionStatus.GetOccurredAt())
+		assert.Equal(t, createdAtProto, executionStatus.GetOccurredAt())
 	})
 	t.Run("incorrect created at", func(t *testing.T) {
 		createdAt := time.Unix(math.MinInt64, math.MinInt32).UTC()
@@ -1072,14 +1068,14 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 		assert.Nil(t, err)
 		stateInt := int32(admin.ExecutionState_EXECUTION_ARCHIVED)
 		assert.Equal(t, execModel.State, &stateInt)
-		var closure admin.ExecutionClosure
-		err = proto.Unmarshal(execModel.Closure, &closure)
+		closure := &admin.ExecutionClosure{}
+		err = proto.Unmarshal(execModel.Closure, closure)
 		assert.Nil(t, err)
 		assert.NotNil(t, closure)
-		assert.NotNil(t, closure.StateChangeDetails)
-		assert.Equal(t, admin.ExecutionState_EXECUTION_ARCHIVED, closure.StateChangeDetails.State)
-		assert.Equal(t, "dummyUser", closure.StateChangeDetails.Principal)
-		assert.Equal(t, statetUpdateAtProto, closure.StateChangeDetails.OccurredAt)
+		assert.NotNil(t, closure.GetStateChangeDetails())
+		assert.Equal(t, admin.ExecutionState_EXECUTION_ARCHIVED, closure.GetStateChangeDetails().GetState())
+		assert.Equal(t, "dummyUser", closure.GetStateChangeDetails().GetPrincipal())
+		assert.Equal(t, statetUpdateAtProto, closure.GetStateChangeDetails().GetOccurredAt())
 
 	})
 	t.Run("bad closure", func(t *testing.T) {

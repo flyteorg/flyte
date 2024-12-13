@@ -245,7 +245,8 @@ data:
   development.integration: |-
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       kube-config: "$HOME/.kube/config"
       grpcServerReflection: true
       security:
@@ -417,6 +418,9 @@ spec:
         - name: flyteadmin
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
+          env:
+            - name: USE_INTEGRATION_TEST_CONFIG
+              value: "True"
           securityContext:
             privileged: true
           readinessProbe:

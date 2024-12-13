@@ -1,4 +1,3 @@
---- # ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
@@ -14,9 +13,9 @@ flyte:
     replicaCount: 1
     image:
       # -- Docker image for Flyteadmin deployment
-      repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
+      repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.10.6 # FLYTEADMIN_TAG
+      tag: v1.14.0  # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
@@ -82,9 +81,9 @@ flyte:
   flytescheduler:
     image:
       # -- Docker image for Flytescheduler deployment
-      repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
+      repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v1.10.6 # FLYTESCHEDULER_TAG
+      tag: v1.14.0  # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -127,9 +126,9 @@ flyte:
     replicaCount: 1
     image:
       # -- Docker image for Datacatalog deployment
-      repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
+      repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
       # -- Docker image tag
-      tag: v1.10.6 # DATACATALOG_TAG
+      tag: v1.14.0  # DATACATALOG_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Datacatalog deployment
@@ -176,9 +175,9 @@ flyte:
     manager: false
     image:
       # -- Docker image for Flytepropeller deployment
-      repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
+      repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.10.6 # FLYTEPROPELLER_TAG
+      tag: v1.14.0  # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -191,7 +190,6 @@ flyte:
         cpu: 10m
         ephemeral-storage: 50Mi
         memory: 50Mi
-    cacheSizeMbs: 0
     # -- Default regex string for searching configuration files
     configPath: /etc/flyte/config/*.yaml
 
@@ -221,9 +219,9 @@ flyte:
     replicaCount: 1
     image:
       # -- Docker image for Flyteconsole deployment
-      repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
+      repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v1.10.2 # FLYTECONSOLE_TAG
+      tag: v1.19.0  # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
@@ -334,6 +332,9 @@ flyte:
     # serviceAccountKey: ""
     # -- Settings for storage type custom. See https://github.com/graymeta/stow for supported storage providers/settings.
     custom: {}
+    cache:
+      maxSizeMBs: 0
+      targetGCPercent: 70
 
   # Database configuration
   db:
@@ -378,7 +379,8 @@ flyte:
       # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
       server:
         httpPort: 8088
-        grpcPort: 8089
+        grpc:
+          port: 8089
         security:
           # -- Controls whether to serve requests over SSL/TLS.
           secure: false
@@ -471,7 +473,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/flyteorg/flytecopilot:v1.10.6 # FLYTECOPILOT_IMAGE
+            image: cr.flyte.org/flyteorg/flytecopilot:v1.14.0  # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
@@ -528,11 +530,12 @@ flyte:
             - sidecar
             - k8s-array
             - agent-service
+            - echo
           default-for-task-types:
             container: container
             sidecar: sidecar
             container_array: k8s-array
-            bigquery_query_job_task: agent-service
+            sensor: agent-service
 
 
     # -- Kubernetes specific Flyte configuration
@@ -547,12 +550,8 @@ flyte:
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
-        agent-service:
-          defaultAgent:
-            endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
-            insecure: true
-          supportedTaskTypes:
-            - bigquery_query_job_task
+          default-env-from-configmaps: []
+          default-env-from-secrets: []
 
     # -- Logger configuration
     logger:
@@ -755,18 +754,18 @@ minio:
   affinity: {}
 
 redoc:
-  # --- enable or disable Minio deployment installation
+  # --- enable or disable redoc deployment installation
   enabled: true
-  # -- Replicas count for Minio deployment
+  # -- Replicas count for redoc deployment
   replicaCount: 1
   image:
-    # -- Docker image for Minio deployment
+    # -- Docker image for redoc deployment
     repository: docker.io/redocly/redoc
     # -- Docker image tag
     tag: latest
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Minio deployment
+  # -- Default resources requests and limits for redoc deployment
   resources:
     # -- Requests are the minimum set of resources needed for this pod
     requests:
@@ -776,16 +775,16 @@ redoc:
     limits:
       cpu: 200m
       memory: 512Mi
-  # -- Service settings for Minio
+  # -- Service settings for redoc
   service:
     type: ClusterIP
-  # -- Annotations for Minio pods
+  # -- Annotations for redoc pods
   podAnnotations: {}
-  # -- nodeSelector for Minio deployment
+  # -- nodeSelector for redoc deployment
   nodeSelector: {}
-  # -- tolerations for Minio deployment
+  # -- tolerations for redoc deployment
   tolerations: []
-  # -- affinity for Minio deployment
+  # -- affinity for redoc deployment
   affinity: {}
 
 #

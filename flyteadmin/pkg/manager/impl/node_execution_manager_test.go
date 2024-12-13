@@ -10,7 +10,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -29,12 +31,13 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var occurredAt = time.Now().UTC()
 var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
 
-var dynamicWorkflowClosure = core.CompiledWorkflowClosure{
+var dynamicWorkflowClosure = &core.CompiledWorkflowClosure{
 	Primary: &core.CompiledWorkflow{
 		Template: &core.WorkflowTemplate{
 			Id: &core.Identifier{
@@ -48,7 +51,7 @@ var dynamicWorkflowClosure = core.CompiledWorkflowClosure{
 	},
 }
 
-var request = admin.NodeExecutionEventRequest{
+var request = &admin.NodeExecutionEventRequest{
 	RequestId: "request id",
 	Event: &event.NodeExecutionEvent{
 		ProducerId: "propeller",
@@ -68,8 +71,8 @@ var request = admin.NodeExecutionEventRequest{
 		TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
 			TaskNodeMetadata: &event.TaskNodeMetadata{
 				DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-					Id:               dynamicWorkflowClosure.Primary.Template.Id,
-					CompiledWorkflow: &dynamicWorkflowClosure,
+					Id:               dynamicWorkflowClosure.GetPrimary().GetTemplate().GetId(),
+					CompiledWorkflow: dynamicWorkflowClosure,
 				},
 			},
 		},
@@ -124,11 +127,11 @@ func TestCreateNodeEvent(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 	expectedClosure := admin.NodeExecutionClosure{
-		Phase:     request.Event.Phase,
+		Phase:     request.GetEvent().GetPhase(),
 		StartedAt: occurredAtProto,
 		CreatedAt: occurredAtProto,
 		UpdatedAt: occurredAtProto,
@@ -179,7 +182,7 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -253,7 +256,7 @@ func TestCreateNodeEvent_MissingExecution(t *testing.T) {
 	})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
-	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error")
+	utils.AssertEqualWithSanitizedRegex(t, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error", err.Error())
 	assert.Nil(t, resp)
 }
 
@@ -284,7 +287,7 @@ func TestCreateNodeEvent_UpdateDatabaseError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -319,7 +322,7 @@ func TestCreateNodeEvent_UpdateTerminalEventError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -354,7 +357,7 @@ func TestCreateNodeEvent_UpdateDuplicateEventError(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -383,7 +386,7 @@ func TestCreateNodeEvent_FirstEventIsTerminal(t *testing.T) {
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
-	succeededRequest := admin.NodeExecutionEventRequest{
+	succeededRequest := &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
 			ProducerId: "propeller",
@@ -420,7 +423,7 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 	t.Run("event version 0", func(t *testing.T) {
 		repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
 			func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-				assert.True(t, proto.Equal(nodeExecID, &input.NodeExecutionIdentifier))
+				assert.True(t, proto.Equal(nodeExecID, input.NodeExecutionIdentifier))
 				return models.NodeExecution{
 					NodeExecutionKey: models.NodeExecutionKey{
 						NodeID: "node id",
@@ -447,8 +450,8 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 		}
 		nodeExecution, err := manager.transformNodeExecutionModel(ctx, models.NodeExecution{}, nodeExecID, transformers.DefaultExecutionTransformerOptions)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(nodeExecID, nodeExecution.Id))
-		assert.True(t, nodeExecution.Metadata.IsParentNode)
+		assert.True(t, proto.Equal(nodeExecID, nodeExecution.GetId()))
+		assert.True(t, nodeExecution.GetMetadata().GetIsParentNode())
 	})
 	t.Run("event version > 0", func(t *testing.T) {
 		manager := NodeExecutionManager{
@@ -477,8 +480,8 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 			InternalData:          internalDataBytes,
 		}, nodeExecID, transformers.DefaultExecutionTransformerOptions)
 		assert.NoError(t, err)
-		assert.True(t, nodeExecution.Metadata.IsParentNode)
-		assert.True(t, nodeExecution.Metadata.IsDynamic)
+		assert.True(t, nodeExecution.GetMetadata().GetIsParentNode())
+		assert.True(t, nodeExecution.GetMetadata().GetIsDynamic())
 	})
 	t.Run("transform internal data err", func(t *testing.T) {
 		manager := NodeExecutionManager{
@@ -494,7 +497,7 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 		expectedErr := flyteAdminErrors.NewFlyteAdminError(codes.Internal, "foo")
 		repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
 			func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-				assert.True(t, proto.Equal(nodeExecID, &input.NodeExecutionIdentifier))
+				assert.True(t, proto.Equal(nodeExecID, input.NodeExecutionIdentifier))
 				return models.NodeExecution{}, expectedErr
 			})
 
@@ -571,7 +574,7 @@ func TestGetNodeExecution(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -590,7 +593,7 @@ func TestGetNodeExecution(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -624,7 +627,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -654,7 +657,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -689,7 +692,7 @@ func TestGetNodeExecutionEventVersion0(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -708,7 +711,7 @@ func TestGetNodeExecutionEventVersion0(t *testing.T) {
 		})
 
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, err)
@@ -728,7 +731,7 @@ func TestGetNodeExecution_DatabaseError(t *testing.T) {
 			return models.NodeExecution{}, expectedErr
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, nodeExecution)
@@ -756,7 +759,7 @@ func TestGetNodeExecution_TransformerError(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
+	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.Nil(t, nodeExecution)
@@ -781,17 +784,17 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 3)
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
@@ -802,6 +805,10 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 				"parent_id":                nil,
 				"parent_task_execution_id": nil,
 			}, filter)
+
+			assert.EqualValues(t, input.JoinTableEntities, map[common.Entity]bool{
+				common.NodeExecution: true,
+			})
 
 			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 			return interfaces.NodeExecutionCollectionOutput{
@@ -844,7 +851,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -858,7 +865,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
@@ -871,8 +878,8 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestListNodeExecutionsWithParent(t *testing.T) {
@@ -888,7 +895,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	parentID := uint(12)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (execution models.NodeExecution, e error) {
-		assert.Equal(t, "parent_1", input.NodeExecutionIdentifier.NodeId)
+		assert.Equal(t, "parent_1", input.NodeExecutionIdentifier.GetNodeId())
 		return models.NodeExecution{
 			BaseModel: models.BaseModel{
 				ID: parentID,
@@ -901,17 +908,17 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 4)
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
@@ -944,7 +951,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -959,7 +966,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		UniqueParentId: "parent_1",
 	})
 	assert.Nil(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
@@ -972,23 +979,146 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
+}
+
+func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	expectedClosure := admin.NodeExecutionClosure{
+		Phase: core.NodeExecution_SUCCEEDED,
+	}
+	expectedMetadata := admin.NodeExecutionMetaData{
+		SpecNodeId: "spec_node_id",
+		RetryGroup: "retry_group",
+	}
+	metadataBytes, _ := proto.Marshal(&expectedMetadata)
+	closureBytes, _ := proto.Marshal(&expectedClosure)
+
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetListCallback(
+		func(ctx context.Context, input interfaces.ListResourceInput) (
+			interfaces.NodeExecutionCollectionOutput, error) {
+			assert.Equal(t, 1, input.Limit)
+			assert.Equal(t, 2, input.Offset)
+			assert.Len(t, input.InlineFilters, 4)
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
+			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+			assert.Equal(t, "project", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
+			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
+			assert.Equal(t, "domain", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
+			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "name", queryExpr.Args)
+			assert.Equal(t, "execution_name = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, "SUCCEEDED", queryExpr.Args)
+			assert.Equal(t, "phase = ?", queryExpr.Query)
+
+			assert.Len(t, input.MapFilters, 1)
+			filter := input.MapFilters[0].GetFilter()
+			assert.Equal(t, map[string]interface{}{
+				"parent_id":                nil,
+				"parent_task_execution_id": nil,
+			}, filter)
+
+			assert.EqualValues(t, input.JoinTableEntities, map[common.Entity]bool{
+				common.NodeExecution: true,
+				common.Execution:     true,
+			})
+
+			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
+			return interfaces.NodeExecutionCollectionOutput{
+				NodeExecutions: []models.NodeExecution{
+					{
+						NodeExecutionKey: models.NodeExecutionKey{
+							NodeID: "node id",
+							ExecutionKey: models.ExecutionKey{
+								Project: "project",
+								Domain:  "domain",
+								Name:    "name",
+							},
+						},
+						Phase:                 core.NodeExecution_SUCCEEDED.String(),
+						InputURI:              "input uri",
+						StartedAt:             &occurredAt,
+						Closure:               closureBytes,
+						NodeExecutionMetadata: metadataBytes,
+					},
+				},
+			}, nil
+		})
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
+		func(
+			ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			return models.NodeExecution{
+				NodeExecutionKey: models.NodeExecutionKey{
+					NodeID: "node id",
+					ExecutionKey: models.ExecutionKey{
+						Project: "project",
+						Domain:  "domain",
+						Name:    "name",
+					},
+				},
+				Phase:                 core.NodeExecution_SUCCEEDED.String(),
+				InputURI:              "input uri",
+				StartedAt:             &occurredAt,
+				Closure:               closureBytes,
+				NodeExecutionMetadata: metadataBytes,
+			}, nil
+		})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
+		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Limit: 1,
+		Token: "2",
+		SortBy: &admin.Sort{
+			Direction: admin.Sort_ASCENDING,
+			Key:       "execution_domain",
+		},
+		Filters: "eq(execution.phase, SUCCEEDED)",
+	})
+	assert.NoError(t, err)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
+	assert.True(t, proto.Equal(&admin.NodeExecution{
+		Id: &core.NodeExecutionIdentifier{
+			NodeId: "node id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+		},
+		InputUri: "input uri",
+		Closure:  &expectedClosure,
+		Metadata: &expectedMetadata,
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestListNodeExecutions_InvalidParams(t *testing.T) {
 	nodeExecManager := NewNodeExecutionManager(nil, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Filters: "eq(execution.project, project)",
 	})
 	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
 
-	_, err = nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err = nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Limit: 1,
 	})
 	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
 
-	_, err = nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err = nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		Limit:   1,
 		Filters: "foo",
 	})
@@ -1004,7 +1134,7 @@ func TestListNodeExecutions_DatabaseError(t *testing.T) {
 			return interfaces.NodeExecutionCollectionOutput{}, expectedErr
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1043,7 +1173,7 @@ func TestListNodeExecutions_TransformerError(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1072,7 +1202,7 @@ func TestListNodeExecutions_NothingToReturn(t *testing.T) {
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 
-	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+	_, err := nodeExecManager.ListNodeExecutions(context.Background(), &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -1117,17 +1247,17 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 4)
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
@@ -1160,7 +1290,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			}, nil
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	nodeExecutions, err := nodeExecManager.ListNodeExecutionsForTask(context.Background(), admin.NodeExecutionForTaskListRequest{
+	nodeExecutions, err := nodeExecManager.ListNodeExecutionsForTask(context.Background(), &admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -1186,7 +1316,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		},
 	})
 	assert.Nil(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	expectedMetadata := admin.NodeExecutionMetaData{
 		SpecNodeId:   "spec-n1",
 		IsParentNode: true,
@@ -1203,8 +1333,8 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestGetNodeExecutionData(t *testing.T) {
@@ -1229,7 +1359,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
-			}, &input.NodeExecutionIdentifier))
+			}, input.NodeExecutionIdentifier))
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -1248,20 +1378,20 @@ func TestGetNodeExecutionData(t *testing.T) {
 		})
 
 	mockNodeExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockNodeExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	mockNodeExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == "input uri" {
-			return admin.UrlBlob{
+			return &admin.UrlBlob{
 				Url:   "inputs",
 				Bytes: 100,
 			}, nil
 		} else if uri == util.OutputsFile {
-			return admin.UrlBlob{
+			return &admin.UrlBlob{
 				Url:   "outputs",
 				Bytes: 200,
 			}, nil
 		}
 
-		return admin.UrlBlob{}, errors.New("unexpected input")
+		return &admin.UrlBlob{}, errors.New("unexpected input")
 	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
@@ -1286,14 +1416,14 @@ func TestGetNodeExecutionData(t *testing.T) {
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
 		} else if reference.String() == dynamicWorkflowClosureRef {
-			marshalled, _ := proto.Marshal(&dynamicWorkflowClosure)
+			marshalled, _ := proto.Marshal(dynamicWorkflowClosure)
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
 		}
 		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
 	}
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
-	dataResponse, err := nodeExecManager.GetNodeExecutionData(context.Background(), admin.NodeExecutionGetDataRequest{
+	dataResponse, err := nodeExecManager.GetNodeExecutionData(context.Background(), &admin.NodeExecutionGetDataRequest{
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.NoError(t, err)
@@ -1309,8 +1439,8 @@ func TestGetNodeExecutionData(t *testing.T) {
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 		DynamicWorkflow: &admin.DynamicWorkflowNodeMetadata{
-			Id:               dynamicWorkflowClosure.Primary.Template.Id,
-			CompiledWorkflow: &dynamicWorkflowClosure,
+			Id:               dynamicWorkflowClosure.GetPrimary().GetTemplate().GetId(),
+			CompiledWorkflow: dynamicWorkflowClosure,
 		},
 		FlyteUrls: &admin.FlyteURLs{
 			Inputs:  "flyte://v1/project/domain/name/node id/i",
@@ -1318,4 +1448,149 @@ func TestGetNodeExecutionData(t *testing.T) {
 			Deck:    "flyte://v1/project/domain/name/node id/d",
 		},
 	}, dataResponse))
+}
+
+func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := &core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	expectedClosure := testutils.GetWorkflowClosure().GetCompiledWorkflow()
+	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, remoteClosureIdentifier, reference.String())
+		bytes, err := proto.Marshal(expectedClosure)
+		require.NoError(t, err)
+		return proto.Unmarshal(bytes, msg)
+	}
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+	expected := &admin.DynamicNodeWorkflowResponse{
+		CompiledWorkflow: expectedClosure,
+	}
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
+
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(expected, resp))
+}
+
+func Test_GetDynamicNodeWorkflow_DBError(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := &core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	expectedErr := errors.New("failure")
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{}, expectedErr
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
+
+	assert.Equal(t, expectedErr, err)
+	assert.Empty(t, resp)
+}
+
+func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := &core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: ""}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
+
+	st, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.NotFound, st.Code())
+	assert.Equal(t, "node does not contain dynamic workflow", st.Message())
+	assert.Empty(t, resp)
+}
+
+func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := &core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, remoteClosureIdentifier, reference.String())
+		return errors.New("failure")
+	}
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{Id: nodeExecID})
+
+	st, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.Internal, st.Code())
+	assert.Equal(t, "Unable to read WorkflowClosure from location s3://flyte/metadata/admin/remote closure id : failure", st.Message())
+	assert.Empty(t, resp)
 }

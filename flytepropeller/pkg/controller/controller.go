@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	tokenCache "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -82,10 +83,11 @@ type Controller struct {
 	workflowStore       workflowstore.FlyteWorkflow
 	// recorder is an event recorder for recording Event resources to the
 	// Kubernetes API.
-	recorder      record.EventRecorder
-	metrics       *metrics
-	leaderElector *leaderelection.LeaderElector
-	levelMonitor  *ResourceLevelMonitor
+	recorder       record.EventRecorder
+	metrics        *metrics
+	leaderElector  *leaderelection.LeaderElector
+	levelMonitor   *ResourceLevelMonitor
+	executionStats *workflowstore.ExecutionStatsMonitor
 }
 
 // Run either as a leader -if configured- or as a standalone process.
@@ -117,6 +119,7 @@ func (c *Controller) run(ctx context.Context) error {
 
 	// Start the collector process
 	c.levelMonitor.RunCollector(ctx)
+	c.executionStats.RunStatsMonitor(ctx)
 
 	// Start the informer factories to begin populating the informer caches
 	logger.Info(ctx, "Starting FlyteWorkflow controller")
@@ -300,14 +303,15 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 
 func getAdminClient(ctx context.Context) (client service.AdminServiceClient, signalClient service.SignalServiceClient, opt []grpc.DialOption, err error) {
 	cfg := admin.GetConfig(ctx)
-	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	tc := tokenCache.NewTokenCacheInMemoryProvider()
+	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).WithTokenCache(tc).Build(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}
 
 	credentialsFuture := admin.NewPerRPCCredentialsFuture()
 	opts := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, nil, credentialsFuture, nil)),
+		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)),
 		grpc.WithPerRPCCredentials(credentialsFuture),
 	}
 
@@ -324,21 +328,14 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
 		return nil, err
 	}
-	var launchPlanActor launchplan.FlyteAdmin
-	if cfg.EnableAdminLauncher {
-		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
-			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"))
-		if err != nil {
-			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
 
-		if err := launchPlanActor.Initialize(ctx); err != nil {
-			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
-	} else {
-		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
+	sCfg := storage.GetConfig()
+	if sCfg == nil {
+		logger.Errorf(ctx, "Storage configuration missing.")
+	}
+	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
 	}
 
 	logger.Info(ctx, "Setting up event sink and recorder")
@@ -401,16 +398,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
 
-	sCfg := storage.GetConfig()
-	if sCfg == nil {
-		logger.Errorf(ctx, "Storage configuration missing.")
-	}
-
-	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
-	}
-
 	logger.Info(ctx, "Setting up Catalog client.")
 	catalogClient, err := catalog.NewCatalogClient(ctx, authOpts...)
 	if err != nil {
@@ -430,21 +417,44 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	controller.levelMonitor = NewResourceLevelMonitor(scope.NewSubScope("collector"), flyteworkflowInformer.Lister())
 
+	var launchPlanActor launchplan.FlyteAdmin
+	if cfg.EnableAdminLauncher {
+		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, launchplan.GetAdminConfig(),
+			scope.NewSubScope("admin_launcher"), store, controller.enqueueWorkflowForNodeUpdates)
+		if err != nil {
+			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+
+		if err := launchPlanActor.Initialize(ctx); err != nil {
+			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+	} else {
+		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
+	}
+
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
-		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.LiteralOffloadingConfig, cfg.ClusterID, signalClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
-		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
+		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
+		catalogClient, recoveryClient, cfg.LiteralOffloadingConfig, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
 
-	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink, controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, scope)
+	activeExecutions, err := workflowstore.NewExecutionStatsHolder()
+	if err != nil {
+		return nil, err
+	}
+	controller.executionStats = workflowstore.NewExecutionStatsMonitor(scope.NewSubScope("execstats"), flyteworkflowInformer.Lister(), activeExecutions)
+
+	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink, controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, scope, activeExecutions)
 	if err != nil {
 		return nil, err
 	}

@@ -143,7 +143,8 @@ data:
       testing:
         host: http://flyteadmin
     server:
-      grpcPort: 8089
+      grpc:
+        port: 8089
       httpPort: 8088
       security:
         allowCors: true
@@ -162,13 +163,16 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -356,13 +360,16 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/flytescheduler/configmap.yaml
 apiVersion: v1
@@ -471,6 +478,7 @@ spec:
     - name: grpc
       port: 81
       protocol: TCP
+      # intentionally set to TCP instead of grpc
       targetPort: 8089
     - name: redoc
       protocol: TCP
@@ -553,17 +561,20 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
         - command:
           - flyteadmin
@@ -571,9 +582,13 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -588,9 +603,13 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -602,9 +621,13 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -615,13 +638,17 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
             [
                 "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /etc/flyte/config
               name: base-config-volume
@@ -638,7 +665,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -663,6 +690,10 @@ spec:
             cpu: 50m
             ephemeral-storage: 200Mi
             memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - mountPath: /etc/db
           name: db-pass
@@ -726,6 +757,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "55ce597c10b17ef6e891f0c9242b17aafb3d7b4e4e414d0a5078d71ad9c804f"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -739,7 +772,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.0"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -788,11 +821,14 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
         runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
+        seLinuxOptions:
+          type: spc_t
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.10.2"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.19.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -800,6 +836,10 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: 
           limits:
             cpu: 250m
@@ -841,17 +881,20 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "ded28f3a68d22eb8e5af14a44cc0d14326f10060405268aac5a3665fb86c8bc"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
       - command:
         - datacatalog
@@ -859,7 +902,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.6"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -867,19 +910,27 @@ spec:
           name: db-pass
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
       containers:
       - command:
         - datacatalog
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.6"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
-        - containerPort: 8088
+        - containerPort: 8080
         - containerPort: 8089
         - containerPort: 10254
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           limits:
             cpu: 1
@@ -932,26 +983,33 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
       - command:
         - flytescheduler
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.6"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - mountPath: /etc/db
           name: db-pass
@@ -965,11 +1023,15 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.6"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.14.0"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
           - containerPort: 10254
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           limits:
             cpu: 250m
@@ -1017,7 +1079,9 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:
@@ -1173,9 +1237,10 @@ kind: Ingress
 metadata:
   name: flyte-core-grpc
   namespace: flyte
-  annotations:
+  annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -1184,9 +1249,10 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
-    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/service-upstream: "true"
 spec:
+  ingressClassName: 
   rules:
     - host: null
       http:

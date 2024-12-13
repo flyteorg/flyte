@@ -31,18 +31,16 @@ func TestSubTaskExecutionContext(t *testing.T) {
 
 	subtaskTemplate, err := stCtx.TaskReader().Read(ctx)
 	assert.Nil(t, err)
-	assert.Equal(t, int32(2), subtaskTemplate.TaskTypeVersion)
-	assert.Equal(t, podPlugin.ContainerTaskType, subtaskTemplate.Type)
+	assert.Equal(t, int32(2), subtaskTemplate.GetTaskTypeVersion())
+	assert.Equal(t, podPlugin.ContainerTaskType, subtaskTemplate.GetType())
 	assert.Equal(t, storage.DataReference("/prefix/"), stCtx.OutputWriter().GetOutputPrefixPath())
 	assert.Equal(t, storage.DataReference("/raw_prefix/5/1"), stCtx.OutputWriter().GetRawOutputPrefix())
 	assert.Equal(t,
-		&tasklog.TemplateVarsByScheme{
-			TaskExecution: tasklog.TemplateVars{
-				{Regex: logTemplateRegexes.ParentName, Value: "notfound"},
-				{Regex: logTemplateRegexes.ExecutionIndex, Value: "0"},
-				{Regex: logTemplateRegexes.RetryAttempt, Value: "1"},
-				{Regex: logTemplateRegexes.ParentRetryAttempt, Value: "0"},
-			},
+		[]tasklog.TemplateVar{
+			{Regex: LogTemplateRegexes.ParentName, Value: "notfound"},
+			{Regex: LogTemplateRegexes.ExecutionIndex, Value: "0"},
+			{Regex: LogTemplateRegexes.RetryAttempt, Value: "1"},
+			{Regex: LogTemplateRegexes.ParentRetryAttempt, Value: "0"},
 		},
 		stCtx.TaskExecutionMetadata().GetTaskExecutionID().(SubTaskExecutionID).TemplateVarsByScheme(),
 	)

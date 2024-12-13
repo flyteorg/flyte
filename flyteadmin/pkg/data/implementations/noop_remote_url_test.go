@@ -14,6 +14,10 @@ const noopFileSize = int64(1256)
 
 type MockMetadata struct{}
 
+func (m MockMetadata) ContentMD5() string {
+	return ""
+}
+
 func (m MockMetadata) Exists() bool {
 	return true
 }
@@ -40,6 +44,6 @@ func TestNoopRemoteURLGet(t *testing.T) {
 	urlBlob, err := noopRemoteURL.Get(context.Background(), "uri")
 	assert.Nil(t, err)
 	assert.NotEmpty(t, urlBlob)
-	assert.Equal(t, "uri", urlBlob.Url)
-	assert.Equal(t, noopFileSize, urlBlob.Bytes)
+	assert.Equal(t, "uri", urlBlob.GetUrl())
+	assert.Equal(t, noopFileSize, urlBlob.GetBytes())
 }

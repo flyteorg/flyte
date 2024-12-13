@@ -29,12 +29,11 @@ var clusterReassignablePhases = sets.NewString(core.WorkflowExecution_UNDEFINED.
 
 // CreateExecutionModelInput encapsulates request parameters for calls to CreateExecutionModel.
 type CreateExecutionModelInput struct {
-	WorkflowExecutionID   core.WorkflowExecutionIdentifier
+	WorkflowExecutionID   *core.WorkflowExecutionIdentifier
 	RequestSpec           *admin.ExecutionSpec
 	LaunchPlanID          uint
 	WorkflowID            uint
 	TaskID                uint
-	Phase                 core.WorkflowExecution_Phase
 	CreatedAt             time.Time
 	Notifications         []*admin.Notification
 	WorkflowIdentifier    *core.Identifier
@@ -62,7 +61,7 @@ var ListExecutionTransformerOptions = &ExecutionTransformerOptions{
 // CreateExecutionModel transforms a ExecutionCreateRequest to a Execution model
 func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, error) {
 	requestSpec := input.RequestSpec
-	if requestSpec.Metadata == nil {
+	if requestSpec.GetMetadata() == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
@@ -76,19 +75,15 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
-		Phase:         input.Phase,
 		CreatedAt:     createdAt,
 		UpdatedAt:     createdAt,
 		Notifications: input.Notifications,
 		WorkflowId:    input.WorkflowIdentifier,
 		StateChangeDetails: &admin.ExecutionStateChangeDetails{
 			State:      admin.ExecutionState_EXECUTION_ACTIVE,
-			Principal:  requestSpec.Metadata.Principal,
+			Principal:  requestSpec.GetMetadata().GetPrincipal(),
 			OccurredAt: createdAt,
 		},
-	}
-	if input.Phase == core.WorkflowExecution_RUNNING {
-		closure.StartedAt = createdAt
 	}
 	if input.Error != nil {
 		closure.Phase = core.WorkflowExecution_FAILED
@@ -116,19 +111,15 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
-	tags := make([]models.AdminTag, len(input.RequestSpec.Tags))
-	for i, tag := range input.RequestSpec.Tags {
-		tags[i] = models.AdminTag{Name: tag}
-	}
 
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
-			Project: input.WorkflowExecutionID.Project,
-			Domain:  input.WorkflowExecutionID.Domain,
-			Name:    input.WorkflowExecutionID.Name,
+			Project: input.WorkflowExecutionID.GetProject(),
+			Domain:  input.WorkflowExecutionID.GetDomain(),
+			Name:    input.WorkflowExecutionID.GetName(),
 		},
 		Spec:                  spec,
-		Phase:                 input.Phase.String(),
+		Phase:                 closure.GetPhase().String(),
 		Closure:               closureBytes,
 		WorkflowID:            input.WorkflowID,
 		ExecutionCreatedAt:    &input.CreatedAt,
@@ -138,10 +129,9 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		Cluster:               input.Cluster,
 		InputsURI:             input.InputsURI,
 		UserInputsURI:         input.UserInputsURI,
-		User:                  requestSpec.Metadata.Principal,
+		User:                  requestSpec.GetMetadata().GetPrincipal(),
 		State:                 &activeExecution,
 		LaunchEntity:          strings.ToLower(input.LaunchEntity.String()),
-		Tags:                  tags,
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.
@@ -150,11 +140,44 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	} else {
 		executionModel.LaunchPlanID = input.LaunchPlanID
 	}
-	if input.RequestSpec.Metadata != nil {
-		executionModel.Mode = int32(input.RequestSpec.Metadata.Mode)
+	if input.RequestSpec.GetMetadata() != nil {
+		executionModel.Mode = int32(input.RequestSpec.GetMetadata().GetMode())
 	}
 
 	return executionModel, nil
+}
+
+// CreateExecutionTagModel transforms a CreateExecutionModelInput to a ExecutionTag model
+func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
+	tags := make([]*models.ExecutionTag, 0)
+
+	if input.RequestSpec.GetLabels() != nil {
+		for k, v := range input.RequestSpec.GetLabels().GetValues() {
+			tags = append(tags, &models.ExecutionTag{
+				ExecutionKey: models.ExecutionKey{
+					Project: input.WorkflowExecutionID.GetProject(),
+					Domain:  input.WorkflowExecutionID.GetDomain(),
+					Name:    input.WorkflowExecutionID.GetName(),
+				},
+				Key:   k,
+				Value: v,
+			})
+		}
+	}
+
+	for _, v := range input.RequestSpec.GetTags() {
+		tags = append(tags, &models.ExecutionTag{
+			ExecutionKey: models.ExecutionKey{
+				Project: input.WorkflowExecutionID.GetProject(),
+				Domain:  input.WorkflowExecutionID.GetDomain(),
+				Name:    input.WorkflowExecutionID.GetName(),
+			},
+			Key:   v,
+			Value: "",
+		})
+	}
+
+	return tags, nil
 }
 
 func reassignCluster(ctx context.Context, cluster string, executionID *core.WorkflowExecutionIdentifier, execution *models.Execution) error {
@@ -166,10 +189,10 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 	if err != nil {
 		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution spec: %v", err)
 	}
-	if executionSpec.Metadata == nil {
+	if executionSpec.GetMetadata() == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
 	}
-	if executionSpec.Metadata.SystemMetadata == nil {
+	if executionSpec.GetMetadata().GetSystemMetadata() == nil {
 		executionSpec.Metadata.SystemMetadata = &admin.SystemMetadata{}
 	}
 	executionSpec.Metadata.SystemMetadata.ExecutionCluster = cluster
@@ -184,71 +207,71 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 // Updates an existing model given a WorkflowExecution event.
 func UpdateExecutionModelState(
 	ctx context.Context,
-	execution *models.Execution, request admin.WorkflowExecutionEventRequest,
+	execution *models.Execution, request *admin.WorkflowExecutionEventRequest,
 	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)
 	if err != nil {
 		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
 	}
-	executionClosure.Phase = request.Event.Phase
-	executionClosure.UpdatedAt = request.Event.OccurredAt
-	execution.Phase = request.Event.Phase.String()
+	executionClosure.Phase = request.GetEvent().GetPhase()
+	executionClosure.UpdatedAt = request.GetEvent().GetOccurredAt()
+	execution.Phase = request.GetEvent().GetPhase().String()
 
-	occurredAtTimestamp, err := ptypes.Timestamp(request.Event.OccurredAt)
+	occurredAtTimestamp, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
 	if err != nil {
 		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to parse OccurredAt: %v", err)
 	}
 	execution.ExecutionUpdatedAt = &occurredAtTimestamp
 
 	// only mark the execution started when we get the initial running event
-	if request.Event.Phase == core.WorkflowExecution_RUNNING {
+	if request.GetEvent().GetPhase() == core.WorkflowExecution_RUNNING {
 		execution.StartedAt = &occurredAtTimestamp
-		executionClosure.StartedAt = request.Event.OccurredAt
-	} else if common.IsExecutionTerminal(request.Event.Phase) {
+		executionClosure.StartedAt = request.GetEvent().GetOccurredAt()
+	} else if common.IsExecutionTerminal(request.GetEvent().GetPhase()) {
 		if execution.StartedAt != nil {
 			execution.Duration = occurredAtTimestamp.Sub(*execution.StartedAt)
 			executionClosure.Duration = ptypes.DurationProto(execution.Duration)
 		} else {
 			logger.Infof(context.Background(),
-				"Cannot compute duration because startedAt was never set, requestId: %v", request.RequestId)
+				"Cannot compute duration because startedAt was never set, requestId: %v", request.GetRequestId())
 		}
 	}
 
 	// Default or empty cluster values do not require updating the execution model.
-	ignoreClusterFromEvent := len(request.Event.ProducerId) == 0 || request.Event.ProducerId == common.DefaultProducerID
-	logger.Debugf(ctx, "Producer Id [%v]. IgnoreClusterFromEvent [%v]", request.Event.ProducerId, ignoreClusterFromEvent)
+	ignoreClusterFromEvent := len(request.GetEvent().GetProducerId()) == 0 || request.GetEvent().GetProducerId() == common.DefaultProducerID
+	logger.Debugf(ctx, "Producer Id [%v]. IgnoreClusterFromEvent [%v]", request.GetEvent().GetProducerId(), ignoreClusterFromEvent)
 	if !ignoreClusterFromEvent {
 		if clusterReassignablePhases.Has(execution.Phase) {
-			if err := reassignCluster(ctx, request.Event.ProducerId, request.Event.ExecutionId, execution); err != nil {
+			if err := reassignCluster(ctx, request.GetEvent().GetProducerId(), request.GetEvent().GetExecutionId(), execution); err != nil {
 				return err
 			}
-		} else if execution.Cluster != request.Event.ProducerId {
+		} else if execution.Cluster != request.GetEvent().GetProducerId() {
 			errorMsg := fmt.Sprintf("Cannot accept events for running/terminated execution [%v] from cluster [%s],"+
 				"expected events to originate from [%s]",
-				request.Event.ExecutionId, request.Event.ProducerId, execution.Cluster)
+				request.GetEvent().GetExecutionId(), request.GetEvent().GetProducerId(), execution.Cluster)
 			return flyteErrs.NewIncompatibleClusterError(ctx, errorMsg, execution.Cluster)
 		}
 	}
 
-	if request.Event.GetOutputUri() != "" {
+	if request.GetEvent().GetOutputUri() != "" {
 		executionClosure.OutputResult = &admin.ExecutionClosure_Outputs{
 			Outputs: &admin.LiteralMapBlob{
 				Data: &admin.LiteralMapBlob_Uri{
-					Uri: request.Event.GetOutputUri(),
+					Uri: request.GetEvent().GetOutputUri(),
 				},
 			},
 		}
-	} else if request.Event.GetOutputData() != nil {
+	} else if request.GetEvent().GetOutputData() != nil {
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			executionClosure.OutputResult = &admin.ExecutionClosure_OutputData{
-				OutputData: request.Event.GetOutputData(),
+				OutputData: request.GetEvent().GetOutputData(),
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetOutputData(),
+				request.GetEvent().GetExecutionId().GetProject(), request.GetEvent().GetExecutionId().GetDomain(), request.GetEvent().GetExecutionId().GetName(), OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -260,11 +283,11 @@ func UpdateExecutionModelState(
 				},
 			}
 		}
-	} else if request.Event.GetError() != nil {
+	} else if request.GetEvent().GetError() != nil {
 		executionClosure.OutputResult = &admin.ExecutionClosure_Error{
-			Error: request.Event.GetError(),
+			Error: request.GetEvent().GetError(),
 		}
-		k := request.Event.GetError().Kind.String()
+		k := request.GetEvent().GetError().GetKind().String()
 		execution.ErrorKind = &k
 		execution.ErrorCode = &request.Event.GetError().Code
 	}
@@ -349,13 +372,13 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
 	}
 	if len(opts.DefaultNamespace) > 0 {
-		if spec.Metadata == nil {
+		if spec.GetMetadata() == nil {
 			spec.Metadata = &admin.ExecutionMetadata{}
 		}
-		if spec.Metadata.SystemMetadata == nil {
+		if spec.GetMetadata().GetSystemMetadata() == nil {
 			spec.Metadata.SystemMetadata = &admin.SystemMetadata{}
 		}
-		if len(spec.GetMetadata().GetSystemMetadata().Namespace) == 0 {
+		if len(spec.GetMetadata().GetSystemMetadata().GetNamespace()) == 0 {
 			logger.Infof(ctx, "setting execution system metadata namespace to [%s]", opts.DefaultNamespace)
 			spec.Metadata.SystemMetadata.Namespace = opts.DefaultNamespace
 		}
@@ -365,7 +388,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	if err = proto.Unmarshal(executionModel.Closure, &closure); err != nil {
 		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
-	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
+	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().GetMessage()) > 0 {
 		trimmedErrOutputResult := closure.GetError()
 		trimmedErrMessage := TrimErrorMessage(trimmedErrOutputResult.GetMessage())
 		trimmedErrOutputResult.Message = trimmedErrMessage
@@ -374,7 +397,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 		}
 	}
 
-	if closure.StateChangeDetails == nil {
+	if closure.GetStateChangeDetails() == nil {
 		// Update execution state details from model for older executions
 		if closure.StateChangeDetails, err = PopulateDefaultStateChangeDetails(executionModel); err != nil {
 			return nil, err

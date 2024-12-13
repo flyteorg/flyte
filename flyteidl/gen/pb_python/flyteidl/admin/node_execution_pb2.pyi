@@ -62,18 +62,20 @@ class NodeExecution(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., input_uri: _Optional[str] = ..., closure: _Optional[_Union[NodeExecutionClosure, _Mapping]] = ..., metadata: _Optional[_Union[NodeExecutionMetaData, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionMetaData(_message.Message):
-    __slots__ = ["retry_group", "is_parent_node", "spec_node_id", "is_dynamic", "is_array"]
+    __slots__ = ["retry_group", "is_parent_node", "spec_node_id", "is_dynamic", "is_array", "is_eager"]
     RETRY_GROUP_FIELD_NUMBER: _ClassVar[int]
     IS_PARENT_NODE_FIELD_NUMBER: _ClassVar[int]
     SPEC_NODE_ID_FIELD_NUMBER: _ClassVar[int]
     IS_DYNAMIC_FIELD_NUMBER: _ClassVar[int]
     IS_ARRAY_FIELD_NUMBER: _ClassVar[int]
+    IS_EAGER_FIELD_NUMBER: _ClassVar[int]
     retry_group: str
     is_parent_node: bool
     spec_node_id: str
     is_dynamic: bool
     is_array: bool
-    def __init__(self, retry_group: _Optional[str] = ..., is_parent_node: bool = ..., spec_node_id: _Optional[str] = ..., is_dynamic: bool = ..., is_array: bool = ...) -> None: ...
+    is_eager: bool
+    def __init__(self, retry_group: _Optional[str] = ..., is_parent_node: bool = ..., spec_node_id: _Optional[str] = ..., is_dynamic: bool = ..., is_array: bool = ..., is_eager: bool = ...) -> None: ...
 
 class NodeExecutionList(_message.Message):
     __slots__ = ["node_executions", "token"]
@@ -158,3 +160,15 @@ class NodeExecutionGetDataResponse(_message.Message):
     dynamic_workflow: DynamicWorkflowNodeMetadata
     flyte_urls: _common_pb2.FlyteURLs
     def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., dynamic_workflow: _Optional[_Union[DynamicWorkflowNodeMetadata, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
+
+class GetDynamicNodeWorkflowRequest(_message.Message):
+    __slots__ = ["id"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: _identifier_pb2.NodeExecutionIdentifier
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
+
+class DynamicNodeWorkflowResponse(_message.Message):
+    __slots__ = ["compiled_workflow"]
+    COMPILED_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    compiled_workflow: _compiler_pb2.CompiledWorkflowClosure
+    def __init__(self, compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ...) -> None: ...

@@ -259,63 +259,177 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 	n := metav1.NewTime(time.Now())
 
 	const queued = "queued"
-	t.Run("identical-phase", func(t *testing.T) {
-		p := NodePhaseQueued
-		ns := NodeStatus{
-			Phase:   p,
-			Message: queued,
-		}
-		msg := queued
-		ns.UpdatePhase(p, n, msg, nil)
-		assert.Nil(t, ns.QueuedAt)
-	})
+	const success = "success"
+	for _, enableCRDebugMetadata := range []bool{false, true} {
+		t.Run("identical-phase", func(t *testing.T) {
+			p := NodePhaseQueued
+			ns := NodeStatus{
+				Phase:   p,
+				Message: queued,
+			}
+			msg := queued
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
+			assert.Nil(t, ns.QueuedAt)
+		})
 
-	t.Run("zero", func(t *testing.T) {
-		p := NodePhaseQueued
-		ns := NodeStatus{}
-		msg := queued
-		ns.UpdatePhase(p, metav1.NewTime(time.Time{}), msg, nil)
-		assert.NotNil(t, ns.QueuedAt)
-	})
+		t.Run("zero", func(t *testing.T) {
+			p := NodePhaseQueued
+			ns := NodeStatus{}
+			msg := queued
+			ns.UpdatePhase(p, metav1.NewTime(time.Time{}), msg, enableCRDebugMetadata, nil)
+			assert.NotNil(t, ns.QueuedAt)
+		})
 
-	t.Run("non-terminal", func(t *testing.T) {
-		ns := NodeStatus{}
-		p := NodePhaseQueued
-		msg := queued
-		ns.UpdatePhase(p, n, msg, nil)
+		t.Run("non-terminal", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseQueued
+			msg := queued
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
-		assert.Equal(t, *ns.LastUpdatedAt, n)
-		assert.Equal(t, *ns.QueuedAt, n)
-		assert.Nil(t, ns.LastAttemptStartedAt)
-		assert.Nil(t, ns.StartedAt)
-		assert.Nil(t, ns.StoppedAt)
-		assert.Equal(t, p, ns.Phase)
-		assert.Equal(t, msg, ns.Message)
-		assert.Nil(t, ns.Error)
-	})
+			assert.Equal(t, *ns.LastUpdatedAt, n)
+			assert.Equal(t, *ns.QueuedAt, n)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Nil(t, ns.StoppedAt)
+			assert.Equal(t, p, ns.Phase)
+			assert.Equal(t, msg, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
 
-	t.Run("non-terminal-running", func(t *testing.T) {
-		ns := NodeStatus{}
-		p := NodePhaseRunning
-		msg := "running"
-		ns.UpdatePhase(p, n, msg, nil)
+		t.Run("non-terminal-running", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseRunning
+			msg := "running"
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
-		assert.Equal(t, *ns.LastUpdatedAt, n)
-		assert.Nil(t, ns.QueuedAt)
-		assert.Equal(t, *ns.LastAttemptStartedAt, n)
-		assert.Equal(t, *ns.StartedAt, n)
-		assert.Nil(t, ns.StoppedAt)
-		assert.Equal(t, p, ns.Phase)
-		assert.Equal(t, msg, ns.Message)
-		assert.Nil(t, ns.Error)
-	})
+			assert.Equal(t, *ns.LastUpdatedAt, n)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Equal(t, *ns.LastAttemptStartedAt, n)
+			assert.Equal(t, *ns.StartedAt, n)
+			assert.Nil(t, ns.StoppedAt)
+			assert.Equal(t, p, ns.Phase)
+			assert.Equal(t, msg, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
+
+		t.Run("non-terminal-timing-out", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseTimingOut
+			msg := "timing-out"
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
+
+			assert.Equal(t, *ns.LastUpdatedAt, n)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Nil(t, ns.StoppedAt)
+			assert.Equal(t, p, ns.Phase)
+			assert.Equal(t, msg, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
+
+		t.Run("terminal-success", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseSucceeded
+			msg := success
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
+
+			assert.Nil(t, ns.LastUpdatedAt)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Equal(t, *ns.StoppedAt, n)
+			assert.Equal(t, p, ns.Phase)
+			assert.Empty(t, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
+
+		t.Run("terminal-skipped", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseSucceeded
+			msg := success
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
+
+			assert.Nil(t, ns.LastUpdatedAt)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Equal(t, *ns.StoppedAt, n)
+			assert.Equal(t, p, ns.Phase)
+			assert.Empty(t, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
+
+		t.Run("terminal-success-preset", func(t *testing.T) {
+			ns := NodeStatus{
+				QueuedAt:             &n,
+				StartedAt:            &n,
+				LastUpdatedAt:        &n,
+				LastAttemptStartedAt: &n,
+				WorkflowNodeStatus:   &WorkflowNodeStatus{},
+				BranchStatus:         &BranchNodeStatus{},
+				DynamicNodeStatus:    &DynamicNodeStatus{},
+				TaskNodeStatus:       &TaskNodeStatus{},
+				SubNodeStatus:        map[NodeID]*NodeStatus{},
+			}
+			p := NodePhaseSucceeded
+			msg := success
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
+
+			assert.Nil(t, ns.LastUpdatedAt)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Equal(t, *ns.StoppedAt, n)
+			assert.Equal(t, p, ns.Phase)
+			assert.Empty(t, ns.Message)
+			assert.Nil(t, ns.Error)
+			assert.Nil(t, ns.SubNodeStatus)
+			assert.Nil(t, ns.DynamicNodeStatus)
+			assert.Nil(t, ns.WorkflowNodeStatus)
+			assert.Nil(t, ns.BranchStatus)
+			assert.Nil(t, ns.TaskNodeStatus)
+		})
+
+		t.Run("non-terminal-preset", func(t *testing.T) {
+			ns := NodeStatus{
+				QueuedAt:             &n,
+				StartedAt:            &n,
+				LastUpdatedAt:        &n,
+				LastAttemptStartedAt: &n,
+				WorkflowNodeStatus:   &WorkflowNodeStatus{},
+				BranchStatus:         &BranchNodeStatus{},
+				DynamicNodeStatus:    &DynamicNodeStatus{},
+				TaskNodeStatus:       &TaskNodeStatus{},
+				SubNodeStatus:        map[NodeID]*NodeStatus{},
+			}
+			n2 := metav1.NewTime(time.Now())
+			p := NodePhaseRunning
+			msg := "running"
+			ns.UpdatePhase(p, n2, msg, enableCRDebugMetadata, nil)
+
+			assert.Equal(t, *ns.LastUpdatedAt, n2)
+			assert.Equal(t, *ns.QueuedAt, n)
+			assert.Equal(t, *ns.LastAttemptStartedAt, n)
+			assert.Equal(t, *ns.StartedAt, n)
+			assert.Nil(t, ns.StoppedAt)
+			assert.Equal(t, p, ns.Phase)
+			assert.Equal(t, msg, ns.Message)
+			assert.Nil(t, ns.Error)
+			assert.NotNil(t, ns.SubNodeStatus)
+			assert.NotNil(t, ns.DynamicNodeStatus)
+			assert.NotNil(t, ns.WorkflowNodeStatus)
+			assert.NotNil(t, ns.BranchStatus)
+			assert.NotNil(t, ns.TaskNodeStatus)
+		})
+	}
 
 	t.Run("terminal-fail", func(t *testing.T) {
 		ns := NodeStatus{}
 		p := NodePhaseFailed
 		msg := "failed"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, err)
+		ns.UpdatePhase(p, n, msg, true, err)
 
 		assert.Equal(t, *ns.LastUpdatedAt, n)
 		assert.Nil(t, ns.QueuedAt)
@@ -324,6 +438,23 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		assert.Equal(t, *ns.StoppedAt, n)
 		assert.Equal(t, p, ns.Phase)
 		assert.Equal(t, msg, ns.Message)
+		assert.Equal(t, ns.Error.ExecutionError, err)
+	})
+
+	t.Run("terminal-fail-clear-state-on-any-termination", func(t *testing.T) {
+		ns := NodeStatus{}
+		p := NodePhaseFailed
+		msg := "failed"
+		err := &core.ExecutionError{}
+		ns.UpdatePhase(p, n, msg, false, err)
+
+		assert.Nil(t, ns.LastUpdatedAt)
+		assert.Nil(t, ns.QueuedAt)
+		assert.Nil(t, ns.LastAttemptStartedAt)
+		assert.Nil(t, ns.StartedAt)
+		assert.Equal(t, *ns.StoppedAt, n)
+		assert.Equal(t, p, ns.Phase)
+		assert.Equal(t, ns.Message, "")
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 
@@ -332,7 +463,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		p := NodePhaseTimedOut
 		msg := "tm"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, err)
+		ns.UpdatePhase(p, n, msg, true, err)
 
 		assert.Equal(t, *ns.LastUpdatedAt, n)
 		assert.Nil(t, ns.QueuedAt)
@@ -344,12 +475,12 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 
-	const success = "success"
-	t.Run("terminal-success", func(t *testing.T) {
+	t.Run("terminal-timeout-clear-state-on-any-termination", func(t *testing.T) {
 		ns := NodeStatus{}
-		p := NodePhaseSucceeded
-		msg := success
-		ns.UpdatePhase(p, n, msg, nil)
+		p := NodePhaseTimedOut
+		msg := "tm"
+		err := &core.ExecutionError{}
+		ns.UpdatePhase(p, n, msg, false, err)
 
 		assert.Nil(t, ns.LastUpdatedAt)
 		assert.Nil(t, ns.QueuedAt)
@@ -357,86 +488,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		assert.Nil(t, ns.StartedAt)
 		assert.Equal(t, *ns.StoppedAt, n)
 		assert.Equal(t, p, ns.Phase)
-		assert.Empty(t, ns.Message)
-		assert.Nil(t, ns.Error)
-	})
-
-	t.Run("terminal-skipped", func(t *testing.T) {
-		ns := NodeStatus{}
-		p := NodePhaseSucceeded
-		msg := success
-		ns.UpdatePhase(p, n, msg, nil)
-
-		assert.Nil(t, ns.LastUpdatedAt)
-		assert.Nil(t, ns.QueuedAt)
-		assert.Nil(t, ns.LastAttemptStartedAt)
-		assert.Nil(t, ns.StartedAt)
-		assert.Equal(t, *ns.StoppedAt, n)
-		assert.Equal(t, p, ns.Phase)
-		assert.Empty(t, ns.Message)
-		assert.Nil(t, ns.Error)
-	})
-
-	t.Run("terminal-success-preset", func(t *testing.T) {
-		ns := NodeStatus{
-			QueuedAt:             &n,
-			StartedAt:            &n,
-			LastUpdatedAt:        &n,
-			LastAttemptStartedAt: &n,
-			WorkflowNodeStatus:   &WorkflowNodeStatus{},
-			BranchStatus:         &BranchNodeStatus{},
-			DynamicNodeStatus:    &DynamicNodeStatus{},
-			TaskNodeStatus:       &TaskNodeStatus{},
-			SubNodeStatus:        map[NodeID]*NodeStatus{},
-		}
-		p := NodePhaseSucceeded
-		msg := success
-		ns.UpdatePhase(p, n, msg, nil)
-
-		assert.Nil(t, ns.LastUpdatedAt)
-		assert.Nil(t, ns.QueuedAt)
-		assert.Nil(t, ns.LastAttemptStartedAt)
-		assert.Nil(t, ns.StartedAt)
-		assert.Equal(t, *ns.StoppedAt, n)
-		assert.Equal(t, p, ns.Phase)
-		assert.Empty(t, ns.Message)
-		assert.Nil(t, ns.Error)
-		assert.Nil(t, ns.SubNodeStatus)
-		assert.Nil(t, ns.DynamicNodeStatus)
-		assert.Nil(t, ns.WorkflowNodeStatus)
-		assert.Nil(t, ns.BranchStatus)
-		assert.Nil(t, ns.TaskNodeStatus)
-	})
-
-	t.Run("non-terminal-preset", func(t *testing.T) {
-		ns := NodeStatus{
-			QueuedAt:             &n,
-			StartedAt:            &n,
-			LastUpdatedAt:        &n,
-			LastAttemptStartedAt: &n,
-			WorkflowNodeStatus:   &WorkflowNodeStatus{},
-			BranchStatus:         &BranchNodeStatus{},
-			DynamicNodeStatus:    &DynamicNodeStatus{},
-			TaskNodeStatus:       &TaskNodeStatus{},
-			SubNodeStatus:        map[NodeID]*NodeStatus{},
-		}
-		n2 := metav1.NewTime(time.Now())
-		p := NodePhaseRunning
-		msg := "running"
-		ns.UpdatePhase(p, n2, msg, nil)
-
-		assert.Equal(t, *ns.LastUpdatedAt, n2)
-		assert.Equal(t, *ns.QueuedAt, n)
-		assert.Equal(t, *ns.LastAttemptStartedAt, n)
-		assert.Equal(t, *ns.StartedAt, n)
-		assert.Nil(t, ns.StoppedAt)
-		assert.Equal(t, p, ns.Phase)
-		assert.Equal(t, msg, ns.Message)
-		assert.Nil(t, ns.Error)
-		assert.NotNil(t, ns.SubNodeStatus)
-		assert.NotNil(t, ns.DynamicNodeStatus)
-		assert.NotNil(t, ns.WorkflowNodeStatus)
-		assert.NotNil(t, ns.BranchStatus)
-		assert.NotNil(t, ns.TaskNodeStatus)
+		assert.Equal(t, ns.Message, "")
+		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 }

@@ -33,6 +33,8 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - echo
+      - agent-service
     # Uncomment to enable sagemaker plugin
     #      - sagemaker_training
     #      - sagemaker_hyperparameter_tuning

@@ -7,7 +7,7 @@ The main features of this 1.3 release are
 * Signaling/gate node support (human in the loop tasks)
 * User documentation support (backend and flytekit only, limited types)
 
-The latter two are pending some work in Flyte console, they will be piped through fully by the end of Q1. Support for setting and approving gate nodes is supported in `FlyteRemote` however, though only a limited set of types can be passed in.
+The latter two are pending some work in Flyte console, they will be piped through fully by the end of Q1. Support for setting and approving gate nodes is supported in `FlyteRemote` however, only a limited set of types can be passed in.
 
 ## Notes
 There are a couple things to point out with this release.
@@ -99,7 +99,7 @@ Users can now configure workflow execution to overwrite the cache. Each task in 
 
 
 ### Support for Dask
-Users will be able to spawn [Dask](https://www.dask.org/) ephemeral clusters as part of their workflows, similar to the support for [Ray](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/ray_example/ray_example.html#sphx-glr-auto-integrations-kubernetes-ray-example-ray-example-py) and [Spark](https://docs.flyte.org/projects/cookbook/en/stable/auto/integrations/kubernetes/k8s_spark/pyspark_pi.html).
+Users will be able to spawn [Dask](https://www.dask.org/) ephemeral clusters as part of their workflows, similar to the support for [Ray](https://docs.flyte.org/en/latest/flytesnacks/examples/ray_plugin/index.html) and [Spark](https://docs.flyte.org/en/latest/flytesnacks/examples/k8s_spark_plugin/index.html).
 
 
 ## Looking Ahead

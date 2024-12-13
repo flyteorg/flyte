@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func TestInClusterGetTarget(t *testing.T) {
@@ -50,6 +51,16 @@ func TestInClusterGetRemoteTarget(t *testing.T) {
 	}
 	_, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: "t1"})
 	assert.EqualError(t, err, "remote target t1 is not supported")
+}
+
+func TestInClusterGetTargetWithExecutionClusterLabel(t *testing.T) {
+	cluster := InCluster{
+		target: executioncluster.ExecutionTarget{},
+	}
+	_, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+		Value: "l1",
+	}})
+	assert.EqualError(t, err, "execution cluster label l1 is not supported")
 }
 
 func TestInClusterGetAllValidTargets(t *testing.T) {

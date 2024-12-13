@@ -141,4 +141,46 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_otlpgrpc.endpoint", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("otlpgrpc.endpoint", testValue)
+			if vString, err := cmdFlags.GetString("otlpgrpc.endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.OtlpGrpcConfig.Endpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_otlphttp.endpoint", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("otlphttp.endpoint", testValue)
+			if vString, err := cmdFlags.GetString("otlphttp.endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.OtlpHttpConfig.Endpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_sampler.parentSampler", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("sampler.parentSampler", testValue)
+			if vString, err := cmdFlags.GetString("sampler.parentSampler"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SamplerConfig.ParentSampler)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

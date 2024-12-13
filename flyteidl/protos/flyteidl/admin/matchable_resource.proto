@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -131,6 +132,9 @@ message WorkflowExecutionConfig {
 
   // Environment variables to be set for the execution.
   Envs envs = 8;
+
+  // Execution environment assignments to be set for the execution.
+  repeated core.ExecutionEnvAssignment execution_env_assignments = 9;
 }
 
 // Generic container for encapsulating all types of the above attributes messages.
@@ -154,8 +158,8 @@ message MatchingAttributes {
   }
 }
 
-// Represents a custom set of attributes applied for either a domain; a domain and project; or
-// domain, project and workflow name.
+// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
+// or domain, project and workflow name (and optional org).
 // These are used to override system level defaults for kubernetes cluster resource management,
 // default execution values, and more all across different levels of specificity.
 message MatchableAttributesConfiguration {
@@ -168,6 +172,9 @@ message MatchableAttributesConfiguration {
     string workflow = 4;
 
     string launch_plan = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Request all matching resource attributes for a resource type.
@@ -175,6 +182,9 @@ message MatchableAttributesConfiguration {
 message ListMatchableAttributesRequest {
     // +required
     MatchableResource resource_type = 1;
+
+    // Optional, org filter applied to list project requests.
+    string org = 2;
 }
 
 // Response for a request for all matching resource attributes for a resource type.

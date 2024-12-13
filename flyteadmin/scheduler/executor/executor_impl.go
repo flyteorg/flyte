@@ -54,7 +54,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}
 
 	// Making the identifier deterministic using the hash of the identifier and scheduled time
-	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, core.Identifier{
+	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, &core.Identifier{
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    s.Name,
@@ -62,7 +62,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}, scheduledTime)
 
 	if err != nil {
-		logger.Error(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
+		logger.Errorf(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
 		return err
 	}
 
@@ -107,18 +107,22 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 				return false
 			}
 			w.metrics.FailedExecutionCounter.Inc()
-			logger.Error(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
+			logger.Errorf(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
 			// TODO: Handle the case when admin launch plan state is archived but the schedule is active.
 			// After this bug is fixed in admin https://github.com/flyteorg/flyte/issues/1354
 			return true
 		},
 		func() error {
 			_, execErr := w.adminServiceClient.CreateExecution(context.Background(), executionRequest)
+			if isInactiveProjectError(execErr) {
+				logger.Debugf(ctx, "project %+v is inactive, ignoring schedule create failure for %+v", s.Project, s)
+				return nil
+			}
 			return execErr
 		},
 	)
 	if err != nil && status.Code(err) != codes.AlreadyExists {
-		logger.Error(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
+		logger.Errorf(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
 		return err
 	}
 	w.metrics.SuccessfulExecutionCounter.Inc()
@@ -143,4 +147,19 @@ func getExecutorMetrics(scope promutils.Scope) executorMetrics {
 		SuccessfulExecutionCounter: scope.MustNewCounter("successful_execution_counter",
 			"count of successful attempts to fire execution for a schedules"),
 	}
+}
+
+func isInactiveProjectError(err error) bool {
+	statusErr, ok := status.FromError(err)
+	if !ok {
+		return false
+	}
+	if len(statusErr.Details()) > 0 {
+		for _, detail := range statusErr.Details() {
+			if _, ok := detail.(*admin.InactiveProject); ok {
+				return true
+			}
+		}
+	}
+	return false
 }

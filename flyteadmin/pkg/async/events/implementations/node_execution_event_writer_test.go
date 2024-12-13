@@ -12,7 +12,7 @@ import (
 func TestNodeExecutionEventWriter(t *testing.T) {
 	db := mocks.NewMockRepository()
 
-	event := admin.NodeExecutionEventRequest{
+	event := &admin.NodeExecutionEventRequest{
 		RequestId: "request_id",
 		Event: &event2.NodeExecutionEvent{
 			Id: &core.NodeExecutionIdentifier{

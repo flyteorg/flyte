@@ -4,7 +4,7 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
@@ -20,6 +20,9 @@ message CreateUploadLocationResponse {
 
   // ExpiresAt defines when will the signed URL expires.
   google.protobuf.Timestamp expires_at = 3;
+
+  // Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+  map<string, string> headers = 4;
 }
 
 // CreateUploadLocationRequest specified request for the CreateUploadLocation API.
@@ -55,6 +58,15 @@ message CreateUploadLocationRequest {
   // in data proxy config. This option is useful when uploading multiple files.
   // +optional
   string filename_root = 6;
+
+  // If true, the data proxy will add content_md5 to the metadata to the signed URL and
+  // it will force clients to add this metadata to the object.
+  // This make sure dataproxy is backward compatible with the old flytekit.
+  bool add_content_md5_metadata = 7;
+
+
+  // Optional, org key applied to the resource.
+  string org = 8;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
@@ -67,7 +79,6 @@ message CreateDownloadLocationRequest {
   // exceeds the platform allowed max.
   // +optional. The default value comes from a global config.
   google.protobuf.Duration expires_in = 2;
-
 }
 
 message CreateDownloadLocationResponse {
@@ -158,9 +169,9 @@ service DataProxyService {
       post: "/api/v1/dataproxy/artifact_urn"
       body: "*"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Creates a write-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Creates a write-only http location that is accessible for tasks at runtime."
+    };
   }
 
   // CreateDownloadLocation creates a signed url to download artifacts.
@@ -169,9 +180,9 @@ service DataProxyService {
     option (google.api.http) = {
       get: "/api/v1/dataproxy/artifact_urn"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime."
+    };
   }
 
   // CreateDownloadLocation creates a signed url to download artifacts.
@@ -180,9 +191,9 @@ service DataProxyService {
       post: "/api/v1/dataproxy/artifact_link"
       body: "*"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Creates a read-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Creates a read-only http location that is accessible for tasks at runtime."
+    };
   }
 
   rpc GetData (GetDataRequest) returns (GetDataResponse) {

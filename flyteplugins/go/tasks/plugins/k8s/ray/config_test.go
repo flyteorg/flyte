@@ -25,3 +25,13 @@ func TestLoadConfig(t *testing.T) {
 		assert.DeepEqual(t, config.RemoteClusterConfig, remoteConfig)
 	})
 }
+
+func TestLoadDefaultServiceAccountConfig(t *testing.T) {
+	rayConfig := GetConfig()
+	assert.Assert(t, rayConfig != nil)
+
+	t.Run("serviceAccount", func(t *testing.T) {
+		config := GetConfig()
+		assert.Equal(t, config.ServiceAccount, "")
+	})
+}

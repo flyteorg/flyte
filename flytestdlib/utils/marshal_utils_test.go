@@ -102,7 +102,7 @@ func TestUnmarshalStructToPb(t *testing.T) {
 			} else if tt.expected == nil {
 				assert.Nil(t, tt.args.msg)
 			} else {
-				assert.Equal(t, (tt.expected.(*prototest.TestProto)).StringValue, (tt.args.msg.(*prototest.TestProto)).StringValue)
+				assert.Equal(t, (tt.expected.(*prototest.TestProto)).GetStringValue(), (tt.args.msg.(*prototest.TestProto)).GetStringValue())
 			}
 		})
 	}
@@ -133,10 +133,10 @@ func TestMarshalPbToStruct(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got, err := MarshalPbToStruct(tt.args.in); (err != nil) != tt.wantErr {
 				t.Errorf("MarshalPbToStruct() error = %v, wantErr %v", err, tt.wantErr)
-			} else if len(tt.expected.Fields) == 0 {
-				assert.Empty(t, got.Fields)
+			} else if len(tt.expected.GetFields()) == 0 {
+				assert.Empty(t, got.GetFields())
 			} else {
-				assert.Equal(t, tt.expected.Fields["stringValue"].Kind, got.Fields["stringValue"].Kind)
+				assert.Equal(t, tt.expected.GetFields()["stringValue"].GetKind(), got.GetFields()["stringValue"].GetKind())
 			}
 		})
 	}
@@ -183,4 +183,57 @@ func TestUnmarshalStructToObj(t *testing.T) {
 			t.Errorf("UnmarshalStructToObj() got = %v, want %v, diff: %v", podSpecObj, podSpec, diff)
 		}
 	})
+}
+
+func TestMarshalPbToBytes(t *testing.T) {
+	type args struct {
+		msg proto.Message
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{"empty", args{msg: &prototest.TestProto{}}, []byte("{}"), false},
+		{"has value", args{msg: &prototest.TestProto{StringValue: "hello"}}, []byte(`{"stringValue":"hello"}`), false},
+		{"nil input", args{msg: nil}, []byte(nil), true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MarshalPbToBytes(tt.args.msg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MarshalPbToBytes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, tt.want, got, "MarshalPbToBytes() = %v, want %v", got, tt.want)
+		})
+	}
+}
+
+func TestUnmarshalBytesToPb(t *testing.T) {
+	type args struct {
+		b []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    proto.Message
+		wantErr bool
+	}{
+		{"empty", args{b: []byte("{}")}, &prototest.TestProto{}, false},
+		{"has value", args{b: []byte(`{"stringValue":"hello"}`)}, &prototest.TestProto{StringValue: "hello"}, false},
+		{"nil input", args{b: []byte(nil)}, &prototest.TestProto{}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &prototest.TestProto{}
+			err := UnmarshalBytesToPb(tt.args.b, m)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UnmarshalBytesToPb() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.True(t, proto.Equal(tt.want, m), "UnmarshalBytesToPb() = %v, want %v", m, tt.want)
+		})
+	}
 }

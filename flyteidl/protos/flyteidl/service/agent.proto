@@ -6,14 +6,58 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/servi
 import "google/api/annotations.proto";
 import "flyteidl/admin/agent.proto";
 
-// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+// SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+service SyncAgentService {
+  // ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+  rpc ExecuteTaskSync (stream flyteidl.admin.ExecuteTaskSyncRequest) returns (stream flyteidl.admin.ExecuteTaskSyncResponse){
+    option (google.api.http) = {
+      post: "/api/v1/agent/task/stream"
+      body: "*"
+    };
+  };
+}
+
+// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
 service AsyncAgentService {
-  // Send a task create request to the agent server.
-  rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){};
+  // CreateTask sends a task create request to the agent service.
+  rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){
+    option (google.api.http) = {
+      post: "/api/v1/agent/task"
+      body: "*"
+    };
+  };
+
   // Get job status.
-  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){};
+  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}"
+    };
+  };
+
   // Delete the task resource.
-  rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){};
+  rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){
+    option (google.api.http) = {
+      delete: "/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}"
+    };
+  };
+
+  // GetTaskMetrics returns one or more task execution metrics, if available.
+  //
+  // Errors include
+  //  * OutOfRange if metrics are not available for the specified task time range
+  //  * various other errors
+  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"
+    };
+  };
+
+  // GetTaskLogs returns task execution logs, if available.
+  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (stream flyteidl.admin.GetTaskLogsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}"
+    };
+  };
 }
 
 // AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.
@@ -22,7 +66,7 @@ service AgentMetadataService {
   // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
   rpc GetAgent (flyteidl.admin.GetAgentRequest) returns (flyteidl.admin.GetAgentResponse){
     option (google.api.http) = {
-      get: "/api/v1/agent/{name}" 
+      get: "/api/v1/agent/{name}"
     };
   };
 

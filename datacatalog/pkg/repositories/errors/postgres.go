@@ -3,7 +3,6 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/database"
 	"reflect"
 
 	"github.com/jackc/pgconn"
@@ -11,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -62,7 +62,7 @@ func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
 	case undefinedTable:
 		return catalogErrors.NewDataCatalogErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
 	default:
-		return catalogErrors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message))
+		return catalogErrors.NewDataCatalogErrorf(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Code, pqError.Message)) //nolint
 	}
 }
 

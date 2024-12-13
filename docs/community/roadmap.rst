@@ -17,7 +17,7 @@ It is extremely important to let the community know about your use cases, so tha
 
 Milestones and Release Processes
 ================================
-Flyte consists of many components and services. Each service is independently iterated and coordinated by maintaining backwards compatible contracts using Protobuf messages defined in `FlyteIDL <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>`__.
+Flyte consists of many components and services. Each service is independently iterated and coordinated by maintaining backwards compatible contracts using Protobuf messages defined in `FlyteIDL <https://docs.flyte.org/en/latest/reference_flyteidl.html>`__.
 
 Release Cadence
 ---------------

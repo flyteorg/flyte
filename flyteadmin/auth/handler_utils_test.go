@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
+	flytestdconfig "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestGetPublicURL(t *testing.T) {
@@ -16,7 +16,7 @@ func TestGetPublicURL(t *testing.T) {
 		req, err := http.NewRequest(http.MethodPost, "https://abc", nil)
 		assert.NoError(t, err)
 		u := GetPublicURL(context.Background(), req, &config.Config{
-			AuthorizedURIs: []config2.URL{
+			AuthorizedURIs: []flytestdconfig.URL{
 				{URL: *config.MustParseURL("https://xyz")},
 				{URL: *config.MustParseURL("https://abc")},
 			},
@@ -28,7 +28,7 @@ func TestGetPublicURL(t *testing.T) {
 		req, err := http.NewRequest(http.MethodPost, "https://abc", nil)
 		assert.NoError(t, err)
 		u := GetPublicURL(context.Background(), req, &config.Config{
-			AuthorizedURIs: []config2.URL{
+			AuthorizedURIs: []flytestdconfig.URL{
 				{URL: *config.MustParseURL("https://xyz")},
 				{URL: *config.MustParseURL("http://abc")},
 			},
@@ -40,7 +40,7 @@ func TestGetPublicURL(t *testing.T) {
 		req, err := http.NewRequest(http.MethodPost, "https://abc", nil)
 		assert.NoError(t, err)
 		u := GetPublicURL(context.Background(), req, &config.Config{
-			AuthorizedURIs: []config2.URL{
+			AuthorizedURIs: []flytestdconfig.URL{
 				{URL: *config.MustParseURL("https://xyz")},
 				{URL: *config.MustParseURL("http://xyz")},
 			},
@@ -61,7 +61,7 @@ func TestGetPublicURL(t *testing.T) {
 
 		assert.NoError(t, err)
 		u := GetPublicURL(context.Background(), req, &config.Config{
-			AuthorizedURIs: []config2.URL{
+			AuthorizedURIs: []flytestdconfig.URL{
 				{URL: *config.MustParseURL("http://flyteadmin:80")},
 				{URL: *config.MustParseURL("http://localhost:30081")},
 				{URL: *config.MustParseURL("http://localhost:8089")},
@@ -70,5 +70,30 @@ func TestGetPublicURL(t *testing.T) {
 			},
 		})
 		assert.Equal(t, "http://localhost:30081", u.String())
+	})
+}
+
+func TestGetRedirectURLAllowed(t *testing.T) {
+	ctx := context.TODO()
+	t.Run("relative url", func(t *testing.T) {
+		assert.True(t, GetRedirectURLAllowed(ctx, "/console", &config.Config{}))
+	})
+	t.Run("no redirect url", func(t *testing.T) {
+		assert.True(t, GetRedirectURLAllowed(ctx, "", &config.Config{}))
+	})
+	cfg := &config.Config{
+		AuthorizedURIs: []flytestdconfig.URL{
+			{URL: *config.MustParseURL("https://example.com")},
+			{URL: *config.MustParseURL("http://localhost:3008")},
+		},
+	}
+	t.Run("authorized url", func(t *testing.T) {
+		assert.True(t, GetRedirectURLAllowed(ctx, "https://example.com", cfg))
+	})
+	t.Run("authorized localhost url", func(t *testing.T) {
+		assert.True(t, GetRedirectURLAllowed(ctx, "http://localhost:3008", cfg))
+	})
+	t.Run("unauthorized url", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "https://flyte.com", cfg))
 	})
 }

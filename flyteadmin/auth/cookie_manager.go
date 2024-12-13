@@ -11,6 +11,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	serverConfig "github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -52,6 +53,24 @@ func NewCookieManager(ctx context.Context, hashKeyEncoded, blockKeyEncoded strin
 	}, nil
 }
 
+func (c CookieManager) RetrieveAccessToken(ctx context.Context, request *http.Request) (string, error) {
+	// If there is an old access token, we will retrieve it
+	oldAccessToken, err := retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	if err == nil && oldAccessToken != "" {
+		return oldAccessToken, nil
+	}
+	// If there is no old access token, we will retrieve the new split access token
+	accessTokenFirstHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplitFirst, c.hashKey, c.blockKey)
+	if err != nil {
+		return "", err
+	}
+	accessTokenSecondHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplitSecond, c.hashKey, c.blockKey)
+	if err != nil {
+		return "", err
+	}
+	return accessTokenFirstHalf + accessTokenSecondHalf, nil
+}
+
 // TODO: Separate refresh token from access token, remove named returns, and use stdlib errors.
 // RetrieveTokenValues retrieves id, access and refresh tokens from cookies if they exist. The existence of a refresh token
 // in a cookie is optional and hence failure to find or read that cookie is tolerated. An error is returned in case of failure
@@ -64,7 +83,7 @@ func (c CookieManager) RetrieveTokenValues(ctx context.Context, request *http.Re
 		return "", "", "", err
 	}
 
-	accessToken, err = retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	accessToken, err = c.RetrieveAccessToken(ctx, request)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -135,19 +154,37 @@ func (c CookieManager) SetAuthCodeCookie(ctx context.Context, writer http.Respon
 	return nil
 }
 
+func (c CookieManager) StoreAccessToken(ctx context.Context, accessToken string, writer http.ResponseWriter) error {
+	midpoint := len(accessToken) / 2
+	firstHalf := accessToken[:midpoint]
+	secondHalf := accessToken[midpoint:]
+	atCookieFirst, err := NewSecureCookie(accessTokenCookieNameSplitFirst, firstHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	if err != nil {
+		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie first half %s", err)
+		return err
+	}
+	http.SetCookie(writer, &atCookieFirst)
+	atCookieSecond, err := NewSecureCookie(accessTokenCookieNameSplitSecond, secondHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	if err != nil {
+		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie second half %s", err)
+		return err
+	}
+	http.SetCookie(writer, &atCookieSecond)
+	return nil
+}
+
 func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) error {
 	if token == nil {
 		logger.Errorf(ctx, "Attempting to set cookies with nil token")
 		return errors.Errorf(ErrTokenNil, "Attempting to set cookies with nil token")
 	}
 
-	atCookie, err := NewSecureCookie(accessTokenCookieName, token.AccessToken, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	err := c.StoreAccessToken(ctx, token.AccessToken, writer)
+
 	if err != nil {
-		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie %s", err)
+		logger.Errorf(ctx, "Error storing access token %s", err)
 		return err
 	}
-
-	http.SetCookie(writer, &atCookie)
 
 	if idTokenRaw, converted := token.Extra(idTokenExtra).(string); converted {
 		idCookie, err := NewSecureCookie(idTokenCookieName, idTokenRaw, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
@@ -182,12 +219,15 @@ func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 		Domain:   c.domain,
 		MaxAge:   0,
 		HttpOnly: true,
+		Secure:   !serverConfig.GetConfig().Security.InsecureCookieHeader,
 		Expires:  time.Now().Add(-1 * time.Hour),
 	}
 }
 
 func (c CookieManager) DeleteCookies(_ context.Context, writer http.ResponseWriter) {
 	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieName))
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplitFirst))
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplitSecond))
 	http.SetCookie(writer, c.getLogoutCookie(refreshTokenCookieName))
 	http.SetCookie(writer, c.getLogoutCookie(idTokenCookieName))
 }

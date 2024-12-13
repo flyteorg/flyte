@@ -16,7 +16,12 @@ spec:
         {{- with .Values.cluster_resource_manager.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
+        prometheus.io/path: {{ .Values.cluster_resource_manager.prometheus.path | quote }}
+        prometheus.io/port: {{ .Values.cluster_resource_manager.prometheus.port | quote }}
+        {{- with .Values.cluster_resource_manager.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        {{- end }}
+      labels: {{ include "flyteclusterresourcesync.podLabels" . | nindent 8 }}
     spec:
       containers:
         - command:
@@ -25,15 +30,27 @@ spec:
             - {{ .Values.flyteadmin.configPath }}
             - clusterresource
             - run
+          {{- if .Values.cluster_resource_manager.podEnv }}
+          env:
+            {{- with .Values.cluster_resource_manager.podEnv }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+          {{- end }}
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
+          {{- with .Values.cluster_resource_manager.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
           {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
           {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           {{- else }}
+          {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
           - name: auth
             mountPath: /etc/secrets/
+          {{- end }}
           {{- end }}
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
@@ -43,10 +60,13 @@ spec:
           - mountPath: /var/run/credentials
             name: cluster-secrets
           {{- end }}
+          {{- if .Values.cluster_resource_manager.prometheus.enabled }}
+          ports:
+          - containerPort: {{ .Values.cluster_resource_manager.prometheus.port }}
+            name: debug
+            protocol: TCP
+          {{- end }}
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
-      {{- if .Values.cluster_resource_manager.resources }}
-      resources: {{- toYaml .Values.cluster_resource_manager.resources | nindent 10 }}
-      {{- end }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
         - configMap:
             name: clusterresource-template
@@ -60,8 +80,13 @@ spec:
             secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           secret:
             secretName: flyte-secret-auth
         {{- end }}
+        {{- end }}
+      {{- with .Values.cluster_resource_manager.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
   {{- end }}

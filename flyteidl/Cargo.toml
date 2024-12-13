@@ -1,0 +1,26 @@
+[package]
+name = "flyteidl"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+homepage = "https://flyte.org"
+repository = "https://github.com/flyteorg/flyte"
+description = "Core Interface Definition for Flyte"
+readme = "README.md"
+keywords = ["ai", "ml", "orchestration"]
+categories = ["science", "science::bioinformatics"]
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prost = "0.12.3"
+prost-types = "0.12.3"
+tonic = "0.11.0"
+
+[lib]
+name = "flyteidl"
+path = "lib.rs"

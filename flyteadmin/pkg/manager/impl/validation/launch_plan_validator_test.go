@@ -10,12 +10,17 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
+)
+
+const (
+	foo = "foo"
 )
 
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func getWorkflowInterface() *core.TypedInterface {
-	return testutils.GetSampleWorkflowSpecForTest().Template.Interface
+	return testutils.GetSampleWorkflowSpecForTest().GetTemplate().GetInterface()
 }
 
 func TestValidateLpEmptyProject(t *testing.T) {
@@ -79,7 +84,7 @@ func TestGetLpExpectedInputs(t *testing.T) {
 		},
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
 				Var: &core.Variable{
@@ -93,14 +98,16 @@ func TestGetLpExpectedInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualExpectedMap)
-	assert.EqualValues(t, expectedMap, *actualExpectedMap)
+	assert.EqualValues(t, expectedMap, actualExpectedMap)
 }
 
 func TestValidateLpDefaultInputsWrongType(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.DefaultInputs.Parameters["foo"].Var.Type = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}}
 	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultProject(), lpApplicationConfig, getWorkflowInterface())
-	assert.EqualError(t, err, "Type mismatch for Parameter foo in default_inputs has type simple:FLOAT , expected simple:STRING ")
+
+	expected := "Type mismatch for Parameter foo in default_inputs has type simple:FLOAT , expected simple:STRING "
+	utils.AssertEqualWithSanitizedRegex(t, expected, err.Error())
 }
 
 func TestValidateLpDefaultInputsEmptyName(t *testing.T) {
@@ -180,7 +187,7 @@ func TestGetLpExpectedInvalidDefaultInputType(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
 
-	assert.EqualError(t, err, "invalid default_input wrong type foo, expected simple:STRING , got simple:BINARY  instead")
+	utils.AssertEqualWithSanitizedRegex(t, "invalid default_input wrong type foo, expected simple:STRING , got simple:BINARY  instead", err.Error())
 	assert.Nil(t, actualMap)
 }
 
@@ -200,7 +207,7 @@ func TestGetLpExpectedInvalidFixedInputType(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
 
-	assert.EqualError(t, err, "invalid fixed_input wrong type bar, expected simple:BINARY , got simple:STRING  instead")
+	utils.AssertEqualWithSanitizedRegex(t, "invalid fixed_input wrong type bar, expected simple:BINARY , got simple:STRING  instead", err.Error())
 	assert.Nil(t, actualMap)
 }
 
@@ -224,6 +231,50 @@ func TestGetLpExpectedInvalidFixedInput(t *testing.T) {
 	assert.Nil(t, actualMap)
 }
 
+func TestGetLpExpectedInvalidFixedInputWithUnknownIDL(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	workflowVariableMap := &core.VariableMap{
+		Variables: map[string]*core.Variable{
+			"foo": {
+				Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+			},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	fixedInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := checkAndFetchExpectedInputForLaunchPlan(
+		workflowVariableMap,
+		fixedInputs,
+		defaultInputs,
+	)
+
+	assert.NotNil(t, err)
+
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
+}
+
 func TestGetLpExpectedNoFixedInput(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	actualMap, err := checkAndFetchExpectedInputForLaunchPlan(
@@ -237,7 +288,7 @@ func TestGetLpExpectedNoFixedInput(t *testing.T) {
 		nil, request.GetSpec().GetDefaultInputs(),
 	)
 
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
 				Var: &core.Variable{
@@ -251,7 +302,7 @@ func TestGetLpExpectedNoFixedInput(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualMap)
-	assert.EqualValues(t, expectedMap, *actualMap)
+	assert.EqualValues(t, expectedMap, actualMap)
 }
 
 func TestGetLpExpectedNoDefaultInput(t *testing.T) {
@@ -267,12 +318,12 @@ func TestGetLpExpectedNoDefaultInput(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), nil,
 	)
 
-	expectedMap := core.ParameterMap{
+	expectedMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{},
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualMap)
-	assert.EqualValues(t, expectedMap, *actualMap)
+	assert.EqualValues(t, expectedMap, actualMap)
 }
 
 func TestValidateSchedule_NoSchedule(t *testing.T) {
@@ -294,7 +345,6 @@ func TestValidateSchedule_NoSchedule(t *testing.T) {
 }
 
 func TestValidateSchedule_ArgNotFixed(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
@@ -307,13 +357,28 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 			},
 		},
 	}
+	t.Run("with deprecated cron expression", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 
-	err := validateSchedule(request, inputMap)
-	assert.NotNil(t, err)
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with rate", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithFixedRateSchedule(2, admin.FixedRateUnit_HOUR)
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with cron schedule", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
 }
 
 func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{},
 	}
@@ -324,10 +389,10 @@ func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -337,17 +402,17 @@ func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
 			},
 		},
 	}
-	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = "foo"
+	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
 
 	err := validateSchedule(request, inputMap)
 	assert.NotNil(t, err)
 }
 
 func TestValidateSchedule_NoRequired(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -363,10 +428,10 @@ func TestValidateSchedule_NoRequired(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}},
 				},
@@ -376,8 +441,39 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 			},
 		},
 	}
-	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = "foo"
+	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
 
 	err := validateSchedule(request, inputMap)
 	assert.Nil(t, err)
+}
+
+func TestValidateSchedule_InvalidCronExpression(t *testing.T) {
+	inputMap := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			foo: {
+				Var: &core.Variable{
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}},
+				},
+				Behavior: &core.Parameter_Required{
+					Required: true,
+				},
+			},
+		},
+	}
+
+	t.Run("with unsupported cron special characters on deprecated cron schedule: #", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * MON#1")
+		request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("with unsupported cron special characters: #", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * MON#1")
+		request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
 }

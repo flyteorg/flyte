@@ -17,12 +17,12 @@ This specification is used to generate client stubs for `Flytekit <https://flyte
    :maxdepth: 1
    :hidden:
 
-   |plane| Getting Started <https://docs.flyte.org/en/latest/getting_started.html>
-   |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
-   |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
+   |plane| Getting Started <https://docs.flyte.org/en/latest/introduction.html>
+   |book-reader| User Guide <https://docs.flyte.org/en/latest/user_guide/index.html>
+   |chalkboard| Tutorials <https://docs.flyte.org/en/latest/flytesnacks/tutorials.html>
    |project-diagram| Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
    |rocket| Deployment <https://docs.flyte.org/en/latest/deployment/index.html>
-   |book| API Reference <https://docs.flyte.org/en/latest/reference/index.html>
+   |book| API Reference <https://docs.flyte.org/en/latest/api/flytekit/docs_index.html>
    |hands-helping| Community <https://docs.flyte.org/en/latest/community/index.html>
 
 .. NOTE: the caption text is important for the sphinx theme to correctly render the nav header

@@ -27,4 +27,5 @@ const (
 	CatalogCallFailed                  ErrorCode = "CatalogCallFailed"
 	InvalidArrayLength                 ErrorCode = "InvalidArrayLength"
 	PromiseAttributeResolveError       ErrorCode = "PromiseAttributeResolveError"
+	IDLNotFoundErr                     ErrorCode = "IDLNotFoundErr"
 )

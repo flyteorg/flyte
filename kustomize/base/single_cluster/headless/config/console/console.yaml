@@ -1,3 +1,0 @@
-# This determines the base url used for all console links. It must match the route specified in ingress.yaml
-BASE_URL: /console
-CONFIG_DIR: /etc/flyte/config

@@ -4,6 +4,8 @@ package flyteidl.core;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/interface.proto";
 import "flyteidl/core/workflow.proto";
 import "flyteidl/core/tasks.proto";
 
@@ -29,6 +31,12 @@ message CompiledWorkflow {
     ConnectionSet connections = 2;
 }
 
+// Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+message CompiledLaunchPlan {
+    // Completely contained LaunchPlan Template
+    LaunchPlanTemplate template = 1;
+}
+
 // Output of the Compilation step. This object represent one Task. We store more metadata at this layer
 message CompiledTask {
     // Completely contained TaskTemplate
@@ -50,4 +58,7 @@ message CompiledWorkflowClosure {
     // Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id
     //+required (at least 1)
     repeated CompiledTask tasks = 3;
+    // A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+    // with a given id, i.e., every launch plan has a unique id.
+    repeated CompiledLaunchPlan launch_plans = 4;
 }

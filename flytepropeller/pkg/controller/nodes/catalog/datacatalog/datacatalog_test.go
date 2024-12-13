@@ -108,7 +108,7 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.Dataset.String())
+				assert.EqualValues(t, datasetID.String(), o.GetDataset().String())
 				return true
 			}),
 		).Return(nil, status.Error(codes.NotFound, "test not found"))
@@ -136,7 +136,7 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.Dataset.String())
+				assert.EqualValues(t, datasetID.String(), o.GetDataset().String())
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil, "")
@@ -167,9 +167,9 @@ func TestCatalog_Get(t *testing.T) {
 		taskID := &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
-				Name:         sampleKey.Identifier.Name,
-				Project:      sampleKey.Identifier.Project,
-				Domain:       sampleKey.Identifier.Domain,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
 				Version:      "ver",
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -190,14 +190,14 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
 
 		sampleArtifact := &datacatalog.Artifact{
 			Id:       "test-artifact",
-			Dataset:  sampleDataSet.Id,
+			Dataset:  sampleDataSet.GetId(),
 			Data:     []*datacatalog.ArtifactData{sampleArtifactData},
 			Metadata: GetArtifactMetadataForSource(taskID),
 			Tags: []*datacatalog.Tag{
@@ -208,16 +208,16 @@ func TestCatalog_Get(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Name, sampleArtifact.GetMetadata().KeyMap[execNameKey])
-		assert.Equal(t, taskID.NodeExecutionId.NodeId, sampleArtifact.GetMetadata().KeyMap[execNodeIDKey])
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Project, sampleArtifact.GetMetadata().KeyMap[execProjectKey])
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Domain, sampleArtifact.GetMetadata().KeyMap[execDomainKey])
-		assert.Equal(t, strconv.Itoa(int(taskID.RetryAttempt)), sampleArtifact.GetMetadata().KeyMap[execTaskAttemptKey])
+		assert.Equal(t, taskID.GetNodeExecutionId().GetExecutionId().GetName(), sampleArtifact.GetMetadata().GetKeyMap()[execNameKey])
+		assert.Equal(t, taskID.GetNodeExecutionId().GetNodeId(), sampleArtifact.GetMetadata().GetKeyMap()[execNodeIDKey])
+		assert.Equal(t, taskID.GetNodeExecutionId().GetExecutionId().GetProject(), sampleArtifact.GetMetadata().GetKeyMap()[execProjectKey])
+		assert.Equal(t, taskID.GetNodeExecutionId().GetExecutionId().GetDomain(), sampleArtifact.GetMetadata().GetKeyMap()[execDomainKey])
+		assert.Equal(t, strconv.Itoa(int(taskID.GetRetryAttempt())), sampleArtifact.GetMetadata().GetKeyMap()[execTaskAttemptKey])
 
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTagName())
 				return true
 			}),
@@ -228,18 +228,18 @@ func TestCatalog_Get(t *testing.T) {
 		resp, err := catalogClient.Get(ctx, newKey)
 		assert.NoError(t, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT.String(), resp.GetStatus().GetCacheStatus().String())
-		assert.NotNil(t, resp.GetStatus().GetMetadata().DatasetId)
-		assert.Equal(t, core.ResourceType_DATASET, resp.GetStatus().GetMetadata().DatasetId.ResourceType)
-		assert.Equal(t, datasetID.Name, resp.GetStatus().GetMetadata().DatasetId.Name)
-		assert.Equal(t, datasetID.Project, resp.GetStatus().GetMetadata().DatasetId.Project)
-		assert.Equal(t, datasetID.Domain, resp.GetStatus().GetMetadata().DatasetId.Domain)
-		assert.Equal(t, datasetID.Version, resp.GetStatus().GetMetadata().DatasetId.Version)
-		assert.NotNil(t, resp.GetStatus().GetMetadata().ArtifactTag)
-		assert.NotNil(t, resp.GetStatus().GetMetadata().SourceExecution)
+		assert.NotNil(t, resp.GetStatus().GetMetadata().GetDatasetId())
+		assert.Equal(t, core.ResourceType_DATASET, resp.GetStatus().GetMetadata().GetDatasetId().GetResourceType())
+		assert.Equal(t, datasetID.GetName(), resp.GetStatus().GetMetadata().GetDatasetId().GetName())
+		assert.Equal(t, datasetID.GetProject(), resp.GetStatus().GetMetadata().GetDatasetId().GetProject())
+		assert.Equal(t, datasetID.GetDomain(), resp.GetStatus().GetMetadata().GetDatasetId().GetDomain())
+		assert.Equal(t, datasetID.GetVersion(), resp.GetStatus().GetMetadata().GetDatasetId().GetVersion())
+		assert.NotNil(t, resp.GetStatus().GetMetadata().GetArtifactTag())
+		assert.NotNil(t, resp.GetStatus().GetMetadata().GetSourceExecution())
 		sourceTID := resp.GetStatus().GetMetadata().GetSourceTaskExecution()
-		assert.Equal(t, taskID.TaskId.String(), sourceTID.TaskId.String())
-		assert.Equal(t, taskID.RetryAttempt, sourceTID.RetryAttempt)
-		assert.Equal(t, taskID.NodeExecutionId.String(), sourceTID.NodeExecutionId.String())
+		assert.Equal(t, taskID.GetTaskId().String(), sourceTID.GetTaskId().String())
+		assert.Equal(t, taskID.GetRetryAttempt(), sourceTID.GetRetryAttempt())
+		assert.Equal(t, taskID.GetNodeExecutionId().String(), sourceTID.GetNodeExecutionId().String())
 	})
 
 	t.Run("Found expired artifact", func(t *testing.T) {
@@ -259,7 +259,7 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
@@ -268,14 +268,14 @@ func TestCatalog_Get(t *testing.T) {
 
 		sampleArtifact := &datacatalog.Artifact{
 			Id:        "test-artifact",
-			Dataset:   sampleDataSet.Id,
+			Dataset:   sampleDataSet.GetId(),
 			Data:      []*datacatalog.ArtifactData{sampleArtifactData},
 			CreatedAt: createdAt,
 		}
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTagName())
 				return true
 			}),
@@ -309,7 +309,7 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
@@ -318,14 +318,14 @@ func TestCatalog_Get(t *testing.T) {
 
 		sampleArtifact := &datacatalog.Artifact{
 			Id:        "test-artifact",
-			Dataset:   sampleDataSet.Id,
+			Dataset:   sampleDataSet.GetId(),
 			Data:      []*datacatalog.ArtifactData{sampleArtifactData},
 			CreatedAt: createdAt,
 		}
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
-				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.EqualValues(t, datasetID, o.GetDataset())
 				assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTagName())
 				return true
 			}),
@@ -356,20 +356,20 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Version)
+				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.GetDataset().GetVersion())
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
 
 		sampleArtifact := &datacatalog.Artifact{
 			Id:      "test-artifact",
-			Dataset: sampleDataSet.Id,
+			Dataset: sampleDataSet.GetId(),
 			Data:    []*datacatalog.ArtifactData{},
 		}
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
-				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Version)
+				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.GetDataset().GetVersion())
 				assert.Equal(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", o.GetTagName())
 				return true
 			}),
@@ -385,7 +385,7 @@ func TestCatalog_Get(t *testing.T) {
 		v, e, err := resp.GetOutputs().Read(ctx)
 		assert.NoError(t, err)
 		assert.Nil(t, e)
-		assert.Len(t, v.Literals, 0)
+		assert.Len(t, v.GetLiterals(), 0)
 	})
 }
 
@@ -404,7 +404,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -412,11 +412,11 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
-				_, parseErr := uuid.Parse(o.Artifact.Id)
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
 				assert.NoError(t, parseErr)
-				assert.EqualValues(t, 1, len(o.Artifact.Data))
-				assert.EqualValues(t, "out1", o.Artifact.Data[0].Name)
-				assert.EqualValues(t, newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value)
+				assert.EqualValues(t, 1, len(o.GetArtifact().GetData()))
+				assert.EqualValues(t, "out1", o.GetArtifact().GetData()[0].GetName())
+				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.GetArtifact().GetData()[0].GetValue()))
 				return true
 			}),
 		).Return(&datacatalog.CreateArtifactResponse{}, nil)
@@ -424,7 +424,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("AddTag",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
-				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.Tag.Name)
+				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
 				return true
 			}),
 		).Return(&datacatalog.AddTagResponse{}, nil)
@@ -440,7 +440,74 @@ func TestCatalog_Put(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
 		assert.NotNil(t, s.GetMetadata())
-		assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().ArtifactTag.Name)
+		assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().GetArtifactTag().GetName())
+	})
+
+	t.Run("Create dataset fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Create artifact fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("CreateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 
 	t.Run("Create new cached execution with no inputs/outputs", func(t *testing.T) {
@@ -452,7 +519,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Id.Version)
+				assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.GetDataset().GetId().GetVersion())
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -460,7 +527,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
-				assert.EqualValues(t, 0, len(o.Artifact.Data))
+				assert.EqualValues(t, 0, len(o.GetArtifact().GetData()))
 				return true
 			}),
 		).Return(&datacatalog.CreateArtifactResponse{}, nil)
@@ -468,7 +535,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("AddTag",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
-				assert.EqualValues(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", o.Tag.Name)
+				assert.EqualValues(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", o.GetTag().GetName())
 				return true
 			}),
 		).Return(&datacatalog.AddTagResponse{}, nil)
@@ -500,11 +567,11 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
-				_, parseErr := uuid.Parse(o.Artifact.Id)
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
 				assert.NoError(t, parseErr)
-				assert.EqualValues(t, 1, len(o.Artifact.Data))
-				assert.EqualValues(t, "out1", o.Artifact.Data[0].Name)
-				assert.EqualValues(t, newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value)
+				assert.EqualValues(t, 1, len(o.GetArtifact().GetData()))
+				assert.EqualValues(t, "out1", o.GetArtifact().GetData()[0].GetName())
+				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.GetArtifact().GetData()[0].GetValue()))
 				createArtifactCalled = true
 				return true
 			}),
@@ -514,7 +581,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("AddTag",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
-				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.Tag.Name)
+				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
 				addTagCalled = true
 				return true
 			}),
@@ -552,7 +619,7 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -560,8 +627,8 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("UpdateArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.UpdateArtifactRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset, datasetID))
-				assert.IsType(t, &datacatalog.UpdateArtifactRequest_TagName{}, o.QueryHandle)
+				assert.True(t, proto.Equal(o.GetDataset(), datasetID))
+				assert.IsType(t, &datacatalog.UpdateArtifactRequest_TagName{}, o.GetQueryHandle())
 				assert.Equal(t, tagName, o.GetTagName())
 				return true
 			}),
@@ -570,9 +637,9 @@ func TestCatalog_Update(t *testing.T) {
 		taskID := &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
-				Name:         sampleKey.Identifier.Name,
-				Project:      sampleKey.Identifier.Project,
-				Domain:       sampleKey.Identifier.Domain,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
 				Version:      "version",
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -591,24 +658,88 @@ func TestCatalog_Update(t *testing.T) {
 		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
 		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
-				Name:    taskID.NodeExecutionId.ExecutionId.Name,
-				Domain:  taskID.NodeExecutionId.ExecutionId.Domain,
-				Project: taskID.NodeExecutionId.ExecutionId.Project,
+				Name:    taskID.GetNodeExecutionId().GetExecutionId().GetName(),
+				Domain:  taskID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Project: taskID.GetNodeExecutionId().GetExecutionId().GetProject(),
 			},
 			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
 				TaskId:          &sampleKey.Identifier,
-				NodeExecutionId: taskID.NodeExecutionId,
+				NodeExecutionId: taskID.GetNodeExecutionId(),
 				RetryAttempt:    0,
 			},
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
 		assert.NotNil(t, s.GetMetadata())
-		assert.Equal(t, tagName, s.GetMetadata().ArtifactTag.Name)
+		assert.Equal(t, tagName, s.GetMetadata().GetArtifactTag().GetName())
 		sourceTID := s.GetMetadata().GetSourceTaskExecution()
-		assert.Equal(t, taskID.TaskId.String(), sourceTID.TaskId.String())
-		assert.Equal(t, taskID.RetryAttempt, sourceTID.RetryAttempt)
-		assert.Equal(t, taskID.NodeExecutionId.String(), sourceTID.NodeExecutionId.String())
+		assert.Equal(t, taskID.GetTaskId().String(), sourceTID.GetTaskId().String())
+		assert.Equal(t, taskID.GetRetryAttempt(), sourceTID.GetRetryAttempt())
+		assert.Equal(t, taskID.GetNodeExecutionId().String(), sourceTID.GetNodeExecutionId().String())
+	})
+
+	t.Run("Overwrite non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		mockClient.On("CreateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, errors.New("generic error"))
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown", // not set in Put request below --> defaults to "unknown"
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.GetNodeExecutionId().GetExecutionId().GetName(),
+				Domain:  taskID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Project: taskID.GetNodeExecutionId().GetExecutionId().GetProject(),
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.GetNodeExecutionId(),
+				RetryAttempt:    0,
+			},
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 
 	t.Run("Overwrite non-existing execution", func(t *testing.T) {
@@ -624,7 +755,7 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
 				createDatasetCalled = true
 				return true
 			}),
@@ -639,9 +770,9 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("CreateArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
-				_, parseErr := uuid.Parse(o.Artifact.Id)
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
 				assert.NoError(t, parseErr)
-				assert.True(t, proto.Equal(o.Artifact.Dataset, datasetID))
+				assert.True(t, proto.Equal(o.GetArtifact().GetDataset(), datasetID))
 				createArtifactCalled = true
 				return true
 			}),
@@ -651,7 +782,7 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("AddTag",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
-				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.Tag.Name)
+				assert.EqualValues(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
 				addTagCalled = true
 				return true
 			}),
@@ -660,9 +791,9 @@ func TestCatalog_Update(t *testing.T) {
 		taskID := &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
-				Name:         sampleKey.Identifier.Name,
-				Project:      sampleKey.Identifier.Project,
-				Domain:       sampleKey.Identifier.Domain,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
 				Version:      "version",
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -681,25 +812,55 @@ func TestCatalog_Update(t *testing.T) {
 		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
 		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
-				Name:    taskID.NodeExecutionId.ExecutionId.Name,
-				Domain:  taskID.NodeExecutionId.ExecutionId.Domain,
-				Project: taskID.NodeExecutionId.ExecutionId.Project,
+				Name:    taskID.GetNodeExecutionId().GetExecutionId().GetName(),
+				Domain:  taskID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Project: taskID.GetNodeExecutionId().GetExecutionId().GetProject(),
 			},
 			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
 				TaskId:          &sampleKey.Identifier,
-				NodeExecutionId: taskID.NodeExecutionId,
+				NodeExecutionId: taskID.GetNodeExecutionId(),
 				RetryAttempt:    0,
 			},
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
 		assert.NotNil(t, s.GetMetadata())
-		assert.Equal(t, tagName, s.GetMetadata().ArtifactTag.Name)
+		assert.Equal(t, tagName, s.GetMetadata().GetArtifactTag().GetName())
 		assert.Nil(t, s.GetMetadata().GetSourceTaskExecution())
 		assert.True(t, createDatasetCalled)
 		assert.True(t, updateArtifactCalled)
 		assert.True(t, createArtifactCalled)
 		assert.True(t, addTagCalled)
+	})
+
+	t.Run("Error while creating dataset", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 
 	t.Run("Error while overwriting execution", func(t *testing.T) {
@@ -714,7 +875,6 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -733,8 +893,8 @@ func TestCatalog_Update(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Equal(t, genericErr, err)
-		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, s.GetCacheStatus())
-		assert.Nil(t, s.GetMetadata())
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 }
 
@@ -772,8 +932,8 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 		mockClient.On("GetOrExtendReservation",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
-				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				assert.EqualValues(t, datasetID.String(), o.GetReservationId().GetDatasetId().String())
+				assert.EqualValues(t, tagName, o.GetReservationId().GetTagName())
 				return true
 			}),
 		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &currentReservation}, nil, "")
@@ -783,7 +943,7 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 		reservation, err := catalogClient.GetOrExtendReservation(ctx, newKey, currentOwner, heartbeatInterval)
 
 		assert.NoError(t, err)
-		assert.Equal(t, reservation.OwnerId, currentOwner)
+		assert.Equal(t, reservation.GetOwnerId(), currentOwner)
 	})
 
 	t.Run("ExistingReservation", func(t *testing.T) {
@@ -798,8 +958,8 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 		mockClient.On("GetOrExtendReservation",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
-				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				assert.EqualValues(t, datasetID.String(), o.GetReservationId().GetDatasetId().String())
+				assert.EqualValues(t, tagName, o.GetReservationId().GetTagName())
 				return true
 			}),
 		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &prevReservation}, nil, "")
@@ -809,7 +969,7 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 		reservation, err := catalogClient.GetOrExtendReservation(ctx, newKey, currentOwner, heartbeatInterval)
 
 		assert.NoError(t, err)
-		assert.Equal(t, reservation.OwnerId, prevOwner)
+		assert.Equal(t, reservation.GetOwnerId(), prevOwner)
 	})
 }
 
@@ -828,8 +988,8 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 		mockClient.On("ReleaseReservation",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.ReleaseReservationRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
-				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				assert.EqualValues(t, datasetID.String(), o.GetReservationId().GetDatasetId().String())
+				assert.EqualValues(t, tagName, o.GetReservationId().GetTagName())
 				return true
 			}),
 		).Return(&datacatalog.ReleaseReservationResponse{}, nil, "")
@@ -853,8 +1013,8 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 		mockClient.On("ReleaseReservation",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.ReleaseReservationRequest) bool {
-				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
-				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				assert.EqualValues(t, datasetID.String(), o.GetReservationId().GetDatasetId().String())
+				assert.EqualValues(t, tagName, o.GetReservationId().GetTagName())
 				return true
 			}),
 		).Return(nil, status.Error(codes.NotFound, "reservation not found"))

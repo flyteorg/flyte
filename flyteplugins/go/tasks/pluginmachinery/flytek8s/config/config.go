@@ -64,6 +64,9 @@ var (
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
+		UpdateBaseBackoffDuration:          10,
+		UpdateBackoffRetries:               5,
+		AddTolerationsForExtendedResources: []string{},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -90,6 +93,10 @@ type K8sPluginConfig struct {
 	DefaultEnvVars map[string]string `json:"default-env-vars" pflag:"-,Additional environment variable that should be injected into every resource"`
 	// Provide additional environment variable pairs whose values resolve from the plugin's execution environment.
 	DefaultEnvVarsFromEnv map[string]string `json:"default-env-vars-from-env" pflag:"-,Additional environment variable that should be injected into every resource"`
+	// Provide additional environment variable parts from configMaps
+	DefaultEnvFromConfigMaps []string `json:"default-env-from-configmaps" pflag:"-,Additional environment variable sets that should be injected into each pod from these configMaps"`
+	// Provide additional environment variable parts from secrets
+	DefaultEnvFromSecrets []string `json:"default-env-from-secrets" pflag:"-,Additional environment variable sets that should be injected into each pod from these secret"`
 
 	// default cpu requests for a container
 	DefaultCPURequest resource.Quantity `json:"default-cpus" pflag:",Defines a default value for cpu for containers if not specified."`
@@ -152,6 +159,9 @@ type K8sPluginConfig struct {
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
 
+	// ImagePullPolicy for the submitted pod.
+	ImagePullPolicy v1.PullPolicy `json:"image-pull-policy" pflag:"-,Image pull policy for all k8s pods created by FlytePropeller."`
+
 	// Time to wait while pod is in pending phase. If the pod is stuck in
 	// pending phase past this timeout, it will be inferred to be a permanent
 	// issue, and the corresponding task marked as failed
@@ -199,6 +209,17 @@ type K8sPluginConfig struct {
 
 	// SendObjectEvents indicates whether to send k8s object events in TaskExecutionEvent updates (similar to kubectl get events).
 	SendObjectEvents bool `json:"send-object-events" pflag:",If true, will send k8s object events in TaskExecutionEvent updates."`
+
+	// Initial delay in exponential backoff when updating a resource in milliseconds.
+	UpdateBaseBackoffDuration int `json:"update-base-backoff-duration" pflag:",Initial delay in exponential backoff when updating a resource in milliseconds."`
+
+	// Number of retries for exponential backoff when updating a resource.
+	UpdateBackoffRetries int `json:"update-backoff-retries" pflag:",Number of retries for exponential backoff when updating a resource."`
+
+	// Extended resources that should be added to the tolerations automatically.
+	AddTolerationsForExtendedResources []string `json:"add-tolerations-for-extended-resources" pflag:",Name of the extended resources for which tolerations should be added."`
+
+	EnableDistributedErrorAggregation bool `json:"enable-distributed-error-aggregation" pflag:",If true, will aggregate errors of different worker pods for distributed tasks."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

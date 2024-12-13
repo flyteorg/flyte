@@ -40,6 +40,7 @@ spec:
   - name: agent-grpc
     port: 8000
     protocol: TCP
+    appProtocol: TCP
     targetPort: agent-grpc
   selector: 
     app.kubernetes.io/name: flyteagent
@@ -71,11 +72,14 @@ spec:
         helm.sh/chart: flyteagent-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        {}
       containers:
       - command:
         - pyflyte
         - serve
-        image: "ghcr.io/flyteorg/flyteagent:1.10.2"
+        - agent
+        image: "cr.flyte.org/flyteorg/flyteagent:1.13.14"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -84,11 +88,18 @@ spec:
         ports:
         - containerPort: 8000
           name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        securityContext:
+            allowPrivilegeEscalation: false
         resources:
           limits:
             cpu: 500m
             ephemeral-storage: 200Mi
-            memory: 200Mi
+            memory: 300Mi
           requests:
             cpu: 500m
             ephemeral-storage: 200Mi

@@ -7,154 +7,90 @@
 - path: /flyteidl.service.SignalService
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.SignalService/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.AdminService
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.AdminService/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.DataProxyService
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.DataProxyService/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.AuthMetadataService
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.AuthMetadataService/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.IdentityService
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /flyteidl.service.IdentityService/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /grpc.health.v1.Health
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
 - path: /grpc.health.v1.Health/*
   pathType: ImplementationSpecific
   backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
     service:
       name: flyteadmin
       port:
         number: {{ $grpcPort }}
-{{- else }}
-    serviceName: flyteadmin
-    servicePort: {{ $grpcPort }}
-{{- end }}
   {{- end }}
   {{- if .Values.common.ingress.enabled }}
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
-{{- else }}
-apiVersion: networking.k8s.io/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ template "flyte.name" . }}
@@ -163,6 +99,7 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
   rules:
     - http:
         paths:
@@ -170,288 +107,173 @@ spec:
           - path: /*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: ssl-redirect
                 port:
                   name: use-annotation
-{{- else }}
-              serviceName: ssl-redirect
-              servicePort: use-annotation
-{{- end }}
           {{- end }}
           # This is useful only for frontend development
           {{- if .Values.common.ingress.webpackHMR }}
           - path: /__webpack_hmr
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteconsole
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteconsole
-              servicePort: 80
-{{- end }}
           {{- end }}
           # NOTE: If you change this, you must update the BASE_URL value in flyteconsole.yaml
           - path: /console
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteconsole
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteconsole
-              servicePort: 80
-{{- end }}
           - path: /console/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteconsole
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteconsole
-              servicePort: 80
-{{- end }}
           - path: /api
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /api/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /healthcheck
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /v1/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
 {{- if .Values.deployRedoc }}
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: redoc
                 port:
                   number: 87
-{{- else }}
-              serviceName: redoc
-              servicePort: 87
-{{- end }}
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: redoc
                 port:
                   number: 87
-{{- else }}
-              serviceName: redoc
-              servicePort: 87
-{{- end }}
 {{- end }}
           - path: /.well-known
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /login
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /login/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /logout
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /logout/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /callback
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /callback/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /me
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /config
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /config/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /oauth2
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           - path: /oauth2/*
             pathType: ImplementationSpecific
             backend:
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
               service:
                 name: flyteadmin
                 port:
                   number: 80
-{{- else }}
-              serviceName: flyteadmin
-              servicePort: 80
-{{- end }}
           {{- if not .Values.common.ingress.separateGrpcIngress }}
           {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
@@ -468,23 +290,18 @@ spec:
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
-{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
 apiVersion: networking.k8s.io/v1
-{{- else }}
-apiVersion: networking.k8s.io/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ template "flyte.name" . }}-grpc
   namespace: {{ template "flyte.namespace" . }}
-  annotations:
-  {{- with .Values.common.ingress.annotations }}
-  {{- tpl (toYaml .) $ | nindent 4}}
-  {{- end }}
-  {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
-  {{- toYaml . | nindent 4}}
+  {{- $annotations := .Values.common.ingress.annotations | deepCopy -}}
+  {{- $_ := merge $annotations .Values.common.ingress.separateGrpcIngressAnnotations -}}
+  {{- with $annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
   rules:
     - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
       http:

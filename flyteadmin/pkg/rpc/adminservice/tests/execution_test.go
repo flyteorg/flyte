@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const requestID = "request id"
@@ -32,12 +33,12 @@ func TestCreateExecutionHappyCase(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.ExecutionCreateRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			request *admin.ExecutionCreateRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
 			return &admin.ExecutionCreateResponse{
 				Id: &core.WorkflowExecutionIdentifier{
-					Project: request.Project,
-					Domain:  request.Domain,
-					Name:    request.Name,
+					Project: request.GetProject(),
+					Domain:  request.GetDomain(),
+					Name:    request.GetName(),
 				},
 			}, nil
 		},
@@ -51,7 +52,7 @@ func TestCreateExecutionHappyCase(t *testing.T) {
 		Domain:  "Domain",
 		Project: "Project",
 	})
-	assert.True(t, proto.Equal(&workflowExecutionIdentifier, resp.Id))
+	assert.True(t, proto.Equal(&workflowExecutionIdentifier, resp.GetId()))
 	assert.NoError(t, err)
 }
 
@@ -61,11 +62,11 @@ func TestCreateExecutionError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.ExecutionCreateRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			request *admin.ExecutionCreateRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
 			return nil, repoErrors.GetMissingEntityError("execution", &core.Identifier{
-				Project: request.Project,
-				Domain:  request.Domain,
-				Name:    request.Name,
+				Project: request.GetProject(),
+				Domain:  request.GetDomain(),
+				Name:    request.GetName(),
 			})
 		},
 	)
@@ -79,8 +80,8 @@ func TestCreateExecutionError(t *testing.T) {
 		Name:    "Name",
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type execution with "+
-		"identifier project:\"Project\" domain:\"Domain\" name:\"Name\" ")
+	utils.AssertEqualWithSanitizedRegex(t,
+		`missing entity of type execution with identifier project:"Project" domain:"Domain" name:"Name"`, err.Error())
 }
 
 func TestRelaunchExecutionHappyCase(t *testing.T) {
@@ -89,12 +90,12 @@ func TestRelaunchExecutionHappyCase(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetRelaunchCallback(
 		func(ctx context.Context,
-			request admin.ExecutionRelaunchRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			request *admin.ExecutionRelaunchRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
 			return &admin.ExecutionCreateResponse{
 				Id: &core.WorkflowExecutionIdentifier{
-					Project: request.Id.Project,
-					Domain:  request.Id.Domain,
-					Name:    request.Name,
+					Project: request.GetId().GetProject(),
+					Domain:  request.GetId().GetDomain(),
+					Name:    request.GetName(),
 				},
 			}, nil
 		},
@@ -110,9 +111,9 @@ func TestRelaunchExecutionHappyCase(t *testing.T) {
 		},
 		Name: "name",
 	})
-	assert.Equal(t, "project", resp.Id.Project)
-	assert.Equal(t, "domain", resp.Id.Domain)
-	assert.Equal(t, "name", resp.Id.Name)
+	assert.Equal(t, "project", resp.GetId().GetProject())
+	assert.Equal(t, "domain", resp.GetId().GetDomain())
+	assert.Equal(t, "name", resp.GetId().GetName())
 	assert.NoError(t, err)
 }
 
@@ -122,8 +123,8 @@ func TestRelaunchExecutionError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetRelaunchCallback(
 		func(ctx context.Context,
-			request admin.ExecutionRelaunchRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
-			return nil, repoErrors.GetMissingEntityError("execution", request.Id)
+			request *admin.ExecutionRelaunchRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			return nil, repoErrors.GetMissingEntityError("execution", request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -144,12 +145,12 @@ func TestRecoverExecutionHappyCase(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.RecoverExecutionFunc =
 		func(ctx context.Context,
-			request admin.ExecutionRecoverRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			request *admin.ExecutionRecoverRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
 			return &admin.ExecutionCreateResponse{
 				Id: &core.WorkflowExecutionIdentifier{
-					Project: request.Id.Project,
-					Domain:  request.Id.Domain,
-					Name:    request.Name,
+					Project: request.GetId().GetProject(),
+					Domain:  request.GetId().GetDomain(),
+					Name:    request.GetName(),
 				},
 			}, nil
 		}
@@ -165,9 +166,9 @@ func TestRecoverExecutionHappyCase(t *testing.T) {
 		},
 		Name: "name",
 	})
-	assert.Equal(t, "project", resp.Id.Project)
-	assert.Equal(t, "domain", resp.Id.Domain)
-	assert.Equal(t, "name", resp.Id.Name)
+	assert.Equal(t, "project", resp.GetId().GetProject())
+	assert.Equal(t, "domain", resp.GetId().GetDomain())
+	assert.Equal(t, "name", resp.GetId().GetName())
 	assert.NoError(t, err)
 }
 
@@ -177,8 +178,8 @@ func TestRecoverExecutionError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.RecoverExecutionFunc =
 		func(ctx context.Context,
-			request admin.ExecutionRecoverRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
-			return nil, repoErrors.GetMissingEntityError("execution", request.Id)
+			request *admin.ExecutionRecoverRequest, requestedAt time.Time) (*admin.ExecutionCreateResponse, error) {
+			return nil, repoErrors.GetMissingEntityError("execution", request.GetId())
 		}
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
 		executionManager: &mockExecutionManager,
@@ -192,25 +193,16 @@ func TestRecoverExecutionError(t *testing.T) {
 		"missing entity of type execution with identifier <nil>")
 }
 
-func TestRecoverExecution_InvalidRequest(t *testing.T) {
-	ctx := context.Background()
-	mockServer := NewMockAdminServer(NewMockAdminServerInput{})
-	resp, err := mockServer.RecoverExecution(ctx, nil)
-	assert.Nil(t, resp)
-	assert.EqualError(t, err,
-		"rpc error: code = InvalidArgument desc = Incorrect request, nil requests not allowed")
-}
-
 func TestCreateWorkflowEvent(t *testing.T) {
 	phase := core.WorkflowExecution_RUNNING
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetCreateEventCallback(
-		func(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
+		func(ctx context.Context, request *admin.WorkflowExecutionEventRequest) (
 			*admin.WorkflowExecutionEventResponse, error) {
-			assert.Equal(t, requestID, request.RequestId)
-			assert.NotNil(t, request.Event)
-			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.Event.ExecutionId))
-			assert.Equal(t, phase, request.Event.Phase)
+			assert.Equal(t, requestID, request.GetRequestId())
+			assert.NotNil(t, request.GetEvent())
+			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.GetEvent().GetExecutionId()))
+			assert.Equal(t, phase, request.GetEvent().GetPhase())
 			return &admin.WorkflowExecutionEventResponse{}, nil
 		})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -229,7 +221,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 func TestCreateWorkflowEventErr(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetCreateEventCallback(
-		func(ctx context.Context, request admin.WorkflowExecutionEventRequest) (
+		func(ctx context.Context, request *admin.WorkflowExecutionEventRequest) (
 			*admin.WorkflowExecutionEventResponse, error) {
 			return nil, errors.New("expected error")
 		})
@@ -255,8 +247,8 @@ func TestGetExecution(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetGetCallback(
 		func(ctx context.Context,
-			request admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
-			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.Id))
+			request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
+			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.GetId()))
 			return response, nil
 		},
 	)
@@ -275,7 +267,7 @@ func TestGetExecutionError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetGetCallback(
 		func(ctx context.Context,
-			request admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
+			request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
 			return nil, errors.New("expected error")
 		},
 	)
@@ -295,8 +287,8 @@ func TestUpdateExecution(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetUpdateExecutionCallback(
 		func(ctx context.Context,
-			request admin.ExecutionUpdateRequest, requestedAt time.Time) (*admin.ExecutionUpdateResponse, error) {
-			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.Id))
+			request *admin.ExecutionUpdateRequest, requestedAt time.Time) (*admin.ExecutionUpdateResponse, error) {
+			assert.True(t, proto.Equal(&workflowExecutionIdentifier, request.GetId()))
 			return response, nil
 		},
 	)
@@ -315,7 +307,7 @@ func TestUpdateExecutionError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
 	mockExecutionManager.SetUpdateExecutionCallback(
 		func(ctx context.Context,
-			request admin.ExecutionUpdateRequest, requestedAt time.Time) (*admin.ExecutionUpdateResponse, error) {
+			request *admin.ExecutionUpdateRequest, requestedAt time.Time) (*admin.ExecutionUpdateResponse, error) {
 			return nil, errors.New("expected error")
 		},
 	)
@@ -332,11 +324,11 @@ func TestUpdateExecutionError(t *testing.T) {
 
 func TestListExecutions(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
-	mockExecutionManager.SetListCallback(func(ctx context.Context, request admin.ResourceListRequest) (
+	mockExecutionManager.SetListCallback(func(ctx context.Context, request *admin.ResourceListRequest) (
 		*admin.ExecutionList, error) {
-		assert.Equal(t, "project", request.Id.Project)
-		assert.Equal(t, "domain", request.Id.Domain)
-		assert.Equal(t, uint32(1), request.Limit)
+		assert.Equal(t, "project", request.GetId().GetProject())
+		assert.Equal(t, "domain", request.GetId().GetDomain())
+		assert.Equal(t, uint32(1), request.GetLimit())
 		return &admin.ExecutionList{
 			Executions: []*admin.Execution{
 				{
@@ -358,12 +350,12 @@ func TestListExecutions(t *testing.T) {
 		Limit: 1,
 	})
 	assert.NoError(t, err)
-	assert.Len(t, response.Executions, 1)
+	assert.Len(t, response.GetExecutions(), 1)
 }
 
 func TestListExecutionsError(t *testing.T) {
 	mockExecutionManager := mocks.MockExecutionManager{}
-	mockExecutionManager.SetListCallback(func(ctx context.Context, request admin.ResourceListRequest) (
+	mockExecutionManager.SetListCallback(func(ctx context.Context, request *admin.ResourceListRequest) (
 		*admin.ExecutionList, error) {
 		return nil, errors.New("expected error")
 	})
@@ -393,9 +385,9 @@ func TestTerminateExecution(t *testing.T) {
 	}
 	abortCause := "abort cause"
 	mockExecutionManager.SetTerminateExecutionCallback(func(
-		ctx context.Context, request admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
-		assert.True(t, proto.Equal(&identifier, request.Id))
-		assert.Equal(t, abortCause, request.Cause)
+		ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
+		assert.True(t, proto.Equal(&identifier, request.GetId()))
+		assert.Equal(t, abortCause, request.GetCause())
 		return &admin.ExecutionTerminateResponse{}, nil
 	})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -417,7 +409,7 @@ func TestTerminateExecution_Error(t *testing.T) {
 	}
 	abortCause := "abort cause"
 	mockExecutionManager.SetTerminateExecutionCallback(func(
-		ctx context.Context, request admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
+		ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
 		return nil, errors.New("expected error")
 	})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

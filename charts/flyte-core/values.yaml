@@ -15,8 +15,8 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.10.6 # FLYTEADMIN_TAG
+    repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
+    tag: v1.14.0  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -31,6 +31,8 @@ flyteadmin:
   #       name: sendgrid-secret
   #       key: api_key
   env: []
+  # -- Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap)
+  envFrom: []
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
@@ -50,10 +52,14 @@ flyteadmin:
     - flyteexamples
   # -- Service settings for Flyteadmin
   service:
+    appProtocols:
+      enabled: false
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
     loadBalancerSourceRanges: []
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for FlyteAdmin
   serviceAccount:
     # -- Should a service account be created for flyteadmin
@@ -89,9 +95,11 @@ flyteadmin:
         - limitranges
       # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
       verbs:
-        - '*'
+        - "*"
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
+  # -- Labels for Flyteadmin pods
+  podLabels: {}
   # -- nodeSelector for Flyteadmin deployment
   nodeSelector: {}
   # -- tolerations for Flyteadmin deployment
@@ -109,6 +117,14 @@ flyteadmin:
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flyteadmin pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
   # -- Settings for flyteadmin service monitor
   serviceMonitor:
@@ -130,9 +146,9 @@ flytescheduler:
   runPrecheck: true
   image:
     # -- Docker image for Flytescheduler deployment
-    repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
+    repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.10.6 # FLYTESCHEDULER_TAG
+    tag: v1.14.0  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -158,6 +174,10 @@ flytescheduler:
     imagePullSecrets: []
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
+  # -- Additional Flytescheduler container environment variables
+  podEnv: {}
+  # -- Labels for Flytescheduler pods
+  podLabels: {}
   # -- nodeSelector for Flytescheduler deployment
   nodeSelector: {}
   # -- tolerations for Flytescheduler deployment
@@ -173,6 +193,14 @@ flytescheduler:
   additionalContainers: []
   # -- Sets priorityClassName for flyte scheduler pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytescheduler pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # DATACATALOG SETTINGS
@@ -184,9 +212,9 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
+    repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.10.6 # DATACATALOG_TAG
+    tag: v1.14.0  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -206,6 +234,8 @@ datacatalog:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog
@@ -216,6 +246,10 @@ datacatalog:
     imagePullSecrets: []
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
+  # -- Additional Datacatalog container environment variables
+  podEnv: {}
+  # -- Labels for Datacatalog pods
+  podLabels: {}
   # -- nodeSelector for Datacatalog deployment
   nodeSelector: {}
   # -- tolerations for Datacatalog deployment
@@ -232,6 +266,14 @@ datacatalog:
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for datacatalog pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 1001
+    runAsUser: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # FLYTE_AGENT SETTINGS
@@ -239,6 +281,21 @@ datacatalog:
 
 flyteagent:
   enabled: false
+  plugin_config:
+    plugins:
+      # -- Agent service configuration for propeller.
+      agent-service:
+        # -- The default agent service to use for plugin tasks.
+        defaultAgent:
+          # -- The agent service endpoint propeller should connect to.
+          endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          # -- Whether the connection from propeller to the agent service should use TLS.
+          insecure: true
+        # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
+        # need to be configured.
+        supportedTaskTypes: []
+  # -- Labels for flyteagent pods
+  podLabels: {}
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -253,8 +310,8 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.10.6 # FLYTEPROPELLER_TAG
+    repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
+    tag: v1.14.0  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -266,7 +323,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
@@ -282,6 +338,10 @@ flytepropeller:
     imagePullSecrets: []
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
+  # -- Additional Flytepropeller container environment variables
+  podEnv: {}
+  # -- Labels for Flytepropeller pods
+  podLabels: {}
   # -- nodeSelector for Flytepropeller deployment
   nodeSelector: {}
   # -- tolerations for Flytepropeller deployment
@@ -300,11 +360,18 @@ flytepropeller:
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytepropeller pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
 
   # -- Settings for flytepropeller service
   service:
     # -- If enabled create the flytepropeller service
     enabled: false
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
 
   # -- Settings for flytepropeller service monitor
   serviceMonitor:
@@ -317,6 +384,10 @@ flytepropeller:
     interval: 60s
     # -- Sets the timeout after which request to scrape metrics will time out
     scrapeTimeout: 30s
+
+  prometheus:
+    enabled: false
+
 #
 # FLYTECONSOLE SETTINGS
 #
@@ -327,8 +398,8 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.10.2 # FLYTECONSOLE_TAG
+    repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
+    tag: v1.19.0  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -340,10 +411,16 @@ flyteconsole:
       memory: 50Mi
   # -- Service settings for Flyteconsole
   service:
+    appProtocols:
+      enabled: false
     annotations: {}
     type: ClusterIP
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
+  # -- Additional Flyteconsole container environment variables
+  podEnv: {}
+  # -- Labels for Flyteconsole pods
+  podLabels: {}
   # -- nodeSelector for Flyteconsole deployment
   nodeSelector: {}
   # -- tolerations for Flyteconsole deployment
@@ -356,7 +433,30 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+   # -- ImagePullSecrets to assign to the Flyteconsole deployment
+  imagePullSecrets: []
+  # -- Sets securityContext for flyteconsole pod(s).
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
+  # -- Settings for flyteconsole service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteconsole service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+
+  livenessProbe: {}
+  readinessProbe: {}
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -367,9 +467,12 @@ deployRedoc: false
 
 secrets:
   adminOauthClientCredentials:
-    # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-    # If enabled is false, it's up to the user to create `flyte-secret-auth` as described in
+    # If enabled is true, and `clientSecret` is specified, helm will create and mount `flyte-secret-auth`.
+    # If enabled is true, and `clientSecret` is null, it's up to the user to create `flyte-secret-auth` as described in
     # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
+    # and helm will mount `flyte-secret-auth`.
+    # If enabled is false, auth is not turned on.
+    # Note: Unsupported combination: enabled.false and clientSecret.someValue
     enabled: true
     clientSecret: foobar
     clientId: flytepropeller
@@ -381,6 +484,8 @@ secrets:
 webhook:
   # -- enable or disable secrets webhook
   enabled: true
+  # -- Sets priorityClassName for webhook pod
+  priorityClassName: ""
   # -- Configuration for service accounts for the webhook
   serviceAccount:
     # -- Should a service account be created for the webhook
@@ -394,6 +499,49 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook pods
+  podAnnotations: {}
+  # -- Additional webhook container environment variables
+  podEnv: {}
+  # -- Labels for webhook pods
+  podLabels: {}
+  # -- nodeSelector for webhook deployment
+  nodeSelector: {}
+  # -- Sets securityContext for webhook pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
+
+  resources:
+    requests:
+      cpu: 200m
+      ephemeral-storage: 500Mi
+      memory: 500Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+  prometheus:
+    enabled: false
 
 # ------------------------------------------------
 #
@@ -407,6 +555,8 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
+    # --- Sets the ingressClassName
+    ingressClassName:
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
@@ -419,6 +569,7 @@ common:
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/app-root: /console
+      nginx.ingress.kubernetes.io/service-upstream: "true"
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
@@ -464,6 +615,9 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
+    targetGCPercent: 70
 
 # Database configuration
 db:
@@ -489,37 +643,37 @@ db:
 configmap:
   clusters:
     labelClusterMap: {}
-#  labelClusterMap:
-#    team1:
-#      - id: testcluster
-#        weight: 1
-#    team2:
-#      - id: testcluster2
-#        weight: 0.5
-#      - id: testcluster3
-#        weight: 0.5
+    #  labelClusterMap:
+    #    team1:
+    #      - id: testcluster
+    #        weight: 1
+    #    team2:
+    #      - id: testcluster2
+    #        weight: 0.5
+    #      - id: testcluster3
+    #        weight: 0.5
     clusterConfigs: []
-#  clusterConfigs:
-#    - name: "testcluster"
-#      endpoint: "testcluster_endpoint"
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster/token"
-#        certPath: "/path/to/testcluster/cert"
-#    - name: "testcluster2"
-#      endpoint: "testcluster2_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster2/token"
-#        certPath: "/path/to/testcluster2/cert"
-#    - name: "testcluster3"
-#      endpoint: "testcluster3_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster3/token"
-#        certPath: "/path/to/testcluster3/cert"
+  #  clusterConfigs:
+  #    - name: "testcluster"
+  #      endpoint: "testcluster_endpoint"
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster/token"
+  #        certPath: "/path/to/testcluster/cert"
+  #    - name: "testcluster2"
+  #      endpoint: "testcluster2_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster2/token"
+  #        certPath: "/path/to/testcluster2/cert"
+  #    - name: "testcluster3"
+  #      endpoint: "testcluster3_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster3/token"
+  #        certPath: "/path/to/testcluster3/cert"
 
   # -- Configuration for Flyte console UI
   console:
@@ -547,7 +701,8 @@ configmap:
     # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         # -- Controls whether to serve requests over SSL/TLS.
         secure: false
@@ -571,7 +726,7 @@ configmap:
       eventVersion: 2
       testing:
         host: http://flyteadmin
-      
+
     # -- Authentication configuration
     auth:
       authorizedUris:
@@ -621,11 +776,9 @@ configmap:
       defaults:
         cpu: 100m
         memory: 500Mi
-        storage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi
-        storage: 20Mi
         gpu: 1
 
   # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
@@ -654,7 +807,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.6 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.14.0  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -698,6 +851,8 @@ configmap:
           type: bucket
           rate: 10
           capacity: 100
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /etc/webhook/certs
       serviceName: flyte-pod-webhook
@@ -715,8 +870,8 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          # -- Uncomment to enable agent service
-          # - agent-service
+          - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -733,11 +888,6 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      # Uncomment and modify to include configuration for Flyte Agent
-      # agent-service:
-      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
-      #   supportedTaskTypes:
-      #     - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"
@@ -798,21 +948,54 @@ external_events:
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
-      - all # Or workflow, node, task. Or "*"
+      - all  # Or workflow, node, task. Or "*"
 
 # Cloud events are used to send events (unprocessed, as Admin see them) in cloud event format to
 # an SNS topic (or gcp equivalent)
 cloud_events:
   enable: false
-  type: aws
-  aws:
-    region: us-east-2
   eventsPublisher:
     # Make sure this is not a fifo queue. Admin does not yet support
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
-      - all # Or workflow, node, task. Or "*"
+      - all  # Or workflow, node, task. Or "*"
+  type: aws
+  # -- Configuration for sending cloud events to AWS SNS
+  aws:
+    region: us-east-2
+  # -- Configuration for sending cloud events to GCP Pub Sub
+  gcp:
+    region: us-east1
+  # -- Configuration for sending cloud events to Kafka
+  kafka:
+    # -- The version of Kafka
+    version: "3.7.0"
+    # -- The kafka brokers to talk to
+    brokers:
+      - mybroker:443
+    # -- SASL based authentication
+    saslConfig:
+      # -- Whether to use SASL authentication
+      enabled: false
+      # -- The kafka user
+      user: kafka
+      # -- The password for the kafka user
+      password: ""
+      # -- Optional mount path of file containing the kafka password.
+      passwordPath: ""
+      # -- Whether the send the SASL handsahke first
+      handshake: true
+      # -- Which SASL mechanism to use. Defaults to PLAIN
+      mechanism: PLAIN
+    # -- Certificate based authentication
+    tlsConfig:
+      # -- Whether to use certificate based authentication or TLS
+      enabled: false
+      # -- Path to the client certificate
+      certPath: /etc/ssl/certs/kafka-client.crt
+      # -- Path to the client private key
+      keyPath: /etc/ssl/certs/kafka-client.key
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
@@ -824,6 +1007,14 @@ cluster_resource_manager:
   service_account_name: flyteadmin
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
+  # -- Additional ClusterResource container environment variables
+  podEnv: {}
+  # -- Labels for ClusterResource pods
+  podLabels: {}
+  # -- nodeSelector for ClusterResource deployment
+  nodeSelector: {}
+  # -- Resources for ClusterResource deployment
+  resources: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
@@ -850,6 +1041,11 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
   # -- Resource templates that should be applied
   templates:

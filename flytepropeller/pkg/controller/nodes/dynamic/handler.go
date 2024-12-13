@@ -103,9 +103,9 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
 	taskNodeInfoMetadata := &event.TaskNodeMetadata{}
-	if dCtx.subWorkflowClosure != nil && dCtx.subWorkflowClosure.Primary != nil && dCtx.subWorkflowClosure.Primary.Template != nil {
+	if dCtx.subWorkflowClosure != nil && dCtx.subWorkflowClosure.GetPrimary() != nil && dCtx.subWorkflowClosure.GetPrimary().GetTemplate() != nil {
 		taskNodeInfoMetadata.DynamicWorkflow = &event.DynamicWorkflowNodeMetadata{
-			Id:                dCtx.subWorkflowClosure.Primary.Template.Id,
+			Id:                dCtx.subWorkflowClosure.GetPrimary().GetTemplate().GetId(),
 			CompiledWorkflow:  dCtx.subWorkflowClosure,
 			DynamicJobSpecUri: dCtx.dynamicJobSpecURI,
 		}
@@ -141,7 +141,7 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 		// These outputPaths only reads the output metadata. So the sandbox is completely optional here and hence it is nil.
 		// The sandbox creation as it uses hashing can be expensive and we skip that expense.
 		outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 		ee, err := d.TaskNodeHandler.ValidateOutput(ctx, nCtx.NodeID(), nCtx.InputReader(),
 			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader())
 

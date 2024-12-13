@@ -69,7 +69,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	exec, err := NewExecutor(ctx, config.GetConfig().NodeConfig, mockStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
-		adminClient, 10, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		adminClient, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -116,7 +116,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 
 	failStorage := createFailingDatastore(t, testScope.NewSubScope("failing"))
 	execFail, err := NewExecutor(ctx, config.GetConfig().NodeConfig, failStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
-		adminClient, 10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	t.Run("StorageFailure", func(t *testing.T) {
 		w := createDummyBaseWorkflow(mockStorage)
@@ -145,7 +145,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient,
-			10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -156,8 +156,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 
-		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient,
-			10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -177,7 +176,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -282,8 +281,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -565,7 +563,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			},
 		}
 
-		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
+		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase, expectedClearStateOnAnyTermination bool) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
 			taskID := "id"
 			taskID0 := "id1"
 			// Setup
@@ -582,7 +580,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 			mockN2Status.OnGetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
-			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), ee)
+			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), expectedClearStateOnAnyTermination, ee)
 			mockN2Status.OnIsDirty().Return(false)
 			mockN2Status.OnGetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
@@ -604,6 +602,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNode.OnGetInputBindings().Return([]*v1alpha1.Binding{})
 			mockNode.OnIsInterruptible().Return(nil)
 			mockNode.OnGetName().Return("name")
+			mockNode.OnGetWorkflowNode().Return(nil)
 
 			mockNodeN0 := &mocks.ExecutableNode{}
 			mockNodeN0.OnGetID().Return(nodeN0)
@@ -614,6 +613,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNodeN0.OnGetTaskID().Return(&taskID0)
 			mockNodeN0.OnIsInterruptible().Return(nil)
 			mockNodeN0.OnGetName().Return("name")
+			mockNodeN0.OnGetWorkflowNode().Return(nil)
 
 			mockN0Status := &mocks.ExecutableNodeStatus{}
 			mockN0Status.OnGetPhase().Return(n0Phase)
@@ -659,17 +659,21 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		}
 
 		tests := []struct {
-			name              string
-			currentNodePhase  v1alpha1.NodePhase
-			parentNodePhase   v1alpha1.NodePhase
-			expectedNodePhase v1alpha1.NodePhase
-			expectedPhase     interfaces.NodePhase
-			expectedError     bool
-			updateCalled      bool
+			name                  string
+			currentNodePhase      v1alpha1.NodePhase
+			parentNodePhase       v1alpha1.NodePhase
+			enableCRDebugMetadata bool
+			expectedNodePhase     v1alpha1.NodePhase
+			expectedPhase         interfaces.NodePhase
+			expectedError         bool
+			updateCalled          bool
 		}{
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
-			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, false, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, true, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -684,13 +688,15 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				h.OnFinalizeRequired().Return(false)
 				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
-				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase)
+				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.enableCRDebugMetadata)
 				startNode := mockWf.StartNode()
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+				nodeConfig := config.GetConfig().NodeConfig
+				nodeConfig.EnableCRDebugMetadata = test.enableCRDebugMetadata
+				execIface, err := NewExecutor(ctx, nodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
@@ -765,7 +771,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
@@ -773,7 +779,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				evRecorder := &eventMocks.NodeEventRecorder{}
 				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -879,7 +885,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
@@ -887,7 +893,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				evRecorder := &eventMocks.NodeEventRecorder{}
 				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -933,7 +939,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				} else {
 					assert.Nil(t, s.Err)
 				}
-				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts())
+				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts()) // #nosec G115
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}
@@ -946,7 +952,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		store := createInmemoryDataStore(t, promutils.NewTestScope())
 		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-			10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -977,7 +983,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		store := createInmemoryDataStore(t, promutils.NewTestScope())
 		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-			10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -1012,7 +1018,7 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -1125,7 +1131,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -1243,7 +1249,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 	// Node not yet started
@@ -1296,6 +1302,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				tid := "tid"
 				eCtx := &mocks4.ExecutionContext{}
 				eCtx.OnGetTask(tid).Return(tk, nil)
+
 				eCtx.OnIsInterruptible().Return(true)
 				eCtx.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
 				eCtx.OnGetLabels().Return(nil)
@@ -1307,6 +1314,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				eCtx.OnIncrementParallelism().Return(0)
 				eCtx.OnCurrentParallelism().Return(0)
 				eCtx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+				eCtx.OnGetConsoleURL().Return("")
 
 				branchTakenNodeID := "branchTakenNode"
 				branchTakenNode := &mocks.ExecutableNode{}
@@ -1317,6 +1325,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				branchTakenNode.OnIsStartNode().Return(false)
 				branchTakenNode.OnIsEndNode().Return(false)
 				branchTakenNode.OnGetInputBindings().Return(nil)
+				branchTakenNode.OnGetWorkflowNode().Return(nil)
 				branchTakeNodeStatus := &mocks.ExecutableNodeStatus{}
 				branchTakeNodeStatus.OnGetPhase().Return(test.currentNodePhase)
 				branchTakeNodeStatus.OnIsDirty().Return(false)
@@ -1329,7 +1338,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 
 				if test.phaseUpdateExpected {
 					var ee *core.ExecutionError
-					branchTakeNodeStatus.On("UpdatePhase", v1alpha1.NodePhaseQueued, mock.Anything, mock.Anything, ee).Return()
+					branchTakeNodeStatus.On("UpdatePhase", v1alpha1.NodePhaseQueued, mock.Anything, mock.Anything, false, ee).Return()
 				}
 
 				leafDag := executors.NewLeafNodeDAGStructure(branchTakenNodeID, parentBranchNodeID)
@@ -1641,6 +1650,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		n.OnGetID().Return(id)
 		n.OnGetKind().Return(v1alpha1.NodeKindStart)
 		n.OnGetTaskID().Return(&id)
+		n.OnGetWorkflowNode().Return(nil)
 		interruptible := false
 		n.OnIsInterruptible().Return(&interruptible)
 		nl := &mocks4.NodeLookup{}
@@ -1677,6 +1687,23 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		execContext.OnGetLabels().Return(nil)
 		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 
+		et := &mocks.ExecutableTask{}
+		et.OnCoreTask().Return(&core.TaskTemplate{
+			Id: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "p",
+				Domain:       "d",
+				Name:         "fake_task_name",
+				Version:      "v",
+			},
+		})
+		execContext.OnGetTask("id").Return(et, nil)
+		parentInfo := &mocks4.ImmutableParentInfo{}
+		parentInfo.OnGetUniqueID().Return("someunique1")
+		parentInfo.OnCurrentAttempt().Return(uint32(1))
+		parentInfo.OnIsInDynamicChain().Return(false)
+		execContext.OnGetParentInfo().Return(parentInfo)
+
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
 }
@@ -1696,6 +1723,7 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
 }
+
 func TestNodeExecutionEventStartNode(t *testing.T) {
 	execID := &core.WorkflowExecutionIdentifier{
 		Name:    "e1",
@@ -1709,12 +1737,20 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	tID := &core.TaskExecutionIdentifier{
 		NodeExecutionId: nID,
 	}
+	subWfID := &core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "p",
+		Domain:       "dev",
+		Name:         "name",
+		Version:      "123",
+	}
 	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
 	inputReader := &mocks3.InputReader{}
 	inputReader.OnGetInputPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1728,20 +1764,24 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	ns.OnGetParentTaskID().Return(tID)
 	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
 	ns.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
-	})
+	}, subWfID)
+
 	assert.NoError(t, err)
-	assert.Equal(t, "start-node", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
+	assert.Equal(t, "start-node", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
 	assert.Equal(t, "dummy://dummyOutUrl/outputs.pb",
-		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
-	assert.Equal(t, ev.ProducerId, testClusterID)
+		ev.GetOutputResult().(*event.NodeExecutionEvent_OutputUri).OutputUri)
+	assert.Equal(t, ev.GetProducerId(), testClusterID)
+	assert.Equal(t, subWfID, ev.GetTargetEntity())
+	assert.Nil(t, ev.GetInputValue())
 }
 
 func TestNodeExecutionEventV0(t *testing.T) {
@@ -1761,6 +1801,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false).Twice()
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1774,15 +1815,17 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	ns.OnGetParentTaskID().Return(tID)
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
-	})
+	}, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, "n1", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
+	assert.Equal(t, "n1", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
+	assert.Empty(t, ev.GetTargetEntity())
+	assert.Equal(t, "reference", ev.GetInputUri())
 }
 
 func TestNodeExecutionEventV1(t *testing.T) {
@@ -1809,6 +1852,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1820,21 +1864,25 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
 	ns.OnGetParentTaskID().Return(tID)
+
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyInline,
-	})
+	}, nil)
+
 	assert.NoError(t, err)
-	assert.Equal(t, "np1-2-n1", eventOpt.Id.NodeId)
-	assert.Equal(t, execID, eventOpt.Id.ExecutionId)
-	assert.Equal(t, "id", eventOpt.SpecNodeId)
+	assert.Equal(t, "np1-2-n1", eventOpt.GetId().GetNodeId())
+	assert.Equal(t, execID, eventOpt.GetId().GetExecutionId())
+	assert.Equal(t, "id", eventOpt.GetSpecNodeId())
 	expectParentMetadata := event.ParentNodeExecutionMetadata{
 		NodeId: "np1",
 	}
-	assert.Equal(t, expectParentMetadata, *eventOpt.ParentNodeMetadata)
-	assert.Nil(t, eventOpt.ParentTaskMetadata)
-	assert.Equal(t, "name", eventOpt.NodeName)
-	assert.Equal(t, "2", eventOpt.RetryGroup)
+	assert.True(t, proto.Equal(&expectParentMetadata, eventOpt.GetParentNodeMetadata()))
+	assert.Nil(t, eventOpt.GetParentTaskMetadata())
+	assert.Equal(t, "name", eventOpt.GetNodeName())
+	assert.Equal(t, "2", eventOpt.GetRetryGroup())
 	assert.True(t, proto.Equal(eventOpt.GetInputData(), inputs))
+	assert.Empty(t, eventOpt.GetTargetEntity())
+	assert.Equal(t, inputs, eventOpt.GetInputData())
 }
 
 func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
@@ -1849,7 +1897,7 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -2278,8 +2326,8 @@ func TestRecover(t *testing.T) {
 			},
 			CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
 			DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-				Id:               dynamicWorkflow.Id,
-				CompiledWorkflow: dynamicWorkflow.CompiledWorkflow,
+				Id:               dynamicWorkflow.GetId(),
+				CompiledWorkflow: dynamicWorkflow.GetCompiledWorkflow(),
 			},
 		}, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata))
 	})
@@ -2535,6 +2583,10 @@ func init() {
 
 type existsMetadata struct{}
 
+func (e existsMetadata) ContentMD5() string {
+	return ""
+}
+
 func (e existsMetadata) Exists() bool {
 	return false
 }
@@ -2611,7 +2663,6 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 			RawOutputPolicy: config.RawOutputPolicyReference,
 		}
 		fakeKubeClient := mocks4.NewFakeKubeClient()
-		maxDatasetSize := int64(10)
 		mockEventSink := eventMocks.NewMockEventSink()
 		nodeConfig := config.GetConfig().NodeConfig
 		rawOutputPrefix := storage.DataReference("s3://bucket/")
@@ -2622,8 +2673,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 		mockHandlerFactory := &nodemocks.HandlerFactory{}
 		mockHandlerFactory.OnGetHandler(v1alpha1.NodeKindTask).Return(mockHandler, nil)
 		nodeExecutor, err := NewExecutor(ctx, nodeConfig, dataStore, enqueueWorkflow, mockEventSink,
-			adminClient, adminClient, maxDatasetSize, rawOutputPrefix, fakeKubeClient, catalogClient,
-			recoveryClient, eventConfig, testClusterID, signalClient, mockHandlerFactory, testScope)
+			adminClient, adminClient, rawOutputPrefix, fakeKubeClient, catalogClient,
+			recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, mockHandlerFactory, testScope)
 		assert.NoError(t, err)
 
 		return nodeExecutor

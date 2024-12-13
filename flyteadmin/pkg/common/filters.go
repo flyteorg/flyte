@@ -22,6 +22,7 @@ type GormQueryExpr struct {
 // Complete set of filters available for database queries.
 const (
 	Contains FilterExpression = iota
+	NotLike
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -29,6 +30,7 @@ const (
 	Equal
 	NotEqual
 	ValueIn
+	ValueNotIn
 )
 
 // String formats for various filter expression queries
@@ -36,6 +38,7 @@ const (
 	joinArgsFormat          = "%s.%s"
 	containsQuery           = "%s LIKE ?"
 	containsArgs            = "%%%s%%"
+	notLikeQuery            = "%s NOT LIKE ?"
 	greaterThanQuery        = "%s > ?"
 	greaterThanOrEqualQuery = "%s >= ?"
 	lessThanQuery           = "%s < ?"
@@ -43,11 +46,13 @@ const (
 	equalQuery              = "%s = ?"
 	notEqualQuery           = "%s <> ?"
 	valueInQuery            = "%s in (?)"
+	valueNotInQuery         = "%s not in (?)"
 )
 
 // Set of available filters which exclusively accept a single argument value.
 var singleValueFilters = map[FilterExpression]bool{
 	Contains:           true,
+	NotLike:            true,
 	GreaterThan:        true,
 	GreaterThanOrEqual: true,
 	LessThan:           true,
@@ -58,13 +63,15 @@ var singleValueFilters = map[FilterExpression]bool{
 
 // Set of available filters which exclusively accept repeated argument values.
 var repeatedValueFilters = map[FilterExpression]bool{
-	ValueIn: true,
+	ValueIn:    true,
+	ValueNotIn: true,
 }
 
 const EqualExpression = "eq"
 
 var filterNameMappings = map[string]FilterExpression{
 	"contains":      Contains,
+	"not_like":      NotLike,
 	"gt":            GreaterThan,
 	"gte":           GreaterThanOrEqual,
 	"lt":            LessThan,
@@ -72,12 +79,33 @@ var filterNameMappings = map[string]FilterExpression{
 	EqualExpression: Equal,
 	"ne":            NotEqual,
 	"value_in":      ValueIn,
+	"value_not_in":  ValueNotIn,
+}
+
+var filterQueryMappings = map[FilterExpression]string{
+	Contains:           containsQuery,
+	NotLike:            notLikeQuery,
+	GreaterThan:        greaterThanQuery,
+	GreaterThanOrEqual: greaterThanOrEqualQuery,
+	LessThan:           lessThanQuery,
+	LessThanOrEqual:    lessThanOrEqualQuery,
+	Equal:              equalQuery,
+	NotEqual:           notEqualQuery,
+	ValueIn:            valueInQuery,
+	ValueNotIn:         valueNotInQuery,
 }
 
 var executionIdentifierFields = map[string]bool{
 	"project": true,
 	"domain":  true,
 	"name":    true,
+}
+
+// Entities that have special case handling for execution identifier fields.
+var executionIdentifierEntities = map[Entity]bool{
+	Execution:     true,
+	NodeExecution: true,
+	TaskExecution: true,
 }
 
 var entityMetadataFields = map[string]bool{
@@ -94,6 +122,8 @@ func getFilterExpressionName(expression FilterExpression) string {
 	switch expression {
 	case Contains:
 		return "contains"
+	case NotLike:
+		return "not like"
 	case GreaterThan:
 		return "greater than"
 	case GreaterThanOrEqual:
@@ -108,6 +138,8 @@ func getFilterExpressionName(expression FilterExpression) string {
 		return "not equal"
 	case ValueIn:
 		return "value in"
+	case ValueNotIn:
+		return "value not in"
 	default:
 		return ""
 	}
@@ -166,9 +198,9 @@ func (f *inlineFilterImpl) GetField() string {
 
 func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExpr, error) {
 
-	// ValueIn is special because it uses repeating values.
-	if f.function == ValueIn {
-		queryStr := fmt.Sprintf(valueInQuery, formattedField)
+	// Filters that use repeated values
+	if _, ok := repeatedValueFilters[f.function]; ok {
+		queryStr := fmt.Sprintf(filterQueryMappings[f.function], formattedField)
 		return GormQueryExpr{
 			Query: queryStr,
 			Args:  f.repeatedValue,
@@ -182,6 +214,12 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 			Query: fmt.Sprintf(containsQuery, formattedField),
 			// args renders to something like: "%value%"
 			Args: fmt.Sprintf(containsArgs, f.value),
+		}, nil
+	case NotLike:
+		return GormQueryExpr{
+			// WHERE field NOT LIKE value
+			Query: fmt.Sprintf(notLikeQuery, formattedField),
+			Args:  f.value,
 		}, nil
 	case GreaterThan:
 		return GormQueryExpr{
@@ -235,8 +273,12 @@ func (f *inlineFilterImpl) GetGormJoinTableQueryExpr(tableName string) (GormQuer
 
 func customizeField(field string, entity Entity) string {
 	// Execution identifier fields have to be customized because we differ from convention in those column names.
-	if entity == Execution && executionIdentifierFields[field] {
+	if executionIdentifierEntities[entity] && executionIdentifierFields[field] {
 		return fmt.Sprintf("execution_%s", field)
+	}
+	// admin_tag table has been migrated to an execution_tag table, so we need to customize the field name.
+	if entity == AdminTag && field == "name" {
+		return "key"
 	}
 	return field
 }
@@ -246,6 +288,10 @@ func customizeEntity(field string, entity Entity) Entity {
 	// is stored using a different entity type.
 	if entity == NamedEntity && entityMetadataFields[field] {
 		return NamedEntityMetadata
+	}
+	// admin_tag table has been migrated to an execution_tag table.
+	if entity == AdminTag {
+		return ExecutionTag
 	}
 	return entity
 }
@@ -271,8 +317,10 @@ func NewRepeatedValueFilter(entity Entity, function FilterExpression, field stri
 		return nil, GetInvalidRepeatedValueFilterErr(function)
 	}
 	customizedField := customizeField(field, entity)
+	customizedEntity := customizeEntity(field, entity)
+
 	return &inlineFilterImpl{
-		entity:        entity,
+		entity:        customizedEntity,
 		function:      function,
 		field:         customizedField,
 		repeatedValue: repeatedValue,

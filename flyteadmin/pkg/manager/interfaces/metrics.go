@@ -10,6 +10,6 @@ import (
 
 // Interface for managing Flyte execution metrics
 type MetricsInterface interface {
-	GetExecutionMetrics(ctx context.Context, request admin.WorkflowExecutionGetMetricsRequest) (
+	GetExecutionMetrics(ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) (
 		*admin.WorkflowExecutionGetMetricsResponse, error)
 }

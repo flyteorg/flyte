@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestCreate(t *testing.T) {
@@ -62,7 +63,7 @@ func TestDeleteFailure(t *testing.T) {
 
 	err := reservationRepo.Delete(context.Background(), expectedReservation.ReservationKey, expectedReservation.OwnerID)
 	assert.Error(t, err)
-	assert.Equal(t, "missing entity of type Reservation with identifier dataset_id:<project:\"testProject\" name:\"testDataset\" domain:\"testDomain\" version:\"testVersion\" > tag_name:\"testTag\" ", err.Error())
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type Reservation with identifier dataset_id:{project:\"testProject\"  name:\"testDataset\"  domain:\"testDomain\"  version:\"testVersion\"}  tag_name:\"testTag\"", err.Error())
 }
 
 func TestGet(t *testing.T) {

@@ -3,14 +3,13 @@ package tokenorchestrator
 import (
 	"context"
 	"fmt"
-	"time"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -54,16 +53,22 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 		return nil, err
 	}
 
-	if !token.Valid() {
-		return nil, fmt.Errorf("token from cache is invalid")
-	}
-
-	// If token doesn't need to be refreshed, return it.
-	if time.Now().Before(token.Expiry.Add(-tokenRefreshGracePeriod.Duration)) {
-		logger.Infof(ctx, "found the token in the cache")
+	if isValid := utils.Valid(token); isValid {
+		logger.Infof(context.Background(), "retrieved token from cache with expiry %v", token.Expiry)
 		return token, nil
 	}
-	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
+
+	t.TokenCache.Lock()
+	defer t.TokenCache.Unlock()
+
+	token, err = t.TokenCache.GetToken()
+	if err != nil {
+		return nil, err
+	}
+
+	if token.Valid() {
+		return token, nil
+	}
 
 	token, err = t.RefreshToken(ctx, token)
 	if err != nil {
@@ -73,6 +78,8 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 	if !token.Valid() {
 		return nil, fmt.Errorf("refreshed token is invalid")
 	}
+
+	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
 	err = t.TokenCache.SaveToken(token)
 	if err != nil {

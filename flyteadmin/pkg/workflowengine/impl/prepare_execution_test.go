@@ -131,7 +131,6 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Limits: runtimeInterfaces.TaskResourceSet{
 				CPU:              resource.MustParse("2"),
 				Memory:           resource.MustParse("200Gi"),
-				Storage:          resource.MustParse("5Gi"),
 				EphemeralStorage: resource.MustParse("1Gi"),
 				GPU:              resource.MustParse("1"),
 			},
@@ -144,7 +143,6 @@ func TestAddExecutionOverrides(t *testing.T) {
 		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("2"),
 			Memory:           resource.MustParse("200Gi"),
-			Storage:          resource.MustParse("5Gi"),
 			EphemeralStorage: resource.MustParse("1Gi"),
 			GPU:              resource.MustParse("1"),
 		}, workflow.ExecutionConfig.TaskResources.Limits)
@@ -256,4 +254,5 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			OutputLocationPrefix: "s3://bucket/key",
 		},
 	})
+	assert.Equal(t, flyteWorkflow.Finalizers, []string{"flyte-finalizer"})
 }

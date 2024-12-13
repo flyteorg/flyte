@@ -185,41 +185,41 @@ func TestValidateTaskTypeWhitelist(t *testing.T) {
 			},
 		},
 	}
-	err := validateTaskType(core.Identifier{
+	err := validateTaskType(&core.Identifier{
 		Project: "proj_a",
 		Domain:  "domain_a",
 	}, "type_a", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_a",
 	}, "type_b", whitelistConfig)
 	assert.NotNil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_b",
 	}, "type_a", whitelistConfig)
 	assert.NotNil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_b",
 	}, "type_b", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_c",
 	}, "every_type", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_c",
 	}, "type_b", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{}, "some_generally_supported_type", whitelistConfig)
+	err = validateTaskType(&core.Identifier{}, "some_generally_supported_type", whitelistConfig)
 	assert.Nil(t, err)
 }
 
@@ -278,6 +278,11 @@ func TestResourceListToQuantity(t *testing.T) {
 	gpuQuantity := gpuResources[core.Resources_CPU]
 	val = gpuQuantity.Value()
 	assert.Equal(t, val, int64(2))
+
+	ephemeralStorageResources := resourceListToQuantity(corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("500Mi")})
+	ephemeralStorageQuantity := ephemeralStorageResources[core.Resources_EPHEMERAL_STORAGE]
+	val = ephemeralStorageQuantity.Value()
+	assert.Equal(t, val, int64(524288000))
 }
 
 func TestRequestedResourcesToQuantity(t *testing.T) {
@@ -439,7 +444,7 @@ func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
 			},
 		})
 	assert.EqualError(t, err,
-		"For extended resource 'gpu' the default value must equal the limit value for task [name:\"name\" ]")
+		"For extended resource 'gpu' the default value must equal the limit value for task [name:\"name\"]")
 }
 
 func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {

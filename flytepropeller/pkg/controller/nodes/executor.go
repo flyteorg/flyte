@@ -153,7 +153,7 @@ func IsMaxParallelismAchieved(ctx context.Context, currentNode v1alpha1.Executab
 		return false
 	}
 
-	if currentNode.GetKind() == v1alpha1.NodeKindTask ||
+	if currentNode.GetKind() == v1alpha1.NodeKindTask || currentNode.GetKind() == v1alpha1.NodeKindArray ||
 		(currentNode.GetKind() == v1alpha1.NodeKindWorkflow && currentNode.GetWorkflowNode() != nil && currentNode.GetWorkflowNode().GetLaunchPlanRefID() != nil) {
 		// If we are queued, let us see if we can proceed within the node parallelism bounds
 		if execContext.CurrentParallelism() >= maxParallelism {
@@ -181,6 +181,15 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
+
+	if nodePhase == v1alpha1.NodePhaseRunning && execContext != nil {
+		execContext.IncrementNodeExecutionCount()
+		if currentNode.GetKind() == v1alpha1.NodeKindTask {
+			execContext.IncrementTaskExecutionCount()
+		}
+		logger.Debugf(currentNodeCtx, "recursive handler - node execution count [%v], task execution count [%v], phase [%v], ",
+			execContext.CurrentNodeExecutionCount(), execContext.CurrentTaskExecutionCount(), nodePhase.String())
+	}
 
 	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
@@ -287,6 +296,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			}), nil
 		}
 
+		logger.Debugf(ctx, "downstream handler starting node id %v, ", downstreamNode.GetID())
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
@@ -475,13 +485,14 @@ func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder inte
 type nodeExecutor struct {
 	catalog                         catalog.Client
 	clusterID                       string
+	enableCRDebugMetadata           bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
+	literalOffloadingConfig         config.LiteralOffloadingConfig
 	interruptibleFailureThreshold   int32
-	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
 	nodeRecorder                    events.NodeEventRecorder
@@ -511,19 +522,19 @@ func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executor
 func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.LiteralMap, error) {
 
-	nodeInputs := recoveredData.FullInputs
+	nodeInputs := recoveredData.GetFullInputs()
 	if nodeInputs != nil {
 		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
 			c.metrics.InputsWriteFailure.Inc(ctx)
 			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
 			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
 		}
-	} else if len(recovered.InputUri) > 0 {
+	} else if len(recovered.GetInputUri()) > 0 {
 		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
 		nodeInputs = &core.LiteralMap{}
-		if recoveredData.FullInputs == nil {
-			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
-				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+		if recoveredData.GetFullInputs() == nil {
+			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.GetInputUri()), nodeInputs); err != nil {
+				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.GetInputUri())
 			}
 		}
 
@@ -538,11 +549,11 @@ func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeEx
 }
 
 func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.PhaseInfo, error) {
-	fullyQualifiedNodeID := nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
+	fullyQualifiedNodeID := nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId()
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		// compute fully qualified node id (prefixed with parent id and retry attempt) to ensure uniqueness
 		var err error
-		fullyQualifiedNodeID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId)
+		fullyQualifiedNodeID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId())
 		if err != nil {
 			return handler.PhaseInfoUndefined, err
 		}
@@ -561,13 +572,13 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 		logger.Warnf(ctx, "call to recover node [%+v] returned no error but also no node", nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 		return handler.PhaseInfoUndefined, nil
 	}
-	if recovered.Closure == nil {
+	if recovered.GetClosure() == nil {
 		logger.Warnf(ctx, "Fetched node execution [%+v] data but was missing closure. Will not attempt to recover",
 			nCtx.NodeExecutionMetadata().GetNodeExecutionID())
 		return handler.PhaseInfoUndefined, nil
 	}
 	// A recoverable node execution should always be in a terminal phase
-	switch recovered.Closure.Phase {
+	switch recovered.GetClosure().GetPhase() {
 	case core.NodeExecution_SKIPPED:
 		return handler.PhaseInfoUndefined, nil
 	case core.NodeExecution_SUCCEEDED:
@@ -577,12 +588,12 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 	default:
 		// The node execution may be partially recoverable through intra task checkpointing. Save the checkpoint
 		// uri in the task node state to pass to the task handler later on.
-		if metadata, ok := recovered.Closure.TargetMetadata.(*admin.NodeExecutionClosure_TaskNodeMetadata); ok {
+		if metadata, ok := recovered.GetClosure().GetTargetMetadata().(*admin.NodeExecutionClosure_TaskNodeMetadata); ok {
 			state := nCtx.NodeStateReader().GetTaskNodeState()
-			state.PreviousNodeExecutionCheckpointURI = storage.DataReference(metadata.TaskNodeMetadata.CheckpointUri)
+			state.PreviousNodeExecutionCheckpointURI = storage.DataReference(metadata.TaskNodeMetadata.GetCheckpointUri())
 			err = nCtx.NodeStateWriter().PutTaskNodeState(state)
 			if err != nil {
-				logger.Warn(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
+				logger.Warnf(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
 					nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
@@ -590,7 +601,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 		// if this node is a dynamic task we attempt to recover the compiled workflow from instances where the parent
 		// task succeeded but the dynamic task did not complete. this is important to ensure correctness since node ids
 		// within the compiled closure may not be generated deterministically.
-		if recovered.Metadata != nil && recovered.Metadata.IsDynamic && len(recovered.Closure.DynamicJobSpecUri) > 0 {
+		if recovered.GetMetadata() != nil && recovered.GetMetadata().GetIsDynamic() && len(recovered.GetClosure().GetDynamicJobSpecUri()) > 0 {
 			// recover node inputs
 			recoveredData, err := c.recoveryClient.RecoverNodeExecutionData(ctx,
 				nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier, fullyQualifiedNodeID)
@@ -608,7 +619,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 				return handler.PhaseInfoUndefined, err
 			}
 
-			dynamicJobSpecReference := storage.DataReference(recovered.Closure.DynamicJobSpecUri)
+			dynamicJobSpecReference := storage.DataReference(recovered.GetClosure().GetDynamicJobSpecUri())
 			if err := nCtx.DataStore().CopyRaw(ctx, dynamicJobSpecReference, f.GetLoc(), storage.Options{}); err != nil {
 				return handler.PhaseInfoUndefined, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err,
 					"failed to store dynamic job spec for node. source file [%s] destination file [%s]", dynamicJobSpecReference, f.GetLoc())
@@ -624,7 +635,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 			return handler.PhaseInfoRunning(&handler.ExecutionInfo{}), nil
 		}
 
-		logger.Debugf(ctx, "Node [%+v] phase [%v] is not recoverable", nCtx.NodeExecutionMetadata().GetNodeExecutionID(), recovered.Closure.Phase)
+		logger.Debugf(ctx, "Node [%+v] phase [%v] is not recoverable", nCtx.NodeExecutionMetadata().GetNodeExecutionID(), recovered.GetClosure().GetPhase())
 		return handler.PhaseInfoUndefined, nil
 	}
 
@@ -651,13 +662,13 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 	// Similarly, copy outputs' reference
 	so := storage.Options{}
 	var outputs = &core.LiteralMap{}
-	if recoveredData.FullOutputs != nil {
-		outputs = recoveredData.FullOutputs
-	} else if recovered.Closure.GetOutputData() != nil {
-		outputs = recovered.Closure.GetOutputData()
-	} else if len(recovered.Closure.GetOutputUri()) > 0 {
-		if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.Closure.GetOutputUri()), outputs); err != nil {
-			return handler.PhaseInfoUndefined, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read output data [%v].", recovered.Closure.GetOutputUri())
+	if recoveredData.GetFullOutputs() != nil {
+		outputs = recoveredData.GetFullOutputs()
+	} else if recovered.GetClosure().GetOutputData() != nil {
+		outputs = recovered.GetClosure().GetOutputData()
+	} else if len(recovered.GetClosure().GetOutputUri()) > 0 {
+		if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.GetClosure().GetOutputUri()), outputs); err != nil {
+			return handler.PhaseInfoUndefined, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read output data [%v].", recovered.GetClosure().GetOutputUri())
 		}
 	} else {
 		logger.Debugf(ctx, "No outputs found for recovered node [%+v]", nCtx.NodeExecutionMetadata().GetNodeExecutionID())
@@ -668,7 +679,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 		OutputURI: outputFile,
 	}
 
-	deckFile := storage.DataReference(recovered.Closure.GetDeckUri())
+	deckFile := storage.DataReference(recovered.GetClosure().GetDeckUri())
 	if len(deckFile) > 0 {
 		metadata, err := nCtx.DataStore().Head(ctx, deckFile)
 		if err != nil {
@@ -691,24 +702,24 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 		OutputInfo: oi,
 	}
 
-	if recovered.Closure.GetTaskNodeMetadata() != nil {
+	if recovered.GetClosure().GetTaskNodeMetadata() != nil {
 		taskNodeInfo := &handler.TaskNodeInfo{
 			TaskNodeMetadata: &event.TaskNodeMetadata{
-				CatalogKey:  recovered.Closure.GetTaskNodeMetadata().CatalogKey,
-				CacheStatus: recovered.Closure.GetTaskNodeMetadata().CacheStatus,
+				CatalogKey:  recovered.GetClosure().GetTaskNodeMetadata().GetCatalogKey(),
+				CacheStatus: recovered.GetClosure().GetTaskNodeMetadata().GetCacheStatus(),
 			},
 		}
-		if recoveredData.DynamicWorkflow != nil {
+		if recoveredData.GetDynamicWorkflow() != nil {
 			taskNodeInfo.TaskNodeMetadata.DynamicWorkflow = &event.DynamicWorkflowNodeMetadata{
-				Id:               recoveredData.DynamicWorkflow.Id,
-				CompiledWorkflow: recoveredData.DynamicWorkflow.CompiledWorkflow,
+				Id:               recoveredData.GetDynamicWorkflow().GetId(),
+				CompiledWorkflow: recoveredData.GetDynamicWorkflow().GetCompiledWorkflow(),
 			}
 		}
 		info.TaskNodeInfo = taskNodeInfo
-	} else if recovered.Closure.GetWorkflowNodeMetadata() != nil {
+	} else if recovered.GetClosure().GetWorkflowNodeMetadata() != nil {
 		logger.Warnf(ctx, "Attempted to recover node")
 		info.WorkflowNodeInfo = &handler.WorkflowNodeInfo{
-			LaunchedWorkflowID: recovered.Closure.GetWorkflowNodeMetadata().ExecutionId,
+			LaunchedWorkflowID: recovered.GetClosure().GetWorkflowNodeMetadata().GetExecutionId(),
 		}
 	}
 	return handler.PhaseInfoRecovered(info), nil
@@ -754,6 +765,10 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			}
 
 			if nodeInputs != nil {
+				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.GetLiterals(), node, c.literalOffloadingConfig)
+				if p != nil {
+					return *p, nil
+				}
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -790,11 +805,11 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 	return false
 }
 
-func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
+func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt uint32, maxAttempts uint32, isEligible bool) {
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		currentAttempt = nodeStatus.GetAttempts() + 1
 	} else {
-		if err.Kind == core.ExecutionError_SYSTEM {
+		if err.GetKind() == core.ExecutionError_SYSTEM {
 			currentAttempt = nodeStatus.GetSystemFailures()
 			maxAttempts = c.maxNodeRetriesForSystemFailures
 			isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
@@ -803,9 +818,9 @@ func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, 
 
 		currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
 	}
-	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
-		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts) // #nosec G115
 	}
 	isEligible = currentAttempt < maxAttempts
 	return
@@ -849,8 +864,8 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 		if !isEligible {
 			return handler.PhaseInfoFailure(
 				core.ExecutionError_USER,
-				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().Code),
-				fmt.Sprintf("[%d/%d] currentAttempt done. Last Error: %s::%s", currentAttempt, maxAttempts, phase.GetErr().Kind.String(), phase.GetErr().Message),
+				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().GetCode()),
+				fmt.Sprintf("[%d/%d] currentAttempt done. Last Error: %s::%s", currentAttempt, maxAttempts, phase.GetErr().GetKind().String(), phase.GetErr().GetMessage()),
 				phase.GetInfo(),
 			), nil
 		}
@@ -879,17 +894,23 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 	// only send event if this is the final transition for this node
 	if finalTransition {
 		nodeExecutionID := &core.NodeExecutionIdentifier{
-			ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
-			NodeId:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId,
+			ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId(),
+			NodeId:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId(),
 		}
 		if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
-			currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
+			currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.GetNodeId())
 			if err != nil {
 				return err
 			}
 			nodeExecutionID.NodeId = currentNodeUniqueID
 		}
 
+		var dynamic = false
+		if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
+			dynamic = true
+		}
+
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
 		err := nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 			Id:         nodeExecutionID,
 			Phase:      core.NodeExecution_ABORTED,
@@ -900,8 +921,10 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 					Message: reason,
 				},
 			},
-			ProducerId: c.clusterID,
-			ReportedAt: ptypes.TimestampNow(),
+			ProducerId:       c.clusterID,
+			ReportedAt:       ptypes.TimestampNow(),
+			IsInDynamicChain: dynamic,
+			TargetEntity:     targetEntity,
 		}, c.eventConfig)
 		if err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
 			if errors2.IsCausedBy(err, errors.IllegalStateError) {
@@ -993,10 +1016,12 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
 		p = p.WithOccuredAt(occurredAt)
 
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
+
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 			p, nCtx.InputReader().GetInputPath().String(), nodeStatus, nCtx.ExecutionContext().GetEventVersion(),
 			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
-			c.eventConfig)
+			c.eventConfig, targetEntity)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -1005,7 +1030,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 		}
-		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
@@ -1221,10 +1246,19 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		// assert np == skipped, succeeding, failing or recovered
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s], (handler phase [%s])", nodeStatus.GetPhase().String(), np.String(), p.GetPhase().String())
 
-		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
-			p, nCtx.InputReader().GetInputPath().String(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
-			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
-			c.eventConfig)
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
+
+		nev, err := ToNodeExecutionEvent(
+			nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+			p,
+			nCtx.InputReader().GetInputPath().String(),
+			nCtx.NodeStatus(),
+			nCtx.ExecutionContext().GetEventVersion(),
+			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(),
+			c.clusterID,
+			nCtx.NodeStateReader().GetDynamicNodeState().Phase,
+			c.eventConfig,
+			targetEntity)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -1241,6 +1275,10 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 				np = v1alpha1.NodePhaseFailing
 				p = handler.PhaseInfoFailure(core.ExecutionError_USER, "NodeFailed", err.Error(), p.GetInfo())
 
+				var dynamic = false
+				if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
+					dynamic = true
+				}
 				err = nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 					Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 					Phase:      core.NodeExecution_FAILED,
@@ -1251,7 +1289,9 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 							Message: err.Error(),
 						},
 					},
-					ReportedAt: ptypes.TimestampNow(),
+					ReportedAt:       ptypes.TimestampNow(),
+					IsInDynamicChain: dynamic,
+					TargetEntity:     targetEntity,
 				}, c.eventConfig)
 
 				if err != nil {
@@ -1271,7 +1311,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 	}
 
-	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 	return finalStatus, nil
 }
 
@@ -1285,7 +1325,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
 	// Attempt is used throughout the system to determine the idempotent resource version.
 	nodeStatus.IncrementAttempts()
-	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", nil)
+	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", c.enableCRDebugMetadata, nil)
 	// We are going to retry in the next round, so we should clear all current state
 	nodeStatus.ClearSubNodeStatus()
 	nodeStatus.ClearTaskStatus()
@@ -1324,8 +1364,14 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
-		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		t := metav1.Now()
+
+		startedAt := nodeStatus.GetStartedAt()
+		if startedAt == nil {
+			startedAt = &t
+		}
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, t, nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
+		c.metrics.FailureDuration.Observe(ctx, startedAt.Time, nodeStatus.GetStoppedAt().Time)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1338,8 +1384,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			return interfaces.NodeStatusUndefined, err
 		}
 
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
 		c.metrics.TimedOutFailure.Inc(ctx)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
@@ -1363,8 +1408,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			stopped = &t
 		}
 		c.metrics.SuccessDuration.Observe(ctx, started.Time, stopped.Time)
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", nil)
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", c.enableCRDebugMetadata, nil)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1384,8 +1428,8 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
-	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
+	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
+	catalogClient catalog.Client, recoveryClient recovery.Client, literalOffloadingConfig config.LiteralOffloadingConfig, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
 
 	// TODO we may want to make this configurable.
@@ -1431,14 +1475,15 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	nodeExecutor := &nodeExecutor{
 		catalog:                         catalogClient,
 		clusterID:                       clusterID,
+		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
+		literalOffloadingConfig:         literalOffloadingConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
-		maxDatasetSizeBytes:             maxDatasetSize,
-		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
+		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures), // #nosec G115
 		metrics:                         metrics,
 		nodeRecorder:                    events.NewNodeEventRecorder(eventSink, nodeScope, store),
 		outputResolver:                  NewRemoteFileOutputResolver(store),
