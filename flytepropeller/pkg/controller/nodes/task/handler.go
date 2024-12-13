@@ -207,6 +207,7 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 	}
 
 	logger.Debugf(ctx, "Task still running")
+	// Here will send the deck uri to flyteadmin
 	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(&p.execInfo)), nil
 }
 
