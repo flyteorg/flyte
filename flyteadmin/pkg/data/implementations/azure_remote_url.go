@@ -16,7 +16,7 @@ type AzureRemoteURL struct {
 	presignDuration       time.Duration
 }
 
-func (n *AzureRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+func (n *AzureRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	metadata, err := n.remoteDataStoreClient.Head(ctx, storage.DataReference(uri))
 	if err != nil {
 		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
