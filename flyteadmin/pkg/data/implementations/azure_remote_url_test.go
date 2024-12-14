@@ -10,6 +10,10 @@ import (
 
 type mockMetadata struct{}
 
+func (m mockMetadata) ContentMD5() string {
+	return ""
+}
+
 func (m mockMetadata) Exists() bool {
 	return true
 }
