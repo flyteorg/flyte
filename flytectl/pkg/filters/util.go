@@ -13,7 +13,7 @@ func BuildResourceListRequestWithName(c Filters, project, domain, name string) (
 		return nil, err
 	}
 	request := &admin.ResourceListRequest{
-		Limit:   uint32(c.Limit),
+		Limit:   uint32(c.Limit), // #nosec G115
 		Token:   getToken(c),
 		Filters: fieldSelector,
 		Id: &admin.NamedEntityIdentifier{
@@ -36,7 +36,7 @@ func BuildNamedEntityListRequest(c Filters, project, domain string, resourceType
 		return nil, err
 	}
 	request := &admin.NamedEntityListRequest{
-		Limit:        uint32(c.Limit),
+		Limit:        uint32(c.Limit), // #nosec G115
 		Token:        getToken(c),
 		Filters:      fieldSelector,
 		Project:      project,
@@ -55,7 +55,7 @@ func BuildProjectListRequest(c Filters) (*admin.ProjectListRequest, error) {
 		return nil, err
 	}
 	request := &admin.ProjectListRequest{
-		Limit:   uint32(c.Limit),
+		Limit:   uint32(c.Limit), // #nosec G115
 		Token:   getToken(c),
 		Filters: fieldSelector,
 		SortBy:  buildSortingRequest(c),

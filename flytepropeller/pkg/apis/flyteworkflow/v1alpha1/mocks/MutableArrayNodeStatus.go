@@ -82,6 +82,38 @@ func (_m *MutableArrayNodeStatus) GetExecutionError() *core.ExecutionError {
 	return r0
 }
 
+type MutableArrayNodeStatus_GetSubNodeDeltaTimestamps struct {
+	*mock.Call
+}
+
+func (_m MutableArrayNodeStatus_GetSubNodeDeltaTimestamps) Return(_a0 bitarray.CompactArray) *MutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	return &MutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableArrayNodeStatus) OnGetSubNodeDeltaTimestamps() *MutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	c_call := _m.On("GetSubNodeDeltaTimestamps")
+	return &MutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: c_call}
+}
+
+func (_m *MutableArrayNodeStatus) OnGetSubNodeDeltaTimestampsMatch(matchers ...interface{}) *MutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	c_call := _m.On("GetSubNodeDeltaTimestamps", matchers...)
+	return &MutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: c_call}
+}
+
+// GetSubNodeDeltaTimestamps provides a mock function with given fields:
+func (_m *MutableArrayNodeStatus) GetSubNodeDeltaTimestamps() bitarray.CompactArray {
+	ret := _m.Called()
+
+	var r0 bitarray.CompactArray
+	if rf, ok := ret.Get(0).(func() bitarray.CompactArray); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bitarray.CompactArray)
+	}
+
+	return r0
+}
+
 type MutableArrayNodeStatus_GetSubNodePhases struct {
 	*mock.Call
 }
@@ -282,6 +314,11 @@ func (_m *MutableArrayNodeStatus) SetArrayNodePhase(phase v1alpha1.ArrayNodePhas
 // SetExecutionError provides a mock function with given fields: executionError
 func (_m *MutableArrayNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
 	_m.Called(executionError)
+}
+
+// SetSubNodeDeltaTimestamps provides a mock function with given fields: subNodeDeltaTimestamps
+func (_m *MutableArrayNodeStatus) SetSubNodeDeltaTimestamps(subNodeDeltaTimestamps bitarray.CompactArray) {
+	_m.Called(subNodeDeltaTimestamps)
 }
 
 // SetSubNodePhases provides a mock function with given fields: subNodePhases

@@ -3,6 +3,8 @@ package task
 import (
 	"context"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
@@ -58,11 +60,14 @@ func (f FutureFileReader) CacheExists(ctx context.Context) (bool, error) {
 }
 
 func (f FutureFileReader) Cache(ctx context.Context, wf *v1alpha1.FlyteWorkflow, workflowClosure *core.CompiledWorkflowClosure) error {
-	err := f.RemoteFileWorkflowStore.PutFlyteWorkflowCRD(ctx, wf, f.flyteWfCRDCacheLoc)
-	if err != nil {
-		return err
-	}
-	return f.RemoteFileWorkflowStore.PutCompiledFlyteWorkflow(ctx, workflowClosure, f.flyteWfClosureCacheLoc)
+	group, ctx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		return f.RemoteFileWorkflowStore.PutFlyteWorkflowCRD(ctx, wf, f.flyteWfCRDCacheLoc)
+	})
+	group.Go(func() error {
+		return f.RemoteFileWorkflowStore.PutCompiledFlyteWorkflow(ctx, workflowClosure, f.flyteWfClosureCacheLoc)
+	})
+	return group.Wait()
 }
 
 type CacheContents struct {
@@ -71,12 +76,18 @@ type CacheContents struct {
 }
 
 func (f FutureFileReader) RetrieveCache(ctx context.Context) (CacheContents, error) {
-	workflowCRD, err := f.RemoteFileWorkflowStore.GetWorkflowCRD(ctx, f.flyteWfCRDCacheLoc)
-	if err != nil {
-		return CacheContents{}, err
-	}
-	compiledWorkflow, err := f.RemoteFileWorkflowStore.GetCompiledWorkflow(ctx, f.flyteWfClosureCacheLoc)
-	if err != nil {
+	group, ctx := errgroup.WithContext(ctx)
+	var workflowCRD *v1alpha1.FlyteWorkflow
+	group.Go(func() (err error) {
+		workflowCRD, err = f.RemoteFileWorkflowStore.GetWorkflowCRD(ctx, f.flyteWfCRDCacheLoc)
+		return
+	})
+	var compiledWorkflow *core.CompiledWorkflowClosure
+	group.Go(func() (err error) {
+		compiledWorkflow, err = f.RemoteFileWorkflowStore.GetCompiledWorkflow(ctx, f.flyteWfClosureCacheLoc)
+		return
+	})
+	if err := group.Wait(); err != nil {
 		return CacheContents{}, err
 	}
 	return CacheContents{

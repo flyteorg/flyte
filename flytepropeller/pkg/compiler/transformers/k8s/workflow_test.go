@@ -331,10 +331,10 @@ func TestBuildFlyteWorkflow_withBranch(t *testing.T) {
 	w := &core.CompiledWorkflowClosure{}
 	assert.NoError(t, utils.UnmarshalBytesToPb(c, w))
 
-	assert.Len(t, w.Primary.Connections.Downstream, 2)
-	ids := w.Primary.Connections.Downstream["start-node"]
-	assert.Len(t, ids.Ids, 1)
-	assert.Equal(t, ids.Ids[0], "n0")
+	assert.Len(t, w.GetPrimary().GetConnections().GetDownstream(), 2)
+	ids := w.GetPrimary().GetConnections().GetDownstream()["start-node"]
+	assert.Len(t, ids.GetIds(), 1)
+	assert.Equal(t, ids.GetIds()[0], "n0")
 
 	wf, err := BuildFlyteWorkflow(
 		w,

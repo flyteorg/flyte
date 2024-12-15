@@ -36,7 +36,7 @@ func dumpIdentifierNames(ids []common.Identifier) []string {
 	res := make([]string, 0, len(ids))
 
 	for _, id := range ids {
-		res = append(res, id.Name)
+		res = append(res, id.GetName())
 	}
 
 	return res
@@ -98,7 +98,7 @@ func ExampleCompileWorkflow_basic() {
 	for _, task := range tasks {
 		compiledTask, err := CompileTask(task)
 		if err != nil {
-			fmt.Printf("failed to compile task [%v]. Error: %v", task.Id, err)
+			fmt.Printf("failed to compile task [%v]. Error: %v", task.GetId(), err)
 			return
 		}
 
@@ -106,7 +106,7 @@ func ExampleCompileWorkflow_basic() {
 	}
 
 	output, errs := CompileWorkflow(inputWorkflow, subWorkflows, compiledTasks, workflows)
-	fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.Primary))
+	fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.GetPrimary()))
 	fmt.Printf("Compile Errors: %v\n", errs)
 
 	// Output:
@@ -195,8 +195,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	}
 
 	output, errs := CompileWorkflow(inputWorkflow, subWorkflows, compiledTasks, workflows)
-	assert.Equal(t, output.Primary.Template.FailureNode.Id, "FailureNode")
-	assert.NotNil(t, output.Primary.Template.FailureNode.GetTaskNode())
+	assert.Equal(t, output.GetPrimary().GetTemplate().GetFailureNode().GetId(), "FailureNode")
+	assert.NotNil(t, output.GetPrimary().GetTemplate().GetFailureNode().GetTaskNode())
 	assert.Nil(t, errs)
 }
 
@@ -287,7 +287,7 @@ func ExampleCompileWorkflow_inputsOutputsBinding() {
 	for _, task := range inputTasks {
 		compiledTask, err := CompileTask(task)
 		if err != nil {
-			fmt.Printf("Failed to compile task [%v]. Error: %v", task.Id, err)
+			fmt.Printf("Failed to compile task [%v]. Error: %v", task.GetId(), err)
 			return
 		}
 
@@ -298,7 +298,7 @@ func ExampleCompileWorkflow_inputsOutputsBinding() {
 	if errs != nil {
 		fmt.Printf("Compile Errors: %v\n", errs)
 	} else {
-		fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.Primary))
+		fmt.Printf("Compiled Workflow in GraphViz: %v\n", visualize.ToGraphViz(output.GetPrimary()))
 	}
 
 	// Output:
@@ -575,7 +575,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 
 	parentT.Run("TaskNode", func(t *testing.T) {
 		errs := errors.NewCompileErrors()
-		iface, ifaceOk := v.ValidateUnderlyingInterface(&g, &nodeBuilder{flyteNode: inputWorkflow.Nodes[0]}, errs)
+		iface, ifaceOk := v.ValidateUnderlyingInterface(&g, &nodeBuilder{flyteNode: inputWorkflow.GetNodes()[0]}, errs)
 		assert.True(t, ifaceOk)
 		assert.False(t, errs.HasErrors())
 		assert.Equal(t, taskIface, iface)
@@ -587,7 +587,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 			Target: &core.Node_WorkflowNode{
 				WorkflowNode: &core.WorkflowNode{
 					Reference: &core.WorkflowNode_SubWorkflowRef{
-						SubWorkflowRef: inputWorkflow.Id,
+						SubWorkflowRef: inputWorkflow.GetId(),
 					},
 				},
 			},
@@ -605,7 +605,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 					BranchNode: &core.BranchNode{
 						IfElse: &core.IfElseBlock{
 							Case: &core.IfBlock{
-								ThenNode: inputWorkflow.Nodes[0],
+								ThenNode: inputWorkflow.GetNodes()[0],
 							},
 						},
 					},
@@ -613,7 +613,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 			}}, errs)
 			assert.True(t, ifaceOk)
 			assert.False(t, errs.HasErrors())
-			assert.Equal(t, taskIface.Outputs, iface.Outputs)
+			assert.Equal(t, taskIface.GetOutputs(), iface.GetOutputs())
 		})
 
 		branchT.Run("TwoCases", func(t *testing.T) {
@@ -623,7 +623,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 					BranchNode: &core.BranchNode{
 						IfElse: &core.IfElseBlock{
 							Case: &core.IfBlock{
-								ThenNode: inputWorkflow.Nodes[0],
+								ThenNode: inputWorkflow.GetNodes()[0],
 							},
 							Other: []*core.IfBlock{
 								{
@@ -631,7 +631,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 										Target: &core.Node_WorkflowNode{
 											WorkflowNode: &core.WorkflowNode{
 												Reference: &core.WorkflowNode_SubWorkflowRef{
-													SubWorkflowRef: inputWorkflow.Id,
+													SubWorkflowRef: inputWorkflow.GetId(),
 												},
 											},
 										},
@@ -720,9 +720,9 @@ func TestCompileWorkflow(t *testing.T) {
 	assert.NoError(t, errs)
 	assert.NotNil(t, output)
 	if output != nil {
-		t.Logf("Graph Repr: %v", visualize.ToGraphViz(output.Primary))
+		t.Logf("Graph Repr: %v", visualize.ToGraphViz(output.GetPrimary()))
 
-		assert.Equal(t, []string{"node_123"}, output.Primary.Connections.Upstream["node_456"].Ids)
+		assert.Equal(t, []string{"node_123"}, output.GetPrimary().GetConnections().GetUpstream()["node_456"].GetIds())
 	}
 }
 

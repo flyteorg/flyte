@@ -26,13 +26,13 @@ func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
 func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
 	optional := true
 	return corev1.EnvVar{
-		Name: strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
+		Name: strings.ToUpper(K8sDefaultEnvVarPrefix + secret.GetGroup() + EnvVarGroupKeySeparator + secret.GetKey()),
 		ValueFrom: &corev1.EnvVarSource{
 			SecretKeyRef: &corev1.SecretKeySelector{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: secret.Group,
+					Name: secret.GetGroup(),
 				},
-				Key:      secret.Key,
+				Key:      secret.GetKey(),
 				Optional: &optional,
 			},
 		},
@@ -43,14 +43,14 @@ func CreateVolumeForSecret(secret *core.Secret) corev1.Volume {
 	optional := true
 	return corev1.Volume{
 		// we don't want to create different volume for the same secret group
-		Name: encoding.Base32Encoder.EncodeToString([]byte(secret.Group + EnvVarGroupKeySeparator + secret.GroupVersion)),
+		Name: encoding.Base32Encoder.EncodeToString([]byte(secret.GetGroup() + EnvVarGroupKeySeparator + secret.GetGroupVersion())),
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: secret.Group,
+				SecretName: secret.GetGroup(),
 				Items: []corev1.KeyToPath{
 					{
-						Key:  secret.Key,
-						Path: strings.ToLower(secret.Key),
+						Key:  secret.GetKey(),
+						Path: strings.ToLower(secret.GetKey()),
 					},
 				},
 				Optional: &optional,
@@ -63,7 +63,7 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 	return corev1.VolumeMount{
 		Name:      volumeName,
 		ReadOnly:  true,
-		MountPath: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.Group)),
+		MountPath: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.GetGroup())),
 	}
 }
 
@@ -130,15 +130,15 @@ func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVer
 	id := string(uuid.NewUUID())
 
 	secretVaultAnnotations := map[string]string{
-		fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", id): secret.Group,
-		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):   fmt.Sprintf("%s/%s", secret.Group, secret.Key),
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-secret-%s", id): secret.GetGroup(),
+		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):   fmt.Sprintf("%s/%s", secret.GetGroup(), secret.GetKey()),
 	}
 
 	// Set the consul template language query depending on the KV Secrets Engine version.
 	// Version 1 stores plain k:v pairs under .Data, version 2 supports versioned secrets
 	// and wraps the k:v pairs into an additional subfield.
 	var query string
-	switch secret.GroupVersion {
+	switch secret.GetGroupVersion() {
 	case "kv1":
 		query = ".Data"
 	case "kv2":
@@ -157,7 +157,7 @@ func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVer
 		}
 	}
 	if query != "" {
-		template := fmt.Sprintf(`{{- with secret "%s" -}}{{ %s.%s }}{{- end -}}`, secret.Group, query, secret.Key)
+		template := fmt.Sprintf(`{{- with secret "%s" -}}{{ %s.%s }}{{- end -}}`, secret.GetGroup(), query, secret.GetKey())
 		secretVaultAnnotations[fmt.Sprintf("vault.hashicorp.com/agent-inject-template-%s", id)] = template
 
 	}

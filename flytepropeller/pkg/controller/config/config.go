@@ -128,7 +128,7 @@ var (
 		LiteralOffloadingConfig: LiteralOffloadingConfig{
 			Enabled: false, // Default keep this disabled and we will followup when flytekit is released with the offloaded changes.
 			SupportedSDKVersions: map[string]string{ // The key is the SDK name (matches the supported SDK in core.RuntimeMetadata_RuntimeType)  and the value is the minimum supported version
-				"FLYTE_SDK": "1.13.5", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
+				"FLYTE_SDK": "1.13.14", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
 			},
 			MinSizeInMBForOffloading: 10,   // 10 MB is the default size for offloading
 			MaxSizeInMBForOffloading: 1000, // 1 GB is the default size before failing fast.
@@ -348,6 +348,7 @@ const (
 type ArrayNodeConfig struct {
 	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
+	UseMapPluginLogs           bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.

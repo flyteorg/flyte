@@ -36,7 +36,6 @@ const (
 	taintEffect          = "NoSchedule"
 	sandboxContextName   = "flyte-sandbox"
 	sandboxDockerContext = "default"
-	K8sEndpoint          = "https://127.0.0.1:6443"
 	sandboxK8sEndpoint   = "https://127.0.0.1:30086"
 	sandboxImageName     = "cr.flyte.org/flyteorg/flyte-sandbox"
 	demoImageName        = "cr.flyte.org/flyteorg/flyte-sandbox-bundled"
@@ -175,13 +174,8 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 	}
 
 	templateValues := configutil.ConfigTemplateSpec{
-		Host:     "localhost:30080",
+		Host:     "dns:///localhost:30080",
 		Insecure: true,
-		DataConfig: &configutil.DataConfig{
-			Endpoint:  "http://localhost:30002",
-			AccessKey: "minio",
-			SecretKey: "miniostorage",
-		},
 	}
 	if err := configutil.SetupConfig(configutil.FlytectlConfig, configutil.GetTemplate(), templateValues); err != nil {
 		return nil, err
@@ -285,12 +279,13 @@ func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdC
 		return err
 	}
 
+	k8sEndpoint := sandboxConfig.GetK8sEndpoint()
 	if reader != nil {
 		var k8sClient k8s.K8s
 		err = retry.Do(
 			func() error {
 				// This should wait for the kubeconfig file being there.
-				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, K8sEndpoint)
+				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, k8sEndpoint)
 				return err
 			},
 			retry.Attempts(10),
@@ -304,7 +299,7 @@ func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdC
 		err = retry.Do(
 			func() error {
 				// Have to get a new client every time because you run into x509 errors if not
-				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, K8sEndpoint)
+				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, k8sEndpoint)
 				if err != nil {
 					logger.Debugf(ctx, "Error getting K8s client in liveness check %s", err)
 					return err
@@ -403,7 +398,7 @@ func StartClusterForSandbox(ctx context.Context, args []string, sandboxConfig *s
 
 func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdConfig.Config) error {
 	sandboxImagePrefix := "sha"
-	exposedPorts, portBindings, err := docker.GetDemoPorts()
+	exposedPorts, portBindings, err := docker.GetDemoPorts(sandboxConfig.Port)
 	if err != nil {
 		return err
 	}

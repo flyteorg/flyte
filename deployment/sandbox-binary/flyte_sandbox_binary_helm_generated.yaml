@@ -79,6 +79,8 @@ data:
       level: 1
     propeller:
       create-flyteworkflow-crd: true
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -92,6 +94,9 @@ data:
         disabled: false
         seedProjects:
         - flytesnacks
+        seedProjectsWithDetails:
+        - description: Default project setup.
+          name: flytesnacks
       dataCatalog:
         disabled: false
       propeller:
@@ -117,7 +122,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.2"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.0"
       k8s-array:
         logs:
           config:
@@ -360,7 +365,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: faaefbd3b3b2ddfd4e718bd77c02c632c75e7111dad0a6e25dc415dc88add73f
+        checksum/configuration: ff48e911b1bb657b6d6ddb6f1e5059d3aa718aea09b14ee31353e66914173d64
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:

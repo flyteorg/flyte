@@ -175,7 +175,7 @@ func TestBuildNodeSpec(t *testing.T) {
 		n.Node.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
 				Reference: &core.WorkflowNode_SubWorkflowRef{
-					SubWorkflowRef: n.subWF.GetCoreWorkflow().Template.Id,
+					SubWorkflowRef: n.subWF.GetCoreWorkflow().GetTemplate().GetId(),
 				},
 			},
 		}
@@ -394,15 +394,15 @@ func TestBuildTasks(t *testing.T) {
 		taskMap := buildTasks(tasks, errs)
 
 		annInputTask := taskMap[(&core.Identifier{Name: "annotatedInput"}).String()]
-		assert.Nil(t, annInputTask.Interface.Inputs.Variables["a"].Type.Annotation)
+		assert.Nil(t, annInputTask.Interface.GetInputs().GetVariables()["a"].GetType().GetAnnotation())
 
 		unAnnInputTask := taskMap[(&core.Identifier{Name: "unannotatedInput"}).String()]
-		assert.Nil(t, unAnnInputTask.Interface.Inputs.Variables["a"].Type.Annotation)
+		assert.Nil(t, unAnnInputTask.Interface.GetInputs().GetVariables()["a"].GetType().GetAnnotation())
 
 		annOutputTask := taskMap[(&core.Identifier{Name: "annotatedOutput"}).String()]
-		assert.Nil(t, annOutputTask.Interface.Outputs.Variables["a"].Type.Annotation)
+		assert.Nil(t, annOutputTask.Interface.GetOutputs().GetVariables()["a"].GetType().GetAnnotation())
 
 		unAnnOutputTask := taskMap[(&core.Identifier{Name: "unannotatedOutput"}).String()]
-		assert.Nil(t, unAnnOutputTask.Interface.Outputs.Variables["a"].Type.Annotation)
+		assert.Nil(t, unAnnOutputTask.Interface.GetOutputs().GetVariables()["a"].GetType().GetAnnotation())
 	})
 }

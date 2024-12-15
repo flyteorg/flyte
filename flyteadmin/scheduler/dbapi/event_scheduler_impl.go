@@ -36,10 +36,10 @@ func (s *eventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 	var fixedRateUnit admin.FixedRateUnit
 	switch v := input.ScheduleExpression.GetScheduleExpression().(type) {
 	case *admin.Schedule_Rate:
-		fixedRateValue = v.Rate.Value
-		fixedRateUnit = v.Rate.Unit
+		fixedRateValue = v.Rate.GetValue()
+		fixedRateUnit = v.Rate.GetUnit()
 	case *admin.Schedule_CronSchedule:
-		cronString = v.CronSchedule.Schedule
+		cronString = v.CronSchedule.GetSchedule()
 	default:
 		return fmt.Errorf("failed adding schedule for unknown schedule expression type %v", v)
 	}
@@ -48,13 +48,13 @@ func (s *eventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 		CronExpression:      cronString,
 		FixedRateValue:      fixedRateValue,
 		Unit:                fixedRateUnit,
-		KickoffTimeInputArg: input.ScheduleExpression.KickoffTimeInputArg,
+		KickoffTimeInputArg: input.ScheduleExpression.GetKickoffTimeInputArg(),
 		Active:              &active,
 		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: input.Identifier.Project,
-			Domain:  input.Identifier.Domain,
-			Name:    input.Identifier.Name,
-			Version: input.Identifier.Version,
+			Project: input.Identifier.GetProject(),
+			Domain:  input.Identifier.GetDomain(),
+			Name:    input.Identifier.GetName(),
+			Version: input.Identifier.GetVersion(),
 		},
 	}
 	err := s.db.SchedulableEntityRepo().Activate(ctx, modelInput)
@@ -69,10 +69,10 @@ func (s *eventScheduler) RemoveSchedule(ctx context.Context, input interfaces.Re
 	logger.Infof(ctx, "Received call to remove schedule [%+v]. Will deactivate it in the scheduler", input.Identifier)
 
 	err := s.db.SchedulableEntityRepo().Deactivate(ctx, models.SchedulableEntityKey{
-		Project: input.Identifier.Project,
-		Domain:  input.Identifier.Domain,
-		Name:    input.Identifier.Name,
-		Version: input.Identifier.Version,
+		Project: input.Identifier.GetProject(),
+		Domain:  input.Identifier.GetDomain(),
+		Name:    input.Identifier.GetName(),
+		Version: input.Identifier.GetVersion(),
 	})
 
 	if err != nil {

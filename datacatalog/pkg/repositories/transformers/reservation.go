@@ -12,14 +12,14 @@ import (
 )
 
 func FromReservationID(reservationID *datacatalog.ReservationID) models.ReservationKey {
-	datasetID := reservationID.DatasetId
+	datasetID := reservationID.GetDatasetId()
 
 	return models.ReservationKey{
-		DatasetProject: datasetID.Project,
-		DatasetDomain:  datasetID.Domain,
-		DatasetName:    datasetID.Name,
-		DatasetVersion: datasetID.Version,
-		TagName:        reservationID.TagName,
+		DatasetProject: datasetID.GetProject(),
+		DatasetDomain:  datasetID.GetDomain(),
+		DatasetName:    datasetID.GetName(),
+		DatasetVersion: datasetID.GetVersion(),
+		TagName:        reservationID.GetTagName(),
 	}
 }
 

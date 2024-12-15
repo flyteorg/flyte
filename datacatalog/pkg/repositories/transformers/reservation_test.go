@@ -22,11 +22,11 @@ func TestFromReservationID(t *testing.T) {
 	}
 
 	reservationKey := FromReservationID(&reservationID)
-	assert.Equal(t, reservationKey.DatasetProject, reservationID.DatasetId.Project)
-	assert.Equal(t, reservationKey.DatasetName, reservationID.DatasetId.Name)
-	assert.Equal(t, reservationKey.DatasetDomain, reservationID.DatasetId.Domain)
-	assert.Equal(t, reservationKey.DatasetVersion, reservationID.DatasetId.Version)
-	assert.Equal(t, reservationKey.TagName, reservationID.TagName)
+	assert.Equal(t, reservationKey.DatasetProject, reservationID.GetDatasetId().GetProject())
+	assert.Equal(t, reservationKey.DatasetName, reservationID.GetDatasetId().GetName())
+	assert.Equal(t, reservationKey.DatasetDomain, reservationID.GetDatasetId().GetDomain())
+	assert.Equal(t, reservationKey.DatasetVersion, reservationID.GetDatasetId().GetVersion())
+	assert.Equal(t, reservationKey.TagName, reservationID.GetTagName())
 }
 
 func TestCreateReservation(t *testing.T) {
@@ -47,16 +47,16 @@ func TestCreateReservation(t *testing.T) {
 	reservation, err := CreateReservation(&modelReservation, heartbeatInterval)
 
 	assert.Equal(t, err, nil)
-	assert.Equal(t, reservation.ExpiresAt.AsTime(), modelReservation.ExpiresAt.UTC())
-	assert.Equal(t, reservation.HeartbeatInterval.AsDuration(), heartbeatInterval)
-	assert.Equal(t, reservation.OwnerId, modelReservation.OwnerID)
+	assert.Equal(t, reservation.GetExpiresAt().AsTime(), modelReservation.ExpiresAt.UTC())
+	assert.Equal(t, reservation.GetHeartbeatInterval().AsDuration(), heartbeatInterval)
+	assert.Equal(t, reservation.GetOwnerId(), modelReservation.OwnerID)
 
-	reservationID := reservation.ReservationId
-	assert.Equal(t, reservationID.TagName, modelReservation.TagName)
+	reservationID := reservation.GetReservationId()
+	assert.Equal(t, reservationID.GetTagName(), modelReservation.TagName)
 
-	datasetID := reservationID.DatasetId
-	assert.Equal(t, datasetID.Project, modelReservation.DatasetProject)
-	assert.Equal(t, datasetID.Name, modelReservation.DatasetName)
-	assert.Equal(t, datasetID.Domain, modelReservation.DatasetDomain)
-	assert.Equal(t, datasetID.Version, modelReservation.DatasetVersion)
+	datasetID := reservationID.GetDatasetId()
+	assert.Equal(t, datasetID.GetProject(), modelReservation.DatasetProject)
+	assert.Equal(t, datasetID.GetName(), modelReservation.DatasetName)
+	assert.Equal(t, datasetID.GetDomain(), modelReservation.DatasetDomain)
+	assert.Equal(t, datasetID.GetVersion(), modelReservation.DatasetVersion)
 }

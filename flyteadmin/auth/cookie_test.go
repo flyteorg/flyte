@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
+	serverConfig "github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -26,22 +26,53 @@ func mustParseURL(t testing.TB, u string) url.URL {
 	return *res
 }
 
-// This function can also be called locally to generate new keys
 func TestSecureCookieLifecycle(t *testing.T) {
-	hashKey := securecookie.GenerateRandomKey(64)
-	assert.True(t, base64.RawStdEncoding.EncodeToString(hashKey) != "")
+	tests := []struct {
+		name                 string
+		insecureCookieHeader bool
+		expectedSecure       bool
+	}{
+		{
+			name:                 "secure_cookie",
+			insecureCookieHeader: false,
+			expectedSecure:       true,
+		},
+		{
+			name:                 "insecure_cookie",
+			insecureCookieHeader: true,
+			expectedSecure:       false,
+		},
+	}
 
-	blockKey := securecookie.GenerateRandomKey(32)
-	assert.True(t, base64.RawStdEncoding.EncodeToString(blockKey) != "")
-	fmt.Printf("Hash key: |%s| Block key: |%s|\n",
-		base64.RawStdEncoding.EncodeToString(hashKey), base64.RawStdEncoding.EncodeToString(blockKey))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Generate hash and block keys for secure cookie
+			hashKey := securecookie.GenerateRandomKey(64)
+			assert.True(t, base64.RawStdEncoding.EncodeToString(hashKey) != "")
 
-	cookie, err := NewSecureCookie("choc", "chip", hashKey, blockKey, "localhost", http.SameSiteLaxMode)
-	assert.NoError(t, err)
+			blockKey := securecookie.GenerateRandomKey(32)
+			assert.True(t, base64.RawStdEncoding.EncodeToString(blockKey) != "")
 
-	value, err := ReadSecureCookie(context.Background(), cookie, hashKey, blockKey)
-	assert.NoError(t, err)
-	assert.Equal(t, "chip", value)
+			// Set up server configuration with insecureCookieHeader option
+			serverConfig.SetConfig(&serverConfig.ServerConfig{
+				Security: serverConfig.ServerSecurityOptions{
+					InsecureCookieHeader: tt.insecureCookieHeader,
+				},
+			})
+
+			// Create a secure cookie
+			cookie, err := NewSecureCookie("choc", "chip", hashKey, blockKey, "localhost", http.SameSiteLaxMode)
+			assert.NoError(t, err)
+
+			// Validate the Secure attribute of the cookie
+			assert.Equal(t, tt.expectedSecure, cookie.Secure)
+
+			// Read and validate the secure cookie value
+			value, err := ReadSecureCookie(context.Background(), cookie, hashKey, blockKey)
+			assert.NoError(t, err)
+			assert.Equal(t, "chip", value)
+		})
+	}
 }
 
 func TestNewCsrfToken(t *testing.T) {
@@ -50,9 +81,41 @@ func TestNewCsrfToken(t *testing.T) {
 }
 
 func TestNewCsrfCookie(t *testing.T) {
-	cookie := NewCsrfCookie()
-	assert.Equal(t, "flyte_csrf_state", cookie.Name)
-	assert.True(t, cookie.HttpOnly)
+	tests := []struct {
+		name                 string
+		insecureCookieHeader bool
+		expectedSecure       bool
+	}{
+		{
+			name:                 "secure_csrf_cookie",
+			insecureCookieHeader: false,
+			expectedSecure:       true,
+		},
+		{
+			name:                 "insecure_csrf_cookie",
+			insecureCookieHeader: true,
+			expectedSecure:       false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set up server configuration with insecureCookieHeader option
+			serverConfig.SetConfig(&serverConfig.ServerConfig{
+				Security: serverConfig.ServerSecurityOptions{
+					InsecureCookieHeader: tt.insecureCookieHeader,
+				},
+			})
+
+			// Generate CSRF cookie
+			cookie := NewCsrfCookie()
+
+			// Validate CSRF cookie properties
+			assert.Equal(t, "flyte_csrf_state", cookie.Name)
+			assert.True(t, cookie.HttpOnly)
+			assert.Equal(t, tt.expectedSecure, cookie.Secure)
+		})
+	}
 }
 
 func TestHashCsrfState(t *testing.T) {
@@ -121,6 +184,36 @@ func TestNewRedirectCookie(t *testing.T) {
 		assert.NotNil(t, cookie)
 		assert.Equal(t, http.SameSiteLaxMode, cookie.SameSite)
 	})
+
+	tests := []struct {
+		name                 string
+		insecureCookieHeader bool
+		expectedSecure       bool
+	}{
+		{
+			name:                 "secure_cookies",
+			insecureCookieHeader: false,
+			expectedSecure:       true,
+		},
+		{
+			name:                 "insecure_cookies",
+			insecureCookieHeader: true,
+			expectedSecure:       false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			serverConfig.SetConfig(&serverConfig.ServerConfig{
+				Security: serverConfig.ServerSecurityOptions{
+					InsecureCookieHeader: tt.insecureCookieHeader,
+				},
+			})
+			ctx := context.Background()
+			cookie := NewRedirectCookie(ctx, "http://www.example.com/postLogin")
+			assert.NotNil(t, cookie)
+			assert.Equal(t, cookie.Secure, tt.expectedSecure)
+		})
+	}
 }
 
 func TestGetAuthFlowEndRedirect(t *testing.T) {

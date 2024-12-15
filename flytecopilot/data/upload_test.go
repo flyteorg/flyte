@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"testing"
@@ -21,7 +21,7 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 	tmpPrefix := "upload_test"
 
 	t.Run("upload-blob", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir(tmpFolderLocation, tmpPrefix)
+		tmpDir, err := os.MkdirTemp(tmpFolderLocation, tmpPrefix)
 		assert.NoError(t, err)
 		defer func() {
 			assert.NoError(t, os.RemoveAll(tmpDir))
@@ -36,7 +36,7 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 		}
 
 		data := []byte("data")
-		assert.NoError(t, ioutil.WriteFile(path.Join(tmpDir, "x"), data, os.ModePerm))
+		assert.NoError(t, os.WriteFile(path.Join(tmpDir, "x"), data, os.ModePerm)) // #nosec G306
 		fmt.Printf("Written to %s ", path.Join(tmpDir, "x"))
 
 		store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
@@ -49,15 +49,15 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 
 		outputs := &core.LiteralMap{}
 		assert.NoError(t, store.ReadProtobuf(context.TODO(), outputRef, outputs))
-		assert.Len(t, outputs.Literals, 1)
-		assert.NotNil(t, outputs.Literals["x"])
-		assert.NotNil(t, outputs.Literals["x"].GetScalar())
-		assert.NotNil(t, outputs.Literals["x"].GetScalar().GetBlob())
-		ref := storage.DataReference(outputs.Literals["x"].GetScalar().GetBlob().GetUri())
+		assert.Len(t, outputs.GetLiterals(), 1)
+		assert.NotNil(t, outputs.GetLiterals()["x"])
+		assert.NotNil(t, outputs.GetLiterals()["x"].GetScalar())
+		assert.NotNil(t, outputs.GetLiterals()["x"].GetScalar().GetBlob())
+		ref := storage.DataReference(outputs.GetLiterals()["x"].GetScalar().GetBlob().GetUri())
 		r, err := store.ReadRaw(context.TODO(), ref)
 		assert.NoError(t, err, "%s does not exist", ref)
 		defer r.Close()
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		assert.NoError(t, err)
 		assert.Equal(t, string(data), string(b), "content dont match")
 	})

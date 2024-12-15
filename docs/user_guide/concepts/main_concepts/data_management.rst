@@ -159,17 +159,6 @@ Between Tasks
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_transfer.png
 
-
-Bringing in Your Own Datastores for Raw Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Flytekit has a pluggable data persistence layer.
-This is driven by PROTOCOL.
-For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
-But for Metadata, the data should be accessible to Flyte control plane.
-
-Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in Flytestdlib.
-
 Practical Example
 ~~~~~~~~~~~~~~~~~
 
@@ -180,19 +169,18 @@ The first task reads a file from the object store, shuffles the data, saves to l
 .. code-block:: python
 
     @task()
-    def task_remove_column(input_file: FlyteFile, column_name: str) -> FlyteFile:
+    def task_read_and_shuffle_file(input_file: FlyteFile) -> FlyteFile:
         """
-        Reads the input file as a DataFrame, removes a specified column, and outputs it as a new file.
+        Reads the input file as a DataFrame, shuffles the rows, and writes the shuffled DataFrame to a new file.
         """
         input_file.download()
         df = pd.read_csv(input_file.path)
 
-        # remove column
-        if column_name in df.columns:
-            df = df.drop(columns=[column_name])
+        # Shuffle the DataFrame rows
+        shuffled_df = df.sample(frac=1).reset_index(drop=True)
 
-        output_file_path = "data_finished.csv"
-        df.to_csv(output_file_path, index=False)
+        output_file_path = "data_shuffle.csv"
+        shuffled_df.to_csv(output_file_path, index=False)
 
         return FlyteFile(output_file_path)
        ...
@@ -241,3 +229,20 @@ First task output metadata:
 Second task input metadata:
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_input.png
+
+Bringing in Your Own Datastores for Raw Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flytekit has a pluggable data persistence layer.
+This is driven by PROTOCOL.
+For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
+But for Metadata, the data should be accessible to Flyte control plane.
+
+Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in Flytestdlib.
+
+Deleting Raw Data in Your Own Datastores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flyte does not offer a direct function to delete raw data stored in external datastores like ``S3`` or ``GCS``. However, you can manage deletion by configuring a lifecycle policy within your datastore service.
+
+If caching is enabled in your Flyte ``task``, ensure that the ``max-cache-age`` is set to be shorter than the lifecycle policy in your datastore to prevent potential data inconsistency issues.

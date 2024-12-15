@@ -372,7 +372,7 @@ func NewJobStore(ctx context.Context, batchClient Client, cfg config.JobStoreCon
 
 	autoCache, err := cache.NewAutoRefreshBatchedCache("aws-batch-jobs", batchJobsForSync(ctx, cfg.BatchChunkSize),
 		syncBatches(ctx, store, handler, cfg.BatchChunkSize), workqueue.DefaultControllerRateLimiter(), cfg.ResyncPeriod.Duration,
-		cfg.Parallelizm, cfg.CacheSize, scope)
+		uint(cfg.Parallelism), uint(cfg.CacheSize), scope) // #nosec G115
 
 	store.AutoRefresh = autoCache
 	return store, err

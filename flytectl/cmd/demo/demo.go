@@ -6,11 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	flyteNs     = "flyte"
-	K8sEndpoint = "https://127.0.0.1:6443"
-)
-
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
 	demoShort = `Helps with demo interactions like start, teardown, status, and exec.`

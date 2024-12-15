@@ -143,6 +143,18 @@ Max number of gRPC retries
   "4"
   
 
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 authType (uint8)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1389,6 +1401,18 @@ kafka (`interfaces.KafkaConfig`_)
 .. code-block:: yaml
 
   brokers: null
+  saslConfig:
+    enabled: false
+    handshake: false
+    mechanism: ""
+    password: ""
+    passwordPath: ""
+    user: ""
+  tlsConfig:
+    certPath: ""
+    enabled: false
+    insecureSkipVerify: false
+    keyPath: ""
   version: ""
   
 
@@ -1503,6 +1527,140 @@ brokers ([]string)
 .. code-block:: yaml
 
   null
+  
+
+saslConfig (`interfaces.SASLConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  handshake: false
+  mechanism: ""
+  password: ""
+  passwordPath: ""
+  user: ""
+  
+
+tlsConfig (`interfaces.TLSConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  certPath: ""
+  enabled: false
+  insecureSkipVerify: false
+  keyPath: ""
+  
+
+interfaces.SASLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+user (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+handshake (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+mechanism (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.TLSConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureSkipVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+certPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+keyPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: cluster_resources
@@ -1751,6 +1909,7 @@ postgres (`database.PostgresConfig`_)
   password: postgres
   passwordPath: ""
   port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -1771,6 +1930,18 @@ host (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
 
 **Default Value**: 
 
@@ -2769,6 +2940,7 @@ k8s (`config.K8sPluginConfig`_)
 
 .. code-block:: yaml
 
+  add-tolerations-for-extended-resources: []
   co-pilot:
     cpu: 500m
     default-input-path: /var/flyte/inputs
@@ -3312,6 +3484,18 @@ Number of retries for exponential backoff when updating a resource.
 .. code-block:: yaml
 
   "5"
+  
+
+add-tolerations-for-extended-resources ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the extended resources for which tolerations should be added.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
   
 
 config.FlyteCoPilotConfig
@@ -3956,6 +4140,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  use-map-plugin-logs: false
   
 
 literal-offloading-config (`config.LiteralOffloadingConfig`_)
@@ -3971,7 +4156,7 @@ config used for literal offloading.
   max-size-in-mb-for-offloading: 1000
   min-size-in-mb-for-offloading: 10
   supported-sdk-versions:
-    FLYTE_SDK: 1.13.5
+    FLYTE_SDK: 1.13.14
   
 
 config.ArrayNodeConfig
@@ -3999,6 +4184,18 @@ Default parallelism behavior for array nodes
 .. code-block:: yaml
 
   unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
@@ -4316,7 +4513,7 @@ Maps flytekit and union SDK names to minimum supported version that can handle r
 
 .. code-block:: yaml
 
-  FLYTE_SDK: 1.13.5
+  FLYTE_SDK: 1.13.14
   
 
 min-size-in-mb-for-offloading (int64)
@@ -5014,6 +5211,7 @@ security (`config.ServerSecurityOptions`_)
   allowedOrigins:
   - '*'
   auditAccess: false
+  insecureCookieHeader: false
   secure: false
   ssl:
     certificateFile: ""
@@ -5305,6 +5503,16 @@ ssl (`config.SslOptions`_)
   
 
 useAuth (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureCookieHeader (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 

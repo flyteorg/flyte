@@ -11,4 +11,4 @@ This is one of the core components of Flyte. It contains the Specification of th
 
 ## Contributing to Flyteidl
 
-See the [contributing docs](protocs/contributing.md) for more information.
+See the [contributing docs](protos/docs/contributing.md) for more information.

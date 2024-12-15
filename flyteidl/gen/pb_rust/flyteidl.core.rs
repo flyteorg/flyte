@@ -1385,6 +1385,10 @@ pub struct TaskMetadata {
     /// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     #[prost(string, repeated, tag="13")]
     pub cache_ignore_input_vars: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// is_eager indicates whether the task is eager or not.
+    /// This would be used by CreateTask endpoint.
+    #[prost(bool, tag="14")]
+    pub is_eager: bool,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
@@ -2129,6 +2133,12 @@ pub struct ExecutionError {
     pub error_uri: ::prost::alloc::string::String,
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ExecutionError`.
 pub mod execution_error {
@@ -2425,6 +2435,9 @@ pub struct ArrayNode {
     /// execution_mode determines the execution path for ArrayNode.
     #[prost(enumeration="array_node::ExecutionMode", tag="5")]
     pub execution_mode: i32,
+    /// Indicates whether the sub node's original interface was altered
+    #[prost(message, optional, tag="6")]
+    pub is_original_sub_node_interface: ::core::option::Option<bool>,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -3091,6 +3104,12 @@ pub struct ContainerError {
     /// Defines the origin of the error (system, user, unknown).
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub origin: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ContainerError`.
 pub mod container_error {

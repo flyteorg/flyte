@@ -3,6 +3,7 @@ package flytek8s
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
@@ -1529,7 +1530,7 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
-		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
+		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().GetCode())
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
@@ -1549,7 +1550,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
 	})
 
 	t.Run("InitContainer OOMKilled", func(t *testing.T) {
@@ -1566,7 +1567,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -1581,16 +1582,16 @@ func TestDemystifyFailure(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(v1.PodStatus{}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "UnknownError", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "UnknownError", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("known-error", func(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "hello", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "hello", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("OOMKilled", func(t *testing.T) {
@@ -1608,8 +1609,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("SIGKILL", func(t *testing.T) {
@@ -1627,8 +1628,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
@@ -1649,9 +1650,9 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Contains(t, phaseInfo.Err().Message, containerReason)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
@@ -1672,9 +1673,9 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Contains(t, phaseInfo.Err().Message, containerReason)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
 	})
 }
 
@@ -1705,8 +1706,8 @@ func TestDemystifyPending_testcases(t *testing.T) {
 					assert.NotNil(t, p)
 					assert.Equal(t, p.Phase(), pluginsCore.PhaseRetryableFailure)
 					if assert.NotNil(t, p.Err()) {
-						assert.Equal(t, p.Err().Code, tt.errCode)
-						assert.Equal(t, p.Err().Message, tt.message)
+						assert.Equal(t, p.Err().GetCode(), tt.errCode)
+						assert.Equal(t, p.Err().GetMessage(), tt.message)
 					}
 				}
 			}
@@ -1765,8 +1766,8 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container succeeded", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
@@ -1786,8 +1787,8 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			secondaryContainer,
 		}, info)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
-		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().Code)
-		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
+		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().GetCode())
+		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed with OOMKilled", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
@@ -1803,8 +1804,8 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 }
 
@@ -1934,6 +1935,14 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Name: "bar",
 			},
 		},
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name: "foo-init",
+			},
+			v1.Container{
+				Name: "foo-bar",
+			},
+		},
 	}
 
 	objectMeta := metav1.ObjectMeta{
@@ -1954,7 +1963,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podSpec, *resultPodSpec))
 		assert.True(t, reflect.DeepEqual(objectMeta, *resultObjectMeta))
@@ -1964,6 +1973,11 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
 			Name:                   primaryContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-termination-log",
+		}
+
+		primaryInitContainerTemplate := v1.Container{
+			Name:                   primaryInitContainerTemplateName,
+			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
 		podTemplate := v1.PodTemplate{
@@ -1981,6 +1995,9 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						primaryContainerTemplate,
+					},
+					InitContainers: []v1.Container{
+						primaryInitContainerTemplate,
 					},
 				},
 			},
@@ -2008,13 +2025,16 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 
 		// test that template podSpec is merged
 		primaryContainer := resultPodSpec.Containers[0]
 		assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 		assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+		primaryInitContainer := resultPodSpec.InitContainers[0]
+		assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
+		assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
 
 		// test that template object metadata is copied
 		assert.Contains(t, resultObjectMeta.Labels, "fooKey")
@@ -2027,13 +2047,13 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
 
-	podSpec1, _ := mergePodSpecs(nil, nil, "foo")
+	podSpec1, _ := mergePodSpecs(nil, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec1)
 
-	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo")
+	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec2)
 
-	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo")
+	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo", "foo-init")
 	assert.Nil(t, podSpec3)
 
 	podSpec := v1.PodSpec{
@@ -2049,6 +2069,20 @@ func TestMergePodSpecs(t *testing.T) {
 			},
 			v1.Container{
 				Name: "bar",
+			},
+		},
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name: "primary-init",
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name:      "nccl",
+						MountPath: "abc",
+					},
+				},
+			},
+			v1.Container{
+				Name: "bar-init",
 			},
 		},
 		NodeSelector: map[string]string{
@@ -2076,10 +2110,24 @@ func TestMergePodSpecs(t *testing.T) {
 		TerminationMessagePath: "/dev/primary-termination-log",
 	}
 
+	defaultInitContainerTemplate := v1.Container{
+		Name:                   defaultInitContainerTemplateName,
+		TerminationMessagePath: "/dev/default-init-termination-log",
+	}
+
+	primaryInitContainerTemplate := v1.Container{
+		Name:                   primaryInitContainerTemplateName,
+		TerminationMessagePath: "/dev/primary-init-termination-log",
+	}
+
 	podTemplateSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			defaultContainerTemplate,
 			primaryContainerTemplate,
+		},
+		InitContainers: []v1.Container{
+			defaultInitContainerTemplate,
+			primaryInitContainerTemplate,
 		},
 		HostNetwork: true,
 		NodeSelector: map[string]string{
@@ -2093,7 +2141,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary")
+	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary", "primary-init")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -2117,6 +2165,17 @@ func TestMergePodSpecs(t *testing.T) {
 	defaultContainer := mergedPodSpec.Containers[1]
 	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
 	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
+
+	// validate primary init container
+	primaryInitContainer := mergedPodSpec.InitContainers[0]
+	assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
+	assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
+	assert.Equal(t, 1, len(primaryInitContainer.VolumeMounts))
+
+	// validate default init container
+	defaultInitContainer := mergedPodSpec.InitContainers[1]
+	assert.Equal(t, podSpec.InitContainers[1].Name, defaultInitContainer.Name)
+	assert.Equal(t, defaultInitContainerTemplate.TerminationMessagePath, defaultInitContainer.TerminationMessagePath)
 }
 
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
@@ -2185,4 +2244,113 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAddTolerationsForExtendedResources(t *testing.T) {
+	gpuResourceName := v1.ResourceName("nvidia.com/gpu")
+	addTolerationResourceName := v1.ResourceName("foo/bar")
+	noTolerationResourceName := v1.ResourceName("foo/baz")
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuResourceName: gpuResourceName,
+		AddTolerationsForExtendedResources: []string{
+			gpuResourceName.String(),
+			addTolerationResourceName.String(),
+		},
+	}))
+
+	podSpec := &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	fmt.Printf("%v\n", podSpec.Tolerations)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      gpuResourceName.String(),
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
 }

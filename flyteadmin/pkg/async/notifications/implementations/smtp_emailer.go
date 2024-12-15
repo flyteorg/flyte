@@ -72,11 +72,11 @@ func (s *SMTPEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) 
 		s.smtpClient = smtpClient
 	}
 
-	if err := s.smtpClient.Mail(email.SenderEmail); err != nil {
+	if err := s.smtpClient.Mail(email.GetSenderEmail()); err != nil {
 		return s.emailError(ctx, fmt.Sprintf("Error creating email instance: %s", err))
 	}
 
-	for _, recipient := range email.RecipientsEmail {
+	for _, recipient := range email.GetRecipientsEmail() {
 		if err := s.smtpClient.Rcpt(recipient); err != nil {
 			return s.emailError(ctx, fmt.Sprintf("Error adding email recipient: %s", err))
 		}
@@ -113,8 +113,8 @@ func (s *SMTPEmailer) emailError(ctx context.Context, error string) error {
 func createMailBody(emailSender string, email *admin.EmailMessage) string {
 	headerMap := make(map[string]string)
 	headerMap["From"] = emailSender
-	headerMap["To"] = strings.Join(email.RecipientsEmail, ",")
-	headerMap["Subject"] = email.SubjectLine
+	headerMap["To"] = strings.Join(email.GetRecipientsEmail(), ",")
+	headerMap["Subject"] = email.GetSubjectLine()
 	headerMap["Content-Type"] = "text/html; charset=\"UTF-8\""
 
 	mailMessage := ""
@@ -123,7 +123,7 @@ func createMailBody(emailSender string, email *admin.EmailMessage) string {
 		mailMessage += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 
-	mailMessage += "\r\n" + email.Body
+	mailMessage += "\r\n" + email.GetBody()
 
 	return mailMessage
 }
@@ -140,7 +140,7 @@ func NewSMTPEmailer(ctx context.Context, config runtimeInterfaces.NotificationsC
 
 	auth := smtp.PlainAuth("", emailConf.SMTPUsername, smtpPassword, emailConf.SMTPServer)
 
-	// #nosec G402
+	// #nosec G402: Allow skipping TLS verification in specific environments.
 	tlsConfiguration = &tls.Config{
 		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify,
 		ServerName:         emailConf.SMTPServer,

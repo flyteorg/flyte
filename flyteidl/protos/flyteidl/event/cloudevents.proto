@@ -28,6 +28,9 @@ message CloudEventWorkflowExecution {
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
   core.Identifier launch_plan_id = 6;
+
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  map<string,string> labels = 7;
 }
 
 message CloudEventNodeExecution {
@@ -48,10 +51,15 @@ message CloudEventNodeExecution {
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
   core.Identifier launch_plan_id = 6;
+
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  map<string,string> labels = 7;
 }
 
 message CloudEventTaskExecution {
   event.TaskExecutionEvent raw_event = 1;
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  map<string,string> labels = 2;
 }
 
 // This event is to be sent by Admin after it creates an execution.

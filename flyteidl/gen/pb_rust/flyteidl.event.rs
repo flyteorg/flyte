@@ -100,6 +100,9 @@ pub struct NodeExecutionEvent {
     /// as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
     #[prost(bool, tag="24")]
     pub is_in_dynamic_chain: bool,
+    /// Whether this node launched an eager task.
+    #[prost(bool, tag="25")]
+    pub is_eager: bool,
     #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
     #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15")]
@@ -421,6 +424,9 @@ pub struct CloudEventWorkflowExecution {
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
     #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="7")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -444,12 +450,18 @@ pub struct CloudEventNodeExecution {
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
     #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="7")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CloudEventTaskExecution {
     #[prost(message, optional, tag="1")]
     pub raw_event: ::core::option::Option<TaskExecutionEvent>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="2")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// This event is to be sent by Admin after it creates an execution.
 #[allow(clippy::derive_partial_eq_without_eq)]

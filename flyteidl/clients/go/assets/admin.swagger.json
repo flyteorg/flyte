@@ -5705,6 +5705,10 @@
         "is_array": {
           "type": "boolean",
           "description": "Boolean flag indicating if the node is an array node. This is intended to uniquely identify\narray nodes from other nodes which can have is_parent_node as true."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "Whether this node is an eager node."
         }
       },
       "title": "Represents additional attributes related to a Node Execution"
@@ -6560,6 +6564,10 @@
         "execution_mode": {
           "$ref": "#/definitions/coreArrayNodeExecutionMode",
           "description": "execution_mode determines the execution path for ArrayNode."
+        },
+        "is_original_sub_node_interface": {
+          "type": "boolean",
+          "title": "Indicates whether the sub node's original interface was altered"
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
@@ -7153,6 +7161,15 @@
         },
         "kind": {
           "$ref": "#/definitions/ExecutionErrorErrorKind"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp of the error"
+        },
+        "worker": {
+          "type": "string",
+          "title": "Worker that generated the error"
         }
       },
       "description": "Represents the error message from the execution."
@@ -8260,6 +8277,10 @@
             "type": "string"
           },
           "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
         }
       },
       "title": "Task Metadata"
@@ -8755,6 +8776,10 @@
         "is_in_dynamic_chain": {
           "type": "boolean",
           "description": "Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of\nthe tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not\neven registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea\nif the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,\nas well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "Whether this node launched an eager task."
         }
       }
     },

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/time/rate"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -64,6 +65,7 @@ type PluginMetrics struct {
 	GetCacheHit     labeled.StopWatch
 	GetAPILatency   labeled.StopWatch
 	ResourceDeleted labeled.Counter
+	TaskPodErrors   *prometheus.CounterVec
 }
 
 func newPluginMetrics(s promutils.Scope) PluginMetrics {
@@ -77,6 +79,8 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 			time.Millisecond, s),
 		ResourceDeleted: labeled.NewCounter("pods_deleted", "Counts how many times CheckTaskStatus is"+
 			" called with a deleted resource.", s),
+		TaskPodErrors: s.MustNewCounterVec("task_pod_errors", "Counts how many times task pods failed in given phase with given code",
+			"phase", "error_code"),
 	}
 }
 
@@ -290,7 +294,12 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		var opReader io.OutputReader
 		if pCtx.ow == nil {
 			logger.Infof(ctx, "Plugin [%s] returned no outputReader, assuming file based outputs", e.id)
-			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
+			opReader, err = ioutils.NewRemoteFileOutputReaderWithErrorAggregationStrategy(
+				ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0,
+				e.plugin.GetProperties().ErrorAggregationStrategy)
+			if err != nil {
+				return pluginsCore.UnknownTransition, err
+			}
 		} else {
 			logger.Infof(ctx, "Plugin [%s] returned outputReader", e.id)
 			opReader = pCtx.ow.GetReader()
@@ -350,14 +359,19 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 		return transition, err
 	}
 
+	phaseInfo := transition.Info()
+	if phaseInfo.Err() != nil {
+		e.metrics.TaskPodErrors.WithLabelValues(phaseInfo.Phase().String(), phaseInfo.Err().GetCode()).Inc()
+	}
+
 	// Add events since last update
-	version := transition.Info().Version()
+	version := phaseInfo.Version()
 	lastEventUpdate := pluginState.LastEventUpdate
 	if e.eventWatcher != nil && o != nil {
 		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 		recentEvents := e.eventWatcher.List(nsName, lastEventUpdate)
 		if len(recentEvents) > 0 {
-			taskInfo := transition.Info().Info()
+			taskInfo := phaseInfo.Info()
 			taskInfo.AdditionalReasons = make([]pluginsCore.ReasonInfo, 0, len(recentEvents))
 			for _, event := range recentEvents {
 				taskInfo.AdditionalReasons = append(taskInfo.AdditionalReasons,
@@ -373,9 +387,9 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	newPluginState := PluginState{
 		Phase: pluginPhase,
 		K8sPluginState: k8s.PluginState{
-			Phase:        transition.Info().Phase(),
+			Phase:        phaseInfo.Phase(),
 			PhaseVersion: version,
-			Reason:       transition.Info().Reason(),
+			Reason:       phaseInfo.Reason(),
 		},
 		LastEventUpdate: lastEventUpdate,
 	}
