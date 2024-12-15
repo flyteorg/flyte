@@ -25,9 +25,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-    pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-
 )
 
 const KindSparkApplication = "SparkApplication"
@@ -143,18 +142,30 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, container *v1.Container, k8sPod *core.K8SPod) *sparkOp.SparkPodSpec {
+func createSparkPodSpec(
+	taskCtx pluginsCore.TaskExecutionContext,
+	podSpec *v1.PodSpec,
+	container *v1.Container,
+	k8sPod *core.K8SPod,
+) *sparkOp.SparkPodSpec {
+
 	// TODO: check whether merge annotations/labels together or other ways?
-    annotations := pluginsUtils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
-    labels := pluginsUtils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
-    if k8sPod != nil && k8sPod.Metadata != nil{
-        if k8sPod.Metadata.Annotations != nil {
-            annotations = pluginsUtils.UnionMaps(annotations, k8sPod.Metadata.Annotations)
-        }
-        if k8sPod.Metadata.Labels != nil {
-            labels = pluginsUtils.UnionMaps(labels, k8sPod.Metadata.Labels)
-        }
-    } 
+	annotations := pluginsUtils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultAnnotations,
+		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+	)
+	labels := pluginsUtils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultLabels,
+		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
+	)
+	if k8sPod != nil && k8sPod.Metadata != nil {
+		if k8sPod.Metadata.Annotations != nil {
+			annotations = pluginsUtils.UnionMaps(annotations, k8sPod.Metadata.Annotations)
+		}
+		if k8sPod.Metadata.Labels != nil {
+			labels = pluginsUtils.UnionMaps(labels, k8sPod.Metadata.Labels)
+		}
+	}
 
 	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
@@ -190,10 +201,17 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		return nil, err
 	}
 
-	// If DriverPod exist in sparkJob and is primary, use it instead
-    driverPod := sparkJob.GetDriverPod()
+	driverPod := sparkJob.GetDriverPod()
 	if driverPod != nil {
-		podSpec, err = unmarshalK8sPod(podSpec, driverPod, primaryContainerName)
+		var customPodSpec *v1.PodSpec
+
+		err = utils.UnmarshalStructToObj(driverPod.PodSpec, &customPodSpec)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"Unable to unmarshal pod spec [%v], Err: [%v]", driverPod.PodSpec, err.Error())
+		}
+
+		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
 		if err != nil {
 			return nil, err
 		}
@@ -218,38 +236,6 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	return &spec, nil
 }
 
-// Unmarshal pod spec from K8SPod
-//
-// Return task's generated pod spec if K8SPod PodSpec is not available
-func unmarshalK8sPod(podSpec *v1.PodSpec, k8sPod *core.K8SPod, primaryContainerName string) (*v1.PodSpec, error) {
-	if k8sPod == nil {
-		return podSpec, nil
-	}
-
-	if k8sPod.PodSpec == nil {
-		return podSpec, nil
-	}
-
-	var customPodSpec *v1.PodSpec
-
-	err := utils.UnmarshalStructToObj(k8sPod.PodSpec, &customPodSpec)
-	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification,
-			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.PodSpec, err.Error())
-	}
-
-	primaryContainers := []v1.Container{}
-	for _, container := range customPodSpec.Containers {
-		// Only support the primary container for now
-		if container.Name == primaryContainerName {
-			primaryContainers = append(primaryContainers, container)
-		}
-	}
-	customPodSpec.Containers = primaryContainers
-
-	return customPodSpec, nil
-}
-
 type executorSpec struct {
 	container          *v1.Container
 	sparkSpec          *sparkOp.ExecutorSpec
@@ -262,9 +248,17 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		return nil, err
 	}
 
-	// If ExecutorPod exist in sparkJob and is primary, use it instead
-	if sparkJob.ExecutorPod != nil {
-		podSpec, err = unmarshalK8sPod(podSpec, sparkJob.ExecutorPod, primaryContainerName)
+	executorPod := sparkJob.ExecutorPod
+	if executorPod != nil {
+		var customPodSpec *v1.PodSpec
+
+		err = utils.UnmarshalStructToObj(executorPod.PodSpec, &customPodSpec)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"Unable to unmarshal pod spec [%v], Err: [%v]", executorPod.PodSpec, err.Error())
+		}
+
+		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
 		if err != nil {
 			return nil, err
 		}
