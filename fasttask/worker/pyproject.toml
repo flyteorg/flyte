@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unionai-actor"
-version = "0.1.4"
+version = "0.1.5"
 requires-python = ">=3.8"
 description = "Enables Union.ai actors"
 authors = [{ name = "unionai", email = "info@union.ai" }]
