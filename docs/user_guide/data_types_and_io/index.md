@@ -108,6 +108,14 @@ Here's a breakdown of these mappings:
       - Structured Dataset
       - Automatic
       - Use ``pandas.DataFrame`` as a type hint. Pandas column types aren't preserved.
+    * - ``polars.DataFrame``
+      - Structured Dataset
+      - Automatic
+      - Use ``polars.DataFrame`` as a type hint. Polars column types aren't preserved.
+    * - ``polars.LazyFrame``
+      - Structured Dataset
+      - Automatic
+      - Use ``polars.LazyFrame`` as a type hint. Polars column types aren't preserved.
     * - ``pyspark.DataFrame``
       - Structured Dataset
       - To utilize the type, install the ``flytekitplugins-spark`` plugin.
