@@ -14,6 +14,10 @@ import (
 //go:generate enumer --type=KVVersion --trimprefix=KVVersion -json -yaml
 //go:generate pflags Config --default-var=DefaultConfig
 
+const (
+	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret"
+)
+
 var (
 	DefaultConfig = &Config{
 		SecretName:        "flyte-pod-webhook",
@@ -80,7 +84,11 @@ var (
 						corev1.ResourceCPU:    resource.MustParse("100m"),
 					},
 				},
+				ContainerName: EmbeddedSecretsFileMountInitContainerName,
 			},
+		},
+		ImageBuilderConfig: ImageBuilderConfig{
+			ExcludedContainerNames: []string{EmbeddedSecretsFileMountInitContainerName},
 		},
 	}
 
@@ -146,7 +154,7 @@ type Config struct {
 	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
-	ImageBuilderConfig *ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	ImageBuilderConfig ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType
@@ -179,8 +187,9 @@ type AzureConfig struct {
 }
 
 type FileMountInitContainerConfig struct {
-	Image     string                      `json:"image" pflag:",Specifies init container image to use for mounting secrets as files."`
-	Resources corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+	Image         string                      `json:"image" pflag:",Specifies init container image to use for mounting secrets as files."`
+	Resources     corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+	ContainerName string                      `json:"containerName" pflag:",Specifies the name of the init container that mounts secrets as files."`
 }
 
 func (c Config) ExpandCertDir() string {
@@ -215,8 +224,10 @@ type HostnameReplacement struct {
 }
 
 type ImageBuilderConfig struct {
-	HostnameReplacement HostnameReplacement  `json:"hostnameReplacement"`
-	LabelSelector       metav1.LabelSelector `json:"labelSelector"`
+	Enabled                bool                 `json:"enabled"`
+	HostnameReplacement    HostnameReplacement  `json:"hostnameReplacement"`
+	LabelSelector          metav1.LabelSelector `json:"labelSelector"`
+	ExcludedContainerNames []string             `json:"excludedContainerNames"`
 }
 
 func GetConfig() *Config {

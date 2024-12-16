@@ -198,8 +198,8 @@ func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme
 		},
 	}
 
-	if cfg.ImageBuilderConfig != nil {
-		imageBuilderMutator := NewImageBuilderMutator(cfg.ImageBuilderConfig.HostnameReplacement, cfg.ImageBuilderConfig.LabelSelector, scope.NewSubScope("image-builder"))
+	if cfg.ImageBuilderConfig.Enabled {
+		imageBuilderMutator := NewImageBuilderMutator(&cfg.ImageBuilderConfig, scope.NewSubScope("image-builder"))
 		httpHandlers = append(httpHandlers, httpHandler{
 			decoder:             decoder,
 			mutator:             imageBuilderMutator,

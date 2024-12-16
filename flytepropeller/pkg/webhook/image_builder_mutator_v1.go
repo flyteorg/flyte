@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
@@ -78,6 +79,8 @@ type ImageBuilderMutatorV1 struct {
 	// Acceptable prefixes is a list of known prefixes
 	// used for post replacement validation.
 	acceptablePrefixes []string
+
+	excludedContainers sets.Set[string]
 }
 
 func (i ImageBuilderMutatorV1) ID() string {
@@ -223,6 +226,11 @@ func (i ImageBuilderMutatorV1) replaceHostnames(ctx context.Context, podName str
 	for ic := range containers {
 		container := containers[ic]
 		label := fmt.Sprintf("Pod [%v/%v] container [%v]", podNameSpace, podName, container.Name)
+		if i.excludedContainers.Has(container.Name) {
+			logger.Debugf(ctx, "%v - Skipping container with whitelist container name [%v] from hostname replacement", label, container.Name)
+			res = append(res, container)
+			continue
+		}
 		logger.Debugf(ctx, "%v - Replacing hostname [%v] with [%v]", label, hr.Existing, hr.Replacement)
 		originalImage := container.Image
 
@@ -246,42 +254,43 @@ func (i ImageBuilderMutatorV1) replaceHostnames(ctx context.Context, podName str
 	return &res, anyContainerChanged, nil
 }
 
-func NewImageBuilderMutator(hostnameReplacement config.HostnameReplacement, labelSelector metav1.LabelSelector, scope promutils.Scope) *ImageBuilderMutatorV1 {
+func NewImageBuilderMutator(cfg *config.ImageBuilderConfig, scope promutils.Scope) *ImageBuilderMutatorV1 {
 	parts := []string{v1CloudTaskPart, v1UnionPublicPart}
 	validPrefixes := make([]string, len(parts)*2)
 	for ip, part := range parts {
 		// Support pre-versioned URI formats for backward compatibility
-		validPrefixes[ip] = fmt.Sprintf("%s/%s", hostnameReplacement.Replacement, part)
+		validPrefixes[ip] = fmt.Sprintf("%s/%s", cfg.HostnameReplacement.Replacement, part)
 		// Support version 1 URI formats
-		validPrefixes[ip+len(parts)] = fmt.Sprintf("%s/%s/%s", hostnameReplacement.Replacement, version1URIPart, part)
+		validPrefixes[ip+len(parts)] = fmt.Sprintf("%s/%s/%s", cfg.HostnameReplacement.Replacement, version1URIPart, part)
 	}
 
 	return &ImageBuilderMutatorV1{
-		hostnameReplacement: hostnameReplacement,
+		hostnameReplacement: cfg.HostnameReplacement,
 		metrics:             newMetrics(scope),
-		labelSelector:       labelSelector,
+		labelSelector:       cfg.LabelSelector,
 		initialV1UnionPublicPrefixes: []string{
 			// Versioned URI formats first
-			fmt.Sprintf("%s/%s/%s/", hostnameReplacement.Existing, version1URIPart, unionaiOrgPlaceholder),
+			fmt.Sprintf("%s/%s/%s/", cfg.HostnameReplacement.Existing, version1URIPart, unionaiOrgPlaceholder),
 		},
 		initialUnversionedUnionPublicPrefixes: []string{
 			// Legacy non-versioned URI formats
-			fmt.Sprintf("%s/%s/", hostnameReplacement.Existing, unionaiOrgPlaceholder),
+			fmt.Sprintf("%s/%s/", cfg.HostnameReplacement.Existing, unionaiOrgPlaceholder),
 		},
 		initialV1OrgPrefixes: []string{
 			// Scenario: Both Unionai SDK and Build-image task updated to include version.
 			// Does not monkey patch replace existing hostname.
-			fmt.Sprintf("%s/%s", hostnameReplacement.Existing, version1URIPart),
+			fmt.Sprintf("%s/%s", cfg.HostnameReplacement.Existing, version1URIPart),
 
 			// Scenario: Unionai SDK not updated and Build-image task updated to include version.
 			// Build image task updated with versioned URI format
-			fmt.Sprintf("%s/orgs/%s", hostnameReplacement.Replacement, version1URIPart),
+			fmt.Sprintf("%s/orgs/%s", cfg.HostnameReplacement.Replacement, version1URIPart),
 		},
 		initialUnversionedOrgPrefixes: []string{
-			hostnameReplacement.Existing,
+			cfg.HostnameReplacement.Existing,
 		},
-		targetPublicPrefix: fmt.Sprintf("%s/%s/", hostnameReplacement.Replacement, unionPathReplacement),
-		targetOrgPrefix:    fmt.Sprintf("%s/%s", hostnameReplacement.Replacement, orgsNamespace),
+		targetPublicPrefix: fmt.Sprintf("%s/%s/", cfg.HostnameReplacement.Replacement, unionPathReplacement),
+		targetOrgPrefix:    fmt.Sprintf("%s/%s", cfg.HostnameReplacement.Replacement, orgsNamespace),
 		acceptablePrefixes: validPrefixes,
+		excludedContainers: sets.New[string](cfg.ExcludedContainerNames...),
 	}
 }

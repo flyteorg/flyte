@@ -20,9 +20,8 @@ import (
 const (
 	UnionSecretEnvVarPrefix = "_UNION_"
 	// Static name of the volume used for mounting secrets with file mount requirement.
-	EmbeddedSecretsFileMountVolumeName        = "embedded-secret-vol"  // #nosec G101
-	EmbeddedSecretsFileMountPath              = "/etc/flyte/secrets"   // #nosec G101
-	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret" // #nosec G101
+	EmbeddedSecretsFileMountVolumeName = "embedded-secret-vol" // #nosec G101
+	EmbeddedSecretsFileMountPath       = "/etc/flyte/secrets"  // #nosec G101
 
 	// Name of the environment variable in the init container used for mounting secrets as files.
 	// This environment variable is used to pass secret names and values to the init container.
@@ -244,13 +243,15 @@ func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValu
 func (i EmbeddedSecretManagerInjector) getOrAppendFileMountInitContainer(pod *corev1.Pod) (*corev1.Container, bool /*exists*/) {
 	index := slices.IndexFunc(
 		pod.Spec.InitContainers,
-		func(c corev1.Container) bool { return c.Name == EmbeddedSecretsFileMountInitContainerName })
+		func(c corev1.Container) bool {
+			return c.Name == i.cfg.FileMountInitContainer.ContainerName
+		})
 	if index != -1 {
 		return &pod.Spec.InitContainers[index], true
 	}
 
 	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
-		Name:  EmbeddedSecretsFileMountInitContainerName,
+		Name:  i.cfg.FileMountInitContainer.ContainerName,
 		Image: i.cfg.FileMountInitContainer.Image,
 		Command: []string{
 			"sh",

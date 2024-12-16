@@ -65,6 +65,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.gcpConfig.project"), DefaultConfig.EmbeddedSecretManagerConfig.GCPConfig.Project, "GCP project to be used for secret manager")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.azureConfig.vaultURI"), DefaultConfig.EmbeddedSecretManagerConfig.AzureConfig.VaultURI, "Azure Vault URI")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.image"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.Image, "Specifies init container image to use for mounting secrets as files.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.containerName"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.ContainerName, "Specifies the name of the init container that mounts secrets as files.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "azureSecretManager.sidecarImage"), DefaultConfig.AzureSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	return cmdFlags
 }

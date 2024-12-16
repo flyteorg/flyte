@@ -9,7 +9,7 @@ import (
 
 // Ensure HostnameReplacements resolves to non-nil empty list.
 func TestConfig_DefaultImageBuilder(t *testing.T) {
-	assert.Nil(t, DefaultConfig.ImageBuilderConfig)
+	assert.Empty(t, DefaultConfig.ImageBuilderConfig.HostnameReplacement)
 }
 
 func TestConfig_LoadSimpleJSON(t *testing.T) {
@@ -28,7 +28,7 @@ func TestConfig_LoadSimpleJSON(t *testing.T) {
 	err := json.Unmarshal([]byte(expectedJSON), &config)
 	assert.Nil(t, err)
 
-	assert.Nil(t, config.ImageBuilderConfig)
+	assert.Empty(t, config.ImageBuilderConfig)
 }
 
 func TestConfig_ImageBuilderConfig(t *testing.T) {

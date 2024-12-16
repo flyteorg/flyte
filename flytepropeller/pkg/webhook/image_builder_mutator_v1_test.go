@@ -41,10 +41,13 @@ var (
 )
 
 func defaultTestImageBuilderMutator() *ImageBuilderMutatorV1 {
-	return NewImageBuilderMutator(config.HostnameReplacement{
-		Existing:    existingHostname,
-		Replacement: replacementHostname,
-	}, unusedLabelSelector, promutils.NewTestScope())
+	return NewImageBuilderMutator(&config.ImageBuilderConfig{
+		HostnameReplacement: config.HostnameReplacement{
+			Existing:    existingHostname,
+			Replacement: replacementHostname,
+		},
+		LabelSelector: unusedLabelSelector,
+	}, promutils.NewTestScope())
 }
 
 func extractReplacedMetric(c prometheus.CounterVec) int {
@@ -516,11 +519,14 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 
 	t.Run("Skips verification for invalid URI paths", func(t *testing.T) {
 		for i, unVerifiedImageName := range invalidImageNames {
-			m := NewImageBuilderMutator(config.HostnameReplacement{
-				Existing:            existingHostname,
-				Replacement:         replacementHostname,
-				DisableVerification: true,
-			}, unusedLabelSelector, promutils.NewTestScope())
+			m := NewImageBuilderMutator(&config.ImageBuilderConfig{
+				HostnameReplacement: config.HostnameReplacement{
+					Existing:            existingHostname,
+					Replacement:         replacementHostname,
+					DisableVerification: true,
+				},
+				LabelSelector: unusedLabelSelector,
+			}, promutils.NewTestScope())
 			pod := corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: org,
@@ -563,11 +569,14 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 			fmt.Sprintf("%s/%s/union/image", otherHostname, version1URIPart),
 		}
 		for _, unVerifiedImageName := range otherHostImageNames {
-			m := NewImageBuilderMutator(config.HostnameReplacement{
-				Existing:            existingHostname,
-				Replacement:         replacementHostname,
-				DisableVerification: true,
-			}, unusedLabelSelector, promutils.NewTestScope())
+			m := NewImageBuilderMutator(&config.ImageBuilderConfig{
+				HostnameReplacement: config.HostnameReplacement{
+					Existing:            existingHostname,
+					Replacement:         replacementHostname,
+					DisableVerification: true,
+				},
+				LabelSelector: unusedLabelSelector,
+			}, promutils.NewTestScope())
 			pod := corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: org,

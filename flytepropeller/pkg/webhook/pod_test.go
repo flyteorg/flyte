@@ -34,11 +34,17 @@ var (
 		},
 	}
 	testImageBuilderConfig = config.ImageBuilderConfig{
+		Enabled: true,
 		HostnameReplacement: config.HostnameReplacement{
 			Existing:    "test.existing.hostname",
 			Replacement: "test.hostname",
 		},
 		LabelSelector: expectedImageBuilderLabelSelector,
+	}
+	secretManagerConfig = config.EmbeddedSecretManagerConfig{
+		FileMountInitContainer: config.FileMountInitContainerConfig{
+			ContainerName: config.EmbeddedSecretsFileMountInitContainerName,
+		},
 	}
 )
 
@@ -48,8 +54,9 @@ func TestNewPodCreationWebhookConfig_NewPodCreationWebhookConfig(t *testing.T) {
 		ctx := context.Background()
 
 		pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
-			CertDir:     "testdata",
-			ServiceName: "my-service",
+			CertDir:                     "testdata",
+			ServiceName:                 "my-service",
+			EmbeddedSecretManagerConfig: secretManagerConfig,
 		}, latest.Scheme, promutils.NewTestScope())
 
 		assert.NoError(t, err)
@@ -59,13 +66,13 @@ func TestNewPodCreationWebhookConfig_NewPodCreationWebhookConfig(t *testing.T) {
 		assert.Equal(t, expectedSecretsLabelSelector, *secretsHTTPHandler.mutator.LabelSelector())
 	})
 
-	t.Run("With additional Image Builder config", func(t *testing.T) {
+	t.Run("With additional Image Builder config enabled", func(t *testing.T) {
 		ctx := context.Background()
 
 		pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 			CertDir:            "testdata",
 			ServiceName:        "my-service",
-			ImageBuilderConfig: &testImageBuilderConfig,
+			ImageBuilderConfig: testImageBuilderConfig,
 		}, latest.Scheme, promutils.NewTestScope())
 
 		assert.NoError(t, err)
@@ -147,7 +154,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 		pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 			CertDir:            "testdata",
 			ServiceName:        serviceName,
-			ImageBuilderConfig: &testImageBuilderConfig,
+			ImageBuilderConfig: testImageBuilderConfig,
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 		namespace := "test-namespace"
@@ -198,7 +205,7 @@ func Test_Register(t *testing.T) {
 		pm, err := NewPodCreationWebhookConfig(context.Background(), &config.Config{
 			CertDir:            "testdata",
 			ServiceName:        "my-service",
-			ImageBuilderConfig: &testImageBuilderConfig,
+			ImageBuilderConfig: testImageBuilderConfig,
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 
@@ -218,7 +225,7 @@ func Test_MutatorConfigHandle(t *testing.T) {
 	pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 		CertDir:            "testdata",
 		ServiceName:        "my-service",
-		ImageBuilderConfig: &testImageBuilderConfig,
+		ImageBuilderConfig: testImageBuilderConfig,
 	}, latest.Scheme, promutils.NewTestScope())
 	assert.NoError(t, err)
 
