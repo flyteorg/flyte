@@ -38,9 +38,8 @@ def _get_loaded_user_modules():
 
     non_user_directories = site.getsitepackages() + [
         site.getusersitepackages(),
-        os.path.join(sys.prefix, "lib"),
-        os.path.join(sys.base_prefix, "lib"),
-        os.path.dirname(sys.executable),
+        sys.prefix,
+        sys.base_prefix,
     ]
     outputs = []
 
