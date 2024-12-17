@@ -287,6 +287,10 @@ message ExternalResourceInfo {
 
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
+
+    // String location uniquely identifying where the deck HTML file is
+    // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
+    string deck_uri = 7;
 }
 
 
