@@ -27,7 +27,7 @@ var (
 				Size:              500000,
 				ResyncInterval:    config.Duration{Duration: 30 * time.Second},
 				Workers:           10,
-				MaxSystemFailures: 5,
+				MaxSystemFailures: 0,
 			},
 			ResourceMeta: nil,
 		},
@@ -42,7 +42,7 @@ var (
 		DefaultAgent: Deployment{
 			Endpoint:       "",
 			Insecure:       true,
-			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
+			DefaultTimeout: config.Duration{Duration: 2 * time.Second},
 		},
 		// AsyncPlugin should be registered to at least one task type.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
