@@ -119,6 +119,93 @@ jobs:
           file: Dockerfile
           push: true
 
+  sandbox-bundled-functional-tests:
+    runs-on: ubuntu-latest
+    env:
+      FLYTESNACKS_PRIORITIES: "P0"
+      FLYTESNACKS_VERSION: ""
+    timeout-minutes: 60
+    needs: [build-and-push-single-binary-image]
+    steps:
+      - name: Set latest Flytesnacks release
+        if: ${{ env.FLYTESNACKS_VERSION == '' }}
+        run: |
+          FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
+          echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: single-binary-image
+          path: docker/sandbox-bundled/images/tar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
+      - name: Build sandbox image for functional tests
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/sandbox-bundled
+          load: true
+          allow: "security.insecure"
+          tags: flyte-sandbox-bundled:local
+      # Without this, the GHA runner is under disk pressure and evicts all the pods.
+      # Buildx cache uses roughly 50% (7gb) of the GHA runner's disk (14gb).
+      - name: Prune Docker Buildx cache to reclaim storage
+        run: docker buildx prune --all --force
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - uses: unionai/flytectl-setup-action@v0.0.3
+        with:
+          version: "0.9.2"
+      - name: Setup sandbox
+        run: |
+          mkdir -p ~/.flyte/sandbox
+          cat << EOF > ~/.flyte/sandbox/config.yaml
+          task_resources:
+            defaults:
+              cpu: "0"
+              memory: "0"
+            limits:
+              cpu: "0"
+              memory: "0"
+          EOF
+          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow pandas
+          uv pip freeze
+      - name: Checkout flytesnacks
+        uses: actions/checkout@v4
+        with:
+          repository: flyteorg/flytesnacks
+          path: flytesnacks
+          ref: ${{ env.FLYTESNACKS_VERSION }}
+      - name: Register specific tests
+        run: |
+          flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
+          while read -r line;
+          do
+              pyflyte -vv --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
+                  register \
+                  --project flytesnacks \
+                  --domain development \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.12-${flytekit_version} \
+                  --version ${{ env.FLYTESNACKS_VERSION }} \
+                  flytesnacks/$line;
+          done < flytesnacks/flyte_tests.txt
+      - name: Install Pytest
+        run: |
+          pip install pytest
+      - name: End2End
+        run: |
+          make end2end_execute
+
   sandbox-bundled-offloaded-functional-tests:
     runs-on: ubuntu-latest
     env:
@@ -166,9 +253,6 @@ jobs:
           mkdir -p ~/.flyte/sandbox
           cat << EOF > ~/.flyte/sandbox/config.yaml
           propeller:
-            create-flyteworkflow-crd: true
-            kube-config: ~/.flyte/sandbox/kubeconfig
-            rawoutput-prefix: s3://my-s3-bucket/data
             literal-offloading-config:
               enabled: true
               min-size-in-mb-for-offloading: 0.000001
@@ -213,97 +297,6 @@ jobs:
       - name: End2End
         run: |
           make end2end_execute
-      - name: Stop sandbox
-        run: flytectl demo teardown
-
-  # sandbox-bundled-functional-tests:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     FLYTESNACKS_PRIORITIES: "P0"
-  #     FLYTESNACKS_VERSION: ""
-  #   timeout-minutes: 60
-  #   needs: [build-and-push-single-binary-image]
-  #   steps:
-  #     - name: Set latest Flytesnacks release
-  #       if: ${{ env.FLYTESNACKS_VERSION == '' }}
-  #       run: |
-  #         FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
-  #         echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: single-binary-image
-  #         path: docker/sandbox-bundled/images/tar
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
-  #       with:
-  #         driver-opts: image=moby/buildkit:master
-  #         buildkitd-flags: "--allow-insecure-entitlement security.insecure"
-  #     - name: Build sandbox image for functional tests
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: docker/sandbox-bundled
-  #         load: true
-  #         allow: "security.insecure"
-  #         tags: flyte-sandbox-bundled:local
-  #     # Without this, the GHA runner is under disk pressure and evicts all the pods.
-  #     # Buildx cache uses roughly 50% (7gb) of the GHA runner's disk (14gb).
-  #     - name: Prune Docker Buildx cache to reclaim storage
-  #       run: docker buildx prune --all --force
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: "3.12"
-  #     - uses: unionai/flytectl-setup-action@v0.0.3
-  #       with:
-  #         version: "0.9.2"
-  #     - name: Setup sandbox
-  #       run: |
-  #         mkdir -p ~/.flyte/sandbox
-  #         cat << EOF > ~/.flyte/sandbox/config.yaml
-  #         task_resources:
-  #           defaults:
-  #             cpu: "0"
-  #             memory: "0"
-  #           limits:
-  #             cpu: "0"
-  #             memory: "0"
-  #         EOF
-  #         flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
-  #     - name: Install Python dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install uv
-  #         uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow pandas
-  #         uv pip freeze
-  #     - name: Checkout flytesnacks
-  #       uses: actions/checkout@v4
-  #       with:
-  #         repository: flyteorg/flytesnacks
-  #         path: flytesnacks
-  #         ref: ${{ env.FLYTESNACKS_VERSION }}
-  #     - name: Register specific tests
-  #       run: |
-  #         flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
-  #         while read -r line;
-  #         do
-  #             pyflyte -vv --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
-  #                 register \
-  #                 --project flytesnacks \
-  #                 --domain development \
-  #                 --image cr.flyte.org/flyteorg/flytekit:py3.12-${flytekit_version} \
-  #                 --version ${{ env.FLYTESNACKS_VERSION }} \
-  #                 flytesnacks/$line;
-  #         done < flytesnacks/flyte_tests.txt
-  #     - name: Install Pytest
-  #       run: |
-  #         pip install pytest
-  #     - name: End2End
-  #       run: |
-  #         make end2end_execute
-  #     - name: Stop sandbox
-  #       run: flytectl demo teardown
 
   build-and-push-sandbox-bundled-image:
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
