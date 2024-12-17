@@ -25,7 +25,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const KindSparkApplication = "SparkApplication"
@@ -65,7 +66,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkJob := plugins.SparkJob{}
-	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &sparkJob)
+	err = utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &sparkJob)
 	if err != nil {
 		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", taskTemplate.GetCustom())
 	}
@@ -75,11 +76,11 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	sparkConfig := getSparkConfig(taskCtx, &sparkJob)
-	driverSpec, err := createDriverSpec(ctx, taskCtx, sparkConfig)
+	driverSpec, err := createDriverSpec(ctx, taskCtx, sparkConfig, &sparkJob)
 	if err != nil {
 		return nil, err
 	}
-	executorSpec, err := createExecutorSpec(ctx, taskCtx, sparkConfig)
+	executorSpec, err := createExecutorSpec(ctx, taskCtx, sparkConfig, &sparkJob)
 	if err != nil {
 		return nil, err
 	}
@@ -141,9 +142,30 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, container *v1.Container) *sparkOp.SparkPodSpec {
-	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
-	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
+func createSparkPodSpec(
+	taskCtx pluginsCore.TaskExecutionContext,
+	podSpec *v1.PodSpec,
+	container *v1.Container,
+	k8sPod *core.K8SPod,
+) *sparkOp.SparkPodSpec {
+
+	// TODO: check whether merge annotations/labels together or other ways?
+	annotations := pluginsUtils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultAnnotations,
+		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+	)
+	labels := pluginsUtils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultLabels,
+		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
+	)
+	if k8sPod != nil && k8sPod.Metadata != nil {
+		if k8sPod.Metadata.Annotations != nil {
+			annotations = pluginsUtils.UnionMaps(annotations, k8sPod.Metadata.Annotations)
+		}
+		if k8sPod.Metadata.Labels != nil {
+			labels = pluginsUtils.UnionMaps(labels, k8sPod.Metadata.Labels)
+		}
+	}
 
 	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
@@ -171,18 +193,35 @@ type driverSpec struct {
 	sparkSpec *sparkOp.DriverSpec
 }
 
-func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*driverSpec, error) {
+func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*driverSpec, error) {
 	// Spark driver pods should always run as non-interruptible
 	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
 	}
+
+	driverPod := sparkJob.GetDriverPod()
+	if driverPod != nil {
+		var customPodSpec *v1.PodSpec
+
+		err = utils.UnmarshalStructToObj(driverPod.PodSpec, &customPodSpec)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"Unable to unmarshal pod spec [%v], Err: [%v]", driverPod.PodSpec, err.Error())
+		}
+
+		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer, driverPod)
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	spec := driverSpec{
 		&sparkOp.DriverSpec{
@@ -203,16 +242,33 @@ type executorSpec struct {
 	serviceAccountName string
 }
 
-func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*executorSpec, error) {
+func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*executorSpec, error) {
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, err
 	}
+
+	executorPod := sparkJob.ExecutorPod
+	if executorPod != nil {
+		var customPodSpec *v1.PodSpec
+
+		err = utils.UnmarshalStructToObj(executorPod.PodSpec, &customPodSpec)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"Unable to unmarshal pod spec [%v], Err: [%v]", executorPod.PodSpec, err.Error())
+		}
+
+		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	primaryContainer, err := flytek8s.GetContainer(podSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer)
+	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer, sparkJob.ExecutorPod)
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
 	spec := executorSpec{
 		primaryContainer,
