@@ -1423,6 +1423,7 @@ eventsPublisher (`interfaces.EventsPublisherConfig`_)
 
 .. code-block:: yaml
 
+  enrichAllWorkflowEventTypes: false
   eventTypes: null
   topicName: ""
   
@@ -1491,6 +1492,16 @@ eventTypes ([]string)
 .. code-block:: yaml
 
   null
+  
+
+enrichAllWorkflowEventTypes (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 interfaces.GCPConfig
@@ -2122,6 +2133,7 @@ eventsPublisher (`interfaces.EventsPublisherConfig`_)
 
 .. code-block:: yaml
 
+  enrichAllWorkflowEventTypes: false
   eventTypes: null
   topicName: ""
   
@@ -2971,6 +2983,7 @@ k8s (`config.K8sPluginConfig`_)
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  enable-distributed-error-aggregation: false
   enable-host-networking-pod: null
   gpu-device-node-label: k8s.amazonaws.com/accelerator
   gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
@@ -3496,6 +3509,18 @@ Name of the extended resources for which tolerations should be added.
 .. code-block:: yaml
 
   []
+  
+
+enable-distributed-error-aggregation (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will aggregate errors of different worker pods for distributed tasks.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.FlyteCoPilotConfig
