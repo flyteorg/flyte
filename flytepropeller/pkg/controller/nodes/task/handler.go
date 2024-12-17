@@ -550,7 +550,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	// is actually present.
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
-		// This is to prevent the console from potentially checking the deck URI that does not exist if in final phase(PhaseSuccess).
+		// This is for backward compatibility with older Flytekit versions.
 		if !deckEnabled {
 			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
 		}
@@ -600,8 +600,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	case pluginCore.PhaseRetryableFailure:
 		fallthrough
 	case pluginCore.PhasePermanentFailure:
-		// This is to prevent the console from potentially checking the deck URI that does not exist if in final
-		// phase(PhaseFailure).
+		// This is for backward compatibility with older Flytekit versions.
 		if !deckEnabled {
 			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
 		}
