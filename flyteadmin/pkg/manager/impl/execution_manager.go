@@ -2299,6 +2299,7 @@ func (m *ExecutionManager) GetExecutionCounts(
 	if err != nil {
 		return nil, err
 	}
+	filters = m.addDefaultRequestFilters(ctx, filters)
 
 	countExecutionByPhaseInput := repositoryInterfaces.CountResourceInput{
 		InlineFilters: filters,
@@ -2341,6 +2342,7 @@ func (m *ExecutionManager) GetRunningExecutionsCount(
 	if filters, err = addPhaseFilter(filters, core.WorkflowExecution_RUNNING); err != nil {
 		return nil, err
 	}
+	filters = m.addDefaultRequestFilters(ctx, filters)
 
 	countRunningExecutionsInput := repositoryInterfaces.CountResourceInput{
 		InlineFilters: filters,

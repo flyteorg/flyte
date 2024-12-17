@@ -71,6 +71,7 @@ const (
 	executionNameQueryExpr      = "execution_name = ?"
 	executionOrgQueryExpr       = "execution_org = ?"
 	executionProjectQueryExpr   = "execution_project = ?"
+	executionModeNeQueryExpr    = "mode <> ?"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -3397,7 +3398,7 @@ func TestGetExecutionCounts(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	getExecutionCountsFunc := func(
 		ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
-		var orgFilter, projectFilter, domainFilter, updatedAtFilter, nameFilter bool
+		var orgFilter, projectFilter, domainFilter, updatedAtFilter, nameFilter, modeFilter bool
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
 			queryExpr, _ := filter.GetGormQueryExpr()
@@ -3416,12 +3417,17 @@ func TestGetExecutionCounts(t *testing.T) {
 			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
 				nameFilter = true
 			}
+			if queryExpr.Args == admin.ExecutionMetadata_WORKSPACE && queryExpr.Query == executionModeNeQueryExpr {
+				modeFilter = true
+			}
+
 		}
 		assert.True(t, orgFilter, "Missing org equality filter")
 		assert.True(t, projectFilter, "Missing project equality filter")
 		assert.True(t, domainFilter, "Missing domain equality filter")
 		assert.True(t, updatedAtFilter, "Missing updated at filter")
 		assert.False(t, nameFilter, "Included name equality filter")
+		assert.True(t, modeFilter, "Missing mode filter")
 		return interfaces.ExecutionCountsByPhaseOutput{
 			{
 				Phase: "FAILED",
@@ -3532,7 +3538,7 @@ func TestGetRunningExecutionsCount(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	getRunningExecutionsCountFunc := func(
 		ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
-		var orgFilter, projectFilter, domainFilter, nameFilter bool
+		var orgFilter, projectFilter, domainFilter, nameFilter, modeFilter bool
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
 			queryExpr, _ := filter.GetGormQueryExpr()
@@ -3548,11 +3554,15 @@ func TestGetRunningExecutionsCount(t *testing.T) {
 			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
 				nameFilter = true
 			}
+			if queryExpr.Args == admin.ExecutionMetadata_WORKSPACE && queryExpr.Query == executionModeNeQueryExpr {
+				modeFilter = true
+			}
 		}
 		assert.True(t, orgFilter, "Missing org equality filter")
 		assert.True(t, projectFilter, "Missing project equality filter")
 		assert.True(t, domainFilter, "Missing domain equality filter")
 		assert.False(t, nameFilter, "Included name equality filter")
+		assert.True(t, modeFilter, "Missing mode filter")
 		return 3, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(getRunningExecutionsCountFunc)
@@ -6914,6 +6924,7 @@ func TestValidateActiveExecutions(t *testing.T) {
 					updatedAtFilter = true
 				}
 			}
+
 			assert.True(t, orgFilter, "Missing org equality filter")
 			assert.True(t, updatedAtFilter, "Missing updated at filter")
 			return interfaces.ExecutionCountsByPhaseOutput{
