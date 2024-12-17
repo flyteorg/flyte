@@ -154,7 +154,7 @@ func (p *Plugin) ExecuteTaskSync(
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "failed to execute task from agent with %v", err)
-		return nil, nil, fmt.Errorf("failed to execute task from agent with: %v", err)
+		return nil, nil, fmt.Errorf("failed to execute task from agent with %v", err)
 	}
 
 	headerProto := &admin.ExecuteTaskSyncRequest{
@@ -203,7 +203,7 @@ func (p *Plugin) ExecuteTaskSync(
 		LogLinks:   resource.GetLogLinks(),
 		CustomInfo: resource.GetCustomInfo(),
 		AgentError: resource.GetAgentError(),
-	}, fmt.Errorf("failed to execute task from agent with %v", err)
+	}, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
