@@ -136,7 +136,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			log.Name = fmt.Sprintf("%s-%d", log.GetName(), index)
 		}
 
-		externalResourceInfo := events.ExternalResourceInfo{
+		externalResourceInfo := event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Index:        uint32(index), // #nosec G115
 			Logs:         taskExecutionEvent.GetLogs(),
