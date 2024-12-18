@@ -43,7 +43,7 @@ import (
 )
 
 const (
-	finalizer = "flyte.lyft.com/finalizer-k8s"
+	finalizer = "flyte.org/finalizer-k8s"
 	// Old non-domain-qualified finalizer for backwards compatibility
 	// This should eventually be removed
 	oldFinalizer = "flyte/flytek8s"

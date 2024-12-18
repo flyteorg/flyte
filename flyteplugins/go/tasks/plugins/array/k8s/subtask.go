@@ -31,7 +31,7 @@ const (
 	ErrBuildPodTemplate       stdErrors.ErrorCode = "POD_TEMPLATE_FAILED"
 	ErrReplaceCmdTemplate     stdErrors.ErrorCode = "CMD_TEMPLATE_FAILED"
 	FlyteK8sArrayIndexVarName string              = "FLYTE_K8S_ARRAY_INDEX"
-	finalizer                 string              = "flyte.lyft.com/finalizer-array"
+	finalizer                 string              = "flyte.org/finalizer-array"
 	// Old non-domain-qualified finalizer for backwards compatibility
 	// This should eventually be removed
 	oldFinalizer    string = "flyte/array"
