@@ -10,9 +10,6 @@ on:
         description: "Cache key for docker image"
         required: true
         type: string
-      go-version:
-        required: true
-        type: string
 jobs:
   integration:
     name: Integration tests
@@ -39,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.component }}/go.mod
       - name: Integration
         run: |
           # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173

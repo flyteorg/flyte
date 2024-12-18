@@ -6,9 +6,6 @@ on:
       component:
         required: true
         type: string
-      go-version:
-        required: true
-        type: string
     secrets:
       CODECOV_TOKEN:
         required: true
@@ -25,7 +22,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.component }}/go.mod
       - name: Unit Tests
         run: make install && make test_unit_codecov
       - name: Push CodeCov
