@@ -987,6 +987,27 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		assert.Equal(t, 0, len(o.GetFinalizers()))
 	})
 
+	t.Run("Inject finalizers", func(t *testing.T) {
+		p := pluginsk8sMock.Plugin{}
+		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: false})
+		pluginManager := PluginManager{plugin: &p}
+		// enable finalizer injection
+		cfg.InjectFinalizer = true
+		o := &v1.Pod{}
+		pluginManager.addObjectMetadata(tm, o, cfg)
+		assert.Equal(t, genName, o.GetName())
+		// empty OwnerReference since we are ignoring
+		assert.Equal(t, 1, len(o.GetOwnerReferences()))
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, l, o.GetLabels())
+		assert.Equal(t, 1, len(o.GetFinalizers()))
+		assert.Contains(t, o.GetFinalizers(), finalizer)
+	})
+
 }
 
 func TestResourceManagerConstruction(t *testing.T) {
@@ -1015,15 +1036,16 @@ func TestFinalize(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		o := &v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-				Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
+				Name:       tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Namespace:  tctx.TaskExecutionMetadata().GetNamespace(),
+				Finalizers: []string{finalizer},
 			},
 		}
 
 		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
 
 		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
-		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
+		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient, updateBackoffRetries: 5}
 		actualO := &v1.Pod{}
 		// Assert the object exists before calling finalize
 		assert.NoError(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
@@ -1061,7 +1083,7 @@ func TestFinalize(t *testing.T) {
 		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
 
 		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
-		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
+		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient, updateBackoffRetries: 5}
 		actualO := &v1.Pod{}
 		// Assert the object exists before calling finalize
 		assert.NoError(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
