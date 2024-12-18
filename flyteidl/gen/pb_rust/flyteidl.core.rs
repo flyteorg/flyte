@@ -2481,9 +2481,15 @@ pub mod array_node {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum DataMode {
-        /// Indicates the ArrayNode will utilize the passed in, single input file for all sub-nodes.
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// The file path set for the subNode will be the ArrayNode's input file, but the in-memory
+        /// value utilized in propeller will be the individual value for each subNode execution.
+        /// SubNode executions need to be able to read in and parse the individual value to execute correctly.
         SingleInputFile = 0,
-        /// Indicates the ArrayNode will create input files for each sub-node.
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// Propeller will create input files for each ArrayNode subNode by parsing the inputs and
+        /// setting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will
+        /// be the individual value for each subNode execution.
         IndividualInputFiles = 1,
     }
     impl DataMode {

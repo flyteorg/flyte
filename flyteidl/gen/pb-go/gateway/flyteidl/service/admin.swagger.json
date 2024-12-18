@@ -4256,7 +4256,7 @@
         "INDIVIDUAL_INPUT_FILES"
       ],
       "default": "SINGLE_INPUT_FILE",
-      "description": " - SINGLE_INPUT_FILE: Indicates the ArrayNode will utilize the passed in, single input file for all sub-nodes.\n - INDIVIDUAL_INPUT_FILES: Indicates the ArrayNode will create input files for each sub-node."
+      "description": " - SINGLE_INPUT_FILE: Indicates the ArrayNode's input is a list of input values that map to subNode executions.\nThe file path set for the subNode will be the ArrayNode's input file, but the in-memory\nvalue utilized in propeller will be the individual value for each subNode execution.\nSubNode executions need to be able to read in and parse the individual value to execute correctly.\n - INDIVIDUAL_INPUT_FILES: Indicates the ArrayNode's input is a list of input values that map to subNode executions.\nPropeller will create input files for each ArrayNode subNode by parsing the inputs and\nsetting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will\nbe the individual value for each subNode execution."
     },
     "BlobTypeBlobDimensionality": {
       "type": "string",
