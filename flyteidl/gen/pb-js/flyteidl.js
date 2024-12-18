@@ -9102,6 +9102,7 @@
                  * @property {flyteidl.core.IBindingDataCollection|null} [collection] BindingData collection
                  * @property {flyteidl.core.IOutputReference|null} [promise] BindingData promise
                  * @property {flyteidl.core.IBindingDataMap|null} [map] BindingData map
+                 * @property {flyteidl.core.ILiteralOffloadedMetadata|null} [offloadedMetadata] BindingData offloadedMetadata
                  * @property {flyteidl.core.IUnionInfo|null} [union] BindingData union
                  */
     
@@ -9153,6 +9154,14 @@
                 BindingData.prototype.map = null;
     
                 /**
+                 * BindingData offloadedMetadata.
+                 * @member {flyteidl.core.ILiteralOffloadedMetadata|null|undefined} offloadedMetadata
+                 * @memberof flyteidl.core.BindingData
+                 * @instance
+                 */
+                BindingData.prototype.offloadedMetadata = null;
+    
+                /**
                  * BindingData union.
                  * @member {flyteidl.core.IUnionInfo|null|undefined} union
                  * @memberof flyteidl.core.BindingData
@@ -9165,12 +9174,12 @@
     
                 /**
                  * BindingData value.
-                 * @member {"scalar"|"collection"|"promise"|"map"|undefined} value
+                 * @member {"scalar"|"collection"|"promise"|"map"|"offloadedMetadata"|undefined} value
                  * @memberof flyteidl.core.BindingData
                  * @instance
                  */
                 Object.defineProperty(BindingData.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "promise", "map"]),
+                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "promise", "map", "offloadedMetadata"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -9208,6 +9217,8 @@
                         $root.flyteidl.core.BindingDataMap.encode(message.map, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.union != null && message.hasOwnProperty("union"))
                         $root.flyteidl.core.UnionInfo.encode(message.union, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata"))
+                        $root.flyteidl.core.LiteralOffloadedMetadata.encode(message.offloadedMetadata, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -9240,6 +9251,9 @@
                             break;
                         case 4:
                             message.map = $root.flyteidl.core.BindingDataMap.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.offloadedMetadata = $root.flyteidl.core.LiteralOffloadedMetadata.decode(reader, reader.uint32());
                             break;
                         case 5:
                             message.union = $root.flyteidl.core.UnionInfo.decode(reader, reader.uint32());
@@ -9300,6 +9314,16 @@
                             var error = $root.flyteidl.core.BindingDataMap.verify(message.map);
                             if (error)
                                 return "map." + error;
+                        }
+                    }
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralOffloadedMetadata.verify(message.offloadedMetadata);
+                            if (error)
+                                return "offloadedMetadata." + error;
                         }
                     }
                     if (message.union != null && message.hasOwnProperty("union")) {

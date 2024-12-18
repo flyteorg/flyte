@@ -568,7 +568,7 @@ pub struct UnionInfo {
 pub struct BindingData {
     #[prost(message, optional, tag="5")]
     pub union: ::core::option::Option<UnionInfo>,
-    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4, 6")]
     pub value: ::core::option::Option<binding_data::Value>,
 }
 /// Nested message and enum types in `BindingData`.
@@ -589,6 +589,11 @@ pub mod binding_data {
         /// A map of bindings. The key is always a string.
         #[prost(message, tag="4")]
         Map(super::BindingDataMap),
+        /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        /// Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+        #[prost(message, tag="6")]
+        OffloadedMetadata(super::LiteralOffloadedMetadata),
     }
 }
 /// An input/output binding of a variable to either static value or a node output.

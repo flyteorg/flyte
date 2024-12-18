@@ -181,18 +181,20 @@ class UnionInfo(_message.Message):
     def __init__(self, targetType: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class BindingData(_message.Message):
-    __slots__ = ["scalar", "collection", "promise", "map", "union"]
+    __slots__ = ["scalar", "collection", "promise", "map", "offloaded_metadata", "union"]
     SCALAR_FIELD_NUMBER: _ClassVar[int]
     COLLECTION_FIELD_NUMBER: _ClassVar[int]
     PROMISE_FIELD_NUMBER: _ClassVar[int]
     MAP_FIELD_NUMBER: _ClassVar[int]
+    OFFLOADED_METADATA_FIELD_NUMBER: _ClassVar[int]
     UNION_FIELD_NUMBER: _ClassVar[int]
     scalar: Scalar
     collection: BindingDataCollection
     promise: _types_pb2.OutputReference
     map: BindingDataMap
+    offloaded_metadata: LiteralOffloadedMetadata
     union: UnionInfo
-    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[BindingDataCollection, _Mapping]] = ..., promise: _Optional[_Union[_types_pb2.OutputReference, _Mapping]] = ..., map: _Optional[_Union[BindingDataMap, _Mapping]] = ..., union: _Optional[_Union[UnionInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[BindingDataCollection, _Mapping]] = ..., promise: _Optional[_Union[_types_pb2.OutputReference, _Mapping]] = ..., map: _Optional[_Union[BindingDataMap, _Mapping]] = ..., offloaded_metadata: _Optional[_Union[LiteralOffloadedMetadata, _Mapping]] = ..., union: _Optional[_Union[UnionInfo, _Mapping]] = ...) -> None: ...
 
 class Binding(_message.Message):
     __slots__ = ["var", "binding"]

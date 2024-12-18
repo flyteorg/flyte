@@ -3797,6 +3797,9 @@ export namespace flyteidl {
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union */
             union?: (flyteidl.core.IUnionInfo|null);
         }
@@ -3822,11 +3825,14 @@ export namespace flyteidl {
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union. */
             public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
-            public value?: ("scalar"|"collection"|"promise"|"map");
+            public value?: ("scalar"|"collection"|"promise"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new BindingData instance using the specified properties.
