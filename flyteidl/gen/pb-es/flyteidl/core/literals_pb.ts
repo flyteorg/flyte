@@ -922,6 +922,16 @@ export class BindingData extends Message<BindingData> {
      */
     value: BindingDataMap;
     case: "map";
+  } | {
+    /**
+     * Offloaded literal metadata
+     * When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+     * Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+     *
+     * @generated from field: flyteidl.core.LiteralOffloadedMetadata offloaded_metadata = 6;
+     */
+    value: LiteralOffloadedMetadata;
+    case: "offloadedMetadata";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -941,6 +951,7 @@ export class BindingData extends Message<BindingData> {
     { no: 2, name: "collection", kind: "message", T: BindingDataCollection, oneof: "value" },
     { no: 3, name: "promise", kind: "message", T: OutputReference, oneof: "value" },
     { no: 4, name: "map", kind: "message", T: BindingDataMap, oneof: "value" },
+    { no: 6, name: "offloaded_metadata", kind: "message", T: LiteralOffloadedMetadata, oneof: "value" },
     { no: 5, name: "union", kind: "message", T: UnionInfo },
   ]);
 

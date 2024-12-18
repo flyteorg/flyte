@@ -169,6 +169,11 @@ message BindingData {
 
         // A map of bindings. The key is always a string.
         BindingDataMap map = 4;
+
+        // Offloaded literal metadata
+        // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        // Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+        LiteralOffloadedMetadata offloaded_metadata = 6;
     }
 
     UnionInfo union = 5;

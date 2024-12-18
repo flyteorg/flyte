@@ -561,6 +561,13 @@ export class ArrayNode extends Message<ArrayNode> {
    */
   isOriginalSubNodeInterface?: boolean;
 
+  /**
+   * data_mode determines how input data is passed to the sub-nodes
+   *
+   * @generated from field: flyteidl.core.ArrayNode.DataMode data_mode = 7;
+   */
+  dataMode = ArrayNode_DataMode.SINGLE_INPUT_FILE;
+
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -575,6 +582,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
     { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
     { no: 6, name: "is_original_sub_node_interface", kind: "message", T: BoolValue },
+    { no: 7, name: "data_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_DataMode) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -618,6 +626,36 @@ export enum ArrayNode_ExecutionMode {
 proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.ExecutionMode", [
   { no: 0, name: "MINIMAL_STATE" },
   { no: 1, name: "FULL_STATE" },
+]);
+
+/**
+ * @generated from enum flyteidl.core.ArrayNode.DataMode
+ */
+export enum ArrayNode_DataMode {
+  /**
+   * Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+   * The file path set for the subNode will be the ArrayNode's input file, but the in-memory
+   * value utilized in propeller will be the individual value for each subNode execution.
+   * SubNode executions need to be able to read in and parse the individual value to execute correctly.
+   *
+   * @generated from enum value: SINGLE_INPUT_FILE = 0;
+   */
+  SINGLE_INPUT_FILE = 0,
+
+  /**
+   * Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+   * Propeller will create input files for each ArrayNode subNode by parsing the inputs and
+   * setting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will
+   * be the individual value for each subNode execution.
+   *
+   * @generated from enum value: INDIVIDUAL_INPUT_FILES = 1;
+   */
+  INDIVIDUAL_INPUT_FILES = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ArrayNode_DataMode)
+proto3.util.setEnumType(ArrayNode_DataMode, "flyteidl.core.ArrayNode.DataMode", [
+  { no: 0, name: "SINGLE_INPUT_FILE" },
+  { no: 1, name: "INDIVIDUAL_INPUT_FILES" },
 ]);
 
 /**
