@@ -2,7 +2,10 @@ package k8s
 
 import (
 	"context"
+	baseErrors "errors"
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -34,6 +37,7 @@ import (
 	compiler "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
 	nodeTaskConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -225,33 +229,43 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	}
 
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
-		if backoff.IsResourceQuotaExceeded(err) && !backoff.IsResourceRequestsEligible(err) {
-			// if task resources exceed resource quotas then permanently fail because the task will
-			// be stuck waiting for resources until the `node-active-deadline` terminates the node.
-			logger.Errorf(ctx, "task resource requests exceed k8s resource limits. err: %v", err)
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("ResourceRequestsExceedLimits",
-				fmt.Sprintf("requested resources exceed limits: %v", err.Error()), nil)), nil
-		} else if stdErrors.IsCausedBy(err, errors.BackOffError) {
-			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
-		} else if e.backOffController == nil && backoff.IsResourceQuotaExceeded(err) {
-			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
-		} else if k8serrors.IsForbidden(err) {
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
-		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
-			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
-			// return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
-		} else if k8serrors.IsRequestEntityTooLargeError(err) {
-			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
-		}
-		reason := k8serrors.ReasonForError(err)
-		logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
-		return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")
+		return e.transitionFromError(ctx, err)
 	}
 
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
+}
+
+func (e *PluginManager) transitionFromError(ctx context.Context, err error) (pluginsCore.Transition, error) {
+	var se *k8serrors.StatusError
+
+	if backoff.IsResourceQuotaExceeded(err) && !backoff.IsResourceRequestsEligible(err) {
+		// if task resources exceed resource quotas then permanently fail because the task will
+		// be stuck waiting for resources until the `node-active-deadline` terminates the node.
+		logger.Errorf(ctx, "task resource requests exceed k8s resource limits. err: %v", err)
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("ResourceRequestsExceedLimits",
+			fmt.Sprintf("requested resources exceed limits: %v", err.Error()), nil)), nil
+	} else if stdErrors.IsCausedBy(err, errors.BackOffError) {
+		logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
+	} else if e.backOffController == nil && backoff.IsResourceQuotaExceeded(err) {
+		logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil)), nil
+	} else if k8serrors.IsForbidden(err) {
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
+	} else if baseErrors.As(err, &se) && se.Status().Code == http.StatusBadRequest && strings.Contains(se.Status().Message, secret.NotFoundAcrossAllScopesMsg) {
+		logger.Errorf(ctx, "secrets injection failed: %v", err)
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("RuntimeFailure", err.Error(), nil)), nil
+	} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
+		logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
+		// return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskFormat", err.Error(), nil)), nil
+	} else if k8serrors.IsRequestEntityTooLargeError(err) {
+		logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("EntityTooLarge", err.Error(), nil)), nil
+	}
+
+	reason := k8serrors.ReasonForError(err)
+	logger.Errorf(ctx, "Failed to launch job, system error. err: %v", err)
+	return pluginsCore.UnknownTransition, errors.Wrapf(stdErrors.ErrorCode(reason), err, "failed to create resource")
 }
 
 func (e *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {

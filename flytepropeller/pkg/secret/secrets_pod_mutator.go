@@ -25,6 +25,12 @@ const (
 	SecretsID                  = "secrets"
 )
 
+const (
+	// NotFoundAcrossAllScopesMsg is the error message prefix returned when a secret is not found across all scopes,
+	// and is used to match on errors.
+	NotFoundAcrossAllScopesMsg = "none of the secret managers injected secret"
+)
+
 type SecretsPodMutator struct {
 	// Secret manager types in order that they should be used.
 	enabledSecretManagerTypes []config.SecretManagerType
@@ -48,9 +54,9 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 		mutatedPod, injected, err := s.injectSecret(ctx, secret, pod)
 		if !injected {
 			if err == nil {
-				err = fmt.Errorf("none of the secret managers injected secret [%v]", secret)
+				err = fmt.Errorf("%s [%v]", NotFoundAcrossAllScopesMsg, secret)
 			} else {
-				err = fmt.Errorf("none of the secret managers injected secret [%v]: %w", secret, err)
+				err = fmt.Errorf("%s [%v]: %w", NotFoundAcrossAllScopesMsg, secret, err)
 			}
 			admissionError := admission.Errored(http.StatusBadRequest, err)
 			return pod, false, &admissionError

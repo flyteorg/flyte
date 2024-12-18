@@ -466,6 +466,52 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 	})
 }
 
+func Test_LaunchResource_ErrorHandling(t *testing.T) {
+	ctx := context.TODO()
+	mockResourceHandler := &pluginsk8sMock.Plugin{}
+	mockResourceHandler.OnGetProperties().Return(k8s.PluginProperties{})
+	mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+	fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
+	mockClientset := k8sfake.NewSimpleClientset()
+	pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+		ID:              "x",
+		ResourceToWatch: &v1.Pod{},
+		Plugin:          mockResourceHandler,
+	}, NewResourceMonitorIndex(), mockClientset)
+	assert.NoError(t, err)
+
+	t.Run("general errors undefined", func(t *testing.T) {
+		err = fmt.Errorf("some error")
+		transition, err := pluginManager.transitionFromError(ctx, err)
+		assert.Error(t, err)
+		assert.Equal(t, transition.Info().Phase(), pluginsCore.PhaseUndefined)
+	})
+
+	t.Run("secret injection failure", func(t *testing.T) {
+		err = &k8serrors.StatusError{
+			ErrStatus: metav1.Status{
+				Message: "none of the secret managers injected secret worked!",
+				Code:    400,
+			},
+		}
+		transition, err := pluginManager.transitionFromError(ctx, err)
+		assert.NoError(t, err)
+		assert.Equal(t, transition.Info().Phase(), pluginsCore.PhasePermanentFailure)
+	})
+
+	t.Run("forbidden", func(t *testing.T) {
+		err = &k8serrors.StatusError{
+			ErrStatus: metav1.Status{
+				Reason: "Forbidden",
+				Code:   500,
+			},
+		}
+		transition, err := pluginManager.transitionFromError(ctx, err)
+		assert.NoError(t, err)
+		assert.Equal(t, transition.Info().Phase(), pluginsCore.PhaseRetryableFailure)
+	})
+}
+
 func TestPluginManager_Abort(t *testing.T) {
 	ctx := context.TODO()
 	tm := getMockTaskExecutionMetadata()
