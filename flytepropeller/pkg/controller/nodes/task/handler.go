@@ -433,6 +433,10 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 }
 
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
+	// FLYTE_ENABLE_DECK is used when flytekit > 1.14.0
+	// For backward compatibility,
+	// we will return DeckUnknow and call a HEAD request to check if the deck file exists in the terminal state.
+
 	template, err := tCtx.tr.Read(ctx)
 	if err != nil {
 		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
