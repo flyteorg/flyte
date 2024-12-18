@@ -29171,6 +29171,7 @@
                  * @memberof flyteidl.admin
                  * @interface IEmailNotification
                  * @property {Array.<string>|null} [recipientsEmail] EmailNotification recipientsEmail
+                 * @property {string|null} [template] EmailNotification template
                  */
     
                 /**
@@ -29196,6 +29197,14 @@
                  * @instance
                  */
                 EmailNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * EmailNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.EmailNotification
+                 * @instance
+                 */
+                EmailNotification.prototype.template = "";
     
                 /**
                  * Creates a new EmailNotification instance using the specified properties.
@@ -29224,6 +29233,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29249,6 +29260,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29276,6 +29290,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29289,6 +29306,7 @@
                  * @memberof flyteidl.admin
                  * @interface IPagerDutyNotification
                  * @property {Array.<string>|null} [recipientsEmail] PagerDutyNotification recipientsEmail
+                 * @property {string|null} [template] PagerDutyNotification template
                  */
     
                 /**
@@ -29314,6 +29332,14 @@
                  * @instance
                  */
                 PagerDutyNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * PagerDutyNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.PagerDutyNotification
+                 * @instance
+                 */
+                PagerDutyNotification.prototype.template = "";
     
                 /**
                  * Creates a new PagerDutyNotification instance using the specified properties.
@@ -29342,6 +29368,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29367,6 +29395,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29394,6 +29425,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29407,6 +29441,7 @@
                  * @memberof flyteidl.admin
                  * @interface ISlackNotification
                  * @property {Array.<string>|null} [recipientsEmail] SlackNotification recipientsEmail
+                 * @property {string|null} [template] SlackNotification template
                  */
     
                 /**
@@ -29432,6 +29467,14 @@
                  * @instance
                  */
                 SlackNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * SlackNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.SlackNotification
+                 * @instance
+                 */
+                SlackNotification.prototype.template = "";
     
                 /**
                  * Creates a new SlackNotification instance using the specified properties.
@@ -29460,6 +29503,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29485,6 +29530,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29512,6 +29560,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
