@@ -30,6 +30,8 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[3].FLYTE_PLATFORM_URL | string | `"{{ printf \"%s-grpc\" .Release.Name }}.{{ .Release.Namespace }}:8089"` |  |
+| flyte-binary.configuration.inline.plugins.k8s.default-env-vars[4].FLYTE_PLATFORM_INSECURE | bool | `true` |  |
 | flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
 | flyte-binary.configuration.inline.task_resources.defaults.cpu | string | `"500m"` |  |
 | flyte-binary.configuration.inline.task_resources.defaults.ephemeralStorage | int | `0` |  |

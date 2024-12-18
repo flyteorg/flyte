@@ -19615,6 +19615,7 @@
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
                  * @property {string|null} [principal] CloudEventWorkflowExecution principal
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventWorkflowExecution launchPlanId
+                 * @property {Object.<string,string>|null} [labels] CloudEventWorkflowExecution labels
                  */
     
                 /**
@@ -19627,6 +19628,7 @@
                  */
                 function CloudEventWorkflowExecution(properties) {
                     this.artifactIds = [];
+                    this.labels = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19682,6 +19684,14 @@
                 CloudEventWorkflowExecution.prototype.launchPlanId = null;
     
                 /**
+                 * CloudEventWorkflowExecution labels.
+                 * @member {Object.<string,string>} labels
+                 * @memberof flyteidl.event.CloudEventWorkflowExecution
+                 * @instance
+                 */
+                CloudEventWorkflowExecution.prototype.labels = $util.emptyObject;
+    
+                /**
                  * Creates a new CloudEventWorkflowExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventWorkflowExecution
@@ -19718,6 +19728,9 @@
                         writer.uint32(/* id 5, wireType 2 =*/42).string(message.principal);
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
                         $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        for (var keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 7, wireType 2 =*/58).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -19735,7 +19748,7 @@
                 CloudEventWorkflowExecution.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventWorkflowExecution();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventWorkflowExecution(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -19758,6 +19771,14 @@
                             break;
                         case 6:
                             message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            reader.skip().pos++;
+                            if (message.labels === $util.emptyObject)
+                                message.labels = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.labels[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19810,6 +19831,14 @@
                         if (error)
                             return "launchPlanId." + error;
                     }
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        if (!$util.isObject(message.labels))
+                            return "labels: object expected";
+                        var key = Object.keys(message.labels);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.labels[key[i]]))
+                                return "labels: string{k:string} expected";
+                    }
                     return null;
                 };
     
@@ -19828,6 +19857,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventNodeExecution artifactIds
                  * @property {string|null} [principal] CloudEventNodeExecution principal
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventNodeExecution launchPlanId
+                 * @property {Object.<string,string>|null} [labels] CloudEventNodeExecution labels
                  */
     
                 /**
@@ -19840,6 +19870,7 @@
                  */
                 function CloudEventNodeExecution(properties) {
                     this.artifactIds = [];
+                    this.labels = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19895,6 +19926,14 @@
                 CloudEventNodeExecution.prototype.launchPlanId = null;
     
                 /**
+                 * CloudEventNodeExecution labels.
+                 * @member {Object.<string,string>} labels
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.labels = $util.emptyObject;
+    
+                /**
                  * Creates a new CloudEventNodeExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventNodeExecution
@@ -19931,6 +19970,9 @@
                         writer.uint32(/* id 5, wireType 2 =*/42).string(message.principal);
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
                         $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        for (var keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 7, wireType 2 =*/58).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -19948,7 +19990,7 @@
                 CloudEventNodeExecution.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventNodeExecution();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventNodeExecution(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -19971,6 +20013,14 @@
                             break;
                         case 6:
                             message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            reader.skip().pos++;
+                            if (message.labels === $util.emptyObject)
+                                message.labels = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.labels[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20023,6 +20073,14 @@
                         if (error)
                             return "launchPlanId." + error;
                     }
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        if (!$util.isObject(message.labels))
+                            return "labels: object expected";
+                        var key = Object.keys(message.labels);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.labels[key[i]]))
+                                return "labels: string{k:string} expected";
+                    }
                     return null;
                 };
     
@@ -20036,6 +20094,7 @@
                  * @memberof flyteidl.event
                  * @interface ICloudEventTaskExecution
                  * @property {flyteidl.event.ITaskExecutionEvent|null} [rawEvent] CloudEventTaskExecution rawEvent
+                 * @property {Object.<string,string>|null} [labels] CloudEventTaskExecution labels
                  */
     
                 /**
@@ -20047,6 +20106,7 @@
                  * @param {flyteidl.event.ICloudEventTaskExecution=} [properties] Properties to set
                  */
                 function CloudEventTaskExecution(properties) {
+                    this.labels = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -20060,6 +20120,14 @@
                  * @instance
                  */
                 CloudEventTaskExecution.prototype.rawEvent = null;
+    
+                /**
+                 * CloudEventTaskExecution labels.
+                 * @member {Object.<string,string>} labels
+                 * @memberof flyteidl.event.CloudEventTaskExecution
+                 * @instance
+                 */
+                CloudEventTaskExecution.prototype.labels = $util.emptyObject;
     
                 /**
                  * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -20087,6 +20155,9 @@
                         writer = $Writer.create();
                     if (message.rawEvent != null && message.hasOwnProperty("rawEvent"))
                         $root.flyteidl.event.TaskExecutionEvent.encode(message.rawEvent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        for (var keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -20104,12 +20175,20 @@
                 CloudEventTaskExecution.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventTaskExecution();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.CloudEventTaskExecution(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
                             message.rawEvent = $root.flyteidl.event.TaskExecutionEvent.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            reader.skip().pos++;
+                            if (message.labels === $util.emptyObject)
+                                message.labels = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.labels[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20134,6 +20213,14 @@
                         var error = $root.flyteidl.event.TaskExecutionEvent.verify(message.rawEvent);
                         if (error)
                             return "rawEvent." + error;
+                    }
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        if (!$util.isObject(message.labels))
+                            return "labels: object expected";
+                        var key = Object.keys(message.labels);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.labels[key[i]]))
+                                return "labels: string{k:string} expected";
                     }
                     return null;
                 };

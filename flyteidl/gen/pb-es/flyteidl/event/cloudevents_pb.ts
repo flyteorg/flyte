@@ -54,6 +54,13 @@ export class CloudEventWorkflowExecution extends Message<CloudEventWorkflowExecu
    */
   launchPlanId?: Identifier;
 
+  /**
+   * We can't have the ExecutionMetadata object directly because of import cycle
+   *
+   * @generated from field: map<string, string> labels = 7;
+   */
+  labels: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CloudEventWorkflowExecution>) {
     super();
     proto3.util.initPartial(data, this);
@@ -68,6 +75,7 @@ export class CloudEventWorkflowExecution extends Message<CloudEventWorkflowExecu
     { no: 4, name: "reference_execution", kind: "message", T: WorkflowExecutionIdentifier },
     { no: 5, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "launch_plan_id", kind: "message", T: Identifier },
+    { no: 7, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CloudEventWorkflowExecution {
@@ -132,6 +140,13 @@ export class CloudEventNodeExecution extends Message<CloudEventNodeExecution> {
    */
   launchPlanId?: Identifier;
 
+  /**
+   * We can't have the ExecutionMetadata object directly because of import cycle
+   *
+   * @generated from field: map<string, string> labels = 7;
+   */
+  labels: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CloudEventNodeExecution>) {
     super();
     proto3.util.initPartial(data, this);
@@ -146,6 +161,7 @@ export class CloudEventNodeExecution extends Message<CloudEventNodeExecution> {
     { no: 4, name: "artifact_ids", kind: "message", T: ArtifactID, repeated: true },
     { no: 5, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "launch_plan_id", kind: "message", T: Identifier },
+    { no: 7, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CloudEventNodeExecution {
@@ -174,6 +190,13 @@ export class CloudEventTaskExecution extends Message<CloudEventTaskExecution> {
    */
   rawEvent?: TaskExecutionEvent;
 
+  /**
+   * We can't have the ExecutionMetadata object directly because of import cycle
+   *
+   * @generated from field: map<string, string> labels = 2;
+   */
+  labels: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CloudEventTaskExecution>) {
     super();
     proto3.util.initPartial(data, this);
@@ -183,6 +206,7 @@ export class CloudEventTaskExecution extends Message<CloudEventTaskExecution> {
   static readonly typeName = "flyteidl.event.CloudEventTaskExecution";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "raw_event", kind: "message", T: TaskExecutionEvent },
+    { no: 2, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CloudEventTaskExecution {
