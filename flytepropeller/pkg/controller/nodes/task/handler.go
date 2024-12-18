@@ -432,7 +432,7 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	return t.taskMetricsMap[metricNameKey], nil
 }
 
-func IsDeckEnabled(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
+func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
 	template, err := tCtx.tr.Read(ctx)
 	if err != nil {
 		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
@@ -548,7 +548,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	// The deck should be accessible even if the task is still running or has failed.
 	// It's possible that the deck URI may not exist in remote storage yet or will never exist.
 	// So, it is console's responsibility to handle the case when the deck URI actually does not exist.
-	deckStatus, err := IsDeckEnabled(ctx, tCtx)
+	deckStatus, err := GetDeckStatus(ctx, tCtx)
 	if err != nil {
 		return nil, err
 	}
