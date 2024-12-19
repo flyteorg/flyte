@@ -143,11 +143,11 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.GetPhase(),
 			CacheStatus:  cacheStatus,
-			CustomInfo:   taskExecutionEvent.CustomInfo,
+			CustomInfo:   taskExecutionEvent.GetCustomInfo(),
 		}
 
-		if taskExecutionEvent.GetMetadata() != nil && len(taskExecutionEvent.GetMetadata().ExternalResources) == 1 {
-			externalResourceInfo.CustomInfo = taskExecutionEvent.GetMetadata().ExternalResources[0].CustomInfo
+		if taskExecutionEvent.GetMetadata() != nil && len(taskExecutionEvent.GetMetadata().GetExternalResources()) == 1 {
+			externalResourceInfo.CustomInfo = taskExecutionEvent.GetMetadata().GetExternalResources()[0].GetCustomInfo()
 		}
 
 		e.externalResources = append(e.externalResources, &externalResourceInfo)
