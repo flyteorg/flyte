@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"testing"
@@ -114,6 +115,7 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 
 	ns := &mocks2.ExecutableNodeStatus{}
 	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
+	ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
 	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 
 	ir := &mocks3.InputReader{}
@@ -166,7 +168,6 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 		name            string
 		ns              interfaces.NodeStatus
 		err             error
-		nodeStatus      *mocks2.ExecutableNodeStatus
 		branchTakenNode v1alpha1.ExecutableNode
 		isErr           bool
 		expectedPhase   handler.EPhase
@@ -174,17 +175,17 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 		upstreamNodeID  string
 	}{
 		{"upstreamNodeExists", interfaces.NodeStatusPending, nil,
-			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, "n2"},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, "n2"},
 		{"childNodeError", interfaces.NodeStatusUndefined, fmt.Errorf("err"),
-			&mocks2.ExecutableNodeStatus{}, bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, ""},
+			bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, ""},
 		{"childPending", interfaces.NodeStatusPending, nil,
-			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, ""},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, ""},
 		{"childStillRunning", interfaces.NodeStatusRunning, nil,
-			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, ""},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, ""},
 		{"childFailure", interfaces.NodeStatusFailed(expectedError), nil,
-			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, ""},
+			bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, ""},
 		{"childComplete", interfaces.NodeStatusComplete, nil,
-			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, ""},
+			bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, ""},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -226,16 +227,16 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			).Return(test.ns, test.err)
 
 			childNodeStatus := &mocks2.ExecutableNodeStatus{}
-			if mockNodeLookup != nil {
-				childNodeStatus.OnGetOutputDir().Return("parent-output-dir")
-				test.nodeStatus.OnGetDataDir().Return("parent-data-dir")
-				test.nodeStatus.OnGetOutputDir().Return("parent-output-dir")
-				mockNodeLookup.OnGetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
-				childNodeStatus.On("SetDataDir", storage.DataReference("parent-data-dir")).Once()
-				childNodeStatus.On("SetOutputDir", storage.DataReference("parent-output-dir")).Once()
+			childNodeStatus.OnGetAttempts().Return(0)
+			childNodeStatus.On("SetDataDir", storage.DataReference("/output-dir/child")).Once()
+			childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/child/0")).Once()
+			mockNodeLookup.OnGetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
+			if test.childPhase == v1alpha1.NodePhaseSucceeded {
+				_ = nCtx.DataStore().WriteRaw(ctx, storage.DataReference("/output-dir/child/0/outputs.pb"), 0, storage.Options{}, bytes.NewReader([]byte{}))
 			}
+
 			branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope()).(*branchHandler)
-			h, err := branch.recurseDownstream(ctx, nCtx, test.nodeStatus, test.branchTakenNode)
+			h, err := branch.recurseDownstream(ctx, nCtx, test.branchTakenNode)
 			if test.isErr {
 				assert.Error(t, err)
 			} else {
