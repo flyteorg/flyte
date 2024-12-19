@@ -1101,6 +1101,11 @@ export class K8sPod extends Message<K8sPod> {
    */
   dataConfig?: DataLoadingConfig;
 
+  /**
+   * @generated from field: string primarycontainername = 4;
+   */
+  primarycontainername = "";
+
   constructor(data?: PartialMessage<K8sPod>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1112,6 +1117,7 @@ export class K8sPod extends Message<K8sPod> {
     { no: 1, name: "metadata", kind: "message", T: K8sObjectMetadata },
     { no: 2, name: "pod_spec", kind: "message", T: Struct },
     { no: 3, name: "data_config", kind: "message", T: DataLoadingConfig },
+    { no: 4, name: "primarycontainername", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): K8sPod {

@@ -271,7 +271,6 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		Labels:      make(map[string]string),
 	}
 	primaryContainerName := ""
-
 	switch target := taskTemplate.GetTarget().(type) {
 	case *core.TaskTemplate_Container:
 		// handles tasks defined by a single container
@@ -286,6 +285,11 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
+		if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername) > 0 {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+			primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername
+		}
+
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
 		if target.K8SPod.GetPodSpec() == nil {
@@ -337,6 +341,7 @@ func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
 // configuration PodTemplate (if exists).
 func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+
 	if err != nil {
 		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
 		return nil, nil, err
@@ -434,6 +439,13 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
 	}
 
+	//if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+	//	podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+	//	if err != nil {
+	//		return nil, nil, err
+	//	}
+	//}
+
 	return podSpec, objectMeta, nil
 }
 
@@ -443,6 +455,25 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 			podSpec.Containers[i].Image = containerImage
 			return
 		}
+	}
+}
+
+func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta metav1.ObjectMeta, podtemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podtemplate.Metadata.Annotations != nil {
+		mergeMapInto(podtemplate.Metadata.Annotations, objectMeta.Annotations)
+	}
+	if podtemplate.Metadata.Labels != nil {
+		mergeMapInto(podtemplate.Metadata.Labels, objectMeta.Labels)
+	}
+	var podspec_override *v1.PodSpec
+	err := utils.UnmarshalStructToObj(podtemplate.PodSpec, &podspec_override)
+	if err != nil {
+		return nil, objectMeta, err
+	}
+	if podspec_override.Containers == nil {
+		return podSpec, objectMeta, nil
+	} else {
+		return podspec_override, objectMeta, nil
 	}
 }
 

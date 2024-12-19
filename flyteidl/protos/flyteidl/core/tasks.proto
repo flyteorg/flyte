@@ -320,6 +320,8 @@ message K8sPod {
     // to understand the default paths.
     // Only K8s
     DataLoadingConfig data_config = 3;
+
+    string primarycontainername = 4;
 }
 
 // Metadata for building a kubernetes object when a task is executed.

@@ -1736,6 +1736,8 @@ pub struct K8sPod {
     /// Only K8s
     #[prost(message, optional, tag="3")]
     pub data_config: ::core::option::Option<DataLoadingConfig>,
+    #[prost(string, tag="4")]
+    pub primarycontainername: ::prost::alloc::string::String,
 }
 /// Metadata for building a kubernetes object when a task is executed.
 #[allow(clippy::derive_partial_eq_without_eq)]
