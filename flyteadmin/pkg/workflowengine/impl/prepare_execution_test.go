@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 )
 
 const testRole = "role"
@@ -254,5 +255,5 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			OutputLocationPrefix: "s3://bucket/key",
 		},
 	})
-	assert.Equal(t, flyteWorkflow.Finalizers, []string{"flyte-finalizer"})
+	assert.Equal(t, flyteWorkflow.Finalizers, []string{controller.Finalizer})
 }

@@ -19,6 +19,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -41,7 +42,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
-const finalizer = "flyte/flytek8s"
+const (
+	finalizer = "flyte.org/finalizer-k8s"
+	// Old non-domain-qualified finalizer for backwards compatibility
+	// This should eventually be removed
+	oldFinalizer = "flyte/flytek8s"
+)
 
 const pluginStateVersion = 1
 
@@ -115,8 +121,7 @@ func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 	}
 
 	if cfg.InjectFinalizer && !e.plugin.GetProperties().DisableInjectFinalizer {
-		f := append(o.GetFinalizers(), finalizer)
-		o.SetFinalizers(f)
+		_ = controllerutil.AddFinalizer(o, finalizer)
 	}
 
 	if errs := validation.IsDNS1123Subdomain(o.GetName()); len(errs) > 0 {
@@ -312,10 +317,10 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		return pluginsCore.DoTransition(p), nil
 	}
 
-	if !p.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
+	if !p.Phase().IsTerminal() && !o.GetDeletionTimestamp().IsZero() {
 		// If the object has been deleted, that is, it has a deletion timestamp, but is not in a terminal state, we should
 		// mark the task as a retryable failure.  We've seen this happen when a kubelet disappears - all pods running on
-		// the node are marked with a deletionTimestamp, but our finalizers prevent the pod from being deleted.
+		// the node are marked with a deletionTimestamp, but our finalizer prevents the pod from being deleted.
 		// This can also happen when a user deletes a Pod directly.
 		failureReason := fmt.Sprintf("object [%s] terminated in the background, manually", nsName.String())
 		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
@@ -444,7 +449,7 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 	}
 
 	if err != nil && !isK8sObjectNotExists(err) {
-		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
+		logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v",
 			resourceToFinalize.GetNamespace(), resourceToFinalize.GetName(), err)
 		return err
 	}
@@ -452,17 +457,21 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 	return nil
 }
 
-func (e *PluginManager) clearFinalizers(ctx context.Context, o client.Object) error {
-	if len(o.GetFinalizers()) > 0 {
-		o.SetFinalizers([]string{})
+// clearFinalizer removes the Flyte finalizer (if it exists) from the k8s resource
+func (e *PluginManager) clearFinalizer(ctx context.Context, o client.Object) error {
+	// Checking for the old finalizer too for backwards compatibility. This should eventually be removed
+	// Go does short-circuiting and we have to make sure both are removed
+	finalizerRemoved := controllerutil.RemoveFinalizer(o, finalizer)
+	oldFinalizerRemoved := controllerutil.RemoveFinalizer(o, oldFinalizer)
+	if finalizerRemoved || oldFinalizerRemoved {
 		err := e.kubeClient.GetClient().Update(ctx, o)
 		if err != nil && !isK8sObjectNotExists(err) {
-			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
+			logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v/%v. Error: %v",
 				o.GetNamespace(), o.GetName(), err)
 			return err
 		}
 	} else {
-		logger.Debugf(ctx, "Finalizers are already empty for Resource with name: %v/%v",
+		logger.Debugf(ctx, "Finalizer is already cleared from Resource with name: %v/%v",
 			o.GetNamespace(), o.GetName())
 	}
 	return nil
@@ -487,7 +496,7 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		Steps:    e.updateBackoffRetries,
 	}
 
-	// Attempt to cleanup finalizers so that the object may be deleted/garbage collected. We try to clear them for all
+	// Attempt to cleanup finalizer so that the object may be deleted/garbage collected. We try to clear it for all
 	// objects, regardless of whether or not InjectFinalizer is configured to handle all cases where InjectFinalizer is
 	// enabled/disabled during object execution.
 	var lastErr error
@@ -507,14 +516,14 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
 		// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
 		// the same event (idempotent) and then come here again...
-		if err := e.clearFinalizers(ctx, o); err != nil {
+		if err := e.clearFinalizer(ctx, o); err != nil {
 			lastErr = err
 			// retry is if there is a conflict in case the informer cache is out of sync
 			if k8serrors.IsConflict(err) {
-				logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v. Error: %v. Retrying..", nsName, err)
+				logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v. Error: %v. Retrying..", nsName, err)
 				return false, nil
 			}
-			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v. Error: %v", nsName, err)
+			logger.Warningf(ctx, "Failed to clear finalizer for Resource with name: %v. Error: %v", nsName, err)
 			return true, err
 		}
 		return true, nil
