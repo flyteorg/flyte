@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"strconv"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -531,9 +530,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}{outputLiterals, nil}
 			} else {
 				// initialize subNode reader
-				currentAttempt := int(arrayNodeStateStore.getAttempts(ctx, nCtx, i))
-				subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx,
-					strconv.Itoa(i), strconv.Itoa(currentAttempt))
+				subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, i, arrayNodeStateStore.getAttempts(ctx, nCtx, i))
 				if err != nil {
 					gatherOutputsRequest.responseChannel <- struct {
 						literalMap map[string]*idlcore.Literal

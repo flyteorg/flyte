@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strconv"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -50,18 +51,83 @@ func bytesFromK8sPluginState(pluginState k8s.PluginState) ([]byte, error) {
 	return bufferWriter.Bytes(), nil
 }
 
-func constructOutputReferences(ctx context.Context, nCtx interfaces.NodeExecutionContext, postfix ...string) (storage.DataReference, storage.DataReference, error) {
-	subDataDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetDataDir(), postfix...)
+func constructOutputReferences(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeIndex int, currentAttempt uint32) (storage.DataReference, storage.DataReference, error) {
+	subDataDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetDataDir(), []string{strconv.Itoa(subNodeIndex)}...)
 	if err != nil {
 		return "", "", err
 	}
 
-	subOutputDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), postfix...)
+	subOutputDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), []string{strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt))}...)
 	if err != nil {
 		return "", "", err
 	}
 
 	return subDataDir, subOutputDir, nil
+}
+
+func convertLiteralToBindingData(literal *idlcore.Literal) (*idlcore.BindingData, error) {
+	bindingData := &idlcore.BindingData{}
+
+	if literal.GetValue() == nil {
+		return bindingData, nil
+	}
+
+	switch val := literal.GetValue().(type) {
+	case *idlcore.Literal_Scalar:
+		bindingData.Value = &idlcore.BindingData_Scalar{Scalar: val.Scalar}
+	case *idlcore.Literal_Collection:
+		convertedItems := make([]*idlcore.BindingData, len(val.Collection.Literals))
+		for i, item := range val.Collection.Literals {
+			bd, err := convertLiteralToBindingData(item)
+			if err != nil {
+				return nil, err
+			}
+			convertedItems[i] = bd
+		}
+		bindingData.Value = &idlcore.BindingData_Collection{
+			Collection: &idlcore.BindingDataCollection{Bindings: convertedItems},
+		}
+	case *idlcore.Literal_Map:
+		bdMap := &idlcore.BindingDataMap{Bindings: make(map[string]*idlcore.BindingData)}
+		for key, literal := range val.Map.Literals {
+			bd, err := convertLiteralToBindingData(literal)
+			if err != nil {
+				return nil, err
+			}
+			bdMap.Bindings[key] = bd
+		}
+		bindingData.Value = &idlcore.BindingData_Map{Map: bdMap}
+	case *idlcore.Literal_OffloadedMetadata:
+		bindingData.Value = &idlcore.BindingData_OffloadedMetadata{
+			OffloadedMetadata: val.OffloadedMetadata,
+		}
+	default:
+		return nil, fmt.Errorf("unsupported Literal value type: %T", val)
+	}
+
+	return bindingData, nil
+}
+
+func constructInputBindings(arrayNode v1alpha1.ExecutableArrayNode, inputLiteralMap *idlcore.LiteralMap) ([]*v1alpha1.Binding, error) {
+	var inputBindings []*v1alpha1.Binding
+	for _, binding := range arrayNode.GetSubNodeSpec().GetInputBindings() {
+		key := inputLiteralMap.GetLiterals()[binding.GetVar()]
+		if key == nil {
+			return nil, fmt.Errorf("binding [%s] not found in input literal map", binding.GetVar())
+		}
+		bindingData, err := convertLiteralToBindingData(key)
+		if err != nil {
+			return nil, err
+		}
+		inputBinding := &v1alpha1.Binding{
+			Binding: &idlcore.Binding{
+				Var:     binding.GetVar(),
+				Binding: bindingData,
+			},
+		}
+		inputBindings = append(inputBindings, inputBinding)
+	}
+	return inputBindings, nil
 }
 
 func inferParallelism(ctx context.Context, parallelism *uint32, parallelismBehavior string, remainingWorkflowParallelism, arrayNodeSize int) (bool, int) {

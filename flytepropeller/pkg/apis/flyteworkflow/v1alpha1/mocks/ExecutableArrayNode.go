@@ -14,6 +14,38 @@ type ExecutableArrayNode struct {
 	mock.Mock
 }
 
+type ExecutableArrayNode_GetDataMode struct {
+	*mock.Call
+}
+
+func (_m ExecutableArrayNode_GetDataMode) Return(_a0 core.ArrayNode_DataMode) *ExecutableArrayNode_GetDataMode {
+	return &ExecutableArrayNode_GetDataMode{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableArrayNode) OnGetDataMode() *ExecutableArrayNode_GetDataMode {
+	c_call := _m.On("GetDataMode")
+	return &ExecutableArrayNode_GetDataMode{Call: c_call}
+}
+
+func (_m *ExecutableArrayNode) OnGetDataModeMatch(matchers ...interface{}) *ExecutableArrayNode_GetDataMode {
+	c_call := _m.On("GetDataMode", matchers...)
+	return &ExecutableArrayNode_GetDataMode{Call: c_call}
+}
+
+// GetDataMode provides a mock function with given fields:
+func (_m *ExecutableArrayNode) GetDataMode() core.ArrayNode_DataMode {
+	ret := _m.Called()
+
+	var r0 core.ArrayNode_DataMode
+	if rf, ok := ret.Get(0).(func() core.ArrayNode_DataMode); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(core.ArrayNode_DataMode)
+	}
+
+	return r0
+}
+
 type ExecutableArrayNode_GetExecutionMode struct {
 	*mock.Call
 }

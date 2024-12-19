@@ -219,3 +219,315 @@ func TestShouldIncrementTaskPhaseVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertLiteralToBindingData(t *testing.T) {
+
+	tests := []struct {
+		name                string
+		literal             *idlcore.Literal
+		expectedBindingData *idlcore.BindingData
+	}{
+		{
+			name:                "Nil",
+			literal:             nil,
+			expectedBindingData: &idlcore.BindingData{},
+		},
+		{
+			name: "Scalar",
+			literal: &idlcore.Literal{
+				Value: &idlcore.Literal_Scalar{
+					Scalar: &idlcore.Scalar{
+						Value: &idlcore.Scalar_Primitive{
+							Primitive: &idlcore.Primitive{
+								Value: &idlcore.Primitive_Integer{
+									Integer: 1,
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedBindingData: &idlcore.BindingData{
+				Value: &idlcore.BindingData_Scalar{
+					Scalar: &idlcore.Scalar{
+						Value: &idlcore.Scalar_Primitive{
+							Primitive: &idlcore.Primitive{
+								Value: &idlcore.Primitive_Integer{
+									Integer: 1,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Collection",
+			literal: &idlcore.Literal{
+				Value: &idlcore.Literal_Collection{
+					Collection: &idlcore.LiteralCollection{
+						Literals: []*idlcore.Literal{
+							{
+								Value: &idlcore.Literal_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_Integer{
+													Integer: 1,
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Value: &idlcore.Literal_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_StringValue{
+													StringValue: "one",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedBindingData: &idlcore.BindingData{
+				Value: &idlcore.BindingData_Collection{
+					Collection: &idlcore.BindingDataCollection{
+						Bindings: []*idlcore.BindingData{
+							{
+								Value: &idlcore.BindingData_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_Integer{
+													Integer: 1,
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Value: &idlcore.BindingData_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_StringValue{
+													StringValue: "one",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Empty Collection",
+			literal: &idlcore.Literal{
+				Value: &idlcore.Literal_Collection{
+					Collection: &idlcore.LiteralCollection{
+						Literals: []*idlcore.Literal{},
+					},
+				},
+			},
+			expectedBindingData: &idlcore.BindingData{
+				Value: &idlcore.BindingData_Collection{
+					Collection: &idlcore.BindingDataCollection{
+						Bindings: []*idlcore.BindingData{},
+					},
+				},
+			},
+		},
+		{
+			name: "Map",
+			literal: &idlcore.Literal{
+				Value: &idlcore.Literal_Map{
+					Map: &idlcore.LiteralMap{
+						Literals: map[string]*idlcore.Literal{
+							"scalar": {
+								Value: &idlcore.Literal_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_Integer{
+													Integer: 1,
+												},
+											},
+										},
+									},
+								},
+							},
+							"collection": {
+								Value: &idlcore.Literal_Collection{
+									Collection: &idlcore.LiteralCollection{
+										Literals: []*idlcore.Literal{
+											{
+												Value: &idlcore.Literal_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_Integer{
+																	Integer: 1,
+																},
+															},
+														},
+													},
+												},
+											},
+											{
+												Value: &idlcore.Literal_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_StringValue{
+																	StringValue: "one",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							"map": {
+								Value: &idlcore.Literal_Map{
+									Map: &idlcore.LiteralMap{
+										Literals: map[string]*idlcore.Literal{
+											"nested_scalar": {
+												Value: &idlcore.Literal_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_Integer{
+																	Integer: 2,
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedBindingData: &idlcore.BindingData{
+				Value: &idlcore.BindingData_Map{
+					Map: &idlcore.BindingDataMap{
+						Bindings: map[string]*idlcore.BindingData{
+							"scalar": {
+								Value: &idlcore.BindingData_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_Integer{
+													Integer: 1,
+												},
+											},
+										},
+									},
+								},
+							},
+							"collection": {
+								Value: &idlcore.BindingData_Collection{
+									Collection: &idlcore.BindingDataCollection{
+										Bindings: []*idlcore.BindingData{
+											{
+												Value: &idlcore.BindingData_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_Integer{
+																	Integer: 1,
+																},
+															},
+														},
+													},
+												},
+											},
+											{
+												Value: &idlcore.BindingData_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_StringValue{
+																	StringValue: "one",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							"map": {
+								Value: &idlcore.BindingData_Map{
+									Map: &idlcore.BindingDataMap{
+										Bindings: map[string]*idlcore.BindingData{
+											"nested_scalar": {
+												Value: &idlcore.BindingData_Scalar{
+													Scalar: &idlcore.Scalar{
+														Value: &idlcore.Scalar_Primitive{
+															Primitive: &idlcore.Primitive{
+																Value: &idlcore.Primitive_Integer{
+																	Integer: 2,
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Empty Map",
+			literal: &idlcore.Literal{
+				Value: &idlcore.Literal_Map{
+					Map: &idlcore.LiteralMap{
+						Literals: map[string]*idlcore.Literal{},
+					},
+				},
+			},
+			expectedBindingData: &idlcore.BindingData{
+				Value: &idlcore.BindingData_Map{
+					Map: &idlcore.BindingDataMap{
+						Bindings: map[string]*idlcore.BindingData{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bindingData, err := convertLiteralToBindingData(tt.literal)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedBindingData, bindingData)
+		})
+	}
+}

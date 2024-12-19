@@ -10135,6 +10135,15 @@
       },
       "title": "Sets custom attributes for a project, domain and workflow combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
+    "ArrayNodeDataMode": {
+      "type": "string",
+      "enum": [
+        "SINGLE_INPUT_FILE",
+        "INDIVIDUAL_INPUT_FILES"
+      ],
+      "default": "SINGLE_INPUT_FILE",
+      "description": " - SINGLE_INPUT_FILE: Indicates the ArrayNode's input is a list of input values that map to subNode executions.\nThe file path set for the subNode will be the ArrayNode's input file, but the in-memory\nvalue utilized in propeller will be the individual value for each subNode execution.\nSubNode executions need to be able to read in and parse the individual value to execute correctly.\n - INDIVIDUAL_INPUT_FILES: Indicates the ArrayNode's input is a list of input values that map to subNode executions.\nPropeller will create input files for each ArrayNode subNode by parsing the inputs and\nsetting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will\nbe the individual value for each subNode execution."
+    },
     "BlobTypeBlobDimensionality": {
       "type": "string",
       "enum": [
@@ -12961,6 +12970,10 @@
         "is_original_sub_node_interface": {
           "type": "boolean",
           "title": "Indicates whether the sub node's original interface was altered"
+        },
+        "data_mode": {
+          "$ref": "#/definitions/ArrayNodeDataMode",
+          "title": "data_mode determines how input data is passed to the sub-nodes"
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
@@ -13104,6 +13117,10 @@
         "map": {
           "$ref": "#/definitions/coreBindingDataMap",
           "description": "A map of bindings. The key is always a string."
+        },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.\nUsed for nodes that don't have promises from upstream nodes such as ArrayNode subNodes."
         },
         "union": {
           "$ref": "#/definitions/coreUnionInfo"

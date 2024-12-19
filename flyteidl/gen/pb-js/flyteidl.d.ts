@@ -3803,6 +3803,9 @@ export namespace flyteidl {
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union */
             union?: (flyteidl.core.IUnionInfo|null);
         }
@@ -3828,11 +3831,14 @@ export namespace flyteidl {
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union. */
             public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
-            public value?: ("scalar"|"collection"|"promise"|"map");
+            public value?: ("scalar"|"collection"|"promise"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new BindingData instance using the specified properties.
@@ -4595,6 +4601,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface */
             isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode */
+            dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4623,6 +4632,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface. */
             public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode. */
+            public dataMode: flyteidl.core.ArrayNode.DataMode;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4669,6 +4681,12 @@ export namespace flyteidl {
             enum ExecutionMode {
                 MINIMAL_STATE = 0,
                 FULL_STATE = 1
+            }
+
+            /** DataMode enum. */
+            enum DataMode {
+                SINGLE_INPUT_FILE = 0,
+                INDIVIDUAL_INPUT_FILES = 1
             }
         }
 

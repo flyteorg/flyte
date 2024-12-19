@@ -8,6 +8,7 @@ type ArrayNodeSpec struct {
 	MinSuccesses    *uint32
 	MinSuccessRatio *float32
 	ExecutionMode   core.ArrayNode_ExecutionMode
+	DataMode        core.ArrayNode_DataMode
 }
 
 func (a *ArrayNodeSpec) GetSubNodeSpec() *NodeSpec {
@@ -28,4 +29,8 @@ func (a *ArrayNodeSpec) GetMinSuccessRatio() *float32 {
 
 func (a *ArrayNodeSpec) GetExecutionMode() core.ArrayNode_ExecutionMode {
 	return a.ExecutionMode
+}
+
+func (a *ArrayNodeSpec) GetDataMode() core.ArrayNode_DataMode {
+	return a.DataMode
 }

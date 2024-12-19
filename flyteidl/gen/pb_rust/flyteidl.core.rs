@@ -568,7 +568,7 @@ pub struct UnionInfo {
 pub struct BindingData {
     #[prost(message, optional, tag="5")]
     pub union: ::core::option::Option<UnionInfo>,
-    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4, 6")]
     pub value: ::core::option::Option<binding_data::Value>,
 }
 /// Nested message and enum types in `BindingData`.
@@ -589,6 +589,11 @@ pub mod binding_data {
         /// A map of bindings. The key is always a string.
         #[prost(message, tag="4")]
         Map(super::BindingDataMap),
+        /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        /// Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+        #[prost(message, tag="6")]
+        OffloadedMetadata(super::LiteralOffloadedMetadata),
     }
 }
 /// An input/output binding of a variable to either static value or a node output.
@@ -2502,6 +2507,9 @@ pub struct ArrayNode {
     /// Indicates whether the sub node's original interface was altered
     #[prost(message, optional, tag="6")]
     pub is_original_sub_node_interface: ::core::option::Option<bool>,
+    /// data_mode determines how input data is passed to the sub-nodes
+    #[prost(enumeration="array_node::DataMode", tag="7")]
+    pub data_mode: i32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -2535,6 +2543,40 @@ pub mod array_node {
             match value {
                 "MINIMAL_STATE" => Some(Self::MinimalState),
                 "FULL_STATE" => Some(Self::FullState),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum DataMode {
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// The file path set for the subNode will be the ArrayNode's input file, but the in-memory
+        /// value utilized in propeller will be the individual value for each subNode execution.
+        /// SubNode executions need to be able to read in and parse the individual value to execute correctly.
+        SingleInputFile = 0,
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// Propeller will create input files for each ArrayNode subNode by parsing the inputs and
+        /// setting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will
+        /// be the individual value for each subNode execution.
+        IndividualInputFiles = 1,
+    }
+    impl DataMode {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                DataMode::SingleInputFile => "SINGLE_INPUT_FILE",
+                DataMode::IndividualInputFiles => "INDIVIDUAL_INPUT_FILES",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "SINGLE_INPUT_FILE" => Some(Self::SingleInputFile),
+                "INDIVIDUAL_INPUT_FILES" => Some(Self::IndividualInputFiles),
                 _ => None,
             }
         }

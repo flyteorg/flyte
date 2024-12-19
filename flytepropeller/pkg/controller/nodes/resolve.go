@@ -84,6 +84,10 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 	case *core.BindingData_Scalar:
 		logger.Debugf(ctx, "bindingData.GetValue() [%v] is of type Scalar", bindingData.GetValue())
 		literal.Value = &core.Literal_Scalar{Scalar: bindingData.GetScalar()}
+	case *core.BindingData_OffloadedMetadata:
+		literal.Value = &core.Literal_OffloadedMetadata{
+			OffloadedMetadata: bindingData.GetOffloadedMetadata(),
+		}
 	}
 	return literal, nil
 }

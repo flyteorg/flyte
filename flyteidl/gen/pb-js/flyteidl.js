@@ -9121,6 +9121,7 @@
                  * @property {flyteidl.core.IBindingDataCollection|null} [collection] BindingData collection
                  * @property {flyteidl.core.IOutputReference|null} [promise] BindingData promise
                  * @property {flyteidl.core.IBindingDataMap|null} [map] BindingData map
+                 * @property {flyteidl.core.ILiteralOffloadedMetadata|null} [offloadedMetadata] BindingData offloadedMetadata
                  * @property {flyteidl.core.IUnionInfo|null} [union] BindingData union
                  */
     
@@ -9172,6 +9173,14 @@
                 BindingData.prototype.map = null;
     
                 /**
+                 * BindingData offloadedMetadata.
+                 * @member {flyteidl.core.ILiteralOffloadedMetadata|null|undefined} offloadedMetadata
+                 * @memberof flyteidl.core.BindingData
+                 * @instance
+                 */
+                BindingData.prototype.offloadedMetadata = null;
+    
+                /**
                  * BindingData union.
                  * @member {flyteidl.core.IUnionInfo|null|undefined} union
                  * @memberof flyteidl.core.BindingData
@@ -9184,12 +9193,12 @@
     
                 /**
                  * BindingData value.
-                 * @member {"scalar"|"collection"|"promise"|"map"|undefined} value
+                 * @member {"scalar"|"collection"|"promise"|"map"|"offloadedMetadata"|undefined} value
                  * @memberof flyteidl.core.BindingData
                  * @instance
                  */
                 Object.defineProperty(BindingData.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "promise", "map"]),
+                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "promise", "map", "offloadedMetadata"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -9227,6 +9236,8 @@
                         $root.flyteidl.core.BindingDataMap.encode(message.map, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.union != null && message.hasOwnProperty("union"))
                         $root.flyteidl.core.UnionInfo.encode(message.union, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata"))
+                        $root.flyteidl.core.LiteralOffloadedMetadata.encode(message.offloadedMetadata, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -9259,6 +9270,9 @@
                             break;
                         case 4:
                             message.map = $root.flyteidl.core.BindingDataMap.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.offloadedMetadata = $root.flyteidl.core.LiteralOffloadedMetadata.decode(reader, reader.uint32());
                             break;
                         case 5:
                             message.union = $root.flyteidl.core.UnionInfo.decode(reader, reader.uint32());
@@ -9319,6 +9333,16 @@
                             var error = $root.flyteidl.core.BindingDataMap.verify(message.map);
                             if (error)
                                 return "map." + error;
+                        }
+                    }
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralOffloadedMetadata.verify(message.offloadedMetadata);
+                            if (error)
+                                return "offloadedMetadata." + error;
                         }
                     }
                     if (message.union != null && message.hasOwnProperty("union")) {
@@ -11002,6 +11026,7 @@
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
+                 * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
                  */
     
                 /**
@@ -11067,6 +11092,14 @@
                  */
                 ArrayNode.prototype.isOriginalSubNodeInterface = null;
     
+                /**
+                 * ArrayNode dataMode.
+                 * @member {flyteidl.core.ArrayNode.DataMode} dataMode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.dataMode = 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -11128,6 +11161,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
                     if (message.isOriginalSubNodeInterface != null && message.hasOwnProperty("isOriginalSubNodeInterface"))
                         $root.google.protobuf.BoolValue.encode(message.isOriginalSubNodeInterface, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.dataMode != null && message.hasOwnProperty("dataMode"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).int32(message.dataMode);
                     return writer;
                 };
     
@@ -11166,6 +11201,9 @@
                             break;
                         case 6:
                             message.isOriginalSubNodeInterface = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.dataMode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11222,6 +11260,14 @@
                         if (error)
                             return "isOriginalSubNodeInterface." + error;
                     }
+                    if (message.dataMode != null && message.hasOwnProperty("dataMode"))
+                        switch (message.dataMode) {
+                        default:
+                            return "dataMode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
     
@@ -11236,6 +11282,20 @@
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "MINIMAL_STATE"] = 0;
                     values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
+    
+                /**
+                 * DataMode enum.
+                 * @name flyteidl.core.ArrayNode.DataMode
+                 * @enum {string}
+                 * @property {number} SINGLE_INPUT_FILE=0 SINGLE_INPUT_FILE value
+                 * @property {number} INDIVIDUAL_INPUT_FILES=1 INDIVIDUAL_INPUT_FILES value
+                 */
+                ArrayNode.DataMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "SINGLE_INPUT_FILE"] = 0;
+                    values[valuesById[1] = "INDIVIDUAL_INPUT_FILES"] = 1;
                     return values;
                 })();
     

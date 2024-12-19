@@ -3,7 +3,6 @@ package array
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -70,7 +69,7 @@ func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfa
 	}
 
 	currentAttempt := subNodeStatus.GetAttempts()
-	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt)))
+	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, subNodeIndex, currentAttempt)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
@@ -82,11 +81,6 @@ func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfa
 	subNodeID := getSubNodeID(subNodeIndex)
 	subNodeSpec.ID = subNodeID
 	subNodeSpec.Name = subNodeID
-	// mock the input bindings for the subNode to nil to bypass input resolution in the
-	// `nodeExecutor.preExecute` function. this is required because this function is the entrypoint
-	// for initial cache lookups. an alternative solution would be to mock the datastore to bypass
-	// writing the inputFile.
-	subNodeSpec.InputBindings = nil
 
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus.(*v1alpha1.NodeStatus))
 
@@ -99,16 +93,11 @@ func (f *fullStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfa
 		executors.NewExecutionContext(nCtx.ExecutionContext(), nCtx.ExecutionContext(), nCtx.ExecutionContext(), newParentInfo, executors.InitializeControlFlow()),
 		subNodeIndex)
 
-	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
-	inputs, err := nCtx.InputReader().Get(ctx)
+	inputReader, inputBindings, err := constructSubNodeInputs(ctx, nCtx, arrayNode, subNodeIndex, subDataDir)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
-	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex)
-	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
-	}
-	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
+	subNodeSpec.InputBindings = inputBindings
 
 	arrayNodeExecutionContextBuilder := newArrayNodeExecutionContextBuilder(f.arrayNodeHandler.nodeExecutor.GetNodeExecutionContextBuilder(),
 		subNodeID, subNodeIndex, subNodeStatus.(*v1alpha1.NodeStatus), inputReader, eventRecorder)
@@ -203,30 +192,12 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 	nodePhase := v1alpha1.NodePhase(m.arrayNodeStateCopy.SubNodePhases.GetItem(subNodeIndex))
 	taskPhase := int(m.arrayNodeStateCopy.SubNodeTaskPhases.GetItem(subNodeIndex))
 
-	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
-	inputs, err := nCtx.InputReader().Get(ctx)
-	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
-	}
-
-	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex)
-	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
-	}
-
-	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
-
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()
 
 	subNodeID := fmt.Sprintf("n%d", subNodeIndex)
 	subNodeSpec.ID = subNodeID
 	subNodeSpec.Name = subNodeID
-	// mock the input bindings for the subNode to nil to bypass input resolution in the
-	// `nodeExecutor.preExecute` function. this is required because this function is the entrypoint
-	// for initial cache lookups. an alternative solution would be to mock the datastore to bypass
-	// writing the inputFile.
-	subNodeSpec.InputBindings = nil
 
 	// TODO - if we want to support more plugin types we need to figure out the best way to store plugin state
 	// currently just mocking based on node phase -> which works for all k8s plugins
@@ -238,10 +209,16 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 
 	// construct output references
 	currentAttempt := uint32(m.arrayNodeStateCopy.SubNodeRetryAttempts.GetItem(subNodeIndex))
-	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt)))
+	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, subNodeIndex, currentAttempt)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
+
+	inputReader, inputBindings, err := constructSubNodeInputs(ctx, nCtx, arrayNode, subNodeIndex, subDataDir)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+	subNodeSpec.InputBindings = inputBindings
 
 	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
 	var startedAt *metav1.Time
