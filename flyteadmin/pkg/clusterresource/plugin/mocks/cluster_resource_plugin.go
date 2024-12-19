@@ -61,3 +61,81 @@ func (_m *ClusterResourcePlugin) BatchUpdateClusterResourceState(ctx context.Con
 
 	return r0, r1, r2
 }
+
+type ClusterResourcePlugin_GetDeprovisionProjectFilter struct {
+	*mock.Call
+}
+
+func (_m ClusterResourcePlugin_GetDeprovisionProjectFilter) Return(_a0 string, _a1 error) *ClusterResourcePlugin_GetDeprovisionProjectFilter {
+	return &ClusterResourcePlugin_GetDeprovisionProjectFilter{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ClusterResourcePlugin) OnGetDeprovisionProjectFilter(ctx context.Context) *ClusterResourcePlugin_GetDeprovisionProjectFilter {
+	c_call := _m.On("GetDeprovisionProjectFilter", ctx)
+	return &ClusterResourcePlugin_GetDeprovisionProjectFilter{Call: c_call}
+}
+
+func (_m *ClusterResourcePlugin) OnGetDeprovisionProjectFilterMatch(matchers ...interface{}) *ClusterResourcePlugin_GetDeprovisionProjectFilter {
+	c_call := _m.On("GetDeprovisionProjectFilter", matchers...)
+	return &ClusterResourcePlugin_GetDeprovisionProjectFilter{Call: c_call}
+}
+
+// GetDeprovisionProjectFilter provides a mock function with given fields: ctx
+func (_m *ClusterResourcePlugin) GetDeprovisionProjectFilter(ctx context.Context) (string, error) {
+	ret := _m.Called(ctx)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context) string); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ClusterResourcePlugin_GetProvisionProjectFilter struct {
+	*mock.Call
+}
+
+func (_m ClusterResourcePlugin_GetProvisionProjectFilter) Return(_a0 string, _a1 error) *ClusterResourcePlugin_GetProvisionProjectFilter {
+	return &ClusterResourcePlugin_GetProvisionProjectFilter{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ClusterResourcePlugin) OnGetProvisionProjectFilter(ctx context.Context) *ClusterResourcePlugin_GetProvisionProjectFilter {
+	c_call := _m.On("GetProvisionProjectFilter", ctx)
+	return &ClusterResourcePlugin_GetProvisionProjectFilter{Call: c_call}
+}
+
+func (_m *ClusterResourcePlugin) OnGetProvisionProjectFilterMatch(matchers ...interface{}) *ClusterResourcePlugin_GetProvisionProjectFilter {
+	c_call := _m.On("GetProvisionProjectFilter", matchers...)
+	return &ClusterResourcePlugin_GetProvisionProjectFilter{Call: c_call}
+}
+
+// GetProvisionProjectFilter provides a mock function with given fields: ctx
+func (_m *ClusterResourcePlugin) GetProvisionProjectFilter(ctx context.Context) (string, error) {
+	ret := _m.Called(ctx)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context) string); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

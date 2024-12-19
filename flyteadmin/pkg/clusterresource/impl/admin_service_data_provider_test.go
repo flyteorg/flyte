@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -86,10 +87,12 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 
 func TestServiceGetProjects(t *testing.T) {
 	ctx := context.TODO()
+	clusterResourcePlugin := plugin.NewDefaultClusterResourcePlugin()
+
 	t.Run("happy case", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			res := req.Limit == 100 && req.Filters == "value_in(state,0;2)" && req.SortBy.Key == "updated_at"
+			res := req.Limit == 100 && req.Filters == "value_not_in(state,1;3)" && req.SortBy.Key == "updated_at"
 			return res
 		})).Return(&admin.Projects{
 			Projects: []*admin.Project{
@@ -104,19 +107,19 @@ func TestServiceGetProjects(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		projects, err := provider.GetProjects(ctx)
+		projects, err := provider.GetProjects(ctx, clusterResourcePlugin)
 		assert.NoError(t, err)
 		assert.Len(t, projects.Projects, 2)
 	})
 	t.Run("admin error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			return req.Limit == 100 && req.Filters == "value_in(state,0;2)" && req.SortBy.Key == "updated_at"
+			return req.Limit == 100 && req.Filters == "value_not_in(state,1;3)" && req.SortBy.Key == "updated_at"
 		})).Return(nil, errFoo)
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		_, err := provider.GetProjects(ctx)
+		_, err := provider.GetProjects(ctx, clusterResourcePlugin)
 		assert.EqualError(t, err, errFoo.Error())
 	})
 }

@@ -870,10 +870,12 @@ func (c *controller) Sync(ctx context.Context) error {
 	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
 	// First handle ensuring k8s resources for active projects
-	projects, err := c.adminDataProvider.GetProjects(ctx)
+	clusterResourcePlugin := plugins.Get[plugin.ClusterResourcePlugin](c.pluginRegistry, plugins.PluginIDClusterResource)
+	projects, err := c.adminDataProvider.GetProjects(ctx, clusterResourcePlugin)
 	if err != nil {
 		return err
 	}
+
 	var errs = make([]error, 0)
 	templateValues, err := populateTemplateValues(c.config.ClusterResourceConfiguration().GetTemplateData())
 	if err != nil {
@@ -896,7 +898,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	// Second, handle deleting k8s namespaces for archived projects
 	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().CleanupNamespace {
-		archivedProjects, err := c.adminDataProvider.GetArchivedProjects(ctx)
+		archivedProjects, err := c.adminDataProvider.GetArchivedProjects(ctx, clusterResourcePlugin)
 		if err != nil {
 			logger.Warningf(ctx, "failed to get archived projects: %v", err)
 			return err
@@ -1035,6 +1037,6 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resourceManager)
 	}
 
-	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, plugin.NewNoopClusterResourcePlugin())
+	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, plugin.NewDefaultClusterResourcePlugin())
 	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope, pluginRegistry), nil
 }

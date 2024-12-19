@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -99,6 +100,7 @@ func TestGetProjects(t *testing.T) {
 		},
 	})
 	mockConfig := configMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
+	clusterResourcePlugin := plugin.NewDefaultClusterResourcePlugin()
 
 	t.Run("happy case", func(t *testing.T) {
 		mockRepo := repoMocks.NewMockRepository()
@@ -124,7 +126,7 @@ func TestGetProjects(t *testing.T) {
 			db:     mockRepo,
 			config: mockConfig,
 		}
-		projects, err := provider.GetProjects(context.TODO())
+		projects, err := provider.GetProjects(context.TODO(), clusterResourcePlugin)
 		assert.NoError(t, err)
 		assert.Len(t, projects.Projects, 2)
 	})
@@ -139,7 +141,7 @@ func TestGetProjects(t *testing.T) {
 			db:     mockRepo,
 			config: mockConfig,
 		}
-		_, err := provider.GetProjects(context.TODO())
+		_, err := provider.GetProjects(context.TODO(), clusterResourcePlugin)
 		assert.EqualError(t, err, errFoo.Error())
 	})
 }

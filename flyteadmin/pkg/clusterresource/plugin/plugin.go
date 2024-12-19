@@ -2,8 +2,11 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // ClusterResourcePlugin defines a subset of the Union Cloud service API that is used by the cluster resource controller
@@ -11,6 +14,8 @@ import (
 //go:generate mockery -name ClusterResourcePlugin -output=./mocks -case=underscore
 type ClusterResourcePlugin interface {
 	BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error)
+	GetProvisionProjectFilter(ctx context.Context) (string, error)
+	GetDeprovisionProjectFilter(ctx context.Context) (string, error)
 }
 
 type ClusterResourceState int
@@ -34,15 +39,23 @@ type BatchUpdateClusterResourceStateError struct {
 	ErrorCode    codes.Code
 }
 
-// NoopClusterResourcePlugin is a noops implementation of the ClusterResourcePlugin interface.
-type NoopClusterResourcePlugin struct {
+// DefaultClusterResourcePlugin is the default implementation of the ClusterResourcePlugin interface.
+type DefaultClusterResourcePlugin struct {
 }
 
 // BatchUpdateClusterResourceState does nothing.
-func (n *NoopClusterResourcePlugin) BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error) {
+func (n *DefaultClusterResourcePlugin) BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error) {
 	return BatchUpdateClusterResourceStateOutput{}, nil, nil
 }
 
-func NewNoopClusterResourcePlugin() *NoopClusterResourcePlugin {
-	return &NoopClusterResourcePlugin{}
+func (n *DefaultClusterResourcePlugin) GetProvisionProjectFilter(ctx context.Context) (string, error) {
+	return fmt.Sprintf("value_not_in(state,%d;%d)", admin.Project_ARCHIVED, admin.Project_SYSTEM_ARCHIVED), nil
+}
+
+func (n *DefaultClusterResourcePlugin) GetDeprovisionProjectFilter(ctx context.Context) (string, error) {
+	return fmt.Sprintf("value_in(state,%d;%d)", admin.Project_ARCHIVED, admin.Project_SYSTEM_ARCHIVED), nil
+}
+
+func NewDefaultClusterResourcePlugin() *DefaultClusterResourcePlugin {
+	return &DefaultClusterResourcePlugin{}
 }
