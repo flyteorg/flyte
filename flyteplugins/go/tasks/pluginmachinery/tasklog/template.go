@@ -27,6 +27,7 @@ type templateRegexes struct {
 	ContainerName        *regexp.Regexp
 	ContainerID          *regexp.Regexp
 	Hostname             *regexp.Regexp
+	NodeName             *regexp.Regexp
 	PodRFC3339StartTime  *regexp.Regexp
 	PodRFC3339FinishTime *regexp.Regexp
 	PodUnixStartTime     *regexp.Regexp
@@ -52,6 +53,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("containerName"),
 		MustCreateRegex("containerID"),
 		MustCreateRegex("hostname"),
+		MustCreateRegex("nodeName"),
 		MustCreateRegex("podRFC3339StartTime"),
 		MustCreateRegex("podRFC3339FinishTime"),
 		MustCreateRegex("podUnixStartTime"),
@@ -105,6 +107,7 @@ func (input Input) templateVars() []TemplateVar {
 		TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
 		TemplateVar{defaultRegexes.ContainerID, containerID},
 		TemplateVar{defaultRegexes.Hostname, input.HostName},
+		TemplateVar{defaultRegexes.NodeName, input.NodeName},
 	)
 	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
