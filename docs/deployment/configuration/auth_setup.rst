@@ -288,17 +288,6 @@ Apply OIDC Configuration
                httpPort: 8088
                grpc:
                  port: 8089
-
-
-
-
-
-
-
-
-
-
-
                security:
                  secure: false
                  useAuth: true
