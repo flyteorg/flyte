@@ -11,6 +11,7 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -34,7 +35,7 @@ type CreateTaskExecutionModelInput struct {
 
 func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
 	closure *admin.TaskExecutionClosure) error {
-	occurredAt, err := ptypes.Timestamp(request.Event.OccurredAt)
+	occurredAt, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal occurredAt with error: %v", err)
 	}
@@ -43,7 +44,7 @@ func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecution
 	// This check makes sure any out of order
 	if taskExecutionModel.StartedAt == nil {
 		taskExecutionModel.StartedAt = &occurredAt
-		closure.StartedAt = request.Event.OccurredAt
+		closure.StartedAt = request.GetEvent().GetOccurredAt()
 	}
 	return nil
 }
@@ -56,7 +57,7 @@ func addTaskTerminalState(
 	if taskExecutionModel.StartedAt == nil {
 		logger.Warning(context.Background(), "task execution is missing StartedAt")
 	} else {
-		endTime, err := ptypes.Timestamp(request.Event.OccurredAt)
+		endTime, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
 		if err != nil {
 			return errors.NewFlyteAdminErrorf(
 				codes.Internal, "Failed to parse task execution occurredAt timestamp: %v", err)
@@ -70,23 +71,23 @@ func addTaskTerminalState(
 		closure.Duration = ptypes.DurationProto(taskExecutionModel.Duration)
 	}
 
-	if request.Event.GetOutputUri() != "" {
+	if request.GetEvent().GetOutputUri() != "" {
 		closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
-			OutputUri: request.Event.GetOutputUri(),
+			OutputUri: request.GetEvent().GetOutputUri(),
 		}
-	} else if request.Event.GetOutputData() != nil {
+	} else if request.GetEvent().GetOutputData() != nil {
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			closure.OutputResult = &admin.TaskExecutionClosure_OutputData{
-				OutputData: request.Event.GetOutputData(),
+				OutputData: request.GetEvent().GetOutputData(),
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
-				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetOutputData(),
+				request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetProject(), request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetDomain(),
+				request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetName(), request.GetEvent().GetParentNodeExecutionId().GetNodeId(),
+				request.GetEvent().GetTaskId().GetProject(), request.GetEvent().GetTaskId().GetDomain(), request.GetEvent().GetTaskId().GetName(), request.GetEvent().GetTaskId().GetVersion(),
+				strconv.FormatUint(uint64(request.GetEvent().GetRetryAttempt()), 10), OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -94,9 +95,9 @@ func addTaskTerminalState(
 				OutputUri: uri.String(),
 			}
 		}
-	} else if request.Event.GetError() != nil {
+	} else if request.GetEvent().GetError() != nil {
 		closure.OutputResult = &admin.TaskExecutionClosure_Error{
-			Error: request.Event.GetError(),
+			Error: request.GetEvent().GetError(),
 		}
 	}
 	return nil
@@ -106,35 +107,35 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 	taskExecution := &models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
-				Project: input.Request.Event.TaskId.Project,
-				Domain:  input.Request.Event.TaskId.Domain,
-				Name:    input.Request.Event.TaskId.Name,
-				Version: input.Request.Event.TaskId.Version,
+				Project: input.Request.GetEvent().GetTaskId().GetProject(),
+				Domain:  input.Request.GetEvent().GetTaskId().GetDomain(),
+				Name:    input.Request.GetEvent().GetTaskId().GetName(),
+				Version: input.Request.GetEvent().GetTaskId().GetVersion(),
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: input.Request.Event.ParentNodeExecutionId.NodeId,
+				NodeID: input.Request.GetEvent().GetParentNodeExecutionId().GetNodeId(),
 				ExecutionKey: models.ExecutionKey{
-					Project: input.Request.Event.ParentNodeExecutionId.ExecutionId.Project,
-					Domain:  input.Request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-					Name:    input.Request.Event.ParentNodeExecutionId.ExecutionId.Name,
+					Project: input.Request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetProject(),
+					Domain:  input.Request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetDomain(),
+					Name:    input.Request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetName(),
 				},
 			},
 			RetryAttempt: &input.Request.Event.RetryAttempt,
 		},
 
-		Phase:        input.Request.Event.Phase.String(),
-		PhaseVersion: input.Request.Event.PhaseVersion,
+		Phase:        input.Request.GetEvent().GetPhase().String(),
+		PhaseVersion: input.Request.GetEvent().GetPhaseVersion(),
 	}
 	err := handleTaskExecutionInputs(ctx, taskExecution, input.Request, input.StorageClient)
 	if err != nil {
 		return nil, err
 	}
 
-	metadata := input.Request.Event.Metadata
-	if metadata != nil && len(metadata.ExternalResources) > 1 {
-		sort.Slice(metadata.ExternalResources, func(i, j int) bool {
-			a := metadata.ExternalResources[i]
-			b := metadata.ExternalResources[j]
+	metadata := input.Request.GetEvent().GetMetadata()
+	if metadata != nil && len(metadata.GetExternalResources()) > 1 {
+		sort.Slice(metadata.GetExternalResources(), func(i, j int) bool {
+			a := metadata.GetExternalResources()[i]
+			b := metadata.GetExternalResources()[j]
 			if a.GetIndex() == b.GetIndex() {
 				return a.GetRetryAttempt() < b.GetRetryAttempt()
 			}
@@ -142,41 +143,41 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		})
 	}
 
-	reportedAt := input.Request.Event.ReportedAt
-	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
-		reportedAt = input.Request.Event.OccurredAt
+	reportedAt := input.Request.GetEvent().GetReportedAt()
+	if reportedAt == nil || (reportedAt.GetSeconds() == 0 && reportedAt.GetNanos() == 0) {
+		reportedAt = input.Request.GetEvent().GetOccurredAt()
 	}
 
 	closure := &admin.TaskExecutionClosure{
-		Phase:        input.Request.Event.Phase,
+		Phase:        input.Request.GetEvent().GetPhase(),
 		UpdatedAt:    reportedAt,
-		CreatedAt:    input.Request.Event.OccurredAt,
-		Logs:         input.Request.Event.Logs,
-		CustomInfo:   input.Request.Event.CustomInfo,
-		TaskType:     input.Request.Event.TaskType,
+		CreatedAt:    input.Request.GetEvent().GetOccurredAt(),
+		Logs:         input.Request.GetEvent().GetLogs(),
+		CustomInfo:   input.Request.GetEvent().GetCustomInfo(),
+		TaskType:     input.Request.GetEvent().GetTaskType(),
 		Metadata:     metadata,
-		EventVersion: input.Request.Event.EventVersion,
+		EventVersion: input.Request.GetEvent().GetEventVersion(),
 	}
 
-	if len(input.Request.Event.Reasons) > 0 {
-		for _, reason := range input.Request.Event.Reasons {
-			closure.Reasons = append(closure.Reasons, &admin.Reason{
-				OccurredAt: reason.OccurredAt,
-				Message:    reason.Reason,
+	if len(input.Request.GetEvent().GetReasons()) > 0 {
+		for _, reason := range input.Request.GetEvent().GetReasons() {
+			closure.Reasons = append(closure.GetReasons(), &admin.Reason{
+				OccurredAt: reason.GetOccurredAt(),
+				Message:    reason.GetReason(),
 			})
 		}
-		closure.Reason = input.Request.Event.Reasons[len(input.Request.Event.Reasons)-1].Reason
-	} else if len(input.Request.Event.Reason) > 0 {
+		closure.Reason = input.Request.GetEvent().GetReasons()[len(input.Request.GetEvent().GetReasons())-1].GetReason()
+	} else if len(input.Request.GetEvent().GetReason()) > 0 {
 		closure.Reasons = []*admin.Reason{
 			{
-				OccurredAt: input.Request.Event.OccurredAt,
-				Message:    input.Request.Event.Reason,
+				OccurredAt: input.Request.GetEvent().GetOccurredAt(),
+				Message:    input.Request.GetEvent().GetReason(),
 			},
 		}
-		closure.Reason = input.Request.Event.Reason
+		closure.Reason = input.Request.GetEvent().GetReason()
 	}
 
-	eventPhase := input.Request.Event.Phase
+	eventPhase := input.Request.GetEvent().GetPhase()
 
 	// Different tasks may report different phases as their first event.
 	// If the first event we receive for this execution is a valid
@@ -188,7 +189,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		}
 	}
 
-	if common.IsTaskExecutionTerminal(input.Request.Event.Phase) {
+	if common.IsTaskExecutionTerminal(input.Request.GetEvent().GetPhase()) {
 		err := addTaskTerminalState(ctx, input.Request, taskExecution, closure, input.InlineEventDataPolicy, input.StorageClient)
 		if err != nil {
 			return nil, err
@@ -201,7 +202,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 	}
 
 	taskExecution.Closure = marshaledClosure
-	taskExecutionCreatedAt, err := ptypes.Timestamp(input.Request.Event.OccurredAt)
+	taskExecutionCreatedAt, err := ptypes.Timestamp(input.Request.GetEvent().GetOccurredAt())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
 	}
@@ -232,17 +233,17 @@ func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
 	latestSetByURI := make(map[string]*core.TaskLog, len(latest))
 	latestSetByName := make(map[string]*core.TaskLog, len(latest))
 	for _, latestLog := range latest {
-		latestSetByURI[latestLog.Uri] = latestLog
-		if len(latestLog.Name) > 0 {
-			latestSetByName[latestLog.Name] = latestLog
+		latestSetByURI[latestLog.GetUri()] = latestLog
+		if len(latestLog.GetName()) > 0 {
+			latestSetByName[latestLog.GetName()] = latestLog
 		}
 	}
 
 	// Copy over the latest logs since names will change for existing logs as a task transitions across phases.
 	logs := latest
 	for _, existingLog := range existing {
-		if _, ok := latestSetByURI[existingLog.Uri]; !ok {
-			if _, ok = latestSetByName[existingLog.Name]; !ok {
+		if _, ok := latestSetByURI[existingLog.GetUri()]; !ok {
+			if _, ok = latestSetByName[existingLog.GetName()]; !ok {
 				// We haven't seen this log before: add it to the output result list.
 				logs = append(logs, existingLog)
 			}
@@ -299,16 +300,21 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 		return existing
 	}
 
-	if latest.ExternalId != "" && existing.ExternalId != latest.ExternalId {
-		existing.ExternalId = latest.ExternalId
+	if latest.GetExternalId() != "" && existing.GetExternalId() != latest.GetExternalId() {
+		existing.ExternalId = latest.GetExternalId()
 	}
 	// note we are not updating existing.Index and existing.RetryAttempt because they are the
 	// search key for our ExternalResource pool.
-	existing.Phase = latest.Phase
-	if latest.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED && existing.CacheStatus != latest.CacheStatus {
-		existing.CacheStatus = latest.CacheStatus
+	existing.Phase = latest.GetPhase()
+	if latest.GetCacheStatus() != core.CatalogCacheStatus_CACHE_DISABLED && existing.GetCacheStatus() != latest.GetCacheStatus() {
+		existing.CacheStatus = latest.GetCacheStatus()
 	}
-	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
+	existing.Logs = mergeLogs(existing.GetLogs(), latest.GetLogs())
+
+	// Overwrite custom info if provided
+	if latest.GetCustomInfo() != nil {
+		existing.CustomInfo = proto.Clone(latest.GetCustomInfo()).(*structpb.Struct)
+	}
 
 	return existing
 }
@@ -357,16 +363,16 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 		return existing
 	}
 
-	if latest.GeneratedName != "" && existing.GeneratedName != latest.GeneratedName {
-		existing.GeneratedName = latest.GeneratedName
+	if latest.GetGeneratedName() != "" && existing.GetGeneratedName() != latest.GetGeneratedName() {
+		existing.GeneratedName = latest.GetGeneratedName()
 	}
-	existing.ExternalResources = mergeExternalResources(existing.ExternalResources, latest.ExternalResources)
-	existing.ResourcePoolInfo = latest.ResourcePoolInfo
-	if latest.PluginIdentifier != "" && existing.PluginIdentifier != latest.PluginIdentifier {
-		existing.PluginIdentifier = latest.PluginIdentifier
+	existing.ExternalResources = mergeExternalResources(existing.GetExternalResources(), latest.GetExternalResources())
+	existing.ResourcePoolInfo = latest.GetResourcePoolInfo()
+	if latest.GetPluginIdentifier() != "" && existing.GetPluginIdentifier() != latest.GetPluginIdentifier() {
+		existing.PluginIdentifier = latest.GetPluginIdentifier()
 	}
-	if latest.InstanceClass != event.TaskExecutionMetadata_DEFAULT && existing.InstanceClass != latest.InstanceClass {
-		existing.InstanceClass = latest.InstanceClass
+	if latest.GetInstanceClass() != event.TaskExecutionMetadata_DEFAULT && existing.GetInstanceClass() != latest.GetInstanceClass() {
+		existing.InstanceClass = latest.GetInstanceClass()
 	}
 
 	return existing
@@ -374,7 +380,7 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 
 func filterExternalResourceLogsByPhase(externalResources []*event.ExternalResourceInfo, phase core.TaskExecution_Phase) {
 	for _, externalResource := range externalResources {
-		externalResource.Logs = filterLogsByPhase(externalResource.Logs, phase)
+		externalResource.Logs = filterLogsByPhase(externalResource.GetLogs(), phase)
 	}
 }
 
@@ -382,13 +388,13 @@ func filterLogsByPhase(logs []*core.TaskLog, phase core.TaskExecution_Phase) []*
 	filteredLogs := make([]*core.TaskLog, 0, len(logs))
 
 	for _, l := range logs {
-		if common.IsTaskExecutionTerminal(phase) && l.HideOnceFinished {
+		if common.IsTaskExecutionTerminal(phase) && l.GetHideOnceFinished() {
 			continue
 		}
 		// Some plugins like e.g. Dask, Ray start with or very quickly transition to core.TaskExecution_INITIALIZING
 		// once the CR has been created even though the underlying pods are still pending. We thus treat queued and
 		// initializing the same here.
-		if (phase == core.TaskExecution_QUEUED || phase == core.TaskExecution_INITIALIZING) && !l.ShowWhilePending {
+		if (phase == core.TaskExecution_QUEUED || phase == core.TaskExecution_INITIALIZING) && !l.GetShowWhilePending() {
 			continue
 		}
 		filteredLogs = append(filteredLogs, l)
@@ -409,45 +415,45 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to unmarshal task execution closure with error: %+v", err)
 	}
-	isPhaseChange := taskExecutionModel.Phase != request.Event.Phase.String()
+	isPhaseChange := taskExecutionModel.Phase != request.GetEvent().GetPhase().String()
 	existingTaskPhase := taskExecutionModel.Phase
-	taskExecutionModel.Phase = request.Event.Phase.String()
-	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
-	taskExecutionClosure.Phase = request.Event.Phase
-	reportedAt := request.Event.ReportedAt
-	if reportedAt == nil || (reportedAt.Seconds == 0 && reportedAt.Nanos == 0) {
-		reportedAt = request.Event.OccurredAt
+	taskExecutionModel.Phase = request.GetEvent().GetPhase().String()
+	taskExecutionModel.PhaseVersion = request.GetEvent().GetPhaseVersion()
+	taskExecutionClosure.Phase = request.GetEvent().GetPhase()
+	reportedAt := request.GetEvent().GetReportedAt()
+	if reportedAt == nil || (reportedAt.GetSeconds() == 0 && reportedAt.GetNanos() == 0) {
+		reportedAt = request.GetEvent().GetOccurredAt()
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
 
-	mergedLogs := mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
-	filteredLogs := filterLogsByPhase(mergedLogs, request.Event.Phase)
+	mergedLogs := mergeLogs(taskExecutionClosure.GetLogs(), request.GetEvent().GetLogs())
+	filteredLogs := filterLogsByPhase(mergedLogs, request.GetEvent().GetPhase())
 	taskExecutionClosure.Logs = filteredLogs
 
-	if len(request.Event.Reasons) > 0 {
-		for _, reason := range request.Event.Reasons {
+	if len(request.GetEvent().GetReasons()) > 0 {
+		for _, reason := range request.GetEvent().GetReasons() {
 			taskExecutionClosure.Reasons = append(
-				taskExecutionClosure.Reasons,
+				taskExecutionClosure.GetReasons(),
 				&admin.Reason{
-					OccurredAt: reason.OccurredAt,
-					Message:    reason.Reason,
+					OccurredAt: reason.GetOccurredAt(),
+					Message:    reason.GetReason(),
 				})
 		}
-		taskExecutionClosure.Reason = request.Event.Reasons[len(request.Event.Reasons)-1].Reason
-	} else if len(request.Event.Reason) > 0 {
-		if taskExecutionClosure.Reason != request.Event.Reason {
+		taskExecutionClosure.Reason = request.GetEvent().GetReasons()[len(request.GetEvent().GetReasons())-1].GetReason()
+	} else if len(request.GetEvent().GetReason()) > 0 {
+		if taskExecutionClosure.GetReason() != request.GetEvent().GetReason() {
 			// by tracking a time-series of reasons we increase the size of the TaskExecutionClosure in scenarios where
 			// a task reports a large number of unique reasons. if this size increase becomes problematic we this logic
 			// will need to be revisited.
 			taskExecutionClosure.Reasons = append(
-				taskExecutionClosure.Reasons,
+				taskExecutionClosure.GetReasons(),
 				&admin.Reason{
-					OccurredAt: request.Event.OccurredAt,
-					Message:    request.Event.Reason,
+					OccurredAt: request.GetEvent().GetOccurredAt(),
+					Message:    request.GetEvent().GetReason(),
 				})
 		}
 
-		taskExecutionClosure.Reason = request.Event.Reason
+		taskExecutionClosure.Reason = request.GetEvent().GetReason()
 	}
 	if existingTaskPhase != core.TaskExecution_RUNNING.String() && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
 		err = addTaskStartedState(request, taskExecutionModel, &taskExecutionClosure)
@@ -456,24 +462,24 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		}
 	}
 
-	if common.IsTaskExecutionTerminal(request.Event.Phase) {
+	if common.IsTaskExecutionTerminal(request.GetEvent().GetPhase()) {
 		err := addTaskTerminalState(ctx, request, taskExecutionModel, &taskExecutionClosure, inlineEventDataPolicy, storageClient)
 		if err != nil {
 			return err
 		}
 	}
-	taskExecutionClosure.CustomInfo, err = mergeCustom(taskExecutionClosure.CustomInfo, request.Event.CustomInfo)
+	taskExecutionClosure.CustomInfo, err = mergeCustom(taskExecutionClosure.GetCustomInfo(), request.GetEvent().GetCustomInfo())
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
-	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
+	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.GetMetadata(), request.GetEvent().GetMetadata())
 
-	if isPhaseChange && taskExecutionClosure.Metadata != nil && len(taskExecutionClosure.Metadata.ExternalResources) > 0 {
-		filterExternalResourceLogsByPhase(taskExecutionClosure.Metadata.ExternalResources, request.Event.Phase)
+	if isPhaseChange && taskExecutionClosure.GetMetadata() != nil && len(taskExecutionClosure.GetMetadata().GetExternalResources()) > 0 {
+		filterExternalResourceLogsByPhase(taskExecutionClosure.GetMetadata().GetExternalResources(), request.GetEvent().GetPhase())
 	}
 
-	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
-		taskExecutionClosure.EventVersion = request.Event.EventVersion
+	if request.GetEvent().GetEventVersion() > taskExecutionClosure.GetEventVersion() {
+		taskExecutionClosure.EventVersion = request.GetEvent().GetEventVersion()
 	}
 	marshaledClosure, err := proto.Marshal(&taskExecutionClosure)
 	if err != nil {
@@ -495,7 +501,7 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *Execu
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
-	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
+	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().GetMessage()) > 0 {
 		trimmedErrOutputResult := closure.GetError()
 		trimmedErrMessage := TrimErrorMessage(trimmedErrOutputResult.GetMessage())
 		trimmedErrOutputResult.Message = trimmedErrMessage
@@ -551,15 +557,15 @@ func handleTaskExecutionInputs(ctx context.Context, taskExecutionModel *models.T
 		// Inputs are static over the duration of the task execution, no need to update them when they're already set
 		return nil
 	}
-	switch request.Event.GetInputValue().(type) {
+	switch request.GetEvent().GetInputValue().(type) {
 	case *event.TaskExecutionEvent_InputUri:
 		taskExecutionModel.InputURI = request.GetEvent().GetInputUri()
 	case *event.TaskExecutionEvent_InputData:
 		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetInputData(),
-			request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-			request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-			request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
-			strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), InputsObjectSuffix)
+			request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetProject(), request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetDomain(),
+			request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetName(), request.GetEvent().GetParentNodeExecutionId().GetNodeId(),
+			request.GetEvent().GetTaskId().GetProject(), request.GetEvent().GetTaskId().GetDomain(), request.GetEvent().GetTaskId().GetName(), request.GetEvent().GetTaskId().GetVersion(),
+			strconv.FormatUint(uint64(request.GetEvent().GetRetryAttempt()), 10), InputsObjectSuffix)
 		if err != nil {
 			return err
 		}

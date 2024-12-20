@@ -23,8 +23,8 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 			},
 		}
 	case *core.Literal_Collection:
-		x := make([]*core.BindingData, 0, len(l.GetCollection().Literals))
-		for _, sub := range l.GetCollection().Literals {
+		x := make([]*core.BindingData, 0, len(l.GetCollection().GetLiterals()))
+		for _, sub := range l.GetCollection().GetLiterals() {
 			x = append(x, LiteralToBinding(sub))
 		}
 
@@ -36,8 +36,8 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 			},
 		}
 	case *core.Literal_Map:
-		x := make(map[string]*core.BindingData, len(l.GetMap().Literals))
-		for key, val := range l.GetMap().Literals {
+		x := make(map[string]*core.BindingData, len(l.GetMap().GetLiterals()))
+		for key, val := range l.GetMap().GetLiterals() {
 			x[key] = LiteralToBinding(val)
 		}
 
@@ -62,7 +62,7 @@ func TestValidateBindings(t *testing.T) {
 		compileErrors := compilerErrors.NewCompileErrors()
 		resolved, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.True(t, ok)
-		assert.Empty(t, resolved.Variables)
+		assert.Empty(t, resolved.GetVariables())
 	})
 
 	t.Run("Variable not in inputs", func(t *testing.T) {

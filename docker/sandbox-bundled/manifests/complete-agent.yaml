@@ -431,6 +431,8 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -473,7 +475,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.2"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.1"
       k8s-array:
         logs:
           config:
@@ -517,6 +519,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - FLYTE_PLATFORM_URL: 'flyte-sandbox-grpc.flyte:8089'
+        - FLYTE_PLATFORM_INSECURE: true
     storage:
       signedURL:
         stowConfigOverride:
@@ -819,7 +823,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SlI1TDFkTXBMaThuc0hlSQ==
+  haSharedSecret: YUNORVNVRjBKVFpMTjVzZg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1250,7 +1254,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: a823eaadac5f3a4358c8acf628ebeb3719f88312af520d2c253de2579dff262d
+        checksum/configuration: 5a537c05dbd27a7f2884eb78f4e762205c3bcc3248ab9e509ab7074c7e5f953d
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1416,7 +1420,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ffc8aa05a602edd8f9b1d7ef35aa1cc5e383bceb9b91307eef99e86f53e13d4e
+        checksum/secret: 89b23b61fb0b3e8423af547ebb08fefb82a79836f1eaaf90e838ebcb71bb2a1b
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1759,7 +1763,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.13.6
+        image: cr.flyte.org/flyteorg/flyteagent:1.14.2
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

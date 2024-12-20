@@ -36,7 +36,8 @@ func NewPrestoExecutionsCache(
 		scope:        scope,
 		cfg:          cfg,
 	}
-	autoRefreshCache, err := cache.NewAutoRefreshCache(cfg.RefreshCacheConfig.Name, q.SyncPrestoQuery, workqueue.DefaultControllerRateLimiter(), cfg.RefreshCacheConfig.SyncPeriod.Duration, cfg.RefreshCacheConfig.Workers, cfg.RefreshCacheConfig.LruCacheSize, scope)
+	// #nosec G115
+	autoRefreshCache, err := cache.NewAutoRefreshCache(cfg.RefreshCacheConfig.Name, q.SyncPrestoQuery, workqueue.DefaultControllerRateLimiter(), cfg.RefreshCacheConfig.SyncPeriod.Duration, uint(cfg.RefreshCacheConfig.Workers), uint(cfg.RefreshCacheConfig.LruCacheSize), scope)
 	if err != nil {
 		logger.Errorf(ctx, "Could not create AutoRefreshCache in Executor. [%s]", err)
 		return q, errors.Wrapf(errors.CacheFailed, err, "Error creating AutoRefreshCache")

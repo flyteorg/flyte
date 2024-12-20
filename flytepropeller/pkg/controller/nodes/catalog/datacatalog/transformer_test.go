@@ -32,8 +32,8 @@ func TestNilParamTask(t *testing.T) {
 	}
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
+	assert.NotEmpty(t, datasetID.GetVersion())
+	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.GetVersion())
 }
 
 // Ensure that empty parameters generate the same dataset as nil parameters
@@ -53,8 +53,8 @@ func TestEmptyParamTask(t *testing.T) {
 	}
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
+	assert.NotEmpty(t, datasetID.GetVersion())
+	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.GetVersion())
 
 	key.TypedInterface.Inputs = nil
 	key.TypedInterface.Outputs = nil
@@ -84,8 +84,8 @@ func TestVariableMapOrder(t *testing.T) {
 	}
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetID.Version)
+	assert.NotEmpty(t, datasetID.GetVersion())
+	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetID.GetVersion())
 
 	key.TypedInterface.Inputs = &core.VariableMap{
 		Variables: map[string]*core.Variable{
@@ -96,7 +96,7 @@ func TestVariableMapOrder(t *testing.T) {
 	datasetIDDupe, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetIDDupe.Version)
+	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetIDDupe.GetVersion())
 	assert.Equal(t, datasetID.String(), datasetIDDupe.String())
 }
 
@@ -173,17 +173,17 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 	}{
 		{"nil TaskExec", args{}, nil},
 		{"TaskExec", args{tID}, map[string]string{
-			execTaskAttemptKey: strconv.Itoa(int(tID.RetryAttempt)),
-			execProjectKey:     tID.NodeExecutionId.ExecutionId.Project,
-			execDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
-			execNodeIDKey:      tID.NodeExecutionId.NodeId,
-			execNameKey:        tID.NodeExecutionId.ExecutionId.Name,
+			execTaskAttemptKey: strconv.Itoa(int(tID.GetRetryAttempt())),
+			execProjectKey:     tID.GetNodeExecutionId().GetExecutionId().GetProject(),
+			execDomainKey:      tID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+			execNodeIDKey:      tID.GetNodeExecutionId().GetNodeId(),
+			execNameKey:        tID.GetNodeExecutionId().GetExecutionId().GetName(),
 		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetArtifactMetadataForSource(tt.args.taskExecutionID); !reflect.DeepEqual(got.KeyMap, tt.want) {
-				t.Errorf("GetMetadataForSource() = %v, want %v", got.KeyMap, tt.want)
+			if got := GetArtifactMetadataForSource(tt.args.taskExecutionID); !reflect.DeepEqual(got.GetKeyMap(), tt.want) {
+				t.Errorf("GetMetadataForSource() = %v, want %v", got.GetKeyMap(), tt.want)
 			}
 		})
 	}
@@ -247,13 +247,13 @@ func TestGetSourceFromMetadata(t *testing.T) {
 			RetryAttempt: 0,
 		}},
 		// In legacy only taskVersionKey is available
-		{"legacy", args{datasetMd: GetDatasetMetadataForSource(&tID).KeyMap, currentID: currentTaskID}, &core.TaskExecutionIdentifier{
+		{"legacy", args{datasetMd: GetDatasetMetadataForSource(&tID).GetKeyMap(), currentID: currentTaskID}, &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Name:         "x",
 				Project:      "project",
 				Domain:       "development",
-				Version:      tID.TaskId.Version,
+				Version:      tID.GetTaskId().GetVersion(),
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -266,7 +266,7 @@ func TestGetSourceFromMetadata(t *testing.T) {
 			RetryAttempt: 0,
 		}},
 		// Completely available
-		{"latest", args{datasetMd: GetDatasetMetadataForSource(&tID).KeyMap, artifactMd: GetArtifactMetadataForSource(&tID).KeyMap, currentID: currentTaskID}, &tID},
+		{"latest", args{datasetMd: GetDatasetMetadataForSource(&tID).GetKeyMap(), artifactMd: GetArtifactMetadataForSource(&tID).GetKeyMap(), currentID: currentTaskID}, &tID},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -325,11 +325,11 @@ func TestEventCatalogMetadata(t *testing.T) {
 
 func TestDatasetIDToIdentifier(t *testing.T) {
 	id := DatasetIDToIdentifier(&datacatalog.DatasetID{Project: "p", Domain: "d", Name: "n", Version: "v"})
-	assert.Equal(t, core.ResourceType_DATASET, id.ResourceType)
-	assert.Equal(t, "n", id.Name)
-	assert.Equal(t, "p", id.Project)
-	assert.Equal(t, "d", id.Domain)
-	assert.Equal(t, "v", id.Version)
+	assert.Equal(t, core.ResourceType_DATASET, id.GetResourceType())
+	assert.Equal(t, "n", id.GetName())
+	assert.Equal(t, "p", id.GetProject())
+	assert.Equal(t, "d", id.GetDomain())
+	assert.Equal(t, "v", id.GetVersion())
 }
 
 func TestGenerateTaskOutputsFromArtifact_IDLNotFound(t *testing.T) {

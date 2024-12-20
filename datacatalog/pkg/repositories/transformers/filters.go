@@ -44,7 +44,7 @@ func FilterToListInput(ctx context.Context, sourceEntity common.Entity, filterEx
 }
 
 func constructModelFilter(ctx context.Context, singleFilter *datacatalog.SinglePropertyFilter, sourceEntity common.Entity) (models.ModelFilter, error) {
-	operator := comparisonOperatorMap[singleFilter.Operator]
+	operator := comparisonOperatorMap[singleFilter.GetOperator()]
 	var modelFilter models.ModelFilter
 
 	switch propertyFilter := singleFilter.GetPropertyFilter().(type) {
@@ -53,8 +53,8 @@ func constructModelFilter(ctx context.Context, singleFilter *datacatalog.SingleP
 
 		switch partitionProperty := partitionPropertyFilter.GetProperty().(type) {
 		case *datacatalog.PartitionPropertyFilter_KeyVal:
-			key := partitionProperty.KeyVal.Key
-			value := partitionProperty.KeyVal.Value
+			key := partitionProperty.KeyVal.GetKey()
+			value := partitionProperty.KeyVal.GetValue()
 
 			logger.Debugf(ctx, "Constructing partition key:[%v], val:[%v] filter", key, value)
 			if err := validators.ValidateEmptyStringField(key, "PartitionKey"); err != nil {

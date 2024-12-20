@@ -90,9 +90,9 @@ func TestGetExecutionInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -123,9 +123,9 @@ func TestGetExecutionWithOffloadedInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	expectedMap := core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -135,8 +135,8 @@ func TestGetExecutionWithOffloadedInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap.GetLiterals()["foo"], actualInputs.Literals["foo"])
-	assert.EqualValues(t, expectedMap.GetLiterals()["bar"], actualInputs.Literals["bar"])
+	assert.EqualValues(t, expectedMap.GetLiterals()["foo"], actualInputs.GetLiterals()["foo"])
+	assert.EqualValues(t, expectedMap.GetLiterals()["bar"], actualInputs.GetLiterals()["bar"])
 }
 
 func TestValidateExecInputsWrongType(t *testing.T) {
@@ -148,9 +148,9 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got literal scalar: {primitive:{integer:1}}", err.Error())
 }
@@ -165,9 +165,9 @@ func TestValidateExecInputsExtraInputs(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	assert.EqualError(t, err, "invalid input foo-extra")
 }
@@ -182,9 +182,9 @@ func TestValidateExecInputsOverrideFixed(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	assert.EqualError(t, err, "invalid input bar")
 }
@@ -194,9 +194,9 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 	executionRequest.Inputs = nil
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{

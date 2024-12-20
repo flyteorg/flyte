@@ -128,7 +128,7 @@ func TestSetWorkflowDefaults(t *testing.T) {
 	request := testutils.GetWorkflowRequest()
 	finalizedRequest, err := workflowManager.(*WorkflowManager).setDefaults(request)
 	assert.NoError(t, err)
-	assert.True(t, proto.Equal(workflowIdentifier, finalizedRequest.Spec.Template.Id))
+	assert.True(t, proto.Equal(workflowIdentifier, finalizedRequest.GetSpec().GetTemplate().GetId()))
 }
 
 func TestCreateWorkflow(t *testing.T) {
@@ -309,12 +309,12 @@ func TestGetWorkflow(t *testing.T) {
 		Id: workflowIdentifier,
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "project", workflow.Id.Project)
-	assert.Equal(t, "domain", workflow.Id.Domain)
-	assert.Equal(t, "name", workflow.Id.Name)
-	assert.Equal(t, "version", workflow.Id.Version)
-	assert.True(t, proto.Equal(testutils.GetWorkflowClosure(), workflow.Closure),
-		"%+v !=\n %+v", testutils.GetWorkflowClosure(), workflow.Closure)
+	assert.Equal(t, "project", workflow.GetId().GetProject())
+	assert.Equal(t, "domain", workflow.GetId().GetDomain())
+	assert.Equal(t, "name", workflow.GetId().GetName())
+	assert.Equal(t, "version", workflow.GetId().GetVersion())
+	assert.True(t, proto.Equal(testutils.GetWorkflowClosure(), workflow.GetClosure()),
+		"%+v !=\n %+v", testutils.GetWorkflowClosure(), workflow.GetClosure())
 }
 
 func TestGetWorkflow_DatabaseError(t *testing.T) {
@@ -450,13 +450,13 @@ func TestListWorkflows(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, workflowList)
-	assert.Len(t, workflowList.Workflows, 2)
+	assert.Len(t, workflowList.GetWorkflows(), 2)
 
-	for idx, workflow := range workflowList.Workflows {
-		assert.Equal(t, projectValue, workflow.Id.Project)
-		assert.Equal(t, domainValue, workflow.Id.Domain)
-		assert.Equal(t, nameValue, workflow.Id.Name)
-		assert.Equal(t, fmt.Sprintf("version %v", idx), workflow.Id.Version)
+	for idx, workflow := range workflowList.GetWorkflows() {
+		assert.Equal(t, projectValue, workflow.GetId().GetProject())
+		assert.Equal(t, domainValue, workflow.GetId().GetDomain())
+		assert.Equal(t, nameValue, workflow.GetId().GetName())
+		assert.Equal(t, fmt.Sprintf("version %v", idx), workflow.GetId().GetVersion())
 		assert.True(t, proto.Equal(&admin.WorkflowClosure{
 			CreatedAt: testutils.MockCreatedAtProto,
 			CompiledWorkflow: &core.CompiledWorkflowClosure{
@@ -466,9 +466,9 @@ func TestListWorkflows(t *testing.T) {
 					},
 				},
 			},
-		}, workflow.Closure))
+		}, workflow.GetClosure()))
 	}
-	assert.Empty(t, workflowList.Token)
+	assert.Empty(t, workflowList.GetToken())
 }
 
 func TestListWorkflows_MissingParameters(t *testing.T) {
@@ -584,11 +584,11 @@ func TestWorkflowManager_ListWorkflowIdentifiers(t *testing.T) {
 		})
 	assert.NoError(t, err)
 	assert.NotNil(t, workflowList)
-	assert.Len(t, workflowList.Entities, 2)
+	assert.Len(t, workflowList.GetEntities(), 2)
 
-	for _, entity := range workflowList.Entities {
-		assert.Equal(t, projectValue, entity.Project)
-		assert.Equal(t, domainValue, entity.Domain)
-		assert.Equal(t, nameValue, entity.Name)
+	for _, entity := range workflowList.GetEntities() {
+		assert.Equal(t, projectValue, entity.GetProject())
+		assert.Equal(t, domainValue, entity.GetDomain())
+		assert.Equal(t, nameValue, entity.GetName())
 	}
 }

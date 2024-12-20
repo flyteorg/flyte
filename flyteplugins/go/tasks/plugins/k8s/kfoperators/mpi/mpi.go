@@ -60,7 +60,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	var launcherReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
 
-	if taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 {
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
 		if err != nil {
@@ -98,7 +98,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			}
 		}
 
-	} else if taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetTaskTypeVersion() == 1 {
 		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
@@ -122,7 +122,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
 	if *workerReplicaSpec.Replicas <= 0 {

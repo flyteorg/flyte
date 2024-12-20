@@ -359,8 +359,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		lpSpec := &admin.LaunchPlanSpec{}
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
-		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.AuthRole)
-		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole"}}, lpSpec.SecurityContext)
+		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole"}, lpSpec.GetAuthRole())
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole"}}, lpSpec.GetSecurityContext())
 	})
 	t.Run("k8sService account override", func(t *testing.T) {
 		registerFilesSetup()
@@ -368,8 +368,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		lpSpec := &admin.LaunchPlanSpec{}
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
-		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
-		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "k8Account"}}, lpSpec.SecurityContext)
+		assert.Equal(t, &admin.AuthRole{KubernetesServiceAccount: "k8Account"}, lpSpec.GetAuthRole())
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{K8SServiceAccount: "k8Account"}}, lpSpec.GetSecurityContext())
 	})
 	t.Run("Both k8sService and IamRole", func(t *testing.T) {
 		registerFilesSetup()
@@ -379,8 +379,8 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
 		assert.Equal(t, &admin.AuthRole{AssumableIamRole: "iamRole",
-			KubernetesServiceAccount: "k8Account"}, lpSpec.AuthRole)
-		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole", K8SServiceAccount: "k8Account"}}, lpSpec.SecurityContext)
+			KubernetesServiceAccount: "k8Account"}, lpSpec.GetAuthRole())
+		assert.Equal(t, &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamRole", K8SServiceAccount: "k8Account"}}, lpSpec.GetSecurityContext())
 	})
 	t.Run("Output prefix", func(t *testing.T) {
 		registerFilesSetup()
@@ -388,7 +388,7 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		lpSpec := &admin.LaunchPlanSpec{}
 		err := hydrateLaunchPlanSpec(rconfig.DefaultFilesConfig.AssumableIamRole, rconfig.DefaultFilesConfig.K8sServiceAccount, rconfig.DefaultFilesConfig.OutputLocationPrefix, lpSpec)
 		assert.Nil(t, err)
-		assert.Equal(t, &admin.RawOutputDataConfig{OutputLocationPrefix: "prefix"}, lpSpec.RawOutputDataConfig)
+		assert.Equal(t, &admin.RawOutputDataConfig{OutputLocationPrefix: "prefix"}, lpSpec.GetRawOutputDataConfig())
 	})
 }
 
@@ -648,7 +648,7 @@ func TestHydrateTaskSpec(t *testing.T) {
 	err = hydrateTaskSpec(task, storage.DataReference("file://somewhere"), "sourcey")
 	assert.NoError(t, err)
 	var hydratedPodSpec = v1.PodSpec{}
-	err = utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &hydratedPodSpec)
+	err = utils.UnmarshalStructToObj(task.GetTemplate().GetK8SPod().GetPodSpec(), &hydratedPodSpec)
 	assert.NoError(t, err)
 	assert.Len(t, hydratedPodSpec.Containers[1].Args, 2)
 	assert.Contains(t, hydratedPodSpec.Containers[1].Args[1], "somewhere")

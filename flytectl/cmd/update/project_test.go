@@ -27,7 +27,7 @@ func TestProjectCanBeActivated(t *testing.T) {
 				t, "UpdateProject", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.Project) bool {
-						return r.State == admin.Project_ACTIVE
+						return r.GetState() == admin.Project_ACTIVE
 					}))
 		})
 }
@@ -46,7 +46,7 @@ func TestProjectCanBeArchived(t *testing.T) {
 				t, "UpdateProject", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.Project) bool {
-						return r.State == admin.Project_ARCHIVED
+						return r.GetState() == admin.Project_ARCHIVED
 					}))
 		})
 }
@@ -145,7 +145,7 @@ func TestProjectUpdateFailsWhenProjectDoesNotExist(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.Id).
+				OnGetProjectByID(s.Ctx, project.GetId()).
 				Return(nil, ext.NewNotFoundError("project not found"))
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).
@@ -164,7 +164,7 @@ func TestProjectUpdateFailsWhenAdminClientFails(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.Id).
+				OnGetProjectByID(s.Ctx, project.GetId()).
 				Return(project, nil)
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).
@@ -209,7 +209,7 @@ func TestProjectUpdateDoesNotActivateArchivedProject(t *testing.T) {
 				t, "UpdateProject", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.Project) bool {
-						return r.State == admin.Project_ARCHIVED
+						return r.GetState() == admin.Project_ARCHIVED
 					}))
 		})
 }
@@ -223,7 +223,7 @@ func testProjectUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.Id).
+				OnGetProjectByID(s.Ctx, project.GetId()).
 				Return(project, nil)
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).
@@ -249,7 +249,7 @@ func testProjectUpdateWithMockSetup(
 	}
 
 	project.DefaultProjectConfig = &project.ConfigProject{
-		ID: target.Id,
+		ID: target.GetId(),
 	}
 	config.GetConfig().Project = ""
 	config.GetConfig().Domain = ""

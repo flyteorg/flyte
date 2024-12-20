@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -25,6 +28,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+)
+
+const (
+	// value is 3 days of seconds which is covered by 18 bits (262144)
+	MAX_DELTA_TIMESTAMP = 259200
 )
 
 var (
@@ -75,7 +83,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing:
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64) // #nosec G115
 
 			// do not process nodes that have not started or are in a terminal state
 			if nodePhase == v1alpha1.NodePhaseNotYetStarted || isTerminalNodePhase(nodePhase) {
@@ -95,7 +103,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 				messageCollector.Collect(i, err.Error())
 			} else {
 				// record events transitioning subNodes to aborted
-				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i)) // #nosec G115
 
 				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
@@ -109,7 +117,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	if messageCollector.Length() > 0 {
-		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength))
+		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
 	}
 
 	// update state for subNodes
@@ -135,7 +143,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing, v1alpha1.ArrayNodePhaseSucceeding:
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64) // #nosec G115
 
 			// do not process nodes that have not started or are in a terminal state
 			if nodePhase == v1alpha1.NodePhaseNotYetStarted || isTerminalNodePhase(nodePhase) {
@@ -158,7 +166,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	}
 
 	if messageCollector.Length() > 0 {
-		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength))
+		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
 	}
 
 	return nil
@@ -191,7 +199,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		size := -1
 
-		for _, variable := range literalMap.Literals {
+		for _, variable := range literalMap.GetLiterals() {
 			if variable.GetOffloadedMetadata() != nil {
 				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
 				// We need this for the map task to be able to create the subNodeSpec
@@ -204,7 +212,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 			switch variable.GetValue().(type) {
 			case *idlcore.Literal_Collection:
-				collectionLength := len(variable.GetCollection().Literals)
+				collectionLength := len(variable.GetCollection().GetLiterals())
 				if size == -1 {
 					size = collectionLength
 				} else if size != collectionLength {
@@ -245,9 +253,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
+			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
 		} {
 
-			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 			if err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -279,8 +288,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				break
 			}
 
-			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
-			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)              // #nosec G115
+			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i)) // #nosec G115
 
 			// do not process nodes in terminal state
 			if isTerminalNodePhase(nodePhase) {
@@ -361,15 +370,29 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			// update subNode state
-			arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
+			arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase())) // #nosec G115
 			if subNodeStatus.GetTaskNodeStatus() == nil {
 				// resetting task phase because during retries we clear the GetTaskNodeStatus
 				arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(0))
 			} else {
-				arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(subNodeStatus.GetTaskNodeStatus().GetPhase()))
+				arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(subNodeStatus.GetTaskNodeStatus().GetPhase())) // #nosec G115
 			}
 			arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 			arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+
+			if arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+				startedAt := nCtx.NodeStatus().GetLastAttemptStartedAt()
+				subNodeStartedAt := subNodeStatus.GetLastAttemptStartedAt()
+				if subNodeStartedAt == nil {
+					// subNodeStartedAt == nil indicates either (1) node has not started or (2) node status has
+					// been reset (ex. retryable failure). in both cases we set the delta timestamp to 0
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, 0)
+				} else if startedAt != nil && arrayNodeState.SubNodeDeltaTimestamps.GetItem(index) == 0 {
+					// otherwise if `SubNodeDeltaTimestamps` is unset, we compute the delta and set it
+					deltaDuration := uint64(subNodeStartedAt.Time.Sub(startedAt.Time).Seconds())
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, deltaDuration)
+				}
+			}
 
 			// increment task phase version if subNode phase or task phase changed
 			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
@@ -388,7 +411,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		failingCount := 0
 		runningCount := 0
 		for _, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64) // #nosec G115
 			switch nodePhase {
 			case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRecovered, v1alpha1.NodePhaseSkipped:
 				successCount++
@@ -449,7 +472,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		gatherOutputsRequests := make([]*gatherOutputsRequest, 0, len(arrayNodeState.SubNodePhases.GetItems()))
 		outputLiteralTypes := make(map[string]*idlcore.LiteralType)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64) // #nosec G115
 			gatherOutputsRequest := &gatherOutputsRequest{
 				ctx: ctx,
 				responseChannel: make(chan struct {
@@ -471,13 +494,13 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					continue
 				}
 
-				if task.CoreTask() != nil && task.CoreTask().Interface != nil && task.CoreTask().Interface.Outputs != nil {
-					for name := range task.CoreTask().Interface.Outputs.Variables {
+				if task.CoreTask() != nil && task.CoreTask().GetInterface() != nil && task.CoreTask().GetInterface().GetOutputs() != nil {
+					for name := range task.CoreTask().GetInterface().GetOutputs().GetVariables() {
 						outputLiterals[name] = nilLiteral
 						// Extract the literal type from the task interface
 						outputLiteralTypes[name] = &idlcore.LiteralType{
 							Type: &idlcore.LiteralType_CollectionType{
-								CollectionType: task.CoreTask().Interface.Outputs.Variables[name].GetType(),
+								CollectionType: task.CoreTask().GetInterface().GetOutputs().GetVariables()[name].GetType(),
 							},
 						}
 					}
@@ -489,7 +512,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}{outputLiterals, nil}
 			} else {
 				// initialize subNode reader
-				currentAttempt := int(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+				currentAttempt := int(arrayNodeState.SubNodeRetryAttempts.GetItem(i)) // #nosec G115
 				subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx,
 					strconv.Itoa(i), strconv.Itoa(currentAttempt))
 				if err != nil {
@@ -525,7 +548,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
-				for name := range outputs.Variables {
+				for name := range outputs.GetVariables() {
 					outputLiteral := &idlcore.Literal{
 						Value: &idlcore.Literal_Collection{
 							Collection: &idlcore.LiteralCollection{
@@ -722,8 +745,8 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalO
 func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNodeState *handler.ArrayNodeState, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder arrayEventRecorder) (
 	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
 
-	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
-	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
+	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex)) // #nosec G115
+	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))            // #nosec G115
 
 	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
 	inputs, err := nCtx.InputReader().Get(ctx)
@@ -759,10 +782,18 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	}
 
 	// construct output references
-	currentAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(subNodeIndex))
+	currentAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(subNodeIndex)) // #nosec G115
 	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt)))
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
+	var startedAt *metav1.Time
+	if nCtx.NodeStatus().GetLastAttemptStartedAt() != nil && arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+		if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
+			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
+		}
 	}
 
 	subNodeStatus := &v1alpha1.NodeStatus{
@@ -770,11 +801,12 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 		DataDir:        subDataDir,
 		OutputDir:      subOutputDir,
 		Attempts:       currentAttempt,
-		SystemFailures: uint32(arrayNodeState.SubNodeSystemFailures.GetItem(subNodeIndex)),
+		SystemFailures: uint32(arrayNodeState.SubNodeSystemFailures.GetItem(subNodeIndex)), // #nosec G115
 		TaskNodeStatus: &v1alpha1.TaskNodeStatus{
 			Phase:       taskPhase,
 			PluginState: pluginStateBytes,
 		},
+		LastAttemptStartedAt: startedAt,
 	}
 
 	// initialize mocks

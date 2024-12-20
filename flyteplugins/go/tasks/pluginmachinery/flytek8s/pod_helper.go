@@ -11,6 +11,7 @@ import (
 	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -287,15 +288,15 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
-		if target.K8SPod.PodSpec == nil {
+		if target.K8SPod.GetPodSpec() == nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.GetPodSpec(), &podSpec)
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
+				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.GetPodSpec(), err.Error())
 		}
 
 		// get primary container name
@@ -306,9 +307,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod().Metadata != nil {
-			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
-			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
+		if taskTemplate.GetK8SPod().GetMetadata() != nil {
+			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
@@ -393,7 +394,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+			primaryContainer, taskTemplate.GetInterface(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
@@ -445,6 +446,54 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
+func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
+	podTolerations := podSpec.Tolerations
+
+	var newTolerations []v1.Toleration
+	for i := range podTolerations {
+		if toleration.MatchToleration(&podTolerations[i]) {
+			return podSpec
+		}
+		newTolerations = append(newTolerations, podTolerations[i])
+	}
+	newTolerations = append(newTolerations, *toleration)
+	podSpec.Tolerations = newTolerations
+	return podSpec
+}
+
+func AddTolerationsForExtendedResources(podSpec *v1.PodSpec) *v1.PodSpec {
+	if podSpec == nil {
+		podSpec = &v1.PodSpec{}
+	}
+
+	resources := sets.NewString()
+	for _, container := range podSpec.Containers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, container := range podSpec.InitContainers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, resource := range resources.List() {
+		addTolerationInPodSpec(podSpec, &v1.Toleration{
+			Key:      resource,
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		})
+	}
+
+	return podSpec
+}
+
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
 // involves parsing the raw PodSpec definition and applying all Flyte configuration options.
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, string, error) {
@@ -459,6 +508,8 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	if err != nil {
 		return nil, nil, "", err
 	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
 
 	return podSpec, objectMeta, primaryContainerName, nil
 }
@@ -483,11 +534,11 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	}
 
 	var podTemplate *v1.PodTemplate
-	if taskTemplate.Metadata != nil && len(taskTemplate.Metadata.PodTemplateName) > 0 {
+	if taskTemplate.GetMetadata() != nil && len(taskTemplate.GetMetadata().GetPodTemplateName()) > 0 {
 		// retrieve PodTemplate by name from PodTemplateStore
-		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.Metadata.PodTemplateName)
+		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.GetMetadata().GetPodTemplateName())
 		if podTemplate == nil {
-			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.Metadata.PodTemplateName)
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.GetMetadata().GetPodTemplateName())
 		}
 	} else {
 		// check for default PodTemplate

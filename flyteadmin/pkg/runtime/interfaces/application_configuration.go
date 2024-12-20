@@ -212,16 +212,16 @@ func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() *admin.WorkflowExecut
 	}
 
 	// For the others, we only add the field when the field is set in the config.
-	if a.GetSecurityContext().RunAs.GetK8SServiceAccount() != "" || a.GetSecurityContext().RunAs.GetIamRole() != "" {
+	if a.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" || a.GetSecurityContext().GetRunAs().GetIamRole() != "" {
 		wec.SecurityContext = a.GetSecurityContext()
 	}
-	if a.GetRawOutputDataConfig().OutputLocationPrefix != "" {
+	if a.GetRawOutputDataConfig().GetOutputLocationPrefix() != "" {
 		wec.RawOutputDataConfig = a.GetRawOutputDataConfig()
 	}
-	if len(a.GetLabels().Values) > 0 {
+	if len(a.GetLabels().GetValues()) > 0 {
 		wec.Labels = a.GetLabels()
 	}
-	if len(a.GetAnnotations().Values) > 0 {
+	if len(a.GetAnnotations().GetValues()) > 0 {
 		wec.Annotations = a.GetAnnotations()
 	}
 
@@ -603,6 +603,8 @@ type EventsPublisherConfig struct {
 	TopicName string `json:"topicName"`
 	// Event types: task, node, workflow executions
 	EventTypes []string `json:"eventTypes"`
+	// Whether to publish enriched events for all workflow execution events
+	EnrichAllWorkflowEventTypes bool `json:"enrichAllWorkflowEventTypes"`
 }
 
 type ExternalEventsConfig struct {

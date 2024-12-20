@@ -20,7 +20,7 @@ const (
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func getWorkflowInterface() *core.TypedInterface {
-	return testutils.GetSampleWorkflowSpecForTest().Template.Interface
+	return testutils.GetSampleWorkflowSpecForTest().GetTemplate().GetInterface()
 }
 
 func TestValidateLpEmptyProject(t *testing.T) {

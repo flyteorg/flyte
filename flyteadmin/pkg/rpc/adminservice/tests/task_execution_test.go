@@ -47,11 +47,11 @@ func TestTaskExecution(t *testing.T) {
 		mockTaskExecutionManager.SetCreateTaskEventCallback(
 			func(ctx context.Context, request *admin.TaskExecutionEventRequest) (
 				*admin.TaskExecutionEventResponse, error) {
-				assert.Equal(t, requestID, request.RequestId)
-				assert.NotNil(t, request.Event)
-				assert.True(t, proto.Equal(taskID, request.Event.TaskId))
-				assert.Equal(t, phase, request.Event.Phase)
-				assert.Equal(t, retryAttempt, request.Event.RetryAttempt)
+				assert.Equal(t, requestID, request.GetRequestId())
+				assert.NotNil(t, request.GetEvent())
+				assert.True(t, proto.Equal(taskID, request.GetEvent().GetTaskId()))
+				assert.Equal(t, phase, request.GetEvent().GetPhase())
+				assert.Equal(t, retryAttempt, request.GetEvent().GetRetryAttempt())
 				return &admin.TaskExecutionEventResponse{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -143,9 +143,9 @@ func TestTaskExecution(t *testing.T) {
 		mockTaskExecutionManager.SetGetTaskExecutionCallback(
 			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
-				assert.Equal(t, taskID, request.Id.TaskId)
-				assert.Equal(t, nodeExecutionID, request.Id.NodeExecutionId)
-				assert.Equal(t, retryAttempt, request.Id.RetryAttempt)
+				assert.Equal(t, taskID, request.GetId().GetTaskId())
+				assert.Equal(t, nodeExecutionID, request.GetId().GetNodeExecutionId())
+				assert.Equal(t, retryAttempt, request.GetId().GetRetryAttempt())
 				return &admin.TaskExecution{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -232,8 +232,8 @@ func TestTaskExecution(t *testing.T) {
 		mockTaskExecutionManager.SetListTaskExecutionsCallback(
 			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
-				assert.Equal(t, "1", request.Token)
-				assert.Equal(t, uint32(99), request.Limit)
+				assert.Equal(t, "1", request.GetToken())
+				assert.Equal(t, uint32(99), request.GetLimit())
 				assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 					NodeId: "nodey",
 					ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -241,7 +241,7 @@ func TestTaskExecution(t *testing.T) {
 						Domain:  "domain",
 						Name:    "name",
 					},
-				}, request.NodeExecutionId))
+				}, request.GetNodeExecutionId()))
 				return &admin.TaskExecutionList{}, nil
 			})
 		mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -344,9 +344,9 @@ func TestGetTaskExecutionData(t *testing.T) {
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "inputs",
 		Bytes: 100,
-	}, resp.Inputs))
+	}, resp.GetInputs()))
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "outputs",
 		Bytes: 200,
-	}, resp.Outputs))
+	}, resp.GetOutputs()))
 }

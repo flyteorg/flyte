@@ -50,18 +50,18 @@ func (f FileEnvSecretManager) Get(ctx context.Context, key string) (string, erro
 // Prefix+SecretGroup+_+SecretKey. If the secret is not found in environment, it'll lookup the secret from files using
 // the configured SecretPath / SecretGroup / SecretKey.
 func (f FileEnvSecretManager) GetForSecret(ctx context.Context, secret *coreIdl.Secret) (string, error) {
-	if len(secret.Group) == 0 || len(secret.Key) == 0 {
+	if len(secret.GetGroup()) == 0 || len(secret.GetKey()) == 0 {
 		return "", fmt.Errorf("both key and group are required parameters. Secret: [%v]", secret.String())
 	}
 
-	envVar := fmt.Sprintf(envVarLookupFormatter, f.envPrefix, strings.ToUpper(secret.Group), strings.ToUpper(secret.Key))
+	envVar := fmt.Sprintf(envVarLookupFormatter, f.envPrefix, strings.ToUpper(secret.GetGroup()), strings.ToUpper(secret.GetKey()))
 	v, ok := os.LookupEnv(envVar)
 	if ok {
 		logger.Debugf(ctx, "Secret found %s", v)
 		return v, nil
 	}
 
-	secretFile := filepath.Join(f.secretPath, filepath.Join(secret.Group, secret.Key))
+	secretFile := filepath.Join(f.secretPath, filepath.Join(secret.GetGroup(), secret.GetKey()))
 	if _, err := os.Stat(secretFile); err != nil {
 		if os.IsNotExist(err) {
 			return "", fmt.Errorf("secrets not found - Env [%s], file [%s]", envVar, secretFile)

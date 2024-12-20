@@ -18,10 +18,10 @@ func ValidateGetArtifactRequest(request *datacatalog.GetArtifactRequest) error {
 		return NewMissingArgumentError(fmt.Sprintf("one of %s/%s", artifactID, tagName))
 	}
 
-	switch request.QueryHandle.(type) {
+	switch request.GetQueryHandle().(type) {
 	case *datacatalog.GetArtifactRequest_ArtifactId:
-		if request.Dataset != nil {
-			err := ValidateDatasetID(request.Dataset)
+		if request.GetDataset() != nil {
+			err := ValidateDatasetID(request.GetDataset())
 			if err != nil {
 				return err
 			}
@@ -31,7 +31,7 @@ func ValidateGetArtifactRequest(request *datacatalog.GetArtifactRequest) error {
 			return err
 		}
 	case *datacatalog.GetArtifactRequest_TagName:
-		if err := ValidateDatasetID(request.Dataset); err != nil {
+		if err := ValidateDatasetID(request.GetDataset()); err != nil {
 			return err
 		}
 
@@ -58,15 +58,15 @@ func ValidateArtifact(artifact *datacatalog.Artifact) error {
 		return NewMissingArgumentError(artifactEntity)
 	}
 
-	if err := ValidateDatasetID(artifact.Dataset); err != nil {
+	if err := ValidateDatasetID(artifact.GetDataset()); err != nil {
 		return err
 	}
 
-	if err := ValidateEmptyStringField(artifact.Id, artifactID); err != nil {
+	if err := ValidateEmptyStringField(artifact.GetId(), artifactID); err != nil {
 		return err
 	}
 
-	if err := ValidateEmptyArtifactData(artifact.Data); err != nil {
+	if err := ValidateEmptyArtifactData(artifact.GetData()); err != nil {
 		return err
 	}
 
@@ -75,16 +75,16 @@ func ValidateArtifact(artifact *datacatalog.Artifact) error {
 
 // Validate the list request and format the request with proper defaults if not provided
 func ValidateListArtifactRequest(request *datacatalog.ListArtifactsRequest) error {
-	if err := ValidateDatasetID(request.Dataset); err != nil {
+	if err := ValidateDatasetID(request.GetDataset()); err != nil {
 		return err
 	}
 
-	if err := ValidateArtifactFilterTypes(request.Filter.GetFilters()); err != nil {
+	if err := ValidateArtifactFilterTypes(request.GetFilter().GetFilters()); err != nil {
 		return err
 	}
 
-	if request.Pagination != nil {
-		err := ValidatePagination(request.Pagination)
+	if request.GetPagination() != nil {
+		err := ValidatePagination(request.GetPagination())
 		if err != nil {
 			return err
 		}
@@ -108,10 +108,10 @@ func ValidateUpdateArtifactRequest(request *datacatalog.UpdateArtifactRequest) e
 		return NewMissingArgumentError(fmt.Sprintf("one of %s/%s", artifactID, tagName))
 	}
 
-	switch request.QueryHandle.(type) {
+	switch request.GetQueryHandle().(type) {
 	case *datacatalog.UpdateArtifactRequest_ArtifactId:
-		if request.Dataset != nil {
-			err := ValidateDatasetID(request.Dataset)
+		if request.GetDataset() != nil {
+			err := ValidateDatasetID(request.GetDataset())
 			if err != nil {
 				return err
 			}
@@ -121,7 +121,7 @@ func ValidateUpdateArtifactRequest(request *datacatalog.UpdateArtifactRequest) e
 			return err
 		}
 	case *datacatalog.UpdateArtifactRequest_TagName:
-		if err := ValidateDatasetID(request.Dataset); err != nil {
+		if err := ValidateDatasetID(request.GetDataset()); err != nil {
 			return err
 		}
 
@@ -132,7 +132,7 @@ func ValidateUpdateArtifactRequest(request *datacatalog.UpdateArtifactRequest) e
 		return NewInvalidArgumentError("QueryHandle", "invalid type")
 	}
 
-	if err := ValidateEmptyArtifactData(request.Data); err != nil {
+	if err := ValidateEmptyArtifactData(request.GetData()); err != nil {
 		return err
 	}
 

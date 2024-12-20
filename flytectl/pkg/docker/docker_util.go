@@ -134,14 +134,14 @@ func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, e
 }
 
 // GetDemoPorts will return demo ports
-func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
+func GetDemoPorts(k8sPort string) (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
 	return nat.ParsePortSpecs([]string{
-		"0.0.0.0:6443:6443",   // K3s API Port
-		"0.0.0.0:30080:30080", // HTTP Port
-		"0.0.0.0:30000:30000", // Registry Port
-		"0.0.0.0:30001:30001", // Postgres Port
-		"0.0.0.0:30002:30002", // Minio API Port (use HTTP port for minio console)
-		"0.0.0.0:30003:30003", // Buildkit Port
+		fmt.Sprintf("0.0.0.0:%s:6443", k8sPort), // K3s API Port
+		"0.0.0.0:30080:30080",                   // HTTP Port
+		"0.0.0.0:30000:30000",                   // Registry Port
+		"0.0.0.0:30001:30001",                   // Postgres Port
+		"0.0.0.0:30002:30002",                   // Minio API Port (use HTTP port for minio console)
+		"0.0.0.0:30003:30003",                   // Buildkit Port
 	})
 }
 

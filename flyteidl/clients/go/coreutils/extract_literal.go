@@ -28,11 +28,11 @@ import (
 )
 
 func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
-	switch literalValue := literal.Value.(type) {
+	switch literalValue := literal.GetValue().(type) {
 	case *core.Literal_Scalar:
-		switch scalarValue := literalValue.Scalar.Value.(type) {
+		switch scalarValue := literalValue.Scalar.GetValue().(type) {
 		case *core.Scalar_Primitive:
-			switch scalarPrimitive := scalarValue.Primitive.Value.(type) {
+			switch scalarPrimitive := scalarValue.Primitive.GetValue().(type) {
 			case *core.Primitive_Integer:
 				scalarPrimitiveInt := scalarPrimitive.Integer
 				return scalarPrimitiveInt, nil
@@ -57,16 +57,16 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 		case *core.Scalar_Binary:
 			return scalarValue.Binary, nil
 		case *core.Scalar_Blob:
-			return scalarValue.Blob.Uri, nil
+			return scalarValue.Blob.GetUri(), nil
 		case *core.Scalar_Schema:
-			return scalarValue.Schema.Uri, nil
+			return scalarValue.Schema.GetUri(), nil
 		case *core.Scalar_Generic:
 			return scalarValue.Generic, nil
 		case *core.Scalar_StructuredDataset:
-			return scalarValue.StructuredDataset.Uri, nil
+			return scalarValue.StructuredDataset.GetUri(), nil
 		case *core.Scalar_Union:
 			// extract the value of the union but not the actual union object
-			extractedVal, err := ExtractFromLiteral(scalarValue.Union.Value)
+			extractedVal, err := ExtractFromLiteral(scalarValue.Union.GetValue())
 			if err != nil {
 				return nil, err
 			}
@@ -77,7 +77,7 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			return nil, fmt.Errorf("unsupported literal scalar type %T", scalarValue)
 		}
 	case *core.Literal_Collection:
-		collectionValue := literalValue.Collection.Literals
+		collectionValue := literalValue.Collection.GetLiterals()
 		collection := make([]interface{}, len(collectionValue))
 		for index, val := range collectionValue {
 			if collectionElem, err := ExtractFromLiteral(val); err == nil {
@@ -88,7 +88,7 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 		}
 		return collection, nil
 	case *core.Literal_Map:
-		mapLiteralValue := literalValue.Map.Literals
+		mapLiteralValue := literalValue.Map.GetLiterals()
 		mapResult := make(map[string]interface{}, len(mapLiteralValue))
 		for key, val := range mapLiteralValue {
 			if val, err := ExtractFromLiteral(val); err == nil {
@@ -100,7 +100,7 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 		return mapResult, nil
 	case *core.Literal_OffloadedMetadata:
 		// Return the URI of the offloaded metadata to be used when displaying in flytectl
-		return literalValue.OffloadedMetadata.Uri, nil
+		return literalValue.OffloadedMetadata.GetUri(), nil
 
 	}
 	return nil, fmt.Errorf("unsupported literal type %T", literal)

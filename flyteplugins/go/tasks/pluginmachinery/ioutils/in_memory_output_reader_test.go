@@ -39,7 +39,7 @@ func TestInMemoryOutputReader(t *testing.T) {
 	assert.NoError(t, err)
 
 	literalMap, executionErr, err := or.Read(ctx)
-	assert.Equal(t, lt, literalMap.Literals)
+	assert.Equal(t, lt, literalMap.GetLiterals())
 	assert.Nil(t, executionErr)
 	assert.NoError(t, err)
 }

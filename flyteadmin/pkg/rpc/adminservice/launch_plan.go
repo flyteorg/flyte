@@ -26,7 +26,7 @@ func (m *AdminService) CreateLaunchPlan(
 func (m *AdminService) GetLaunchPlan(ctx context.Context, request *admin.ObjectGetRequest) (*admin.LaunchPlan, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.Id != nil && request.Id.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetId() != nil && request.GetId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.ResourceType = core.ResourceType_LAUNCH_PLAN
 	}
@@ -60,7 +60,7 @@ func (m *AdminService) UpdateLaunchPlan(ctx context.Context, request *admin.Laun
 	*admin.LaunchPlanUpdateResponse, error) {
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
-	if request.Id != nil && request.Id.ResourceType == core.ResourceType_UNSPECIFIED {
+	if request.GetId() != nil && request.GetId().GetResourceType() == core.ResourceType_UNSPECIFIED {
 		logger.Infof(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
 		request.Id.ResourceType = core.ResourceType_LAUNCH_PLAN
 	}

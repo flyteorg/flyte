@@ -53,8 +53,8 @@ func unmarshalSecret(encoded string) (*core.Secret, error) {
 func MarshalSecretsToMapStrings(secrets []*core.Secret) (map[string]string, error) {
 	res := make(map[string]string, len(secrets))
 	for index, s := range secrets {
-		if _, found := core.Secret_MountType_name[int32(s.MountRequirement)]; !found {
-			return nil, fmt.Errorf("invalid mount requirement [%v]", s.MountRequirement)
+		if _, found := core.Secret_MountType_name[int32(s.GetMountRequirement())]; !found {
+			return nil, fmt.Errorf("invalid mount requirement [%v]", s.GetMountRequirement())
 		}
 
 		encodedSecret := marshalSecret(s)

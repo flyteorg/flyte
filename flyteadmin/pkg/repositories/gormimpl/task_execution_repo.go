@@ -37,17 +37,17 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 	tx := r.db.WithContext(ctx).Where(&models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
-				Project: input.TaskExecutionID.TaskId.Project,
-				Domain:  input.TaskExecutionID.TaskId.Domain,
-				Name:    input.TaskExecutionID.TaskId.Name,
-				Version: input.TaskExecutionID.TaskId.Version,
+				Project: input.TaskExecutionID.GetTaskId().GetProject(),
+				Domain:  input.TaskExecutionID.GetTaskId().GetDomain(),
+				Name:    input.TaskExecutionID.GetTaskId().GetName(),
+				Version: input.TaskExecutionID.GetTaskId().GetVersion(),
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: input.TaskExecutionID.NodeExecutionId.NodeId,
+				NodeID: input.TaskExecutionID.GetNodeExecutionId().GetNodeId(),
 				ExecutionKey: models.ExecutionKey{
-					Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
-					Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
-					Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
+					Project: input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetProject(),
+					Domain:  input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+					Name:    input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetName(),
 				},
 			},
 			RetryAttempt: &input.TaskExecutionID.RetryAttempt,
@@ -59,17 +59,17 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 		return models.TaskExecution{},
 			flyteAdminDbErrors.GetMissingEntityError("task execution", &core.TaskExecutionIdentifier{
 				TaskId: &core.Identifier{
-					Project: input.TaskExecutionID.TaskId.Project,
-					Domain:  input.TaskExecutionID.TaskId.Domain,
-					Name:    input.TaskExecutionID.TaskId.Name,
-					Version: input.TaskExecutionID.TaskId.Version,
+					Project: input.TaskExecutionID.GetTaskId().GetProject(),
+					Domain:  input.TaskExecutionID.GetTaskId().GetDomain(),
+					Name:    input.TaskExecutionID.GetTaskId().GetName(),
+					Version: input.TaskExecutionID.GetTaskId().GetVersion(),
 				},
 				NodeExecutionId: &core.NodeExecutionIdentifier{
-					NodeId: input.TaskExecutionID.NodeExecutionId.NodeId,
+					NodeId: input.TaskExecutionID.GetNodeExecutionId().GetNodeId(),
 					ExecutionId: &core.WorkflowExecutionIdentifier{
-						Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
-						Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
-						Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
+						Project: input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetProject(),
+						Domain:  input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+						Name:    input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetName(),
 					},
 				},
 			})

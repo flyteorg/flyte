@@ -26,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -473,9 +474,10 @@ func TestBuildResourcePytorchContainerImage(t *testing.T) {
 
 func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
-		GpuDeviceNodeLabel:        "gpu-node-label",
-		GpuPartitionSizeNodeLabel: "gpu-partition-size",
-		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
 	}))
 
 	fixtures := []struct {
@@ -515,6 +517,11 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-t4",
 					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
@@ -566,6 +573,11 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 					Key:      "gpu-partition-size",
 					Value:    "1g.5gb",
 					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
@@ -688,9 +700,9 @@ func TestGetLogs(t *testing.T) {
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].GetUri())
 }
 
 func TestGetLogsElastic(t *testing.T) {
@@ -708,13 +720,19 @@ func TestGetLogsElastic(t *testing.T) {
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
 }
 
 func TestGetProperties(t *testing.T) {
+	config := k8sConfig.GetK8sPluginConfig()
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	expected := k8s.PluginProperties{
+
+	expected := k8s.PluginProperties{}
+	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
+
+	config.EnableDistributedErrorAggregation = true
+	expected = k8s.PluginProperties{
 		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
 	}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
@@ -850,6 +868,8 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			},
 		}
 
+		config := k8sConfig.GetK8sPluginConfig()
+		config.EnableDistributedErrorAggregation = true
 		pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
 		taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)

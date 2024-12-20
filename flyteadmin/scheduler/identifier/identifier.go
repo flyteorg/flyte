@@ -44,7 +44,7 @@ func GetExecutionIdentifier(ctx context.Context, identifier *core.Identifier, sc
 func hashIdentifier(ctx context.Context, identifier *core.Identifier) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(scheduleNameInputsFormat,
-		identifier.Project, identifier.Domain, identifier.Name, identifier.Version)))
+		identifier.GetProject(), identifier.GetDomain(), identifier.GetName(), identifier.GetVersion())))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,
@@ -59,7 +59,7 @@ func hashIdentifier(ctx context.Context, identifier *core.Identifier) uint64 {
 func hashScheduledTimeStamp(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(executionIDInputsFormat,
-		identifier.Project, identifier.Domain, identifier.Name, identifier.Version, scheduledTime.Unix())))
+		identifier.GetProject(), identifier.GetDomain(), identifier.GetName(), identifier.GetVersion(), scheduledTime.Unix())))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,

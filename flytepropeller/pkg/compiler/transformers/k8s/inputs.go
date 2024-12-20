@@ -15,28 +15,28 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 		return false
 	}
 
-	if iface.Inputs == nil {
+	if iface.GetInputs() == nil {
 		errs.Collect(errors.NewValueRequiredErr(nodeID, "interface.InputsRef"))
 		return false
 	}
 
-	varMap := make(map[string]*core.Variable, len(iface.Inputs.Variables))
+	varMap := make(map[string]*core.Variable, len(iface.GetInputs().GetVariables()))
 	requiredInputsSet := sets.String{}
-	for name, v := range iface.Inputs.Variables {
+	for name, v := range iface.GetInputs().GetVariables() {
 		varMap[name] = v
 		requiredInputsSet.Insert(name)
 	}
 
 	boundInputsSet := sets.String{}
-	for inputVar, inputVal := range inputs.Literals {
+	for inputVar, inputVal := range inputs.GetLiterals() {
 		v, exists := varMap[inputVar]
 		if !exists {
 			errs.Collect(errors.NewVariableNameNotFoundErr(nodeID, "", inputVar))
 			continue
 		}
 
-		if !validators.IsInstance(inputVal, v.Type) {
-			errs.Collect(errors.NewMismatchingInstanceErr(nodeID, inputVar, common.LiteralTypeToStr(v.Type), inputVal.String()))
+		if !validators.IsInstance(inputVal, v.GetType()) {
+			errs.Collect(errors.NewMismatchingInstanceErr(nodeID, inputVar, common.LiteralTypeToStr(v.GetType()), inputVal.String()))
 			continue
 		}
 

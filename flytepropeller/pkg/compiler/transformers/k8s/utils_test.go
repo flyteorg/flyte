@@ -6,6 +6,7 @@ import (
 	"github.com/go-test/deep"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -14,9 +15,9 @@ func TestComputeRetryStrategy(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		nodeRetries     int
-		taskRetries     int
-		expectedRetries int
+		nodeRetries     uint32
+		taskRetries     uint32
+		expectedRetries uint32
 	}{
 		{"node-only", 1, 0, 2},
 		{"task-only", 0, 1, 2},
@@ -31,7 +32,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				node = &core.Node{
 					Metadata: &core.NodeMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.nodeRetries),
+							Retries: test.nodeRetries,
 						},
 					},
 				}
@@ -42,7 +43,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				tmpl = &core.TaskTemplate{
 					Metadata: &core.TaskMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.taskRetries),
+							Retries: test.taskRetries,
 						},
 					},
 				}
@@ -51,7 +52,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 			r := computeRetryStrategy(node, tmpl)
 			if test.expectedRetries != 0 {
 				assert.NotNil(t, r)
-				assert.Equal(t, test.expectedRetries, *r.MinAttempts)
+				assert.Equal(t, int(test.expectedRetries), *r.MinAttempts) // #nosec G115
 			} else {
 				assert.Nil(t, r)
 			}
@@ -248,6 +249,99 @@ func TestStripTypeMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "cache-key-metadata set",
+			args: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"cache-key-metadata": {
+								Kind: &_struct.Value_StructValue{
+									StructValue: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
+											"foo": {
+												Kind: &_struct.Value_StringValue{
+													StringValue: "bar",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Metadata: &_struct.Struct{
+					Fields: map[string]*_struct.Value{
+						"foo": {
+							Kind: &_struct.Value_StringValue{
+								StringValue: "bar",
+							},
+						},
+					},
+				},
+			},
+			want: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"cache-key-metadata": {
+								Kind: &_struct.Value_StructValue{
+									StructValue: &structpb.Struct{
+										Fields: map[string]*structpb.Value{
+											"foo": {
+												Kind: &_struct.Value_StringValue{
+													StringValue: "bar",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "cache-key-metadata not present in annotation",
+			args: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+				Annotation: &core.TypeAnnotation{
+					Annotations: &structpb.Struct{
+						Fields: map[string]*structpb.Value{
+							"some-key": {
+								Kind: &_struct.Value_StringValue{
+									StringValue: "some-value",
+								},
+							},
+						},
+					},
+				},
+				Metadata: &_struct.Struct{
+					Fields: map[string]*_struct.Value{
+						"foo": {
+							Kind: &_struct.Value_StringValue{
+								StringValue: "bar",
+							},
+						},
+					},
+				},
+			},
+			want: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -292,7 +386,7 @@ func TestStripInterfaceTypeMetadata(t *testing.T) {
 		}
 
 		stripped := StripInterfaceTypeMetadata(i)
-		assert.Nil(t, stripped.Inputs.Variables["a"].Type.Metadata)
-		assert.Nil(t, stripped.Outputs.Variables["a"].Type.Metadata)
+		assert.Nil(t, stripped.GetInputs().GetVariables()["a"].GetType().GetMetadata())
+		assert.Nil(t, stripped.GetOutputs().GetVariables()["a"].GetType().GetMetadata())
 	})
 }

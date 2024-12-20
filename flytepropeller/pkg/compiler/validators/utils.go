@@ -13,7 +13,7 @@ import (
 
 func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {
 	for _, b := range bindings {
-		if b.Var == name {
+		if b.GetVar() == name {
 			return true
 		}
 	}
@@ -26,7 +26,7 @@ func findVariableByName(vars *core.VariableMap, name string) (variable *core.Var
 		return nil, false
 	}
 
-	variable, found = vars.Variables[name]
+	variable, found = vars.GetVariables()[name]
 	return
 }
 
@@ -47,7 +47,7 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 		// If the binary has a tag, treat it as a structured type (e.g., dict, dataclass, Pydantic BaseModel).
 		// Otherwise, treat it as raw binary data.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
-		if v.Binary.Tag == coreutils.MESSAGEPACK {
+		if v.Binary.GetTag() == coreutils.MESSAGEPACK {
 			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
 		} else {
 			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
@@ -55,11 +55,11 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 	case *core.Scalar_Schema:
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_Schema{
-				Schema: scalar.GetSchema().Type,
+				Schema: scalar.GetSchema().GetType(),
 			},
 		}
 	case *core.Scalar_StructuredDataset:
-		if v.StructuredDataset == nil || v.StructuredDataset.Metadata == nil {
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
 			return &core.LiteralType{
 				Type: &core.LiteralType_StructuredDatasetType{},
 			}
@@ -67,7 +67,7 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_StructuredDatasetType{
-				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType,
+				StructuredDatasetType: scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(),
 			},
 		}
 	case *core.Scalar_NoneType:
@@ -114,9 +114,9 @@ func literalTypeForPrimitive(primitive *core.Primitive) *core.LiteralType {
 }
 
 func buildVariablesIndex(params *core.VariableMap) (map[string]*core.Variable, sets.String) {
-	paramMap := make(map[string]*core.Variable, len(params.Variables))
+	paramMap := make(map[string]*core.Variable, len(params.GetVariables()))
 	paramSet := sets.NewString()
-	for paramName, param := range params.Variables {
+	for paramName, param := range params.GetVariables() {
 		paramMap[paramName] = param
 		paramSet.Insert(paramName)
 	}
@@ -129,7 +129,7 @@ func filterVariables(vars *core.VariableMap, varNames sets.String) *core.Variabl
 		Variables: make(map[string]*core.Variable, len(varNames)),
 	}
 
-	for paramName, param := range vars.Variables {
+	for paramName, param := range vars.GetVariables() {
 		if varNames.Has(paramName) {
 			res.Variables[paramName] = param
 		}
@@ -157,9 +157,9 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 
 	for k, v := range m2 {
 		if existingV, exists := res[k]; exists {
-			if v.Type.String() != existingV.Type.String() {
+			if v.GetType().String() != existingV.GetType().String() {
 				return nil, fmt.Errorf("key already exists with a different type. %v has type [%v] on one side "+
-					"and type [%v] on the other", k, existingV.Type.String(), v.Type.String())
+					"and type [%v] on the other", k, existingV.GetType().String(), v.GetType().String())
 			}
 		}
 
@@ -232,12 +232,8 @@ func (t collectionInstanceChecker) isInstance(lit *core.Literal) bool {
 	if _, ok := lit.GetValue().(*core.Literal_Collection); !ok {
 		return false
 	}
-	for _, x := range lit.GetCollection().Literals {
-		if _, ok := x.GetValue().(*core.Literal_OffloadedMetadata); ok {
-			if !AreTypesCastable(x.GetOffloadedMetadata().GetInferredType(), t.literalType) {
-				return false
-			}
-		} else if !IsInstance(x, t.literalType.GetCollectionType()) {
+	for _, x := range lit.GetCollection().GetLiterals() {
+		if !IsInstance(x, t.literalType.GetCollectionType()) {
 			return false
 		}
 	}
@@ -252,12 +248,8 @@ func (t mapInstanceChecker) isInstance(lit *core.Literal) bool {
 	if _, ok := lit.GetValue().(*core.Literal_Map); !ok {
 		return false
 	}
-	for _, x := range lit.GetMap().Literals {
-		if _, ok := x.GetValue().(*core.Literal_OffloadedMetadata); ok {
-			if !AreTypesCastable(x.GetOffloadedMetadata().GetInferredType(), t.literalType) {
-				return false
-			}
-		} else if !IsInstance(x, t.literalType.GetMapValueType()) {
+	for _, x := range lit.GetMap().GetLiterals() {
+		if !IsInstance(x, t.literalType.GetMapValueType()) {
 			return false
 		}
 	}
@@ -269,7 +261,6 @@ type blobInstanceChecker struct {
 }
 
 func (t blobInstanceChecker) isInstance(lit *core.Literal) bool {
-	//scalar.GetBlob().GetMetadata().GetType()
 	if _, ok := lit.GetScalar().GetValue().(*core.Scalar_Blob); !ok {
 		return false
 	}
@@ -299,12 +290,12 @@ func (t schemaInstanceChecker) isInstance(lit *core.Literal) bool {
 
 	switch v := scalar.GetValue().(type) {
 	case *core.Scalar_Schema:
-		return schemaCastFromSchema(scalar.GetSchema().Type, t.literalType.GetSchema())
+		return schemaCastFromSchema(scalar.GetSchema().GetType(), t.literalType.GetSchema())
 	case *core.Scalar_StructuredDataset:
-		if v.StructuredDataset == nil || v.StructuredDataset.Metadata == nil {
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
 			return true
 		}
-		return schemaCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType, t.literalType.GetSchema())
+		return schemaCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(), t.literalType.GetSchema())
 	default:
 		return false
 	}
@@ -325,16 +316,16 @@ func (t structuredDatasetInstanceChecker) isInstance(lit *core.Literal) bool {
 		return true
 	case *core.Scalar_Schema:
 		// Flyte Schema can only be serialized to parquet
-		format := t.literalType.GetStructuredDatasetType().Format
+		format := t.literalType.GetStructuredDatasetType().GetFormat()
 		if len(format) != 0 && !strings.EqualFold(format, "parquet") {
 			return false
 		}
-		return structuredDatasetCastFromSchema(scalar.GetSchema().Type, t.literalType.GetStructuredDatasetType())
+		return structuredDatasetCastFromSchema(scalar.GetSchema().GetType(), t.literalType.GetStructuredDatasetType())
 	case *core.Scalar_StructuredDataset:
-		if v.StructuredDataset == nil || v.StructuredDataset.Metadata == nil {
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
 			return true
 		}
-		return structuredDatasetCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().StructuredDatasetType, t.literalType.GetStructuredDatasetType())
+		return structuredDatasetCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(), t.literalType.GetStructuredDatasetType())
 	default:
 		return false
 	}

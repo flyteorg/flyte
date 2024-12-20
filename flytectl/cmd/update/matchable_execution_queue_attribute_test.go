@@ -274,10 +274,10 @@ func TestExecutionQueueAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testin
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -296,10 +296,10 @@ func TestExecutionQueueAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testin
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -318,10 +318,10 @@ func TestExecutionQueueAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testin
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -342,10 +342,10 @@ func TestExecutionQueueAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -363,10 +363,10 @@ func TestExecutionQueueAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -384,10 +384,10 @@ func TestExecutionQueueAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_QUEUE).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_QUEUE).
 					Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *executionqueueattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -410,10 +410,10 @@ func testWorkflowExecutionQueueAttributeUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
-				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_QUEUE).
+				OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_EXECUTION_QUEUE).
 				Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+				OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -479,10 +479,10 @@ func testProjectExecutionQueueAttributeUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
-				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_QUEUE).
+				OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_EXECUTION_QUEUE).
 				Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+				OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -546,10 +546,10 @@ func testProjectDomainExecutionQueueAttributeUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
-				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_QUEUE).
+				OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_EXECUTION_QUEUE).
 				Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 				Return(nil)
 		},
 		setup,

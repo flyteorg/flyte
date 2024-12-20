@@ -148,9 +148,9 @@ func TestFetchLiteral(t *testing.T) {
 			Fields: fieldsMap,
 		}
 		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
-		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
-		for key, val := range expectedStructVal.Fields {
-			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		assert.Equal(t, len(expectedStructVal.GetFields()), len(extractedStructValue.GetFields()))
+		for key, val := range expectedStructVal.GetFields() {
+			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
 		}
 		os.Unsetenv(FlyteUseOldDcFormat)
 	})
@@ -174,9 +174,9 @@ func TestFetchLiteral(t *testing.T) {
 			Fields: fieldsMap,
 		}
 		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
-		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
-		for key, val := range expectedStructVal.Fields {
-			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		assert.Equal(t, len(expectedStructVal.GetFields()), len(extractedStructValue.GetFields()))
+		for key, val := range expectedStructVal.GetFields() {
+			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
 		}
 	})
 

@@ -66,10 +66,10 @@ func assertNonEmptyInterface(t testing.TB, iface *core.TypedInterface, ifaceOk b
 		t.Fatal(errs)
 	}
 
-	assert.NotNil(t, iface.Inputs)
-	assert.NotNil(t, iface.Inputs.Variables)
-	assert.NotNil(t, iface.Outputs)
-	assert.NotNil(t, iface.Outputs.Variables)
+	assert.NotNil(t, iface.GetInputs())
+	assert.NotNil(t, iface.GetInputs().GetVariables())
+	assert.NotNil(t, iface.GetOutputs())
+	assert.NotNil(t, iface.GetOutputs().GetVariables())
 }
 
 func TestValidateUnderlyingInterface(t *testing.T) {
@@ -419,8 +419,8 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 
 		taskNodeBuilder := &mocks.NodeBuilder{}
 		taskNodeBuilder.On("GetCoreNode").Return(taskNode)
-		taskNodeBuilder.On("GetId").Return(taskNode.Id)
-		taskNodeBuilder.On("GetTaskNode").Return(taskNode.Target.(*core.Node_TaskNode).TaskNode)
+		taskNodeBuilder.On("GetId").Return(taskNode.GetId())
+		taskNodeBuilder.On("GetTaskNode").Return(taskNode.GetTarget().(*core.Node_TaskNode).TaskNode)
 		taskNodeBuilder.On("GetInterface").Return(nil)
 		taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
 
@@ -431,7 +431,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 			}).String()
 		})).Return(&task, true)
 		wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
-			return node.Id == "node_1"
+			return node.GetId() == "node_1"
 		})).Return(taskNodeBuilder)
 
 		// mock array node
@@ -445,9 +445,9 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		}
 
 		nodeBuilder := mocks.NodeBuilder{}
-		nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+		nodeBuilder.On("GetArrayNode").Return(arrayNode.GetTarget().(*core.Node_ArrayNode).ArrayNode)
 		nodeBuilder.On("GetCoreNode").Return(arrayNode)
-		nodeBuilder.On("GetId").Return(arrayNode.Id)
+		nodeBuilder.On("GetId").Return(arrayNode.GetId())
 		nodeBuilder.On("GetInterface").Return(nil)
 		nodeBuilder.On("SetInterface", mock.Anything).Return()
 

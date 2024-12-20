@@ -128,7 +128,7 @@ var (
 		LiteralOffloadingConfig: LiteralOffloadingConfig{
 			Enabled: false, // Default keep this disabled and we will followup when flytekit is released with the offloaded changes.
 			SupportedSDKVersions: map[string]string{ // The key is the SDK name (matches the supported SDK in core.RuntimeMetadata_RuntimeType)  and the value is the minimum supported version
-				"FLYTE_SDK": "1.13.5", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
+				"FLYTE_SDK": "1.13.14", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
 			},
 			MinSizeInMBForOffloading: 10,   // 10 MB is the default size for offloading
 			MaxSizeInMBForOffloading: 1000, // 1 GB is the default size before failing fast.

@@ -123,7 +123,7 @@ type autoRefresh struct {
 	toDelete    *syncSet
 	syncPeriod  time.Duration
 	workqueue   workqueue.RateLimitingInterface
-	parallelizm int
+	parallelism uint
 	lock        sync.RWMutex
 	clock       clock.Clock
 }
@@ -156,7 +156,7 @@ func newMetrics(scope promutils.Scope) metrics {
 }
 
 func (w *autoRefresh) Start(ctx context.Context) error {
-	for i := 0; i < w.parallelizm; i++ {
+	for i := uint(0); i < w.parallelism; i++ {
 		go func(ctx context.Context) {
 			err := w.sync(ctx)
 			if err != nil {
@@ -285,7 +285,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	return nil
 }
 
-// There are w.parallelizm instances of this function running all the time, each one will:
+// There are w.parallelism instances of this function running all the time, each one will:
 // - Retrieve an item from the workqueue
 // - For each batch of the keys, call syncCb, which tells us if the items have been updated
 // -- If any has, then overwrite the item in the cache.
@@ -389,15 +389,16 @@ func (w *autoRefresh) inProcessing(key interface{}) bool {
 
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
 func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
-	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
-	return newAutoRefreshBatchedCacheWithClock(name, createBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock.RealClock{})
+	resyncPeriod time.Duration, parallelism, size uint, scope promutils.Scope) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, createBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope, clock.RealClock{})
 }
 
 func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
-	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
+	resyncPeriod time.Duration, parallelism, size uint, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 
 	metrics := newMetrics(scope)
-	lruCache, err := lru.NewWithEvict(size, getEvictionFunction(metrics.Evictions))
+	// #nosec G115
+	lruCache, err := lru.NewWithEvict(int(size), getEvictionFunction(metrics.Evictions))
 	if err != nil {
 		return nil, err
 	}
@@ -405,7 +406,7 @@ func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatche
 	cache := &autoRefresh{
 		name:            name,
 		metrics:         metrics,
-		parallelizm:     parallelizm,
+		parallelism:     parallelism,
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
@@ -424,12 +425,12 @@ func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatche
 
 // Instantiates a new AutoRefresh Cache that syncs items periodically.
 func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
-	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	parallelism, size uint, scope promutils.Scope) (AutoRefresh, error) {
 
-	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
+	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope)
 }
 
 func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
-	parallelizm, size int, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
-	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, clock)
+	parallelism, size uint, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope, clock)
 }

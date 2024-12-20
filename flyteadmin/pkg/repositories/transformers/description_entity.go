@@ -26,34 +26,34 @@ func CreateDescriptionEntityModel(
 	var sourceCode models.SourceCode
 	var err error
 
-	if descriptionEntity.LongDescription != nil {
-		longDescriptionBytes, err = proto.Marshal(descriptionEntity.LongDescription)
+	if descriptionEntity.GetLongDescription() != nil {
+		longDescriptionBytes, err = proto.Marshal(descriptionEntity.GetLongDescription())
 		if err != nil {
 			logger.Errorf(ctx, "Failed to marshal LongDescription with error: %v", err)
 			return nil, err
 		}
 	}
 
-	if descriptionEntity.LongDescription != nil {
-		longDescriptionBytes, err = proto.Marshal(descriptionEntity.LongDescription)
+	if descriptionEntity.GetLongDescription() != nil {
+		longDescriptionBytes, err = proto.Marshal(descriptionEntity.GetLongDescription())
 		if err != nil {
 			logger.Errorf(ctx, "Failed to marshal LongDescription with error: %v", err)
 			return nil, err
 		}
 	}
-	if descriptionEntity.SourceCode != nil {
-		sourceCode = models.SourceCode{Link: descriptionEntity.SourceCode.Link}
+	if descriptionEntity.GetSourceCode() != nil {
+		sourceCode = models.SourceCode{Link: descriptionEntity.GetSourceCode().GetLink()}
 	}
 
 	return &models.DescriptionEntity{
 		DescriptionEntityKey: models.DescriptionEntityKey{
-			ResourceType: id.ResourceType,
-			Project:      id.Project,
-			Domain:       id.Domain,
-			Name:         id.Name,
-			Version:      id.Version,
+			ResourceType: id.GetResourceType(),
+			Project:      id.GetProject(),
+			Domain:       id.GetDomain(),
+			Name:         id.GetName(),
+			Version:      id.GetVersion(),
 		},
-		ShortDescription: descriptionEntity.ShortDescription,
+		ShortDescription: descriptionEntity.GetShortDescription(),
 		LongDescription:  longDescriptionBytes,
 		SourceCode:       sourceCode,
 	}, nil
