@@ -30,12 +30,12 @@ func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEnt
 			}
 			return nil
 		}
-		tx := r.db.WithContext(ctx).Omit("id").Create(descriptionEntity)
+		tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 		if tx.Error != nil {
 			return r.errorTransformer.ToFlyteAdminError(tx.Error)
 		}
 
-		tx = r.db.WithContext(ctx).Omit("id").Create(&input)
+		tx = r.db.WithContext(ctx).Omit("id").Create(descriptionEntity)
 		if tx.Error != nil {
 			return r.errorTransformer.ToFlyteAdminError(tx.Error)
 		}
