@@ -28,6 +28,7 @@ type TemplateVar struct {
 // log links.
 type Input struct {
 	HostName             string
+	NodeName             string
 	PodName              string
 	Namespace            string
 	ContainerName        string
