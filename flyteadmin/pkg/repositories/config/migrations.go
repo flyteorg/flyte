@@ -1182,6 +1182,16 @@ var NoopMigrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&Execution{})
 		},
 	},
+	//Add composite index for executions table on execution_project, execution_domain, phase, created_at and state
+	{
+		ID: "2024-02-09-executions-composite-idx",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropIndex("execution_project_domain_phase_created_at_state_idx")
+		},
+	},
 }
 
 // ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we
