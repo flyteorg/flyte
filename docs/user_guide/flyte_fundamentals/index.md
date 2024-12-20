@@ -22,6 +22,8 @@ use cases.
   - Develop and deploy workflows to a local Flyte demo cluster.
 * - {doc}`⏱ Running and scheduling workflows <running_and_scheduling_workflows>`
   - Execute workflows programmatically and schedule them as cron jobs.
+* - {doc}`📙 Jupyter notebook interaction <jupyter_notebook_interaction>`
+  - Develop and debug Flyte workflows interactively in Jupyter notebooks.
 * - {doc}`📊 Visualizing task input and output <visualizing_task_input_and_output>`
   - Create rich, customizable static reports for increased visibility into tasks.
 * - {doc}`🏎 Optimizing tasks <optimizing_tasks>`
@@ -45,6 +47,7 @@ cluster, see the {ref}`Deployment Guide <deployment>`.
 tasks_workflows_and_launch_plans
 registering_workflows
 running_and_scheduling_workflows
+jupyter_notebook_interaction
 visualizing_task_input_and_output
 optimizing_tasks
 extending_flyte
