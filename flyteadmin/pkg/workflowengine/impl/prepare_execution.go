@@ -4,12 +4,14 @@ import (
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 )
 
 func addMapValues(overrides map[string]string, defaultValues map[string]string) map[string]string {
@@ -130,7 +132,7 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	flyteWorkflow.AcceptedAt = &acceptAtWrapper
 
 	// Add finalizer
-	flyteWorkflow.Finalizers = append(flyteWorkflow.Finalizers, "flyte-finalizer")
+	_ = controllerutil.AddFinalizer(flyteWorkflow, controller.Finalizer)
 
 	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
 	// have migrated over to security context
