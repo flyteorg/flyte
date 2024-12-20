@@ -149,7 +149,6 @@ func createSparkPodSpec(
 	k8sPod *core.K8SPod,
 ) *sparkOp.SparkPodSpec {
 
-	// TODO: check whether merge annotations/labels together or other ways?
 	annotations := pluginsUtils.UnionMaps(
 		config.GetK8sPluginConfig().DefaultAnnotations,
 		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),

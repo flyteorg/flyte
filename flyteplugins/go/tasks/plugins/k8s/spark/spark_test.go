@@ -1010,7 +1010,6 @@ func TestBuildResourceCustomK8SPod(t *testing.T) {
 			Labels:      map[string]string{"label-executor": "val-executor"},
 		},
 	}
-	// put the driver/executor podspec (add custom tolerations) to below function
 	taskTemplate := dummySparkTaskTemplateDriverExecutor("blah-1", dummySparkConf, driverK8SPod, executorK8SPod)
 	sparkResourceHandler := sparkResourceHandler{}
 
