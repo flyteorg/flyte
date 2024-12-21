@@ -157,12 +157,12 @@ func createSparkPodSpec(
 		config.GetK8sPluginConfig().DefaultLabels,
 		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
 	)
-	if k8sPod != nil && k8sPod.Metadata != nil {
+	if k8sPod != nil && k8sPod.GetMetadata() != nil {
 		if k8sPod.Metadata.Annotations != nil {
-			annotations = pluginsUtils.UnionMaps(annotations, k8sPod.Metadata.Annotations)
+			annotations = pluginsUtils.UnionMaps(annotations, k8sPod.GetMetadata().GetAnnotations())
 		}
 		if k8sPod.Metadata.Labels != nil {
-			labels = pluginsUtils.UnionMaps(labels, k8sPod.Metadata.Labels)
+			labels = pluginsUtils.UnionMaps(labels, k8sPod.GetMetadata().GetLabels())
 		}
 	}
 
@@ -204,10 +204,10 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if driverPod != nil {
 		var customPodSpec *v1.PodSpec
 
-		err = utils.UnmarshalStructToObj(driverPod.PodSpec, &customPodSpec)
+		err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
 		if err != nil {
 			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal pod spec [%v], Err: [%v]", driverPod.PodSpec, err.Error())
+				"Unable to unmarshal pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
 		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
@@ -247,14 +247,14 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		return nil, err
 	}
 
-	executorPod := sparkJob.ExecutorPod
+	executorPod := sparkJob.GetExecutorPod()
 	if executorPod != nil {
 		var customPodSpec *v1.PodSpec
 
-		err = utils.UnmarshalStructToObj(executorPod.PodSpec, &customPodSpec)
+		err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
 		if err != nil {
 			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal pod spec [%v], Err: [%v]", executorPod.PodSpec, err.Error())
+				"Unable to unmarshal pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
 		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
@@ -267,7 +267,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer, sparkJob.ExecutorPod)
+	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer, sparkJob.GetExecutorPod())
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
 	spec := executorSpec{
 		primaryContainer,
