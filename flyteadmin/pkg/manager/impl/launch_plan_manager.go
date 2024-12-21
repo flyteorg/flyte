@@ -159,18 +159,18 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	return &admin.LaunchPlanCreateResponse{}, nil
 }
 
-func (m *LaunchPlanManager) updateLaunchPlanModelState(launchPlan *models.LaunchPlan, state admin.LaunchPlanState) error {
+func (m *LaunchPlanManager) updateLaunchPlanModelState(ctx context.Context, launchPlan *models.LaunchPlan, state admin.LaunchPlanState) error {
 	var launchPlanClosure admin.LaunchPlanClosure
 	err := proto.Unmarshal(launchPlan.Closure, &launchPlanClosure)
 	if err != nil {
-		logger.Errorf(context.Background(), "failed to unmarshal launch plan closure: %v", err)
+		logger.Errorf(ctx, "failed to unmarshal launch plan closure: %v", err)
 		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal launch plan closure: %v", err)
 	}
 	// Don't write the state in the closure - we store it only in the model column "State" and fill in the closure
 	// value when transforming from a model to an admin.LaunchPlan object
 	marshalledClosure, err := proto.Marshal(&launchPlanClosure)
 	if err != nil {
-		logger.Errorf(context.Background(), "Failed to marshal launch plan closure: %v", err)
+		logger.Errorf(ctx, "Failed to marshal launch plan closure: %v", err)
 		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal launch plan closure: %v", err)
 	}
 	launchPlan.Closure = marshalledClosure
@@ -275,7 +275,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request *admi
 		return nil, err
 	}
 
-	err = m.updateLaunchPlanModelState(&launchPlanModel, admin.LaunchPlanState_INACTIVE)
+	err = m.updateLaunchPlanModelState(ctx, &launchPlanModel, admin.LaunchPlanState_INACTIVE)
 	if err != nil {
 		logger.Debugf(ctx, "failed to disable launch plan [%+v] with err: %v", request.Id, err)
 		return nil, err
@@ -396,7 +396,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin
 		return nil, err
 	}
 	// Set desired launch plan version to active:
-	err = m.updateLaunchPlanModelState(&newlyActiveLaunchPlanModel, admin.LaunchPlanState_ACTIVE)
+	err = m.updateLaunchPlanModelState(ctx, &newlyActiveLaunchPlanModel, admin.LaunchPlanState_ACTIVE)
 	if err != nil {
 		return nil, err
 	}
@@ -423,7 +423,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin
 	} else if formerlyActiveLaunchPlanModelOutput.LaunchPlans != nil &&
 		len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
 		formerlyActiveLaunchPlanModel = &formerlyActiveLaunchPlanModelOutput.LaunchPlans[0]
-		err = m.updateLaunchPlanModelState(formerlyActiveLaunchPlanModel, admin.LaunchPlanState_INACTIVE)
+		err = m.updateLaunchPlanModelState(ctx, formerlyActiveLaunchPlanModel, admin.LaunchPlanState_INACTIVE)
 		if err != nil {
 			return nil, err
 		}
@@ -686,7 +686,7 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 	var subNode *core.Node
 	if request.GetSubNodeIds() != nil {
 		subNodeID := request.GetSubNodeIds().GetSubNodeIds()[0].GetSubNodeId()
-		originalLaunchPlan, err := util.GetLaunchPlan(context.Background(), m.db, request.GetLaunchPlanId())
+		originalLaunchPlan, err := util.GetLaunchPlan(ctx, m.db, request.GetLaunchPlanId())
 		if err != nil {
 			return nil, err
 		}
