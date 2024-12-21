@@ -351,6 +351,12 @@ pub struct SparkJob {
     /// This instance name can be set in either flytepropeller or flytekit.
     #[prost(string, tag="9")]
     pub databricks_instance: ::prost::alloc::string::String,
+    /// Pod Spec for the Spark driver pod
+    #[prost(message, optional, tag="10")]
+    pub driver_pod: ::core::option::Option<super::core::K8sPod>,
+    /// Pod Spec for the Spark executor pod
+    #[prost(message, optional, tag="11")]
+    pub executor_pod: ::core::option::Option<super::core::K8sPod>,
 }
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/tf-operator>
 #[allow(clippy::derive_partial_eq_without_eq)]

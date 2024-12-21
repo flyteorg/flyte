@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Struct } from "@bufbuild/protobuf";
+import { K8sPod } from "../core/tasks_pb.js";
 
 /**
  * @generated from message flyteidl.plugins.SparkApplication
@@ -131,6 +132,20 @@ export class SparkJob extends Message<SparkJob> {
    */
   databricksInstance = "";
 
+  /**
+   * Pod Spec for the Spark driver pod
+   *
+   * @generated from field: flyteidl.core.K8sPod driverPod = 10;
+   */
+  driverPod?: K8sPod;
+
+  /**
+   * Pod Spec for the Spark executor pod
+   *
+   * @generated from field: flyteidl.core.K8sPod executorPod = 11;
+   */
+  executorPod?: K8sPod;
+
   constructor(data?: PartialMessage<SparkJob>) {
     super();
     proto3.util.initPartial(data, this);
@@ -148,6 +163,8 @@ export class SparkJob extends Message<SparkJob> {
     { no: 7, name: "databricksConf", kind: "message", T: Struct },
     { no: 8, name: "databricksToken", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 9, name: "databricksInstance", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "driverPod", kind: "message", T: K8sPod },
+    { no: 11, name: "executorPod", kind: "message", T: K8sPod },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SparkJob {
