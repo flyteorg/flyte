@@ -4706,6 +4706,10 @@
             "type": "string"
           },
           "title": "The list of email addresses recipients for this notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines an email notification specification."
@@ -5765,6 +5769,10 @@
             "type": "string"
           },
           "title": "Currently, PagerDuty notifications leverage email to trigger a notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines a pager duty notification specification."
@@ -5998,6 +6006,10 @@
             "type": "string"
           },
           "title": "Currently, Slack notifications leverage email to trigger a notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines a slack notification specification."
