@@ -148,12 +148,12 @@ type UpdateResourceOperation struct {
 	Options []client.UpdateOption
 }
 
-// AbortBehavior that patches the default resource
+// AbortBehaviorPatchDefaultResource that patches the default resource
 func AbortBehaviorPatchDefaultResource(patchOperation PatchResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorPatch(patchOperation, deleteOnErr, nil)
 }
 
-// AbortBehavior that patches the specified resource
+// AbortBehaviorPatch that patches the specified resource
 func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -162,12 +162,12 @@ func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool,
 	}
 }
 
-// AbortBehavior that updates the default resource
+// AbortBehaviorUpdateDefaultResource that updates the default resource
 func AbortBehaviorUpdateDefaultResource(updateOperation UpdateResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorUpdate(updateOperation, deleteOnErr, nil)
 }
 
-// AbortBehavior that updates the specified resource
+// AbortBehaviorUpdate that updates the specified resource
 func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -176,12 +176,12 @@ func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bo
 	}
 }
 
-// AbortBehavior that deletes the default resource
+// AbortBehaviorDeleteDefaultResource that deletes the default resource
 func AbortBehaviorDeleteDefaultResource() AbortBehavior {
 	return AbortBehaviorDelete(nil)
 }
 
-// AbortBehavior that deletes the specified resource
+// AbortBehaviorDelete that deletes the specified resource
 func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:       resource,
