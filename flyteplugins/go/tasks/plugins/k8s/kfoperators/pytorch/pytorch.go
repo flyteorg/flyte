@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -30,8 +31,14 @@ type pytorchOperatorResourceHandler struct {
 var _ k8s.Plugin = pytorchOperatorResourceHandler{}
 
 func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{
-		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
+	config := k8sConfig.GetK8sPluginConfig()
+
+	if config.EnableDistributedErrorAggregation {
+		return k8s.PluginProperties{
+			ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
+		}
+	} else {
+		return k8s.PluginProperties{}
 	}
 }
 
@@ -47,7 +54,7 @@ func (pytorchOperatorResourceHandler) BuildIdentityResource(ctx context.Context,
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
-func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
+func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 
 	if err != nil {
@@ -115,10 +122,13 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 					},
 				},
 			})
-			container.Env = append(container.Env, apiv1.EnvVar{
-				Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
-				Value: k8s.EarliestErrorAggregationStrategy.String(),
-			})
+
+			if p.GetProperties().ErrorAggregationStrategy == k8s.EarliestErrorAggregationStrategy {
+				container.Env = append(container.Env, apiv1.EnvVar{
+					Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
+					Value: k8s.EarliestErrorAggregationStrategy.String(),
+				})
+			}
 		}
 		updateEnvVars(&workerReplicaSpec.Template.Spec.Containers[0])
 

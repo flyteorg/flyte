@@ -334,6 +334,26 @@ pub struct ExternalResourceInfo {
     /// log information for the external resource execution
     #[prost(message, repeated, tag="6")]
     pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// Extensible field for custom, plugin-specific info
+    #[prost(message, optional, tag="8")]
+    pub custom_info: ::core::option::Option<::prost_types::Struct>,
+    /// Additional metadata to do with this event's node target based on the node type. We are
+    /// explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    /// If we decide to include in the future, we should deprecate the cache_status field.
+    #[prost(oneof="external_resource_info::TargetMetadata", tags="7")]
+    pub target_metadata: ::core::option::Option<external_resource_info::TargetMetadata>,
+}
+/// Nested message and enum types in `ExternalResourceInfo`.
+pub mod external_resource_info {
+    /// Additional metadata to do with this event's node target based on the node type. We are
+    /// explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    /// If we decide to include in the future, we should deprecate the cache_status field.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum TargetMetadata {
+        #[prost(message, tag="7")]
+        WorkflowNodeMetadata(super::WorkflowNodeMetadata),
+    }
 }
 /// This message holds task execution metadata specific to resource allocation used to manage concurrent
 /// executions for a project namespace.
@@ -424,6 +444,9 @@ pub struct CloudEventWorkflowExecution {
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
     #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="7")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -447,12 +470,18 @@ pub struct CloudEventNodeExecution {
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
     #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="7")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CloudEventTaskExecution {
     #[prost(message, optional, tag="1")]
     pub raw_event: ::core::option::Option<TaskExecutionEvent>,
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(map="string, string", tag="2")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// This event is to be sent by Admin after it creates an execution.
 #[allow(clippy::derive_partial_eq_without_eq)]

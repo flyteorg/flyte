@@ -184,6 +184,8 @@ execution = remote.execute(flyte_task, inputs={"name": "Kermit"})
 You can also launch tasks via `flytectl`, learn more in the {ref}`User Guide <remote_task>`
 ```
 
+(getting_started_run_and_schedule_fetch_execution)=
+
 ## Fetching inputs and outputs of an execution
 
 By default, {py:meth}`FlyteRemote.execute <flytekit.remote.remote.FlyteRemote.execute>`
@@ -342,4 +344,5 @@ In this guide, you learned about how to:
 - Run tasks, workflows, and launch plans using `FlyteRemote`.
 - Create a cron schedule to run a launch plan at a specified time interval.
 
-In the next guide, you'll learn how to visualize tasks using Flyte Decks.
+In the next guide, you'll learn how to develop and run tasks and workflows in
+a Jupyter Notebook environment.

@@ -3797,6 +3797,9 @@ export namespace flyteidl {
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union */
             union?: (flyteidl.core.IUnionInfo|null);
         }
@@ -3822,11 +3825,14 @@ export namespace flyteidl {
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union. */
             public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
-            public value?: ("scalar"|"collection"|"promise"|"map");
+            public value?: ("scalar"|"collection"|"promise"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new BindingData instance using the specified properties.
@@ -4589,6 +4595,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface */
             isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode */
+            dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4617,6 +4626,9 @@ export namespace flyteidl {
 
             /** ArrayNode isOriginalSubNodeInterface. */
             public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode. */
+            public dataMode: flyteidl.core.ArrayNode.DataMode;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4663,6 +4675,12 @@ export namespace flyteidl {
             enum ExecutionMode {
                 MINIMAL_STATE = 0,
                 FULL_STATE = 1
+            }
+
+            /** DataMode enum. */
+            enum DataMode {
+                SINGLE_INPUT_FILE = 0,
+                INDIVIDUAL_INPUT_FILES = 1
             }
         }
 
@@ -8082,6 +8100,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -8110,6 +8131,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -8164,6 +8188,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventNodeExecution. */
@@ -8192,6 +8219,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventNodeExecution instance using the specified properties.
@@ -8231,6 +8261,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent */
             rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -8244,6 +8277,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent. */
             public rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -9202,6 +9238,12 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo workflowNodeMetadata */
+            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9230,6 +9272,15 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo workflowNodeMetadata. */
+            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo targetMetadata. */
+            public targetMetadata?: "workflowNodeMetadata";
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.

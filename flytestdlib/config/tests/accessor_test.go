@@ -431,11 +431,9 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			key := strings.ToUpper("my-component.str3")
 			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
-			err = v.UpdateConfig(context.TODO())
-			assert.Error(t, err)
-			assert.EqualError(t, err, "Config File \"config\" Not Found in \"[]\"")
+			assert.NoError(t, v.UpdateConfig(context.TODO()))
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			assert.Equal(t, "", r.StringValue3)
+			assert.Equal(t, "Set From Env", r.StringValue3)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler", provider(config.Options{}).ID()), func(t *testing.T) {

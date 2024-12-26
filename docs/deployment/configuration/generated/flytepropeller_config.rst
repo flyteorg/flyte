@@ -113,6 +113,18 @@ Max number of gRPC retries
   "4"
   
 
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 authType (uint8)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1114,6 +1126,30 @@ catalogcache (`catalog.Config`_)
     workers: 10
   
 
+dask (`dask.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  logs:
+    cloudwatch-enabled: false
+    cloudwatch-log-group: ""
+    cloudwatch-region: ""
+    cloudwatch-template-uri: ""
+    dynamic-log-links: null
+    gcp-project: ""
+    kubernetes-enabled: true
+    kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+      }}/pod?namespace={{ .namespace }}
+    kubernetes-url: ""
+    stackdriver-enabled: false
+    stackdriver-logresourcename: ""
+    stackdriver-template-uri: ""
+    templates: null
+  
+
 databricks (`databricks.Config`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1164,6 +1200,7 @@ k8s (`config.K8sPluginConfig`_)
 
 .. code-block:: yaml
 
+  add-tolerations-for-extended-resources: []
   co-pilot:
     cpu: 500m
     default-input-path: /var/flyte/inputs
@@ -1194,6 +1231,7 @@ k8s (`config.K8sPluginConfig`_)
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  enable-distributed-error-aggregation: false
   enable-host-networking-pod: null
   gpu-device-node-label: k8s.amazonaws.com/accelerator
   gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
@@ -1364,7 +1402,7 @@ ray (`ray.Config`_)
     enabled: false
     endpoint: ""
     name: ""
-  serviceAccount: default
+  serviceAccount: ""
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -2738,6 +2776,30 @@ Number of retries for exponential backoff when updating a resource.
   "5"
   
 
+add-tolerations-for-extended-resources ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the extended resources for which tolerations should be added.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+enable-distributed-error-aggregation (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will aggregate errors of different worker pods for distributed tasks.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 config.FlyteCoPilotConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2936,6 +2998,188 @@ scale (int32)
 .. code-block:: yaml
 
   "0"
+  
+
+dask.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+logs (`logs.LogConfig (logs)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  dynamic-log-links: null
+  gcp-project: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+logs.LogConfig (logs)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+cloudwatch-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Cloudwatch Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+cloudwatch-region (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+AWS region in which Cloudwatch logs are stored.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-log-group (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Log group to which streams are associated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building cloudwatch log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Kubernetes Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+kubernetes-url (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Console URL for Kubernetes logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building kubernetes log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
+  
+
+stackdriver-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Log-links to stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+gcp-project (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the project in GCP
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-logresourcename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the logresource in stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building stackdriver log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+templates ([]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 databricks.Config
@@ -3276,7 +3520,7 @@ Certificate path
 k8s.LogConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-config (`logs.LogConfig (config)`_)
+config (`logs.LogConfig`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Defines the log config for k8s logs.
@@ -3299,162 +3543,6 @@ Defines the log config for k8s logs.
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
-  
-
-logs.LogConfig (config)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-cloudwatch-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Cloudwatch Logging
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-cloudwatch-region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-AWS region in which Cloudwatch logs are stored.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-log-group (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Log group to which streams are associated.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-cloudwatch-template-uri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template Uri to use when building cloudwatch log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Kubernetes Logging
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "true"
-  
-
-kubernetes-url (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Console URL for Kubernetes logs
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-kubernetes-template-uri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template Uri to use when building kubernetes log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
-    }}
-  
-
-stackdriver-enabled (bool)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Log-links to stackdriver
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "false"
-  
-
-gcp-project (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Name of the project in GCP
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-stackdriver-logresourcename (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Name of the logresource in stackdriver
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-stackdriver-template-uri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template Uri to use when building stackdriver log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
-  
-
-templates ([]tasklog.TemplateLogPlugin)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  null
   
 
 k8s.ResourceConfig
@@ -3800,7 +3888,7 @@ The k8s service account to run as
 
 .. code-block:: yaml
 
-  default
+  ""
   
 
 ray.DefaultConfig
@@ -4588,6 +4676,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  use-map-plugin-logs: false
   
 
 literal-offloading-config (`config.LiteralOffloadingConfig`_)
@@ -4603,7 +4692,7 @@ config used for literal offloading.
   max-size-in-mb-for-offloading: 1000
   min-size-in-mb-for-offloading: 10
   supported-sdk-versions:
-    FLYTE_SDK: 1.13.5
+    FLYTE_SDK: 1.13.14
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4614,6 +4703,7 @@ admin-launcher (`launchplan.AdminConfig`_)
 .. code-block:: yaml
 
   burst: 10
+  cache-resync-duration: 30s
   cacheSize: 10000
   tps: 100
   workers: 10
@@ -4671,6 +4761,18 @@ Default parallelism behavior for array nodes
 .. code-block:: yaml
 
   unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
@@ -5094,7 +5196,7 @@ Maps flytekit and union SDK names to minimum supported version that can handle r
 
 .. code-block:: yaml
 
-  FLYTE_SDK: 1.13.5
+  FLYTE_SDK: 1.13.14
   
 
 min-size-in-mb-for-offloading (int64)
@@ -5299,6 +5401,18 @@ Number of parallel workers to work on the queue.
 .. code-block:: yaml
 
   "10"
+  
+
+cache-resync-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Frequency of re-syncing launchplans within the auto refresh cache.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
   
 
 workflowstore.Config
