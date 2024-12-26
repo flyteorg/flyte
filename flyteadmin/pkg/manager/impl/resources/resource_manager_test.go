@@ -92,8 +92,8 @@ func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 1)
-			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().Overrides[0], &admin.PluginOverride{
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 1)
+			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().GetOverrides()[0], &admin.PluginOverride{
 				TaskType: "python",
 				PluginId: []string{"plugin a"}}))
 
@@ -136,14 +136,14 @@ func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 2)
-			for _, override := range attributesToBeSaved.GetPluginOverrides().Overrides {
-				if override.TaskType == python {
-					assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
-				} else if override.TaskType == hive {
-					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 2)
+			for _, override := range attributesToBeSaved.GetPluginOverrides().GetOverrides() {
+				if override.GetTaskType() == python {
+					assert.EqualValues(t, []string{"plugin a"}, override.GetPluginId())
+				} else if override.GetTaskType() == hive {
+					assert.EqualValues(t, []string{"plugin b"}, override.GetPluginId())
 				} else {
-					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
+					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.GetTaskType())
 				}
 			}
 			createOrUpdateCalled = true
@@ -347,8 +347,8 @@ func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 1)
-			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().Overrides[0], &admin.PluginOverride{
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 1)
+			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().GetOverrides()[0], &admin.PluginOverride{
 				TaskType: python,
 				PluginId: []string{"plugin a"}}))
 
@@ -389,14 +389,14 @@ func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 2)
-			for _, override := range attributesToBeSaved.GetPluginOverrides().Overrides {
-				if override.TaskType == python {
-					assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
-				} else if override.TaskType == hive {
-					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 2)
+			for _, override := range attributesToBeSaved.GetPluginOverrides().GetOverrides() {
+				if override.GetTaskType() == python {
+					assert.EqualValues(t, []string{"plugin a"}, override.GetPluginId())
+				} else if override.GetTaskType() == hive {
+					assert.EqualValues(t, []string{"plugin b"}, override.GetPluginId())
 				} else {
-					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
+					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.GetTaskType())
 				}
 			}
 			createOrUpdateCalled = true
@@ -584,8 +584,8 @@ func TestUpdateProjectAttributes_CreateOrMerge(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 1)
-			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().Overrides[0], &admin.PluginOverride{
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 1)
+			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().GetOverrides()[0], &admin.PluginOverride{
 				TaskType: python,
 				PluginId: []string{"plugin a"}}))
 
@@ -625,14 +625,14 @@ func TestUpdateProjectAttributes_CreateOrMerge(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 2)
-			for _, override := range attributesToBeSaved.GetPluginOverrides().Overrides {
-				if override.TaskType == python {
-					assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
-				} else if override.TaskType == hive {
-					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().GetOverrides(), 2)
+			for _, override := range attributesToBeSaved.GetPluginOverrides().GetOverrides() {
+				if override.GetTaskType() == python {
+					assert.EqualValues(t, []string{"plugin a"}, override.GetPluginId())
+				} else if override.GetTaskType() == hive {
+					assert.EqualValues(t, []string{"plugin b"}, override.GetPluginId())
 				} else {
-					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
+					t.Errorf("Unexpected task type [%s] plugin override committed to db", override.GetTaskType())
 				}
 			}
 			createOrUpdateCalled = true
@@ -933,18 +933,18 @@ func TestListAllResources(t *testing.T) {
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})
 	assert.Nil(t, err)
-	assert.NotNil(t, response.Configurations)
-	assert.Len(t, response.Configurations, 2)
+	assert.NotNil(t, response.GetConfigurations())
+	assert.Len(t, response.GetConfigurations(), 2)
 	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
 		Project:    "projectA",
 		Attributes: &projectAttributes,
-	}, response.Configurations[0]))
+	}, response.GetConfigurations()[0]))
 	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
 		Project:    "projectB",
 		Domain:     "development",
 		Workflow:   "workflow",
 		Attributes: &workflowAttributes,
-	}, response.Configurations[1]))
+	}, response.GetConfigurations()[1]))
 
 	db.ResourceRepo().(*mocks.MockResourceRepo).ListAllFunction = func(ctx context.Context, resourceType string) (
 		[]models.Resource, error) {

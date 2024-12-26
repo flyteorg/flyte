@@ -76,6 +76,10 @@ func NewCursorFromCustomPosition(customPosition string) Cursor {
 	}
 }
 
+func IsCursorEnd(cursor Cursor) bool {
+	return cursor.cursorState == AtEndCursorState
+}
+
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
 // Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {
@@ -114,7 +118,7 @@ type RawStore interface {
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
 
-	// List gets a list of items given a prefix, using a paginated API
+	// List gets a list of items (relative path to the reference input) given a prefix, using a paginated API
 	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error

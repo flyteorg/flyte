@@ -134,6 +134,9 @@ message TaskMetadata {
 
     // cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     repeated string cache_ignore_input_vars  = 13;
+    // is_eager indicates whether the task is eager or not.
+    // This would be used by CreateTask endpoint.
+    bool is_eager = 14;
 }
 
 // A Task structure that uniquely identifies a task in the system

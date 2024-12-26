@@ -88,7 +88,7 @@ func TestGCPGet(t *testing.T) {
 
 	mockIAMCredentials := mockIAMCredentialsImpl{}
 	mockIAMCredentials.signBlobFunc = func(ctx context.Context, req *credentialspb.SignBlobRequest, opts ...gax.CallOption) (*credentialspb.SignBlobResponse, error) {
-		assert.Equal(t, "projects/-/serviceAccounts/"+signingPrincipal, req.Name)
+		assert.Equal(t, "projects/-/serviceAccounts/"+signingPrincipal, req.GetName())
 		return &credentialspb.SignBlobResponse{SignedBlob: []byte(signedBlob)}, nil
 	}
 
@@ -102,12 +102,12 @@ func TestGCPGet(t *testing.T) {
 	urlBlob, err := remoteURL.Get(context.Background(), "gs://bucket/key")
 	assert.Nil(t, err)
 
-	u, _ := url.Parse(urlBlob.Url)
+	u, _ := url.Parse(urlBlob.GetUrl())
 	assert.Equal(t, "https", u.Scheme)
 	assert.Equal(t, "storage.googleapis.com", u.Hostname())
 	assert.Equal(t, "/bucket/key", u.Path)
 	assert.Equal(t, encodedSignedBlob, u.Query().Get("Signature"))
-	assert.Equal(t, int64(100), urlBlob.Bytes)
+	assert.Equal(t, int64(100), urlBlob.GetBytes())
 }
 
 func TestToken(t *testing.T) {
@@ -117,8 +117,8 @@ func TestToken(t *testing.T) {
 
 	mockIAMCredentials := mockIAMCredentialsImpl{}
 	mockIAMCredentials.generateAccessTokenFunc = func(ctx context.Context, req *credentialspb.GenerateAccessTokenRequest, opts ...gax.CallOption) (*credentialspb.GenerateAccessTokenResponse, error) {
-		assert.Equal(t, "projects/-/serviceAccounts/"+signingPrincipal, req.Name)
-		assert.Equal(t, []string{"https://www.googleapis.com/auth/devstorage.read_only"}, req.Scope)
+		assert.Equal(t, "projects/-/serviceAccounts/"+signingPrincipal, req.GetName())
+		assert.Equal(t, []string{"https://www.googleapis.com/auth/devstorage.read_only"}, req.GetScope())
 		return &credentialspb.GenerateAccessTokenResponse{
 			AccessToken: token,
 			ExpireTime:  &timestamp,

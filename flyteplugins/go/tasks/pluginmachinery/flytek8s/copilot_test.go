@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -107,6 +108,12 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Error(t, err)
 		cfg.Memory = old
 	})
+
+	t.Run("sidecar-container-name-change", func(t *testing.T) {
+		c, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, []string{"hello"})
+		assert.NoError(t, err)
+		assert.Equal(t, "uploader", strings.Split(c.Name, "-")[1])
+	})
 }
 
 func TestDownloadCommandArgs(t *testing.T) {
@@ -132,11 +139,11 @@ func TestDownloadCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			vm := &core.VariableMap{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, vm))
-			assert.Len(t, vm.Variables, 2)
-			for k, v := range iFace.Variables {
-				v2, ok := vm.Variables[k]
+			assert.Len(t, vm.GetVariables(), 2)
+			for k, v := range iFace.GetVariables() {
+				v2, ok := vm.GetVariables()[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -167,11 +174,11 @@ func TestSidecarCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			if2 := &core.TypedInterface{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, if2))
-			assert.Len(t, if2.Outputs.Variables, 2)
-			for k, v := range iFace.Outputs.Variables {
-				v2, ok := if2.Outputs.Variables[k]
+			assert.Len(t, if2.GetOutputs().GetVariables(), 2)
+			for k, v := range iFace.GetOutputs().GetVariables() {
+				v2, ok := if2.GetOutputs().GetVariables()[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -196,20 +203,20 @@ func assertContainerHasVolumeMounts(t *testing.T, cfg config.FlyteCoPilotConfig,
 		for _, v := range c.VolumeMounts {
 			vmap[v.Name] = v
 		}
-		if iFace.Inputs != nil {
+		if iFace.GetInputs() != nil {
 			path := cfg.DefaultInputDataPath
-			if pilot.InputPath != "" {
-				path = pilot.InputPath
+			if pilot.GetInputPath() != "" {
+				path = pilot.GetInputPath()
 			}
 			v, found := vmap[cfg.InputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Input Path does not match")
 			assert.True(t, found, "Input volume mount expected but not found!")
 		}
 
-		if iFace.Outputs != nil {
+		if iFace.GetOutputs() != nil {
 			path := cfg.DefaultOutputPath
-			if pilot.OutputPath != "" {
-				path = pilot.OutputPath
+			if pilot.GetOutputPath() != "" {
+				path = pilot.GetOutputPath()
 			}
 			v, found := vmap[cfg.OutputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Output Path does not match")
@@ -260,10 +267,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 					for _, v := range c.VolumeMounts {
 						vmap[v.Name] = v
 					}
-					if iFace.Inputs != nil {
+					if iFace.GetInputs() != nil {
 						path := cfg.DefaultInputDataPath
 						if pilot != nil {
-							path = pilot.InputPath
+							path = pilot.GetInputPath()
 						}
 						v, found := vmap[cfg.InputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteInitContainerName {
@@ -274,10 +281,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 						}
 					}
 
-					if iFace.Outputs != nil {
+					if iFace.GetOutputs() != nil {
 						path := cfg.DefaultOutputPath
 						if pilot != nil {
-							path = pilot.OutputPath
+							path = pilot.GetOutputPath()
 						}
 						v, found := vmap[cfg.OutputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteInitContainerName {

@@ -16,10 +16,10 @@ func CreateLaunchPlan(
 	expectedOutputs *core.VariableMap) *admin.LaunchPlan {
 
 	return &admin.LaunchPlan{
-		Id:   request.Id,
-		Spec: request.Spec,
+		Id:   request.GetId(),
+		Spec: request.GetSpec(),
 		Closure: &admin.LaunchPlanClosure{
-			ExpectedInputs:  request.Spec.DefaultInputs,
+			ExpectedInputs:  request.GetSpec().GetDefaultInputs(),
 			ExpectedOutputs: expectedOutputs,
 		},
 	}
@@ -31,22 +31,22 @@ func CreateLaunchPlanModel(
 	workflowRepoID uint,
 	digest []byte,
 	initState admin.LaunchPlanState) (models.LaunchPlan, error) {
-	spec, err := proto.Marshal(launchPlan.Spec)
+	spec, err := proto.Marshal(launchPlan.GetSpec())
 	if err != nil {
 		return models.LaunchPlan{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize launch plan spec")
 	}
-	closure, err := proto.Marshal(launchPlan.Closure)
+	closure, err := proto.Marshal(launchPlan.GetClosure())
 	if err != nil {
 		return models.LaunchPlan{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize launch plan closure")
 	}
 
 	var launchConditionType models.LaunchConditionType
 	scheduleType := models.LaunchPlanScheduleTypeNONE
-	if launchPlan.Spec.EntityMetadata != nil && launchPlan.Spec.EntityMetadata.Schedule != nil {
-		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" || launchPlan.Spec.EntityMetadata.Schedule.GetCronSchedule() != nil {
+	if launchPlan.GetSpec().GetEntityMetadata() != nil && launchPlan.GetSpec().GetEntityMetadata().GetSchedule() != nil {
+		if launchPlan.GetSpec().GetEntityMetadata().GetSchedule().GetCronExpression() != "" || launchPlan.GetSpec().GetEntityMetadata().GetSchedule().GetCronSchedule() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeCRON
 			launchConditionType = models.LaunchConditionTypeSCHED
-		} else if launchPlan.Spec.EntityMetadata.Schedule.GetRate() != nil {
+		} else if launchPlan.GetSpec().GetEntityMetadata().GetSchedule().GetRate() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeRATE
 			launchConditionType = models.LaunchConditionTypeSCHED
 		}
@@ -56,10 +56,10 @@ func CreateLaunchPlanModel(
 
 	lpModel := models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
-			Project: launchPlan.Id.Project,
-			Domain:  launchPlan.Id.Domain,
-			Name:    launchPlan.Id.Name,
-			Version: launchPlan.Id.Version,
+			Project: launchPlan.GetId().GetProject(),
+			Domain:  launchPlan.GetId().GetDomain(),
+			Name:    launchPlan.GetId().GetName(),
+			Version: launchPlan.GetId().GetVersion(),
 		},
 		Spec:         spec,
 		State:        &state,

@@ -39,13 +39,13 @@ func requiresInputs(w *core.WorkflowTemplate) bool {
 		return false
 	}
 
-	return len(w.GetInterface().GetInputs().Variables) > 0
+	return len(w.GetInterface().GetInputs().GetVariables()) > 0
 }
 
 // Note: Update WorkflowNameFromID for any change made to WorkflowIDAsString
 func WorkflowIDAsString(id *core.Identifier) string {
 	b := strings.Builder{}
-	_, err := b.WriteString(id.Project)
+	_, err := b.WriteString(id.GetProject())
 	if err != nil {
 		return ""
 	}
@@ -55,7 +55,7 @@ func WorkflowIDAsString(id *core.Identifier) string {
 		return ""
 	}
 
-	_, err = b.WriteString(id.Domain)
+	_, err = b.WriteString(id.GetDomain())
 	if err != nil {
 		return ""
 	}
@@ -65,7 +65,7 @@ func WorkflowIDAsString(id *core.Identifier) string {
 		return ""
 	}
 
-	_, err = b.WriteString(id.Name)
+	_, err = b.WriteString(id.GetName())
 	if err != nil {
 		return ""
 	}
@@ -83,10 +83,10 @@ func WorkflowNameFromID(id string) string {
 
 func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTask, errs errors.CompileErrors) (
 	spec *v1alpha1.WorkflowSpec, err error) {
-	wf.Template.Interface = StripInterfaceTypeMetadata(wf.Template.Interface)
+	wf.Template.Interface = StripInterfaceTypeMetadata(wf.GetTemplate().GetInterface())
 
 	var failureN *v1alpha1.NodeSpec
-	if n := wf.Template.GetFailureNode(); n != nil {
+	if n := wf.GetTemplate().GetFailureNode(); n != nil {
 		nodes, ok := buildNodeSpec(n, tasks, errs.NewScope())
 		if !ok {
 			return nil, errs
@@ -94,34 +94,34 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		failureN = nodes[0]
 	}
 
-	nodes, _ := buildNodes(wf.Template.GetNodes(), tasks, errs.NewScope())
+	nodes, _ := buildNodes(wf.GetTemplate().GetNodes(), tasks, errs.NewScope())
 
 	if errs.HasErrors() {
 		return nil, errs
 	}
 
-	outputBindings := make([]*v1alpha1.Binding, 0, len(wf.Template.Outputs))
-	for _, b := range wf.Template.Outputs {
+	outputBindings := make([]*v1alpha1.Binding, 0, len(wf.GetTemplate().GetOutputs()))
+	for _, b := range wf.GetTemplate().GetOutputs() {
 		outputBindings = append(outputBindings, &v1alpha1.Binding{
 			Binding: b,
 		})
 	}
 
 	var outputs *v1alpha1.OutputVarMap
-	if wf.Template.GetInterface() != nil {
-		outputs = &v1alpha1.OutputVarMap{VariableMap: wf.Template.GetInterface().Outputs}
+	if wf.GetTemplate().GetInterface() != nil {
+		outputs = &v1alpha1.OutputVarMap{VariableMap: wf.GetTemplate().GetInterface().GetOutputs()}
 	} else {
 		outputs = &v1alpha1.OutputVarMap{VariableMap: &core.VariableMap{}}
 	}
 
 	failurePolicy := v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY)
-	if wf.Template != nil && wf.Template.Metadata != nil {
-		failurePolicy = v1alpha1.WorkflowOnFailurePolicy(wf.Template.Metadata.OnFailure)
+	if wf.GetTemplate() != nil && wf.GetTemplate().GetMetadata() != nil {
+		failurePolicy = v1alpha1.WorkflowOnFailurePolicy(wf.GetTemplate().GetMetadata().GetOnFailure())
 	}
 
 	connections := buildConnections(wf)
 	return &v1alpha1.WorkflowSpec{
-		ID:              WorkflowIDAsString(wf.Template.Id),
+		ID:              WorkflowIDAsString(wf.GetTemplate().GetId()),
 		OnFailure:       failureN,
 		Nodes:           nodes,
 		Outputs:         outputs,
@@ -147,13 +147,13 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 	name string, generateName string, label string, project string, domain string, err error) {
 
 	if execID != nil {
-		return execID.Name, "", execID.Name, execID.Project, execID.Domain, nil
+		return execID.GetName(), "", execID.GetName(), execID.GetProject(), execID.GetDomain(), nil
 	} else if wfID != nil {
-		wid := fmt.Sprintf("%v%v%v", withSeparatorIfNotEmpty(wfID.Project), withSeparatorIfNotEmpty(wfID.Domain), wfID.Name)
+		wid := fmt.Sprintf("%v%v%v", withSeparatorIfNotEmpty(wfID.GetProject()), withSeparatorIfNotEmpty(wfID.GetDomain()), wfID.GetName())
 
 		// TODO: this is a hack until we figure out how to restrict generated names. K8s has a limitation of 63 chars
 		wid = wid[:minInt(32, len(wid))]
-		return "", fmt.Sprintf("%v-", wid), wid, wfID.Project, wfID.Domain, nil
+		return "", fmt.Sprintf("%v-", wid), wid, wfID.GetProject(), wfID.GetDomain(), nil
 	} else {
 		return "", "", "", "", "", fmt.Errorf("expected param not set. wfID or execID must be non-nil values")
 	}
@@ -169,8 +169,8 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		return nil, errs
 	}
 
-	wf := wfClosure.Primary.Template
-	tasks := wfClosure.Tasks
+	wf := wfClosure.GetPrimary().GetTemplate()
+	tasks := wfClosure.GetTasks()
 	// Fill in inputs in the start node.
 	if inputs != nil {
 		if ok := validateInputs(common.StartNodeID, wf.GetInterface(), *inputs, errs.NewScope()); !ok {
@@ -182,22 +182,22 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 	}
 
 	for _, t := range tasks {
-		t.Template.Interface = StripInterfaceTypeMetadata(t.Template.Interface)
+		t.Template.Interface = StripInterfaceTypeMetadata(t.GetTemplate().GetInterface())
 	}
 
-	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.Primary, tasks, errs.NewScope())
+	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.GetPrimary(), tasks, errs.NewScope())
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, errs
 	}
 
-	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
-	for _, subWf := range wfClosure.SubWorkflows {
+	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.GetSubWorkflows()))
+	for _, subWf := range wfClosure.GetSubWorkflows() {
 		spec, err := buildFlyteWorkflowSpec(subWf, tasks, errs.NewScope())
 		if err != nil {
 			errs.Collect(errors.NewWorkflowBuildError(err))
 		} else {
-			subwfs[subWf.Template.Id.String()] = spec
+			subwfs[subWf.GetTemplate().GetId().String()] = spec
 		}
 	}
 
@@ -266,7 +266,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 func toMapOfLists(connections map[string]*core.ConnectionSet_IdList) map[string][]string {
 	res := make(map[string][]string, len(connections))
 	for key, val := range connections {
-		res[key] = val.Ids
+		res[key] = val.GetIds()
 	}
 
 	return res
@@ -292,24 +292,24 @@ func BuildWfClosureCrdFields(wfClosure *core.CompiledWorkflowClosure) (*WfClosur
 		return nil, errs
 	}
 
-	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.GetPrimary(), wfClosure.GetTasks(), errs.NewScope())
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, errs
 	}
 
-	for _, t := range wfClosure.Tasks {
-		t.Template.Interface = StripInterfaceTypeMetadata(t.Template.Interface)
+	for _, t := range wfClosure.GetTasks() {
+		t.Template.Interface = StripInterfaceTypeMetadata(t.GetTemplate().GetInterface())
 	}
-	tasks := buildTasks(wfClosure.Tasks, errs.NewScope())
+	tasks := buildTasks(wfClosure.GetTasks(), errs.NewScope())
 
-	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
-	for _, subWf := range wfClosure.SubWorkflows {
-		spec, err := buildFlyteWorkflowSpec(subWf, wfClosure.Tasks, errs.NewScope())
+	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.GetSubWorkflows()))
+	for _, subWf := range wfClosure.GetSubWorkflows() {
+		spec, err := buildFlyteWorkflowSpec(subWf, wfClosure.GetTasks(), errs.NewScope())
 		if err != nil {
 			errs.Collect(errors.NewWorkflowBuildError(err))
 		} else {
-			subwfs[subWf.Template.Id.String()] = spec
+			subwfs[subWf.GetTemplate().GetId().String()] = spec
 		}
 	}
 

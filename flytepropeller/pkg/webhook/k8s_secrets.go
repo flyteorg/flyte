@@ -38,12 +38,12 @@ func (i K8sSecretInjector) Type() config.SecretManagerType {
 }
 
 func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	if len(secret.Group) == 0 || len(secret.Key) == 0 {
+	if len(secret.GetGroup()) == 0 || len(secret.GetKey()) == 0 {
 		return nil, false, fmt.Errorf("k8s Secrets Webhook require both key and group to be set. "+
 			"Secret: [%v]", secret)
 	}
 
-	switch secret.MountRequirement {
+	switch secret.GetMountRequirement() {
 	case core.Secret_ANY:
 		fallthrough
 	case core.Secret_FILE:
@@ -88,7 +88,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
 	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.GetMountRequirement().String(), secret.GetKey())
 		logger.Error(ctx, err)
 		return p, false, err
 	}

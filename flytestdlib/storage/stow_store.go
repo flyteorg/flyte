@@ -263,7 +263,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 }
 
 func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
-	scheme, containerName, key, err := reference.Split()
+	_, containerName, key, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
 		return nil, NewCursorAtEnd(), err
@@ -291,7 +291,7 @@ func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems 
 	if err == nil {
 		results := make([]DataReference, len(items))
 		for index, item := range items {
-			results[index] = DataReference(fmt.Sprintf("%s://%s/%s", scheme, containerName, item.URL().String()))
+			results[index] = DataReference(item.URL().String())
 		}
 		if stow.IsCursorEnd(stowCursor) {
 			cursor = NewCursorAtEnd()
@@ -445,7 +445,8 @@ const (
 )
 
 func (l locationID) String() string {
-	return strconv.Itoa(int(l))
+	return strconv.Itoa(int(l)) // #nosec G115
+
 }
 
 func (s *StowStore) getLocation(id locationID) stow.Location {

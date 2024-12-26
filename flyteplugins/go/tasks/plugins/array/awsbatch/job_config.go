@@ -41,7 +41,7 @@ func (j *JobConfig) setKeyIfKnown(key, value string) bool {
 
 func (j *JobConfig) MergeFromKeyValuePairs(pairs []*core.KeyValuePair) *JobConfig {
 	for _, entry := range pairs {
-		j.setKeyIfKnown(entry.Key, entry.Value)
+		j.setKeyIfKnown(entry.GetKey(), entry.GetValue())
 	}
 
 	return j

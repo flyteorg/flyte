@@ -101,6 +101,6 @@ func TestGetPluginLogs(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, len(logConfig.Templates), len(logs))
-	assert.Equal(t, "bar", logs[0].Name)
-	assert.Equal(t, "/console/projects/node_project/domains/node_domain/executions/node_name/nodeId/foo/taskId/task_name/attempt/0/mappedIndex/1/mappedAttempt/0/view/logs?duration=all", logs[0].Uri)
+	assert.Equal(t, "bar", logs[0].GetName())
+	assert.Equal(t, "/console/projects/node_project/domains/node_domain/executions/node_name/nodeId/foo/taskId/task_name/attempt/0/mappedIndex/1/mappedAttempt/0/view/logs?duration=all", logs[0].GetUri())
 }

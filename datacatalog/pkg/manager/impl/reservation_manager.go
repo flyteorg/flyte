@@ -88,7 +88,7 @@ func NewReservationManager(
 // Attempt to acquire a reservation for the specified artifact. If there is not active reservation, successfully
 // acquire it. If you are the owner of the active reservation, extend it. If another owner, return the existing reservation.
 func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request *datacatalog.GetOrExtendReservationRequest) (*datacatalog.GetOrExtendReservationResponse, error) {
-	reservationID := request.ReservationId
+	reservationID := request.GetReservationId()
 
 	// Use minimum of maxHeartbeatInterval and requested heartbeat interval
 	heartbeatInterval := r.maxHeartbeatInterval
@@ -97,7 +97,7 @@ func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request
 		heartbeatInterval = requestHeartbeatInterval.AsDuration()
 	}
 
-	reservation, err := r.tryAcquireReservation(ctx, reservationID, request.OwnerId, heartbeatInterval)
+	reservation, err := r.tryAcquireReservation(ctx, reservationID, request.GetOwnerId(), heartbeatInterval)
 	if err != nil {
 		r.systemMetrics.acquireReservationFailure.Inc(ctx)
 		return nil, err
@@ -189,12 +189,12 @@ func (r *reservationManager) tryAcquireReservation(ctx context.Context, reservat
 // Release an active reservation with the specified owner. If one does not exist, gracefully return.
 func (r *reservationManager) ReleaseReservation(ctx context.Context, request *datacatalog.ReleaseReservationRequest) (*datacatalog.ReleaseReservationResponse, error) {
 	repo := r.repo.ReservationRepo()
-	reservationKey := transformers.FromReservationID(request.ReservationId)
+	reservationKey := transformers.FromReservationID(request.GetReservationId())
 
-	err := repo.Delete(ctx, reservationKey, request.OwnerId)
+	err := repo.Delete(ctx, reservationKey, request.GetOwnerId())
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
-			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", request.ReservationId, err)
+			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", request.GetReservationId(), err)
 			r.systemMetrics.reservationDoesNotExist.Inc(ctx)
 			return &datacatalog.ReleaseReservationResponse{}, nil
 		}

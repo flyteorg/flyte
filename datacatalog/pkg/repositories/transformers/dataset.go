@@ -7,12 +7,12 @@ import (
 
 // Create a dataset model from the Dataset api object. This will serialize the metadata in the dataset as part of the transform
 func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
-	serializedMetadata, err := marshalMetadata(dataset.Metadata)
+	serializedMetadata, err := marshalMetadata(dataset.GetMetadata())
 	if err != nil {
 		return nil, err
 	}
 
-	partitionKeys := make([]models.PartitionKey, len(dataset.PartitionKeys))
+	partitionKeys := make([]models.PartitionKey, len(dataset.GetPartitionKeys()))
 
 	for i, partitionKey := range dataset.GetPartitionKeys() {
 		partitionKeys[i] = models.PartitionKey{
@@ -22,11 +22,11 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 
 	return &models.Dataset{
 		DatasetKey: models.DatasetKey{
-			Project: dataset.Id.Project,
-			Domain:  dataset.Id.Domain,
-			Name:    dataset.Id.Name,
-			Version: dataset.Id.Version,
-			UUID:    dataset.Id.UUID,
+			Project: dataset.GetId().GetProject(),
+			Domain:  dataset.GetId().GetDomain(),
+			Name:    dataset.GetId().GetName(),
+			Version: dataset.GetId().GetVersion(),
+			UUID:    dataset.GetId().GetUUID(),
 		},
 		SerializedMetadata: serializedMetadata,
 		PartitionKeys:      partitionKeys,
@@ -36,11 +36,11 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 // Create a dataset ID from the dataset key model
 func FromDatasetID(datasetID *datacatalog.DatasetID) models.DatasetKey {
 	return models.DatasetKey{
-		Project: datasetID.Project,
-		Domain:  datasetID.Domain,
-		Name:    datasetID.Name,
-		Version: datasetID.Version,
-		UUID:    datasetID.UUID,
+		Project: datasetID.GetProject(),
+		Domain:  datasetID.GetDomain(),
+		Name:    datasetID.GetName(),
+		Version: datasetID.GetVersion(),
+		UUID:    datasetID.GetUUID(),
 	}
 }
 

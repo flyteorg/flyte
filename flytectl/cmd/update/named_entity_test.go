@@ -59,7 +59,7 @@ func testNamedEntityUpdateWithMockSetup(
 
 	updateMetadataFactory := getUpdateMetadataFactory(resourceType)
 
-	args := []string{target.Id.Name}
+	args := []string{target.GetId().GetName()}
 	err := updateMetadataFactory(config)(s.Ctx, args, s.CmdCtx)
 
 	if asserter != nil {

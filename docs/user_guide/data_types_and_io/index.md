@@ -108,13 +108,21 @@ Here's a breakdown of these mappings:
       - Structured Dataset
       - Automatic
       - Use ``pandas.DataFrame`` as a type hint. Pandas column types aren't preserved.
+    * - ``polars.DataFrame``
+      - Structured Dataset
+      - Automatic
+      - Use ``polars.DataFrame`` as a type hint. Polars column types aren't preserved.
+    * - ``polars.LazyFrame``
+      - Structured Dataset
+      - Automatic
+      - Use ``polars.LazyFrame`` as a type hint. Polars column types aren't preserved.
     * - ``pyspark.DataFrame``
       - Structured Dataset
       - To utilize the type, install the ``flytekitplugins-spark`` plugin.
       - Use ``pyspark.DataFrame`` as a type hint.
     * - ``pydantic.BaseModel``
       - ``Map``
-      - To utilize the type, install the ``flytekitplugins-pydantic`` plugin.
+      - To utilize the type, install the ``pydantic>2`` module.
       - Use ``pydantic.BaseModel`` as a type hint.
     * - ``torch.Tensor`` / ``torch.nn.Module``
       - File
@@ -144,6 +152,7 @@ flytefile
 flytedirectory
 structureddataset
 dataclass
+pydantic_basemodel
 accessing_attributes
 pytorch_type
 enum_type

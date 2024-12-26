@@ -11,8 +11,24 @@ When you've multiple values that you want to send across Flyte entities, you can
 Flytekit uses the [Mashumaro library](https://github.com/Fatal1ty/mashumaro)
 to serialize and deserialize dataclasses.
 
+With the 1.14 release, `flytekit` adopted `MessagePack` as the 
+serialization format for dataclasses, overcoming a major limitation of serialization into a JSON string within a Protobuf `struct` datatype, like the previous versions do:
+
+to store `int` types, Protobuf's `struct` converts them to `float`, forcing users to write boilerplate code to work around this issue.
+
 :::{important}
-If you're using Flytekit version below v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
+If you're using Flytekit version < v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
+:::
+
+:::{important}
+Flytekit version < v1.14.0 will produce protobuf `struct` literal for dataclasses.
+
+Flytekit version >= v1.14.0 will produce msgpack bytes literal for dataclasses.
+
+If you're using Flytekit version >= v1.14.0 and you want to produce protobuf `struct` literal for dataclasses, you can 
+set environment variable  `FLYTE_USE_OLD_DC_FORMAT` to `true`.
+
+For more details, you can refer the MSGPACK IDL RFC: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
 :::
 
 ```{note}
@@ -21,13 +37,13 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the necessary dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 1-9
 ```
 
 Build your custom image with ImageSpec:
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 16-19
 ```
@@ -35,7 +51,7 @@ Build your custom image with ImageSpec:
 ## Python types
 We define a `dataclass` with `int`, `str` and `dict` as the data types.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :pyobject: Datum
 ```
@@ -48,7 +64,7 @@ All variables in a data class should be **annotated with their type**. Failure t
 
 Once declared, a dataclass can be returned as an output or accepted as an input.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 32-47
 ```
@@ -57,7 +73,7 @@ Once declared, a dataclass can be returned as an output or accepted as an input.
 We also define a data class that accepts {std:ref}`StructuredDataset <structured_dataset>`,
 {std:ref}`FlyteFile <files>` and {std:ref}`FlyteDirectory <folder>`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 51-88
 ```
@@ -67,14 +83,14 @@ flyte file, flyte directory and structured dataset.
 
 We define a workflow that calls the tasks created above.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :pyobject: dataclass_wf
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 101-102
 ```

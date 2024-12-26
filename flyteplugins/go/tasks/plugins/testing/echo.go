@@ -104,7 +104,7 @@ func copyInputsToOutputs(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 		outputLiterals := make(map[string]*idlcore.Literal, len(inputToOutputVariableMappings))
 		for inputVariableName, outputVariableName := range inputToOutputVariableMappings {
-			outputLiterals[outputVariableName] = inputLiterals.Literals[inputVariableName]
+			outputLiterals[outputVariableName] = inputLiterals.GetLiterals()[inputVariableName]
 		}
 
 		outputLiteralMap := &idlcore.LiteralMap{
@@ -132,12 +132,12 @@ func compileInputToOutputVariableMappings(ctx context.Context, tCtx core.TaskExe
 	}
 
 	var inputs, outputs map[string]*idlcore.Variable
-	if taskTemplate.Interface != nil {
-		if taskTemplate.Interface.Inputs != nil {
-			inputs = taskTemplate.Interface.Inputs.Variables
+	if taskTemplate.GetInterface() != nil {
+		if taskTemplate.GetInterface().GetInputs() != nil {
+			inputs = taskTemplate.GetInterface().GetInputs().GetVariables()
 		}
-		if taskTemplate.Interface.Outputs != nil {
-			outputs = taskTemplate.Interface.Outputs.Variables
+		if taskTemplate.GetInterface().GetOutputs() != nil {
+			outputs = taskTemplate.GetInterface().GetOutputs().GetVariables()
 		}
 	}
 

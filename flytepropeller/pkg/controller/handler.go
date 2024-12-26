@@ -102,7 +102,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	}
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
-	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
+	maxRetries := uint32(p.cfg.MaxWorkflowRetries) // #nosec G115
 	if IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
 		var err error
 		func() {
@@ -267,7 +267,7 @@ func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataRefer
 		return nil, err
 	}
 
-	wfClosureCrdFields, err := k8s.BuildWfClosureCrdFields(wfClosure.CompiledWorkflow)
+	wfClosureCrdFields, err := k8s.BuildWfClosureCrdFields(wfClosure.GetCompiledWorkflow())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to parse workflow closure data from '%s' with error '%s'", dataReference, err)
 		return nil, err

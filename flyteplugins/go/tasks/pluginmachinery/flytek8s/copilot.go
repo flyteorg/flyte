@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "sidecar"
+	flyteSidecarContainerName = "uploader"
 	flyteInitContainerName    = "downloader"
 )
 
@@ -162,7 +162,7 @@ func CalculateStorageSize(requirements *v1.ResourceRequirements) *resource.Quant
 }
 
 func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c *v1.Container, iFace *core.TypedInterface, pilot *core.DataLoadingConfig) error {
-	if pilot == nil || !pilot.Enabled {
+	if pilot == nil || !pilot.GetEnabled() {
 		return nil
 	}
 	logger.Infof(ctx, "Enabling CoPilot on main container [%s]", c.Name)
@@ -175,7 +175,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	c.SecurityContext.Capabilities.Add = append(c.SecurityContext.Capabilities.Add, pTraceCapability)
 
 	if iFace != nil {
-		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
+		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -187,7 +187,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 			})
 		}
 
-		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
+		if iFace.GetOutputs() != nil && len(iFace.GetOutputs().GetVariables()) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
@@ -202,16 +202,17 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 }
 
 func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilotPod *v1.PodSpec, iFace *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) (string, error) {
-	if pilot == nil || !pilot.Enabled {
+	if pilot == nil || !pilot.GetEnabled() {
 		return "", nil
 	}
 
-	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
+	//nolint:protogetter
+	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 	shareProcessNamespaceEnabled := true
 	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
 	primaryInitContainerName := ""
 	if iFace != nil {
-		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
+		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
 			inPath := cfg.DefaultInputDataPath
 			if pilot.GetInputPath() != "" {
 				inPath = pilot.GetInputPath()
@@ -219,18 +220,19 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 			// TODO we should calculate input volume size based on the size of the inputs which is known ahead of time. We should store that as part of the metadata
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			logger.Infof(ctx, "Adding Input path [%s] of Size [%d] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
+			//nolint:protogetter
+			logger.Infof(ctx, "Adding Input path [%s] of Size [%d] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 			inputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.InputVolumeName,
 				MountPath: inPath,
 			}
 
-			format := pilot.Format
+			format := pilot.GetFormat()
 			// Lets add the InputsVolume
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.InputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
+			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.GetInputs())
 			if err != nil {
 				return primaryInitContainerName, err
 			}
@@ -242,14 +244,15 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			primaryInitContainerName = downloader.Name
 		}
 
-		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
+		if iFace.GetOutputs() != nil && len(iFace.GetOutputs().GetVariables()) > 0 {
 			outPath := cfg.DefaultOutputPath
 			if pilot.GetOutputPath() != "" {
 				outPath = pilot.GetOutputPath()
 			}
 
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
-			logger.Infof(ctx, "Adding Output path [%s] of size [%d] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
+			//nolint:protogetter
+			logger.Infof(ctx, "Adding Output path [%s] of size [%d] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 
 			outputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.OutputVolumeName,

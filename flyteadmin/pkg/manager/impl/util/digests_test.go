@@ -149,7 +149,7 @@ func TestGetWorkflowDigest_Unequal(t *testing.T) {
 	workflowWithDifferentNodes, err := getCompiledWorkflow()
 	assert.Nil(t, err)
 	workflowWithDifferentNodes.Primary.Template.Nodes = append(
-		workflowWithDifferentNodes.Primary.Template.Nodes, &core.Node{
+		workflowWithDifferentNodes.GetPrimary().GetTemplate().GetNodes(), &core.Node{
 			Id: "unexpected",
 		})
 	workflowDigest, err := GetWorkflowDigest(context.Background(), workflowWithDifferentNodes)

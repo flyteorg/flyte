@@ -29,9 +29,11 @@ these prerequisites.
 
 .. note::
    
-   `Union.AI <https://www.union.ai/>`__ plans to open-source a reference
-   implementation of these requirements for the major cloud providers in early
-   2023.
+
+   `Union.ai <https://www.union.ai/>`__ maintains a `set of Terraform scripts <https://github.com/unionai-oss/deploy-flyte>`__ that automate the configuration
+   of prerequisites and Flyte installation on AWS, GCP, or Azure.
+
+   A community-maintained guide to manually prepare an EKS environment and deploy Flyte is available `here <https://github.com/davidmirror-ops/flyte-the-hard-way/tree/main>`__
 
 ***************
 Installation

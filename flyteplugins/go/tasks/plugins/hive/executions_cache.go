@@ -39,7 +39,8 @@ func NewQuboleHiveExecutionsCache(ctx context.Context, quboleClient client.Qubol
 		scope:         scope,
 		cfg:           cfg,
 	}
-	autoRefreshCache, err := cache.NewAutoRefreshCache("qubole", q.SyncQuboleQuery, workqueue.DefaultControllerRateLimiter(), ResyncDuration, cfg.Workers, cfg.LruCacheSize, scope)
+	// #nosec G115
+	autoRefreshCache, err := cache.NewAutoRefreshCache("qubole", q.SyncQuboleQuery, workqueue.DefaultControllerRateLimiter(), ResyncDuration, uint(cfg.Workers), uint(cfg.LruCacheSize), scope)
 	if err != nil {
 		logger.Errorf(ctx, "Could not create AutoRefreshCache in QuboleHiveExecutor. [%s]", err)
 		return q, errors.Wrapf(errors.CacheFailed, err, "Error creating AutoRefreshCache")

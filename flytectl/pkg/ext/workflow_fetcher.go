@@ -19,10 +19,10 @@ func (a *AdminFetcherExtClient) FetchAllVerOfWorkflow(ctx context.Context, workf
 	if err != nil {
 		return nil, err
 	}
-	if len(wList.Workflows) == 0 {
+	if len(wList.GetWorkflows()) == 0 {
 		return nil, fmt.Errorf("no workflow retrieved for %v", workflowName)
 	}
-	return wList.Workflows, nil
+	return wList.GetWorkflows(), nil
 }
 
 // FetchAllWorkflows fetches all workflows in project domain
@@ -35,10 +35,10 @@ func (a *AdminFetcherExtClient) FetchAllWorkflows(ctx context.Context, project, 
 	if err != nil {
 		return nil, err
 	}
-	if len(wList.Entities) == 0 {
+	if len(wList.GetEntities()) == 0 {
 		return nil, fmt.Errorf("no workflow retrieved for %v project %v domain", project, domain)
 	}
-	return wList.Entities, nil
+	return wList.GetEntities(), nil
 }
 
 // FetchWorkflowLatestVersion fetches latest version for given workflow name
@@ -53,7 +53,7 @@ func (a *AdminFetcherExtClient) FetchWorkflowLatestVersion(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return a.FetchWorkflowVersion(ctx, name, wVersions[0].Id.Version, project, domain)
+	return a.FetchWorkflowVersion(ctx, name, wVersions[0].GetId().GetVersion(), project, domain)
 }
 
 // FetchWorkflowVersion fetches particular version of workflow

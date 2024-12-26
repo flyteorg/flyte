@@ -118,7 +118,7 @@ func getCallBack(ctx context.Context, cmdCtx cmdCore.CommandContext) bubbletea.D
 		if err != nil {
 			return nil, err
 		}
-		return ExecutionToProtoMessages(executionList.Executions), nil
+		return ExecutionToProtoMessages(executionList.GetExecutions()), nil
 	}
 }
 
@@ -160,7 +160,7 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 	if err != nil {
 		return err
 	}
-	logger.Infof(ctx, "Retrieved %v executions", len(executionList.Executions))
+	logger.Infof(ctx, "Retrieved %v executions", len(executionList.GetExecutions()))
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
-		ExecutionToProtoMessages(executionList.Executions)...)
+		ExecutionToProtoMessages(executionList.GetExecutions())...)
 }

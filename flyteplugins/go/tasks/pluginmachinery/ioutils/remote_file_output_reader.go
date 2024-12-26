@@ -105,7 +105,7 @@ func (s *singleFileErrorReader) IsError(ctx context.Context) (bool, error) {
 }
 
 func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage.DataReference) io.ExecutionError {
-	if errorDoc.Error == nil {
+	if errorDoc.GetError() == nil {
 		return io.ExecutionError{
 			IsRecoverable: true,
 			ExecutionError: &core.ExecutionError{
@@ -117,15 +117,15 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 	}
 	executionError := io.ExecutionError{
 		ExecutionError: &core.ExecutionError{
-			Code:      errorDoc.Error.Code,
-			Message:   errorDoc.Error.Message,
-			Kind:      errorDoc.Error.Origin,
-			Timestamp: errorDoc.Error.Timestamp,
-			Worker:    errorDoc.Error.Worker,
+			Code:      errorDoc.GetError().GetCode(),
+			Message:   errorDoc.GetError().GetMessage(),
+			Kind:      errorDoc.GetError().GetOrigin(),
+			Timestamp: errorDoc.GetError().GetTimestamp(),
+			Worker:    errorDoc.GetError().GetWorker(),
 		},
 	}
 
-	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
+	if errorDoc.GetError().GetKind() == core.ContainerError_RECOVERABLE {
 		executionError.IsRecoverable = true
 	}
 
@@ -201,7 +201,7 @@ func (e *earliestFileErrorReader) ReadError(ctx context.Context) (io.ExecutionEr
 			if err != nil {
 				return io.ExecutionError{}, errors.Wrapf(err, "failed to read error file @[%s]", errorFilePath.String())
 			}
-			timestamp := errorDoc.Error.GetTimestamp().AsTime()
+			timestamp := errorDoc.GetError().GetTimestamp().AsTime()
 			if earliestTimestamp == nil || earliestTimestamp.After(timestamp) {
 				earliestExecutionError = errorDoc2ExecutionError(errorDoc, errorFilePath)
 				earliestTimestamp = &timestamp

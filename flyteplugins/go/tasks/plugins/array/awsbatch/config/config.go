@@ -30,7 +30,7 @@ type Config struct {
 
 type JobStoreConfig struct {
 	CacheSize      int             `json:"jacheSize" pflag:",Maximum informer cache size as number of items. Caches are used as an optimization to lessen the load on AWS Services."`
-	Parallelizm    int             `json:"parallelizm"`
+	Parallelism    int             `json:"parallelism"`
 	BatchChunkSize int             `json:"batchChunkSize" pflag:",Determines the size of each batch sent to GetJobDetails api."`
 	ResyncPeriod   config.Duration `json:"resyncPeriod" pflag:",Defines the duration for syncing job details from AWS Batch."`
 }
@@ -39,7 +39,7 @@ var (
 	defaultConfig = &Config{
 		JobStoreConfig: JobStoreConfig{
 			CacheSize:      10000,
-			Parallelizm:    20,
+			Parallelism:    20,
 			BatchChunkSize: 100,
 			ResyncPeriod:   config.Duration{Duration: 30 * time.Second},
 		},

@@ -4,6 +4,7 @@
 package coreutils
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -125,6 +126,7 @@ func TestFetchLiteral(t *testing.T) {
 	})
 
 	t.Run("Generic", func(t *testing.T) {
+		os.Setenv(FlyteUseOldDcFormat, "true")
 		literalVal := map[string]interface{}{
 			"x": 1,
 			"y": "ystringvalue",
@@ -146,10 +148,11 @@ func TestFetchLiteral(t *testing.T) {
 			Fields: fieldsMap,
 		}
 		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
-		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
-		for key, val := range expectedStructVal.Fields {
-			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		assert.Equal(t, len(expectedStructVal.GetFields()), len(extractedStructValue.GetFields()))
+		for key, val := range expectedStructVal.GetFields() {
+			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
 		}
+		os.Unsetenv(FlyteUseOldDcFormat)
 	})
 
 	t.Run("Generic Passed As String", func(t *testing.T) {
@@ -171,9 +174,9 @@ func TestFetchLiteral(t *testing.T) {
 			Fields: fieldsMap,
 		}
 		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
-		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
-		for key, val := range expectedStructVal.Fields {
-			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		assert.Equal(t, len(expectedStructVal.GetFields()), len(extractedStructValue.GetFields()))
+		for key, val := range expectedStructVal.GetFields() {
+			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
 		}
 	})
 

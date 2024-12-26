@@ -21,7 +21,7 @@ const (
 
 func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
-		urlBlob.Bytes < config.MaxSizeInBytes
+		urlBlob.GetBytes() < config.MaxSizeInBytes
 }
 
 func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob *admin.UrlBlob, outputURI string) bool {

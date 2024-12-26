@@ -33,7 +33,7 @@ func (g PDWGetterCommandLine) GetDomain() string {
 
 // GetWorkflow returns the first argument from the commandline
 func (g PDWGetterCommandLine) GetWorkflow() string {
-	if g.Args == nil || len(g.Args) == 0 {
+	if len(g.Args) == 0 {
 		return ""
 	}
 	return g.Args[0]
