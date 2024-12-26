@@ -45,28 +45,4 @@ We have used a simple object here for demonstration purposes.
 :lines: 7-26
 ```
 
-## Batch size
-
-By default, if the list subtype is unrecognized, a single pickle file is generated.
-To optimize serialization and deserialization performance for scenarios involving a large number of items
-or significant list elements, you can specify a batch size.
-This feature allows for the processing of each batch as a separate pickle file.
-The following example demonstrates how to set the batch size.
-
-```{literalinclude} /examples/data_types_and_io/data_types_and_io/pickle_type.py
-:caption: data_types_and_io/pickle_type.py
-:lines: 35-58
-```
-
-:::{note}
-The `welcome_superheroes` task will generate two pickle files: one containing two superheroes and the other containing one superhero.
-:::
-
-You can run the workflows locally as follows:
-
-```{literalinclude} /examples/data_types_and_io/data_types_and_io/pickle_type.py
-:caption: data_types_and_io/pickle_type.py
-:lines: 62-64
-```
-
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
