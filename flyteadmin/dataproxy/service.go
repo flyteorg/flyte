@@ -49,22 +49,22 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If it exists, and a hash was provided, then check if it matches. If it matches, then proceed as normal otherwise fail.
 	// If it doesn't exist, then proceed as normal.
 
-	if len(req.Project) == 0 || len(req.Domain) == 0 {
-		logger.Infof(ctx, "project and domain are required parameters. Project [%v]. Domain [%v]", req.Project, req.Domain)
+	if len(req.GetProject()) == 0 || len(req.GetDomain()) == 0 {
+		logger.Infof(ctx, "project and domain are required parameters. Project [%v]. Domain [%v]", req.GetProject(), req.GetDomain())
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project and domain are required parameters")
 	}
 
 	// At least one of the hash or manually given prefix must be provided.
-	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
-		logger.Infof(ctx, "content_md5 or filename_root is a required parameter. FilenameRoot [%v], ContentMD5 [%v]", req.FilenameRoot, req.ContentMd5)
+	if len(req.GetFilenameRoot()) == 0 && len(req.GetContentMd5()) == 0 {
+		logger.Infof(ctx, "content_md5 or filename_root is a required parameter. FilenameRoot [%v], ContentMD5 [%v]", req.GetFilenameRoot(), req.GetContentMd5())
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"content_md5 or filename_root is a required parameter")
 	}
 
 	// If we fall in here, that means that the full path is deterministic and we should check for existence.
-	if len(req.Filename) > 0 && len(req.FilenameRoot) > 0 {
+	if len(req.GetFilename()) > 0 && len(req.GetFilenameRoot()) > 0 {
 		knownLocation, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-			req.Org, req.Project, req.Domain, req.FilenameRoot, req.Filename)
+			req.GetOrg(), req.GetProject(), req.GetDomain(), req.GetFilenameRoot(), req.GetFilename())
 		if err != nil {
 			logger.Errorf(ctx, "failed to create storage location. Error %v", err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
@@ -78,15 +78,15 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			// Basically if the file exists, then error unless the user also provided a hash and it matches.
 			// Keep in mind this is just a best effort attempt. There can easily be race conditions where two users
 			// request the same file at the same time and one of the writes is lost.
-			if len(req.ContentMd5) == 0 {
+			if len(req.GetContentMd5()) == 0 {
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
-			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
+			base64Digest := base64.StdEncoding.EncodeToString(req.GetContentMd5())
 			if len(metadata.ContentMD5()) == 0 {
 				// For backward compatibility, dataproxy assumes that the Etag exists if ContentMD5 is not in the metadata.
 				// Data proxy won't allow people to overwrite the file if both the Etag and the ContentMD5 do not exist.
-				hexDigest := hex.EncodeToString(req.ContentMd5)
-				base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
+				hexDigest := hex.EncodeToString(req.GetContentMd5())
+				base32Digest := base32.StdEncoding.EncodeToString(req.GetContentMd5())
 				if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
 					logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 					return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
@@ -99,7 +99,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		}
 	}
 
-	if expiresIn := req.ExpiresIn; expiresIn != nil {
+	if expiresIn := req.GetExpiresIn(); expiresIn != nil {
 		if !expiresIn.IsValid() {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "expiresIn [%v] is invalid", expiresIn)
 		}
@@ -112,21 +112,21 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		req.ExpiresIn = durationpb.New(s.cfg.Upload.MaxExpiresIn.Duration)
 	}
 
-	if len(req.Filename) == 0 {
+	if len(req.GetFilename()) == 0 {
 		req.Filename = rand.String(s.cfg.Upload.DefaultFileNameLength)
 	}
 
-	base64digestMD5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
+	base64digestMD5 := base64.StdEncoding.EncodeToString(req.GetContentMd5())
 
 	var prefix string
-	if len(req.FilenameRoot) > 0 {
-		prefix = req.FilenameRoot
+	if len(req.GetFilenameRoot()) > 0 {
+		prefix = req.GetFilenameRoot()
 	} else {
 		// url safe base32 encoding
-		prefix = base32.StdEncoding.EncodeToString(req.ContentMd5)
+		prefix = base32.StdEncoding.EncodeToString(req.GetContentMd5())
 	}
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
-		req.Org, req.Project, req.Domain, prefix, req.Filename)
+		req.GetOrg(), req.GetProject(), req.GetDomain(), prefix, req.GetFilename())
 	if err != nil {
 		logger.Errorf(ctx, "failed to create shardedStorageLocation. Error %v", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
@@ -134,9 +134,9 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 
 	resp, err := s.dataStore.CreateSignedURL(ctx, storagePath, storage.SignedURLProperties{
 		Scope:                 stow.ClientMethodPut,
-		ExpiresIn:             req.ExpiresIn.AsDuration(),
+		ExpiresIn:             req.GetExpiresIn().AsDuration(),
 		ContentMD5:            base64digestMD5,
-		AddContentMD5Metadata: req.AddContentMd5Metadata,
+		AddContentMD5Metadata: req.GetAddContentMd5Metadata(),
 	})
 
 	if err != nil {
@@ -147,7 +147,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	return &service.CreateUploadLocationResponse{
 		SignedUrl: resp.URL.String(),
 		NativeUrl: storagePath.String(),
-		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
+		ExpiresAt: timestamppb.New(time.Now().Add(req.GetExpiresIn().AsDuration())),
 		Headers:   resp.RequiredRequestHeaders,
 	}, nil
 }
@@ -172,7 +172,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 
 		switch req.GetArtifactType() {
 		case service.ArtifactType_ARTIFACT_TYPE_DECK:
-			nativeURL = node.Closure.DeckUri
+			nativeURL = node.GetClosure().GetDeckUri()
 		}
 	} else {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unsupported source [%v]", reflect.TypeOf(req.GetSource()))
@@ -194,7 +194,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 
 	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, ref, storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
-		ExpiresIn: req.ExpiresIn.AsDuration(),
+		ExpiresIn: req.GetExpiresIn().AsDuration(),
 	})
 
 	if err != nil {
@@ -202,7 +202,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 	}
 
 	u := []string{signedURLResp.URL.String()}
-	ts := timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration()))
+	ts := timestamppb.New(time.Now().Add(req.GetExpiresIn().AsDuration()))
 
 	//
 	return &service.CreateDownloadLinkResponse{
@@ -223,9 +223,9 @@ func (s Service) CreateDownloadLocation(ctx context.Context, req *service.Create
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "error while validating request: %v", err)
 	}
 
-	resp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(req.NativeUrl), storage.SignedURLProperties{
+	resp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(req.GetNativeUrl()), storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
-		ExpiresIn: req.ExpiresIn.AsDuration(),
+		ExpiresIn: req.GetExpiresIn().AsDuration(),
 	})
 
 	if err != nil {
@@ -234,21 +234,21 @@ func (s Service) CreateDownloadLocation(ctx context.Context, req *service.Create
 
 	return &service.CreateDownloadLocationResponse{
 		SignedUrl: resp.URL.String(),
-		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
+		ExpiresAt: timestamppb.New(time.Now().Add(req.GetExpiresIn().AsDuration())),
 	}, nil
 }
 
 func (s Service) validateCreateDownloadLocationRequest(req *service.CreateDownloadLocationRequest) error {
-	validatedExpiresIn, err := validateDuration(req.ExpiresIn, s.cfg.Download.MaxExpiresIn.Duration)
+	validatedExpiresIn, err := validateDuration(req.GetExpiresIn(), s.cfg.Download.MaxExpiresIn.Duration)
 	if err != nil {
 		return fmt.Errorf("expiresIn is invalid. Error: %w", err)
 	}
 
 	req.ExpiresIn = validatedExpiresIn
 
-	if _, err := url.Parse(req.NativeUrl); err != nil {
+	if _, err := url.Parse(req.GetNativeUrl()); err != nil {
 		return fmt.Errorf("failed to parse native_url [%v]",
-			req.NativeUrl)
+			req.GetNativeUrl())
 	}
 
 	return nil
@@ -275,7 +275,7 @@ func validateDuration(input *durationpb.Duration, maxAllowed time.Duration) (*du
 }
 
 func (s Service) validateCreateDownloadLinkRequest(req *service.CreateDownloadLinkRequest) (*service.CreateDownloadLinkRequest, error) {
-	validatedExpiresIn, err := validateDuration(req.ExpiresIn, s.cfg.Download.MaxExpiresIn.Duration)
+	validatedExpiresIn, err := validateDuration(req.GetExpiresIn(), s.cfg.Download.MaxExpiresIn.Duration)
 	if err != nil {
 		return nil, fmt.Errorf("expiresIn is invalid. Error: %w", err)
 	}
@@ -328,16 +328,16 @@ func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID *cor
 	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
 		NodeExecutionId: taskExecID.GetNodeExecutionId(),
 		Limit:           1,
-		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(int(taskExecID.RetryAttempt))),
+		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(int(taskExecID.GetRetryAttempt()))),
 	})
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to list task executions [%v]. Error: %v", taskExecID, err)
 	}
-	if len(taskExecs.TaskExecutions) == 0 {
+	if len(taskExecs.GetTaskExecutions()) == 0 {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "no task executions were listed [%v]. Error: %v", taskExecID, err)
 	}
-	taskExec := taskExecs.TaskExecutions[0]
-	return taskExec.Id, nil
+	taskExec := taskExecs.GetTaskExecutions()[0]
+	return taskExec.GetId(), nil
 }
 
 func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID *core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
@@ -349,11 +349,11 @@ func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to list task executions [%v]. Error: %v", nodeExecID, err)
 	}
-	if len(taskExecs.TaskExecutions) == 0 {
+	if len(taskExecs.GetTaskExecutions()) == 0 {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "no task executions were listed [%v]. Error: %v", nodeExecID, err)
 	}
-	taskExec := taskExecs.TaskExecutions[0]
-	return taskExec.Id, nil
+	taskExec := taskExecs.GetTaskExecutions()[0]
+	return taskExec.GetId(), nil
 }
 
 func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
@@ -368,9 +368,9 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.
 
 	var lm *core.LiteralMap
 	if ioType == common.ArtifactTypeI {
-		lm = resp.FullInputs
+		lm = resp.GetFullInputs()
 	} else if ioType == common.ArtifactTypeO {
-		lm = resp.FullOutputs
+		lm = resp.GetFullOutputs()
 	} else {
 		// Assume deck, and create a download link request
 		dlRequest := service.CreateDownloadLinkRequest{
@@ -383,13 +383,13 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.
 		}
 		return &service.GetDataResponse{
 			Data: &service.GetDataResponse_PreSignedUrls{
-				PreSignedUrls: resp.PreSignedUrls,
+				PreSignedUrls: resp.GetPreSignedUrls(),
 			},
 		}, nil
 	}
 
 	if name != "" {
-		if literal, ok := lm.Literals[name]; ok {
+		if literal, ok := lm.GetLiterals()[name]; ok {
 			return &service.GetDataResponse{
 				Data: &service.GetDataResponse_Literal{
 					Literal: literal,
@@ -418,15 +418,15 @@ func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.
 	}
 
 	if ioType == common.ArtifactTypeI {
-		lm = resp.FullInputs
+		lm = resp.GetFullInputs()
 	} else if ioType == common.ArtifactTypeO {
-		lm = resp.FullOutputs
+		lm = resp.GetFullOutputs()
 	} else {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "deck type cannot be specified with a retry attempt, just use the node instead")
 	}
 
 	if name != "" {
-		if literal, ok := lm.Literals[name]; ok {
+		if literal, ok := lm.GetLiterals()[name]; ok {
 			return &service.GetDataResponse{
 				Data: &service.GetDataResponse_Literal{
 					Literal: literal,

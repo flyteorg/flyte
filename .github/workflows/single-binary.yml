@@ -10,6 +10,7 @@ on:
     branches:
       - master
       - rc/*
+      - 'release-v**'
   workflow_dispatch:
 
 jobs:
@@ -72,7 +73,7 @@ jobs:
         run: |
           mkdir -p docker/sandbox-bundled/images/tar/{arm64,amd64}
       - name: Export ARM64 Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/arm64
@@ -83,7 +84,7 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
@@ -107,7 +108,7 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push Image
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/arm64, linux/amd64
@@ -143,7 +144,7 @@ jobs:
           driver-opts: image=moby/buildkit:master
           buildkitd-flags: "--allow-insecure-entitlement security.insecure"
       - name: Build sandbox image for functional tests
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: docker/sandbox-bundled
           load: true
@@ -158,6 +159,8 @@ jobs:
         with:
           python-version: "3.12"
       - uses: unionai/flytectl-setup-action@v0.0.3
+        with:
+          version: '0.9.2'
       - name: Setup sandbox
         run: |
           mkdir -p ~/.flyte/sandbox
@@ -196,6 +199,9 @@ jobs:
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flytesnacks/flyte_tests.txt
+      - name: Install Pytest
+        run: |
+          pip install pytest
       - name: End2End
         run: |
           make end2end_execute
@@ -239,7 +245,7 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: docker/sandbox-bundled
           allow: "security.insecure"

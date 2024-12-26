@@ -51,7 +51,7 @@ func (e executionCacheItem) IsTerminal() bool {
 	if e.ExecutionClosure == nil {
 		return false
 	}
-	return e.ExecutionClosure.Phase == core.WorkflowExecution_ABORTED || e.ExecutionClosure.Phase == core.WorkflowExecution_FAILED || e.ExecutionClosure.Phase == core.WorkflowExecution_SUCCEEDED
+	return e.ExecutionClosure.GetPhase() == core.WorkflowExecution_ABORTED || e.ExecutionClosure.GetPhase() == core.WorkflowExecution_FAILED || e.ExecutionClosure.GetPhase() == core.WorkflowExecution_SUCCEEDED
 }
 
 func (e executionCacheItem) ID() string {
@@ -63,7 +63,7 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 
 	statusCode := status.Code(err)
 	if isRecovery && statusCode == codes.NotFound {
-		logger.Warnf(ctx, "failed to recover workflow [%s] with err %+v. will attempt to launch instead", launchPlanRef.Name, err)
+		logger.Warnf(ctx, "failed to recover workflow [%s] with err %+v. will attempt to launch instead", launchPlanRef.GetName(), err)
 		return nil
 	}
 	switch statusCode {
@@ -73,9 +73,9 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 			logger.Errorf(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 		}
 
-		return stdErr.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
+		return stdErr.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.GetName())
 	case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
-		return stdErr.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
+		return stdErr.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.GetName())
 	default:
 		return stdErr.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
 	}
@@ -88,7 +88,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	if launchCtx.RecoveryExecution != nil {
 		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
 			Id:   launchCtx.RecoveryExecution,
-			Name: executionID.Name,
+			Name: executionID.GetName(),
 			Metadata: &admin.ExecutionMetadata{
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
@@ -128,9 +128,9 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	}
 
 	req := &admin.ExecutionCreateRequest{
-		Project: executionID.Project,
-		Domain:  executionID.Domain,
-		Name:    executionID.Name,
+		Project: executionID.GetProject(),
+		Domain:  executionID.GetDomain(),
+		Name:    executionID.GetName(),
 		Inputs:  inputs,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlanRef,
@@ -143,7 +143,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			Labels:              &admin.Labels{Values: labels},
 			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
 			SecurityContext:     &launchCtx.SecurityContext,
-			MaxParallelism:      int32(launchCtx.MaxParallelism),
+			MaxParallelism:      int32(launchCtx.MaxParallelism), // #nosec G115
 			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
 			Interruptible:       interruptible,
 			OverwriteCache:      launchCtx.OverwriteCache,
@@ -235,8 +235,8 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 
 		// Is workflow already terminated, then no need to fetch information, also the item can be dropped from the cache
 		if exec.ExecutionClosure != nil {
-			if IsWorkflowTerminated(exec.ExecutionClosure.Phase) {
-				logger.Debugf(ctx, "Workflow [%s] is already completed, will not fetch execution information", exec.ExecutionClosure.WorkflowId)
+			if IsWorkflowTerminated(exec.ExecutionClosure.GetPhase()) {
+				logger.Debugf(ctx, "Workflow [%s] is already completed, will not fetch execution information", exec.ExecutionClosure.GetWorkflowId())
 				resp = append(resp, cache.ItemSyncResponse{
 					ID:     obj.GetID(),
 					Item:   exec,
@@ -256,7 +256,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			// TODO: Define which error codes are system errors (and return the error) vs user stdErr.
 
 			if status.Code(err) == codes.NotFound {
-				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.Name)
+				err = stdErr.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.GetName())
 			} else {
 				err = stdErr.Wrapf(RemoteErrorSystem, err, "system error")
 			}
@@ -315,7 +315,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			ID: obj.GetID(),
 			Item: executionCacheItem{
 				WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-				ExecutionClosure:            res.Closure,
+				ExecutionClosure:            res.GetClosure(),
 				ExecutionOutputs:            outputs,
 				ParentWorkflowID:            exec.ParentWorkflowID,
 			},
@@ -327,7 +327,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 	// prematurely, there is a chance the parent workflow evaluates before the cache is updated.
 	for _, itemSyncResponse := range resp {
 		exec := itemSyncResponse.Item.(executionCacheItem)
-		if exec.ExecutionClosure != nil && IsWorkflowTerminated(exec.ExecutionClosure.Phase) {
+		if exec.ExecutionClosure != nil && IsWorkflowTerminated(exec.ExecutionClosure.GetPhase()) {
 			a.enqueueWorkflow(exec.ParentWorkflowID)
 		}
 	}
@@ -344,7 +344,8 @@ func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceCl
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, cfg.Workers, cfg.MaxCacheSize, scope)
+	// #nosec G115
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, uint(cfg.Workers), uint(cfg.MaxCacheSize), scope)
 	if err != nil {
 		return nil, err
 	}

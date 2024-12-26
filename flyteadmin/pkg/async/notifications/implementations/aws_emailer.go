@@ -23,7 +23,7 @@ type AwsEmailer struct {
 
 func FlyteEmailToSesEmailInput(email *admin.EmailMessage) ses.SendEmailInput {
 	var toAddress []*string
-	for _, toEmail := range email.RecipientsEmail {
+	for _, toEmail := range email.GetRecipientsEmail() {
 		// SES email input takes an array of pointers to strings so we have to create a new one for each email
 		//nolint:unconvert
 		e := string(toEmail)
@@ -61,7 +61,7 @@ func (e *AwsEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) e
 		e.systemMetrics.SendError.Inc()
 		return errors.NewFlyteAdminErrorf(codes.Internal, "errors were seen while sending emails")
 	}
-	logger.Debugf(ctx, "Sent email to %s sub: %s", email.RecipientsEmail, email.SubjectLine)
+	logger.Debugf(ctx, "Sent email to %s sub: %s", email.GetRecipientsEmail(), email.GetSubjectLine())
 	e.systemMetrics.SendSuccess.Inc()
 	return nil
 }

@@ -435,7 +435,7 @@ func TestGetOrCreateVolume(t *testing.T) {
 }
 
 func TestDemoPorts(t *testing.T) {
-	_, ports, _ := GetDemoPorts()
+	_, ports, _ := GetDemoPorts("6443")
 	assert.Equal(t, 6, len(ports))
 }
 

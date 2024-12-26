@@ -199,8 +199,8 @@ func FormatVariableDescriptions(variableMap map[string]*core.Variable) {
 	for _, k := range keys {
 		v := variableMap[k]
 		// a: a isn't very helpful
-		if k != v.Description {
-			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Description)))
+		if k != v.GetDescription() {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.GetDescription())))
 		} else {
 			descriptions = append(descriptions, getTruncatedLine(k))
 		}
@@ -220,12 +220,12 @@ func FormatParameterDescriptions(parameterMap map[string]*core.Parameter) {
 	var descriptions []string
 	for _, k := range keys {
 		v := parameterMap[k]
-		if v.Var == nil {
+		if v.GetVar() == nil {
 			continue
 		}
 		// a: a isn't very helpful
-		if k != v.Var.Description {
-			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.Var.Description)))
+		if k != v.GetVar().GetDescription() {
+			descriptions = append(descriptions, getTruncatedLine(fmt.Sprintf("%s: %s", k, v.GetVar().GetDescription())))
 		} else {
 			descriptions = append(descriptions, getTruncatedLine(k))
 		}
@@ -272,7 +272,7 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 			return fmt.Errorf("at least one workflow required for visualization")
 		}
 		workflow := workflows[0]
-		graphStr, err := visualize.RenderWorkflow(workflow.Closure.CompiledWorkflow)
+		graphStr, err := visualize.RenderWorkflow(workflow.GetClosure().GetCompiledWorkflow())
 		if err != nil {
 			return errors.Wrapf("VisualizationError", err, "failed to visualize workflow")
 		}

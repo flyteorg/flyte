@@ -34,11 +34,11 @@ func flatten(binding *core.BindingData, flatMap map[common.NodeID]sets.String) {
 			flatten(v, flatMap)
 		}
 	case *core.BindingData_Promise:
-		if _, ok := flatMap[binding.GetPromise().NodeId]; !ok {
-			flatMap[binding.GetPromise().NodeId] = sets.String{}
+		if _, ok := flatMap[binding.GetPromise().GetNodeId()]; !ok {
+			flatMap[binding.GetPromise().GetNodeId()] = sets.String{}
 		}
 
-		flatMap[binding.GetPromise().NodeId].Insert(binding.GetPromise().GetVar())
+		flatMap[binding.GetPromise().GetNodeId()].Insert(binding.GetPromise().GetVar())
 	case *core.BindingData_Scalar:
 		if _, ok := flatMap[staticNodeID]; !ok {
 			flatMap[staticNodeID] = sets.NewString()
@@ -142,11 +142,11 @@ func WorkflowToGraphViz(g *v1alpha1.FlyteWorkflow) string {
 
 func ToGraphViz(g *core.CompiledWorkflow) string {
 	res := fmt.Sprintf("digraph G {rankdir=TB;workflow[label=\"Workflow Id: %v\"];node[style=filled];",
-		g.Template.GetId())
+		g.GetTemplate().GetId())
 
 	nodeFinder := func(nodeId common.NodeID) *core.Node {
-		for _, n := range g.Template.Nodes {
-			if n.Id == nodeId {
+		for _, n := range g.GetTemplate().GetNodes() {
+			if n.GetId() == nodeId {
 				return n
 			}
 		}
@@ -204,9 +204,9 @@ func ToGraphViz(g *core.CompiledWorkflow) string {
 		node := nodesToVisit.Deque()
 		nodes, found := g.GetConnections().GetDownstream()[node]
 		if found {
-			nodesToVisit.Enqueue(nodes.Ids...)
+			nodesToVisit.Enqueue(nodes.GetIds()...)
 
-			for _, child := range nodes.Ids {
+			for _, child := range nodes.GetIds() {
 				label := edgeLabel(node, child)
 				edge := fmt.Sprintf("\"%v\" -> \"%v\" [label=\"%v\",style=\"%v\"];",
 					nodeLabel(node),

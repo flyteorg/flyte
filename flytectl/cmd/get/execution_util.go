@@ -43,7 +43,7 @@ func WriteExecConfigToFile(executionConfig ExecutionConfig, fileName string) err
 
 func CreateAndWriteExecConfigForTask(task *admin.Task, fileName string) error {
 	var err error
-	executionConfig := ExecutionConfig{Task: task.Id.Name, Version: task.Id.Version}
+	executionConfig := ExecutionConfig{Task: task.GetId().GetName(), Version: task.GetId().GetVersion()}
 	if executionConfig.Inputs, err = ParamMapForTask(task); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func CreateAndWriteExecConfigForTask(task *admin.Task, fileName string) error {
 
 func CreateAndWriteExecConfigForWorkflow(wlp *admin.LaunchPlan, fileName string) error {
 	var err error
-	executionConfig := ExecutionConfig{Workflow: wlp.Id.Name, Version: wlp.Id.Version}
+	executionConfig := ExecutionConfig{Workflow: wlp.GetId().GetName(), Version: wlp.GetId().GetVersion()}
 	if executionConfig.Inputs, err = ParamMapForWorkflow(wlp); err != nil {
 		return err
 	}
@@ -61,31 +61,31 @@ func CreateAndWriteExecConfigForWorkflow(wlp *admin.LaunchPlan, fileName string)
 
 func TaskInputs(task *admin.Task) map[string]*core.Variable {
 	taskInputs := map[string]*core.Variable{}
-	if task == nil || task.Closure == nil {
+	if task == nil || task.GetClosure() == nil {
 		return taskInputs
 	}
-	if task.Closure.CompiledTask == nil {
+	if task.GetClosure().GetCompiledTask() == nil {
 		return taskInputs
 	}
-	if task.Closure.CompiledTask.Template == nil {
+	if task.GetClosure().GetCompiledTask().GetTemplate() == nil {
 		return taskInputs
 	}
-	if task.Closure.CompiledTask.Template.Interface == nil {
+	if task.GetClosure().GetCompiledTask().GetTemplate().GetInterface() == nil {
 		return taskInputs
 	}
-	if task.Closure.CompiledTask.Template.Interface.Inputs == nil {
+	if task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs() == nil {
 		return taskInputs
 	}
-	return task.Closure.CompiledTask.Template.Interface.Inputs.Variables
+	return task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs().GetVariables()
 }
 
 func ParamMapForTask(task *admin.Task) (map[string]yaml.Node, error) {
 	taskInputs := TaskInputs(task)
 	paramMap := make(map[string]yaml.Node, len(taskInputs))
 	for k, v := range taskInputs {
-		varTypeValue, err := coreutils.MakeDefaultLiteralForType(v.Type)
+		varTypeValue, err := coreutils.MakeDefaultLiteralForType(v.GetType())
 		if err != nil {
-			fmt.Println("error creating default value for literal type ", v.Type)
+			fmt.Println("error creating default value for literal type ", v.GetType())
 			return nil, err
 		}
 		var nativeLiteral interface{}
@@ -93,11 +93,11 @@ func ParamMapForTask(task *admin.Task) (map[string]yaml.Node, error) {
 			return nil, err
 		}
 
-		if k == v.Description {
+		if k == v.GetDescription() {
 			// a: # a isn't very helpful
 			paramMap[k], err = getCommentedYamlNode(nativeLiteral, "")
 		} else {
-			paramMap[k], err = getCommentedYamlNode(nativeLiteral, v.Description)
+			paramMap[k], err = getCommentedYamlNode(nativeLiteral, v.GetDescription())
 		}
 		if err != nil {
 			return nil, err
@@ -108,22 +108,22 @@ func ParamMapForTask(task *admin.Task) (map[string]yaml.Node, error) {
 
 func WorkflowParams(lp *admin.LaunchPlan) map[string]*core.Parameter {
 	workflowParams := map[string]*core.Parameter{}
-	if lp == nil || lp.Spec == nil {
+	if lp == nil || lp.GetSpec() == nil {
 		return workflowParams
 	}
-	if lp.Spec.DefaultInputs == nil {
+	if lp.GetSpec().GetDefaultInputs() == nil {
 		return workflowParams
 	}
-	return lp.Spec.DefaultInputs.Parameters
+	return lp.GetSpec().GetDefaultInputs().GetParameters()
 }
 
 func ParamMapForWorkflow(lp *admin.LaunchPlan) (map[string]yaml.Node, error) {
 	workflowParams := WorkflowParams(lp)
 	paramMap := make(map[string]yaml.Node, len(workflowParams))
 	for k, v := range workflowParams {
-		varTypeValue, err := coreutils.MakeDefaultLiteralForType(v.Var.Type)
+		varTypeValue, err := coreutils.MakeDefaultLiteralForType(v.GetVar().GetType())
 		if err != nil {
-			fmt.Println("error creating default value for literal type ", v.Var.Type)
+			fmt.Println("error creating default value for literal type ", v.GetVar().GetType())
 			return nil, err
 		}
 		var nativeLiteral interface{}
@@ -131,16 +131,16 @@ func ParamMapForWorkflow(lp *admin.LaunchPlan) (map[string]yaml.Node, error) {
 			return nil, err
 		}
 		// Override if there is a default value
-		if paramsDefault, ok := v.Behavior.(*core.Parameter_Default); ok {
+		if paramsDefault, ok := v.GetBehavior().(*core.Parameter_Default); ok {
 			if nativeLiteral, err = coreutils.ExtractFromLiteral(paramsDefault.Default); err != nil {
 				return nil, err
 			}
 		}
-		if k == v.Var.Description {
+		if k == v.GetVar().GetDescription() {
 			// a: # a isn't very helpful
 			paramMap[k], err = getCommentedYamlNode(nativeLiteral, "")
 		} else {
-			paramMap[k], err = getCommentedYamlNode(nativeLiteral, v.Var.Description)
+			paramMap[k], err = getCommentedYamlNode(nativeLiteral, v.GetVar().GetDescription())
 		}
 
 		if err != nil {

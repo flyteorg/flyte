@@ -82,7 +82,7 @@ func TestCreateSignalModel(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			signalModel, err := CreateSignalModel(test.proto.Id, test.proto.Type, test.proto.Value)
+			signalModel, err := CreateSignalModel(test.proto.GetId(), test.proto.GetType(), test.proto.GetValue())
 			assert.NoError(t, err)
 
 			assert.Equal(t, test.model, signalModel)

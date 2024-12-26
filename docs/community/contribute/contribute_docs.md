@@ -82,14 +82,14 @@ The following are some tips to include various content:
 * **Source code references (Embedded format)** <br>
 	`.rst` example:
 	```{code-block}
-  .. rli:: https://raw.githubusercontent.com/flyteorg/<source repo name>/<git sha>/<target file path>
+  .. literalinclude:: /examples/<target file path>
 		:lines: <from line>-<to line>
 	```
 
 	`.md` example:
 	````{code-block}
-	```{rli} https://raw.githubusercontent.com/flyteorg/<source repo name>/<git sha>/<target file path>
-		lines: <from line>-<to line>
+	```{literalinclude} /examples/<target file path>
+		:lines: <from line>-<to line>
 	```
 	````
 

@@ -50,11 +50,11 @@ func getTestTags() []models.Tag {
 func getDatasetModel() models.Dataset {
 	return models.Dataset{
 		DatasetKey: models.DatasetKey{
-			Project: datasetID.Project,
-			Domain:  datasetID.Domain,
-			Name:    datasetID.Name,
-			Version: datasetID.Version,
-			UUID:    datasetID.UUID,
+			Project: datasetID.GetProject(),
+			Domain:  datasetID.GetDomain(),
+			Name:    datasetID.GetName(),
+			Version: datasetID.GetVersion(),
+			UUID:    datasetID.GetUUID(),
 		},
 	}
 }
@@ -81,11 +81,11 @@ func TestCreateArtifactModel(t *testing.T) {
 
 	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData, getDatasetModel())
 	assert.NoError(t, err)
-	assert.Equal(t, artifactModel.ArtifactID, createArtifactRequest.Artifact.Id)
-	assert.Equal(t, artifactModel.ArtifactKey.DatasetProject, datasetID.Project)
-	assert.Equal(t, artifactModel.ArtifactKey.DatasetDomain, datasetID.Domain)
-	assert.Equal(t, artifactModel.ArtifactKey.DatasetName, datasetID.Name)
-	assert.Equal(t, artifactModel.ArtifactKey.DatasetVersion, datasetID.Version)
+	assert.Equal(t, artifactModel.ArtifactID, createArtifactRequest.GetArtifact().GetId())
+	assert.Equal(t, artifactModel.ArtifactKey.DatasetProject, datasetID.GetProject())
+	assert.Equal(t, artifactModel.ArtifactKey.DatasetDomain, datasetID.GetDomain())
+	assert.Equal(t, artifactModel.ArtifactKey.DatasetName, datasetID.GetName())
+	assert.Equal(t, artifactModel.ArtifactKey.DatasetVersion, datasetID.GetVersion())
 	assert.EqualValues(t, testArtifactData, artifactModel.ArtifactData)
 	assert.EqualValues(t, getTestPartitions(), artifactModel.Partitions)
 }
@@ -130,32 +130,32 @@ func TestFromArtifactModel(t *testing.T) {
 
 	actual, err := FromArtifactModel(artifactModel)
 	assert.NoError(t, err)
-	assert.Equal(t, artifactModel.ArtifactID, actual.Id)
-	assert.Equal(t, artifactModel.DatasetProject, actual.Dataset.Project)
-	assert.Equal(t, artifactModel.DatasetDomain, actual.Dataset.Domain)
-	assert.Equal(t, artifactModel.DatasetName, actual.Dataset.Name)
-	assert.Equal(t, artifactModel.DatasetVersion, actual.Dataset.Version)
+	assert.Equal(t, artifactModel.ArtifactID, actual.GetId())
+	assert.Equal(t, artifactModel.DatasetProject, actual.GetDataset().GetProject())
+	assert.Equal(t, artifactModel.DatasetDomain, actual.GetDataset().GetDomain())
+	assert.Equal(t, artifactModel.DatasetName, actual.GetDataset().GetName())
+	assert.Equal(t, artifactModel.DatasetVersion, actual.GetDataset().GetVersion())
 
-	assert.Len(t, actual.Partitions, 2)
-	assert.EqualValues(t, artifactModel.Partitions[0].Key, actual.Partitions[0].Key)
-	assert.EqualValues(t, artifactModel.Partitions[0].Value, actual.Partitions[0].Value)
-	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.Partitions[1].Value)
-	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.Partitions[1].Value)
+	assert.Len(t, actual.GetPartitions(), 2)
+	assert.EqualValues(t, artifactModel.Partitions[0].Key, actual.GetPartitions()[0].GetKey())
+	assert.EqualValues(t, artifactModel.Partitions[0].Value, actual.GetPartitions()[0].GetValue())
+	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.GetPartitions()[1].GetValue())
+	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.GetPartitions()[1].GetValue())
 
-	assert.Len(t, actual.Tags, 1)
-	assert.EqualValues(t, artifactModel.Tags[0].TagName, actual.Tags[0].Name)
+	assert.Len(t, actual.GetTags(), 1)
+	assert.EqualValues(t, artifactModel.Tags[0].TagName, actual.GetTags()[0].GetName())
 
 	timestampProto, err := ptypes.TimestampProto(createdAt)
 	assert.NoError(t, err)
-	assert.Equal(t, actual.CreatedAt, timestampProto)
+	assert.Equal(t, actual.GetCreatedAt(), timestampProto)
 }
 
 func TestToArtifactKey(t *testing.T) {
 	artifactKey := ToArtifactKey(datasetID, "artifactID-1")
-	assert.Equal(t, datasetID.Project, artifactKey.DatasetProject)
-	assert.Equal(t, datasetID.Domain, artifactKey.DatasetDomain)
-	assert.Equal(t, datasetID.Name, artifactKey.DatasetName)
-	assert.Equal(t, datasetID.Version, artifactKey.DatasetVersion)
+	assert.Equal(t, datasetID.GetProject(), artifactKey.DatasetProject)
+	assert.Equal(t, datasetID.GetDomain(), artifactKey.DatasetDomain)
+	assert.Equal(t, datasetID.GetName(), artifactKey.DatasetName)
+	assert.Equal(t, datasetID.GetVersion(), artifactKey.DatasetVersion)
 	assert.Equal(t, artifactKey.ArtifactID, "artifactID-1")
 }
 

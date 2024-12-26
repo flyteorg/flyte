@@ -41,13 +41,13 @@ type LaunchPlanManager struct {
 }
 
 func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
-	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
-	return contextutils.WithLaunchPlanID(ctx, identifier.Name)
+	ctx = contextutils.WithProjectDomain(ctx, identifier.GetProject(), identifier.GetDomain())
+	return contextutils.WithLaunchPlanID(ctx, identifier.GetName())
 }
 
 func (m *LaunchPlanManager) getNamedEntityContext(ctx context.Context, identifier *admin.NamedEntityIdentifier) context.Context {
-	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
-	return contextutils.WithLaunchPlanID(ctx, identifier.Name)
+	ctx = contextutils.WithProjectDomain(ctx, identifier.GetProject(), identifier.GetDomain())
+	return contextutils.WithLaunchPlanID(ctx, identifier.GetName())
 }
 
 func (m *LaunchPlanManager) CreateLaunchPlan(
@@ -57,35 +57,35 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		logger.Debugf(ctx, "Failed to validate provided workflow ID for CreateLaunchPlan with err: %v", err)
 		return nil, err
 	}
-	workflowModel, err := util.GetWorkflowModel(ctx, m.db, request.Spec.WorkflowId)
+	workflowModel, err := util.GetWorkflowModel(ctx, m.db, request.GetSpec().GetWorkflowId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id [%+v] for CreateLaunchPlan with id [%+v] with err %v",
-			request.Spec.WorkflowId, request.Id)
+			request.GetSpec().GetWorkflowId(), request.GetId())
 		return nil, err
 	}
 	var workflowInterface core.TypedInterface
-	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
+	if len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
 			logger.Errorf(ctx,
 				"Failed to unmarshal TypedInterface for workflow [%+v] with err: %v",
-				request.Spec.WorkflowId, err)
+				request.GetSpec().GetWorkflowId(), err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal workflow inputs")
 		}
 	}
 	if err := validation.ValidateLaunchPlan(ctx, request, m.db, m.config.ApplicationConfiguration(), &workflowInterface); err != nil {
-		logger.Debugf(ctx, "could not create launch plan: %+v, request failed validation with err: %v", request.Id, err)
+		logger.Debugf(ctx, "could not create launch plan: %+v, request failed validation with err: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = getLaunchPlanContext(ctx, request.Id)
-	launchPlan := transformers.CreateLaunchPlan(request, workflowInterface.Outputs)
+	ctx = getLaunchPlanContext(ctx, request.GetId())
+	launchPlan := transformers.CreateLaunchPlan(request, workflowInterface.GetOutputs())
 	launchPlanDigest, err := util.GetLaunchPlanDigest(ctx, launchPlan)
 	if err != nil {
-		logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.Id, err)
+		logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.GetId(), err)
 		return nil, err
 	}
 
-	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Id)
+	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.GetId())
 	if err == nil {
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
 			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, request)
@@ -96,7 +96,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 			return nil, transformerErr
 		}
 		// A launch plan exists with different structure
-		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, request, existingLaunchPlan.Spec, launchPlan.Spec)
+		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, request, existingLaunchPlan.GetSpec(), launchPlan.GetSpec())
 	}
 
 	launchPlanModel, err :=
@@ -104,12 +104,12 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	if err != nil {
 		logger.Errorf(ctx,
 			"Failed to transform launch plan model [%+v], and workflow outputs [%+v] with err: %v",
-			request, workflowInterface.Outputs, err)
+			request, workflowInterface.GetOutputs(), err)
 		return nil, err
 	}
 	err = m.db.LaunchPlanRepo().Create(ctx, launchPlanModel)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to save launch plan model %+v with err: %v", request.Id, err)
+		logger.Errorf(ctx, "Failed to save launch plan model %+v with err: %v", request.GetId(), err)
 		return nil, err
 	}
 	m.metrics.SpecSizeBytes.Observe(float64(len(launchPlanModel.Spec)))
@@ -143,7 +143,7 @@ func isScheduleEmpty(launchPlanSpec *admin.LaunchPlanSpec) bool {
 	if schedule == nil {
 		return true
 	}
-	if schedule.GetCronSchedule() != nil && len(schedule.GetCronSchedule().Schedule) != 0 {
+	if schedule.GetCronSchedule() != nil && len(schedule.GetCronSchedule().GetSchedule()) != 0 {
 		return false
 	}
 	if len(schedule.GetCronExpression()) != 0 {
@@ -160,7 +160,7 @@ func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdenti
 
 	addScheduleInput, err := m.scheduler.CreateScheduleInput(ctx,
 		m.config.ApplicationConfiguration().GetSchedulerConfig(), launchPlanIdentifier,
-		launchPlanSpec.EntityMetadata.Schedule)
+		launchPlanSpec.GetEntityMetadata().GetSchedule())
 	if err != nil {
 		return err
 	}
@@ -223,30 +223,30 @@ func (m *LaunchPlanManager) updateSchedules(
 
 func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
-	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
-		logger.Debugf(ctx, "can't disable launch plan [%+v] with invalid identifier: %v", request.Id, err)
+	if err := validation.ValidateIdentifier(request.GetId(), common.LaunchPlan); err != nil {
+		logger.Debugf(ctx, "can't disable launch plan [%+v] with invalid identifier: %v", request.GetId(), err)
 		return nil, err
 	}
-	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Id)
+	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.GetId())
 	if err != nil {
-		logger.Debugf(ctx, "couldn't find launch plan [%+v] to disable with err: %v", request.Id, err)
+		logger.Debugf(ctx, "couldn't find launch plan [%+v] to disable with err: %v", request.GetId(), err)
 		return nil, err
 	}
 
 	err = m.updateLaunchPlanModelState(&launchPlanModel, admin.LaunchPlanState_INACTIVE)
 	if err != nil {
-		logger.Debugf(ctx, "failed to disable launch plan [%+v] with err: %v", request.Id, err)
+		logger.Debugf(ctx, "failed to disable launch plan [%+v] with err: %v", request.GetId(), err)
 		return nil, err
 	}
 
 	var launchPlanSpec admin.LaunchPlanSpec
 	err = proto.Unmarshal(launchPlanModel.Spec, &launchPlanSpec)
 	if err != nil {
-		logger.Errorf(ctx, "failed to unmarshal launch plan spec when disabling schedule for %+v", request.Id)
+		logger.Errorf(ctx, "failed to unmarshal launch plan spec when disabling schedule for %+v", request.GetId())
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"failed to unmarshal launch plan spec when disabling schedule for %+v", request.Id)
+			"failed to unmarshal launch plan spec when disabling schedule for %+v", request.GetId())
 	}
-	if launchPlanSpec.EntityMetadata != nil && launchPlanSpec.EntityMetadata.Schedule != nil {
+	if launchPlanSpec.GetEntityMetadata() != nil && launchPlanSpec.GetEntityMetadata().GetSchedule() != nil {
 		err = m.disableSchedule(ctx, &core.Identifier{
 			Project: launchPlanModel.Project,
 			Domain:  launchPlanModel.Domain,
@@ -259,23 +259,23 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request *admi
 	}
 	err = m.db.LaunchPlanRepo().Update(ctx, launchPlanModel)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to update launchPlanModel with ID [%+v] with err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to update launchPlanModel with ID [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
-	logger.Debugf(ctx, "disabled launch plan: [%+v]", request.Id)
+	logger.Debugf(ctx, "disabled launch plan: [%+v]", request.GetId())
 	return &admin.LaunchPlanUpdateResponse{}, nil
 }
 
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Id.Name,
-		Version: request.Id.Version,
+		Project: request.GetId().GetProject(),
+		Domain:  request.GetId().GetDomain(),
+		Name:    request.GetId().GetName(),
+		Version: request.GetId().GetVersion(),
 	})
 	if err != nil {
-		logger.Debugf(ctx, "Failed to find launch plan to enable with id [%+v] and err %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to find launch plan to enable with id [%+v] and err %v", request.GetId(), err)
 		return nil, err
 	}
 	// Set desired launch plan version to active:
@@ -298,13 +298,12 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin
 		// Not found is fine, there isn't always a guaranteed active launch plan model.
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
 			logger.Infof(ctx, "Failed to search for an active launch plan model with project: %s, domain: %s, name: %s and err %v",
-				request.Id.Project, request.Id.Domain, request.Id.Name, err)
+				request.GetId().GetProject(), request.GetId().GetDomain(), request.GetId().GetName(), err)
 			return nil, err
 		}
 		logger.Debugf(ctx, "No active launch plan model found to disable with project: %s, domain: %s, name: %s",
-			request.Id.Project, request.Id.Domain, request.Id.Name)
-	} else if formerlyActiveLaunchPlanModelOutput.LaunchPlans != nil &&
-		len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
+			request.GetId().GetProject(), request.GetId().GetDomain(), request.GetId().GetName())
+	} else if len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
 		formerlyActiveLaunchPlanModel = &formerlyActiveLaunchPlanModelOutput.LaunchPlans[0]
 		err = m.updateLaunchPlanModelState(formerlyActiveLaunchPlanModel, admin.LaunchPlanState_INACTIVE)
 		if err != nil {
@@ -322,7 +321,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin
 	err = m.db.LaunchPlanRepo().SetActive(ctx, newlyActiveLaunchPlanModel, formerlyActiveLaunchPlanModel)
 	if err != nil {
 		logger.Debugf(ctx,
-			"Failed to set launchPlanModel with ID [%+v] to active with err %v", request.Id, err)
+			"Failed to set launchPlanModel with ID [%+v] to active with err %v", request.GetId(), err)
 		return nil, err
 	}
 	return &admin.LaunchPlanUpdateResponse{}, nil
@@ -331,11 +330,11 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin
 
 func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
-	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
-		logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.Id, err)
+	if err := validation.ValidateIdentifier(request.GetId(), common.LaunchPlan); err != nil {
+		logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.GetId(), err)
 	}
-	ctx = getLaunchPlanContext(ctx, request.Id)
-	switch request.State {
+	ctx = getLaunchPlanContext(ctx, request.GetId())
+	switch request.GetState() {
 	case admin.LaunchPlanState_INACTIVE:
 		return m.disableLaunchPlan(ctx, request)
 	case admin.LaunchPlanState_ACTIVE:
@@ -343,29 +342,29 @@ func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request *admin
 	default:
 		return nil, errors.NewFlyteAdminErrorf(
 			codes.InvalidArgument, "Unrecognized launch plan state %v for update for launch plan [%+v]",
-			request.State, request.Id)
+			request.GetState(), request.GetId())
 	}
 }
 
 func (m *LaunchPlanManager) GetLaunchPlan(ctx context.Context, request *admin.ObjectGetRequest) (
 	*admin.LaunchPlan, error) {
-	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
-		logger.Debugf(ctx, "can't get launch plan [%+v] with invalid identifier: %v", request.Id, err)
+	if err := validation.ValidateIdentifier(request.GetId(), common.LaunchPlan); err != nil {
+		logger.Debugf(ctx, "can't get launch plan [%+v] with invalid identifier: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = getLaunchPlanContext(ctx, request.Id)
-	return util.GetLaunchPlan(ctx, m.db, request.Id)
+	ctx = getLaunchPlanContext(ctx, request.GetId())
+	return util.GetLaunchPlan(ctx, m.db, request.GetId())
 }
 
 func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request *admin.ActiveLaunchPlanRequest) (
 	*admin.LaunchPlan, error) {
 	if err := validation.ValidateActiveLaunchPlanRequest(request); err != nil {
-		logger.Debugf(ctx, "can't get active launch plan [%+v] with invalid request: %v", request.Id, err)
+		logger.Debugf(ctx, "can't get active launch plan [%+v] with invalid request: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = m.getNamedEntityContext(ctx, request.Id)
+	ctx = m.getNamedEntityContext(ctx, request.GetId())
 
-	filters, err := util.GetActiveLaunchPlanVersionFilters(request.Id.Project, request.Id.Domain, request.Id.Name)
+	filters, err := util.GetActiveLaunchPlanVersionFilters(request.GetId().GetProject(), request.GetId().GetDomain(), request.GetId().GetName())
 	if err != nil {
 		return nil, err
 	}
@@ -383,7 +382,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request *ad
 	}
 
 	if len(output.LaunchPlans) != 1 {
-		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "No active launch plan could be found: %s:%s:%s", request.Id.Project, request.Id.Domain, request.Id.Name)
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "No active launch plan could be found: %s:%s:%s", request.GetId().GetProject(), request.GetId().GetDomain(), request.GetId().GetName())
 	}
 
 	return transformers.FromLaunchPlanModel(output.LaunchPlans[0])
@@ -397,30 +396,30 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request *admin.
 		logger.Debugf(ctx, "")
 		return nil, err
 	}
-	ctx = m.getNamedEntityContext(ctx, request.Id)
+	ctx = m.getNamedEntityContext(ctx, request.GetId())
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
+		Project:        request.GetId().GetProject(),
+		Domain:         request.GetId().GetDomain(),
+		Name:           request.GetId().GetName(),
+		RequestFilters: request.GetFilters(),
 	}, common.LaunchPlan)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.LaunchPlanColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListLaunchPlans", request.Token)
+			"invalid pagination token %s for ListLaunchPlans", request.GetToken())
 	}
 	listLaunchPlansInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -438,7 +437,7 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request *admin.
 		return nil, err
 	}
 	var token string
-	if len(output.LaunchPlans) == int(request.Limit) {
+	if len(output.LaunchPlans) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.LaunchPlans))
 	}
 	return &admin.LaunchPlanList{
@@ -455,25 +454,25 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request *
 		logger.Debugf(ctx, "")
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetProject(), request.GetDomain())
 
-	filters, err := util.ListActiveLaunchPlanVersionsFilters(request.Project, request.Domain)
+	filters, err := util.ListActiveLaunchPlanVersionsFilters(request.GetProject(), request.GetDomain())
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.LaunchPlanColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListActiveLaunchPlans", request.Token)
+			"invalid pagination token %s for ListActiveLaunchPlans", request.GetToken())
 	}
 	listLaunchPlansInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -491,7 +490,7 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request *
 		return nil, err
 	}
 	var token string
-	if len(output.LaunchPlans) == int(request.Limit) {
+	if len(output.LaunchPlans) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.LaunchPlans))
 	}
 	return &admin.LaunchPlanList{
@@ -503,26 +502,26 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request *
 // At least project name and domain must be specified along with limit.
 func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
-	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetProject(), request.GetDomain())
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project: request.Project,
-		Domain:  request.Domain,
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
 	}, common.LaunchPlan)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.LaunchPlanColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.LaunchPlanColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid pagination token %s", request.Token)
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid pagination token %s", request.GetToken())
 	}
 	listLaunchPlansInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
+		Limit:         int(request.GetLimit()),
 		Offset:        offset,
 		InlineFilters: filters,
 		SortParameter: sortParameter,
@@ -535,7 +534,7 @@ func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request *admi
 		return nil, err
 	}
 	var token string
-	if len(output.LaunchPlans) == int(request.Limit) {
+	if len(output.LaunchPlans) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(output.LaunchPlans))
 	}
 	return &admin.NamedEntityIdentifierList{

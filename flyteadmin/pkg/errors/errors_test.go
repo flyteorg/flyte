@@ -284,7 +284,7 @@ func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
 		Id: &identifier,
 	}
 
-	statusErr := NewLaunchPlanExistsDifferentStructureError(context.Background(), req, oldLaunchPlan.Spec, newLaunchPlan.Spec)
+	statusErr := NewLaunchPlanExistsDifferentStructureError(context.Background(), req, oldLaunchPlan.GetSpec(), newLaunchPlan.GetSpec())
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
@@ -325,5 +325,5 @@ func TestNewInactiveProjectError(t *testing.T) {
 	details, ok := statusErr.Details()[0].(*admin.InactiveProject)
 
 	assert.True(t, ok)
-	assert.Equal(t, identifier.GetProject(), details.Id)
+	assert.Equal(t, identifier.GetProject(), details.GetId())
 }

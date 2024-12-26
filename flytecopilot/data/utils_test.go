@@ -3,7 +3,6 @@ package data
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -19,7 +18,7 @@ func TestIsFileReadable(t *testing.T) {
 	tmpFolderLocation := ""
 	tmpPrefix := "util_test"
 
-	tmpDir, err := ioutil.TempDir(tmpFolderLocation, tmpPrefix)
+	tmpDir, err := os.MkdirTemp(tmpFolderLocation, tmpPrefix)
 	assert.NoError(t, err)
 	defer func() {
 		assert.NoError(t, os.RemoveAll(tmpDir))
@@ -30,7 +29,7 @@ func TestIsFileReadable(t *testing.T) {
 	assert.Empty(t, f)
 	assert.Nil(t, i)
 
-	assert.NoError(t, ioutil.WriteFile(p, []byte("data"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(p, []byte("data"), os.ModePerm)) // #nosec G306
 	f, i, err = IsFileReadable(p, false)
 	assert.NoError(t, err)
 	assert.Equal(t, p, f)
@@ -42,7 +41,7 @@ func TestIsFileReadable(t *testing.T) {
 	_, _, err = IsFileReadable(noExt, false)
 	assert.Error(t, err)
 
-	assert.NoError(t, ioutil.WriteFile(p, []byte("data"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(p, []byte("data"), os.ModePerm)) // #nosec G306
 	_, _, err = IsFileReadable(noExt, false)
 	assert.Error(t, err)
 
@@ -57,7 +56,7 @@ func TestUploadFile(t *testing.T) {
 	tmpFolderLocation := ""
 	tmpPrefix := "util_test"
 
-	tmpDir, err := ioutil.TempDir(tmpFolderLocation, tmpPrefix)
+	tmpDir, err := os.MkdirTemp(tmpFolderLocation, tmpPrefix)
 	assert.NoError(t, err)
 	defer func() {
 		assert.NoError(t, os.RemoveAll(tmpDir))
@@ -66,7 +65,7 @@ func TestUploadFile(t *testing.T) {
 	exist := path.Join(tmpDir, "exist-file")
 	data := []byte("data")
 	l := int64(len(data))
-	assert.NoError(t, ioutil.WriteFile(exist, data, os.ModePerm))
+	assert.NoError(t, os.WriteFile(exist, data, os.ModePerm)) // #nosec G306
 	nonExist := path.Join(tmpDir, "non-exist-file")
 
 	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())

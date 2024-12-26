@@ -29,6 +29,7 @@ message NamedEntityIdentifier {
 
 // The status of the named entity is used to control its visibility in the UI.
 enum NamedEntityState {
+    reserved 3, 4;
     // By default, all named entities are considered active and under development.
     NAMED_ENTITY_ACTIVE = 0;
 

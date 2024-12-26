@@ -14,15 +14,13 @@ import (
 func TestSandboxStatus(t *testing.T) {
 	t.Run("Sandbox status with zero result", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 		mockDocker.OnContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		err := PrintStatus(s.Ctx, mockDocker)
 		assert.Nil(t, err)
 	})
 	t.Run("Sandbox status with running sandbox", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 		ctx := s.Ctx
 		mockDocker := &mocks.Docker{}
 		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{

@@ -20,10 +20,10 @@ func TestSandboxProcessor_StartProcessingSuccess(t *testing.T) {
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 
 	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
-		assert.Equal(t, testEmail.Body, email.Body)
-		assert.Equal(t, testEmail.RecipientsEmail, email.RecipientsEmail)
-		assert.Equal(t, testEmail.SubjectLine, email.SubjectLine)
-		assert.Equal(t, testEmail.SenderEmail, email.SenderEmail)
+		assert.Equal(t, testEmail.GetBody(), email.GetBody())
+		assert.Equal(t, testEmail.GetRecipientsEmail(), email.GetRecipientsEmail())
+		assert.Equal(t, testEmail.GetSubjectLine(), email.GetSubjectLine())
+		assert.Equal(t, testEmail.GetSenderEmail(), email.GetSenderEmail())
 		return nil
 	}
 

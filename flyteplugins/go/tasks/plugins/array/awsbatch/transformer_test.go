@@ -198,7 +198,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	batchInput, err := FlyteTaskToBatchInput(ctx, taskCtx, "", &config.Config{})
 	assert.NoError(t, err)
 
-	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.Size)
+	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.GetSize())
 	assert.NotNil(t, batchInput)
 	assert.Equal(t, *expectedBatchInput, *batchInput)
 

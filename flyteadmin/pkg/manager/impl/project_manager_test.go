@@ -70,11 +70,11 @@ func testListProjects(request *admin.ProjectListRequest, token string, orderExpr
 	resp, err := projectManager.ListProjects(context.Background(), request)
 	assert.NoError(t, err)
 
-	assert.Len(t, resp.Projects, 1)
+	assert.Len(t, resp.GetProjects(), 1)
 	assert.Equal(t, token, resp.GetToken())
-	assert.Len(t, resp.Projects[0].Domains, 4)
-	for _, domain := range resp.Projects[0].Domains {
-		assert.Contains(t, testDomainsForProjManager, domain.Id)
+	assert.Len(t, resp.GetProjects()[0].GetDomains(), 4)
+	for _, domain := range resp.GetProjects()[0].GetDomains() {
+		assert.Contains(t, testDomainsForProjManager, domain.GetId())
 	}
 }
 
@@ -300,10 +300,10 @@ func TestProjectManager_TestGetProject(t *testing.T) {
 	resp, _ := projectManager.GetProject(context.Background(),
 		mockedProject)
 
-	assert.Equal(t, mockedProject.Id, resp.Id)
-	assert.Equal(t, "a-mocked-project", resp.Name)
-	assert.Equal(t, "A mocked project", resp.Description)
-	assert.Equal(t, admin.Project_ProjectState(0), resp.State)
+	assert.Equal(t, mockedProject.GetId(), resp.GetId())
+	assert.Equal(t, "a-mocked-project", resp.GetName())
+	assert.Equal(t, "A mocked project", resp.GetDescription())
+	assert.Equal(t, admin.Project_ProjectState(0), resp.GetState())
 }
 
 func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {

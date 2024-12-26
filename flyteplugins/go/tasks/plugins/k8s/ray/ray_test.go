@@ -2,18 +2,19 @@ package ray
 
 import (
 	"context"
+	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -26,7 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
@@ -148,7 +149,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
 	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
 	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
@@ -279,9 +280,10 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 
 func TestBuildResourceRayExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		GpuDeviceNodeLabel:        "gpu-node-label",
-		GpuPartitionSizeNodeLabel: "gpu-partition-size",
-		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
 	}))
 
 	params := []struct {
@@ -321,6 +323,11 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-t4",
 					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
@@ -374,6 +381,11 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 					Operator: corev1.TolerationOpEqual,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
 			},
 		},
 	}
@@ -415,6 +427,123 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 				p.expectedTol,
 				workerNodeSpec.Tolerations,
 			)
+		})
+	}
+}
+
+func TestBuildResourceRayCustomK8SPod(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	headResourceEntries := []*core.Resources_ResourceEntry{
+		{Name: core.Resources_CPU, Value: "10"},
+		{Name: core.Resources_MEMORY, Value: "10Gi"},
+		{Name: core.Resources_GPU, Value: "10"},
+	}
+	headResources := &core.Resources{Requests: headResourceEntries, Limits: headResourceEntries}
+
+	expectedHeadResources, err := flytek8s.ToK8sResourceRequirements(headResources)
+	require.NoError(t, err)
+
+	workerResourceEntries := []*core.Resources_ResourceEntry{
+		{Name: core.Resources_CPU, Value: "20"},
+		{Name: core.Resources_MEMORY, Value: "20Gi"},
+		{Name: core.Resources_GPU, Value: "20"},
+	}
+	workerResources := &core.Resources{Requests: workerResourceEntries, Limits: workerResourceEntries}
+
+	expectedWorkerResources, err := flytek8s.ToK8sResourceRequirements(workerResources)
+	require.NoError(t, err)
+
+	headPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-head",
+				Resources: *expectedHeadResources,
+			},
+		},
+	}
+	workerPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:      "ray-worker",
+				Resources: *expectedWorkerResources,
+			},
+		},
+	}
+
+	params := []struct {
+		name                       string
+		taskResources              *corev1.ResourceRequirements
+		headK8SPod                 *core.K8SPod
+		workerK8SPod               *core.K8SPod
+		expectedSubmitterResources *corev1.ResourceRequirements
+		expectedHeadResources      *corev1.ResourceRequirements
+		expectedWorkerResources    *corev1.ResourceRequirements
+	}{
+		{
+			name:                       "task resources",
+			taskResources:              resourceRequirements,
+			expectedSubmitterResources: resourceRequirements,
+			expectedHeadResources:      resourceRequirements,
+			expectedWorkerResources:    resourceRequirements,
+		},
+		{
+			name:          "custom worker and head resources",
+			taskResources: resourceRequirements,
+			headK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, headPodSpec),
+			},
+			workerK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, workerPodSpec),
+			},
+			expectedSubmitterResources: resourceRequirements,
+			expectedHeadResources:      expectedHeadResources,
+			expectedWorkerResources:    expectedWorkerResources,
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			rayJobInput := dummyRayCustomObj()
+
+			if p.headK8SPod != nil {
+				rayJobInput.RayCluster.HeadGroupSpec.K8SPod = p.headK8SPod
+			}
+
+			if p.workerK8SPod != nil {
+				for _, spec := range rayJobInput.GetRayCluster().GetWorkerGroupSpec() {
+					spec.K8SPod = p.workerK8SPod
+				}
+			}
+
+			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
+			taskContext := dummyRayTaskContext(taskTemplate, p.taskResources, nil, "", serviceAccount)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1.RayJob)
+			assert.True(t, ok)
+
+			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
+			assert.EqualValues(t,
+				p.expectedSubmitterResources,
+				&submitterPodResources,
+			)
+
+			headPodResources := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers[0].Resources
+			assert.EqualValues(t,
+				p.expectedHeadResources,
+				&headPodResources,
+			)
+
+			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
+				workerPodResources := workerGroupSpec.Template.Spec.Containers[0].Resources
+				assert.EqualValues(t,
+					p.expectedWorkerResources,
+					&workerPodResources,
+				)
+			}
 		})
 	}
 }
@@ -1102,4 +1231,15 @@ func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
+}
+
+func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
+	data, err := json.Marshal(obj)
+	assert.Nil(t, err)
+	podSpecMap := make(map[string]interface{})
+	err = json.Unmarshal(data, &podSpecMap)
+	assert.Nil(t, err)
+	s, err := structpb.NewStruct(podSpecMap)
+	assert.Nil(t, err)
+	return s
 }

@@ -27,8 +27,8 @@ type artifactDataStore struct {
 }
 
 func (m *artifactDataStore) getDataLocation(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error) {
-	dataset := artifact.Dataset
-	return m.store.ConstructReference(ctx, m.storagePrefix, dataset.Project, dataset.Domain, dataset.Name, dataset.Version, artifact.Id, data.Name, artifactDataFile)
+	dataset := artifact.GetDataset()
+	return m.store.ConstructReference(ctx, m.storagePrefix, dataset.GetProject(), dataset.GetDomain(), dataset.GetName(), dataset.GetVersion(), artifact.GetId(), data.GetName(), artifactDataFile)
 }
 
 // Store marshalled data in data.pb under the storage prefix
@@ -37,7 +37,7 @@ func (m *artifactDataStore) PutData(ctx context.Context, artifact *datacatalog.A
 	if err != nil {
 		return "", errors.NewDataCatalogErrorf(codes.Internal, "Unable to generate data location %s, err %v", dataLocation.String(), err)
 	}
-	err = m.store.WriteProtobuf(ctx, dataLocation, storage.Options{}, data.Value)
+	err = m.store.WriteProtobuf(ctx, dataLocation, storage.Options{}, data.GetValue())
 	if err != nil {
 		return "", errors.NewDataCatalogErrorf(codes.Internal, "Unable to store artifact data in location %s, err %v", dataLocation.String(), err)
 	}

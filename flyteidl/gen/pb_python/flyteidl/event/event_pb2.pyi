@@ -32,7 +32,7 @@ class WorkflowExecutionEvent(_message.Message):
     def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionEvent(_message.Message):
-    __slots__ = ["id", "producer_id", "phase", "occurred_at", "input_uri", "input_data", "output_uri", "error", "output_data", "workflow_node_metadata", "task_node_metadata", "parent_task_metadata", "parent_node_metadata", "retry_group", "spec_node_id", "node_name", "event_version", "is_parent", "is_dynamic", "deck_uri", "reported_at", "is_array", "target_entity", "is_in_dynamic_chain"]
+    __slots__ = ["id", "producer_id", "phase", "occurred_at", "input_uri", "input_data", "output_uri", "error", "output_data", "workflow_node_metadata", "task_node_metadata", "parent_task_metadata", "parent_node_metadata", "retry_group", "spec_node_id", "node_name", "event_version", "is_parent", "is_dynamic", "deck_uri", "reported_at", "is_array", "target_entity", "is_in_dynamic_chain", "is_eager"]
     ID_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
@@ -57,6 +57,7 @@ class NodeExecutionEvent(_message.Message):
     IS_ARRAY_FIELD_NUMBER: _ClassVar[int]
     TARGET_ENTITY_FIELD_NUMBER: _ClassVar[int]
     IS_IN_DYNAMIC_CHAIN_FIELD_NUMBER: _ClassVar[int]
+    IS_EAGER_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.NodeExecutionIdentifier
     producer_id: str
     phase: _execution_pb2.NodeExecution.Phase
@@ -81,7 +82,8 @@ class NodeExecutionEvent(_message.Message):
     is_array: bool
     target_entity: _identifier_pb2.Identifier
     is_in_dynamic_chain: bool
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., is_array: bool = ..., target_entity: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., is_in_dynamic_chain: bool = ...) -> None: ...
+    is_eager: bool
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., is_array: bool = ..., target_entity: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., is_in_dynamic_chain: bool = ..., is_eager: bool = ...) -> None: ...
 
 class WorkflowNodeMetadata(_message.Message):
     __slots__ = ["execution_id"]
@@ -178,20 +180,24 @@ class TaskExecutionEvent(_message.Message):
     def __init__(self, task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., parent_node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., producer_id: _Optional[str] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., phase_version: _Optional[int] = ..., reason: _Optional[str] = ..., reasons: _Optional[_Iterable[_Union[EventReason, _Mapping]]] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ExternalResourceInfo(_message.Message):
-    __slots__ = ["external_id", "index", "retry_attempt", "phase", "cache_status", "logs"]
+    __slots__ = ["external_id", "index", "retry_attempt", "phase", "cache_status", "logs", "workflow_node_metadata", "custom_info"]
     EXTERNAL_ID_FIELD_NUMBER: _ClassVar[int]
     INDEX_FIELD_NUMBER: _ClassVar[int]
     RETRY_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     CACHE_STATUS_FIELD_NUMBER: _ClassVar[int]
     LOGS_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_NODE_METADATA_FIELD_NUMBER: _ClassVar[int]
+    CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
     external_id: str
     index: int
     retry_attempt: int
     phase: _execution_pb2.TaskExecution.Phase
     cache_status: _catalog_pb2.CatalogCacheStatus
     logs: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
-    def __init__(self, external_id: _Optional[str] = ..., index: _Optional[int] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
+    workflow_node_metadata: WorkflowNodeMetadata
+    custom_info: _struct_pb2.Struct
+    def __init__(self, external_id: _Optional[str] = ..., index: _Optional[int] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., cache_status: _Optional[_Union[_catalog_pb2.CatalogCacheStatus, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class ResourcePoolInfo(_message.Message):
     __slots__ = ["allocation_token", "namespace"]

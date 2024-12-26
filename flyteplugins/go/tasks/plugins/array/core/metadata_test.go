@@ -17,9 +17,9 @@ func TestInitializeExternalResources(t *testing.T) {
 	subTaskCount := 10
 	cachedCount := 4
 
-	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount))
+	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount)) // #nosec G115
 	for i := 0; i < cachedCount; i++ {
-		indexesToCache.Clear(uint(i))
+		indexesToCache.Clear(uint(i)) // #nosec G115
 	}
 
 	tr := &mocks.TaskReader{}
@@ -54,7 +54,7 @@ func TestInitializeExternalResources(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, subTaskCount, len(externalResources))
 	for i, externalResource := range externalResources {
-		assert.Equal(t, uint32(i), externalResource.Index)
+		assert.Equal(t, uint32(i), externalResource.Index) // #nosec G115
 		assert.Equal(t, 0, len(externalResource.Logs))
 		assert.Equal(t, uint32(0), externalResource.RetryAttempt)
 		if i < cachedCount {
