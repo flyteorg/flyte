@@ -323,6 +323,17 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
+  # -- If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods
+  manager_resources:
+    resources:
+      limits:
+        cpu: 200m
+        ephemeral-storage: 100Mi
+        memory: 200Mi
+      requests:
+        cpu: 10m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
