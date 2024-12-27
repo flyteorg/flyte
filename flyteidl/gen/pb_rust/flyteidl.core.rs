@@ -1736,6 +1736,7 @@ pub struct K8sPod {
     /// Only K8s
     #[prost(message, optional, tag="3")]
     pub data_config: ::core::option::Option<DataLoadingConfig>,
+    /// Defines the primary container name when pod template override is executed.
     #[prost(string, tag="4")]
     pub primarycontainername: ::prost::alloc::string::String,
 }

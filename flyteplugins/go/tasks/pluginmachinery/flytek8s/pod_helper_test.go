@@ -27,7 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionMetadata {
+func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string, podtemplate *core.K8SPod) pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
 	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -54,6 +54,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
 	to.On("GetContainerImage").Return(containerImage)
+	to.On("GetPodTemplate").Return(podtemplate)
 	taskExecutionMetadata.On("GetOverrides").Return(to)
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
@@ -82,7 +83,7 @@ func dummyInputReader() io.InputReader {
 	return inputReader
 }
 
-func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirements, rm *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionContext {
+func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirements, rm *core.ExtendedResources, containerImage string, podtemplate *core.K8SPod) pluginsCore.TaskExecutionContext {
 	ow := &pluginsIOMock.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("")
 	ow.OnGetRawOutputPrefix().Return("")
@@ -90,7 +91,7 @@ func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirement
 	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage))
+	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage, podtemplate))
 	tCtx.OnInputReader().Return(dummyInputReader())
 	tCtx.OnOutputWriter().Return(ow)
 
@@ -703,7 +704,7 @@ func updatePod(t *testing.T) {
 			v1.ResourceCPU:              resource.MustParse("1024m"),
 			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
-	}, nil, "")
+	}, nil, "", nil)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -756,7 +757,7 @@ func updatePod(t *testing.T) {
 }
 
 func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *testing.T) {
-	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "")
+	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil)
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		DefaultAffinity: &v1.Affinity{
 			NodeAffinity: &v1.NodeAffinity{
@@ -820,7 +821,7 @@ func toK8sPodInterruptible(t *testing.T) {
 			v1.ResourceCPU:              resource.MustParse("1024m"),
 			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
-	}, nil, "")
+	}, nil, "", nil)
 
 	p, _, _, err := ToK8sPodSpec(ctx, x)
 	assert.NoError(t, err)
@@ -887,7 +888,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
@@ -904,7 +905,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
@@ -922,7 +923,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			DefaultNodeSelector: map[string]string{
@@ -949,7 +950,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		}))
 
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.SecurityContext)
@@ -961,7 +962,7 @@ func TestToK8sPod(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			EnableHostNetworkingPod: &enabled,
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.True(t, p.HostNetwork)
@@ -972,7 +973,7 @@ func TestToK8sPod(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			EnableHostNetworkingPod: &enabled,
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
@@ -980,7 +981,7 @@ func TestToK8sPod(t *testing.T) {
 
 	t.Run("skipSettingHostNetwork", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
@@ -1014,7 +1015,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		}))
 
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.DNSConfig)
@@ -1035,7 +1036,7 @@ func TestToK8sPod(t *testing.T) {
 				"foo": "bar",
 			},
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		for _, c := range p.Containers {
@@ -1055,7 +1056,19 @@ func TestToK8sPodContainerImage(t *testing.T) {
 		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Requests: v1.ResourceList{
 				v1.ResourceCPU: resource.MustParse("1024m"),
-			}}, nil, "foo:latest")
+			}}, nil, "foo:latest", nil)
+		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, "foo:latest", p.Containers[0].Image)
+	})
+}
+
+func TestToK8sPodPodTemplate(t *testing.T) {
+	t.Run("Override pod template", func(t *testing.T) {
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1024m"),
+			}}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo:latest", p.Containers[0].Image)
@@ -1167,7 +1180,7 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 		t.Run(f.name, func(t *testing.T) {
 			taskTemplate := dummyTaskTemplate()
 			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskContext := dummyExecContext(taskTemplate, f.resources, f.extendedResourcesOverride, "")
+			taskContext := dummyExecContext(taskTemplate, f.resources, f.extendedResourcesOverride, "", nil)
 			p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 			assert.NoError(t, err)
 
@@ -1829,7 +1842,7 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
@@ -1855,7 +1868,7 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
@@ -1882,7 +1895,7 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
@@ -1910,7 +1923,7 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
@@ -1960,7 +1973,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
@@ -2022,7 +2035,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
+		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
 		tCtx.OnTaskReader().Return(taskReader)
 
 		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")

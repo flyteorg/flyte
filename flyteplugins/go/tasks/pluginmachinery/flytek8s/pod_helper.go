@@ -285,9 +285,11 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
-		if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername) > 0 {
-			podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
-			primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername
+		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+			if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername) > 0 {
+				podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+				primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername
+			}
 		}
 
 	case *core.TaskTemplate_K8SPod:

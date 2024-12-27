@@ -1402,8 +1402,9 @@ type K8SPod struct {
 	// are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
 	// to understand the default paths.
 	// Only K8s
-	DataConfig           *DataLoadingConfig `protobuf:"bytes,3,opt,name=data_config,json=dataConfig,proto3" json:"data_config,omitempty"`
-	Primarycontainername string             `protobuf:"bytes,4,opt,name=primarycontainername,proto3" json:"primarycontainername,omitempty"`
+	DataConfig *DataLoadingConfig `protobuf:"bytes,3,opt,name=data_config,json=dataConfig,proto3" json:"data_config,omitempty"`
+	// Defines the primary container name when pod template override is executed.
+	Primarycontainername string `protobuf:"bytes,4,opt,name=primarycontainername,proto3" json:"primarycontainername,omitempty"`
 }
 
 func (x *K8SPod) Reset() {

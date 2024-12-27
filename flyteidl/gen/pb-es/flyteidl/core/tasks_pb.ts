@@ -1102,6 +1102,8 @@ export class K8sPod extends Message<K8sPod> {
   dataConfig?: DataLoadingConfig;
 
   /**
+   * Defines the primary container name when pod template override is executed.
+   *
    * @generated from field: string primarycontainername = 4;
    */
   primarycontainername = "";
