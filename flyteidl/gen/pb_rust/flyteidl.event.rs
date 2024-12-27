@@ -334,6 +334,26 @@ pub struct ExternalResourceInfo {
     /// log information for the external resource execution
     #[prost(message, repeated, tag="6")]
     pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// Extensible field for custom, plugin-specific info
+    #[prost(message, optional, tag="8")]
+    pub custom_info: ::core::option::Option<::prost_types::Struct>,
+    /// Additional metadata to do with this event's node target based on the node type. We are
+    /// explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    /// If we decide to include in the future, we should deprecate the cache_status field.
+    #[prost(oneof="external_resource_info::TargetMetadata", tags="7")]
+    pub target_metadata: ::core::option::Option<external_resource_info::TargetMetadata>,
+}
+/// Nested message and enum types in `ExternalResourceInfo`.
+pub mod external_resource_info {
+    /// Additional metadata to do with this event's node target based on the node type. We are
+    /// explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    /// If we decide to include in the future, we should deprecate the cache_status field.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum TargetMetadata {
+        #[prost(message, tag="7")]
+        WorkflowNodeMetadata(super::WorkflowNodeMetadata),
+    }
 }
 /// This message holds task execution metadata specific to resource allocation used to manage concurrent
 /// executions for a project namespace.

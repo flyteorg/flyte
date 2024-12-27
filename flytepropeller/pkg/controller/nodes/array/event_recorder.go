@@ -136,14 +136,21 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			log.Name = fmt.Sprintf("%s-%d", log.GetName(), index)
 		}
 
-		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
+		externalResourceInfo := event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Index:        uint32(index), // #nosec G115
 			Logs:         taskExecutionEvent.GetLogs(),
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.GetPhase(),
 			CacheStatus:  cacheStatus,
-		})
+			CustomInfo:   taskExecutionEvent.GetCustomInfo(),
+		}
+
+		if taskExecutionEvent.GetMetadata() != nil && len(taskExecutionEvent.GetMetadata().GetExternalResources()) == 1 {
+			externalResourceInfo.CustomInfo = taskExecutionEvent.GetMetadata().GetExternalResources()[0].GetCustomInfo()
+		}
+
+		e.externalResources = append(e.externalResources, &externalResourceInfo)
 	}
 
 	// clear nodeEvents and taskEvents
