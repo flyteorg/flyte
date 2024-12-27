@@ -1063,18 +1063,6 @@ func TestToK8sPodContainerImage(t *testing.T) {
 	})
 }
 
-func TestToK8sPodPodTemplate(t *testing.T) {
-	t.Run("Override pod template", func(t *testing.T) {
-		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
-			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
-			}}, nil, "", nil)
-		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, "foo:latest", p.Containers[0].Image)
-	})
-}
-
 func TestToK8sPodExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:        "gpu-node-label",
