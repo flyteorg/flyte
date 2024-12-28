@@ -100,13 +100,8 @@ func CheckAndFetchInputsForExecution(
 			}
 			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
-			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
-			err := validators.ValidateLiteralType(inputType)
-			if err != nil {
-				return nil, errors.NewInvalidLiteralTypeError(name, err)
-			}
-			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
+			if !validators.IsInstance(executionInputMap[name], expectedInput.GetVar().GetType()) {
+				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got literal %s", name, expectedInput.GetVar().GetType(), executionInputMap[name])
 			}
 		}
 	}
