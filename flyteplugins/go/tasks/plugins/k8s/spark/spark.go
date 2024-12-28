@@ -157,13 +157,11 @@ func createSparkPodSpec(
 		config.GetK8sPluginConfig().DefaultLabels,
 		pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
 	)
-	if k8sPod != nil && k8sPod.GetMetadata() != nil {
-		if k8sPod.Metadata.Annotations != nil {
-			annotations = pluginsUtils.UnionMaps(annotations, k8sPod.GetMetadata().GetAnnotations())
-		}
-		if k8sPod.Metadata.Labels != nil {
-			labels = pluginsUtils.UnionMaps(labels, k8sPod.GetMetadata().GetLabels())
-		}
+	if k8sPod.GetMetadata().GetAnnotations() != nil {
+		annotations = pluginsUtils.UnionMaps(annotations, k8sPod.GetMetadata().GetAnnotations())
+	}
+	if k8sPod.GetMetadata().GetLabels() != nil {
+		labels = pluginsUtils.UnionMaps(labels, k8sPod.GetMetadata().GetLabels())
 	}
 
 	sparkEnv := make([]v1.EnvVar, 0)
@@ -207,7 +205,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 		err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
 		if err != nil {
 			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
+				"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
 		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
@@ -254,7 +252,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
 		if err != nil {
 			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
+				"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
 		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
