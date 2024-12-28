@@ -7071,6 +7071,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 \u003c x \u003c 65536."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the port to expose on the pod's IP address."
         }
       },
       "description": "Defines port properties for a container."
