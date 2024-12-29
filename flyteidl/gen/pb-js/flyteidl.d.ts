@@ -6960,8 +6960,8 @@ export namespace flyteidl {
             /** K8sPod dataConfig */
             dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
 
-            /** K8sPod primarycontainername */
-            primarycontainername?: (string|null);
+            /** K8sPod primaryContainerName */
+            primaryContainerName?: (string|null);
         }
 
         /** Represents a K8sPod. */
@@ -6982,8 +6982,8 @@ export namespace flyteidl {
             /** K8sPod dataConfig. */
             public dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
 
-            /** K8sPod primarycontainername. */
-            public primarycontainername: string;
+            /** K8sPod primaryContainerName. */
+            public primaryContainerName: string;
 
             /**
              * Creates a new K8sPod instance using the specified properties.

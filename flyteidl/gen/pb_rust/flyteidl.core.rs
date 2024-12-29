@@ -1738,7 +1738,7 @@ pub struct K8sPod {
     pub data_config: ::core::option::Option<DataLoadingConfig>,
     /// Defines the primary container name when pod template override is executed.
     #[prost(string, tag="4")]
-    pub primarycontainername: ::prost::alloc::string::String,
+    pub primary_container_name: ::prost::alloc::string::String,
 }
 /// Metadata for building a kubernetes object when a task is executed.
 #[allow(clippy::derive_partial_eq_without_eq)]

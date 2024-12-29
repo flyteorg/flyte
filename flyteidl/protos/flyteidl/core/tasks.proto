@@ -323,7 +323,7 @@ message K8sPod {
 
 
     // Defines the primary container name when pod template override is executed.
-    string primarycontainername = 4;
+    string primary_container_name = 4;
 }
 
 // Metadata for building a kubernetes object when a task is executed.

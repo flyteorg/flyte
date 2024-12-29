@@ -271,6 +271,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		Labels:      make(map[string]string),
 	}
 	primaryContainerName := ""
+
 	switch target := taskTemplate.GetTarget().(type) {
 	case *core.TaskTemplate_Container:
 		// handles tasks defined by a single container
@@ -286,9 +287,9 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			},
 		}
 		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
-			if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername) > 0 {
+			if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName) > 0 {
 				podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
-				primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().Primarycontainername
+				primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName
 			}
 		}
 
@@ -343,7 +344,6 @@ func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
 // configuration PodTemplate (if exists).
 func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-
 	if err != nil {
 		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
 		return nil, nil, err

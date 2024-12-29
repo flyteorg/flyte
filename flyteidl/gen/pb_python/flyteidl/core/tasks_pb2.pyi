@@ -232,16 +232,16 @@ class DataLoadingConfig(_message.Message):
     def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ...) -> None: ...
 
 class K8sPod(_message.Message):
-    __slots__ = ["metadata", "pod_spec", "data_config", "primarycontainername"]
+    __slots__ = ["metadata", "pod_spec", "data_config", "primary_container_name"]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     POD_SPEC_FIELD_NUMBER: _ClassVar[int]
     DATA_CONFIG_FIELD_NUMBER: _ClassVar[int]
-    PRIMARYCONTAINERNAME_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
     metadata: K8sObjectMetadata
     pod_spec: _struct_pb2.Struct
     data_config: DataLoadingConfig
-    primarycontainername: str
-    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., data_config: _Optional[_Union[DataLoadingConfig, _Mapping]] = ..., primarycontainername: _Optional[str] = ...) -> None: ...
+    primary_container_name: str
+    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., data_config: _Optional[_Union[DataLoadingConfig, _Mapping]] = ..., primary_container_name: _Optional[str] = ...) -> None: ...
 
 class K8sObjectMetadata(_message.Message):
     __slots__ = ["labels", "annotations"]

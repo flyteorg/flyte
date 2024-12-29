@@ -1104,9 +1104,9 @@ export class K8sPod extends Message<K8sPod> {
   /**
    * Defines the primary container name when pod template override is executed.
    *
-   * @generated from field: string primarycontainername = 4;
+   * @generated from field: string primary_container_name = 4;
    */
-  primarycontainername = "";
+  primaryContainerName = "";
 
   constructor(data?: PartialMessage<K8sPod>) {
     super();
@@ -1119,7 +1119,7 @@ export class K8sPod extends Message<K8sPod> {
     { no: 1, name: "metadata", kind: "message", T: K8sObjectMetadata },
     { no: 2, name: "pod_spec", kind: "message", T: Struct },
     { no: 3, name: "data_config", kind: "message", T: DataLoadingConfig },
-    { no: 4, name: "primarycontainername", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "primary_container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): K8sPod {

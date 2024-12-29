@@ -16850,7 +16850,7 @@
                  * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] K8sPod metadata
                  * @property {google.protobuf.IStruct|null} [podSpec] K8sPod podSpec
                  * @property {flyteidl.core.IDataLoadingConfig|null} [dataConfig] K8sPod dataConfig
-                 * @property {string|null} [primarycontainername] K8sPod primarycontainername
+                 * @property {string|null} [primaryContainerName] K8sPod primaryContainerName
                  */
     
                 /**
@@ -16893,12 +16893,12 @@
                 K8sPod.prototype.dataConfig = null;
     
                 /**
-                 * K8sPod primarycontainername.
-                 * @member {string} primarycontainername
+                 * K8sPod primaryContainerName.
+                 * @member {string} primaryContainerName
                  * @memberof flyteidl.core.K8sPod
                  * @instance
                  */
-                K8sPod.prototype.primarycontainername = "";
+                K8sPod.prototype.primaryContainerName = "";
     
                 /**
                  * Creates a new K8sPod instance using the specified properties.
@@ -16930,8 +16930,8 @@
                         $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.dataConfig != null && message.hasOwnProperty("dataConfig"))
                         $root.flyteidl.core.DataLoadingConfig.encode(message.dataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.primarycontainername != null && message.hasOwnProperty("primarycontainername"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.primarycontainername);
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.primaryContainerName);
                     return writer;
                 };
     
@@ -16963,7 +16963,7 @@
                             message.dataConfig = $root.flyteidl.core.DataLoadingConfig.decode(reader, reader.uint32());
                             break;
                         case 4:
-                            message.primarycontainername = reader.string();
+                            message.primaryContainerName = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -16999,9 +16999,9 @@
                         if (error)
                             return "dataConfig." + error;
                     }
-                    if (message.primarycontainername != null && message.hasOwnProperty("primarycontainername"))
-                        if (!$util.isString(message.primarycontainername))
-                            return "primarycontainername: string expected";
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        if (!$util.isString(message.primaryContainerName))
+                            return "primaryContainerName: string expected";
                     return null;
                 };
     
