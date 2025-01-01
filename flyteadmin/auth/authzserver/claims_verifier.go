@@ -15,15 +15,17 @@ import (
 func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
 	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
 
+	audience := ""
 	foundAudIndex := -1
 	for audIndex, aud := range claims.Audience {
 		if expectedAudience.Has(aud) {
 			foundAudIndex = audIndex
+			audience = aud
 			break
 		}
 	}
 
-	if foundAudIndex < 0 {
+	if foundAudIndex < 0 && !expectedAudience.Has("*") {
 		return nil, fmt.Errorf("invalid audience [%v], wanted [%v]", claims, expectedAudience)
 	}
 
@@ -71,5 +73,5 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		scopes.Insert(auth.ScopeAll)
 	}
 
-	return auth.NewIdentityContext(claims.Audience[foundAudIndex], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw)
+	return auth.NewIdentityContext(audience, claims.Subject, clientID, claims.IssuedAt, scopes, userInfo, claimsRaw)
 }
