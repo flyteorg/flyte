@@ -11964,6 +11964,9 @@ export namespace flyteidl {
 
             /** EmailNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** EmailNotification template */
+            template?: (string|null);
         }
 
         /** Represents an EmailNotification. */
@@ -11977,6 +11980,9 @@ export namespace flyteidl {
 
             /** EmailNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** EmailNotification template. */
+            public template: string;
 
             /**
              * Creates a new EmailNotification instance using the specified properties.
@@ -12016,6 +12022,9 @@ export namespace flyteidl {
 
             /** PagerDutyNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** PagerDutyNotification template */
+            template?: (string|null);
         }
 
         /** Represents a PagerDutyNotification. */
@@ -12029,6 +12038,9 @@ export namespace flyteidl {
 
             /** PagerDutyNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** PagerDutyNotification template. */
+            public template: string;
 
             /**
              * Creates a new PagerDutyNotification instance using the specified properties.
@@ -12068,6 +12080,9 @@ export namespace flyteidl {
 
             /** SlackNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** SlackNotification template */
+            template?: (string|null);
         }
 
         /** Represents a SlackNotification. */
@@ -12081,6 +12096,9 @@ export namespace flyteidl {
 
             /** SlackNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** SlackNotification template. */
+            public template: string;
 
             /**
              * Creates a new SlackNotification instance using the specified properties.
