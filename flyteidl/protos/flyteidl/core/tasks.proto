@@ -192,6 +192,8 @@ message ContainerPort {
     // Number of port to expose on the pod's IP address.
     // This must be a valid port number, 0 < x < 65536.
     uint32 container_port = 1;
+    // Name of the port to expose on the pod's IP address.
+    string name = 2;
 }
 
 message Container {
