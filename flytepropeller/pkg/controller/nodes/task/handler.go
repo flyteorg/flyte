@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
-	"strconv"
-	"strings"
 	"time"
 
 	regErrors "github.com/pkg/errors"
@@ -435,32 +433,21 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
 	// FLYTE_ENABLE_DECK is used when flytekit > 1.14.0
 	// For backward compatibility,
-	// we will return DeckUnknow and call a HEAD request to check if the deck file exists in the terminal state.
+	// we will return DeckUnknown and call a HEAD request to check if the deck file exists in the terminal state.
 
 	template, err := tCtx.tr.Read(ctx)
 	if err != nil {
 		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
 	}
 
-	templateConfig := template.GetConfig()
-	if templateConfig == nil {
+	metadata := template.GetMetadata()
+	if metadata == nil {
 		return DeckUnknown, nil
 	}
-
-	rawValue, ok := templateConfig[FLYTE_ENABLE_DECK]
-	if !ok {
-		return DeckUnknown, nil
-	}
-
-	rawValue = strings.ToLower(rawValue)
-	deckEnabled, err := strconv.ParseBool(rawValue)
-	if err != nil {
-		return DeckUnknown, nil
-	}
-
-	if deckEnabled {
+	if metadata.GetGeneratesDeck() {
 		return DeckEnabled, nil
 	}
+
 	return DeckDisabled, nil
 }
 
