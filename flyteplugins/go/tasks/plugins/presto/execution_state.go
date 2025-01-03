@@ -474,13 +474,13 @@ func MapExecutionStateToPhaseInfo(state ExecutionState) core.PhaseInfo {
 		if state.CreationFailureCount > 5 {
 			phaseInfo = core.PhaseInfoRetryableFailure("PrestoFailure", "Too many creation attempts", nil)
 		} else {
-			phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+1), ConstructTaskInfo(state))
+			phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+1), ConstructTaskInfo(state)) // #nosec G115
 		}
 	case PhaseSubmitted:
-		phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+2), ConstructTaskInfo(state))
+		phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+2), ConstructTaskInfo(state)) // #nosec G115
 	case PhaseQuerySucceeded:
 		if state.QueryCount < 5 {
-			phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+3), ConstructTaskInfo(state))
+			phaseInfo = core.PhaseInfoRunning(uint32(3*state.QueryCount+3), ConstructTaskInfo(state)) // #nosec G115
 		} else {
 			phaseInfo = core.PhaseInfoSuccess(ConstructTaskInfo(state))
 		}

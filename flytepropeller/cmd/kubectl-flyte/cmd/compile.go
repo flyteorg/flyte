@@ -76,7 +76,7 @@ func (c *CompileOpts) compileWorkflowCmd() error {
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(c.protoFile+".yaml", b, os.ModePerm)
+		err = ioutil.WriteFile(c.protoFile+".yaml", b, os.ModePerm) // #nosec G306
 		if err != nil {
 			return err
 		}
@@ -100,7 +100,7 @@ func (c *CompileOpts) compileWorkflowCmd() error {
 	}
 
 	if c.outputPath != "" {
-		return ioutil.WriteFile(c.outputPath, o, os.ModePerm)
+		return ioutil.WriteFile(c.outputPath, o, os.ModePerm) // #nosec G306
 	}
 	fmt.Printf("%v", string(o))
 	return nil

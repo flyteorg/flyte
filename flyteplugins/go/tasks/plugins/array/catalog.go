@@ -120,7 +120,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
 		logger.Infof(ctx, "Task is not discoverable, moving to launch phase...")
 		// Set an all set indexes to cache. This task won't try to write to catalog anyway.
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize))) // #nosec G115
 		state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason("Task is not discoverable.")
 
 		state.SetExecutionArraySize(int(arrayJobSize))
@@ -165,7 +165,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			// TODO: maybe add a config option to decide the behavior on catalog failure.
 			logger.Warnf(ctx, "Failing to lookup catalog. Will move on to launching the task. Error: %v", err)
 
-			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
+			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize))) // #nosec G115
 			state = state.SetExecutionArraySize(int(arrayJobSize))
 			state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason(fmt.Sprintf("Skipping cache check due to err [%v]", err))
 			return state, nil
@@ -178,7 +178,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		}
 
 		cachedResults := resp.GetCachedResults()
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJobSize)))
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJobSize))) // #nosec G115
 		state = state.SetExecutionArraySize(int(arrayJobSize) - resp.GetCachedCount())
 
 		// If all the sub-tasks are actually done, then we can just move on.
@@ -262,7 +262,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		if !phase.IsSuccess() {
 			// tasksToCache is built on the originalArraySize and ArrayStatus.Detailed is the executionArraySize
 			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
-			tasksToCache.Clear(uint(originalIdx))
+			tasksToCache.Clear(uint(originalIdx)) // #nosec G115
 		}
 	}
 
@@ -292,6 +292,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 		externalResources = make([]*core.ExternalResource, 0)
 		for idx, phaseIdx := range state.ArrayStatus.Detailed.GetItems() {
 			originalIdx := arrayCore.CalculateOriginalIndex(idx, state.GetIndexesToCache())
+			// #nosec G115
 			if !tasksToCache.IsSet(uint(originalIdx)) {
 				continue
 			}
@@ -299,8 +300,8 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 			externalResources = append(externalResources,
 				&core.ExternalResource{
 					CacheStatus:  idlCore.CatalogCacheStatus_CACHE_POPULATED,
-					Index:        uint32(originalIdx),
-					RetryAttempt: uint32(state.RetryAttempts.GetItem(idx)),
+					Index:        uint32(originalIdx),                      // #nosec G115
+					RetryAttempt: uint32(state.RetryAttempts.GetItem(idx)), // #nosec G115
 					Phase:        core.Phases[phaseIdx],
 				},
 			)
@@ -349,6 +350,7 @@ func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore
 	}
 
 	for idx, input := range inputReaders {
+		// #nosec G115
 		if !whichTasksToCache.IsSet(uint(idx)) {
 			continue
 		}
@@ -400,6 +402,7 @@ func NewLiteralScalarOfInteger(number int64) *idlCore.Literal {
 func CatalogBitsetToLiteralCollection(catalogResults *bitarray.BitSet, size int) *idlCore.LiteralCollection {
 	literals := make([]*idlCore.Literal, 0, size)
 	for i := 0; i < size; i++ {
+		// #nosec G115
 		if !catalogResults.IsSet(uint(i)) {
 			literals = append(literals, NewLiteralScalarOfInteger(int64(i)))
 		}

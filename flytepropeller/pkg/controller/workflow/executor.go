@@ -447,7 +447,7 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 	case v1alpha1.WorkflowPhaseHandlingFailureNode:
 		newStatus, err := c.handleFailureNode(ctx, w)
 		if err != nil {
-			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, err.Error())
+			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, "%s", err.Error())
 		}
 		failureErr := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus)
 		// Ignore ExecutionNotFound and IncompatibleCluster errors to allow graceful failure

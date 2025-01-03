@@ -110,8 +110,8 @@ func TestNewGenerator(t *testing.T) {
 			}
 
 			if *update {
-				assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, os.ModePerm))
-				assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, os.ModePerm))
+				assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, os.ModePerm))     // #nosec G306
+				assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, os.ModePerm)) // #nosec G306
 			}
 
 			goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))

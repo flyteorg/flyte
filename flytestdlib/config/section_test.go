@@ -72,7 +72,7 @@ func TestMarshal(t *testing.T) {
 		t.Log("Updating config file.")
 		raw, err := yaml.Marshal(expected)
 		assert.NoError(t, err)
-		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm))
+		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm)) // #nosec G306
 	}
 
 	r := TestConfig{}

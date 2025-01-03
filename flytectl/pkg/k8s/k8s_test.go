@@ -45,6 +45,7 @@ users:
 		t.Error(err)
 	}
 	defer os.Remove(tmpfile.Name())
+	// #nosec G306
 	if err := ioutil.WriteFile(tmpfile.Name(), []byte(content), os.ModePerm); err != nil {
 		t.Error(err)
 	}

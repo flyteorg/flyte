@@ -287,9 +287,9 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		// For the unified retry behavior we execute the last interruptibleFailureThreshold attempts on a non
 		// interruptible machine
-		maxAttempts := uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		maxAttempts := uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 		if n.GetRetryStrategy() != nil && n.GetRetryStrategy().MinAttempts != nil && *n.GetRetryStrategy().MinAttempts != 1 {
-			maxAttempts = uint32(*n.GetRetryStrategy().MinAttempts)
+			maxAttempts = uint32(*n.GetRetryStrategy().MinAttempts) // #nosec G115
 		}
 
 		// For interruptible nodes run at least one attempt on an interruptible machine (thus s.GetAttempts() > 0) even if there won't be any retries

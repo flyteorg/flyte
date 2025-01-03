@@ -434,6 +434,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			pluginTrns.TransitionPreviouslyRecorded()
 			return pluginTrns, nil
 		}
+		// #nosec G115
 		if pluginTrns.pInfo.Version() > uint32(t.cfg.MaxPluginPhaseVersions) {
 			logger.Errorf(ctx, "Too many Plugin p versions for plugin [%s]. p versions [%d/%d]", p.GetID(), pluginTrns.pInfo.Version(), t.cfg.MaxPluginPhaseVersions)
 			pluginTrns.ObservedExecutionError(&io.ExecutionError{

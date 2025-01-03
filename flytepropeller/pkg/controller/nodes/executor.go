@@ -813,9 +813,9 @@ func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, 
 
 		currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
 	}
-	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
-		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts) // #nosec G115
 	}
 	isEligible = currentAttempt < maxAttempts
 	return
@@ -1470,7 +1470,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
-		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
+		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures), // #nosec G115
 		metrics:                         metrics,
 		nodeRecorder:                    events.NewNodeEventRecorder(eventSink, nodeScope, store),
 		outputResolver:                  NewRemoteFileOutputResolver(store),

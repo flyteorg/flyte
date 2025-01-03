@@ -91,7 +91,7 @@ func NewAlreadyInTerminalStateError(ctx context.Context, errorMsg string, curPha
 	statusErr, transformationErr := NewFlyteAdminError(codes.FailedPrecondition, errorMsg).WithDetails(reason)
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)
+		return NewFlyteAdminErrorf(codes.FailedPrecondition, "%s", errorMsg)
 	}
 	return statusErr
 }
@@ -106,7 +106,7 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 	})
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)
+		return NewFlyteAdminErrorf(codes.FailedPrecondition, "%s", errorMsg)
 	}
 	return statusErr
 }
@@ -135,13 +135,13 @@ func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.Ta
 
 	errorMsg += strings.Join(rs, "\n")
 
-	return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+	return NewFlyteAdminErrorf(codes.InvalidArgument, "%s", errorMsg)
 
 }
 
 func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.TaskCreateRequest) FlyteAdminError {
 	errorMsg := "task with identical structure already exists"
-	return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
+	return NewFlyteAdminErrorf(codes.AlreadyExists, "%s", errorMsg)
 }
 
 func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldSpec *core.CompiledWorkflowClosure, newSpec *core.CompiledWorkflowClosure) FlyteAdminError {
@@ -161,7 +161,7 @@ func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admi
 	})
 	if transformationErr != nil {
 		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, "%s", errorMsg)
 	}
 	return statusErr
 }
@@ -177,7 +177,7 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 	})
 	if transformationErr != nil {
 		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
+		return NewFlyteAdminErrorf(codes.AlreadyExists, "%s", errorMsg)
 	}
 	return statusErr
 }
@@ -190,12 +190,12 @@ func NewLaunchPlanExistsDifferentStructureError(ctx context.Context, request *ad
 
 	errorMsg += strings.Join(rs, "\n")
 
-	return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+	return NewFlyteAdminErrorf(codes.InvalidArgument, "%s", errorMsg)
 }
 
 func NewLaunchPlanExistsIdenticalStructureError(ctx context.Context, request *admin.LaunchPlanCreateRequest) FlyteAdminError {
 	errorMsg := "launch plan with identical structure already exists"
-	return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
+	return NewFlyteAdminErrorf(codes.AlreadyExists, "%s", errorMsg)
 }
 
 func IsDoesNotExistError(err error) bool {

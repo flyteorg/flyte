@@ -79,7 +79,7 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	}
 	comps, ok := perTypeComparators[lValueType.String()]
 	if !ok {
-		return false, errors.Errorf("Comparator not defined for type: [%v]", lValueType.String())
+		return false, errors.Errorf("Comparator not defined for type: [%v]", "%s", lValueType.String())
 	}
 	isBoolean := false
 	if lValueType.String() == primitiveBooleanType {

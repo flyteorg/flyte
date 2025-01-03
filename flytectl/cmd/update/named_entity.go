@@ -28,7 +28,7 @@ type NamedEntityConfig struct {
 
 func (cfg NamedEntityConfig) UpdateNamedEntity(ctx context.Context, name string, project string, domain string, rsType core.ResourceType, cmdCtx cmdCore.CommandContext) error {
 	if cfg.Activate && cfg.Archive {
-		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
+		return fmt.Errorf("%s", clierrors.ErrInvalidStateUpdate)
 	}
 
 	id := &admin.NamedEntityIdentifier{

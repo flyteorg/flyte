@@ -50,10 +50,10 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 		return err
 	}
 	if projectSpec.Id == "" {
-		return fmt.Errorf(clierrors.ErrProjectNotPassed)
+		return fmt.Errorf("%s", clierrors.ErrProjectNotPassed)
 	}
 	if projectSpec.Name == "" {
-		return fmt.Errorf(clierrors.ErrProjectNameNotPassed)
+		return fmt.Errorf("%s", clierrors.ErrProjectNameNotPassed)
 	}
 
 	if project.DefaultProjectConfig.DryRun {

@@ -102,7 +102,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	}
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
-	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
+	maxRetries := uint32(p.cfg.MaxWorkflowRetries) // #nosec G115
 	if IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
 		var err error
 		func() {

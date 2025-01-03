@@ -192,7 +192,7 @@ func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
 		{Regex: logTemplateRegexes.ParentName, Value: s.parentName},
 		{
 			Regex: logTemplateRegexes.ExecutionIndex,
-			Value: strconv.FormatUint(uint64(s.executionIndex), 10),
+			Value: strconv.FormatUint(uint64(s.executionIndex), 10), // #nosec G115
 		},
 		{
 			Regex: logTemplateRegexes.RetryAttempt,
@@ -200,7 +200,7 @@ func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
 		},
 		{
 			Regex: logTemplateRegexes.ParentRetryAttempt,
-			Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10),
+			Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10), // #nosec G115
 		},
 	}
 }
@@ -264,7 +264,7 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 	}
 
 	subTaskExecutionID := NewSubTaskExecutionID(taskExecutionMetadata.GetTaskExecutionID(), executionIndex, retryAttempt)
-	interruptible := taskExecutionMetadata.IsInterruptible() && int32(systemFailures) < taskExecutionMetadata.GetInterruptibleFailureThreshold()
+	interruptible := taskExecutionMetadata.IsInterruptible() && int32(systemFailures) < taskExecutionMetadata.GetInterruptibleFailureThreshold() // #nosec G115
 	return SubTaskExecutionMetadata{
 		taskExecutionMetadata,
 		utils.UnionMaps(taskExecutionMetadata.GetAnnotations(), secretsMap),

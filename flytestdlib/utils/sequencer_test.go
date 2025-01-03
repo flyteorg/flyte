@@ -13,7 +13,7 @@ func TestSequencer(t *testing.T) {
 	sequencer := GetSequencer()
 	curVal := sequencer.GetCur() + 1
 	// sum = n(a0 + aN) / 2
-	expectedSum := uint64(size) * (curVal + curVal + uint64(size-1)) / 2
+	expectedSum := uint64(size) * (curVal + curVal + uint64(size-1)) / 2 // #nosec G115
 	numbers := make(chan uint64, size)
 
 	var wg sync.WaitGroup

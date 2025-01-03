@@ -136,7 +136,7 @@ func initializeAdminClientFromConfig(ctx context.Context, config *Config) (clien
 
 	grpcOptions := []grpcRetry.CallOption{
 		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(config.BackoffScalar)*time.Millisecond, config.GetBackoffJitter(ctx))),
-		grpcRetry.WithMax(uint(config.MaxRetries)),
+		grpcRetry.WithMax(uint(config.MaxRetries)), // #nosec G115
 	}
 
 	opt := grpc.WithChainUnaryInterceptor(

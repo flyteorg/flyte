@@ -50,7 +50,7 @@ func TestStorageAndLoggerConfig(t *testing.T) {
 		t.Log("Updating golden files.")
 		raw, err := yaml.Marshal(expected)
 		assert.NoError(t, err)
-		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm))
+		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm)) // #nosec G306
 	}
 
 	actual := CompositeConfig{}

@@ -35,6 +35,7 @@ func assertBitSetsEqual(t testing.TB, b1, b2 *bitarray.BitSet, len int) {
 	}
 
 	assert.Equal(t, b1.Cap(), b2.Cap())
+	// #nosec G115
 	for i := uint(0); i < uint(len); i++ {
 		assert.Equal(t, b1.IsSet(i), b2.IsSet(i), "At index %v", i)
 	}
@@ -45,9 +46,9 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 
 	subTaskCount := 3
 
-	detailedArray := NewPhasesCompactArray(uint(subTaskCount))
-	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount))
-	retryAttemptsArray, err := bitarray.NewCompactArray(uint(subTaskCount), bitarray.Item(1))
+	detailedArray := NewPhasesCompactArray(uint(subTaskCount))                                 // #nosec G115
+	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount)) // #nosec G115
+	retryAttemptsArray, err := bitarray.NewCompactArray(uint(subTaskCount), bitarray.Item(1))  // #nosec G115
 	assert.NoError(t, err)
 
 	t.Run("start", func(t *testing.T) {

@@ -89,7 +89,7 @@ func (d Downloader) handleBinary(_ context.Context, b *core.Binary, toFilePath s
 	// maybe we should return a map
 	v := b.GetValue()
 	if writeToFile {
-		return v, ioutil.WriteFile(toFilePath, v, os.ModePerm)
+		return v, ioutil.WriteFile(toFilePath, v, os.ModePerm) // #nosec G306
 	}
 	return v, nil
 }
@@ -97,7 +97,7 @@ func (d Downloader) handleBinary(_ context.Context, b *core.Binary, toFilePath s
 func (d Downloader) handleError(_ context.Context, b *core.Error, toFilePath string, writeToFile bool) (interface{}, error) {
 	// maybe we should return a map
 	if writeToFile {
-		return b.Message, ioutil.WriteFile(toFilePath, []byte(b.Message), os.ModePerm)
+		return b.Message, ioutil.WriteFile(toFilePath, []byte(b.Message), os.ModePerm) // #nosec G306
 	}
 	return b.Message, nil
 }
@@ -175,7 +175,7 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 		if err != nil {
 			return nil, err
 		}
-		return v, ioutil.WriteFile(toFilePath, b, os.ModePerm)
+		return v, ioutil.WriteFile(toFilePath, b, os.ModePerm) // #nosec G306
 	}
 	return v, nil
 }
@@ -208,7 +208,7 @@ func (d Downloader) handleScalar(ctx context.Context, scalar *core.Scalar, toFil
 		return i, scalar, err
 	case *core.Scalar_NoneType:
 		if writeToFile {
-			return nil, scalar, ioutil.WriteFile(toFilePath, []byte("null"), os.ModePerm)
+			return nil, scalar, ioutil.WriteFile(toFilePath, []byte("null"), os.ModePerm) // #nosec G306
 		}
 		return nil, scalar, nil
 	default:
@@ -336,6 +336,7 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 	if err != nil {
 		return err
 	}
+	// #nosec G306
 	if err := ioutil.WriteFile(path.Join(outputDir, "inputs.pb"), b, os.ModePerm); err != nil {
 		return err
 	}
@@ -345,14 +346,14 @@ func (d Downloader) DownloadInputs(ctx context.Context, inputRef storage.DataRef
 		if err != nil {
 			return errors.Wrapf(err, "failed to marshal out inputs")
 		}
-		return ioutil.WriteFile(path.Join(outputDir, "inputs.json"), m, os.ModePerm)
+		return ioutil.WriteFile(path.Join(outputDir, "inputs.json"), m, os.ModePerm) // #nosec G306
 	}
 	if d.format == core.DataLoadingConfig_YAML {
 		m, err := yaml.Marshal(varMap)
 		if err != nil {
 			return errors.Wrapf(err, "failed to marshal out inputs")
 		}
-		return ioutil.WriteFile(path.Join(outputDir, "inputs.yaml"), m, os.ModePerm)
+		return ioutil.WriteFile(path.Join(outputDir, "inputs.yaml"), m, os.ModePerm) // #nosec G306
 	}
 	return nil
 }

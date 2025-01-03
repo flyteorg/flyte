@@ -606,7 +606,7 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 				}
 			}
 		} else if header.Typeflag == tar.TypeReg {
-			dest, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			dest, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode)) // #nosec G115
 			if err != nil {
 				return unarchivedFiles, err
 			}

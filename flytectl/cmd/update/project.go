@@ -104,7 +104,7 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 	}
 
 	if edits.Id == "" {
-		return fmt.Errorf(clierrors.ErrProjectNotPassed)
+		return fmt.Errorf("%s", clierrors.ErrProjectNotPassed)
 	}
 
 	currentProject, err := cmdCtx.AdminFetcherExt().GetProjectByID(ctx, edits.Id)

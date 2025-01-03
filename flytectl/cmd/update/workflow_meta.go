@@ -37,7 +37,7 @@ func getUpdateWorkflowFunc(namedEntityConfig *NamedEntityConfig) func(ctx contex
 		project := config.GetConfig().Project
 		domain := config.GetConfig().Domain
 		if len(args) != 1 {
-			return fmt.Errorf(clierrors.ErrWorkflowNotPassed)
+			return fmt.Errorf("%s", clierrors.ErrWorkflowNotPassed)
 		}
 		name := args[0]
 		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_WORKFLOW, cmdCtx)

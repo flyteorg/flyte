@@ -78,21 +78,21 @@ type SecretsSet struct {
 }
 
 func writeSecrets(ctx context.Context, secrets SecretsSet, path string) error {
-	err := ioutil.WriteFile(filepath.Join(path, config.SecretNameClaimSymmetricKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.TokenHashKey)), os.ModePerm)
+	err := ioutil.WriteFile(filepath.Join(path, config.SecretNameClaimSymmetricKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.TokenHashKey)), os.ModePerm) // #nosec G306
 	if err != nil {
 		return fmt.Errorf("failed to persist token hash key. Error: %w", err)
 	}
 
 	logger.Infof(ctx, "wrote %v", config.SecretNameClaimSymmetricKey)
 
-	err = ioutil.WriteFile(filepath.Join(path, config.SecretNameCookieHashKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.CookieHashKey)), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(path, config.SecretNameCookieHashKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.CookieHashKey)), os.ModePerm) // #nosec G306
 	if err != nil {
 		return fmt.Errorf("failed to persist cookie hash key. Error: %w", err)
 	}
 
 	logger.Infof(ctx, "wrote %v", config.SecretNameCookieHashKey)
 
-	err = ioutil.WriteFile(filepath.Join(path, config.SecretNameCookieBlockKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.CookieBlockKey)), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(path, config.SecretNameCookieBlockKey), []byte(base64.RawStdEncoding.EncodeToString(secrets.CookieBlockKey)), os.ModePerm) // #nosec G306
 	if err != nil {
 		return fmt.Errorf("failed to persist cookie block key. Error: %w", err)
 	}

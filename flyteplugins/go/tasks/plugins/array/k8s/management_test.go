@@ -217,9 +217,9 @@ func TestCheckSubTasksState(t *testing.T) {
 			OriginalArraySize:    int64(subtaskCount),
 			OriginalMinSuccesses: int64(subtaskCount),
 			ArrayStatus: arraystatus.ArrayStatus{
-				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
+				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // #nosec G115 set all tasks to core.PhaseUndefined
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 		}
 
 		// execute
@@ -254,9 +254,9 @@ func TestCheckSubTasksState(t *testing.T) {
 				OriginalArraySize:    int64(subtaskCount),
 				OriginalMinSuccesses: int64(subtaskCount),
 				ArrayStatus: arraystatus.ArrayStatus{
-					Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
+					Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // #nosec G115 set all tasks to core.PhaseUndefined
 				},
-				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 			}
 
 			// execute
@@ -296,9 +296,9 @@ func TestCheckSubTasksState(t *testing.T) {
 			OriginalArraySize:    int64(subtaskCount),
 			OriginalMinSuccesses: int64(subtaskCount),
 			ArrayStatus: arraystatus.ArrayStatus{
-				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
+				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // #nosec G115 set all tasks to core.PhaseUndefined
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 		}
 
 		// execute
@@ -342,12 +342,12 @@ func TestCheckSubTasksState(t *testing.T) {
 		tCtx := getMockTaskExecutionContext(ctx, 0)
 		tCtx.OnResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
-			detailed.SetItem(i, bitarray.Item(core.PhaseRetryableFailure)) // set all tasks to core.PhaseRetryableFailure
+			detailed.SetItem(i, bitarray.Item(core.PhaseRetryableFailure)) // #nosec G115 set all tasks to core.PhaseRetryableFailure
 		}
 
-		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
+		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1)) // #nosec G115
 		assert.NoError(t, err)
 
 		currentState := &arrayCore.State{
@@ -358,7 +358,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
 
@@ -411,7 +411,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		tCtx := getMockTaskExecutionContext(ctx, 0)
 		tCtx.OnResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
 			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
 		}
@@ -424,7 +424,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 		}
 
 		// execute
@@ -464,12 +464,12 @@ func TestCheckSubTasksState(t *testing.T) {
 		tCtx := getMockTaskExecutionContext(ctx, 0)
 		tCtx.OnResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
-			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
+			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // #nosec G115 set all tasks to core.PhaseRunning
 		}
 
-		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
+		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1)) // #nosec G115
 		assert.NoError(t, err)
 
 		currentState := &arrayCore.State{
@@ -480,7 +480,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
 
@@ -509,12 +509,12 @@ func TestCheckSubTasksState(t *testing.T) {
 		tCtx := getMockTaskExecutionContext(ctx, 0)
 		tCtx.OnResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
-			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
+			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // #nosec G115 set all tasks to core.PhaseRunning
 		}
 
-		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
+		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1)) // #nosec G115
 		assert.NoError(t, err)
 
 		for i := 0; i < subtaskCount; i++ {
@@ -529,7 +529,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
-			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115 set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
 
@@ -561,7 +561,7 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
 	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
 
-	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 	for i := 0; i < subtaskCount; i++ {
 		compactArray.SetItem(i, 5)
 	}
@@ -574,7 +574,7 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 		ArrayStatus: arraystatus.ArrayStatus{
 			Detailed: compactArray,
 		},
-		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
+		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115
 	}
 
 	t.Run("SuccessfulTermination", func(t *testing.T) {
@@ -652,9 +652,9 @@ func TestTerminateSubTasks(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+			compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 			for i, phaseIdx := range test.initialPhaseIndices {
-				compactArray.SetItem(i, bitarray.Item(phaseIdx))
+				compactArray.SetItem(i, bitarray.Item(phaseIdx)) // #nosec G115
 			}
 			currentState := &arrayCore.State{
 				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -665,7 +665,7 @@ func TestTerminateSubTasks(t *testing.T) {
 				ArrayStatus: arraystatus.ArrayStatus{
 					Detailed: compactArray,
 				},
-				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
+				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // #nosec G115
 			}
 
 			tCtx := getMockTaskExecutionContext(ctx, 0)

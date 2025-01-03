@@ -170,7 +170,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		return nil, err
 	}
 	var workflowInterface core.TypedInterface
-	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
+	if len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
 			return nil, fmt.Errorf(
@@ -230,7 +230,7 @@ func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context
 	if err != nil {
 		return nil, err
 	}
-	if output.TaskExecutions == nil || len(output.TaskExecutions) == 0 {
+	if len(output.TaskExecutions) == 0 {
 		logger.Debugf(ctx, "no task executions found for node exec id [%+v]", nodeExecutionID)
 		return nil, nil
 	}

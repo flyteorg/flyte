@@ -29,6 +29,7 @@ func InitializeExternalResources(ctx context.Context, tCtx core.TaskExecutionCon
 		var childIndex int
 		var phase core.Phase
 
+		// #nosec G115
 		if state.IndexesToCache.IsSet(uint(i)) {
 			// if not cached set to PhaseUndefined and set cacheStatus according to Discoverable
 			phase = core.PhaseUndefined
@@ -54,7 +55,7 @@ func InitializeExternalResources(ctx context.Context, tCtx core.TaskExecutionCon
 		externalResources[i] = &core.ExternalResource{
 			ExternalID:   subTaskID,
 			CacheStatus:  cacheStatus,
-			Index:        uint32(i),
+			Index:        uint32(i), // #nosec G115
 			Logs:         nil,
 			RetryAttempt: 0,
 			Phase:        phase,

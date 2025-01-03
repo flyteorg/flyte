@@ -305,7 +305,7 @@ func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path st
 	}
 
 	if *update {
-		err = ioutil.WriteFile(path, raw, os.ModePerm)
+		err = ioutil.WriteFile(path, raw, os.ModePerm) // #nosec G306
 		if !assert.NoError(t, err) {
 			return false
 		}

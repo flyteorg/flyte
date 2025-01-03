@@ -31,7 +31,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				node = &core.Node{
 					Metadata: &core.NodeMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.nodeRetries),
+							Retries: uint32(test.nodeRetries), // #nosec G115
 						},
 					},
 				}
@@ -42,7 +42,7 @@ func TestComputeRetryStrategy(t *testing.T) {
 				tmpl = &core.TaskTemplate{
 					Metadata: &core.TaskMetadata{
 						Retries: &core.RetryStrategy{
-							Retries: uint32(test.taskRetries),
+							Retries: uint32(test.taskRetries), // #nosec G115
 						},
 					},
 				}

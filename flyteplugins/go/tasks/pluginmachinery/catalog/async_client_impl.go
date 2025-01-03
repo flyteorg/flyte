@@ -88,7 +88,7 @@ func (c AsyncClientImpl) Download(ctx context.Context, requests ...DownloadReque
 			}
 
 			if readerWorkItem.IsCached() {
-				cachedResults.Set(uint(idx))
+				cachedResults.Set(uint(idx)) // #nosec G115
 				cachedCount++
 			}
 		case workqueue.WorkStatusFailed:

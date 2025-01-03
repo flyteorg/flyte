@@ -128,7 +128,7 @@ func generateExecutionName(launchPlan admin.LaunchPlan, kickoffTime time.Time) s
 		Domain:  launchPlan.Id.Domain,
 		Name:    launchPlan.Id.Name,
 	})
-	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier)
+	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier) // #nosec G115
 	return common.GetExecutionName(randomSeed)
 }
 

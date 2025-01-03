@@ -52,7 +52,7 @@ func (p PFlagProvider) WriteTestFile(outputFilePath string) error {
 }
 
 func (p PFlagProvider) writeToFile(buffer *bytes.Buffer, fileName string) error {
-	return ioutil.WriteFile(fileName, buffer.Bytes(), os.ModePerm)
+	return ioutil.WriteFile(fileName, buffer.Bytes(), os.ModePerm) // #nosec G306
 }
 
 // generate evaluates the generator and writes the output to buffer. targetFileName is used only to influence how imports are

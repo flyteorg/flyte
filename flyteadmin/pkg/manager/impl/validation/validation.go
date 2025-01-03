@@ -341,7 +341,7 @@ func ValidateDatetime(literal *core.Literal) error {
 
 	err := timestamp.CheckValid()
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, err.Error())
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s", err.Error())
 	}
 	return nil
 }

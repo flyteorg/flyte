@@ -939,7 +939,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				} else {
 					assert.Nil(t, s.Err)
 				}
-				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts())
+				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts()) // #nosec G115
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}

@@ -46,7 +46,7 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 
 	metrics.SubTasksSubmitted.Add(ctx, float64(size))
 
-	retryAttemptsArray, err := bitarray.NewCompactArray(uint(size), bitarray.Item(pluginConfig.MaxRetries))
+	retryAttemptsArray, err := bitarray.NewCompactArray(uint(size), bitarray.Item(pluginConfig.MaxRetries)) // #nosec G115
 	if err != nil {
 		logger.Errorf(context.Background(), "Failed to create attempts compact array with [count: %v, maxValue: %v]", size, pluginConfig.MaxRetries)
 		return nil, err
@@ -58,7 +58,7 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 			Summary: arraystatus.ArraySummary{
 				core.PhaseQueued: int64(size),
 			},
-			Detailed: arrayCore.NewPhasesCompactArray(uint(size)),
+			Detailed: arrayCore.NewPhasesCompactArray(uint(size)), // #nosec G115
 		}).
 		SetReason("Successfully launched subtasks.").
 		SetRetryAttempts(retryAttemptsArray)

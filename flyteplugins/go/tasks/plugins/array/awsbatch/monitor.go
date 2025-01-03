@@ -67,7 +67,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 	msg := errorcollector.NewErrorMessageCollector()
 	newArrayStatus := arraystatus.ArrayStatus{
 		Summary:  arraystatus.ArraySummary{},
-		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
+		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())), // #nosec G115
 	}
 
 	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
@@ -126,7 +126,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 			}
 		}
 
-		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
+		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase)) // #nosec G115
 		newArrayStatus.Summary.Inc(actualPhase)
 		parentState.RetryAttempts.SetItem(childIdx, bitarray.Item(len(subJob.Attempts)))
 	}

@@ -36,12 +36,12 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 	project := config.GetConfig().Project
 	domain := config.GetConfig().Domain
 	if len(args) != 1 {
-		return fmt.Errorf(clierrors.ErrLPNotPassed)
+		return fmt.Errorf("%s", clierrors.ErrLPNotPassed)
 	}
 	name := args[0]
 	version := launchplan.UConfig.Version
 	if len(version) == 0 {
-		return fmt.Errorf(clierrors.ErrLPVersionNotPassed)
+		return fmt.Errorf("%s", clierrors.ErrLPVersionNotPassed)
 	}
 
 	activate := launchplan.UConfig.Activate
@@ -55,7 +55,7 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 		deactivate = launchplan.UConfig.Deactivate
 	}
 	if activate == deactivate && deactivate {
-		return fmt.Errorf(clierrors.ErrInvalidBothStateUpdate)
+		return fmt.Errorf("%s", clierrors.ErrInvalidBothStateUpdate)
 	}
 
 	var newState admin.LaunchPlanState

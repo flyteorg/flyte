@@ -34,7 +34,7 @@ func getRandSource(seed string) (rand.Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	hashedSeed := int64(h.Sum64())
+	hashedSeed := int64(h.Sum64()) // #nosec G115
 	return rand.NewSource(hashedSeed), nil
 }
 

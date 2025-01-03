@@ -80,7 +80,7 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 	tn := n.nodeStatus.GetTaskNodeStatus()
 	if tn != nil {
 		return handler.TaskNodeState{
-			PluginPhase:                        pluginCore.Phase(tn.GetPhase()),
+			PluginPhase:                        pluginCore.Phase(tn.GetPhase()), // #nosec G115
 			PluginPhaseVersion:                 tn.GetPhaseVersion(),
 			PluginStateVersion:                 tn.GetPluginStateVersion(),
 			PluginState:                        tn.GetPluginState(),

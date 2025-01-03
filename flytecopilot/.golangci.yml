@@ -10,25 +10,21 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - gas
     - gci
     - goconst
     - goimports
-    - golint
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
 
 linters-settings:
   gci:
@@ -38,3 +34,6 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
+  gosec:
+    excludes:
+      - G601 # disable the rule G601 since its not relevant in go 1.22+

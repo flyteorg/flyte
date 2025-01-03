@@ -76,7 +76,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(e.taskEvents) == 0 {
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
-			Index:        uint32(index),
+			Index:        uint32(index), // #nosec G115
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
 			CacheStatus:  cacheStatus,
@@ -90,7 +90,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
-			Index:        uint32(index),
+			Index:        uint32(index), // #nosec G115
 			Logs:         taskExecutionEvent.Logs,
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.Phase,

@@ -117,7 +117,7 @@ func getMessageList(batchIndex int) ([]proto.Message, error) {
 
 	msg, err := callback(filters.Filters{
 		Limit:  msgPerBatch,
-		Page:   int32(batchIndex + 1),
+		Page:   int32(batchIndex + 1), // #nosec G115
 		SortBy: filter.SortBy,
 		Asc:    filter.Asc,
 	})

@@ -243,7 +243,7 @@ func toBackoffLimit(metadata *idlCore.TaskMetadata) *int32 {
 		return nil
 	}
 
-	i := int32(metadata.Retries.Retries)
+	i := int32(metadata.Retries.Retries) // #nosec G115
 	return &i
 }
 

@@ -140,7 +140,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			Labels:              &admin.Labels{Values: labels},
 			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
 			SecurityContext:     &launchCtx.SecurityContext,
-			MaxParallelism:      int32(launchCtx.MaxParallelism),
+			MaxParallelism:      int32(launchCtx.MaxParallelism), // #nosec G115
 			RawOutputDataConfig: launchCtx.RawOutputDataConfig,
 			Interruptible:       interruptible,
 			OverwriteCache:      launchCtx.OverwriteCache,

@@ -32,6 +32,7 @@ func TestNewItemArray(t *testing.T) {
 			arr, err := NewCompactArray(itemsCount, Item(1)<<(itemSize-1))
 			assert.NoError(t, err)
 
+			// #nosec G115
 			for i := 0; i < int(itemsCount); i++ {
 				// Ensure inserted items is in the accepted range (0 -> 1<<itemSize)
 				val := getRandInt() % (1 << (itemSize - 1))
@@ -86,11 +87,11 @@ func TestCompactArray_GetItems(t *testing.T) {
 
 func BenchmarkCompactArray_SetItem(b *testing.B) {
 	// Number of bits = log b.N (to base 2)
-	itemsCount := uint(b.N)
+	itemsCount := uint(b.N) // #nosec G115
 	expected := make([]Item, 0, itemsCount)
 
 	b.ResetTimer()
-	arr, err := NewCompactArray(itemsCount, Item(b.N))
+	arr, err := NewCompactArray(itemsCount, Item(b.N)) // #nosec G115
 	assert.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -137,7 +138,7 @@ func TestPanicOnOversizedValue(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Panics(t, func() { itemArray.validateValue(4) })
 	for i := 0; i < 4; i++ {
-		assert.NotPanics(t, func() { itemArray.validateValue(Item(i)) })
+		assert.NotPanics(t, func() { itemArray.validateValue(Item(i)) }) // #nosec G115
 	}
 }
 

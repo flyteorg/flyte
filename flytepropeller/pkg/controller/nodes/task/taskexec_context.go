@@ -280,9 +280,9 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 	}
 
 	resourceNamespacePrefix := pluginCore.ResourceNamespace(t.resourceManager.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(plugin.GetID()))
-	maxAttempts := uint32(controllerconfig.GetConfig().NodeConfig.DefaultMaxAttempts)
+	maxAttempts := uint32(controllerconfig.GetConfig().NodeConfig.DefaultMaxAttempts) // #nosec G115
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
-		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts) // #nosec G115
 	}
 
 	taskTemplatePath, err := ioutils.GetTaskTemplatePath(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetDataDir())

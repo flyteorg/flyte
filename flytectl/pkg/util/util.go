@@ -26,7 +26,7 @@ var Ext string
 
 // WriteIntoFile will write content in a file
 func WriteIntoFile(data []byte, file string) error {
-	err := ioutil.WriteFile(file, data, os.ModePerm)
+	err := ioutil.WriteFile(file, data, os.ModePerm) // #nosec G306
 	if err != nil {
 		return err
 	}
@@ -45,6 +45,7 @@ func CreatePathAndFile(pathToConfig string) error {
 	// Created a empty file with right permission
 	if _, err := os.Stat(p); err != nil {
 		if os.IsNotExist(err) {
+			// #nosec G306
 			if err := os.WriteFile(p, []byte(""), os.ModePerm); err != nil {
 				return err
 			}
@@ -62,6 +63,7 @@ func SetupFlyteDir() error {
 	// Created a empty file with right permission
 	if _, err := os.Stat(docker.Kubeconfig); err != nil {
 		if os.IsNotExist(err) {
+			// #nosec G306
 			if err := os.WriteFile(docker.Kubeconfig, []byte(""), os.ModePerm); err != nil {
 				return err
 			}

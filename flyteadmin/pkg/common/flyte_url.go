@@ -108,7 +108,7 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 		taskExecID := core.TaskExecutionIdentifier{
 			NodeExecutionId: &nodeExecID,
 			// checking for overflow here is probably unreasonable
-			RetryAttempt: uint32(a),
+			RetryAttempt: uint32(a), // #nosec G115
 		}
 		return ParsedExecution{
 			PartialTaskExecID: &taskExecID,

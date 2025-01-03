@@ -87,7 +87,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 		}
 
 		success := path.Join(tmpDir, SuccessFile)
-		assert.NoError(t, ioutil.WriteFile(success, []byte("done"), os.ModePerm))
+		assert.NoError(t, ioutil.WriteFile(success, []byte("done"), os.ModePerm)) // #nosec G306
 		ok, err := containerwatcher.FileExists(success)
 		assert.NoError(t, err)
 		assert.True(t, ok, "sucessfile not created")

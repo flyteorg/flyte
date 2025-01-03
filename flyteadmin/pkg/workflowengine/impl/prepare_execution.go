@@ -57,7 +57,7 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 
 	}
 	if workflowExecutionConfig != nil {
-		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism)
+		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism) // #nosec G115
 
 		if workflowExecutionConfig.GetInterruptible() != nil {
 			interruptible := workflowExecutionConfig.GetInterruptible().GetValue()

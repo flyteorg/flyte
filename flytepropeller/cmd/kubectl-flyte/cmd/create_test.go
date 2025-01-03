@@ -113,7 +113,7 @@ func generateSimpleWorkflow(t *testing.T) {
 	marshaller := &jsonpb.Marshaler{}
 	s, err := marshaller.MarshalToString(&closure)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.json.golden"), []byte(s), os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.json.golden"), []byte(s), os.ModePerm)) // #nosec G306
 
 	m := map[string]interface{}{}
 	err = json.Unmarshal([]byte(s), &m)
@@ -121,11 +121,11 @@ func generateSimpleWorkflow(t *testing.T) {
 
 	b, err := yaml.Marshal(m)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.yaml.golden"), b, os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.yaml.golden"), b, os.ModePerm)) // #nosec G306
 
 	raw, err := proto.Marshal(&closure)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.pb.golden"), raw, os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.pb.golden"), raw, os.ModePerm)) // #nosec G306
 }
 
 func generateWorkflowWithInputs(t *testing.T) {
@@ -242,7 +242,7 @@ func marshalGolden(t *testing.T, message proto.Message, filename string) {
 	marshaller := &jsonpb.Marshaler{}
 	s, err := marshaller.MarshalToString(message)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".json.golden"), []byte(s), os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".json.golden"), []byte(s), os.ModePerm)) // #nosec G306
 
 	m := map[string]interface{}{}
 	err = json.Unmarshal([]byte(s), &m)
@@ -250,11 +250,11 @@ func marshalGolden(t *testing.T, message proto.Message, filename string) {
 
 	b, err := yaml.Marshal(m)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".yaml.golden"), b, os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".yaml.golden"), b, os.ModePerm)) // #nosec G306
 
 	raw, err := proto.Marshal(message)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".pb.golden"), raw, os.ModePerm))
+	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".pb.golden"), raw, os.ModePerm)) // #nosec G306
 }
 
 func testCompile(t *testing.T) {

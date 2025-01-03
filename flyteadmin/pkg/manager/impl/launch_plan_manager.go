@@ -64,7 +64,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		return nil, err
 	}
 	var workflowInterface core.TypedInterface
-	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
+	if len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
 			logger.Errorf(ctx,
@@ -303,8 +303,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 		}
 		logger.Debugf(ctx, "No active launch plan model found to disable with project: %s, domain: %s, name: %s",
 			request.Id.Project, request.Id.Domain, request.Id.Name)
-	} else if formerlyActiveLaunchPlanModelOutput.LaunchPlans != nil &&
-		len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
+	} else if len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
 		formerlyActiveLaunchPlanModel = &formerlyActiveLaunchPlanModelOutput.LaunchPlans[0]
 		err = m.updateLaunchPlanModelState(formerlyActiveLaunchPlanModel, admin.LaunchPlanState_INACTIVE)
 		if err != nil {

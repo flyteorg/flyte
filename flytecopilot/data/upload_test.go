@@ -36,7 +36,7 @@ func TestUploader_RecursiveUpload(t *testing.T) {
 		}
 
 		data := []byte("data")
-		assert.NoError(t, ioutil.WriteFile(path.Join(tmpDir, "x"), data, os.ModePerm))
+		assert.NoError(t, ioutil.WriteFile(path.Join(tmpDir, "x"), data, os.ModePerm)) // #nosec G306
 		fmt.Printf("Written to %s ", path.Join(tmpDir, "x"))
 
 		store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())

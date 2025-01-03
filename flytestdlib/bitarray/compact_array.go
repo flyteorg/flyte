@@ -39,13 +39,14 @@ func (a *CompactArray) validateValue(value Item) {
 func (a *CompactArray) SetItem(index int, value Item) {
 	a.validateIndex(index)
 	a.validateValue(value)
-	bitIndex := uint(index) * a.ItemSize
+	bitIndex := uint(index) * a.ItemSize // #nosec G115
 	x := Item(1)
+	// #nosec G115
 	for i := int(a.ItemSize - 1); i >= 0; i-- {
 		if x&value != 0 {
-			a.BitSet.Set(bitIndex + uint(i))
+			a.BitSet.Set(bitIndex + uint(i)) // #nosec G115
 		} else {
-			a.BitSet.Clear(bitIndex + uint(i))
+			a.BitSet.Clear(bitIndex + uint(i)) // #nosec G115
 		}
 
 		x <<= 1
@@ -55,10 +56,12 @@ func (a *CompactArray) SetItem(index int, value Item) {
 // Gets Item at provided index.
 func (a *CompactArray) GetItem(index int) Item {
 	a.validateIndex(index)
-	bitIndex := uint(index) * a.ItemSize
+	bitIndex := uint(index) * a.ItemSize // #nosec G115
 	res := Item(0)
 	x := Item(1)
+	// #nosec G115
 	for i := int(a.ItemSize - 1); i >= 0; i-- {
+		// #nosec G115
 		if a.BitSet.IsSet(bitIndex + uint(i)) {
 			res |= x
 		}
@@ -72,6 +75,7 @@ func (a *CompactArray) GetItem(index int) Item {
 // Gets all items stored in the array. The size of the returned array matches the ItemsCount it was initialized with.
 func (a CompactArray) GetItems() []Item {
 	res := make([]Item, 0, a.ItemsCount)
+	// #nosec G115
 	for i := 0; i < int(a.ItemsCount); i++ {
 		res = append(res, a.GetItem(i))
 	}
