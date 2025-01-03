@@ -625,4 +625,15 @@ func TestGetDynamicLogLinkTypes(t *testing.T) {
 		},
 	})
 	assert.Equal(t, []string{vscode}, linkTypes)
+	linkTypes = getDynamicLogLinkTypes(Input{
+		PodName: "my-pod-name",
+		TaskTemplate: &core.TaskTemplate{
+			Config: map[string]string{
+				"link_type": "wandb",
+				"port":      "8080",
+			},
+		},
+		EnableVscode: true,
+	})
+	assert.Equal(t, []string{"wandb", vscode}, linkTypes)
 }

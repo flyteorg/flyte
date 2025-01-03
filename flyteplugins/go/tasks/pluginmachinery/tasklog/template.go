@@ -212,7 +212,7 @@ func getDynamicLogLinkTypes(input Input) []string {
 	if linkType == "" {
 		return dynamicLogLinkTypes
 	}
-	return strings.Split(linkType, ",")
+	return append(strings.Split(linkType, ","), dynamicLogLinkTypes...)
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
