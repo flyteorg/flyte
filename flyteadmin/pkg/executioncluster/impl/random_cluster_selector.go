@@ -98,8 +98,8 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 	var label string
 
-	if spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.Value != "" {
-		label = spec.ExecutionClusterLabel.Value
+	if spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.GetValue() != "" {
+		label = spec.ExecutionClusterLabel.GetValue()
 		logger.Debugf(ctx, "Using execution cluster label %s", label)
 	} else {
 		resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
@@ -113,7 +113,7 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 			return nil, err
 		}
 		if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
-			label = resource.Attributes.GetExecutionClusterLabel().Value
+			label = resource.Attributes.GetExecutionClusterLabel().GetValue()
 		}
 	}
 

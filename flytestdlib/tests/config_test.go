@@ -3,7 +3,6 @@ package tests
 import (
 	"context"
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -50,12 +49,12 @@ func TestStorageAndLoggerConfig(t *testing.T) {
 		t.Log("Updating golden files.")
 		raw, err := yaml.Marshal(expected)
 		assert.NoError(t, err)
-		assert.NoError(t, ioutil.WriteFile(configPath, raw, os.ModePerm)) // #nosec G306
+		assert.NoError(t, os.WriteFile(configPath, raw, os.ModePerm)) // #nosec G306
 	}
 
 	actual := CompositeConfig{}
 	/* #nosec */
-	raw, err := ioutil.ReadFile(configPath)
+	raw, err := os.ReadFile(configPath)
 	assert.NoError(t, err)
 	assert.NoError(t, yaml.Unmarshal(raw, &actual))
 	assert.True(t, reflect.DeepEqual(expected, actual))

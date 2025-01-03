@@ -258,12 +258,12 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		length = *l
 	}
 
-	rawOutputPrefix, uniqueID, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
+	rawOutputPrefix, uniqueID, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, id.GetRetryAttempt())
 	if err != nil {
 		return nil, err
 	}
 
-	prevCheckpointPath, err := ComputePreviousCheckpointPath(ctx, length, nCtx, currentNodeUniqueID, id.RetryAttempt)
+	prevCheckpointPath, err := ComputePreviousCheckpointPath(ctx, length, nCtx, currentNodeUniqueID, id.GetRetryAttempt())
 	if err != nil {
 		return nil, err
 	}

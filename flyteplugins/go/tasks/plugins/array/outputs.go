@@ -52,7 +52,8 @@ type assembleOutputsWorker struct {
 func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.WorkItem) (workqueue.WorkStatus, error) {
 	i := workItem.(*outputAssembleItem)
 
-	outputReaders, err := ConstructOutputReaders(ctx, i.dataStore, i.outputPaths.GetOutputPrefixPath(), i.outputPaths.GetRawOutputPrefix(), int(i.finalPhases.ItemsCount)) // #nosec G115
+	// #nosec G115
+	outputReaders, err := ConstructOutputReaders(ctx, i.dataStore, i.outputPaths.GetOutputPrefixPath(), i.outputPaths.GetRawOutputPrefix(), int(i.finalPhases.ItemsCount))
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct output readers. Error: %v", err)
 		return workqueue.WorkStatusFailed, err
@@ -110,7 +111,7 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 }
 
 func appendOneItem(outputs *core.LiteralMap, varName string, literal *core.Literal, expectedSize int64) {
-	existingVal, found := outputs.Literals[varName]
+	existingVal, found := outputs.GetLiterals()[varName]
 	var list *core.LiteralCollection
 	if found {
 		list = existingVal.GetCollection()
@@ -206,7 +207,7 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 			finalPhases:    finalPhases,
 			outputPaths:    tCtx.OutputWriter(),
 			dataStore:      tCtx.DataStore(),
-			isAwsSingleJob: taskTemplate.Type == AwsBatchTaskType,
+			isAwsSingleJob: taskTemplate.GetType() == AwsBatchTaskType,
 		})
 
 		if err != nil {
@@ -274,7 +275,8 @@ type assembleErrorsWorker struct {
 
 func (a assembleErrorsWorker) Process(ctx context.Context, workItem workqueue.WorkItem) (workqueue.WorkStatus, error) {
 	w := workItem.(*outputAssembleItem)
-	outputReaders, err := ConstructOutputReaders(ctx, w.dataStore, w.outputPaths.GetOutputPrefixPath(), w.outputPaths.GetRawOutputPrefix(), int(w.finalPhases.ItemsCount)) // #nosec G115
+	// #nosec G115
+	outputReaders, err := ConstructOutputReaders(ctx, w.dataStore, w.outputPaths.GetOutputPrefixPath(), w.outputPaths.GetRawOutputPrefix(), int(w.finalPhases.ItemsCount))
 	if err != nil {
 		return workqueue.WorkStatusNotDone, err
 	}

@@ -3,7 +3,6 @@ package test
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -36,27 +35,27 @@ func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 		return nil
 	}
 
-	res := make(map[string]*core.Literal, len(iface.GetInputs().Variables))
-	for inputName, inputVar := range iface.GetInputs().Variables {
+	res := make(map[string]*core.Literal, len(iface.GetInputs().GetVariables()))
+	for inputName, inputVar := range iface.GetInputs().GetVariables() {
 		// A workaround because the coreutils don't support the "StructuredDataSet" type
-		if reflect.TypeOf(inputVar.Type.Type) == reflect.TypeOf(&core.LiteralType_StructuredDatasetType{}) {
+		if reflect.TypeOf(inputVar.GetType().GetType()) == reflect.TypeOf(&core.LiteralType_StructuredDatasetType{}) {
 			res[inputName] = &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_StructuredDataset{
 							StructuredDataset: &core.StructuredDataset{
 								Metadata: &core.StructuredDatasetMetadata{
-									StructuredDatasetType: inputVar.Type.Type.(*core.LiteralType_StructuredDatasetType).StructuredDatasetType,
+									StructuredDatasetType: inputVar.GetType().GetType().(*core.LiteralType_StructuredDatasetType).StructuredDatasetType,
 								},
 							},
 						},
 					},
 				},
 			}
-		} else if reflect.TypeOf(inputVar.Type.Type) == reflect.TypeOf(&core.LiteralType_Simple{}) && inputVar.Type.GetSimple() == core.SimpleType_DATETIME {
+		} else if reflect.TypeOf(inputVar.GetType().GetType()) == reflect.TypeOf(&core.LiteralType_Simple{}) && inputVar.GetType().GetSimple() == core.SimpleType_DATETIME {
 			res[inputName] = coreutils.MustMakeLiteral(time.UnixMicro(10))
 		} else {
-			res[inputName] = coreutils.MustMakeDefaultLiteralForType(inputVar.Type)
+			res[inputName] = coreutils.MustMakeDefaultLiteralForType(inputVar.GetType())
 		}
 	}
 
@@ -114,7 +113,7 @@ func TestDynamic(t *testing.T) {
 			//	t.SkipNow()
 			//}
 
-			raw, err := ioutil.ReadFile(path)
+			raw, err := os.ReadFile(path)
 			assert.NoError(t, err)
 			wf := &core.DynamicJobSpec{}
 			err = utils.UnmarshalBytesToPb(raw, wf)
@@ -123,7 +122,7 @@ func TestDynamic(t *testing.T) {
 			}
 
 			t.Log("Compiling Workflow")
-			compiledTasks := mustCompileTasks(t, wf.Tasks)
+			compiledTasks := mustCompileTasks(t, wf.GetTasks())
 			wfTemplate := &core.WorkflowTemplate{
 				Id: &core.Identifier{
 					Domain:  "domain",
@@ -146,16 +145,16 @@ func TestDynamic(t *testing.T) {
 						},
 					}},
 				},
-				Nodes:   wf.Nodes,
-				Outputs: wf.Outputs,
+				Nodes:   wf.GetNodes(),
+				Outputs: wf.GetOutputs(),
 			}
-			compiledWfc, err := compiler.CompileWorkflow(wfTemplate, wf.Subworkflows, compiledTasks,
+			compiledWfc, err := compiler.CompileWorkflow(wfTemplate, wf.GetSubworkflows(), compiledTasks,
 				[]common.InterfaceProvider{})
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 
-			inputs := makeDefaultInputs(compiledWfc.Primary.Template.Interface)
+			inputs := makeDefaultInputs(compiledWfc.GetPrimary().GetTemplate().GetInterface())
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
 				inputs,
@@ -180,22 +179,22 @@ func TestDynamic(t *testing.T) {
 func getAllSubNodeIDs(n *core.Node) sets.String {
 	res := sets.NewString()
 	if branchNode := n.GetBranchNode(); branchNode != nil {
-		thenNode := branchNode.IfElse.Case.ThenNode
+		thenNode := branchNode.GetIfElse().GetCase().GetThenNode()
 		if hasPromiseInputs(thenNode.GetInputs()) {
 			res.Insert(thenNode.GetId())
 		}
 
 		res = res.Union(getAllSubNodeIDs(thenNode))
 
-		for _, other := range branchNode.IfElse.Other {
-			if hasPromiseInputs(other.ThenNode.GetInputs()) {
-				res.Insert(other.ThenNode.GetId())
+		for _, other := range branchNode.GetIfElse().GetOther() {
+			if hasPromiseInputs(other.GetThenNode().GetInputs()) {
+				res.Insert(other.GetThenNode().GetId())
 			}
 
-			res = res.Union(getAllSubNodeIDs(other.ThenNode))
+			res = res.Union(getAllSubNodeIDs(other.GetThenNode()))
 		}
 
-		if elseNode := branchNode.IfElse.GetElseNode(); elseNode != nil {
+		if elseNode := branchNode.GetIfElse().GetElseNode(); elseNode != nil {
 			if hasPromiseInputs(elseNode.GetInputs()) {
 				res.Insert(elseNode.GetId())
 			}
@@ -221,7 +220,7 @@ var allNodesPredicate = func(n *core.Node) bool {
 
 func getAllMatchingNodes(wf *core.CompiledWorkflow, predicate nodePredicate) sets.String {
 	s := sets.NewString()
-	for _, n := range wf.Template.Nodes {
+	for _, n := range wf.GetTemplate().GetNodes() {
 		if predicate(n) {
 			s.Insert(n.GetId())
 		}
@@ -235,13 +234,13 @@ func getAllMatchingNodes(wf *core.CompiledWorkflow, predicate nodePredicate) set
 func bindingHasPromiseInputs(binding *core.BindingData) bool {
 	switch v := binding.GetValue().(type) {
 	case *core.BindingData_Collection:
-		for _, d := range v.Collection.Bindings {
+		for _, d := range v.Collection.GetBindings() {
 			if bindingHasPromiseInputs(d) {
 				return true
 			}
 		}
 	case *core.BindingData_Map:
-		for _, d := range v.Map.Bindings {
+		for _, d := range v.Map.GetBindings() {
 			if bindingHasPromiseInputs(d) {
 				return true
 			}
@@ -255,7 +254,7 @@ func bindingHasPromiseInputs(binding *core.BindingData) bool {
 
 func hasPromiseInputs(bindings []*core.Binding) bool {
 	for _, b := range bindings {
-		if bindingHasPromiseInputs(b.Binding) {
+		if bindingHasPromiseInputs(b.GetBinding()) {
 			return true
 		}
 	}
@@ -265,14 +264,14 @@ func hasPromiseInputs(bindings []*core.Binding) bool {
 
 func assertNodeIDsInConnections(t testing.TB, nodeIDsWithDeps, allNodeIDs sets.String, connections *core.ConnectionSet) bool {
 	actualNodeIDs := sets.NewString()
-	for id, lst := range connections.Downstream {
+	for id, lst := range connections.GetDownstream() {
 		actualNodeIDs.Insert(id)
-		actualNodeIDs.Insert(lst.Ids...)
+		actualNodeIDs.Insert(lst.GetIds()...)
 	}
 
-	for id, lst := range connections.Upstream {
+	for id, lst := range connections.GetUpstream() {
 		actualNodeIDs.Insert(id)
-		actualNodeIDs.Insert(lst.Ids...)
+		actualNodeIDs.Insert(lst.GetIds()...)
 	}
 
 	notFoundInConnections := nodeIDsWithDeps.Difference(actualNodeIDs)
@@ -305,13 +304,13 @@ func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path st
 	}
 
 	if *update {
-		err = ioutil.WriteFile(path, raw, os.ModePerm) // #nosec G306
+		err = os.WriteFile(path, raw, os.ModePerm) // #nosec G306
 		if !assert.NoError(t, err) {
 			return false
 		}
 
 	} else {
-		goldenRaw, err := ioutil.ReadFile(path)
+		goldenRaw, err := os.ReadFile(path)
 		if !assert.NoError(t, err) {
 			return false
 		}
@@ -339,7 +338,7 @@ func runCompileTest(t *testing.T, dirName string) {
 		}
 
 		for _, p := range paths {
-			raw, err := ioutil.ReadFile(p)
+			raw, err := os.ReadFile(p)
 			assert.NoError(t, err)
 			tsk := &admin.TaskSpec{}
 			err = proto.Unmarshal(raw, tsk)
@@ -349,13 +348,13 @@ func runCompileTest(t *testing.T, dirName string) {
 			}
 
 			t.Run(p, func(t *testing.T) {
-				inputTask := tsk.Template
+				inputTask := tsk.GetTemplate()
 				setDefaultFields(inputTask)
 				task, err := compiler.CompileTask(inputTask)
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
-				compiledTasks[tsk.Template.Id.String()] = task
+				compiledTasks[tsk.GetTemplate().GetId().String()] = task
 
 				// unmarshal from json file to compare rather than yaml
 				taskFile := filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.json")
@@ -387,7 +386,7 @@ func runCompileTest(t *testing.T, dirName string) {
 			}
 
 			t.Run(p, func(t *testing.T) {
-				inputWf := wf.Workflow
+				inputWf := wf.GetWorkflow()
 
 				reqs, err := compiler.GetRequirements(inputWf, nil)
 				if !assert.NoError(t, err) {
@@ -411,9 +410,9 @@ func runCompileTest(t *testing.T, dirName string) {
 					t.FailNow()
 				}
 
-				allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
-				nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
-				if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
+				allNodeIDs := getAllMatchingNodes(compiledWfc.GetPrimary(), allNodesPredicate)
+				nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.GetPrimary(), hasPromiseNodePredicate)
+				if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.GetPrimary().GetConnections()) {
 					t.FailNow()
 				}
 
@@ -433,7 +432,7 @@ func runCompileTest(t *testing.T, dirName string) {
 
 		for _, p := range paths {
 			t.Run(p, func(t *testing.T) {
-				raw, err := ioutil.ReadFile(p)
+				raw, err := os.ReadFile(p)
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
@@ -443,9 +442,9 @@ func runCompileTest(t *testing.T, dirName string) {
 					t.FailNow()
 				}
 
-				inputs := makeDefaultInputs(compiledWfc.Primary.Template.Interface)
+				inputs := makeDefaultInputs(compiledWfc.GetPrimary().GetTemplate().GetInterface())
 
-				dotFormat := visualize.ToGraphViz(compiledWfc.Primary)
+				dotFormat := visualize.ToGraphViz(compiledWfc.GetPrimary())
 				t.Logf("GraphViz Dot: %v\n", dotFormat)
 
 				flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,

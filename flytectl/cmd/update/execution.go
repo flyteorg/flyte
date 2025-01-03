@@ -36,13 +36,13 @@ func updateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 	project := config.GetConfig().Project
 	domain := config.GetConfig().Domain
 	if len(args) != 1 {
-		return fmt.Errorf("%s", clierrors.ErrExecutionNotPassed)
+		return fmt.Errorf(clierrors.ErrExecutionNotPassed) //nolint
 	}
 	executionName := args[0]
 	activate := execution.UConfig.Activate
 	archive := execution.UConfig.Archive
 	if activate && archive {
-		return fmt.Errorf("%s", clierrors.ErrInvalidStateUpdate)
+		return fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
 	}
 
 	var newState admin.ExecutionState

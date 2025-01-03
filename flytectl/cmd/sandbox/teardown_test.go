@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
@@ -19,11 +20,11 @@ func TestTearDownClusterFunc(t *testing.T) {
 	var containers []types.Container
 	_ = util.SetupFlyteDir()
 	_ = util.WriteIntoFile([]byte("data"), configutil.FlytectlConfig)
-	s := testutils.Setup()
+	s := testutils.Setup(t)
 	ctx := s.Ctx
 	mockDocker := &mocks.Docker{}
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
-	mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+	mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 	mockK8sContextMgr := &k8sMocks.ContextOps{}
 	mockK8sContextMgr.OnRemoveContext(mock.Anything).Return(nil)
 	k8s.ContextMgr = mockK8sContextMgr

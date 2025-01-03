@@ -41,7 +41,7 @@ func consistentHash(str string) (string, error) {
 
 func hashInputs(ctx context.Context, key Key) (string, error) {
 	inputs := &core.LiteralMap{}
-	if key.TypedInterface.Inputs != nil {
+	if key.TypedInterface.GetInputs() != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return "", err

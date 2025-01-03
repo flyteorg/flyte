@@ -14,54 +14,54 @@ import (
 	propellervalidators "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 )
 
-func ValidateSignalGetOrCreateRequest(ctx context.Context, request admin.SignalGetOrCreateRequest) error {
-	if request.Id == nil {
+func ValidateSignalGetOrCreateRequest(ctx context.Context, request *admin.SignalGetOrCreateRequest) error {
+	if request.GetId() == nil {
 		return shared.GetMissingArgumentError("id")
 	}
-	if err := ValidateSignalIdentifier(*request.Id); err != nil {
+	if err := ValidateSignalIdentifier(request.GetId()); err != nil {
 		return err
 	}
-	if request.Type == nil {
+	if request.GetType() == nil {
 		return shared.GetMissingArgumentError("type")
 	}
 
 	return nil
 }
 
-func ValidateSignalIdentifier(identifier core.SignalIdentifier) error {
-	if identifier.ExecutionId == nil {
+func ValidateSignalIdentifier(identifier *core.SignalIdentifier) error {
+	if identifier.GetExecutionId() == nil {
 		return shared.GetMissingArgumentError(shared.ExecutionID)
 	}
-	if identifier.SignalId == "" {
+	if identifier.GetSignalId() == "" {
 		return shared.GetMissingArgumentError("signal_id")
 	}
 
-	return ValidateWorkflowExecutionIdentifier(identifier.ExecutionId)
+	return ValidateWorkflowExecutionIdentifier(identifier.GetExecutionId())
 }
 
-func ValidateSignalListRequest(ctx context.Context, request admin.SignalListRequest) error {
-	if err := ValidateWorkflowExecutionIdentifier(request.WorkflowExecutionId); err != nil {
+func ValidateSignalListRequest(ctx context.Context, request *admin.SignalListRequest) error {
+	if err := ValidateWorkflowExecutionIdentifier(request.GetWorkflowExecutionId()); err != nil {
 		return shared.GetMissingArgumentError(shared.ExecutionID)
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil
 }
 
-func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repository, request admin.SignalSetRequest) error {
-	if request.Id == nil {
+func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repository, request *admin.SignalSetRequest) error {
+	if request.GetId() == nil {
 		return shared.GetMissingArgumentError("id")
 	}
-	if err := ValidateSignalIdentifier(*request.Id); err != nil {
+	if err := ValidateSignalIdentifier(request.GetId()); err != nil {
 		return err
 	}
-	if request.Value == nil {
+	if request.GetValue() == nil {
 		return shared.GetMissingArgumentError("value")
 	}
 
 	// validate that signal value matches type of existing signal
-	signalModel, err := transformers.CreateSignalModel(request.Id, nil, nil)
+	signalModel, err := transformers.CreateSignalModel(request.GetId(), nil, nil)
 	if err != nil {
 		return nil
 	}
@@ -71,15 +71,19 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 			"failed to validate that signal [%v] exists, err: [%+v]",
 			signalModel.SignalKey, err)
 	}
-	valueType := propellervalidators.LiteralTypeForLiteral(request.Value)
+	valueType := propellervalidators.LiteralTypeForLiteral(request.GetValue())
 	lookupSignal, err := transformers.FromSignalModel(lookupSignalModel)
 	if err != nil {
 		return err
 	}
-	if !propellervalidators.AreTypesCastable(lookupSignal.Type, valueType) {
+	err = propellervalidators.ValidateLiteralType(valueType)
+	if err != nil {
+		return errors.NewInvalidLiteralTypeError("", err)
+	}
+	if !propellervalidators.AreTypesCastable(lookupSignal.GetType(), valueType) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"requested signal value [%v] is not castable to existing signal type [%v]",
-			request.Value, lookupSignalModel.Type)
+			request.GetValue(), lookupSignalModel.Type)
 	}
 
 	return nil

@@ -17,7 +17,7 @@ import (
 )
 
 func TestValidateProjectRegisterRequest_ValidRequest(t *testing.T) {
-	assert.Nil(t, ValidateProjectRegisterRequest(admin.ProjectRegisterRequest{
+	assert.Nil(t, ValidateProjectRegisterRequest(&admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:   "proj",
 			Name: "proj",
@@ -27,16 +27,16 @@ func TestValidateProjectRegisterRequest_ValidRequest(t *testing.T) {
 
 func TestValidateProjectRegisterRequest(t *testing.T) {
 	type testValue struct {
-		request       admin.ProjectRegisterRequest
+		request       *admin.ProjectRegisterRequest
 		expectedError string
 	}
 	testValues := []testValue{
 		{
-			request:       admin.ProjectRegisterRequest{},
+			request:       &admin.ProjectRegisterRequest{},
 			expectedError: "missing project",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Name: "proj",
 					Domains: []*admin.Domain{
@@ -50,7 +50,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "missing project_id",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "%)(*&",
 					Name: "proj",
@@ -59,7 +59,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "invalid project id [%)(*&]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id: "proj",
 				},
@@ -67,7 +67,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "missing project_name",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "proj",
 					Name: "longnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamel",
@@ -76,7 +76,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "project_name cannot exceed 64 characters",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "proj",
 					Name: "proj",
@@ -94,7 +94,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "Domains are currently only set system wide. Please retry without domains included in your request.",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "proj",
 					Name: "name",
@@ -105,7 +105,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "project_description cannot exceed 300 characters",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "proj",
 					Name: "name",
@@ -120,7 +120,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 			expectedError: "invalid label key [#badkey]: [name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')]",
 		},
 		{
-			request: admin.ProjectRegisterRequest{
+			request: &admin.ProjectRegisterRequest{
 				Project: &admin.Project{
 					Id:   "proj",
 					Name: "name",
@@ -144,7 +144,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 }
 
 func TestValidateProject_ValidProject(t *testing.T) {
-	assert.Nil(t, ValidateProject(admin.Project{
+	assert.Nil(t, ValidateProject(&admin.Project{
 		Id:          "proj",
 		Description: "An amazing description for this project",
 		State:       admin.Project_ARCHIVED,
@@ -159,12 +159,12 @@ func TestValidateProject_ValidProject(t *testing.T) {
 
 func TestValidateProject(t *testing.T) {
 	type testValue struct {
-		project       admin.Project
+		project       *admin.Project
 		expectedError string
 	}
 	testValues := []testValue{
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Name: "proj",
 				Domains: []*admin.Domain{
 					{
@@ -176,21 +176,21 @@ func TestValidateProject(t *testing.T) {
 			expectedError: "missing project_id",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "%)(*&",
 				Name: "proj",
 			},
 			expectedError: "invalid project id [%)(*&]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "proj",
 				Name: "longnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamel",
 			},
 			expectedError: "project_name cannot exceed 64 characters",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "proj",
 				Name: "proj",
 				Domains: []*admin.Domain{
@@ -206,7 +206,7 @@ func TestValidateProject(t *testing.T) {
 			expectedError: "Domains are currently only set system wide. Please retry without domains included in your request.",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "proj",
 				Name: "name",
 				// 301 character string
@@ -215,7 +215,7 @@ func TestValidateProject(t *testing.T) {
 			expectedError: "project_description cannot exceed 300 characters",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "proj",
 				Name: "name",
 				Labels: &admin.Labels{
@@ -225,7 +225,7 @@ func TestValidateProject(t *testing.T) {
 			expectedError: "labels map cannot exceed 16 entries",
 		},
 		{
-			project: admin.Project{
+			project: &admin.Project{
 				Id:   "proj",
 				Name: "name",
 				Labels: &admin.Labels{
@@ -367,12 +367,12 @@ func TestValidateProjectExistsDb(t *testing.T) {
 
 func TestValidateProjectGetRequest(t *testing.T) {
 	t.Run("base case", func(t *testing.T) {
-		assert.Nil(t, ValidateProjectGetRequest(admin.ProjectGetRequest{
+		assert.Nil(t, ValidateProjectGetRequest(&admin.ProjectGetRequest{
 			Id: "project-id",
 		}))
 	})
 
 	t.Run("missing project id", func(t *testing.T) {
-		assert.EqualError(t, ValidateProjectGetRequest(admin.ProjectGetRequest{}), "missing project_id")
+		assert.EqualError(t, ValidateProjectGetRequest(&admin.ProjectGetRequest{}), "missing project_id")
 	})
 }

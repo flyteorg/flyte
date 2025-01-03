@@ -27,7 +27,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
+		lValue = nodeInputs.GetLiterals()[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
@@ -39,7 +39,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
+		rValue = nodeInputs.GetLiterals()[expr.GetRightValue().GetVar()]
 		if rValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}
@@ -136,7 +136,7 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 
 	if selectedNodeID == nil {
 		if node.GetElseFail() != nil {
-			return nil, errors.Errorf(ErrorCodeUserProvidedError, "%s", node.GetElseFail().Message)
+			return nil, errors.Errorf(ErrorCodeUserProvidedError, node.GetElseFail().GetMessage()) //nolint:govet,staticcheck
 		}
 		return nil, errors.Errorf(ErrorCodeMalformedBranch, "No branch satisfied")
 	}

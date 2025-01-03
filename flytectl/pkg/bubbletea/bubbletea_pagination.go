@@ -147,7 +147,7 @@ func Paginator(_listHeader []printer.Column, _callback DataCallback, _filter fil
 	listHeader = _listHeader
 	callback = _callback
 	filter = _filter
-	filter.Page = int32(_max(int(filter.Page), 1)) // #nosec G115
+	filter.Page = max(filter.Page, 1)
 	firstBatchIndex = (int(filter.Page) - 1) / pagePerBatch
 	lastBatchIndex = firstBatchIndex
 

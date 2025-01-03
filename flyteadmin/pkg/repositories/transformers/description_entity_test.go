@@ -26,7 +26,7 @@ func TestToDescriptionEntityExecutionModel(t *testing.T) {
 		SourceCode:       sourceCode,
 	}
 
-	id := core.Identifier{
+	id := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -37,7 +37,7 @@ func TestToDescriptionEntityExecutionModel(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, shortDescription, model.ShortDescription)
 	assert.Equal(t, longDescriptionBytes, model.LongDescription)
-	assert.Equal(t, sourceCode.Link, model.Link)
+	assert.Equal(t, sourceCode.GetLink(), model.Link)
 }
 
 func TestFromDescriptionEntityExecutionModel(t *testing.T) {
@@ -59,9 +59,9 @@ func TestFromDescriptionEntityExecutionModel(t *testing.T) {
 		SourceCode:       models.SourceCode{Link: "https://github/flyte"},
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, descriptionEntity.ShortDescription, shortDescription)
-	assert.Equal(t, descriptionEntity.LongDescription.IconLink, longDescription.IconLink)
-	assert.Equal(t, descriptionEntity.SourceCode, sourceCode)
+	assert.Equal(t, descriptionEntity.GetShortDescription(), shortDescription)
+	assert.Equal(t, descriptionEntity.GetLongDescription().GetIconLink(), longDescription.GetIconLink())
+	assert.Equal(t, descriptionEntity.GetSourceCode(), sourceCode)
 }
 
 func TestFromDescriptionEntityExecutionModels(t *testing.T) {
@@ -85,7 +85,7 @@ func TestFromDescriptionEntityExecutionModels(t *testing.T) {
 		},
 	})
 	assert.Nil(t, err)
-	assert.Equal(t, descriptionEntity[0].ShortDescription, shortDescription)
-	assert.Equal(t, descriptionEntity[0].LongDescription.IconLink, longDescription.IconLink)
-	assert.Equal(t, descriptionEntity[0].SourceCode, sourceCode)
+	assert.Equal(t, descriptionEntity[0].GetShortDescription(), shortDescription)
+	assert.Equal(t, descriptionEntity[0].GetLongDescription().GetIconLink(), longDescription.GetIconLink())
+	assert.Equal(t, descriptionEntity[0].GetSourceCode(), sourceCode)
 }

@@ -8,5 +8,5 @@ import (
 
 type NodeExecutionEventWriter interface {
 	Run()
-	Write(nodeExecutionEvent admin.NodeExecutionEventRequest)
+	Write(nodeExecutionEvent *admin.NodeExecutionEventRequest)
 }

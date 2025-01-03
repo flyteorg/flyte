@@ -33,7 +33,11 @@ type EventError struct {
 }
 
 func (r EventError) Error() string {
-	return fmt.Sprintf("%s: %s, caused by [%s]", r.Code, r.Message, r.Cause.Error())
+	var cause string
+	if r.Cause != nil {
+		cause = r.Cause.Error()
+	}
+	return fmt.Sprintf("%s: %s, caused by [%s]", r.Code, r.Message, cause)
 }
 
 func (r *EventError) Is(target error) bool {
@@ -70,7 +74,7 @@ func WrapError(err error) error {
 					phase := reason.AlreadyInTerminalState.GetCurrentPhase()
 					return wrapf(EventAlreadyInTerminalStateError, err, fmt.Sprintf("conflicting events; destination: %v", phase))
 				case *admin.EventFailureReason_IncompatibleCluster:
-					return wrapf(EventIncompatibleCusterError, err, fmt.Sprintf("conflicting execution cluster; expected: %v", reason.IncompatibleCluster.Cluster))
+					return wrapf(EventIncompatibleCusterError, err, fmt.Sprintf("conflicting execution cluster; expected: %v", reason.IncompatibleCluster.GetCluster()))
 				default:
 					logger.Warnf(context.Background(), "found unexpected type in details of grpc status: %v", reason)
 				}

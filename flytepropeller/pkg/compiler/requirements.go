@@ -57,11 +57,11 @@ func getRequirements(fg *core.WorkflowTemplate, subWfs common.WorkflowIndex, fol
 func updateWorkflowRequirements(workflow *core.WorkflowTemplate, subWfs common.WorkflowIndex,
 	taskIds, workflowIds common.IdentifierSet, followSubworkflows bool, errs errors.CompileErrors) {
 
-	for _, node := range workflow.Nodes {
+	for _, node := range workflow.GetNodes() {
 		updateNodeRequirements(node, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 	}
-	if workflow.FailureNode != nil {
-		updateNodeRequirements(workflow.FailureNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+	if workflow.GetFailureNode() != nil {
+		updateNodeRequirements(workflow.GetFailureNode(), subWfs, taskIds, workflowIds, followSubworkflows, errs)
 	}
 }
 
@@ -69,27 +69,27 @@ func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskId
 	followSubworkflows bool, errs errors.CompileErrors) {
 
 	if taskN := node.GetTaskNode(); taskN != nil && taskN.GetReferenceId() != nil {
-		taskIds.Insert(*taskN.GetReferenceId())
+		taskIds.Insert(taskN.GetReferenceId())
 	} else if workflowNode := node.GetWorkflowNode(); workflowNode != nil {
 		if workflowNode.GetLaunchplanRef() != nil {
-			workflowIds.Insert(*workflowNode.GetLaunchplanRef())
+			workflowIds.Insert(workflowNode.GetLaunchplanRef())
 		} else if workflowNode.GetSubWorkflowRef() != nil && followSubworkflows {
 			if subWf, found := subWfs[workflowNode.GetSubWorkflowRef().String()]; !found {
-				errs.Collect(errors.NewWorkflowReferenceNotFoundErr(node.Id, workflowNode.GetSubWorkflowRef().String()))
+				errs.Collect(errors.NewWorkflowReferenceNotFoundErr(node.GetId(), workflowNode.GetSubWorkflowRef().String()))
 			} else {
-				updateWorkflowRequirements(subWf.Template, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+				updateWorkflowRequirements(subWf.GetTemplate(), subWfs, taskIds, workflowIds, followSubworkflows, errs)
 			}
 		}
 	} else if branchN := node.GetBranchNode(); branchN != nil {
-		updateNodeRequirements(branchN.IfElse.Case.ThenNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
-		for _, otherCase := range branchN.IfElse.Other {
-			updateNodeRequirements(otherCase.ThenNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+		updateNodeRequirements(branchN.GetIfElse().GetCase().GetThenNode(), subWfs, taskIds, workflowIds, followSubworkflows, errs)
+		for _, otherCase := range branchN.GetIfElse().GetOther() {
+			updateNodeRequirements(otherCase.GetThenNode(), subWfs, taskIds, workflowIds, followSubworkflows, errs)
 		}
 
-		if elseNode := branchN.IfElse.GetElseNode(); elseNode != nil {
+		if elseNode := branchN.GetIfElse().GetElseNode(); elseNode != nil {
 			updateNodeRequirements(elseNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 		}
 	} else if arrayNode := node.GetArrayNode(); arrayNode != nil {
-		updateNodeRequirements(arrayNode.Node, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+		updateNodeRequirements(arrayNode.GetNode(), subWfs, taskIds, workflowIds, followSubworkflows, errs)
 	}
 }

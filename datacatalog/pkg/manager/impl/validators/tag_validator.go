@@ -13,15 +13,15 @@ func ValidateTag(tag *datacatalog.Tag) error {
 	if tag == nil {
 		return NewMissingArgumentError(tagEntity)
 	}
-	if err := ValidateDatasetID(tag.Dataset); err != nil {
+	if err := ValidateDatasetID(tag.GetDataset()); err != nil {
 		return err
 	}
 
-	if err := ValidateEmptyStringField(tag.Name, tagName); err != nil {
+	if err := ValidateEmptyStringField(tag.GetName(), tagName); err != nil {
 		return err
 	}
 
-	if err := ValidateEmptyStringField(tag.ArtifactId, artifactID); err != nil {
+	if err := ValidateEmptyStringField(tag.GetArtifactId(), artifactID); err != nil {
 		return err
 	}
 	return nil

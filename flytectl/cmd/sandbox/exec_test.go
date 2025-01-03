@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
@@ -26,7 +27,7 @@ func TestSandboxClusterExec(t *testing.T) {
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	reader := bufio.NewReader(strings.NewReader("test"))
 
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{
@@ -49,10 +50,10 @@ func TestSandboxClusterExec(t *testing.T) {
 func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	reader := bufio.NewReader(strings.NewReader("test"))
-	s := testutils.Setup()
+	s := testutils.Setup(t)
 	ctx := s.Ctx
 
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{

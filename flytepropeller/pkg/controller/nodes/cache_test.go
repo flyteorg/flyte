@@ -61,8 +61,8 @@ func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTempla
 	mockParentInfo.OnGetUniqueIDMatch().Return(uniqueID)
 
 	mockExecutionContext := &executorsmocks.ExecutionContext{}
-	mockExecutionContext.EXPECT().GetParentInfo().Return(mockParentInfo)
-	mockExecutionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	mockExecutionContext.OnGetParentInfo().Return(mockParentInfo)
+	mockExecutionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 
 	mockNodeExecutionMetadata := &interfacesmocks.NodeExecutionMetadata{}
 	mockNodeExecutionMetadata.OnGetOwnerID().Return(
@@ -128,11 +128,11 @@ func TestUpdatePhaseCacheInfo(t *testing.T) {
 
 			// ensure cache and reservation status' are being set correctly
 			if test.cacheStatus != nil {
-				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCacheStatus())
 			}
 
 			if test.reservationStatus != nil {
-				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.ReservationStatus)
+				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetReservationStatus())
 			}
 		})
 	}

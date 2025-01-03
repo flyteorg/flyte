@@ -447,6 +447,14 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   cacheIgnoreInputVars: string[] = [];
 
+  /**
+   * is_eager indicates whether the task is eager or not.
+   * This would be used by CreateTask endpoint.
+   *
+   * @generated from field: bool is_eager = 14;
+   */
+  isEager = false;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -467,6 +475,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 11, name: "tags", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 12, name: "pod_template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {

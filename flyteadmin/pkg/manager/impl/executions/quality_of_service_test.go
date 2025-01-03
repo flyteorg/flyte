@@ -38,7 +38,7 @@ func getQualityOfServiceWithDuration(duration time.Duration) *core.QualityOfServ
 func getMockConfig() runtimeInterfaces.Configuration {
 	mockConfig := mocks.NewMockConfigurationProvider(nil, nil, nil, nil, nil, nil)
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	provider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
+	provider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
 			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
 		},
@@ -63,9 +63,9 @@ func addGetResourceFunc(t *testing.T, resourceManager interfaces.ResourceInterfa
 	resourceManager.(*managerMocks.MockResourceManager).GetResourceFunc = func(ctx context.Context,
 		request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 		assert.EqualValues(t, request, interfaces.ResourceRequest{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			Workflow:     workflowIdentifier.Name,
+			Project:      workflowIdentifier.GetProject(),
+			Domain:       workflowIdentifier.GetDomain(),
+			Workflow:     workflowIdentifier.GetName(),
 			ResourceType: admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
 		})
 		return &interfaces.ResourceResponse{

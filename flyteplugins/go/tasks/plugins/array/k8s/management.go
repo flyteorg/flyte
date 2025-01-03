@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -134,13 +135,13 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		return currentState, externalResources, flyteErrors.Errorf(flyteErrors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
-	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.GetTaskTypeVersion())
 	if err != nil {
 		return currentState, externalResources, err
 	}
 
 	currentParallelism := 0
-	maxParallelism := int(arrayJob.Parallelism)
+	maxParallelism := int(arrayJob.GetParallelism())
 
 	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
 	if err != nil {
@@ -392,7 +393,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	}
 
 	if messageCollector.Length() > 0 {
-		return currentState, externalResources, errors.New(messageCollector.Summary(config.MaxErrorStringLength))
+		return currentState, externalResources, fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength)) //nolint
 	}
 
 	return currentState.SetPhase(arrayCore.PhaseWriteToDiscoveryThenFail, currentState.PhaseVersion+1), externalResources, nil

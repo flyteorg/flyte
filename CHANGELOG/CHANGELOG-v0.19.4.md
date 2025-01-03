@@ -17,7 +17,7 @@
 
 ## SDK
 - Script mode: register and run workflows all in one command using a pre-defined base image
-- Flyte remote GA: register workflows and interact with Flyte execution artifacts programmmatically
+- Flyte remote GA: register workflows and interact with Flyte execution artifacts programmatically
 - Configuration overhaul: use the same config across flytekit and flytectl
 - Fast register without having AWS or other cloud credentials on your laptop, all you need is Flyte access
 

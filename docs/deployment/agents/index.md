@@ -25,10 +25,12 @@ If you are using a managed deployment of Flyte, you will need to contact your de
   - Configuring your Flyte deployment for the BigQuery agent.
 * - {ref}`MMCloud Agent <deployment-agent-setup-mmcloud>`
   - Configuring your Flyte deployment for the MMCloud agent.
-* - {ref}`Sensor Agent <deployment-agent-setup-sensor>`
-  - Configuring your Flyte deployment for the sensor agent.
 * - {ref}`SageMaker Inference <deployment-agent-setup-sagemaker-inference>`
   - Deploy models and create, as well as trigger inference endpoints on SageMaker.
+* - {ref}`Sensor Agent <deployment-agent-setup-sensor>`
+  - Configuring your Flyte deployment for the sensor agent.
+* - {ref}`Snowflake Agent <deployment-agent-setup-snowflake>`
+  - Configuring your Flyte deployment for the SnowFlake agent.
 * - {ref}`OpenAI Batch <deployment-agent-setup-openai-batch>`
   - Submit requests to OpenAI GPT models for asynchronous batch processing.
 ```

@@ -109,9 +109,9 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	}
 	submitJobInput.SetJobName(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()).
 		SetJobDefinition(jobDefinition).SetJobQueue(jobConfig.DynamicTaskQueue).
-		SetRetryStrategy(toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries)).
+		SetRetryStrategy(toRetryStrategy(ctx, toBackoffLimit(taskTemplate.GetMetadata()), cfg.MinRetries, cfg.MaxRetries)).
 		SetContainerOverrides(toContainerOverrides(ctx, append(cmd, args...), &resources, envVars)).
-		SetTimeout(toTimeout(taskTemplate.Metadata.GetTimeout(), cfg.DefaultTimeOut.Duration))
+		SetTimeout(toTimeout(taskTemplate.GetMetadata().GetTimeout(), cfg.DefaultTimeOut.Duration))
 
 	return submitJobInput, nil
 }
@@ -159,7 +159,7 @@ func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, c
 }
 
 func toTimeout(templateTimeout *duration.Duration, defaultTimeout time.Duration) *batch.JobTimeout {
-	if templateTimeout != nil && templateTimeout.Seconds > 0 {
+	if templateTimeout != nil && templateTimeout.GetSeconds() > 0 {
 		return (&batch.JobTimeout{}).SetAttemptDurationSeconds(templateTimeout.GetSeconds())
 	}
 
@@ -239,11 +239,11 @@ func toRetryStrategy(_ context.Context, backoffLimit *int32, minRetryAttempts, m
 }
 
 func toBackoffLimit(metadata *idlCore.TaskMetadata) *int32 {
-	if metadata == nil || metadata.Retries == nil {
+	if metadata == nil || metadata.GetRetries() == nil {
 		return nil
 	}
 
-	i := int32(metadata.Retries.Retries) // #nosec G115
+	i := int32(metadata.GetRetries().GetRetries()) // #nosec G115
 	return &i
 }
 

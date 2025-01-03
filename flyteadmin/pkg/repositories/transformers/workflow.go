@@ -14,11 +14,11 @@ import (
 )
 
 // Transforms a WorkflowCreateRequest to a workflow model
-func CreateWorkflowModel(request admin.WorkflowCreateRequest, remoteClosureIdentifier string,
+func CreateWorkflowModel(request *admin.WorkflowCreateRequest, remoteClosureIdentifier string,
 	digest []byte) (models.Workflow, error) {
 	var typedInterface []byte
-	if request.Spec != nil && request.Spec.Template != nil && request.Spec.Template.Interface != nil {
-		serializedTypedInterface, err := proto.Marshal(request.Spec.Template.Interface)
+	if request.GetSpec() != nil && request.GetSpec().GetTemplate() != nil && request.GetSpec().GetTemplate().GetInterface() != nil {
+		serializedTypedInterface, err := proto.Marshal(request.GetSpec().GetTemplate().GetInterface())
 		if err != nil {
 			return models.Workflow{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize workflow spec")
 		}
@@ -26,10 +26,10 @@ func CreateWorkflowModel(request admin.WorkflowCreateRequest, remoteClosureIdent
 	}
 	return models.Workflow{
 		WorkflowKey: models.WorkflowKey{
-			Project: request.Id.Project,
-			Domain:  request.Id.Domain,
-			Name:    request.Id.Name,
-			Version: request.Id.Version,
+			Project: request.GetId().GetProject(),
+			Domain:  request.GetId().GetDomain(),
+			Name:    request.GetId().GetName(),
+			Version: request.GetId().GetVersion(),
 		},
 		TypedInterface:          typedInterface,
 		RemoteClosureIdentifier: remoteClosureIdentifier,
@@ -54,7 +54,7 @@ func FromWorkflowModel(workflowModel models.Workflow) (admin.Workflow, error) {
 	if len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
-			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, "%s", fmt.Sprintf("failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error()))
+			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, fmt.Sprintf("failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error())) //nolint
 		}
 	}
 

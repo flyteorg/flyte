@@ -240,7 +240,7 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 }
 
 func validateQuboleHiveJob(hiveJob plugins.QuboleHiveJob) error {
-	if hiveJob.Query == nil {
+	if hiveJob.GetQuery() == nil {
 		return errors.Errorf(errors.BadTaskSpecification,
 			"Query could not be found. Please ensure that you are at least on Flytekit version 0.3.0 or later.")
 	}
@@ -267,7 +267,7 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 		return "", "", []string{}, 0, "", err
 	}
 
-	query := hiveJob.Query.GetQuery()
+	query := hiveJob.GetQuery().GetQuery()
 
 	outputs, err := template.Render(ctx, []string{query},
 		template.Parameters{
@@ -281,10 +281,10 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	}
 	formattedQuery = outputs[0]
 
-	cluster = hiveJob.ClusterLabel
-	timeoutSec = hiveJob.Query.TimeoutSec
-	taskName = taskTemplate.Id.Name
-	tags = hiveJob.Tags
+	cluster = hiveJob.GetClusterLabel()
+	timeoutSec = hiveJob.GetQuery().GetTimeoutSec()
+	taskName = taskTemplate.GetId().GetName()
+	tags = hiveJob.GetTags()
 	tags = append(tags, fmt.Sprintf("ns:%s", tCtx.TaskExecutionMetadata().GetNamespace()))
 	for k, v := range tCtx.TaskExecutionMetadata().GetLabels() {
 		tags = append(tags, fmt.Sprintf("%s:%s", k, v))
@@ -326,8 +326,8 @@ func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label
 
 func mapProjectDomainToDestinationClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, quboleCfg *config.Config) (string, bool) {
 	tExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	project := tExecID.NodeExecutionId.GetExecutionId().GetProject()
-	domain := tExecID.NodeExecutionId.GetExecutionId().GetDomain()
+	project := tExecID.GetNodeExecutionId().GetExecutionId().GetProject()
+	domain := tExecID.GetNodeExecutionId().GetExecutionId().GetDomain()
 	logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
 	// Using a linear search because N is small
 	for _, m := range quboleCfg.DestinationClusterConfigs {
@@ -504,7 +504,7 @@ func WriteOutputs(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 	}
 
 	externalLocation := tCtx.OutputWriter().GetRawOutputPrefix()
-	outputs := taskTemplate.Interface.Outputs.GetVariables()
+	outputs := taskTemplate.GetInterface().GetOutputs().GetVariables()
 	if len(outputs) != 0 && len(outputs) != 1 {
 		return currentState, errors.Errorf(errors.BadTaskSpecification, "Hive tasks must have zero or one output: [%d] found", len(outputs))
 	}

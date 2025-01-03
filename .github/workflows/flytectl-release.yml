@@ -1,13 +1,34 @@
 name: Flytectl release
 
 on:
-  push:
-    tags:
-      - flytectl/v*.*.*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version. Do *not* use the `flytectl/` prefix, e.g. `flytectl/v1.2.3`, instead use only `v1.2.3` (including the `v`)"
+        required: true
 
 jobs:
+  push-flytectl-tag:
+    name: Push git tag containing the `flyteidl/` prefix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.FLYTE_BOT_PAT }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/flytectl/${{ github.event.inputs.version }}`,
+              sha: context.sha
+            })
   release:
     name: Goreleaser
+    needs:
+      - push-flytectl-tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

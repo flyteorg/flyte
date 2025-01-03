@@ -125,9 +125,9 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 
 }
 
-func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
-	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s", nodeExecutionID.ExecutionId.Project,
-		nodeExecutionID.ExecutionId.Domain, nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
+func FlyteURLsFromNodeExecutionID(nodeExecutionID *core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
+	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s", nodeExecutionID.GetExecutionId().GetProject(),
+		nodeExecutionID.GetExecutionId().GetDomain(), nodeExecutionID.GetExecutionId().GetName(), nodeExecutionID.GetNodeId())
 
 	res := &admin.FlyteURLs{
 		Inputs:  fmt.Sprintf("%s/%s", base, ArtifactTypeI),
@@ -142,23 +142,23 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 // FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
 // This constructs a fully unique prefix, and when post-pended with the output name, forms a fully unique name for
 // the artifact service (including the project/domain of course, which the artifact service will add).
-func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier) string {
-	res := fmt.Sprintf("%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
+func FlyteURLKeyFromNodeExecutionID(nodeExecutionID *core.NodeExecutionIdentifier) string {
+	res := fmt.Sprintf("%s/%s", nodeExecutionID.GetExecutionId().GetName(), nodeExecutionID.GetNodeId())
 
 	return res
 }
 
 // FlyteURLKeyFromNodeExecutionIDRetry is a modified version of the function above.
 // See the uniqueness comment above.
-func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int) string {
-	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry))
+func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID *core.NodeExecutionIdentifier, retry int) string {
+	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.GetExecutionId().GetName(), nodeExecutionID.GetNodeId(), strconv.Itoa(retry))
 
 	return res
 }
 
-func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
-	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Project,
-		taskExecutionID.NodeExecutionId.ExecutionId.Domain, taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))
+func FlyteURLsFromTaskExecutionID(taskExecutionID *core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
+	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.GetNodeExecutionId().GetExecutionId().GetProject(),
+		taskExecutionID.GetNodeExecutionId().GetExecutionId().GetDomain(), taskExecutionID.GetNodeExecutionId().GetExecutionId().GetName(), taskExecutionID.GetNodeExecutionId().GetNodeId(), strconv.Itoa(int(taskExecutionID.GetRetryAttempt())))
 
 	res := &admin.FlyteURLs{
 		Inputs:  fmt.Sprintf("%s/%s", base, ArtifactTypeI),

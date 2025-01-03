@@ -209,8 +209,8 @@ func (c *controller) getCustomTemplateValues(
 			collectedErrs = append(collectedErrs, err)
 		}
 	}
-	if attributes != nil && attributes.Attributes != nil {
-		for templateKey, templateValue := range attributes.Attributes {
+	if attributes != nil && attributes.GetAttributes() != nil {
+		for templateKey, templateValue := range attributes.GetAttributes() {
 			customTemplateValues[fmt.Sprintf(templateVariableFormat, templateKey)] = templateValue
 		}
 	}
@@ -481,18 +481,17 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	// First, add the special case namespace template which is always substituted by the system
 	// rather than fetched via a user-specified source.
 	templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
-	templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.Id
-	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Id
+	templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.GetId()
+	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.GetId()
 
 	var k8sManifest = string(template)
-	for templateKey, templateValue := range templateValues {
-		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
-	}
-	// Replace remaining template variables from domain specific defaults.
 	for templateKey, templateValue := range customTemplateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
-
+	// Replace remaining template variables from domain specific defaults.
+	for templateKey, templateValue := range templateValues {
+		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
+	}
 	return k8sManifest, nil
 }
 
@@ -588,11 +587,11 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	stats := ResourceSyncStats{}
 
-	for _, project := range projects.Projects {
-		for _, domain := range project.Domains {
-			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Id, domain.Name)
+	for _, project := range projects.GetProjects() {
+		for _, domain := range project.GetDomains() {
+			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.GetId(), domain.GetName())
 			customTemplateValues, err := c.getCustomTemplateValues(
-				ctx, project.Id, domain.Id, domainTemplateValues[domain.Id])
+				ctx, project.GetId(), domain.GetId(), domainTemplateValues[domain.GetId()])
 			if err != nil {
 				logger.Errorf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
 				errs = append(errs, err)

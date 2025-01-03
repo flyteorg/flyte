@@ -2,8 +2,6 @@
 package adminservice
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -115,8 +113,7 @@ type descriptionEntityEndpointMetrics struct {
 }
 
 type AdminMetrics struct {
-	Scope        promutils.Scope
-	PanicCounter prometheus.Counter
+	Scope promutils.Scope
 
 	executionEndpointMetrics               executionEndpointMetrics
 	launchPlanEndpointMetrics              launchPlanEndpointMetrics
@@ -137,8 +134,6 @@ type AdminMetrics struct {
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 	return AdminMetrics{
 		Scope: adminScope,
-		PanicCounter: adminScope.MustNewCounter("handler_panic",
-			"panics encountered while handling requests to the admin service"),
 
 		executionEndpointMetrics: executionEndpointMetrics{
 			scope:       adminScope,

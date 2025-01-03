@@ -1,7 +1,7 @@
 # Flyte v0.14.0
 
 ## Platform
-- Update to the Flyte Compiler, to supported nested branches and more. Better
+- Update to the Flyte Compiler, to support nested branches and more. Better
   regression tests
 - support for iam roles and k8s serviceaccounts
 - customizable pod specs for pod tasks (add labels and annotations)

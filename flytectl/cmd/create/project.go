@@ -49,11 +49,11 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 	if err != nil {
 		return err
 	}
-	if projectSpec.Id == "" {
-		return fmt.Errorf("%s", clierrors.ErrProjectNotPassed)
+	if projectSpec.GetId() == "" {
+		return fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
 	}
-	if projectSpec.Name == "" {
-		return fmt.Errorf("%s", clierrors.ErrProjectNameNotPassed)
+	if projectSpec.GetName() == "" {
+		return fmt.Errorf(clierrors.ErrProjectNameNotPassed) //nolint
 	}
 
 	if project.DefaultProjectConfig.DryRun {
@@ -61,10 +61,10 @@ func createProjectsCommand(ctx context.Context, args []string, cmdCtx cmdCore.Co
 	} else {
 		_, err := cmdCtx.AdminClient().RegisterProject(ctx, &admin.ProjectRegisterRequest{
 			Project: &admin.Project{
-				Id:          projectSpec.Id,
-				Name:        projectSpec.Name,
-				Description: projectSpec.Description,
-				Labels:      projectSpec.Labels,
+				Id:          projectSpec.GetId(),
+				Name:        projectSpec.GetName(),
+				Description: projectSpec.GetDescription(),
+				Labels:      projectSpec.GetLabels(),
 			},
 		})
 		if err != nil {

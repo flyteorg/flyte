@@ -267,7 +267,7 @@ func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataRefer
 		return nil, err
 	}
 
-	wfClosureCrdFields, err := k8s.BuildWfClosureCrdFields(wfClosure.CompiledWorkflow)
+	wfClosureCrdFields, err := k8s.BuildWfClosureCrdFields(wfClosure.GetCompiledWorkflow())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to parse workflow closure data from '%s' with error '%s'", dataReference, err)
 		return nil, err

@@ -19,15 +19,20 @@ func (a *AdminFetcherExtClient) FetchAllVerOfLP(ctx context.Context, lpName, pro
 	if err != nil {
 		return nil, err
 	}
-	if len(tList.LaunchPlans) == 0 {
+	if len(tList.GetLaunchPlans()) == 0 {
 		return nil, fmt.Errorf("no launchplans retrieved for %v", lpName)
 	}
-	return tList.LaunchPlans, nil
+	return tList.GetLaunchPlans(), nil
 }
 
 // FetchLPLatestVersion fetches latest version for give launch plan name
-func (a *AdminFetcherExtClient) FetchLPLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.LaunchPlan, error) {
-	// Fetch the latest version of the task.
+func (a *AdminFetcherExtClient) FetchLPLatestVersion(ctx context.Context, name, project, domain string) (*admin.LaunchPlan, error) {
+	// Fetch the latest version of the LaunchPLan.
+	filter := filters.Filters{
+		SortBy: "created_at",
+		Limit:  1,
+		Asc:    false,
+	}
 	lpVersions, err := a.FetchAllVerOfLP(ctx, name, project, domain, filter)
 	if err != nil {
 		return nil, err

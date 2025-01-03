@@ -20,6 +20,6 @@ type QualityOfServiceConfig struct {
 }
 
 type QualityOfServiceConfiguration interface {
-	GetTierExecutionValues() map[core.QualityOfService_Tier]core.QualityOfServiceSpec
+	GetTierExecutionValues() map[core.QualityOfService_Tier]*core.QualityOfServiceSpec
 	GetDefaultTiers() map[DomainName]core.QualityOfService_Tier
 }

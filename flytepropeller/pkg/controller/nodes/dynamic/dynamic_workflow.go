@@ -46,8 +46,8 @@ func setEphemeralNodeExecutionStatusAttributes(ctx context.Context, djSpec *core
 	// We keep track of the original node ids because that's where flytekit inputs are written to in the case of legacy
 	// map tasks. The modern map tasks do not write input files any longer and this entire piece of code can be removed.
 	parentNodeID := nCtx.NodeID()
-	for _, node := range djSpec.Nodes {
-		nodeID := node.Id
+	for _, node := range djSpec.GetNodes() {
+		nodeID := node.GetId()
 		var subNodeStatus v1alpha1.ExecutableNodeStatus
 		newID, err := hierarchicalNodeID(parentNodeID, currentAttemptStr, nodeID)
 		if err != nil {
@@ -98,16 +98,16 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 			return nil, errors.Wrapf("TaskReadFailed", err, "Failed to find task [%v].", nCtx.TaskReader().GetTaskID())
 		}
 
-		for _, t := range djSpec.Tasks {
+		for _, t := range djSpec.GetTasks() {
 			if t.GetContainer() != nil && parentTask.GetContainer() != nil {
-				t.GetContainer().Config = append(t.GetContainer().Config, parentTask.GetContainer().Config...)
+				t.GetContainer().Config = append(t.GetContainer().Config, parentTask.GetContainer().GetConfig()...)
 			}
 		}
 	}
 
 	if nCtx.ExecutionContext().GetEventVersion() == v1alpha1.EventVersion0 {
-		for _, o := range djSpec.Outputs {
-			err = updateBindingNodeIDsWithLineage(parentNodeID, currentAttemptStr, o.Binding)
+		for _, o := range djSpec.GetOutputs() {
+			err = updateBindingNodeIDsWithLineage(parentNodeID, currentAttemptStr, o.GetBinding())
 			if err != nil {
 				return nil, err
 			}
@@ -115,14 +115,14 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 	}
 	return &core.WorkflowTemplate{
 		Id: &core.Identifier{
-			Project:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Project,
-			Domain:       nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Domain,
-			Name:         fmt.Sprintf(dynamicWfNameTemplate, nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId),
+			Project:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().GetProject(),
+			Domain:       nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().GetDomain(),
+			Name:         fmt.Sprintf(dynamicWfNameTemplate, nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetNodeId()),
 			Version:      rand.String(10),
 			ResourceType: core.ResourceType_WORKFLOW,
 		},
-		Nodes:     djSpec.Nodes,
-		Outputs:   djSpec.Outputs,
+		Nodes:     djSpec.GetNodes(),
+		Outputs:   djSpec.GetOutputs(),
 		Interface: iface,
 	}, nil
 }
@@ -228,14 +228,14 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nC
 		return nil, nil, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build dynamic workflow template")
 	}
 
-	compiledTasks, err := compileTasks(ctx, djSpec.Tasks)
+	compiledTasks, err := compileTasks(ctx, djSpec.GetTasks())
 	if err != nil {
 		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "failed to compile dynamic tasks")
 	}
 
 	// Get the requirements, that is, a list of all the task IDs and the launch plan IDs that will be called as part of this dynamic task.
 	// The definition of these will need to be fetched from Admin (in order to get the interface).
-	requirements, err := compiler.GetRequirements(wf, djSpec.Subworkflows)
+	requirements, err := compiler.GetRequirements(wf, djSpec.GetSubworkflows())
 	if err != nil {
 		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "failed to Get requirements for subworkflows")
 	}
@@ -251,7 +251,7 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nC
 	// 	     See https://github.com/flyteorg/flyte/issues/219 for more information.
 
 	var closure *core.CompiledWorkflowClosure
-	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
+	closure, err = compiler.CompileWorkflow(wf, djSpec.GetSubworkflows(), compiledTasks, launchPlanInterfaces)
 	if err != nil {
 		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "malformed dynamic workflow")
 	}
@@ -343,18 +343,17 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 
 	var launchPlanInterfaces = make([]common.InterfaceProvider, len(launchPlanIDs))
 	for idx, id := range launchPlanIDs {
-		idVal := id
-		lp, err := d.lpReader.GetLaunchPlan(ctx, &idVal)
+		lp, err := d.lpReader.GetLaunchPlan(ctx, id)
 		if err != nil {
 			logger.Debugf(ctx, "Error fetching launch plan definition from admin")
 			if launchplan.IsNotFound(err) || launchplan.IsUserError(err) {
 				return nil, errors.Wrapf(utils.ErrorCodeUser, err, "incorrectly specified launchplan %s:%s:%s:%s",
-					id.Project, id.Domain, id.Name, id.Version)
+					id.GetProject(), id.GetDomain(), id.GetName(), id.GetVersion())
 			}
 			return nil, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to retrieve launchplan information %s:%s:%s:%s",
-				id.Project, id.Domain, id.Name, id.Version)
+				id.GetProject(), id.GetDomain(), id.GetName(), id.GetVersion())
 		}
-		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(*lp)
+		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(lp)
 	}
 
 	return launchPlanInterfaces, nil

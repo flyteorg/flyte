@@ -45,7 +45,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 	} else if taskTemplate == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
-	retry := toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries)
+	retry := toRetryStrategy(ctx, toBackoffLimit(taskTemplate.GetMetadata()), cfg.MinRetries, cfg.MaxRetries)
 
 	// If job isn't currently being monitored (recovering from a restart?), add it to the sync-cache and return
 	if job == nil {

@@ -18,7 +18,7 @@ func TestTaskInputs(t *testing.T) {
 	t.Run("valid inputs", func(t *testing.T) {
 		task := createTask()
 		retValue := TaskInputs(task)
-		assert.Equal(t, task.Closure.CompiledTask.Template.Interface.Inputs.Variables, retValue)
+		assert.Equal(t, task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs().GetVariables(), retValue)
 	})
 	t.Run("closure  compiled task nil", func(t *testing.T) {
 		task := createTask()

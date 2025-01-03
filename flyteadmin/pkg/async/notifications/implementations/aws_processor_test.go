@@ -30,11 +30,11 @@ func TestProcessor_StartProcessing(t *testing.T) {
 	// Because the message stored in Amazon SQS is a JSON of the SNS output, store the test output in the JSON Messages.
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
-		assert.Equal(t, email.Body, testEmail.Body)
-		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
-		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
-		assert.Equal(t, email.SenderEmail, testEmail.SenderEmail)
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
+		assert.Equal(t, email.GetBody(), testEmail.GetBody())
+		assert.Equal(t, email.GetRecipientsEmail(), testEmail.GetRecipientsEmail())
+		assert.Equal(t, email.GetSubjectLine(), testEmail.GetSubjectLine())
+		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
 	mockEmailer.SetSendEmailFunc(sendEmailValidationFunc)
@@ -115,7 +115,7 @@ func TestProcessor_StartProcessingError(t *testing.T) {
 func TestProcessor_StartProcessingEmailError(t *testing.T) {
 	initializeProcessor()
 	emailError := errors.New("error sending email")
-	sendEmailErrorFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailErrorFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
 	mockEmailer.SetSendEmailFunc(sendEmailErrorFunc)

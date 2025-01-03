@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery-v2 --case=underscore --with-expecter --name ExecutionContext --output=mocks
+//go:generate mockery -all -case=underscore
 
 type TaskDetailsGetter interface {
 	GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error)

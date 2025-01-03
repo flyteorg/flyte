@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
@@ -126,6 +127,8 @@ func Test_task_Setup(t *testing.T) {
 	k8sPluginDefault := &pluginK8sMocks.Plugin{}
 	k8sPluginDefault.OnGetProperties().Return(pluginK8s.PluginProperties{})
 
+	loadErrorPluginType := "loadError"
+
 	corePluginEntry := pluginCore.PluginEntry{
 		ID:                  corePluginType,
 		RegisteredTaskTypes: []pluginCore.TaskType{corePluginType},
@@ -153,6 +156,13 @@ func Test_task_Setup(t *testing.T) {
 		Plugin:              k8sPluginDefault,
 		RegisteredTaskTypes: []pluginCore.TaskType{k8sPluginDefaultType},
 		ResourceToWatch:     &v1.Pod{},
+	}
+	loadErrorPluginEntry := pluginCore.PluginEntry{
+		ID:                  loadErrorPluginType,
+		RegisteredTaskTypes: []pluginCore.TaskType{loadErrorPluginType},
+		LoadPlugin: func(ctx context.Context, iCtx pluginCore.SetupContext) (pluginCore.Plugin, error) {
+			return nil, fmt.Errorf("test")
+		},
 	}
 
 	type wantFields struct {
@@ -232,6 +242,15 @@ func Test_task_Setup(t *testing.T) {
 				},
 			},
 			false},
+		{"load-error",
+			testPluginRegistry{
+				core: []pluginCore.PluginEntry{loadErrorPluginEntry},
+				k8s:  []pluginK8s.PluginEntry{},
+			},
+			[]string{loadErrorPluginType},
+			map[string]string{corePluginType: loadErrorPluginType},
+			wantFields{},
+			true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -501,11 +520,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
-		executionContext.EXPECT().GetParentInfo().Return(nil)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
 		if allowIncrementParallelism {
-			executionContext.EXPECT().IncrementParallelism().Return(1)
+			executionContext.OnIncrementParallelism().Return(1)
 		}
 		nCtx.OnExecutionContext().Return(executionContext)
 
@@ -692,7 +711,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedEventRecorder{}
-			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel) // #nosec G115
+			// #nosec G115
+			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
 				cfg: &config.Config{MaxErrorMessageLength: 100},
@@ -716,11 +736,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				if tt.want.event {
 					if assert.Equal(t, 1, len(ev.evs)) {
 						e := ev.evs[0]
-						assert.Equal(t, tt.want.eventPhase.String(), e.Phase.String())
+						assert.Equal(t, tt.want.eventPhase.String(), e.GetPhase().String())
 						if tt.args.expectedState.TaskInfo != nil {
-							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.Logs)
+							assert.Equal(t, tt.args.expectedState.TaskInfo.Logs, e.GetLogs())
 						}
-						if e.Phase == core.TaskExecution_RUNNING || e.Phase == core.TaskExecution_SUCCEEDED {
+						if e.GetPhase() == core.TaskExecution_RUNNING || e.GetPhase() == core.TaskExecution_SUCCEEDED {
 							assert.True(t, proto.Equal(inputs, e.GetInputData()))
 						}
 					}
@@ -742,11 +762,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
-						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)
+						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri())
 				} else {
 					assert.True(t, got.Info().GetInfo() == nil || got.Info().GetInfo().TaskNodeInfo == nil ||
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata == nil ||
-						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri) == 0)
+						len(got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCheckpointUri()) == 0)
 				}
 			}
 		})
@@ -777,6 +797,7 @@ func Test_task_Abort(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -814,9 +835,9 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -891,6 +912,7 @@ func Test_task_Abort(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -939,6 +961,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -976,9 +999,9 @@ func Test_task_Abort_v1(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1053,6 +1076,7 @@ func Test_task_Abort_v1(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1158,9 +1182,9 @@ func Test_task_Finalize(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1247,4 +1271,42 @@ func TestNew(t *testing.T) {
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
 		contextutils.TaskIDKey)
+}
+
+func Test_task_Handle_ValidateOutputErr(t *testing.T) {
+	ctx := context.TODO()
+	nodeID := "n1"
+	execConfig := v1alpha1.ExecutionConfig{}
+
+	tk := &core.TaskTemplate{
+		Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},
+		Type: "test",
+		Interface: &core.TypedInterface{
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"x": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_BOOLEAN,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	taskID := &core.Identifier{}
+	tr := &nodeMocks.TaskReader{}
+	tr.OnGetTaskID().Return(taskID)
+	tr.OnReadMatch(mock.Anything).Return(tk, nil)
+
+	expectedErr := errors.Wrapf(ioutils.ErrRemoteFileExceedsMaxSize, "test file size exceeded")
+	r := &ioMocks.OutputReader{}
+	r.OnIsError(ctx).Return(false, nil)
+	r.OnExists(ctx).Return(true, expectedErr)
+
+	h := Handler{}
+	result, err := h.ValidateOutput(ctx, nodeID, nil, r, nil, execConfig, tr)
+	assert.NoError(t, err)
+	assert.False(t, result.IsRecoverable)
 }

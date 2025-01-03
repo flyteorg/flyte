@@ -112,18 +112,18 @@ func TestValidateMatchingAttributes(t *testing.T) {
 func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 	_, err := ValidateProjectDomainAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesUpdateRequest{})
+		&admin.ProjectDomainAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())
 
 	_, err = ValidateProjectDomainAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesUpdateRequest{
+		&admin.ProjectDomainAttributesUpdateRequest{
 			Attributes: &admin.ProjectDomainAttributes{}})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	_, err = ValidateProjectDomainAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesUpdateRequest{
+		&admin.ProjectDomainAttributesUpdateRequest{
 			Attributes: &admin.ProjectDomainAttributes{
 				Domain: "development",
 			}})
@@ -133,7 +133,7 @@ func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 
 	matchableResource, err := ValidateProjectDomainAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesUpdateRequest{
+		&admin.ProjectDomainAttributesUpdateRequest{
 			Attributes: &admin.ProjectDomainAttributes{
 				Project: "project",
 				Domain:  "domain",
@@ -154,12 +154,12 @@ func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
 	err := ValidateProjectDomainAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesGetRequest{})
+		&admin.ProjectDomainAttributesGetRequest{})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	err = ValidateProjectDomainAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
-		attributesApplicationConfigProvider, admin.ProjectDomainAttributesGetRequest{
+		attributesApplicationConfigProvider, &admin.ProjectDomainAttributesGetRequest{
 			Domain: "development",
 		})
 	assert.Equal(t, "failed to validate that project [] and domain [development] are registered, err: [missing project]",
@@ -167,7 +167,7 @@ func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
 
 	assert.Nil(t, ValidateProjectDomainAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesGetRequest{
+		&admin.ProjectDomainAttributesGetRequest{
 			Project: "project",
 			Domain:  "domain",
 		}))
@@ -176,12 +176,12 @@ func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
 func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
 	err := ValidateProjectDomainAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesDeleteRequest{})
+		&admin.ProjectDomainAttributesDeleteRequest{})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	err = ValidateProjectDomainAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
-		attributesApplicationConfigProvider, admin.ProjectDomainAttributesDeleteRequest{
+		attributesApplicationConfigProvider, &admin.ProjectDomainAttributesDeleteRequest{
 			Domain: "development",
 		})
 	assert.Equal(t,
@@ -190,7 +190,7 @@ func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
 
 	assert.Nil(t, ValidateProjectDomainAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.ProjectDomainAttributesDeleteRequest{
+		&admin.ProjectDomainAttributesDeleteRequest{
 			Project: "project",
 			Domain:  "domain",
 		}))
@@ -199,18 +199,18 @@ func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
 func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 	_, err := ValidateWorkflowAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesUpdateRequest{})
+		&admin.WorkflowAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())
 
 	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesUpdateRequest{
+		&admin.WorkflowAttributesUpdateRequest{
 			Attributes: &admin.WorkflowAttributes{}})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
-		attributesApplicationConfigProvider, admin.WorkflowAttributesUpdateRequest{
+		attributesApplicationConfigProvider, &admin.WorkflowAttributesUpdateRequest{
 			Attributes: &admin.WorkflowAttributes{
 				Domain: "development",
 			}})
@@ -220,7 +220,7 @@ func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 
 	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesUpdateRequest{
+		&admin.WorkflowAttributesUpdateRequest{
 			Attributes: &admin.WorkflowAttributes{
 				Project: "project",
 				Domain:  "domain",
@@ -229,7 +229,7 @@ func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 
 	matchableResource, err := ValidateWorkflowAttributesUpdateRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesUpdateRequest{
+		&admin.WorkflowAttributesUpdateRequest{
 			Attributes: &admin.WorkflowAttributes{
 				Project:  "project",
 				Domain:   "domain",
@@ -249,12 +249,12 @@ func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
 	err := ValidateWorkflowAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesGetRequest{})
+		&admin.WorkflowAttributesGetRequest{})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	err = ValidateWorkflowAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
-		attributesApplicationConfigProvider, admin.WorkflowAttributesGetRequest{
+		attributesApplicationConfigProvider, &admin.WorkflowAttributesGetRequest{
 			Domain: "development",
 		})
 	assert.Equal(t,
@@ -263,7 +263,7 @@ func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
 
 	err = ValidateWorkflowAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesGetRequest{
+		&admin.WorkflowAttributesGetRequest{
 			Project: "project",
 			Domain:  "domain",
 		})
@@ -271,7 +271,7 @@ func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
 
 	assert.Nil(t, ValidateWorkflowAttributesGetRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesGetRequest{
+		&admin.WorkflowAttributesGetRequest{
 			Project:  "project",
 			Domain:   "domain",
 			Workflow: "workflow",
@@ -281,12 +281,12 @@ func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
 func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 	err := ValidateWorkflowAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesDeleteRequest{})
+		&admin.WorkflowAttributesDeleteRequest{})
 	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
 	err = ValidateWorkflowAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
-		attributesApplicationConfigProvider, admin.WorkflowAttributesDeleteRequest{
+		attributesApplicationConfigProvider, &admin.WorkflowAttributesDeleteRequest{
 			Domain: "development",
 		})
 	assert.Equal(t,
@@ -295,7 +295,7 @@ func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 
 	err = ValidateWorkflowAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesDeleteRequest{
+		&admin.WorkflowAttributesDeleteRequest{
 			Project: "project",
 			Domain:  "domain",
 		})
@@ -303,7 +303,7 @@ func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 
 	assert.Nil(t, ValidateWorkflowAttributesDeleteRequest(context.Background(),
 		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
-		admin.WorkflowAttributesDeleteRequest{
+		&admin.WorkflowAttributesDeleteRequest{
 			Project:  "project",
 			Domain:   "domain",
 			Workflow: "workflow",
@@ -311,12 +311,12 @@ func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 }
 
 func TestValidateListAllMatchableAttributesRequest(t *testing.T) {
-	err := ValidateListAllMatchableAttributesRequest(admin.ListMatchableAttributesRequest{
+	err := ValidateListAllMatchableAttributesRequest(&admin.ListMatchableAttributesRequest{
 		ResourceType: 44,
 	})
 	assert.EqualError(t, err, "invalid value for resource_type")
 
-	err = ValidateListAllMatchableAttributesRequest(admin.ListMatchableAttributesRequest{
+	err = ValidateListAllMatchableAttributesRequest(&admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})
 	assert.Nil(t, err)

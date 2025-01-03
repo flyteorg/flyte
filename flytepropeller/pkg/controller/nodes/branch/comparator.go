@@ -72,14 +72,14 @@ var perTypeComparators = map[string]comparators{
 }
 
 func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.ComparisonExpression_Operator) (bool, error) {
-	lValueType := reflect.TypeOf(lValue.Value)
-	rValueType := reflect.TypeOf(rValue.Value)
+	lValueType := reflect.TypeOf(lValue.GetValue())
+	rValueType := reflect.TypeOf(rValue.GetValue())
 	if lValueType != rValueType {
 		return false, errors.Errorf(ErrorCodeMalformedBranch, "Comparison between different primitives types. lVal[%v]:rVal[%v]", lValueType, rValueType)
 	}
 	comps, ok := perTypeComparators[lValueType.String()]
 	if !ok {
-		return false, errors.Errorf("Comparator not defined for type: [%v]", "%s", lValueType.String())
+		return false, errors.Errorf("Comparator not defined for type: [%v]", lValueType.String()) //nolint:govet,staticcheck
 	}
 	isBoolean := false
 	if lValueType.String() == primitiveBooleanType {

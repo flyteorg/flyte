@@ -58,13 +58,13 @@ func TestCreateDataset(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
-				return dataset.Name == expectedDataset.Id.Name &&
-					dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Version == expectedDataset.Id.Version &&
-					len(dataset.PartitionKeys) == len(expectedDataset.PartitionKeys) &&
-					dataset.PartitionKeys[0].Name == expectedDataset.PartitionKeys[0] &&
-					dataset.PartitionKeys[1].Name == expectedDataset.PartitionKeys[1]
+				return dataset.Name == expectedDataset.GetId().GetName() &&
+					dataset.Project == expectedDataset.GetId().GetProject() &&
+					dataset.Domain == expectedDataset.GetId().GetDomain() &&
+					dataset.Version == expectedDataset.GetId().GetVersion() &&
+					len(dataset.PartitionKeys) == len(expectedDataset.GetPartitionKeys()) &&
+					dataset.PartitionKeys[0].Name == expectedDataset.GetPartitionKeys()[0] &&
+					dataset.PartitionKeys[1].Name == expectedDataset.GetPartitionKeys()[1]
 			})).Return(nil)
 		request := &datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
 		datasetResponse, err := datasetManager.CreateDataset(context.Background(), request)
@@ -79,10 +79,10 @@ func TestCreateDataset(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
-				return dataset.Name == expectedDataset.Id.Name &&
-					dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Version == expectedDataset.Id.Version &&
+				return dataset.Name == expectedDataset.GetId().GetName() &&
+					dataset.Project == expectedDataset.GetId().GetProject() &&
+					dataset.Domain == expectedDataset.GetId().GetDomain() &&
+					dataset.Version == expectedDataset.GetId().GetVersion() &&
 					len(dataset.PartitionKeys) == 0
 			})).Return(nil)
 
@@ -132,7 +132,7 @@ func TestCreateDataset(t *testing.T) {
 	t.Run("DuplicatePartition", func(t *testing.T) {
 		dcRepo := getDataCatalogRepo()
 		badDataset := getTestDataset()
-		badDataset.PartitionKeys = append(badDataset.PartitionKeys, badDataset.PartitionKeys[0])
+		badDataset.PartitionKeys = append(badDataset.PartitionKeys, badDataset.GetPartitionKeys()[0])
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
 
 		dcRepo.MockDatasetRepo.On("Create",
@@ -162,17 +162,17 @@ func TestGetDataset(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
 
-				return datasetKey.Name == expectedDataset.Id.Name &&
-					datasetKey.Project == expectedDataset.Id.Project &&
-					datasetKey.Domain == expectedDataset.Id.Domain &&
-					datasetKey.Version == expectedDataset.Id.Version
+				return datasetKey.Name == expectedDataset.GetId().GetName() &&
+					datasetKey.Project == expectedDataset.GetId().GetProject() &&
+					datasetKey.Domain == expectedDataset.GetId().GetDomain() &&
+					datasetKey.Version == expectedDataset.GetId().GetVersion()
 			})).Return(*datasetModelResponse, nil)
-		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
+		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().GetId()}
 		datasetResponse, err := datasetManager.GetDataset(context.Background(), request)
 		assert.NoError(t, err)
 		assert.NotNil(t, datasetResponse)
-		assert.True(t, proto.Equal(datasetResponse.Dataset, expectedDataset))
-		assert.EqualValues(t, datasetResponse.Dataset.Metadata.KeyMap, expectedDataset.Metadata.KeyMap)
+		assert.True(t, proto.Equal(datasetResponse.GetDataset(), expectedDataset))
+		assert.EqualValues(t, datasetResponse.GetDataset().GetMetadata().GetKeyMap(), expectedDataset.GetMetadata().GetKeyMap())
 	})
 
 	t.Run("Does not exist", func(t *testing.T) {
@@ -183,12 +183,12 @@ func TestGetDataset(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
 
-				return datasetKey.Name == expectedDataset.Id.Name &&
-					datasetKey.Project == expectedDataset.Id.Project &&
-					datasetKey.Domain == expectedDataset.Id.Domain &&
-					datasetKey.Version == expectedDataset.Id.Version
+				return datasetKey.Name == expectedDataset.GetId().GetName() &&
+					datasetKey.Project == expectedDataset.GetId().GetProject() &&
+					datasetKey.Domain == expectedDataset.GetId().GetDomain() &&
+					datasetKey.Version == expectedDataset.GetId().GetVersion()
 			})).Return(models.Dataset{}, errors.NewDataCatalogError(codes.NotFound, "dataset does not exist"))
-		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
+		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().GetId()}
 		_, err := datasetManager.GetDataset(context.Background(), request)
 		assert.Error(t, err)
 		responseCode := status.Code(err)
@@ -267,7 +267,7 @@ func TestListDatasets(t *testing.T) {
 		datasetResponse, err := datasetManager.ListDatasets(ctx, &datacatalog.ListDatasetsRequest{Filter: filter})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, datasetResponse)
-		assert.Len(t, datasetResponse.Datasets, 1)
+		assert.Len(t, datasetResponse.GetDatasets(), 1)
 	})
 
 	t.Run("List Datasets with no filtering", func(t *testing.T) {
@@ -286,6 +286,6 @@ func TestListDatasets(t *testing.T) {
 		datasetResponse, err := datasetManager.ListDatasets(ctx, &datacatalog.ListDatasetsRequest{})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, datasetResponse)
-		assert.Len(t, datasetResponse.Datasets, 1)
+		assert.Len(t, datasetResponse.GetDatasets(), 1)
 	})
 }

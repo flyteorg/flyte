@@ -80,6 +80,10 @@ func GetAdditionalAdminClientConfigOptions(cfg *Config) []grpc.DialOption {
 	// ever has those endpoints
 	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor, retryInterceptor))
 
+	if cfg.MaxMessageSizeBytes > 0 {
+		opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.MaxMessageSizeBytes)))
+	}
+
 	return opts
 }
 
@@ -97,7 +101,7 @@ func getAuthenticationDialOption(ctx context.Context, cfg *Config, tokenSourcePr
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
 		}
-		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+		authorizationMetadataKey = clientMetadata.GetAuthorizationMetadataKey()
 	}
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
@@ -179,8 +183,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	credentialsFuture := NewPerRPCCredentialsFuture()
 	proxyCredentialsFuture := NewPerRPCCredentialsFuture()
 
+	authInterceptor := NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 	opts = append(opts,
-		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)),
+		grpc.WithChainUnaryInterceptor(authInterceptor),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
 	if cfg.DefaultServiceConfig != "" {

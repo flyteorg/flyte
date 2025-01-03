@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 )
 
-var launchPlanIdentifier = core.Identifier{
+var launchPlanIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_LAUNCH_PLAN,
 	Project:      "project",
 	Domain:       "domain",
@@ -42,11 +42,11 @@ var outputs = core.VariableMap{
 }
 
 func getProviderForTest(t *testing.T) common.InterfaceProvider {
-	launchPlanStatus := admin.LaunchPlanClosure{
+	launchPlanStatus := &admin.LaunchPlanClosure{
 		ExpectedInputs:  &inputs,
 		ExpectedOutputs: &outputs,
 	}
-	bytes, _ := proto.Marshal(&launchPlanStatus)
+	bytes, _ := proto.Marshal(launchPlanStatus)
 	provider, err := NewLaunchPlanInterfaceProvider(
 		models.LaunchPlan{
 			Closure: bytes,
@@ -64,14 +64,14 @@ func TestGetId(t *testing.T) {
 
 func TestGetExpectedInputs(t *testing.T) {
 	provider := getProviderForTest(t)
-	assert.Contains(t, (*provider.GetExpectedInputs()).Parameters, "foo")
-	assert.NotNil(t, (*provider.GetExpectedInputs()).Parameters["foo"].Var.Type.GetSimple())
-	assert.EqualValues(t, "STRING", (*provider.GetExpectedInputs()).Parameters["foo"].Var.Type.GetSimple().String())
-	assert.NotNil(t, (*provider.GetExpectedInputs()).Parameters["foo"].GetDefault())
+	assert.Contains(t, (*provider.GetExpectedInputs()).GetParameters(), "foo")
+	assert.NotNil(t, (*provider.GetExpectedInputs()).GetParameters()["foo"].GetVar().GetType().GetSimple())
+	assert.EqualValues(t, "STRING", (*provider.GetExpectedInputs()).GetParameters()["foo"].GetVar().GetType().GetSimple().String())
+	assert.NotNil(t, (*provider.GetExpectedInputs()).GetParameters()["foo"].GetDefault())
 }
 
 func TestGetExpectedOutputs(t *testing.T) {
 	provider := getProviderForTest(t)
-	assert.EqualValues(t, outputs.Variables["foo"].GetType().GetType(),
-		provider.GetExpectedOutputs().Variables["foo"].GetType().GetType())
+	assert.EqualValues(t, outputs.GetVariables()["foo"].GetType().GetType(),
+		provider.GetExpectedOutputs().GetVariables()["foo"].GetType().GetType())
 }

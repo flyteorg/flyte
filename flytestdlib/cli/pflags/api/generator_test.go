@@ -5,7 +5,6 @@ import (
 	"flag"
 	"go/token"
 	"go/types"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -77,14 +76,14 @@ func TestNewGenerator(t *testing.T) {
 				t.FailNow()
 			}
 
-			codeOutput, err := ioutil.TempFile("", "output-*.go")
+			codeOutput, err := os.CreateTemp("", "output-*.go")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
 
 			defer func() { assert.NoError(t, os.Remove(codeOutput.Name())) }()
 
-			testOutput, err := ioutil.TempFile("", "output-*_test.go")
+			testOutput, err := os.CreateTemp("", "output-*_test.go")
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -94,10 +93,10 @@ func TestNewGenerator(t *testing.T) {
 			assert.NoError(t, p.WriteCodeFile(codeOutput.Name()))
 			assert.NoError(t, p.WriteTestFile(testOutput.Name()))
 
-			codeBytes, err := ioutil.ReadFile(codeOutput.Name())
+			codeBytes, err := os.ReadFile(codeOutput.Name())
 			assert.NoError(t, err)
 
-			testBytes, err := ioutil.ReadFile(testOutput.Name())
+			testBytes, err := os.ReadFile(testOutput.Name())
 			assert.NoError(t, err)
 
 			var goldenFilePath string
@@ -110,15 +109,15 @@ func TestNewGenerator(t *testing.T) {
 			}
 
 			if *update {
-				assert.NoError(t, ioutil.WriteFile(goldenFilePath, codeBytes, os.ModePerm))     // #nosec G306
-				assert.NoError(t, ioutil.WriteFile(goldenTestFilePath, testBytes, os.ModePerm)) // #nosec G306
+				assert.NoError(t, os.WriteFile(goldenFilePath, codeBytes, os.ModePerm))     // #nosec G306
+				assert.NoError(t, os.WriteFile(goldenTestFilePath, testBytes, os.ModePerm)) // #nosec G306
 			}
 
-			goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))
+			goldenOutput, err := os.ReadFile(filepath.Clean(goldenFilePath))
 			assert.NoError(t, err)
 			assert.Equal(t, string(goldenOutput), string(codeBytes))
 
-			goldenTestOutput, err := ioutil.ReadFile(filepath.Clean(goldenTestFilePath))
+			goldenTestOutput, err := os.ReadFile(filepath.Clean(goldenTestFilePath))
 			assert.NoError(t, err)
 			assert.Equal(t, string(goldenTestOutput), string(testBytes))
 		})

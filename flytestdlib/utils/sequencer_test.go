@@ -9,17 +9,17 @@ import (
 )
 
 func TestSequencer(t *testing.T) {
-	size := 3
+	size := uint64(3)
 	sequencer := GetSequencer()
 	curVal := sequencer.GetCur() + 1
 	// sum = n(a0 + aN) / 2
-	expectedSum := uint64(size) * (curVal + curVal + uint64(size-1)) / 2 // #nosec G115
+	expectedSum := size * (curVal + curVal + size - 1) / 2
 	numbers := make(chan uint64, size)
 
 	var wg sync.WaitGroup
-	wg.Add(size)
+	wg.Add(int(size))
 
-	iter := 0
+	iter := uint64(0)
 	for iter < size {
 		go func() {
 			number := sequencer.GetNext()

@@ -22,11 +22,11 @@ and contributing samples easy. If this is your first time running these examples
 
 ```{tip}
 To learn about how to spin up and manage a Flyte cluster in the cloud, see the
-{doc}`Deployment Guides <flyte:deployment/index>`.
+{doc}`Deployment Guides <../deployment/index>`.
 ```
 
 ```{note}
-Want to contribute or update an example? Check out the {doc}`Contribution Guide <../flytesnacks/contribute>`.
+Want to contribute or update an example? Check out the {ref}`Contribution Guide <contribute_docs>`.
 ```
 
 ## Table of contents
@@ -60,7 +60,9 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 :name: user_guide_toc
 :hidden:
 
-environment_setup
+introduction
+quickstart_guide
+getting_started_with_workflow_development/index
 basics/index
 data_types_and_io/index
 advanced_composition/index
@@ -69,4 +71,29 @@ development_lifecycle/index
 testing/index
 productionizing/index
 extending/index
+flyte_agents/index
+environment_setup
+flyte_fundamentals/index
+```
+
+```{toctree}
+:maxdepth: -1
+:name: glossary
+:caption: Glossary
+:hidden:
+
+concepts/main_concepts/index
+concepts/control_plane/index
+concepts/component_architecture/index
+```
+
+```{toctree}
+:maxdepth: -1
+:name: ecosystem
+:caption: Ecosystem
+:hidden:
+
+flytekit-java <https://github.com/spotify/flytekit-java>
+pterodactyl <https://github.com/NotMatthewGriffin/pterodactyl>
+latch sdk <https://docs.latch.bio/>
 ```

@@ -9,8 +9,9 @@ on:
   push:
     branches:
       - master
+      - 'release-v**'
 env:
-  GO_VERSION: "1.21"
+  GO_VERSION: "1.22"
   PRIORITIES: "P0"
 jobs:
   unpack-envvars:
@@ -32,8 +33,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
-          # TODO(monorepo): Enable lint flytecopilot
-          # - flytecopilot
+          - flytecopilot
           - flytectl
           - flyteidl
           - flyteplugins

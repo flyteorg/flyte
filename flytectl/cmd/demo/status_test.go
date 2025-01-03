@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
@@ -13,19 +14,17 @@ import (
 func TestDemoStatus(t *testing.T) {
 	t.Run("Demo status with zero result", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
-		s := testutils.Setup()
-		defer s.TearDown()
-		mockDocker.OnContainerList(s.Ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		s := testutils.Setup(t)
+		mockDocker.OnContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		docker.Client = mockDocker
 		err := demoClusterStatus(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("Demo status with running", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 		ctx := s.Ctx
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
 				Names: []string{

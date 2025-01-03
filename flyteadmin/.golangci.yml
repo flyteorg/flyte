@@ -3,12 +3,11 @@ run:
     # because we're skipping TLS verification - for now
     - cmd/entrypoints/serve.go
     - pkg/async/messages/sqs.go
-
 linters:
   disable-all: true
   enable:
     - errcheck
-    - gas
+    - gosec
     - gci
     - goconst
     - goimports
@@ -22,7 +21,7 @@ linters:
     - unconvert
     - unparam
     - unused
-
+    - protogetter
 linters-settings:
   gci:
     custom-order: true
@@ -34,6 +33,11 @@ linters-settings:
   gosec:
     excludes:
       - G601 # disable the rule G601 since its not relevant in go 1.22+
+  goconst:
+    ignore-tests: true
 issues:
-  exclude:
-    - copylocks
+  exclude-rules:
+    - path: pkg/workflowengine/impl/prepare_execution.go
+      text: "copies lock"
+    - path: pkg/runtime/interfaces/application_configuration.go
+      text: "G402: TLS InsecureSkipVerify may be true."

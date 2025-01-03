@@ -96,3 +96,11 @@ class ProjectGetRequest(_message.Message):
     id: str
     org: str
     def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+
+class InactiveProject(_message.Message):
+    __slots__ = ["id", "org"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    org: str
+    def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...

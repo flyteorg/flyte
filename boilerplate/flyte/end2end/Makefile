@@ -7,8 +7,12 @@
 end2end_execute: export FLYTESNACKS_PRIORITIES ?= P0
 end2end_execute: export FLYTESNACKS_VERSION ?= $(shell curl --silent "https://api.github.com/repos/flyteorg/flytesnacks/releases/latest" | jq -r .tag_name)
 end2end_execute:
-	./boilerplate/flyte/end2end/end2end.sh ./boilerplate/flyte/end2end/functional-test-config.yaml --return_non_zero_on_failure
-
+	pytest ./boilerplate/flyte/end2end/test_run.py \
+		--flytesnacks_release_tag=$(FLYTESNACKS_VERSION) \
+		--priorities=$(FLYTESNACKS_PRIORITIES) \
+		--config_file=./boilerplate/flyte/end2end/functional-test-config.yaml \
+		--return_non_zero_on_failure
+		
 .PHONY: k8s_integration_execute
 k8s_integration_execute:
 	echo "pass"

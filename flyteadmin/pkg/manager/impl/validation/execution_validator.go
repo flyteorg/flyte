@@ -26,47 +26,50 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 	core.ResourceType_TASK:        nil,
 }
 
-func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
+func ValidateExecutionRequest(ctx context.Context, request *admin.ExecutionCreateRequest,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(request.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if request.Name != "" {
-		if err := CheckValidExecutionID(strings.ToLower(request.Name), shared.Name); err != nil {
+	if request.GetName() != "" {
+		if err := CheckValidExecutionID(strings.ToLower(request.GetName()), shared.Name); err != nil {
 			return err
 		}
 	}
-	if len(request.Name) > allowedExecutionNameLength {
+	if len(request.GetName()) > allowedExecutionNameLength {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"name for ExecutionCreateRequest [%+v] exceeded allowed length %d", request, allowedExecutionNameLength)
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request.GetProject(), request.GetDomain()); err != nil {
 		return err
 	}
 
-	if request.Spec == nil {
+	if request.GetSpec() == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
 	// TODO(katrogan): Change the name of Spec.LaunchPlan to something more generic to permit reference Tasks.
 	// https://github.com/flyteorg/flyte/issues/262
-	if err := ValidateIdentifierFieldsSet(request.Spec.LaunchPlan); err != nil {
+	if err := ValidateIdentifierFieldsSet(request.GetSpec().GetLaunchPlan()); err != nil {
 		return err
 	}
-	if _, ok := acceptedReferenceLaunchTypes[request.Spec.LaunchPlan.ResourceType]; !ok {
+	if _, ok := acceptedReferenceLaunchTypes[request.GetSpec().GetLaunchPlan().GetResourceType()]; !ok {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Invalid reference entity resource type [%v], only [%+v] allowed",
-			request.Spec.LaunchPlan.ResourceType, acceptedReferenceLaunchTypes)
+			request.GetSpec().GetLaunchPlan().GetResourceType(), acceptedReferenceLaunchTypes)
 	}
-	if err := validateLiteralMap(request.Inputs, shared.Inputs); err != nil {
+	if err := validateLiteralMap(request.GetInputs(), shared.Inputs); err != nil {
 		return err
 	}
-	if request.Spec.GetNotifications() != nil {
-		if err := validateNotifications(request.Spec.GetNotifications().Notifications); err != nil {
+	if request.GetSpec().GetNotifications() != nil {
+		if err := validateNotifications(request.GetSpec().GetNotifications().GetNotifications()); err != nil {
 			return err
 		}
+	}
+	if err := validateLabels(request.GetSpec().GetLabels()); err != nil {
+		return err
 	}
 	return nil
 }
@@ -98,6 +101,10 @@ func CheckAndFetchInputsForExecution(
 			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
 			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
+			err := validators.ValidateLiteralType(inputType)
+			if err != nil {
+				return nil, errors.NewInvalidLiteralTypeError(name, err)
+			}
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
 			}
@@ -132,15 +139,15 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	return nil
 }
 
-func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
-	if request.Event == nil {
+func ValidateCreateWorkflowEventRequest(request *admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
+	if request.GetEvent() == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler was called without event")
-	} else if request.Event.ExecutionId == nil {
+	} else if request.GetEvent().GetExecutionId() == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"Workflow event handler request event doesn't have an execution id - %v", request.Event)
+			"Workflow event handler request event doesn't have an execution id - %v", request.GetEvent())
 	}
-	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+	if err := ValidateOutputData(request.GetEvent().GetOutputData(), maxOutputSizeInBytes); err != nil {
 		return err
 	}
 	return nil
@@ -150,13 +157,13 @@ func ValidateWorkflowExecutionIdentifier(identifier *core.WorkflowExecutionIdent
 	if identifier == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(identifier.Project, shared.Project); err != nil {
+	if err := ValidateEmptyStringField(identifier.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(identifier.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(identifier.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(identifier.Name, shared.Name); err != nil {
+	if err := ValidateEmptyStringField(identifier.GetName(), shared.Name); err != nil {
 		return err
 	}
 	return nil

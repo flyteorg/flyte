@@ -21,16 +21,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) string {
-	if request.Name != "" {
-		return request.Name
+func GetExecutionName(request *admin.ExecutionCreateRequest) string {
+	if request.GetName() != "" {
+		return request.GetName()
 	}
 	return common.GetExecutionName(time.Now().UnixNano())
 }
 
-func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (
+func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (
 	*admin.Task, error) {
-	taskModel, err := GetTaskModel(ctx, repo, &identifier)
+	taskModel, err := GetTaskModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +44,12 @@ func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier cor
 }
 
 func GetWorkflowModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.Workflow, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.Workflow, error) {
 	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
+		Version: identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.Workflow{}, err
@@ -74,7 +74,7 @@ func GetWorkflow(
 	ctx context.Context,
 	repo repoInterfaces.Repository,
 	store *storage.DataStore,
-	identifier core.Identifier) (*admin.Workflow, error) {
+	identifier *core.Identifier) (*admin.Workflow, error) {
 	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -87,18 +87,18 @@ func GetWorkflow(
 	if err != nil {
 		return nil, err
 	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
+	closure.CreatedAt = workflow.GetClosure().GetCreatedAt()
 	workflow.Closure = closure
 	return &workflow, nil
 }
 
 func GetLaunchPlanModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.LaunchPlan, error) {
 	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
+		Version: identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.LaunchPlan{}, err
@@ -107,7 +107,7 @@ func GetLaunchPlanModel(
 }
 
 func GetLaunchPlan(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.LaunchPlan, error) {
 	launchPlanModel, err := GetLaunchPlanModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -116,12 +116,12 @@ func GetLaunchPlan(
 }
 
 func GetNamedEntityModel(
-	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier *admin.NamedEntityIdentifier) (models.NamedEntity, error) {
 	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
 		ResourceType: resourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
+		Project:      identifier.GetProject(),
+		Domain:       identifier.GetDomain(),
+		Name:         identifier.GetName(),
 	})
 	if err != nil {
 		return models.NamedEntity{}, err
@@ -130,7 +130,7 @@ func GetNamedEntityModel(
 }
 
 func GetNamedEntity(
-	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier *admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
 	metadataModel, err := GetNamedEntityModel(ctx, repo, resourceType, identifier)
 	if err != nil {
 		return nil, err
@@ -140,13 +140,13 @@ func GetNamedEntity(
 }
 
 func GetDescriptionEntityModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.DescriptionEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.DescriptionEntity, error) {
 	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, repoInterfaces.GetDescriptionEntityInput{
-		ResourceType: identifier.ResourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
-		Version:      identifier.Version,
+		ResourceType: identifier.GetResourceType(),
+		Project:      identifier.GetProject(),
+		Domain:       identifier.GetDomain(),
+		Name:         identifier.GetName(),
+		Version:      identifier.GetVersion(),
 	})
 	if err != nil {
 		return models.DescriptionEntity{}, err
@@ -155,7 +155,7 @@ func GetDescriptionEntityModel(
 }
 
 func GetDescriptionEntity(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.DescriptionEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.DescriptionEntity, error) {
 	descriptionEntityModel, err := GetDescriptionEntityModel(ctx, repo, identifier)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get description entity [%+v]: %v", identifier, err)
@@ -208,12 +208,12 @@ func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.Inlin
 }
 
 func GetExecutionModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.WorkflowExecutionIdentifier) (
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
 	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
+		Project: identifier.GetProject(),
+		Domain:  identifier.GetDomain(),
+		Name:    identifier.GetName(),
 	})
 	if err != nil {
 		return nil, err
@@ -224,7 +224,7 @@ func GetExecutionModel(
 func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
 	*models.NodeExecution, error) {
 	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionIdentifier,
+		NodeExecutionIdentifier: nodeExecutionIdentifier,
 	})
 
 	if err != nil {
@@ -236,10 +236,10 @@ func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, 
 func GetTaskModel(ctx context.Context, repo repoInterfaces.Repository, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
 	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: taskIdentifier.Project,
-		Domain:  taskIdentifier.Domain,
-		Name:    taskIdentifier.Name,
-		Version: taskIdentifier.Version,
+		Project: taskIdentifier.GetProject(),
+		Domain:  taskIdentifier.GetDomain(),
+		Name:    taskIdentifier.GetName(),
+		Version: taskIdentifier.GetVersion(),
 	})
 
 	if err != nil {
@@ -256,7 +256,7 @@ func GetTaskExecutionModel(
 	}
 
 	taskExecutionModel, err := repo.TaskExecutionRepo().Get(ctx, repoInterfaces.GetTaskExecutionInput{
-		TaskExecutionID: *taskExecutionID,
+		TaskExecutionID: taskExecutionID,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task execution with id [%+v] with err %v", taskExecutionID, err)
@@ -286,7 +286,7 @@ func GetMatchableResource(ctx context.Context, resourceManager interfaces.Resour
 // MergeIntoExecConfig into workflowExecConfig (higher priority) from spec (lower priority) and return the
 // new object with the merged changes.
 // After settings project is done, can move this function back to execution manager. Currently shared with resource.
-func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) admin.WorkflowExecutionConfig {
+func MergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) *admin.WorkflowExecutionConfig {
 	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
 		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
 	}
@@ -305,15 +305,15 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	// Hence we do a deep check in the following conditions before assignment
 	if (workflowExecConfig.GetRawOutputDataConfig() == nil ||
 		len(workflowExecConfig.GetRawOutputDataConfig().GetOutputLocationPrefix()) == 0) &&
-		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().OutputLocationPrefix) > 0) {
+		(spec.GetRawOutputDataConfig() != nil && len(spec.GetRawOutputDataConfig().GetOutputLocationPrefix()) > 0) {
 		workflowExecConfig.RawOutputDataConfig = spec.GetRawOutputDataConfig()
 	}
-	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().Values) == 0) &&
-		(spec.GetLabels() != nil && len(spec.GetLabels().Values) > 0) {
+	if (workflowExecConfig.GetLabels() == nil || len(workflowExecConfig.GetLabels().GetValues()) == 0) &&
+		(spec.GetLabels() != nil && len(spec.GetLabels().GetValues()) > 0) {
 		workflowExecConfig.Labels = spec.GetLabels()
 	}
-	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().Values) == 0) &&
-		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().Values) > 0) {
+	if (workflowExecConfig.GetAnnotations() == nil || len(workflowExecConfig.GetAnnotations().GetValues()) == 0) &&
+		(spec.GetAnnotations() != nil && len(spec.GetAnnotations().GetValues()) > 0) {
 		workflowExecConfig.Annotations = spec.GetAnnotations()
 	}
 
@@ -325,8 +325,8 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 		workflowExecConfig.OverwriteCache = spec.GetOverwriteCache()
 	}
 
-	if (workflowExecConfig.GetEnvs() == nil || len(workflowExecConfig.GetEnvs().Values) == 0) &&
-		(spec.GetEnvs() != nil && len(spec.GetEnvs().Values) > 0) {
+	if (workflowExecConfig.GetEnvs() == nil || len(workflowExecConfig.GetEnvs().GetValues()) == 0) &&
+		(spec.GetEnvs() != nil && len(spec.GetEnvs().GetValues()) > 0) {
 		workflowExecConfig.Envs = spec.GetEnvs()
 	}
 

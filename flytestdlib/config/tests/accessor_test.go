@@ -73,7 +73,7 @@ func populateConfigData(configPath string) (TestConfig, error) {
 		return TestConfig{}, err
 	}
 
-	return expected, ioutil.WriteFile(configPath, raw, os.ModePerm) // #nosec G306
+	return expected, os.WriteFile(configPath, raw, os.ModePerm) // #nosec G306
 }
 
 func TestGetEmptySection(t *testing.T) {
@@ -662,7 +662,7 @@ func runEqualTest(t *testing.T, accessor accessorCreatorFn, expected interface{}
 	assert.NoError(t, err)
 	defer func() { assert.NoError(t, os.Remove(f)) }()
 
-	assert.NoError(t, ioutil.WriteFile(f, raw, os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(f, raw, os.ModePerm)) // #nosec G306
 	t.Logf("Generated yaml: %v", string(raw))
 	assert.NoError(t, accessor(rootSection, f).UpdateConfig(context.TODO()))
 

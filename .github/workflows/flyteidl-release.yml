@@ -1,18 +1,41 @@
-name: Upload flyteidl to PyPI and npm
+name: Release flyteidl
 
 on:
-  push:
-    tags:
-      - flyteidl/v*.*.*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version. Do *not* use the `flyteidl/` prefix, e.g. `flyteidl/v1.2.3`, instead use only `v1.2.3` (including the `v`)"
+        required: true
 
 jobs:
+  push-flyteidl-tag:
+    name: Push git tag containing the `flyteidl/` prefix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.FLYTE_BOT_PAT }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/flyteidl/${{ github.event.inputs.version }}`,
+              sha: context.sha
+            })
   deploy-to-pypi:
+    needs:
+      - push-flyteidl-tag
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: flyteidl
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -29,6 +52,8 @@ jobs:
           python -m build
           twine upload dist/*
   deploy-to-npm:
+    needs:
+      - push-flyteidl-tag
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -41,8 +66,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Set version in npm package
         run: |
-          # from refs/tags/v1.2.3 get 1.2.3
-          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          # v1.2.3 get 1.2.3
+          VERSION=$(echo ${{ inputs.version }} | sed 's#.*v##')
           VERSION=$VERSION make update_npmversion
         shell: bash
       - run: |

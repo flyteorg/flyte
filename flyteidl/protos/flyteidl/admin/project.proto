@@ -118,3 +118,15 @@ message ProjectGetRequest {
     // Optional, org key applied to the resource.
     string org = 2;
 }
+
+
+// Error returned for inactive projects
+message InactiveProject {
+    // Indicates a unique project.
+    // +required
+    string id = 1;
+
+    // Optional, org key applied to the resource.
+    string org = 2;
+}
+

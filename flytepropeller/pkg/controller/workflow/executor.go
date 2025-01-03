@@ -100,9 +100,23 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 			Message: err.Error()}), nil
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
-	var inputs *core.LiteralMap
+	inputs := &core.LiteralMap{}
 	if w.Inputs != nil {
+		if len(w.OffloadedInputs) > 0 {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    errors.BadSpecificationError.String(),
+				Message: "cannot specify inline inputs AND offloaded inputs"}), nil
+		}
 		inputs = w.Inputs.LiteralMap
+	} else if len(w.OffloadedInputs) > 0 {
+		err = c.store.ReadProtobuf(ctx, w.OffloadedInputs, inputs)
+		if err != nil {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    "OffloadedInputsReadFailure",
+				Message: err.Error()}), nil
+		}
 	}
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
@@ -281,7 +295,7 @@ func (c *workflowExecutor) IdempotentReportEvent(ctx context.Context, e *event.W
 	err := c.wfRecorder.RecordWorkflowEvent(ctx, e, c.eventConfig)
 	if err != nil && eventsErr.IsAlreadyExists(err) {
 		logger.Infof(ctx, "Workflow event phase: %s, executionId %s already exist",
-			e.Phase.String(), e.ExecutionId)
+			e.GetPhase().String(), e.GetExecutionId())
 		return nil
 	}
 	return err
@@ -356,21 +370,21 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 
 		if recordingErr := c.IdempotentReportEvent(ctx, wfEvent); recordingErr != nil {
 			if eventsErr.IsAlreadyExists(recordingErr) {
-				logger.Warningf(ctx, "Failed to record workflowEvent, error [%s]. Trying to record state: %s. Ignoring this error!", recordingErr.Error(), wfEvent.Phase)
+				logger.Warningf(ctx, "Failed to record workflowEvent, error [%s]. Trying to record state: %s. Ignoring this error!", recordingErr.Error(), wfEvent.GetPhase())
 				return nil
 			}
 			if eventsErr.IsEventAlreadyInTerminalStateError(recordingErr) {
 				// Move to WorkflowPhaseFailed for state mismatch
-				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
+				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.GetPhase().String(), wfEvent.GetExecutionId())
 				logger.Warningf(ctx, msg)
 				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, nil)
 				return nil
 			}
-			if (wfEvent.Phase == core.WorkflowExecution_FAILING || wfEvent.Phase == core.WorkflowExecution_FAILED) &&
+			if (wfEvent.GetPhase() == core.WorkflowExecution_FAILING || wfEvent.GetPhase() == core.WorkflowExecution_FAILED) &&
 				(eventsErr.IsNotFound(recordingErr) || eventsErr.IsEventIncompatibleClusterError(recordingErr)) {
 				// Don't stall the workflow transition to terminated (so that resources can be cleaned up) since these events
 				// are being discarded by the back-end anyways.
-				logger.Infof(ctx, "Failed to record %s workflowEvent, error [%s]. Ignoring this error!", wfEvent.Phase.String(), recordingErr.Error())
+				logger.Infof(ctx, "Failed to record %s workflowEvent, error [%s]. Ignoring this error!", wfEvent.GetPhase().String(), recordingErr.Error())
 				return nil
 			}
 			logger.Warningf(ctx, "Event recording failed. Error [%s]", recordingErr.Error())
@@ -447,7 +461,7 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 	case v1alpha1.WorkflowPhaseHandlingFailureNode:
 		newStatus, err := c.handleFailureNode(ctx, w)
 		if err != nil {
-			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, "%s", err.Error())
+			return errors.Errorf("failed to handle failure node for workflow [%s], err: [%s]", w.ID, err.Error()) //nolint:govet,staticcheck
 		}
 		failureErr := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus)
 		// Ignore ExecutionNotFound and IncompatibleCluster errors to allow graceful failure

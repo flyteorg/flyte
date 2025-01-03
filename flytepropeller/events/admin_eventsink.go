@@ -57,7 +57,11 @@ func (s *adminEventSink) Sink(ctx context.Context, message proto.Message) error 
 
 	if s.filter.Contains(ctx, id) {
 		logger.Debugf(ctx, "event '%s' has already been sent", string(id))
-		return nil
+		return &errors.EventError{
+			Code:    errors.AlreadyExists,
+			Cause:   fmt.Errorf("event has already been sent"),
+			Message: "Event Already Exists",
+		}
 	}
 
 	// Validate submission with rate limiter and send admin event
@@ -112,17 +116,17 @@ func IDFromMessage(message proto.Message) ([]byte, error) {
 	var id string
 	switch eventMessage := message.(type) {
 	case *event.WorkflowExecutionEvent:
-		wid := eventMessage.ExecutionId
-		id = fmt.Sprintf("%s:%s:%s:%d", wid.Project, wid.Domain, wid.Name, eventMessage.Phase)
+		wid := eventMessage.GetExecutionId()
+		id = fmt.Sprintf("%s:%s:%s:%d", wid.GetProject(), wid.GetDomain(), wid.GetName(), eventMessage.GetPhase())
 	case *event.NodeExecutionEvent:
-		nid := eventMessage.Id
-		wid := nid.ExecutionId
-		id = fmt.Sprintf("%s:%s:%s:%s:%s:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, eventMessage.RetryGroup, eventMessage.Phase)
+		nid := eventMessage.GetId()
+		wid := nid.GetExecutionId()
+		id = fmt.Sprintf("%s:%s:%s:%s:%s:%d", wid.GetProject(), wid.GetDomain(), wid.GetName(), nid.GetNodeId(), eventMessage.GetRetryGroup(), eventMessage.GetPhase())
 	case *event.TaskExecutionEvent:
-		tid := eventMessage.TaskId
-		nid := eventMessage.ParentNodeExecutionId
-		wid := nid.ExecutionId
-		id = fmt.Sprintf("%s:%s:%s:%s:%s:%s:%d:%d:%d", wid.Project, wid.Domain, wid.Name, nid.NodeId, tid.Name, tid.Version, eventMessage.RetryAttempt, eventMessage.Phase, eventMessage.PhaseVersion)
+		tid := eventMessage.GetTaskId()
+		nid := eventMessage.GetParentNodeExecutionId()
+		wid := nid.GetExecutionId()
+		id = fmt.Sprintf("%s:%s:%s:%s:%s:%s:%d:%d:%d", wid.GetProject(), wid.GetDomain(), wid.GetName(), nid.GetNodeId(), tid.GetName(), tid.GetVersion(), eventMessage.GetRetryAttempt(), eventMessage.GetPhase(), eventMessage.GetPhaseVersion())
 	default:
 		return nil, fmt.Errorf("unknown event type [%s]", eventMessage.String())
 	}

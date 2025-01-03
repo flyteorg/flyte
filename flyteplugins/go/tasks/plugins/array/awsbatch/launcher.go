@@ -33,8 +33,8 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 	}
 
 	// If the original job was marked as an array (not a single job), then make sure to set it up correctly.
-	if t.Type == arrayTaskType {
-		logger.Debugf(ctx, "Task is of type [%v]. Will setup task index env vars.", t.Type)
+	if t.GetType() == arrayTaskType {
+		logger.Debugf(ctx, "Task is of type [%v]. Will setup task index env vars.", t.GetType())
 		batchInput = UpdateBatchInputForArray(ctx, batchInput, int64(size))
 	}
 

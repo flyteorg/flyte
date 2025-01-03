@@ -217,10 +217,10 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (string, 
 	}
 
 	outputs, err := template.Render(ctx, []string{
-		prestoQuery.RoutingGroup,
-		prestoQuery.Catalog,
-		prestoQuery.Schema,
-		prestoQuery.Statement,
+		prestoQuery.GetRoutingGroup(),
+		prestoQuery.GetCatalog(),
+		prestoQuery.GetSchema(),
+		prestoQuery.GetStatement(),
 	}, template.Parameters{
 		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
 		Inputs:           tCtx.InputReader(),
@@ -241,7 +241,7 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (string, 
 }
 
 func validatePrestoStatement(prestoJob plugins.PrestoQuery) error {
-	if prestoJob.Statement == "" {
+	if prestoJob.GetStatement() == "" {
 		return errors.Errorf(errors.BadTaskSpecification,
 			"Query could not be found. Please ensure that you are at least on Flytekit version 0.3.0 or later.")
 	}
@@ -440,7 +440,7 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 		return err
 	}
 
-	results := taskTemplate.Interface.Outputs.Variables["results"]
+	results := taskTemplate.GetInterface().GetOutputs().GetVariables()["results"]
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
 		&pb.LiteralMap{

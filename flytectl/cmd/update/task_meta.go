@@ -37,7 +37,7 @@ func getUpdateTaskFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.Co
 		project := config.GetConfig().Project
 		domain := config.GetConfig().Domain
 		if len(args) != 1 {
-			return fmt.Errorf("%s", clierrors.ErrTaskNotPassed)
+			return fmt.Errorf(clierrors.ErrTaskNotPassed) //nolint
 		}
 
 		name := args[0]

@@ -3,11 +3,12 @@
 #
 # TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
 
-FROM --platform=${BUILDPLATFORM} golang:1.21-alpine3.18 as builder
+FROM --platform=${BUILDPLATFORM} golang:1.22-alpine3.18 AS builder
+
 
 ARG TARGETARCH
-ENV GOARCH "${TARGETARCH}"
-ENV GOOS linux
+ENV GOARCH="${TARGETARCH}"
+ENV GOOS=linux
 
 RUN apk add git openssh-client make curl
 
@@ -31,7 +32,7 @@ ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
 FROM alpine:3.18
-LABEL org.opencontainers.image.source https://github.com/lyft/flyteplugins
+LABEL org.opencontainers.image.source=https://github.com/lyft/flyteplugins
 
 COPY --from=builder /artifacts /bin
 

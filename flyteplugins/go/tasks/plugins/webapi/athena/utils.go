@@ -19,12 +19,12 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 		return err
 	}
 
-	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+	if taskTemplate.GetInterface() == nil || taskTemplate.GetInterface().GetOutputs() == nil || taskTemplate.Interface.Outputs.Variables == nil {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
 	}
 
-	resultsSchema, exists := taskTemplate.Interface.Outputs.Variables["results"]
+	resultsSchema, exists := taskTemplate.GetInterface().GetOutputs().GetVariables()["results"]
 	if !exists {
 		logger.Infof(ctx, "The task declares no outputs. Skipping writing the outputs.")
 		return nil
@@ -56,11 +56,11 @@ type QueryInfo struct {
 }
 
 func validateHiveQuery(hiveQuery pluginsIdl.QuboleHiveJob) error {
-	if hiveQuery.Query == nil {
+	if hiveQuery.GetQuery() == nil {
 		return errors.Errorf(errors.BadTaskSpecification, "Query is a required field.")
 	}
 
-	if len(hiveQuery.Query.Query) == 0 {
+	if len(hiveQuery.GetQuery().GetQuery()) == 0 {
 		return errors.Errorf(errors.BadTaskSpecification, "Query statement is a required field.")
 	}
 
@@ -68,7 +68,7 @@ func validateHiveQuery(hiveQuery pluginsIdl.QuboleHiveJob) error {
 }
 
 func validatePrestoQuery(prestoQuery pluginsIdl.PrestoQuery) error {
-	if len(prestoQuery.Statement) == 0 {
+	if len(prestoQuery.GetStatement()) == 0 {
 		return errors.Errorf(errors.BadTaskSpecification, "Statement is a required field.")
 	}
 
@@ -81,7 +81,7 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 		return QueryInfo{}, err
 	}
 
-	switch task.Type {
+	switch task.GetType() {
 	case "hive":
 		custom := task.GetCustom()
 		hiveQuery := pluginsIdl.QuboleHiveJob{}
@@ -95,8 +95,8 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 		}
 
 		outputs, err := template.Render(ctx, []string{
-			hiveQuery.Query.Query,
-			hiveQuery.ClusterLabel,
+			hiveQuery.GetQuery().GetQuery(),
+			hiveQuery.GetClusterLabel(),
 		}, template.Parameters{
 			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
 			Inputs:           tCtx.InputReader(),
@@ -124,10 +124,10 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 		}
 
 		outputs, err := template.Render(ctx, []string{
-			prestoQuery.RoutingGroup,
-			prestoQuery.Catalog,
-			prestoQuery.Schema,
-			prestoQuery.Statement,
+			prestoQuery.GetRoutingGroup(),
+			prestoQuery.GetCatalog(),
+			prestoQuery.GetSchema(),
+			prestoQuery.GetStatement(),
 		}, template.Parameters{
 			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
 			Inputs:           tCtx.InputReader(),
@@ -146,5 +146,5 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 		}, nil
 	}
 
-	return QueryInfo{}, errors.Errorf(ErrUser, "Unexpected task type [%v].", task.Type)
+	return QueryInfo{}, errors.Errorf(ErrUser, "Unexpected task type [%v].", task.GetType())
 }

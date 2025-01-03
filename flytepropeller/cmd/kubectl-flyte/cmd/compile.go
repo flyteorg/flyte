@@ -76,18 +76,18 @@ func (c *CompileOpts) compileWorkflowCmd() error {
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(c.protoFile+".yaml", b, os.ModePerm) // #nosec G306
+		err = os.WriteFile(c.protoFile+".yaml", b, os.ModePerm) // #nosec G306
 		if err != nil {
 			return err
 		}
 	}
 
-	compiledTasks, err := compileTasks(wfClosure.Tasks)
+	compiledTasks, err := compileTasks(wfClosure.GetTasks())
 	if err != nil {
 		return err
 	}
 
-	compileWfClosure, err := compiler.CompileWorkflow(wfClosure.Workflow, []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
+	compileWfClosure, err := compiler.CompileWorkflow(wfClosure.GetWorkflow(), []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (c *CompileOpts) compileWorkflowCmd() error {
 	}
 
 	if c.outputPath != "" {
-		return ioutil.WriteFile(c.outputPath, o, os.ModePerm) // #nosec G306
+		return os.WriteFile(c.outputPath, o, os.ModePerm) // #nosec G306
 	}
 	fmt.Printf("%v", string(o))
 	return nil

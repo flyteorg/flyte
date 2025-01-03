@@ -33,7 +33,7 @@ func InitializeExternalResources(ctx context.Context, tCtx core.TaskExecutionCon
 		if state.IndexesToCache.IsSet(uint(i)) {
 			// if not cached set to PhaseUndefined and set cacheStatus according to Discoverable
 			phase = core.PhaseUndefined
-			if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
+			if taskTemplate.GetMetadata() == nil || !taskTemplate.GetMetadata().GetDiscoverable() {
 				cacheStatus = idlCore.CatalogCacheStatus_CACHE_DISABLED
 			} else {
 				cacheStatus = idlCore.CatalogCacheStatus_CACHE_MISS

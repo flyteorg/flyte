@@ -69,7 +69,7 @@ func (r *taskEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskE
 		logger.Infof(ctx, "Failed to record task event [%+v] with err: %v", ev, err)
 		// Only attempt to retry sending an event in the case we tried to send raw output data inline
 		if eventConfig.FallbackToOutputReference && rawOutputPolicy == config.RawOutputPolicyInline {
-			logger.Infof(ctx, "Falling back to sending task event outputs by reference for [%+v]", ev.TaskId)
+			logger.Infof(ctx, "Falling back to sending task event outputs by reference for [%+v]", ev.GetTaskId())
 			return r.handleFailure(ctx, origEvent, err)
 		}
 		return err

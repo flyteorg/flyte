@@ -290,6 +290,7 @@ type ExecutableArrayNodeStatus interface {
 	GetSubNodeTaskPhases() bitarray.CompactArray
 	GetSubNodeRetryAttempts() bitarray.CompactArray
 	GetSubNodeSystemFailures() bitarray.CompactArray
+	GetSubNodeDeltaTimestamps() bitarray.CompactArray
 	GetTaskPhaseVersion() uint32
 }
 
@@ -302,6 +303,7 @@ type MutableArrayNodeStatus interface {
 	SetSubNodeTaskPhases(subNodeTaskPhases bitarray.CompactArray)
 	SetSubNodeRetryAttempts(subNodeRetryAttempts bitarray.CompactArray)
 	SetSubNodeSystemFailures(subNodeSystemFailures bitarray.CompactArray)
+	SetSubNodeDeltaTimestamps(subNodeDeltaTimestamps bitarray.CompactArray)
 	SetTaskPhaseVersion(taskPhaseVersion uint32)
 }
 
@@ -552,6 +554,10 @@ type EnqueueWorkflow func(workflowID WorkflowID)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
 	return outputDir + "/outputs.pb"
+}
+
+func GetOutputsLiteralMetadataFile(literalKey string, outputDir DataReference) DataReference {
+	return outputDir + DataReference(fmt.Sprintf("/%s_offloaded_metadata.pb", literalKey))
 }
 
 func GetInputsFile(inputDir DataReference) DataReference {

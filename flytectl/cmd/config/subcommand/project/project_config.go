@@ -73,18 +73,18 @@ func (c *ConfigProject) GetProjectSpec(cf *config.Config) (*admin.Project, error
 	}
 
 	project := cf.Project
-	if len(projectSpec.Id) == 0 && len(project) == 0 {
-		err := fmt.Errorf("%s", clierrors.ErrProjectNotPassed)
+	if len(projectSpec.GetId()) == 0 && len(project) == 0 {
+		err := fmt.Errorf(clierrors.ErrProjectNotPassed) //nolint
 		return nil, err
 	}
 
-	if len(projectSpec.Id) > 0 && len(project) > 0 {
-		err := fmt.Errorf("%s", clierrors.ErrProjectIDBothPassed)
+	if len(projectSpec.GetId()) > 0 && len(project) > 0 {
+		err := fmt.Errorf(clierrors.ErrProjectIDBothPassed) //nolint
 		return nil, err
 	}
 
 	// Get projectId from file, if not provided, fall back to project
-	if len(projectSpec.Id) == 0 {
+	if len(projectSpec.GetId()) == 0 {
 		projectSpec.Id = project
 	}
 	return &projectSpec, nil
@@ -104,7 +104,7 @@ func (c *ConfigProject) MapToAdminState() (admin.Project_ProjectState, error) {
 
 	if activate || archive {
 		if activate == archive {
-			return admin.Project_ACTIVE, fmt.Errorf("%s", clierrors.ErrInvalidStateUpdate)
+			return admin.Project_ACTIVE, fmt.Errorf(clierrors.ErrInvalidStateUpdate) //nolint
 		}
 		if archive {
 			return admin.Project_ARCHIVED, nil

@@ -25,4 +25,6 @@ sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopi
 sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopilot:${VERSION}  # FLYTECOPILOT_IMAGE," ./charts/flyte-core/values.yaml
 sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${VERSION}  # FLYTECOPILOT_TAG," ./charts/flyte-binary/values.yaml
 
+sed -i "s,tag:[^P]*# FLYTEBINARY_TAG,tag: ${VERSION}  # FLYTEBINARY_TAG," ./charts/flyte-binary/values.yaml
+
 sed -i "s,tag:[^P]*# FLYTEAGENT_TAG,tag: ${FLYTEKIT_TAG}  # FLYTEAGENT_TAG," ./charts/flyteagent/values.yaml

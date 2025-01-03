@@ -6,15 +6,12 @@ import (
 	"sort"
 	"testing"
 
-	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	GetDoFunc func(req *http.Request) (*http.Response, error)
 )
-
-var setup = u.Setup
 
 func TestRegisterCommand(t *testing.T) {
 	registerCommand := RemoteRegisterCommand()

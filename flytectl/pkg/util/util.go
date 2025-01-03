@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -26,7 +25,7 @@ var Ext string
 
 // WriteIntoFile will write content in a file
 func WriteIntoFile(data []byte, file string) error {
-	err := ioutil.WriteFile(file, data, os.ModePerm) // #nosec G306
+	err := os.WriteFile(file, data, os.ModePerm) // #nosec G306
 	if err != nil {
 		return err
 	}
@@ -38,6 +37,7 @@ func CreatePathAndFile(pathToConfig string) error {
 	if err != nil {
 		return err
 	}
+	// #nosec G306
 	if err := os.MkdirAll(filepath.Dir(p), os.ModePerm); err != nil {
 		return err
 	}

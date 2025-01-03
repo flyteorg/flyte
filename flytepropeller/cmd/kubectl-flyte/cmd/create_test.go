@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -113,7 +112,7 @@ func generateSimpleWorkflow(t *testing.T) {
 	marshaller := &jsonpb.Marshaler{}
 	s, err := marshaller.MarshalToString(&closure)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.json.golden"), []byte(s), os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", "workflow.json.golden"), []byte(s), os.ModePerm)) // #nosec G306
 
 	m := map[string]interface{}{}
 	err = json.Unmarshal([]byte(s), &m)
@@ -121,11 +120,11 @@ func generateSimpleWorkflow(t *testing.T) {
 
 	b, err := yaml.Marshal(m)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.yaml.golden"), b, os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", "workflow.yaml.golden"), b, os.ModePerm)) // #nosec G306
 
 	raw, err := proto.Marshal(&closure)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", "workflow.pb.golden"), raw, os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", "workflow.pb.golden"), raw, os.ModePerm)) // #nosec G306
 }
 
 func generateWorkflowWithInputs(t *testing.T) {
@@ -242,7 +241,7 @@ func marshalGolden(t *testing.T, message proto.Message, filename string) {
 	marshaller := &jsonpb.Marshaler{}
 	s, err := marshaller.MarshalToString(message)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".json.golden"), []byte(s), os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", filename+".json.golden"), []byte(s), os.ModePerm)) // #nosec G306
 
 	m := map[string]interface{}{}
 	err = json.Unmarshal([]byte(s), &m)
@@ -250,28 +249,28 @@ func marshalGolden(t *testing.T, message proto.Message, filename string) {
 
 	b, err := yaml.Marshal(m)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".yaml.golden"), b, os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", filename+".yaml.golden"), b, os.ModePerm)) // #nosec G306
 
 	raw, err := proto.Marshal(message)
 	assert.NoError(t, err)
-	assert.NoError(t, ioutil.WriteFile(filepath.Join("testdata", filename+".pb.golden"), raw, os.ModePerm)) // #nosec G306
+	assert.NoError(t, os.WriteFile(filepath.Join("testdata", filename+".pb.golden"), raw, os.ModePerm)) // #nosec G306
 }
 
 func testCompile(t *testing.T) {
 	f := func(t *testing.T, filePath, format string) {
-		raw, err := ioutil.ReadFile(filepath.Join("testdata", filePath))
+		raw, err := os.ReadFile(filepath.Join("testdata", filePath))
 		assert.NoError(t, err)
 		wf := &core.WorkflowClosure{}
 		err = unmarshal(raw, format, wf)
 		assert.NoError(t, err)
 		assert.NotNil(t, wf)
-		assert.Equal(t, 2, len(wf.Tasks))
-		if len(wf.Tasks) == 2 {
-			c := wf.Tasks[0].GetContainer()
+		assert.Equal(t, 2, len(wf.GetTasks()))
+		if len(wf.GetTasks()) == 2 {
+			c := wf.GetTasks()[0].GetContainer()
 			assert.NotNil(t, c)
-			compiledTasks, err := compileTasks(wf.Tasks)
+			compiledTasks, err := compileTasks(wf.GetTasks())
 			assert.NoError(t, err)
-			compiledWf, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
+			compiledWf, err := compiler.CompileWorkflow(wf.GetWorkflow(), []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
 			assert.NoError(t, err)
 			_, err = k8s.BuildFlyteWorkflow(compiledWf, nil, nil, "")
 			assert.NoError(t, err)

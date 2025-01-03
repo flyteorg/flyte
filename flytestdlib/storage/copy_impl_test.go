@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"testing"
@@ -97,11 +98,12 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		store := dummyStore{
 			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
 				readerCalled = true
-				return ioutils.NewBytesReadCloser(bigD), flyteErrors.Wrapf(ErrFailedToWriteCache, errors.New(dummyErrorMsg), "Failed to Cache the metadata")
+				//nolint:govet,staticcheck
+				return ioutils.NewBytesReadCloser(bigD), flyteErrors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata")
 			},
 			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 				writerCalled = true
-				return flyteErrors.Wrapf(ErrFailedToWriteCache, errors.New(dummyErrorMsg), "Failed to Cache the metadata")
+				return flyteErrors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata") //nolint:govet,staticcheck
 			},
 		}
 
@@ -123,11 +125,11 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		store := dummyStore{
 			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
 				readerCalled = true
-				return ioutils.NewBytesReadCloser(bigD), errors.New(dummyErrorMsg)
+				return ioutils.NewBytesReadCloser(bigD), fmt.Errorf(dummyErrorMsg) //nolint:govet,staticcheck
 			},
 			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 				writerCalled = true
-				return errors.New(dummyErrorMsg)
+				return fmt.Errorf(dummyErrorMsg) //nolint:govet,staticcheck
 			},
 		}
 

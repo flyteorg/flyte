@@ -29,7 +29,7 @@ var matchingClusterResourceAttributes = &admin.MatchingAttributes{
 	},
 }
 
-var workflowAttributes = admin.WorkflowAttributes{
+var workflowAttributes = &admin.WorkflowAttributes{
 	Project:            resourceProject,
 	Domain:             resourceDomain,
 	Workflow:           resourceWorkflow,
@@ -48,7 +48,7 @@ var matchingExecutionQueueAttributes = &admin.MatchingAttributes{
 	},
 }
 
-var projectDomainAttributes = admin.ProjectDomainAttributes{
+var projectDomainAttributes = &admin.ProjectDomainAttributes{
 	Project:            resourceProject,
 	Domain:             resourceDomain,
 	MatchingAttributes: matchingExecutionQueueAttributes,
@@ -97,15 +97,15 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 		assert.NoError(t, err)
 		var sawPythonTask, sawSidecarTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
-			if override.TaskType == "python" {
+			if override.GetTaskType() == "python" {
 				sawPythonTask = true
-				assert.EqualValues(t, []string{"plugin_a"}, override.PluginId)
-			} else if override.TaskType == "sidecar" {
+				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
+			} else if override.GetTaskType() == "sidecar" {
 				sawSidecarTask = true
-				assert.EqualValues(t, []string{"plugin_c"}, override.PluginId)
-			} else if override.TaskType == "hive" {
+				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
+			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
-				assert.EqualValues(t, []string{"plugin_d"}, override.PluginId)
+				assert.EqualValues(t, []string{"plugin_d"}, override.GetPluginId())
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")
@@ -135,7 +135,7 @@ func TestFromProjectDomainAttributesModel(t *testing.T) {
 	}
 	unmarshalledAttributes, err := FromResourceModelToProjectDomainAttributes(model)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&projectDomainAttributes, &unmarshalledAttributes))
+	assert.True(t, proto.Equal(projectDomainAttributes, &unmarshalledAttributes))
 }
 
 func TestFromProjectDomainAttributesModel_InvalidResourceAttributes(t *testing.T) {
@@ -194,15 +194,15 @@ func TestMergeUpdateWorkflowAttributes(t *testing.T) {
 		assert.NoError(t, err)
 		var sawPythonTask, sawSidecarTask, sawHiveTask bool
 		for _, override := range updatedAttributes.GetPluginOverrides().GetOverrides() {
-			if override.TaskType == "python" {
+			if override.GetTaskType() == "python" {
 				sawPythonTask = true
-				assert.EqualValues(t, []string{"plugin_a"}, override.PluginId)
-			} else if override.TaskType == "sidecar" {
+				assert.EqualValues(t, []string{"plugin_a"}, override.GetPluginId())
+			} else if override.GetTaskType() == "sidecar" {
 				sawSidecarTask = true
-				assert.EqualValues(t, []string{"plugin_c"}, override.PluginId)
-			} else if override.TaskType == "hive" {
+				assert.EqualValues(t, []string{"plugin_c"}, override.GetPluginId())
+			} else if override.GetTaskType() == "hive" {
 				sawHiveTask = true
-				assert.EqualValues(t, []string{"plugin_d"}, override.PluginId)
+				assert.EqualValues(t, []string{"plugin_d"}, override.GetPluginId())
 			}
 		}
 		assert.True(t, sawPythonTask, "Missing python task from finalized attributes")
@@ -233,7 +233,7 @@ func TestFromWorkflowAttributesModel(t *testing.T) {
 	}
 	unmarshalledAttributes, err := FromResourceModelToWorkflowAttributes(model)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&workflowAttributes, &unmarshalledAttributes))
+	assert.True(t, proto.Equal(workflowAttributes, &unmarshalledAttributes))
 }
 
 func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
@@ -250,7 +250,7 @@ func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
 }
 
 func TestProjectAttributesToResourceModel(t *testing.T) {
-	pa := admin.ProjectAttributes{
+	pa := &admin.ProjectAttributes{
 		Project:            resourceProject,
 		MatchingAttributes: matchingClusterResourceAttributes,
 	}

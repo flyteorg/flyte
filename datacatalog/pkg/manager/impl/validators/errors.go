@@ -14,13 +14,13 @@ const invalidArgFormat = "invalid value for %s, value:[%s]"
 const invalidFilterFormat = "%s cannot be filtered by %s properties"
 
 func NewMissingArgumentError(field string) error {
-	return errors.NewDataCatalogErrorf(codes.InvalidArgument, "%s", fmt.Sprintf(missingFieldFormat, field))
+	return errors.NewDataCatalogErrorf(codes.InvalidArgument, fmt.Sprintf(missingFieldFormat, field)) //nolint
 }
 
 func NewInvalidArgumentError(field string, value string) error {
-	return errors.NewDataCatalogErrorf(codes.InvalidArgument, "%s", fmt.Sprintf(invalidArgFormat, field, value))
+	return errors.NewDataCatalogErrorf(codes.InvalidArgument, fmt.Sprintf(invalidArgFormat, field, value)) //nolint
 }
 
 func NewInvalidFilterError(entity common.Entity, propertyEntity common.Entity) error {
-	return errors.NewDataCatalogErrorf(codes.InvalidArgument, "%s", fmt.Sprintf(invalidFilterFormat, entity, propertyEntity))
+	return errors.NewDataCatalogErrorf(codes.InvalidArgument, fmt.Sprintf(invalidFilterFormat, entity, propertyEntity)) //nolint
 }

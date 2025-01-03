@@ -23,14 +23,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the required libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 1
 ```
 
 Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 4-19
 ```
@@ -67,9 +67,13 @@ If the input size exceeds the concurrency value, multiple batches will run seria
 
 ```python
 @workflow
-def map_workflow_with_additional_params(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 11, 12, 10]) -> list[bool]:
+def map_workflow_with_additional_params(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 11, 12, 10]) -> list[typing.Optional[bool]]:
     return map_task(detect_anomalies, concurrency=1, min_success_ratio=0.75)(data_point=data)
 ```
+
+:::{note}
+Notice the return type of the list has been set to `Optional` when a `min_success_ratio` is added. This is due to the fact we are now tolerating failures, meaning the expected return type from the mapped task may in fact not get returned.
+:::
 
 A map task internally uses a compression algorithm (bitsets) to handle every Flyte workflow node’s metadata,
 which would have otherwise been in the order of 100s of bytes.
@@ -78,7 +82,7 @@ When defining a map task, avoid calling other tasks in it. Flyte can't accuratel
 
 In this example, the map task `suboptimal_mappable_task` would not give you the best performance:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 31-40
 ```
@@ -94,7 +98,7 @@ You might need to map a task with multiple inputs.
 
 For instance, consider a task that requires three inputs:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :pyobject: multi_input_task
 ```
@@ -103,21 +107,21 @@ You may want to map this task with only the ``quantity`` input, while keeping th
 Since a map task accepts only one input, you can achieve this by partially binding values to the map task.
 This can be done using the {py:func}`functools.partial` function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 52-58
 ```
 
 Another possibility is to bind the outputs of a task to partials:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 63-72
 ```
 
 You can also provide multiple lists as input to a `map_task`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+```{literalinclude} /examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :pyobject: map_workflow_with_lists
 ```
@@ -162,36 +166,14 @@ pyflyte run --remote \
 
 ## ArrayNode
 
-:::{important}
-This feature is experimental and the API is subject to breaking changes.
-If you encounter any issues, please submit a
-[bug report](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&projects=&template=bug_report.yaml&title=%5BBUG%5D+).
-:::
-
-ArrayNode map tasks serve as a seamless substitution for regular map tasks, differing solely in the submodule
-utilized to import the `map_task` function. Specifically, you will need to import `map_task` from the experimental module as illustrated below:
-
-```python
-from flytekit import task, workflow
-from flytekit.experimental import map_task
-
-@task
-def t(a: int) -> int:
-    ...
-
-@workflow
-def array_node_wf(xs: list[int]) -> list[int]:
-    return map_task(t)(a=xs)
-```
-
-Flyte introduces map task to enable parallelization of homogeneous operations,
+Flyte originally introduced map tasks to enable parallelization of homogeneous operations,
 offering efficient evaluation and a user-friendly API. Because it’s implemented as a backend plugin,
 its evaluation is independent of core Flyte logic, which generates subtask executions that lack full Flyte functionality.
-ArrayNode tackles this issue by offering robust support for subtask executions.
+ArrayNode tackled this issue by offering robust support for subtask executions.
 It also extends mapping capabilities across all plugins and Flyte node types.
-This enhancement will be a part of our move from the experimental phase to general availability.
+Starting with `flytekit` version 1.12.0, ArrayNode is the default `map_task` importable via `from flytekit import map_task`.
 
-In contrast to map tasks, an ArrayNode provides the following enhancements:
+In contrast to the original map tasks, an ArrayNode provides the following enhancements:
 
 - **Wider mapping support**. ArrayNode extends mapping capabilities beyond Kubernetes tasks, encompassing tasks such as Python tasks, container tasks and pod tasks.
 - **Cache management**. It supports both cache serialization and cache overwriting for subtask executions.

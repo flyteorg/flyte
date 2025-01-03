@@ -30,7 +30,7 @@ Please join us on:
 Open Source Community Meeting 
 -----------------------------
 
-When: every other Tuesday, 9:00 AM Pacific Time.
+When: Every other Thursday, 11:00 AM Pacific Time.
 You're welcome to join and learn from other community members sharing their experiences with Flyte or any other technology from the AI ecosystem.
 Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
@@ -102,4 +102,11 @@ If you want to promote a product or service, go to the #shameless-promotion chan
 
 Messages that don't follow these rules will be deleted.
 
+.. toctree::
+    :maxdepth: 1
+    :hidden:
 
+    Contributing to Flyte <contribute/index>
+    Roadmap <roadmap>
+    Frequently asked questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
+    Troubleshooting guide <troubleshoot>

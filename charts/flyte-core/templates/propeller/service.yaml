@@ -10,7 +10,7 @@ spec:
   ports:
     - name: http-metrics
       protocol: TCP
-      port: 10254
+      port: {{ index .Values.configmap.core.propeller "prof-port" }}
     {{- with .Values.flytepropeller.service.additionalPorts -}}
     {{ tpl (toYaml .) $ | nindent 4 }}
     {{- end }}

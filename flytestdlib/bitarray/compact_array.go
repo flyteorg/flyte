@@ -77,7 +77,7 @@ func (a CompactArray) GetItems() []Item {
 	res := make([]Item, 0, a.ItemsCount)
 	// #nosec G115
 	for i := 0; i < int(a.ItemsCount); i++ {
-		res = append(res, a.GetItem(i))
+		res = append(res, a.GetItem(i)) // #nosec G115
 	}
 
 	return res

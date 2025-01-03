@@ -7,6 +7,8 @@ import (
 
 	container "github.com/docker/docker/api/types/container"
 
+	image "github.com/docker/docker/api/types/image"
+
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -189,7 +191,7 @@ func (_m Docker_ContainerList) Return(_a0 []types.Container, _a1 error) *Docker_
 	return &Docker_ContainerList{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnContainerList(ctx context.Context, options types.ContainerListOptions) *Docker_ContainerList {
+func (_m *Docker) OnContainerList(ctx context.Context, options container.ListOptions) *Docker_ContainerList {
 	c_call := _m.On("ContainerList", ctx, options)
 	return &Docker_ContainerList{Call: c_call}
 }
@@ -200,11 +202,11 @@ func (_m *Docker) OnContainerListMatch(matchers ...interface{}) *Docker_Containe
 }
 
 // ContainerList provides a mock function with given fields: ctx, options
-func (_m *Docker) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
+func (_m *Docker) ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
 	ret := _m.Called(ctx, options)
 
 	var r0 []types.Container
-	if rf, ok := ret.Get(0).(func(context.Context, types.ContainerListOptions) []types.Container); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, container.ListOptions) []types.Container); ok {
 		r0 = rf(ctx, options)
 	} else {
 		if ret.Get(0) != nil {
@@ -213,7 +215,7 @@ func (_m *Docker) ContainerList(ctx context.Context, options types.ContainerList
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, types.ContainerListOptions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, container.ListOptions) error); ok {
 		r1 = rf(ctx, options)
 	} else {
 		r1 = ret.Error(1)
@@ -230,7 +232,7 @@ func (_m Docker_ContainerLogs) Return(_a0 io.ReadCloser, _a1 error) *Docker_Cont
 	return &Docker_ContainerLogs{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnContainerLogs(ctx context.Context, _a1 string, options types.ContainerLogsOptions) *Docker_ContainerLogs {
+func (_m *Docker) OnContainerLogs(ctx context.Context, _a1 string, options container.LogsOptions) *Docker_ContainerLogs {
 	c_call := _m.On("ContainerLogs", ctx, _a1, options)
 	return &Docker_ContainerLogs{Call: c_call}
 }
@@ -241,11 +243,11 @@ func (_m *Docker) OnContainerLogsMatch(matchers ...interface{}) *Docker_Containe
 }
 
 // ContainerLogs provides a mock function with given fields: ctx, _a1, options
-func (_m *Docker) ContainerLogs(ctx context.Context, _a1 string, options types.ContainerLogsOptions) (io.ReadCloser, error) {
+func (_m *Docker) ContainerLogs(ctx context.Context, _a1 string, options container.LogsOptions) (io.ReadCloser, error) {
 	ret := _m.Called(ctx, _a1, options)
 
 	var r0 io.ReadCloser
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ContainerLogsOptions) io.ReadCloser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.LogsOptions) io.ReadCloser); ok {
 		r0 = rf(ctx, _a1, options)
 	} else {
 		if ret.Get(0) != nil {
@@ -254,7 +256,7 @@ func (_m *Docker) ContainerLogs(ctx context.Context, _a1 string, options types.C
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, types.ContainerLogsOptions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, container.LogsOptions) error); ok {
 		r1 = rf(ctx, _a1, options)
 	} else {
 		r1 = ret.Error(1)
@@ -271,7 +273,7 @@ func (_m Docker_ContainerRemove) Return(_a0 error) *Docker_ContainerRemove {
 	return &Docker_ContainerRemove{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *Docker) OnContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) *Docker_ContainerRemove {
+func (_m *Docker) OnContainerRemove(ctx context.Context, containerID string, options container.RemoveOptions) *Docker_ContainerRemove {
 	c_call := _m.On("ContainerRemove", ctx, containerID, options)
 	return &Docker_ContainerRemove{Call: c_call}
 }
@@ -282,11 +284,11 @@ func (_m *Docker) OnContainerRemoveMatch(matchers ...interface{}) *Docker_Contai
 }
 
 // ContainerRemove provides a mock function with given fields: ctx, containerID, options
-func (_m *Docker) ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error {
+func (_m *Docker) ContainerRemove(ctx context.Context, containerID string, options container.RemoveOptions) error {
 	ret := _m.Called(ctx, containerID, options)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ContainerRemoveOptions) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.RemoveOptions) error); ok {
 		r0 = rf(ctx, containerID, options)
 	} else {
 		r0 = ret.Error(0)
@@ -303,7 +305,7 @@ func (_m Docker_ContainerStart) Return(_a0 error) *Docker_ContainerStart {
 	return &Docker_ContainerStart{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *Docker) OnContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) *Docker_ContainerStart {
+func (_m *Docker) OnContainerStart(ctx context.Context, containerID string, options container.StartOptions) *Docker_ContainerStart {
 	c_call := _m.On("ContainerStart", ctx, containerID, options)
 	return &Docker_ContainerStart{Call: c_call}
 }
@@ -314,11 +316,11 @@ func (_m *Docker) OnContainerStartMatch(matchers ...interface{}) *Docker_Contain
 }
 
 // ContainerStart provides a mock function with given fields: ctx, containerID, options
-func (_m *Docker) ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error {
+func (_m *Docker) ContainerStart(ctx context.Context, containerID string, options container.StartOptions) error {
 	ret := _m.Called(ctx, containerID, options)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ContainerStartOptions) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.StartOptions) error); ok {
 		r0 = rf(ctx, containerID, options)
 	} else {
 		r0 = ret.Error(0)
@@ -461,11 +463,11 @@ type Docker_ImageList struct {
 	*mock.Call
 }
 
-func (_m Docker_ImageList) Return(_a0 []types.ImageSummary, _a1 error) *Docker_ImageList {
+func (_m Docker_ImageList) Return(_a0 []image.Summary, _a1 error) *Docker_ImageList {
 	return &Docker_ImageList{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnImageList(ctx context.Context, listOption types.ImageListOptions) *Docker_ImageList {
+func (_m *Docker) OnImageList(ctx context.Context, listOption image.ListOptions) *Docker_ImageList {
 	c_call := _m.On("ImageList", ctx, listOption)
 	return &Docker_ImageList{Call: c_call}
 }
@@ -476,20 +478,20 @@ func (_m *Docker) OnImageListMatch(matchers ...interface{}) *Docker_ImageList {
 }
 
 // ImageList provides a mock function with given fields: ctx, listOption
-func (_m *Docker) ImageList(ctx context.Context, listOption types.ImageListOptions) ([]types.ImageSummary, error) {
+func (_m *Docker) ImageList(ctx context.Context, listOption image.ListOptions) ([]image.Summary, error) {
 	ret := _m.Called(ctx, listOption)
 
-	var r0 []types.ImageSummary
-	if rf, ok := ret.Get(0).(func(context.Context, types.ImageListOptions) []types.ImageSummary); ok {
+	var r0 []image.Summary
+	if rf, ok := ret.Get(0).(func(context.Context, image.ListOptions) []image.Summary); ok {
 		r0 = rf(ctx, listOption)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]types.ImageSummary)
+			r0 = ret.Get(0).([]image.Summary)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, types.ImageListOptions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, image.ListOptions) error); ok {
 		r1 = rf(ctx, listOption)
 	} else {
 		r1 = ret.Error(1)
@@ -506,7 +508,7 @@ func (_m Docker_ImagePull) Return(_a0 io.ReadCloser, _a1 error) *Docker_ImagePul
 	return &Docker_ImagePull{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) *Docker_ImagePull {
+func (_m *Docker) OnImagePull(ctx context.Context, refStr string, options image.PullOptions) *Docker_ImagePull {
 	c_call := _m.On("ImagePull", ctx, refStr, options)
 	return &Docker_ImagePull{Call: c_call}
 }
@@ -517,11 +519,11 @@ func (_m *Docker) OnImagePullMatch(matchers ...interface{}) *Docker_ImagePull {
 }
 
 // ImagePull provides a mock function with given fields: ctx, refStr, options
-func (_m *Docker) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) {
+func (_m *Docker) ImagePull(ctx context.Context, refStr string, options image.PullOptions) (io.ReadCloser, error) {
 	ret := _m.Called(ctx, refStr, options)
 
 	var r0 io.ReadCloser
-	if rf, ok := ret.Get(0).(func(context.Context, string, types.ImagePullOptions) io.ReadCloser); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, image.PullOptions) io.ReadCloser); ok {
 		r0 = rf(ctx, refStr, options)
 	} else {
 		if ret.Get(0) != nil {
@@ -530,7 +532,7 @@ func (_m *Docker) ImagePull(ctx context.Context, refStr string, options types.Im
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, types.ImagePullOptions) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, image.PullOptions) error); ok {
 		r1 = rf(ctx, refStr, options)
 	} else {
 		r1 = ret.Error(1)

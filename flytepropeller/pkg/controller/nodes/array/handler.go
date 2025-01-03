@@ -2,16 +2,19 @@ package array
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"strconv"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 	"github.com/flyteorg/flyte/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -22,9 +25,15 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+)
+
+const (
+	// value is 3 days of seconds which is covered by 18 bits (262144)
+	MAX_DELTA_TIMESTAMP = 259200
 )
 
 var (
@@ -44,6 +53,7 @@ var (
 // arrayNodeHandler is a handle implementation for processing array nodes
 type arrayNodeHandler struct {
 	eventConfig                 *config.EventConfig
+	literalOffloadingConfig     config.LiteralOffloadingConfig
 	gatherOutputsRequestChannel chan *gatherOutputsRequest
 	metrics                     metrics
 	nodeExecutionRequestChannel chan *nodeExecutionRequest
@@ -108,11 +118,15 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	if messageCollector.Length() > 0 {
-		return errors.New(messageCollector.Summary(events.MaxErrorMessageLength))
+		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
 	}
 
 	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
+		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
+		if eventsErr.IsAlreadyExists(err) {
+			return nil
+		}
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
@@ -153,7 +167,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	}
 
 	if messageCollector.Length() > 0 {
-		return errors.New(messageCollector.Summary(events.MaxErrorMessageLength))
+		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength)) //nolint:govet,staticcheck
 	}
 
 	return nil
@@ -185,12 +199,29 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
-		for _, variable := range literalMap.Literals {
-			literalType := validators.LiteralTypeForLiteral(variable)
-			switch literalType.Type.(type) {
-			case *idlcore.LiteralType_CollectionType:
-				collectionLength := len(variable.GetCollection().Literals)
 
+		for key, variable := range literalMap.GetLiterals() {
+			literalType := validators.LiteralTypeForLiteral(variable)
+			err := validators.ValidateLiteralType(literalType)
+			if err != nil {
+				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
+				return handler.DoTransition(handler.TransitionTypeEphemeral,
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, flyteErrors.IDLNotFoundErr, errMsg, nil),
+				), nil
+			}
+			if variable.GetOffloadedMetadata() != nil {
+				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
+				// We need this for the map task to be able to create the subNodeSpec
+				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
+				if err != nil {
+					return handler.DoTransition(handler.TransitionTypeEphemeral,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, flyteErrors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
+					), nil
+				}
+			}
+			switch literalType.GetType().(type) {
+			case *idlcore.LiteralType_CollectionType:
+				collectionLength := len(variable.GetCollection().GetLiterals())
 				if size == -1 {
 					size = collectionLength
 				} else if size != collectionLength {
@@ -231,6 +262,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
+			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
 		} {
 
 			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
@@ -341,6 +373,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 				}
 			}
+
 			if err := eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts()); err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -355,6 +388,20 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 			arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 			arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+
+			if arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+				startedAt := nCtx.NodeStatus().GetLastAttemptStartedAt()
+				subNodeStartedAt := subNodeStatus.GetLastAttemptStartedAt()
+				if subNodeStartedAt == nil {
+					// subNodeStartedAt == nil indicates either (1) node has not started or (2) node status has
+					// been reset (ex. retryable failure). in both cases we set the delta timestamp to 0
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, 0)
+				} else if startedAt != nil && arrayNodeState.SubNodeDeltaTimestamps.GetItem(index) == 0 {
+					// otherwise if `SubNodeDeltaTimestamps` is unset, we compute the delta and set it
+					deltaDuration := uint64(subNodeStartedAt.Time.Sub(startedAt.Time).Seconds())
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, deltaDuration)
+				}
+			}
 
 			// increment task phase version if subNode phase or task phase changed
 			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
@@ -455,8 +502,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					continue
 				}
 
-				if task.CoreTask() != nil && task.CoreTask().Interface != nil && task.CoreTask().Interface.Outputs != nil {
-					for name := range task.CoreTask().Interface.Outputs.Variables {
+				if task.CoreTask() != nil && task.CoreTask().GetInterface() != nil && task.CoreTask().GetInterface().GetOutputs() != nil {
+					for name := range task.CoreTask().GetInterface().GetOutputs().GetVariables() {
 						outputLiterals[name] = nilLiteral
 					}
 				}
@@ -493,7 +540,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// attempt best effort at initializing outputLiterals with output variable names. currently
 		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
-
 		switch arrayNode.GetSubNodeSpec().GetKind() {
 		case v1alpha1.NodeKindTask:
 			taskID := *arrayNode.GetSubNodeSpec().TaskRef
@@ -504,7 +550,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
-				for name := range outputs.Variables {
+				for name := range outputs.GetVariables() {
 					outputLiteral := &idlcore.Literal{
 						Value: &idlcore.Literal_Collection{
 							Collection: &idlcore.LiteralCollection{
@@ -542,6 +588,18 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
+		// only offload literal if config is enabled for this feature.
+		if a.literalOffloadingConfig.Enabled {
+			for outputLiteralKey, outputLiteral := range outputLiterals {
+				// if the size of the output Literal is > threshold then we write the literal to the offloaded store and populate the literal with its zero value and update the offloaded url
+				// use the OffloadLargeLiteralKey to create  {OffloadLargeLiteralKey}_offloaded_metadata.pb file in the datastore.
+				// Update the url in the outputLiteral with the offloaded url and also update the size of the literal.
+				offloadedOutputFile := v1alpha1.GetOutputsLiteralMetadataFile(outputLiteralKey, nCtx.NodeStatus().GetOutputDir())
+				if err := common.OffloadLargeLiteral(ctx, nCtx.DataStore(), offloadedOutputFile, outputLiteral, a.literalOffloadingConfig); err != nil {
+					return handler.UnknownTransition, err
+				}
+			}
+		}
 		outputLiteralMap := &idlcore.LiteralMap{
 			Literals: outputLiterals,
 		}
@@ -578,17 +636,42 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
-		// increment it if we detect any changes in subNode state.
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		} else if incrementTaskPhaseVersion {
-			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
+		// increment taskPhaseVersion if we detect any changes in subNode state.
+		if incrementTaskPhaseVersion {
+			arrayNodeState.TaskPhaseVersion++
 		}
 
-		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
-			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-			return handler.UnknownTransition, err
+		const maxRetries = 3
+		retries := 0
+		for retries <= maxRetries {
+			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
+
+			if err == nil {
+				break
+			}
+
+			// Handle potential race condition if FlyteWorkflow CRD fails to get synced
+			if eventsErr.IsAlreadyExists(err) {
+				if !incrementTaskPhaseVersion {
+					break
+				}
+				logger.Warnf(ctx, "Event version already exists, bumping version and retrying (%d/%d): [%s]", retries+1, maxRetries, err.Error())
+				arrayNodeState.TaskPhaseVersion++
+			} else {
+				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+				return handler.UnknownTransition, err
+			}
+
+			retries++
+			if retries > maxRetries {
+				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
+				return handler.UnknownTransition, err
+			}
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 	}
 
@@ -619,7 +702,7 @@ func (a *arrayNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) e
 }
 
 // New initializes a new arrayNodeHandler
-func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
+func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalOffloadingConfig config.LiteralOffloadingConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// create k8s PluginState byte mocks to reuse instead of creating for each subNode evaluation
 	pluginStateBytesNotStarted, err := bytesFromK8sPluginState(k8s.PluginState{Phase: k8s.PluginPhaseNotStarted})
 	if err != nil {
@@ -631,9 +714,22 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 		return nil, err
 	}
 
+	eventConfigCopy, err := stdConfig.DeepCopyConfig(eventConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	deepCopiedEventConfig, ok := eventConfigCopy.(*config.EventConfig)
+	if !ok {
+		return nil, fmt.Errorf("deep copy error: expected *config.EventConfig, but got %T", eventConfigCopy)
+	}
+
+	deepCopiedEventConfig.ErrorOnAlreadyExists = true
+
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
-		eventConfig:                 eventConfig,
+		eventConfig:                 deepCopiedEventConfig,
+		literalOffloadingConfig:     literalOffloadingConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
 		nodeExecutionRequestChannel: make(chan *nodeExecutionRequest),
@@ -694,6 +790,14 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
+	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
+	var startedAt *metav1.Time
+	if nCtx.NodeStatus().GetLastAttemptStartedAt() != nil && arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+		if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
+			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
+		}
+	}
+
 	subNodeStatus := &v1alpha1.NodeStatus{
 		Phase:          nodePhase,
 		DataDir:        subDataDir,
@@ -704,6 +808,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 			Phase:       taskPhase,
 			PluginState: pluginStateBytes,
 		},
+		LastAttemptStartedAt: startedAt,
 	}
 
 	// initialize mocks
