@@ -11,6 +11,7 @@ import { ExecutionError, NodeExecution_Phase } from "../core/execution_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { CatalogCacheStatus, CatalogMetadata } from "../core/catalog_pb.js";
 import { CompiledWorkflowClosure } from "../core/compiler_pb.js";
+import { VariableMap } from "../core/interface_pb.js";
 
 /**
  * A message used to fetch a single node execution entity.
@@ -825,6 +826,11 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
    */
   flyteUrls?: FlyteURLs;
 
+  /**
+   * @generated from field: flyteidl.core.VariableMap output_variable_map = 18;
+   */
+  outputVariableMap?: VariableMap;
+
   constructor(data?: PartialMessage<NodeExecutionGetDataResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -839,6 +845,7 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
     { no: 16, name: "dynamic_workflow", kind: "message", T: DynamicWorkflowNodeMetadata },
     { no: 17, name: "flyte_urls", kind: "message", T: FlyteURLs },
+    { no: 18, name: "output_variable_map", kind: "message", T: VariableMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeExecutionGetDataResponse {

@@ -538,6 +538,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 
 	var outputs *core.LiteralMap
 	var outputURLBlob *admin.UrlBlob
+	var outputVariableMap *core.VariableMap
 	group.Go(func() error {
 		var err error
 		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
@@ -545,17 +546,31 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return err
 	})
 
+	// TODO: Get the output variable map from the node execution model
+	// group.Go(func() error {
+	// 	var err error
+
+	// 	modelNode, err := m.db.NodeExecutionRepo().Get(groupCtx, repoInterfaces.NodeExecutionResource{
+	// 		NodeExecutionIdentifier: request.GetId(),
+	// 	})
+
+	// 	node, err := transformers.FromNodeExecutionModel(modelNode, transformers.DefaultExecutionTransformerOptions)
+
+	// 	return err
+	// })
+
 	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
 
 	response := &admin.NodeExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(request.GetId(), nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
+		Inputs:            inputURLBlob,
+		Outputs:           outputURLBlob,
+		FullInputs:        inputs,
+		FullOutputs:       outputs,
+		FlyteUrls:         common.FlyteURLsFromNodeExecutionID(request.GetId(), nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
+		OutputVariableMap: outputVariableMap,
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {

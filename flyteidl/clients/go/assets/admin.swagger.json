@@ -5671,6 +5671,9 @@
         },
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs"
+        },
+        "output_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
         }
       },
       "description": "Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution."
@@ -6190,6 +6193,9 @@
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs",
           "title": "flyte tiny url to fetch a core.LiteralMap of task execution's IO\nDeck will be empty for task"
+        },
+        "output_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
         }
       },
       "description": "Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution."
