@@ -8,6 +8,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/event/event.proto";
+import "flyteidl/core/interface.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -165,4 +166,6 @@ message TaskExecutionGetDataResponse {
     // flyte tiny url to fetch a core.LiteralMap of task execution's IO
     // Deck will be empty for task
     FlyteURLs flyte_urls = 5;
+
+    core.VariableMap output_variable_map = 6;
 }

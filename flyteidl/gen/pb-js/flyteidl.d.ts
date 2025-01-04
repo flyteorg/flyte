@@ -17605,6 +17605,9 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse flyteUrls */
             flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** NodeExecutionGetDataResponse outputVariableMap */
+            outputVariableMap?: (flyteidl.core.IVariableMap|null);
         }
 
         /** Represents a NodeExecutionGetDataResponse. */
@@ -17633,6 +17636,9 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse flyteUrls. */
             public flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** NodeExecutionGetDataResponse outputVariableMap. */
+            public outputVariableMap?: (flyteidl.core.IVariableMap|null);
 
             /**
              * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
@@ -20508,6 +20514,9 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse flyteUrls */
             flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** TaskExecutionGetDataResponse outputVariableMap */
+            outputVariableMap?: (flyteidl.core.IVariableMap|null);
         }
 
         /** Represents a TaskExecutionGetDataResponse. */
@@ -20533,6 +20542,9 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse flyteUrls. */
             public flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** TaskExecutionGetDataResponse outputVariableMap. */
+            public outputVariableMap?: (flyteidl.core.IVariableMap|null);
 
             /**
              * Creates a new TaskExecutionGetDataResponse instance using the specified properties.
@@ -23994,6 +24006,9 @@ export namespace flyteidl {
 
             /** GetDataResponse literal */
             literal?: (flyteidl.core.ILiteral|null);
+
+            /** GetDataResponse variableMap */
+            variableMap?: (flyteidl.core.IVariableMap|null);
         }
 
         /** Represents a GetDataResponse. */
@@ -24013,6 +24028,9 @@ export namespace flyteidl {
 
             /** GetDataResponse literal. */
             public literal?: (flyteidl.core.ILiteral|null);
+
+            /** GetDataResponse variableMap. */
+            public variableMap?: (flyteidl.core.IVariableMap|null);
 
             /** GetDataResponse data. */
             public data?: ("literalMap"|"preSignedUrls"|"literal");

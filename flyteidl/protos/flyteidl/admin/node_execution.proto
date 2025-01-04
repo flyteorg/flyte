@@ -9,6 +9,7 @@ import "flyteidl/core/catalog.proto";
 import "flyteidl/core/compiler.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/core/interface.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
@@ -236,6 +237,8 @@ message NodeExecutionGetDataResponse {
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;
 
     FlyteURLs flyte_urls = 17;
+
+    core.VariableMap output_variable_map = 18;
 
 }
 

@@ -42736,6 +42736,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] NodeExecutionGetDataResponse fullOutputs
                  * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] NodeExecutionGetDataResponse dynamicWorkflow
                  * @property {flyteidl.admin.IFlyteURLs|null} [flyteUrls] NodeExecutionGetDataResponse flyteUrls
+                 * @property {flyteidl.core.IVariableMap|null} [outputVariableMap] NodeExecutionGetDataResponse outputVariableMap
                  */
     
                 /**
@@ -42802,6 +42803,14 @@
                 NodeExecutionGetDataResponse.prototype.flyteUrls = null;
     
                 /**
+                 * NodeExecutionGetDataResponse outputVariableMap.
+                 * @member {flyteidl.core.IVariableMap|null|undefined} outputVariableMap
+                 * @memberof flyteidl.admin.NodeExecutionGetDataResponse
+                 * @instance
+                 */
+                NodeExecutionGetDataResponse.prototype.outputVariableMap = null;
+    
+                /**
                  * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NodeExecutionGetDataResponse
@@ -42837,6 +42846,8 @@
                         $root.flyteidl.admin.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                     if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls"))
                         $root.flyteidl.admin.FlyteURLs.encode(message.flyteUrls, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
+                    if (message.outputVariableMap != null && message.hasOwnProperty("outputVariableMap"))
+                        $root.flyteidl.core.VariableMap.encode(message.outputVariableMap, writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
                     return writer;
                 };
     
@@ -42875,6 +42886,9 @@
                             break;
                         case 17:
                             message.flyteUrls = $root.flyteidl.admin.FlyteURLs.decode(reader, reader.uint32());
+                            break;
+                        case 18:
+                            message.outputVariableMap = $root.flyteidl.core.VariableMap.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -42924,6 +42938,11 @@
                         var error = $root.flyteidl.admin.FlyteURLs.verify(message.flyteUrls);
                         if (error)
                             return "flyteUrls." + error;
+                    }
+                    if (message.outputVariableMap != null && message.hasOwnProperty("outputVariableMap")) {
+                        var error = $root.flyteidl.core.VariableMap.verify(message.outputVariableMap);
+                        if (error)
+                            return "outputVariableMap." + error;
                     }
                     return null;
                 };
@@ -49430,6 +49449,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] TaskExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] TaskExecutionGetDataResponse fullOutputs
                  * @property {flyteidl.admin.IFlyteURLs|null} [flyteUrls] TaskExecutionGetDataResponse flyteUrls
+                 * @property {flyteidl.core.IVariableMap|null} [outputVariableMap] TaskExecutionGetDataResponse outputVariableMap
                  */
     
                 /**
@@ -49488,6 +49508,14 @@
                 TaskExecutionGetDataResponse.prototype.flyteUrls = null;
     
                 /**
+                 * TaskExecutionGetDataResponse outputVariableMap.
+                 * @member {flyteidl.core.IVariableMap|null|undefined} outputVariableMap
+                 * @memberof flyteidl.admin.TaskExecutionGetDataResponse
+                 * @instance
+                 */
+                TaskExecutionGetDataResponse.prototype.outputVariableMap = null;
+    
+                /**
                  * Creates a new TaskExecutionGetDataResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionGetDataResponse
@@ -49521,6 +49549,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.flyteUrls != null && message.hasOwnProperty("flyteUrls"))
                         $root.flyteidl.admin.FlyteURLs.encode(message.flyteUrls, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.outputVariableMap != null && message.hasOwnProperty("outputVariableMap"))
+                        $root.flyteidl.core.VariableMap.encode(message.outputVariableMap, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -49556,6 +49586,9 @@
                             break;
                         case 5:
                             message.flyteUrls = $root.flyteidl.admin.FlyteURLs.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.outputVariableMap = $root.flyteidl.core.VariableMap.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -49600,6 +49633,11 @@
                         var error = $root.flyteidl.admin.FlyteURLs.verify(message.flyteUrls);
                         if (error)
                             return "flyteUrls." + error;
+                    }
+                    if (message.outputVariableMap != null && message.hasOwnProperty("outputVariableMap")) {
+                        var error = $root.flyteidl.core.VariableMap.verify(message.outputVariableMap);
+                        if (error)
+                            return "outputVariableMap." + error;
                     }
                     return null;
                 };
@@ -56418,6 +56456,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [literalMap] GetDataResponse literalMap
                  * @property {flyteidl.service.IPreSignedURLs|null} [preSignedUrls] GetDataResponse preSignedUrls
                  * @property {flyteidl.core.ILiteral|null} [literal] GetDataResponse literal
+                 * @property {flyteidl.core.IVariableMap|null} [variableMap] GetDataResponse variableMap
                  */
     
                 /**
@@ -56458,6 +56497,14 @@
                  * @instance
                  */
                 GetDataResponse.prototype.literal = null;
+    
+                /**
+                 * GetDataResponse variableMap.
+                 * @member {flyteidl.core.IVariableMap|null|undefined} variableMap
+                 * @memberof flyteidl.service.GetDataResponse
+                 * @instance
+                 */
+                GetDataResponse.prototype.variableMap = null;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -56503,6 +56550,8 @@
                         $root.flyteidl.service.PreSignedURLs.encode(message.preSignedUrls, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.literal != null && message.hasOwnProperty("literal"))
                         $root.flyteidl.core.Literal.encode(message.literal, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.variableMap != null && message.hasOwnProperty("variableMap"))
+                        $root.flyteidl.core.VariableMap.encode(message.variableMap, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -56532,6 +56581,9 @@
                             break;
                         case 3:
                             message.literal = $root.flyteidl.core.Literal.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.variableMap = $root.flyteidl.core.VariableMap.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -56580,6 +56632,11 @@
                             if (error)
                                 return "literal." + error;
                         }
+                    }
+                    if (message.variableMap != null && message.hasOwnProperty("variableMap")) {
+                        var error = $root.flyteidl.core.VariableMap.verify(message.variableMap);
+                        if (error)
+                            return "variableMap." + error;
                     }
                     return null;
                 };

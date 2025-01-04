@@ -10,6 +10,7 @@ import { FlyteURLs, Sort, UrlBlob } from "./common_pb.js";
 import { ExecutionError, TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskExecutionMetadata } from "../event/event_pb.js";
+import { VariableMap } from "../core/interface_pb.js";
 
 /**
  * A message used to fetch a single task execution entity.
@@ -558,6 +559,11 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
    */
   flyteUrls?: FlyteURLs;
 
+  /**
+   * @generated from field: flyteidl.core.VariableMap output_variable_map = 6;
+   */
+  outputVariableMap?: VariableMap;
+
   constructor(data?: PartialMessage<TaskExecutionGetDataResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -571,6 +577,7 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
     { no: 5, name: "flyte_urls", kind: "message", T: FlyteURLs },
+    { no: 6, name: "output_variable_map", kind: "message", T: VariableMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionGetDataResponse {

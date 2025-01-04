@@ -9,6 +9,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/core/interface.proto";
 
 
 message CreateUploadLocationResponse {
@@ -159,6 +160,10 @@ message GetDataResponse {
     // by name. See the o3 example above.
     core.Literal literal = 3;
   }
+
+  // Return VariableMap if the request is for a node execution input/output with dataclasses.
+  optional core.VariableMap variable_map = 4;
+
 }
 
 // DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.
