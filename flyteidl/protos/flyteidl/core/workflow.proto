@@ -12,6 +12,7 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/types.proto";
 import "flyteidl/core/security.proto";
+import "flyteidl/admin/common.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -199,6 +200,10 @@ message NodeMetadata {
     oneof cache_serializable_value {
         bool cache_serializable = 9;
     }
+
+    Labels labels = 10;
+
+    Annotations annotations = 11;
 }
 
 // Links a variable to an alias.
