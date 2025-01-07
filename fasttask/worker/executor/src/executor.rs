@@ -267,6 +267,9 @@ async fn cleanup_python_env<'a>(
 ) -> Result<(), PyErr> {
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
 
+    // flush stdout to ensure any print statements are persisted
+    py.eval_bound("sys.stdout.flush()", None, Some(&locals))?;
+
     // remote `fast_register_dir` from sys path
     if let Some(ref fast_register_dir) = fast_register_dir {
         py.eval_bound(
