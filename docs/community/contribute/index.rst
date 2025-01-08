@@ -23,7 +23,7 @@ An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels
     To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions.
 
 Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__.
-Several checks are introduced to help maintain the robustness of the project.
+Several checks are introduced to help maintain the robustness of the project:
 
 #. To get through DCO, sign off on every commit (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__)
 #. To improve code coverage, write unit tests to test your code.
@@ -36,6 +36,22 @@ Several checks are introduced to help maintain the robustness of the project.
     Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
 As you become more involved with the project, you may be able to be added as a committer to the repos you're working on. Checkout the `Flyte Contributor Ladder <https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership>`__ to learn more. 
+
+Before submitting your PR
+**************************
+
+We stronly encourage you to add one of these labels to your Pull Request:
+
+- **added**: For new features.
+- **changed**: For changes in existing functionality.
+- **deprecated**: For soon-to-be-removed features.
+- **removed**: For features being removed.
+- **fixed**: For any bug fixes.
+- **security**: In case of vulnerabilities
+
+This is helpful to build human-readable release notes. `Learn more <https://keepachangelog.com/en/1.1.0/>`__
+
+**If you dont't have permissions to label PRs, please indicate the intended label in the PR description.**
 
 🐞 File an issue
 ================
