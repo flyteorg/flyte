@@ -51,7 +51,8 @@ We stronly encourage you to add one of these labels to your Pull Request:
 
 This is helpful to build human-readable release notes. `Learn more <https://keepachangelog.com/en/1.1.0/>`__
 
-**If you dont't have permissions to label PRs, please indicate the intended label in the PR description.**
+.. note::
+    Learn how to apply a label to a PR in the `Github docs <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels#applying-a-label>`__.
 
 🐞 File an issue
 ================
