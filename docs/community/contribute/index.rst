@@ -40,7 +40,7 @@ As you become more involved with the project, you may be able to be added as a c
 Before submitting your PR
 **************************
 
-We stronly encourage you to add one of these labels to your Pull Request:
+We strongly encourage you to add one of these labels to your Pull Request:
 
 - **added**: For new features.
 - **changed**: For changes in existing functionality.
