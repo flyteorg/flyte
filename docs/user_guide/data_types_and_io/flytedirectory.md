@@ -18,7 +18,7 @@ To begin, import the libraries:
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
-:lines: 1-10
+:lines: 1-9
 ```
 
 Building upon the previous example demonstrated in the {std:ref}`file <file>` section,
@@ -100,7 +100,7 @@ Here is a simple example, you can accept a `FlyteDirectory` as an input, walk th
 
 ```{literalinclude} /examples/data_types_and_io/data_types_and_io/file_streaming.py
 :caption: data_types_and_io/file_streaming.py
-:lines: 23-33
+:lines: 24-34
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
