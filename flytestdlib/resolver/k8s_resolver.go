@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -157,6 +158,16 @@ func (k *kResolver) run() {
 	logger.Infof(k.ctx, "Starting k8s resolver for target: %s", k.target)
 	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{FieldSelector: "metadata.name=" + k.target.serviceName})
 	if err != nil {
+		logger.Errorf(
+			k.ctx,
+			"k8s resolver: failed to create watcher for target [%s]: namespace [%s], service [%s], error [%v]",
+			k.target, k.target.serviceNamespace, k.target.serviceName, err,
+		)
+		if statusErr, ok := err.(*errors.StatusError); ok {
+			logger.Errorf(k.ctx, "k8s resolver: status error details: %v", statusErr.ErrStatus)
+		}
+
+		logger.Infof(k.ctx, "k8s resolver: failed to create watcher: [%v]", err)
 		grpclog.Errorf("k8s resolver: failed to create watcher: %v", err)
 		return
 	}
@@ -166,6 +177,11 @@ func (k *kResolver) run() {
 		case <-k.ctx.Done():
 			return
 		case event, ok := <-watcher.ResultChan():
+			logger.Info(k.ctx, "k8s resolver watchet event response: [%v]", event)
+			logger.Info(k.ctx, "k8s resolver watchet event Object response: [%v]", event.Object)
+			if event.Object != nil {
+				logger.Info(k.ctx, "k8s resolver watchet event Object Kind: [%v]", event.Object.GetObjectKind())
+			}
 			if !ok {
 				logger.Debugf(k.ctx, "k8s resolver: watcher closed")
 				return
