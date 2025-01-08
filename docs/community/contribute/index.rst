@@ -7,7 +7,6 @@ Contributing to Flyte
 .. tags:: Contribute, Basic
 
 Thank you for taking the time to contribute to Flyte!
-Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`__ before contributing to Flyte.
 
 Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
 
@@ -18,24 +17,25 @@ TL;DR: Find the repo-specific contribution guidelines in the :ref:`Component Ref
 
 An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
 
-**Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.**
+**Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.**
 
 .. note::
     To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions.
 
 Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__.
-A couple of checks are introduced to help maintain the robustness of the project.
+Several checks are introduced to help maintain the robustness of the project.
 
 #. To get through DCO, sign off on every commit (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__)
-#. To improve code coverage, write unit tests to test your code
-#. Make sure all the tests pass. If you face any issues, please let us know
+#. To improve code coverage, write unit tests to test your code.
+#. Make sure all the tests pass. If you face any issues, please let us know in the `#contribute <https://flyte-org.slack.com/archives/C04NJPLRWUX>`__ channel
+#. Format your Go code with ``golangci-lint`` followed by ``goimports`` (use ``make lint`` and ``make goimports``)
+#. Format your Python code with ``black`` and ``isort`` (use ``make fmt``).
+#. If make targets are not available, you can manually format the code.
 
-On a side note, format your Go code with ``golangci-lint`` followed by ``goimports`` (use ``make lint`` and ``make goimports``), and Python code with ``black`` and ``isort`` (use ``make fmt``).
-If make targets are not available, you can manually format the code.
-Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
+.. note::
+    Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
-As you become more involved with the project, you may be able to be added as a contributor to the repos you're working on,
-but there is a medium term effort to move all development to forks.
+As you become more involved with the project, you may be able to be added as a committer to the repos you're working on. Checkout the `Flyte Contributor Ladder <https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership>`__ to learn more. 
 
 🐞 File an issue
 ================
@@ -53,7 +53,7 @@ We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tr
 If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 Also, add relevant labels to your issue. For example, if you are filing a Flytekit plugin request, add the ``flytekit`` label.
 
-For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__.
+For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://flyte-org.slack.com/archives/C04NJPLRWUX>`__.
 
 .. toctree::
     :maxdepth: 1
