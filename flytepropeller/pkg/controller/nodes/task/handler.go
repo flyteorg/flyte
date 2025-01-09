@@ -40,14 +40,12 @@ import (
 )
 
 const pluginContextKey = contextutils.Key("plugin")
-const FLYTE_ENABLE_DECK = string("FLYTE_ENABLE_DECK")
 
 type DeckStatus int
 
 const (
 	DeckUnknown DeckStatus = iota
 	DeckEnabled
-	DeckDisabled
 )
 
 type metrics struct {
@@ -431,24 +429,29 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 }
 
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
-	// FLYTE_ENABLE_DECK is used when flytekit > 1.14.0
-	// For backward compatibility,
-	// we will return DeckUnknown and call a HEAD request to check if the deck file exists in the terminal state.
+	// GetDeckStatus determines whether a task generates a deck based on its execution context.
+	//
+	// This function ensures backward compatibility with older Flytekit versions using the following logic:
+	// 1. For Flytekit > 1.14.3, the task template's metadata includes the `generates_deck` flag:
+	//    - If `generates_deck` is set to true, it indicates that the task generates a deck, and DeckEnabled is returned.
+	// 2. If `generates_deck` is set to false or is not set (likely from older Flytekit versions):
+	//    - DeckUnknown is returned as a placeholder status.
+	//    - In terminal states, a HEAD request can be made to check if the deck file exists.
+	//
+	// In future implementations, a `DeckDisabled` status could be introduced for better performance optimization:
+	//    - This would eliminate the need for a HEAD request in the final phase.
+	//    - However, the tradeoff is that a new field would need to be added to FlyteIDL to support this behavior.
 
 	template, err := tCtx.tr.Read(ctx)
 	if err != nil {
 		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
 	}
 
-	metadata := template.GetMetadata()
-	if metadata == nil {
-		return DeckUnknown, nil
-	}
-	if metadata.GetGeneratesDeck() {
+	if template.GetMetadata().GetGeneratesDeck() {
 		return DeckEnabled, nil
 	}
 
-	return DeckDisabled, nil
+	return DeckUnknown, nil
 }
 
 func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *taskExecutionContext, ts handler.TaskNodeState) (*pluginRequestedTransition, error) {
@@ -547,23 +550,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		pluginTrns.AddDeckURI(tCtx)
 	}
 
-	// Handle backward compatibility for Flyte deck display behavior.
-	//
-	// Before (legacy behavior):
-	//   - Deck URI was only shown if the deck file existed in the terminal state.
-	//   - We relied on a HEAD request to check if the deck file exists, then added the URI to the event.
-	//
-	// After (new behavior):
-	//   - If `FLYTE_ENABLE_DECK = true` is set in the task template config (requires Flytekit > 1.14.0),
-	//     we display the deck URI from the beginning rather than waiting until the terminal state.
-	//
-	// For backward compatibility with older Flytekit versions (which don't support `FLYTE_ENABLE_DECK`),
-	// we still need to check deck file existence in the terminal state. This ensures that when the deck
-	// isn't enabled via config or doesn't exist, we only show the URI in terminal states if the deck file
-	// is actually present.
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
-		// This is for backward compatibility with older Flytekit versions.
 		if deckStatus == DeckUnknown {
 			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
 		}
