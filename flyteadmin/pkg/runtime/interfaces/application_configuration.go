@@ -603,6 +603,8 @@ type EventsPublisherConfig struct {
 	TopicName string `json:"topicName"`
 	// Event types: task, node, workflow executions
 	EventTypes []string `json:"eventTypes"`
+	// Whether to publish enriched events for all workflow execution events
+	EnrichAllWorkflowEventTypes bool `json:"enrichAllWorkflowEventTypes"`
 }
 
 type ExternalEventsConfig struct {

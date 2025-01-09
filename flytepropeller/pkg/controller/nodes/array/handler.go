@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -26,6 +29,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+)
+
+const (
+	// value is 3 days of seconds which is covered by 18 bits (262144)
+	MAX_DELTA_TIMESTAMP = 259200
 )
 
 var (
@@ -254,6 +262,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
+			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
 		} {
 
 			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
@@ -379,6 +388,20 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 			arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
 			arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+
+			if arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+				startedAt := nCtx.NodeStatus().GetLastAttemptStartedAt()
+				subNodeStartedAt := subNodeStatus.GetLastAttemptStartedAt()
+				if subNodeStartedAt == nil {
+					// subNodeStartedAt == nil indicates either (1) node has not started or (2) node status has
+					// been reset (ex. retryable failure). in both cases we set the delta timestamp to 0
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, 0)
+				} else if startedAt != nil && arrayNodeState.SubNodeDeltaTimestamps.GetItem(index) == 0 {
+					// otherwise if `SubNodeDeltaTimestamps` is unset, we compute the delta and set it
+					deltaDuration := uint64(subNodeStartedAt.Time.Sub(startedAt.Time).Seconds())
+					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, deltaDuration)
+				}
+			}
 
 			// increment task phase version if subNode phase or task phase changed
 			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
@@ -767,6 +790,14 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
+	// compute start time for subNode using delta timestamp from ArrayNode NodeStatus
+	var startedAt *metav1.Time
+	if nCtx.NodeStatus().GetLastAttemptStartedAt() != nil && arrayNodeState.SubNodeDeltaTimestamps.BitSet != nil {
+		if deltaSeconds := arrayNodeState.SubNodeDeltaTimestamps.GetItem(subNodeIndex); deltaSeconds != 0 {
+			startedAt = &metav1.Time{Time: nCtx.NodeStatus().GetLastAttemptStartedAt().Add(time.Duration(deltaSeconds) * time.Second)} // #nosec G115
+		}
+	}
+
 	subNodeStatus := &v1alpha1.NodeStatus{
 		Phase:          nodePhase,
 		DataDir:        subDataDir,
@@ -777,6 +808,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 			Phase:       taskPhase,
 			PluginState: pluginStateBytes,
 		},
+		LastAttemptStartedAt: startedAt,
 	}
 
 	// initialize mocks

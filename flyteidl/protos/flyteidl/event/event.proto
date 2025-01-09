@@ -287,6 +287,16 @@ message ExternalResourceInfo {
 
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
+
+    // Additional metadata to do with this event's node target based on the node type. We are
+    // explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    // If we decide to include in the future, we should deprecate the cache_status field.
+    oneof target_metadata {
+        WorkflowNodeMetadata workflow_node_metadata = 7;
+    }
+
+    // Extensible field for custom, plugin-specific info
+    google.protobuf.Struct custom_info = 8;
 }
 
 

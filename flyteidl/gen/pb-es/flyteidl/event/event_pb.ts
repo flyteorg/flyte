@@ -933,6 +933,28 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
    */
   logs: TaskLog[] = [];
 
+  /**
+   * Additional metadata to do with this event's node target based on the node type. We are
+   * explicitly not including the task_node_metadata here because it is not clear if it is needed.
+   * If we decide to include in the future, we should deprecate the cache_status field.
+   *
+   * @generated from oneof flyteidl.event.ExternalResourceInfo.target_metadata
+   */
+  targetMetadata: {
+    /**
+     * @generated from field: flyteidl.event.WorkflowNodeMetadata workflow_node_metadata = 7;
+     */
+    value: WorkflowNodeMetadata;
+    case: "workflowNodeMetadata";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  /**
+   * Extensible field for custom, plugin-specific info
+   *
+   * @generated from field: google.protobuf.Struct custom_info = 8;
+   */
+  customInfo?: Struct;
+
   constructor(data?: PartialMessage<ExternalResourceInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -947,6 +969,8 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
     { no: 4, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 5, name: "cache_status", kind: "enum", T: proto3.getEnumType(CatalogCacheStatus) },
     { no: 6, name: "logs", kind: "message", T: TaskLog, repeated: true },
+    { no: 7, name: "workflow_node_metadata", kind: "message", T: WorkflowNodeMetadata, oneof: "target_metadata" },
+    { no: 8, name: "custom_info", kind: "message", T: Struct },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceInfo {
