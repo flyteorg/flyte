@@ -470,7 +470,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		)), nil
 	case v1alpha1.ArrayNodePhaseSucceeding:
 		gatherOutputsRequests := make([]*gatherOutputsRequest, 0, len(arrayNodeState.SubNodePhases.GetItems()))
-		outputLiteralTypes := make(map[string]*idlcore.LiteralType)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64) // #nosec G115
 			gatherOutputsRequest := &gatherOutputsRequest{
@@ -497,12 +496,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				if task.CoreTask() != nil && task.CoreTask().GetInterface() != nil && task.CoreTask().GetInterface().GetOutputs() != nil {
 					for name := range task.CoreTask().GetInterface().GetOutputs().GetVariables() {
 						outputLiterals[name] = nilLiteral
-						// Extract the literal type from the task interface
-						outputLiteralTypes[name] = &idlcore.LiteralType{
-							Type: &idlcore.LiteralType_CollectionType{
-								CollectionType: task.CoreTask().GetInterface().GetOutputs().GetVariables()[name].GetType(),
-							},
-						}
 					}
 				}
 
@@ -538,6 +531,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// attempt best effort at initializing outputLiterals with output variable names. currently
 		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
+		outputLiteralTypes := make(map[string]*idlcore.LiteralType)
 		switch arrayNode.GetSubNodeSpec().GetKind() {
 		case v1alpha1.NodeKindTask:
 			taskID := *arrayNode.GetSubNodeSpec().TaskRef
@@ -558,6 +552,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 
 					outputLiterals[name] = outputLiteral
+					// Extract the literal type from the task interface
+					outputLiteralTypes[name] = &idlcore.LiteralType{
+						Type: &idlcore.LiteralType_CollectionType{
+							CollectionType: outputs.GetVariables()[name].GetType(),
+						},
+					}
 				}
 			}
 		case v1alpha1.NodeKindWorkflow:
