@@ -7,7 +7,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Secret(_message.Message):
-    __slots__ = ["group", "group_version", "key", "mount_requirement"]
+    __slots__ = ["group", "group_version", "key", "mount_requirement", "env_name"]
     class MountType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         ANY: _ClassVar[Secret.MountType]
@@ -20,11 +20,13 @@ class Secret(_message.Message):
     GROUP_VERSION_FIELD_NUMBER: _ClassVar[int]
     KEY_FIELD_NUMBER: _ClassVar[int]
     MOUNT_REQUIREMENT_FIELD_NUMBER: _ClassVar[int]
+    ENV_NAME_FIELD_NUMBER: _ClassVar[int]
     group: str
     group_version: str
     key: str
     mount_requirement: Secret.MountType
-    def __init__(self, group: _Optional[str] = ..., group_version: _Optional[str] = ..., key: _Optional[str] = ..., mount_requirement: _Optional[_Union[Secret.MountType, str]] = ...) -> None: ...
+    env_name: str
+    def __init__(self, group: _Optional[str] = ..., group_version: _Optional[str] = ..., key: _Optional[str] = ..., mount_requirement: _Optional[_Union[Secret.MountType, str]] = ..., env_name: _Optional[str] = ...) -> None: ...
 
 class OAuth2Client(_message.Message):
     __slots__ = ["client_id", "client_secret"]
