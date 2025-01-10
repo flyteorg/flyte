@@ -17,7 +17,7 @@ var MockCreatedAtProto, _ = ptypes.TimestampProto(MockCreatedAtValue)
 func GetTaskClosure() *admin.TaskClosure {
 	return &admin.TaskClosure{
 		CompiledTask: &core.CompiledTask{
-			Template: GetValidTaskRequest().Spec.Template,
+			Template: GetValidTaskRequest().GetSpec().GetTemplate(),
 		},
 		CreatedAt: MockCreatedAtProto,
 	}
@@ -32,11 +32,11 @@ func GetWorkflowClosure() *admin.WorkflowClosure {
 	return &admin.WorkflowClosure{
 		CompiledWorkflow: &core.CompiledWorkflowClosure{
 			Primary: &core.CompiledWorkflow{
-				Template: GetWorkflowRequest().Spec.Template,
+				Template: GetWorkflowRequest().GetSpec().GetTemplate(),
 			},
 			Tasks: []*core.CompiledTask{
 				{
-					Template: GetValidTaskRequest().Spec.Template,
+					Template: GetValidTaskRequest().GetSpec().GetTemplate(),
 				},
 			},
 		},

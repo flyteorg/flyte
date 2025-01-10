@@ -70,7 +70,7 @@ func TestFromWorkflowModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
-	}, workflow.Id))
+	}, workflow.GetId()))
 
 	var workflowInterface core.TypedInterface
 	err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
@@ -85,7 +85,7 @@ func TestFromWorkflowModel(t *testing.T) {
 				},
 			},
 		},
-	}, workflow.Closure))
+	}, workflow.GetClosure()))
 }
 
 func TestFromWorkflowModels(t *testing.T) {
@@ -131,7 +131,7 @@ func TestFromWorkflowModels(t *testing.T) {
 		Domain:       "domain a",
 		Name:         "name a",
 		Version:      "version a",
-	}, workflowList[0].Id))
+	}, workflowList[0].GetId()))
 
 	workflowInterface := testutils.GetWorkflowRequestInterface()
 	assert.NoError(t, err)
@@ -145,7 +145,7 @@ func TestFromWorkflowModels(t *testing.T) {
 				},
 			},
 		},
-	}, workflowList[0].Closure))
+	}, workflowList[0].GetClosure()))
 
 	assert.True(t, proto.Equal(&core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
@@ -153,7 +153,7 @@ func TestFromWorkflowModels(t *testing.T) {
 		Domain:       "domain b",
 		Name:         "name b",
 		Version:      "version b",
-	}, workflowList[1].Id))
+	}, workflowList[1].GetId()))
 
 	assert.True(t, proto.Equal(&admin.WorkflowClosure{
 		CreatedAt: createdAtBProto,
@@ -164,5 +164,5 @@ func TestFromWorkflowModels(t *testing.T) {
 				},
 			},
 		},
-	}, workflowList[1].Closure))
+	}, workflowList[1].GetClosure()))
 }

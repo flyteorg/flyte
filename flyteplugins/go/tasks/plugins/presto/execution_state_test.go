@@ -84,7 +84,7 @@ func TestConstructTaskLog(t *testing.T) {
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
 	taskLog := ConstructTaskLog(ExecutionState{CommandID: "123", URI: u.String()})
-	assert.Equal(t, expected, taskLog.Uri)
+	assert.Equal(t, expected, taskLog.GetUri())
 }
 
 func TestConstructTaskInfo(t *testing.T) {
@@ -103,7 +103,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	}
 
 	taskInfo := ConstructTaskInfo(e)
-	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].Uri)
+	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].GetUri())
 	assert.Len(t, taskInfo.ExternalResources, 1)
 	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "123")
 }

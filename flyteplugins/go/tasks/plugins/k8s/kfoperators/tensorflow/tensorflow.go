@@ -55,7 +55,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	replicaSpecMap := make(map[commonOp.ReplicaType]*commonOp.ReplicaSpec)
 	runPolicy := commonOp.RunPolicy{}
 
-	if taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 {
 		tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &tensorflowTaskExtraArgs)
@@ -83,7 +83,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			}
 		}
 
-	} else if taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetTaskTypeVersion() == 1 {
 		kfTensorflowTaskExtraArgs := kfplugins.DistributedTensorflowTrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfTensorflowTaskExtraArgs)
@@ -125,7 +125,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
 	if v, ok := replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker]; !ok || *v.Replicas <= 0 {

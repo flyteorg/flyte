@@ -41,12 +41,12 @@ func formatGCPSecretAccessCommand(secret *core.Secret) []string {
 	// `gcloud` writes this file with permission 0600.
 	// This will cause permission issues in the main container when using non-root
 	// users, so we fix the file permissions with `chmod`.
-	secretDir := strings.ToLower(filepath.Join(GCPSecretMountPath, secret.Group))
-	secretPath := strings.ToLower(filepath.Join(secretDir, secret.GroupVersion))
+	secretDir := strings.ToLower(filepath.Join(GCPSecretMountPath, secret.GetGroup()))
+	secretPath := strings.ToLower(filepath.Join(secretDir, secret.GetGroupVersion()))
 	args := fmt.Sprintf(
 		"gcloud secrets versions access %[1]s/versions/%[2]s --out-file=%[4]s || gcloud secrets versions access %[2]s --secret=%[1]s --out-file=%[4]s; chmod +rX %[3]s %[4]s",
-		secret.Group,
-		secret.GroupVersion,
+		secret.GetGroup(),
+		secret.GetGroupVersion(),
 		secretDir,
 		secretPath,
 	)
@@ -62,12 +62,12 @@ func (i GCPSecretManagerInjector) Type() config.SecretManagerType {
 }
 
 func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	if len(secret.Group) == 0 || len(secret.GroupVersion) == 0 {
+	if len(secret.GetGroup()) == 0 || len(secret.GetGroupVersion()) == 0 {
 		return nil, false, fmt.Errorf("GCP Secrets Webhook require both group and group version to be set. "+
 			"Secret: [%v]", secret)
 	}
 
-	switch secret.MountRequirement {
+	switch secret.GetMountRequirement() {
 	case core.Secret_ANY:
 		fallthrough
 	case core.Secret_FILE:
@@ -115,7 +115,7 @@ func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 	case core.Secret_ENV_VAR:
 		fallthrough
 	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.GetMountRequirement().String(), secret.GetKey())
 		logger.Error(ctx, err)
 		return p, false, err
 	}

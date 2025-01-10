@@ -70,9 +70,9 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 		logger.Errorf(ctx, "Bad interface passed, failed to unmarshal err: %s", err)
 		return errors.Wrap(err, "Bad interface passed, failed to unmarshal, expected core.TypedInterface")
 	}
-	outputInterface := iface.Outputs
+	outputInterface := iface.GetOutputs()
 
-	if iface.Outputs == nil || iface.Outputs.Variables == nil || len(iface.Outputs.Variables) == 0 {
+	if iface.GetOutputs() == nil || iface.Outputs.Variables == nil || len(iface.GetOutputs().GetVariables()) == 0 {
 		logger.Infof(ctx, "Empty output interface received. Assuming void outputs. Sidecar will exit immediately.")
 		return nil
 	}

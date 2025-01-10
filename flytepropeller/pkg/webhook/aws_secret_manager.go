@@ -47,7 +47,7 @@ type AWSSecretManagerInjector struct {
 }
 
 func formatAWSSecretArn(secret *core.Secret) string {
-	return strings.TrimRight(secret.Group, ":") + ":" + strings.TrimLeft(secret.Key, ":")
+	return strings.TrimRight(secret.GetGroup(), ":") + ":" + strings.TrimLeft(secret.GetKey(), ":")
 }
 
 func formatAWSInitContainerName(index int) string {
@@ -59,12 +59,12 @@ func (i AWSSecretManagerInjector) Type() config.SecretManagerType {
 }
 
 func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	if len(secret.Group) == 0 || len(secret.Key) == 0 {
+	if len(secret.GetGroup()) == 0 || len(secret.GetKey()) == 0 {
 		return nil, false, fmt.Errorf("AWS Secrets Webhook require both key and group to be set. "+
 			"Secret: [%v]", secret)
 	}
 
-	switch secret.MountRequirement {
+	switch secret.GetMountRequirement() {
 	case core.Secret_ANY:
 		fallthrough
 	case core.Secret_FILE:
@@ -112,7 +112,7 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 	case core.Secret_ENV_VAR:
 		fallthrough
 	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.GetMountRequirement().String(), secret.GetKey())
 		logger.Error(ctx, err)
 		return p, false, err
 	}
@@ -138,7 +138,7 @@ func createAWSSidecarContainer(cfg config.AWSSecretManagerConfig, p *corev1.Pod,
 			},
 			{
 				Name:  AWSSecretFilenameEnvVar,
-				Value: filepath.Join(string(filepath.Separator), strings.ToLower(secret.Group), strings.ToLower(secret.Key)),
+				Value: filepath.Join(string(filepath.Separator), strings.ToLower(secret.GetGroup()), strings.ToLower(secret.GetKey())),
 			},
 		},
 		Resources: cfg.Resources,

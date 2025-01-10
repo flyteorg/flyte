@@ -7,20 +7,20 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type UpdateProjectAttrsFunc func(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+type UpdateProjectAttrsFunc func(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (
 	*admin.ProjectAttributesUpdateResponse, error)
-type GetProjectAttrFunc func(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+type GetProjectAttrFunc func(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error)
-type DeleteProjectAttrFunc func(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+type DeleteProjectAttrFunc func(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error)
 
-type UpdateProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
+type UpdateProjectDomainFunc func(ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error)
-type GetProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
+type GetProjectDomainFunc func(ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error)
-type DeleteProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
+type DeleteProjectDomainFunc func(ctx context.Context, request *admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error)
-type ListResourceFunc func(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+type ListResourceFunc func(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
 	*admin.ListMatchableAttributesResponse, error)
 type GetResourceFunc func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error)
 
@@ -42,17 +42,17 @@ func (m *MockResourceManager) GetResource(ctx context.Context, request interface
 	return nil, nil
 }
 
-func (m *MockResourceManager) UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
+func (m *MockResourceManager) UpdateWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) (
 	*admin.WorkflowAttributesUpdateResponse, error) {
 	panic("implement me")
 }
 
-func (m *MockResourceManager) GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+func (m *MockResourceManager) GetWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesGetRequest) (
 	*admin.WorkflowAttributesGetResponse, error) {
 	panic("implement me")
 }
 
-func (m *MockResourceManager) DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
+func (m *MockResourceManager) DeleteWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesDeleteRequest) (
 	*admin.WorkflowAttributesDeleteResponse, error) {
 	panic("implement me")
 }
@@ -62,7 +62,7 @@ func (m *MockResourceManager) SetUpdateProjectDomainAttributes(updateProjectDoma
 }
 
 func (m *MockResourceManager) UpdateProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
+	ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
 	if m.updateProjectDomainFunc != nil {
 		return m.updateProjectDomainFunc(ctx, request)
@@ -71,7 +71,7 @@ func (m *MockResourceManager) UpdateProjectDomainAttributes(
 }
 
 func (m *MockResourceManager) GetProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
+	ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
 	if m.GetFunc != nil {
 		return m.GetFunc(ctx, request)
@@ -80,7 +80,7 @@ func (m *MockResourceManager) GetProjectDomainAttributes(
 }
 
 func (m *MockResourceManager) DeleteProjectDomainAttributes(
-	ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
+	ctx context.Context, request *admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error) {
 	if m.DeleteFunc != nil {
 		return m.DeleteFunc(ctx, request)
@@ -92,7 +92,7 @@ func (m *MockResourceManager) SetUpdateProjectAttributes(updateProjectAttrsFunc 
 	m.updateProjectAttrsFunc = updateProjectAttrsFunc
 }
 
-func (m *MockResourceManager) UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+func (m *MockResourceManager) UpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (
 	*admin.ProjectAttributesUpdateResponse, error) {
 	if m.updateProjectAttrsFunc != nil {
 		return m.updateProjectAttrsFunc(ctx, request)
@@ -104,7 +104,7 @@ func (m *MockResourceManager) SetGetProjectAttributes(getProjectFunc GetProjectA
 	m.getProjectAttrFunc = getProjectFunc
 }
 
-func (m *MockResourceManager) GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+func (m *MockResourceManager) GetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 	if m.getProjectAttrFunc != nil {
 		return m.getProjectAttrFunc(ctx, request)
@@ -116,7 +116,7 @@ func (m *MockResourceManager) SetDeleteProjectAttributes(deleteProjectFunc Delet
 	m.deleteProjectAttrFunc = deleteProjectFunc
 }
 
-func (m *MockResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+func (m *MockResourceManager) DeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 	if m.deleteProjectAttrFunc != nil {
 		return m.deleteProjectAttrFunc(ctx, request)
@@ -124,7 +124,7 @@ func (m *MockResourceManager) DeleteProjectAttributes(ctx context.Context, reque
 	return nil, nil
 }
 
-func (m *MockResourceManager) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+func (m *MockResourceManager) ListAll(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
 	*admin.ListMatchableAttributesResponse, error) {
 	if m.ListFunc != nil {
 		return m.ListFunc(ctx, request)

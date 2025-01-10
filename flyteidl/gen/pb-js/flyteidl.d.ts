@@ -3385,17 +3385,14 @@ export namespace flyteidl {
             /** Literal map */
             map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal hash */
             hash?: (string|null);
 
             /** Literal metadata */
             metadata?: ({ [k: string]: string }|null);
-
-            /** Literal uri */
-            uri?: (string|null);
-
-            /** Literal sizeBytes */
-            sizeBytes?: (Long|null);
         }
 
         /** Represents a Literal. */
@@ -3416,20 +3413,17 @@ export namespace flyteidl {
             /** Literal map. */
             public map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal hash. */
             public hash: string;
 
             /** Literal metadata. */
             public metadata: { [k: string]: string };
 
-            /** Literal uri. */
-            public uri: string;
-
-            /** Literal sizeBytes. */
-            public sizeBytes: Long;
-
             /** Literal value. */
-            public value?: ("scalar"|"collection"|"map");
+            public value?: ("scalar"|"collection"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new Literal instance using the specified properties.
@@ -3458,6 +3452,70 @@ export namespace flyteidl {
 
             /**
              * Verifies a Literal message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a LiteralOffloadedMetadata. */
+        interface ILiteralOffloadedMetadata {
+
+            /** LiteralOffloadedMetadata uri */
+            uri?: (string|null);
+
+            /** LiteralOffloadedMetadata sizeBytes */
+            sizeBytes?: (Long|null);
+
+            /** LiteralOffloadedMetadata inferredType */
+            inferredType?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents a LiteralOffloadedMetadata. */
+        class LiteralOffloadedMetadata implements ILiteralOffloadedMetadata {
+
+            /**
+             * Constructs a new LiteralOffloadedMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ILiteralOffloadedMetadata);
+
+            /** LiteralOffloadedMetadata uri. */
+            public uri: string;
+
+            /** LiteralOffloadedMetadata sizeBytes. */
+            public sizeBytes: Long;
+
+            /** LiteralOffloadedMetadata inferredType. */
+            public inferredType?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new LiteralOffloadedMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LiteralOffloadedMetadata instance
+             */
+            public static create(properties?: flyteidl.core.ILiteralOffloadedMetadata): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Encodes the specified LiteralOffloadedMetadata message. Does not implicitly {@link flyteidl.core.LiteralOffloadedMetadata.verify|verify} messages.
+             * @param message LiteralOffloadedMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ILiteralOffloadedMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LiteralOffloadedMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LiteralOffloadedMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Verifies a LiteralOffloadedMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -3739,6 +3797,9 @@ export namespace flyteidl {
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union */
             union?: (flyteidl.core.IUnionInfo|null);
         }
@@ -3764,11 +3825,14 @@ export namespace flyteidl {
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** BindingData union. */
             public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
-            public value?: ("scalar"|"collection"|"promise"|"map");
+            public value?: ("scalar"|"collection"|"promise"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new BindingData instance using the specified properties.
@@ -4528,6 +4592,12 @@ export namespace flyteidl {
 
             /** ArrayNode executionMode */
             executionMode?: (flyteidl.core.ArrayNode.ExecutionMode|null);
+
+            /** ArrayNode isOriginalSubNodeInterface */
+            isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode */
+            dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4553,6 +4623,12 @@ export namespace flyteidl {
 
             /** ArrayNode executionMode. */
             public executionMode: flyteidl.core.ArrayNode.ExecutionMode;
+
+            /** ArrayNode isOriginalSubNodeInterface. */
+            public isOriginalSubNodeInterface?: (google.protobuf.IBoolValue|null);
+
+            /** ArrayNode dataMode. */
+            public dataMode: flyteidl.core.ArrayNode.DataMode;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4599,6 +4675,12 @@ export namespace flyteidl {
             enum ExecutionMode {
                 MINIMAL_STATE = 0,
                 FULL_STATE = 1
+            }
+
+            /** DataMode enum. */
+            enum DataMode {
+                SINGLE_INPUT_FILE = 0,
+                INDIVIDUAL_INPUT_FILES = 1
             }
         }
 
@@ -5690,6 +5772,12 @@ export namespace flyteidl {
 
             /** ExecutionError kind */
             kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ExecutionError timestamp */
+            timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ExecutionError worker */
+            worker?: (string|null);
         }
 
         /** Represents an ExecutionError. */
@@ -5712,6 +5800,12 @@ export namespace flyteidl {
 
             /** ExecutionError kind. */
             public kind: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ExecutionError timestamp. */
+            public timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ExecutionError worker. */
+            public worker: string;
 
             /**
              * Creates a new ExecutionError instance using the specified properties.
@@ -6331,6 +6425,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars */
             cacheIgnoreInputVars?: (string[]|null);
+
+            /** TaskMetadata isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6377,6 +6474,9 @@ export namespace flyteidl {
 
             /** TaskMetadata cacheIgnoreInputVars. */
             public cacheIgnoreInputVars: string[];
+
+            /** TaskMetadata isEager. */
+            public isEager: boolean;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -7497,6 +7597,12 @@ export namespace flyteidl {
 
             /** ContainerError origin */
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ContainerError timestamp */
+            timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ContainerError worker */
+            worker?: (string|null);
         }
 
         /** Represents a ContainerError. */
@@ -7519,6 +7625,12 @@ export namespace flyteidl {
 
             /** ContainerError origin. */
             public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ContainerError timestamp. */
+            public timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** ContainerError worker. */
+            public worker: string;
 
             /**
              * Creates a new ContainerError instance using the specified properties.
@@ -7988,6 +8100,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -8016,6 +8131,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -8070,6 +8188,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventNodeExecution. */
@@ -8098,6 +8219,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventNodeExecution instance using the specified properties.
@@ -8137,6 +8261,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent */
             rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels */
+            labels?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -8150,6 +8277,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution rawEvent. */
             public rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels. */
+            public labels: { [k: string]: string };
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -8431,6 +8561,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain */
             isInDynamicChain?: (boolean|null);
+
+            /** NodeExecutionEvent isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -8513,6 +8646,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isInDynamicChain. */
             public isInDynamicChain: boolean;
+
+            /** NodeExecutionEvent isEager. */
+            public isEager: boolean;
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -9102,6 +9238,12 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo workflowNodeMetadata */
+            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9130,6 +9272,15 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo workflowNodeMetadata. */
+            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo targetMetadata. */
+            public targetMetadata?: "workflowNodeMetadata";
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
@@ -9934,6 +10085,9 @@ export namespace flyteidl {
 
             /** Resource customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource agentError */
+            agentError?: (flyteidl.admin.IAgentError|null);
         }
 
         /** Represents a Resource. */
@@ -9962,6 +10116,9 @@ export namespace flyteidl {
 
             /** Resource customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource agentError. */
+            public agentError?: (flyteidl.admin.IAgentError|null);
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -10815,6 +10972,79 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an AgentError. */
+        interface IAgentError {
+
+            /** AgentError code */
+            code?: (string|null);
+
+            /** AgentError kind */
+            kind?: (flyteidl.admin.AgentError.Kind|null);
+
+            /** AgentError origin */
+            origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+        }
+
+        /** Represents an AgentError. */
+        class AgentError implements IAgentError {
+
+            /**
+             * Constructs a new AgentError.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAgentError);
+
+            /** AgentError code. */
+            public code: string;
+
+            /** AgentError kind. */
+            public kind: flyteidl.admin.AgentError.Kind;
+
+            /** AgentError origin. */
+            public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /**
+             * Creates a new AgentError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AgentError instance
+             */
+            public static create(properties?: flyteidl.admin.IAgentError): flyteidl.admin.AgentError;
+
+            /**
+             * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.admin.AgentError.verify|verify} messages.
+             * @param message AgentError message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAgentError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AgentError message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AgentError
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AgentError;
+
+            /**
+             * Verifies an AgentError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace AgentError {
+
+            /** Kind enum. */
+            enum Kind {
+                NON_RECOVERABLE = 0,
+                RECOVERABLE = 1
+            }
         }
 
         /** Properties of a ClusterAssignment. */
@@ -16876,6 +17106,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray */
             isArray?: (boolean|null);
+
+            /** NodeExecutionMetaData isEager */
+            isEager?: (boolean|null);
         }
 
         /** Represents a NodeExecutionMetaData. */
@@ -16901,6 +17134,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isArray. */
             public isArray: boolean;
+
+            /** NodeExecutionMetaData isEager. */
+            public isEager: boolean;
 
             /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.

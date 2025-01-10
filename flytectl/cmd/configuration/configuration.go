@@ -63,9 +63,13 @@ func CreateConfigCommand() *cobra.Command {
 	configCmd := viper.GetConfigCommand()
 
 	getResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"init": {CmdFunc: configInitFunc, Aliases: []string{""}, ProjectDomainNotRequired: true,
-			Short: initCmdShort,
-			Long:  initCmdLong, PFlagProvider: initConfig.DefaultConfig},
+		"init": {
+			CmdFunc:                  configInitFunc,
+			Aliases:                  []string{""},
+			ProjectDomainNotRequired: true,
+			DisableFlyteClient:       true,
+			Short:                    initCmdShort,
+			Long:                     initCmdLong, PFlagProvider: initConfig.DefaultConfig},
 	}
 
 	configCmd.Flags().BoolVar(&initConfig.DefaultConfig.Force, "force", false, "Force to overwrite the default config file without confirmation")

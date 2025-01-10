@@ -30,19 +30,19 @@ func getEmailAddresses(addresses []string) []*mail.Email {
 	return sendgridAddresses
 }
 
-func getSendgridEmail(adminEmail admin.EmailMessage) *mail.SGMailV3 {
+func getSendgridEmail(adminEmail *admin.EmailMessage) *mail.SGMailV3 {
 	m := mail.NewV3Mail()
 	// This from email address is really here as a formality. For sendgrid specifically, the sender email is determined
 	// from the api key that's used, not what you send along here.
-	from := mail.NewEmail("Flyte Notifications", adminEmail.SenderEmail)
-	content := mail.NewContent("text/html", adminEmail.Body)
+	from := mail.NewEmail("Flyte Notifications", adminEmail.GetSenderEmail())
+	content := mail.NewContent("text/html", adminEmail.GetBody())
 	m.SetFrom(from)
 	m.AddContent(content)
 
 	personalization := mail.NewPersonalization()
-	emailAddresses := getEmailAddresses(adminEmail.RecipientsEmail)
+	emailAddresses := getEmailAddresses(adminEmail.GetRecipientsEmail())
 	personalization.AddTos(emailAddresses...)
-	personalization.Subject = adminEmail.SubjectLine
+	personalization.Subject = adminEmail.GetSubjectLine()
 	m.AddPersonalizations(personalization)
 
 	return m
@@ -60,7 +60,7 @@ func getAPIKey(config runtimeInterfaces.EmailServerConfig) string {
 	return strings.TrimSpace(string(apiKeyFile))
 }
 
-func (s SendgridEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (s SendgridEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	m := getSendgridEmail(email)
 	s.systemMetrics.SendTotal.Inc()
 	response, err := s.client.Send(m)

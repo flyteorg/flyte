@@ -57,7 +57,7 @@ func TestNamedEntityManager_Get(t *testing.T) {
 		}, nil
 	}
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getFunction)
-	response, err := manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err := manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
 	})
@@ -69,14 +69,14 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
 
-	response, err := manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err := manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_UNSPECIFIED,
 		Id:           &namedEntityIdentifier,
 	})
 	assert.Error(t, err)
 	assert.Nil(t, response)
 
-	response, err = manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err = manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: resourceType,
 		Id:           &badIdentifier,
 	})
@@ -87,7 +87,7 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
-	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_TASK, "eq(state, 0)")
+	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters("eq(state, 0)")
 	assert.NoError(t, err)
 	assert.Len(t, updatedFilters, 1)
 
@@ -97,13 +97,9 @@ func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	assert.Equal(t, "COALESCE(state, 0) = ?", queryExp.Query)
 	assert.Equal(t, "0", queryExp.Args)
 
-	updatedFilters, err = manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_WORKFLOW, "")
+	updatedFilters, err = manager.(*NamedEntityManager).getQueryFilters("")
 	assert.NoError(t, err)
-	assert.Len(t, updatedFilters, 1)
-	queryExp, err = updatedFilters[0].GetGormQueryExpr()
-	assert.NoError(t, err)
-	assert.Equal(t, "COALESCE(state, 0) <> ?", queryExp.Query)
-	assert.Equal(t, admin.NamedEntityState_SYSTEM_GENERATED, queryExp.Args)
+	assert.Len(t, updatedFilters, 0)
 }
 
 func TestNamedEntityManager_Update(t *testing.T) {
@@ -125,7 +121,7 @@ func TestNamedEntityManager_Update(t *testing.T) {
 	updatedMetadata := admin.NamedEntityMetadata{
 		Description: updatedDescription,
 	}
-	response, err := manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err := manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
@@ -143,7 +139,7 @@ func TestNamedEntityManager_Update_BadRequest(t *testing.T) {
 	updatedMetadata := admin.NamedEntityMetadata{
 		Description: updatedDescription,
 	}
-	response, err := manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err := manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: core.ResourceType_UNSPECIFIED,
 		Id:           &namedEntityIdentifier,
@@ -151,7 +147,7 @@ func TestNamedEntityManager_Update_BadRequest(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, response)
 
-	response, err = manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err = manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: resourceType,
 		Id:           &badIdentifier,

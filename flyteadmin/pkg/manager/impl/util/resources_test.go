@@ -44,9 +44,9 @@ func TestGetTaskResources(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				Workflow:     workflowIdentifier.Name,
+				Project:      workflowIdentifier.GetProject(),
+				Domain:       workflowIdentifier.GetDomain(),
+				Workflow:     workflowIdentifier.GetName(),
 				ResourceType: admin.MatchableResource_TASK_RESOURCE,
 			})
 			return &managerInterfaces.ResourceResponse{}, nil
@@ -73,9 +73,9 @@ func TestGetTaskResources(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				Workflow:     workflowIdentifier.Name,
+				Project:      workflowIdentifier.GetProject(),
+				Domain:       workflowIdentifier.GetDomain(),
+				Workflow:     workflowIdentifier.GetName(),
 				ResourceType: admin.MatchableResource_TASK_RESOURCE,
 			})
 			return &managerInterfaces.ResourceResponse{

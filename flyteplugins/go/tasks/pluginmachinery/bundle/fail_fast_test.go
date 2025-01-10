@@ -48,8 +48,8 @@ func TestHandleAlwaysFails(t *testing.T) {
 	transition, err := testHandler.Handle(context.TODO(), taskCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, core.PhasePermanentFailure, transition.Info().Phase())
-	assert.Equal(t, "AlwaysFail", transition.Info().Err().Code)
-	assert.Contains(t, transition.Info().Err().Message, "Task [unsupportedtype]")
+	assert.Equal(t, "AlwaysFail", transition.Info().Err().GetCode())
+	assert.Contains(t, transition.Info().Err().GetMessage(), "Task [unsupportedtype]")
 }
 
 func TestAbort(t *testing.T) {

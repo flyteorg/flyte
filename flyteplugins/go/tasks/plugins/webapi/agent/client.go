@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"crypto/x509"
+	"strings"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -127,19 +128,26 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 			continue
 		}
 
+		agentSupportedTaskCategories := make(map[string]struct{})
 		for _, agent := range res.GetAgents() {
-			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
+			deprecatedSupportedTaskTypes := agent.GetSupportedTaskTypes()
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.GetIsSync()}
 				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+				agentSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
-			supportedTaskCategories := agent.SupportedTaskCategories
+			supportedTaskCategories := agent.GetSupportedTaskCategories()
 			for _, supportedCategory := range supportedTaskCategories {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
-				newAgentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.GetIsSync()}
+				supportedCategoryName := supportedCategory.GetName()
+				newAgentRegistry[supportedCategoryName] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
+				agentSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
+
 		}
+		logger.Infof(ctx, "AgentDeployment [%v] supports the following task types: [%v]", agentDeployment.Endpoint,
+			strings.Join(maps.Keys(agentSupportedTaskCategories), ", "))
 	}
 
 	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
@@ -160,6 +168,7 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 	}
 
+	logger.Infof(ctx, "AgentDeployments support the following task types: [%v]", strings.Join(maps.Keys(newAgentRegistry), ", "))
 	return newAgentRegistry
 }
 

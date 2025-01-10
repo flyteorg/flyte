@@ -64,7 +64,7 @@ func TestUpdateNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
 	nodeExecutionQuery := GlobalMock.NewMock()
-	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE "execution_project" = $14 AND "execution_domain" = $15 AND "execution_name" = $16 AND "node_id" = $17`)
+	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE id = $14`)
 	err := nodeExecutionRepo.Update(context.Background(),
 		&models.NodeExecution{
 			BaseModel: models.BaseModel{ID: 1},
@@ -139,7 +139,7 @@ func TestGetNodeExecution(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",
@@ -160,7 +160,7 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrRecordNotFound)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+			NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
@@ -176,7 +176,7 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrInvalidData)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+			NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
@@ -215,12 +215,65 @@ func TestListNodeExecutions(t *testing.T) {
 	}
 
 	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(`SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference","node_executions"."internal_data" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 LIMIT 20%`).
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "node_executions" WHERE node_executions.phase = $1 LIMIT 20`).
 		WithReply(nodeExecutions)
 
 	collection, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
 			getEqualityFilter(common.NodeExecution, "phase", nodePhase),
+		},
+		Limit: 20,
+	})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, collection)
+	assert.NotEmpty(t, collection.NodeExecutions)
+	assert.Len(t, collection.NodeExecutions, 2)
+	for _, nodeExecution := range collection.NodeExecutions {
+		assert.Equal(t, "project", nodeExecution.ExecutionKey.Project)
+		assert.Equal(t, "domain", nodeExecution.ExecutionKey.Domain)
+		assert.Contains(t, executionIDs, nodeExecution.ExecutionKey.Name)
+		assert.Equal(t, nodePhase, nodeExecution.Phase)
+		assert.Equal(t, []byte("closure"), nodeExecution.Closure)
+		assert.Equal(t, "input uri", nodeExecution.InputURI)
+		assert.Equal(t, nodeStartedAt, *nodeExecution.StartedAt)
+		assert.Equal(t, time.Hour, nodeExecution.Duration)
+	}
+}
+
+func TestListNodeExecutions_WithJoins(t *testing.T) {
+	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	nodeExecutions := make([]map[string]interface{}, 0)
+	executionIDs := []string{"100", "200"}
+	for _, executionID := range executionIDs {
+		nodeExecution := getMockNodeExecutionResponseFromDb(models.NodeExecution{
+			NodeExecutionKey: models.NodeExecutionKey{
+				ExecutionKey: models.ExecutionKey{
+					Project: "project",
+					Domain:  "domain",
+					Name:    executionID,
+				},
+			},
+			Phase:                  nodePhase,
+			Closure:                []byte("closure"),
+			InputURI:               "input uri",
+			StartedAt:              &nodeStartedAt,
+			Duration:               time.Hour,
+			NodeExecutionCreatedAt: &nodeCreatedAt,
+			NodeExecutionUpdatedAt: &nodePlanUpdatedAt,
+		})
+		nodeExecutions = append(nodeExecutions, nodeExecution)
+	}
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	GlobalMock.NewMock().WithQuery(`SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference","node_executions"."internal_data" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 LIMIT 20`).
+		WithReply(nodeExecutions)
+
+	collection, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.NodeExecution, "phase", nodePhase),
+		},
+		JoinTableEntities: map[common.Entity]bool{
+			common.Execution: true,
 		},
 		Limit: 20,
 	})
@@ -305,7 +358,7 @@ func TestListNodeExecutionsForExecution(t *testing.T) {
 	nodeExecutions = append(nodeExecutions, nodeExecution)
 
 	GlobalMock := mocket.Catcher.Reset()
-	query := `SELECT "node_executions"."id","node_executions"."created_at","node_executions"."updated_at","node_executions"."deleted_at","node_executions"."execution_project","node_executions"."execution_domain","node_executions"."execution_name","node_executions"."node_id","node_executions"."phase","node_executions"."input_uri","node_executions"."closure","node_executions"."started_at","node_executions"."node_execution_created_at","node_executions"."node_execution_updated_at","node_executions"."duration","node_executions"."node_execution_metadata","node_executions"."parent_id","node_executions"."parent_task_execution_id","node_executions"."error_kind","node_executions"."error_code","node_executions"."cache_status","node_executions"."dynamic_workflow_remote_closure_reference","node_executions"."internal_data" FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND executions.execution_name = $2 LIMIT 20%`
+	query := `SELECT * FROM "node_executions" WHERE node_executions.phase = $1 AND executions.execution_name = $2 LIMIT 20`
 	GlobalMock.NewMock().WithQuery(query).WithReply(nodeExecutions)
 
 	collection, err := nodeExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
@@ -362,7 +415,7 @@ func TestNodeExecutionExists(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	exists, err := nodeExecutionRepo.Exists(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",
@@ -392,7 +445,7 @@ func TestCountNodeExecutions_Filters(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "node_executions" INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE node_executions.phase = $1 AND "node_executions"."error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
+		`SELECT count(*) FROM "node_executions" WHERE node_executions.phase = $1 AND "node_executions"."error_code" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
 
 	count, err := nodeExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
 		InlineFilters: []common.InlineFilter{

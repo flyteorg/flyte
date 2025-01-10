@@ -18,7 +18,7 @@ func TestMakePrimitiveBinding(t *testing.T) {
 		assert.Equal(t, "x", x.GetVar())
 		p := x.GetBinding()
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v, p.GetScalar().GetPrimitive().GetFloatValue())
 	}
 	{
@@ -36,7 +36,7 @@ func TestMustMakePrimitiveBinding(t *testing.T) {
 		assert.Equal(t, "x", x.GetVar())
 		p := x.GetBinding()
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v, p.GetScalar().GetPrimitive().GetFloatValue())
 	}
 	{
@@ -62,26 +62,26 @@ func TestMakeBindingDataCollection(t *testing.T) {
 	)
 
 	assert.NotNil(t, c.GetCollection())
-	assert.Equal(t, 2, len(c.GetCollection().Bindings))
+	assert.Equal(t, 2, len(c.GetCollection().GetBindings()))
 	{
 		p := c.GetCollection().GetBindings()[0]
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
 	}
 	{
 		p := c.GetCollection().GetBindings()[1]
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v2, p.GetScalar().GetPrimitive().GetStringValue())
 	}
 
 	assert.NotNil(t, c2.GetCollection())
-	assert.Equal(t, 2, len(c2.GetCollection().Bindings))
+	assert.Equal(t, 2, len(c2.GetCollection().GetBindings()))
 	{
 		p := c2.GetCollection().GetBindings()[0]
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
 	}
 	{
@@ -113,7 +113,7 @@ func TestMakeBindingDataMap(t *testing.T) {
 	{
 		p := m.GetMap().GetBindings()["x"]
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
 	}
 	{
@@ -127,7 +127,7 @@ func TestMakeBindingDataMap(t *testing.T) {
 	{
 		p := m2.GetMap().GetBindings()["x"]
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
 	}
 	{

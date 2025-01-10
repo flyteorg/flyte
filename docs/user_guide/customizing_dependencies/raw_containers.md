@@ -15,9 +15,9 @@ Refer to the raw protocol to understand how to leverage this.
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+```{literalinclude} /examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
-:lines: 1-5
+:lines: 1-6
 ```
 
 ## Container tasks
@@ -31,15 +31,22 @@ is `calculate_ellipse_area_shell`. This name has to be unique in the entire proj
 `inputs` and `outputs` specify the interface for the task; thus it should be an ordered dictionary of typed input and
 output variables.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+The `image` field specifies the container image for the task, either as an image name or
+an [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html).
+To access the file that is not included in the image, use `ImageSpec` to copy files or
+directories into container `/root`. 
+
+[Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
+
+```{literalinclude} /examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
-:lines: 15-112
+:lines: 16-118
 ```
 
 As can be seen in this example, `ContainerTask`s can be interacted with like normal Python functions, whose inputs
 correspond to the declared input variables. All data returned by the tasks are consumed and logged by a Flyte task.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+```{literalinclude} /examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
 :pyobject: wf
 ```
@@ -49,6 +56,13 @@ One of the benefits of raw container tasks is that Flytekit does not need to be 
 :::{note}
 Raw containers can be run locally when flytekit version >= 1.11.0.
 :::
+
+### Raise User Error
+
+Raw containers handle errors by checking for the presence of an `_ERROR` file in the
+`output_data_dir` after the container's execution. If this file exists, Flyte treats it as
+a user-defined error and retries the task if `retries` parameter is set in the task
+metadata.
 
 ## Scripts
 

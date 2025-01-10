@@ -33,6 +33,10 @@ func (t *TestDataStore) Head(ctx context.Context, reference storage.DataReferenc
 	return t.HeadCb(ctx, reference)
 }
 
+func (t *TestDataStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	return nil, storage.NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
+}
+
 func (t *TestDataStore) ReadProtobuf(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 	return t.ReadProtobufCb(ctx, reference, msg)
 }

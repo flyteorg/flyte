@@ -13,33 +13,33 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-func WorkflowAttributesToResourceModel(attributes admin.WorkflowAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+func WorkflowAttributesToResourceModel(attributes *admin.WorkflowAttributes, resource admin.MatchableResource) (models.Resource, error) {
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
-		Domain:       attributes.Domain,
-		Workflow:     attributes.Workflow,
+		Project:      attributes.GetProject(),
+		Domain:       attributes.GetDomain(),
+		Workflow:     attributes.GetWorkflow(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityWorkflowLevel,
 		Attributes:   attributeBytes,
 	}, nil
 }
 
-func mergeUpdatePluginOverrides(existingAttributes admin.MatchingAttributes,
+func mergeUpdatePluginOverrides(existingAttributes *admin.MatchingAttributes,
 	newMatchingAttributes *admin.MatchingAttributes) *admin.MatchingAttributes {
 	taskPluginOverrides := make(map[string]*admin.PluginOverride)
-	if existingAttributes.GetPluginOverrides() != nil && len(existingAttributes.GetPluginOverrides().Overrides) > 0 {
-		for _, pluginOverride := range existingAttributes.GetPluginOverrides().Overrides {
-			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+	if existingAttributes.GetPluginOverrides() != nil && len(existingAttributes.GetPluginOverrides().GetOverrides()) > 0 {
+		for _, pluginOverride := range existingAttributes.GetPluginOverrides().GetOverrides() {
+			taskPluginOverrides[pluginOverride.GetTaskType()] = pluginOverride
 		}
 	}
 	if newMatchingAttributes.GetPluginOverrides() != nil &&
-		len(newMatchingAttributes.GetPluginOverrides().Overrides) > 0 {
-		for _, pluginOverride := range newMatchingAttributes.GetPluginOverrides().Overrides {
-			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+		len(newMatchingAttributes.GetPluginOverrides().GetOverrides()) > 0 {
+		for _, pluginOverride := range newMatchingAttributes.GetPluginOverrides().GetOverrides() {
+			taskPluginOverrides[pluginOverride.GetTaskType()] = pluginOverride
 		}
 	}
 
@@ -60,8 +60,8 @@ func MergeUpdateWorkflowAttributes(ctx context.Context, model models.Resource, r
 	resourceID *repoInterfaces.ResourceID, workflowAttributes *admin.WorkflowAttributes) (models.Resource, error) {
 	switch resource {
 	case admin.MatchableResource_PLUGIN_OVERRIDE:
-		var existingAttributes admin.MatchingAttributes
-		err := proto.Unmarshal(model.Attributes, &existingAttributes)
+		existingAttributes := &admin.MatchingAttributes{}
+		err := proto.Unmarshal(model.Attributes, existingAttributes)
 		if err != nil {
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
 				"Unable to unmarshal existing resource attributes for [%+v] with err: %v", resourceID, err)
@@ -98,27 +98,27 @@ func FromResourceModelToWorkflowAttributes(model models.Resource) (admin.Workflo
 	}, nil
 }
 
-func ProjectDomainAttributesToResourceModel(attributes admin.ProjectDomainAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+func ProjectDomainAttributesToResourceModel(attributes *admin.ProjectDomainAttributes, resource admin.MatchableResource) (models.Resource, error) {
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
-		Domain:       attributes.Domain,
+		Project:      attributes.GetProject(),
+		Domain:       attributes.GetDomain(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectDomainLevel,
 		Attributes:   attributeBytes,
 	}, nil
 }
 
-func ProjectAttributesToResourceModel(attributes admin.ProjectAttributes, resource admin.MatchableResource) (models.Resource, error) {
-	attributeBytes, err := proto.Marshal(attributes.MatchingAttributes)
+func ProjectAttributesToResourceModel(attributes *admin.ProjectAttributes, resource admin.MatchableResource) (models.Resource, error) {
+	attributeBytes, err := proto.Marshal(attributes.GetMatchingAttributes())
 	if err != nil {
 		return models.Resource{}, err
 	}
 	return models.Resource{
-		Project:      attributes.Project,
+		Project:      attributes.GetProject(),
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectLevel,
 		Attributes:   attributeBytes,
@@ -131,8 +131,8 @@ func MergeUpdatePluginAttributes(ctx context.Context, model models.Resource, res
 	resourceID *repoInterfaces.ResourceID, matchingAttributes *admin.MatchingAttributes) (models.Resource, error) {
 	switch resource {
 	case admin.MatchableResource_PLUGIN_OVERRIDE:
-		var existingAttributes admin.MatchingAttributes
-		err := proto.Unmarshal(model.Attributes, &existingAttributes)
+		existingAttributes := &admin.MatchingAttributes{}
+		err := proto.Unmarshal(model.Attributes, existingAttributes)
 		if err != nil {
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
 				"Unable to unmarshal existing resource attributes for [%+v] with err: %v", resourceID, err)

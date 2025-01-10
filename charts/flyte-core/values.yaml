@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.13.1-rc0  # FLYTEADMIN_TAG
+    tag: v1.14.1  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -31,6 +31,8 @@ flyteadmin:
   #       name: sendgrid-secret
   #       key: api_key
   env: []
+  # -- Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap)
+  envFrom: []
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
@@ -50,6 +52,8 @@ flyteadmin:
     - flyteexamples
   # -- Service settings for Flyteadmin
   service:
+    appProtocols:
+      enabled: false
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
@@ -144,7 +148,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.13.1-rc0  # FLYTESCHEDULER_TAG
+    tag: v1.14.1  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -210,7 +214,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.13.1-rc0  # DATACATALOG_TAG
+    tag: v1.14.1  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -287,11 +291,9 @@ flyteagent:
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
-        # -- The task types supported by the default agent.
-        supportedTaskTypes:
-        - sensor
-        # -- Uncomment to enable task type that uses Flyte Agent
-        # - bigquery_query_job_task
+        # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
+        # need to be configured.
+        supportedTaskTypes: []
   # -- Labels for flyteagent pods
   podLabels: {}
 
@@ -309,7 +311,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.13.1-rc0  # FLYTEPROPELLER_TAG
+    tag: v1.14.1  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -321,7 +323,17 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
+  # -- If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods
+  manager_resources:
+    resources:
+      limits:
+        cpu: 200m
+        ephemeral-storage: 100Mi
+        memory: 200Mi
+      requests:
+        cpu: 10m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
@@ -398,7 +410,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
-    tag: v1.17.1  # FLYTECONSOLE_TAG
+    tag: v1.19.0  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -410,6 +422,8 @@ flyteconsole:
       memory: 50Mi
   # -- Service settings for Flyteconsole
   service:
+    appProtocols:
+      enabled: false
     annotations: {}
     type: ClusterIP
   # -- Annotations for Flyteconsole pods
@@ -612,6 +626,9 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
+    targetGCPercent: 70
 
 # Database configuration
 db:
@@ -801,7 +818,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc0  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.14.1  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -845,6 +862,8 @@ configmap:
           type: bucket
           rate: 10
           capacity: 100
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /etc/webhook/certs
       serviceName: flyte-pod-webhook
@@ -863,6 +882,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -945,15 +965,48 @@ external_events:
 # an SNS topic (or gcp equivalent)
 cloud_events:
   enable: false
-  type: aws
-  aws:
-    region: us-east-2
   eventsPublisher:
     # Make sure this is not a fifo queue. Admin does not yet support
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
       - all  # Or workflow, node, task. Or "*"
+  type: aws
+  # -- Configuration for sending cloud events to AWS SNS
+  aws:
+    region: us-east-2
+  # -- Configuration for sending cloud events to GCP Pub Sub
+  gcp:
+    region: us-east1
+  # -- Configuration for sending cloud events to Kafka
+  kafka:
+    # -- The version of Kafka
+    version: "3.7.0"
+    # -- The kafka brokers to talk to
+    brokers:
+      - mybroker:443
+    # -- SASL based authentication
+    saslConfig:
+      # -- Whether to use SASL authentication
+      enabled: false
+      # -- The kafka user
+      user: kafka
+      # -- The password for the kafka user
+      password: ""
+      # -- Optional mount path of file containing the kafka password.
+      passwordPath: ""
+      # -- Whether the send the SASL handsahke first
+      handshake: true
+      # -- Which SASL mechanism to use. Defaults to PLAIN
+      mechanism: PLAIN
+    # -- Certificate based authentication
+    tlsConfig:
+      # -- Whether to use certificate based authentication or TLS
+      enabled: false
+      # -- Path to the client certificate
+      certPath: /etc/ssl/certs/kafka-client.crt
+      # -- Path to the client private key
+      keyPath: /etc/ssl/certs/kafka-client.key
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain

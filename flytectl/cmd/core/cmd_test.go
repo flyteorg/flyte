@@ -21,7 +21,7 @@ func TestGenerateCommandFunc(t *testing.T) {
 		adminCfg.Endpoint = config.URL{URL: url.URL{Host: "dummyHost"}}
 		adminCfg.AuthType = admin.AuthTypePkce
 		rootCmd := &cobra.Command{}
-		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true}
+		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true, DisableFlyteClient: true}
 		fn := generateCommandFunc(cmdEntry)
 		assert.Nil(t, fn(rootCmd, []string{}))
 	})
@@ -30,7 +30,7 @@ func TestGenerateCommandFunc(t *testing.T) {
 		adminCfg := admin.GetConfig(context.Background())
 		adminCfg.Endpoint = config.URL{URL: url.URL{Host: ""}}
 		rootCmd := &cobra.Command{}
-		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true}
+		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true, DisableFlyteClient: true}
 		fn := generateCommandFunc(cmdEntry)
 		assert.Nil(t, fn(rootCmd, []string{}))
 	})

@@ -102,7 +102,6 @@ flytepropeller:
       cpu: 1
       ephemeral-storage: 1Gi
       memory: 2Gi
-  cacheSizeMbs: 1024
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: "system-cluster-critical"
   affinity:
@@ -191,6 +190,8 @@ storage:
   bucketName: "{{ .Values.userSettings.bucketName }}"
   s3:
     region: "{{ .Values.userSettings.accountRegion }}"
+  cache:
+    maxSizeMBs: 1024
 
 db:
   datacatalog:
@@ -282,6 +283,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training

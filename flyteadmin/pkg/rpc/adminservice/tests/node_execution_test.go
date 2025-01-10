@@ -30,12 +30,12 @@ func TestCreateNodeEvent(t *testing.T) {
 	phase := core.NodeExecution_RUNNING
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetCreateNodeEventCallback(
-		func(ctx context.Context, request admin.NodeExecutionEventRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 			*admin.NodeExecutionEventResponse, error) {
-			assert.Equal(t, requestID, request.RequestId)
-			assert.NotNil(t, request.Event)
-			assert.True(t, proto.Equal(&nodeExecutionID, request.Event.Id))
-			assert.Equal(t, phase, request.Event.Phase)
+			assert.Equal(t, requestID, request.GetRequestId())
+			assert.NotNil(t, request.GetEvent())
+			assert.True(t, proto.Equal(&nodeExecutionID, request.GetEvent().GetId()))
+			assert.Equal(t, phase, request.GetEvent().GetPhase())
 			return &admin.NodeExecutionEventResponse{}, nil
 		})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -55,7 +55,7 @@ func TestCreateNodeEvent(t *testing.T) {
 func TestCreateNodeEventErr(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetCreateNodeEventCallback(
-		func(ctx context.Context, request admin.NodeExecutionEventRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 			*admin.NodeExecutionEventResponse, error) {
 			return nil, errors.New("expected error")
 		})
@@ -81,8 +81,8 @@ func TestGetNodeExecution(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
-			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
+			request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+			assert.True(t, proto.Equal(&nodeExecutionID, request.GetId()))
 			return response, nil
 		},
 	)
@@ -101,8 +101,8 @@ func TestGetNodeExecutionError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
-			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
+			request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+			assert.True(t, proto.Equal(&nodeExecutionID, request.GetId()))
 			return nil, errors.New("expected error")
 		},
 	)
@@ -121,11 +121,11 @@ func TestGetNodeExecutionError(t *testing.T) {
 func TestListNodeExecutions(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	filters := "encoded filters probably"
-	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request admin.NodeExecutionListRequest) (
+	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request *admin.NodeExecutionListRequest) (
 		*admin.NodeExecutionList, error) {
-		assert.Equal(t, filters, request.Filters)
-		assert.Equal(t, uint32(1), request.Limit)
-		assert.Equal(t, "20", request.Token)
+		assert.Equal(t, filters, request.GetFilters())
+		assert.Equal(t, uint32(1), request.GetLimit())
+		assert.Equal(t, "20", request.GetToken())
 		return &admin.NodeExecutionList{
 			NodeExecutions: []*admin.NodeExecution{
 				{
@@ -145,12 +145,12 @@ func TestListNodeExecutions(t *testing.T) {
 		Token:   "20",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, response.NodeExecutions, 1)
+	assert.Len(t, response.GetNodeExecutions(), 1)
 }
 
 func TestListNodeExecutionsError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
-	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request admin.NodeExecutionListRequest) (
+	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request *admin.NodeExecutionListRequest) (
 		*admin.NodeExecutionList, error) {
 		return nil, errors.New("expected error")
 	})
@@ -172,11 +172,11 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	filters := "encoded filters probably"
 	mockNodeExecutionManager.SetListNodeExecutionsForTaskFunc(
-		func(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (
 			*admin.NodeExecutionList, error) {
-			assert.Equal(t, filters, request.Filters)
-			assert.Equal(t, uint32(1), request.Limit)
-			assert.Equal(t, "20", request.Token)
+			assert.Equal(t, filters, request.GetFilters())
+			assert.Equal(t, uint32(1), request.GetLimit())
+			assert.Equal(t, "20", request.GetToken())
 			return &admin.NodeExecutionList{
 				NodeExecutions: []*admin.NodeExecution{
 					{
@@ -196,13 +196,13 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		Token:   "20",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, response.NodeExecutions, 1)
+	assert.Len(t, response.GetNodeExecutions(), 1)
 }
 
 func TestListNodeExecutionsForTaskError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetListNodeExecutionsForTaskFunc(
-		func(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (
 			*admin.NodeExecutionList, error) {
 			return nil, errors.New("expected error")
 		})
@@ -224,8 +224,8 @@ func TestGetNodeExecutionData(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionDataFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
-			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
+			request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+			assert.True(t, proto.Equal(&nodeExecutionID, request.GetId()))
 			return &admin.NodeExecutionGetDataResponse{
 				Inputs: &admin.UrlBlob{
 					Url:   "inputs",
@@ -249,9 +249,9 @@ func TestGetNodeExecutionData(t *testing.T) {
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "inputs",
 		Bytes: 100,
-	}, resp.Inputs))
+	}, resp.GetInputs()))
 	assert.True(t, proto.Equal(&admin.UrlBlob{
 		Url:   "outputs",
 		Bytes: 200,
-	}, resp.Outputs))
+	}, resp.GetOutputs()))
 }

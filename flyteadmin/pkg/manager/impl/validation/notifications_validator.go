@@ -23,22 +23,22 @@ func validateNotifications(notifications []*admin.Notification) error {
 	for _, notif := range notifications {
 		switch {
 		case notif.GetEmail() != nil:
-			if err := validateRecipientsEmail(notif.GetEmail().RecipientsEmail); err != nil {
+			if err := validateRecipientsEmail(notif.GetEmail().GetRecipientsEmail()); err != nil {
 				return err
 			}
 		case notif.GetSlack() != nil:
-			if err := validateRecipientsEmail(notif.GetSlack().RecipientsEmail); err != nil {
+			if err := validateRecipientsEmail(notif.GetSlack().GetRecipientsEmail()); err != nil {
 				return err
 			}
 		case notif.GetPagerDuty() != nil:
-			if err := validateRecipientsEmail(notif.GetPagerDuty().RecipientsEmail); err != nil {
+			if err := validateRecipientsEmail(notif.GetPagerDuty().GetRecipientsEmail()); err != nil {
 				return err
 			}
 		default:
 			return shared.GetInvalidArgumentError("notification type")
 		}
 
-		for _, phase := range notif.Phases {
+		for _, phase := range notif.GetPhases() {
 			if !common.IsExecutionTerminal(phase) {
 				return shared.GetInvalidArgumentError("phase")
 			}

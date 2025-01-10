@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -55,17 +56,17 @@ type TaskExecutionManager struct {
 }
 
 func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
-	ctx = getNodeExecutionContext(ctx, identifier.NodeExecutionId)
-	return contextutils.WithTaskID(ctx, fmt.Sprintf("%s-%v", identifier.TaskId.Name, identifier.RetryAttempt))
+	ctx = getNodeExecutionContext(ctx, identifier.GetNodeExecutionId())
+	return contextutils.WithTaskID(ctx, fmt.Sprintf("%s-%v", identifier.GetTaskId().GetName(), identifier.GetRetryAttempt()))
 }
 
 func (m *TaskExecutionManager) createTaskExecution(
 	ctx context.Context, request *admin.TaskExecutionEventRequest) (
 	models.TaskExecution, error) {
 
-	nodeExecutionID := request.Event.ParentNodeExecutionId
+	nodeExecutionID := request.GetEvent().GetParentNodeExecutionId()
 	nodeExecutionExists, err := m.db.NodeExecutionRepo().Exists(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionID,
+		NodeExecutionIdentifier: nodeExecutionID,
 	})
 	if err != nil || !nodeExecutionExists {
 		m.metrics.MissingTaskExecution.Inc()
@@ -87,19 +88,19 @@ func (m *TaskExecutionManager) createTaskExecution(
 			StorageClient:         m.storageClient,
 		})
 	if err != nil {
-		logger.Debugf(ctx, "failed to transform task execution %+v into database model: %v", request.Event.TaskId, err)
+		logger.Debugf(ctx, "failed to transform task execution %+v into database model: %v", request.GetEvent().GetTaskId(), err)
 		return models.TaskExecution{}, err
 	}
 
 	if err := m.db.TaskExecutionRepo().Create(ctx, *taskExecutionModel); err != nil {
 		logger.Debugf(ctx, "Failed to create task execution with task id [%+v] with err %v",
-			request.Event.TaskId, err)
+			request.GetEvent().GetTaskId(), err)
 		return models.TaskExecution{}, err
 	}
 
 	m.metrics.TaskExecutionsCreated.Inc()
 	m.metrics.ClosureSizeBytes.Observe(float64(len(taskExecutionModel.Closure)))
-	logger.Debugf(ctx, "created task execution: %+v", request.Event.TaskId)
+	logger.Debugf(ctx, "created task execution: %+v", request.GetEvent().GetTaskId())
 	return *taskExecutionModel, nil
 }
 
@@ -110,41 +111,41 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 	err := transformers.UpdateTaskExecutionModel(ctx, request, existingTaskExecution,
 		m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy, m.storageClient)
 	if err != nil {
-		logger.Debugf(ctx, "failed to update task execution model [%+v] with err: %v", request.Event.TaskId, err)
+		logger.Debugf(ctx, "failed to update task execution model [%+v] with err: %v", request.GetEvent().GetTaskId(), err)
 		return models.TaskExecution{}, err
 	}
 
 	err = m.db.TaskExecutionRepo().Update(ctx, *existingTaskExecution)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update task execution with task id [%+v] and task execution model [%+v] with err %v",
-			request.Event.TaskId, existingTaskExecution, err)
+			request.GetEvent().GetTaskId(), existingTaskExecution, err)
 		return models.TaskExecution{}, err
 	}
 
 	return *existingTaskExecution, nil
 }
 
-func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request admin.TaskExecutionEventRequest) (
+func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request *admin.TaskExecutionEventRequest) (
 	*admin.TaskExecutionEventResponse, error) {
 
 	if err := validation.ValidateTaskExecutionRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
 		return nil, err
 	}
 
-	if err := validation.ValidateClusterForExecutionID(ctx, m.db, request.Event.ParentNodeExecutionId.ExecutionId, request.Event.ProducerId); err != nil {
+	if err := validation.ValidateClusterForExecutionID(ctx, m.db, request.GetEvent().GetParentNodeExecutionId().GetExecutionId(), request.GetEvent().GetProducerId()); err != nil {
 		return nil, err
 	}
 
 	// Get the parent node execution, if none found a MissingEntityError will be returned
-	nodeExecutionID := request.Event.ParentNodeExecutionId
-	taskExecutionID := core.TaskExecutionIdentifier{
-		TaskId:          request.Event.TaskId,
+	nodeExecutionID := request.GetEvent().GetParentNodeExecutionId()
+	taskExecutionID := &core.TaskExecutionIdentifier{
+		TaskId:          request.GetEvent().GetTaskId(),
 		NodeExecutionId: nodeExecutionID,
-		RetryAttempt:    request.Event.RetryAttempt,
+		RetryAttempt:    request.GetEvent().GetRetryAttempt(),
 	}
-	ctx = getTaskExecutionContext(ctx, &taskExecutionID)
+	ctx = getTaskExecutionContext(ctx, taskExecutionID)
 	logger.Debugf(ctx, "Received task execution event for [%+v] transitioning to phase [%v]",
-		taskExecutionID, request.Event.Phase)
+		taskExecutionID, request.GetEvent().GetPhase())
 
 	// See if the task execution exists
 	// - if it does check if the new phase is applicable and then update
@@ -158,120 +159,125 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 			logger.Debugf(ctx, "Failed to find existing task execution [%+v] with err %v", taskExecutionID, err)
 			return nil, err
 		}
-		_, err := m.createTaskExecution(ctx, &request)
+		_, err := m.createTaskExecution(ctx, request)
 		if err != nil {
 			return nil, err
 		}
 
 		return &admin.TaskExecutionEventResponse{}, nil
 	}
-	if taskExecutionModel.Phase == request.Event.Phase.String() &&
-		taskExecutionModel.PhaseVersion >= request.Event.PhaseVersion {
+	if taskExecutionModel.Phase == request.GetEvent().GetPhase().String() &&
+		taskExecutionModel.PhaseVersion >= request.GetEvent().GetPhaseVersion() {
 		logger.Debugf(ctx, "have already recorded task execution phase %s (version: %d) for %v",
-			request.Event.Phase.String(), request.Event.PhaseVersion, taskExecutionID)
+			request.GetEvent().GetPhase().String(), request.GetEvent().GetPhaseVersion(), taskExecutionID)
 		return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
 			"have already recorded task execution phase %s (version: %d) for %v",
-			request.Event.Phase.String(), request.Event.PhaseVersion, taskExecutionID)
+			request.GetEvent().GetPhase().String(), request.GetEvent().GetPhaseVersion(), taskExecutionID)
 	}
 
 	currentPhase := core.TaskExecution_Phase(core.TaskExecution_Phase_value[taskExecutionModel.Phase])
 	if common.IsTaskExecutionTerminal(currentPhase) {
 		// Cannot update a terminal execution.
-		curPhase := request.Event.Phase.String()
-		errorMsg := fmt.Sprintf("invalid phase change from %v to %v for task execution %v", taskExecutionModel.Phase, request.Event.Phase, taskExecutionID)
+		curPhase := request.GetEvent().GetPhase().String()
+		errorMsg := fmt.Sprintf("invalid phase change from %v to %v for task execution %v", taskExecutionModel.Phase, request.GetEvent().GetPhase(), taskExecutionID)
 		logger.Warnf(ctx, errorMsg)
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
 	}
 
-	taskExecutionModel, err = m.updateTaskExecutionModelState(ctx, &request, &taskExecutionModel)
+	taskExecutionModel, err = m.updateTaskExecutionModelState(ctx, request, &taskExecutionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update task execution with id [%+v] with err %v",
 			taskExecutionID, err)
 		return nil, err
 	}
 
-	if request.Event.Phase == core.TaskExecution_RUNNING && request.Event.PhaseVersion == 0 { // TODO: need to be careful about missing inc/decs
+	if request.GetEvent().GetPhase() == core.TaskExecution_RUNNING && request.GetEvent().GetPhaseVersion() == 0 { // TODO: need to be careful about missing inc/decs
 		m.metrics.ActiveTaskExecutions.Inc()
-	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
+	} else if common.IsTaskExecutionTerminal(request.GetEvent().GetPhase()) && request.GetEvent().GetPhaseVersion() == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()
-		m.metrics.TaskExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
-		if request.Event.GetOutputData() != nil {
-			m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		m.metrics.TaskExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.GetEvent().GetPhase().String()))
+		if request.GetEvent().GetOutputData() != nil {
+			m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(request.GetEvent().GetOutputData())))
 		}
 	}
 
-	if err = m.notificationClient.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+	if err = m.notificationClient.Publish(ctx, proto.MessageName(request), request); err != nil {
 		m.metrics.PublishEventError.Inc()
-		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
 	go func() {
 		ceCtx := context.TODO()
-		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
-			logger.Errorf(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
+			logger.Errorf(ctx, "error publishing cloud event [%+v] with err: [%v]", request.GetRequestId(), err)
 		}
 	}()
 
 	m.metrics.TaskExecutionEventsCreated.Inc()
-	logger.Debugf(ctx, "Successfully recorded task execution event [%v]", request.Event)
+	logger.Debugf(ctx, "Successfully recorded task execution event [%v]", request.GetEvent())
 	// TODO: we will want to return some scope information here soon!
 	return &admin.TaskExecutionEventResponse{}, nil
 }
 
 func (m *TaskExecutionManager) GetTaskExecution(
-	ctx context.Context, request admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
-	err := validation.ValidateTaskExecutionIdentifier(request.Id)
+	ctx context.Context, request *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
+	err := validation.ValidateTaskExecutionIdentifier(request.GetId())
 	if err != nil {
-		logger.Debugf(ctx, "Failed to validate GetTaskExecution [%+v] with err: %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to validate GetTaskExecution [%+v] with err: %v", request.GetId(), err)
 		return nil, err
 	}
-	ctx = getTaskExecutionContext(ctx, request.Id)
-	taskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.Id)
+	ctx = getTaskExecutionContext(ctx, request.GetId())
+	taskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		return nil, err
 	}
 	taskExecution, err := transformers.FromTaskExecutionModel(*taskExecutionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to transform task execution model [%+v] to proto: %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to transform task execution model [%+v] to proto: %v", request.GetId(), err)
 		return nil, err
 	}
 	return taskExecution, nil
 }
 
 func (m *TaskExecutionManager) ListTaskExecutions(
-	ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+	ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 	if err := validation.ValidateTaskExecutionListRequest(request); err != nil {
 		logger.Debugf(ctx, "ListTaskExecutions request [%+v] is invalid: %v", request, err)
 		return nil, err
 	}
-	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
+	ctx = getNodeExecutionContext(ctx, request.GetNodeExecutionId())
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, request.GetNodeExecutionId(), common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}
 
-	filters, err := util.AddRequestFilters(request.Filters, common.TaskExecution, identifierFilters)
+	filters, err := util.AddRequestFilters(request.GetFilters(), common.TaskExecution, identifierFilters)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskExecutionColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.TaskExecutionColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"invalid pagination token %s for ListTaskExecutions", request.Token)
+			"invalid pagination token %s for ListTaskExecutions", request.GetToken())
+	}
+	joinTableEntities := make(map[common.Entity]bool)
+	for _, filter := range filters {
+		joinTableEntities[filter.GetEntity()] = true
 	}
 
 	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
+		InlineFilters:     filters,
+		Offset:            offset,
+		Limit:             int(request.GetLimit()),
+		SortParameter:     sortParameter,
+		JoinTableEntities: joinTableEntities,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",
@@ -286,7 +292,7 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 		return nil, err
 	}
 	var token string
-	if len(taskExecutionList) == int(request.Limit) {
+	if len(taskExecutionList) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(taskExecutionList))
 	}
 	return &admin.TaskExecutionList{
@@ -296,27 +302,40 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 }
 
 func (m *TaskExecutionManager) GetTaskExecutionData(
-	ctx context.Context, request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
-	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
-		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
+	ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
+	if err := validation.ValidateTaskExecutionIdentifier(request.GetId()); err != nil {
+		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.GetId(), err)
 	}
-	ctx = getTaskExecutionContext(ctx, request.Id)
-	taskExecution, err := m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{
-		Id: request.Id,
+	ctx = getTaskExecutionContext(ctx, request.GetId())
+	taskExecution, err := m.GetTaskExecution(ctx, &admin.TaskExecutionGetRequest{
+		Id: request.GetId(),
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task execution with id [%+v] with err %v",
-			request.Id, err)
+			request.GetId(), err)
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.InputUri)
-	if err != nil {
-		return nil, err
-	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.Closure)
+	var inputs *core.LiteralMap
+	var inputURLBlob *admin.UrlBlob
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		var err error
+		inputs, inputURLBlob, err = util.GetInputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, taskExecution.GetInputUri())
+		return err
+	})
+
+	var outputs *core.LiteralMap
+	var outputURLBlob *admin.UrlBlob
+	group.Go(func() error {
+		var err error
+		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, taskExecution.GetClosure())
+		return err
+	})
+
+	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -326,14 +345,14 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
+		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(request.GetId(), false),
 	}
 
-	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
-		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
+	m.metrics.TaskExecutionInputBytes.Observe(float64(response.GetInputs().GetBytes()))
+	if response.GetOutputs().GetBytes() > 0 {
+		m.metrics.TaskExecutionOutputBytes.Observe(float64(response.GetOutputs().GetBytes()))
+	} else if response.GetFullOutputs() != nil {
+		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.GetFullOutputs())))
 	}
 	return response, nil
 }

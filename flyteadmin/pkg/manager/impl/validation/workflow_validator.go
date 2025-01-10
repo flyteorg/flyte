@@ -20,24 +20,24 @@ import (
 const numSystemNodes = 2 // A workflow graph always has a start and end node injected by the platform.
 
 func ValidateWorkflow(
-	ctx context.Context, request admin.WorkflowCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, request *admin.WorkflowCreateRequest, db repositoryInterfaces.Repository,
 	config runtime.ApplicationConfiguration) error {
-	if err := ValidateIdentifier(request.Id, common.Workflow); err != nil {
+	if err := ValidateIdentifier(request.GetId(), common.Workflow); err != nil {
 		return err
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Id.Project, request.Id.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request.GetId().GetProject(), request.GetId().GetDomain()); err != nil {
 		return err
 	}
-	if request.Spec == nil || request.Spec.Template == nil {
+	if request.GetSpec() == nil || request.GetSpec().GetTemplate() == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
 	return nil
 }
 
-func ValidateCompiledWorkflow(identifier core.Identifier, workflow admin.WorkflowClosure, config runtime.RegistrationValidationConfiguration) error {
+func ValidateCompiledWorkflow(identifier *core.Identifier, workflow *admin.WorkflowClosure, config runtime.RegistrationValidationConfiguration) error {
 	if len(config.GetWorkflowSizeLimit()) > 0 {
 		workflowSizeLimit := resource.MustParse(config.GetWorkflowSizeLimit())
-		workflowSizeValue := resource.NewQuantity(int64(proto.Size(&workflow)), resource.DecimalExponent)
+		workflowSizeValue := resource.NewQuantity(int64(proto.Size(workflow)), resource.DecimalExponent)
 		if workflowSizeLimit.Cmp(*workflowSizeValue) <= -1 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"Workflow closure size exceeds max limit [%v]", config.GetWorkflowSizeLimit())
@@ -47,12 +47,12 @@ func ValidateCompiledWorkflow(identifier core.Identifier, workflow admin.Workflo
 		// Treat this is unset. There is no limit to compare against.
 		return nil
 	}
-	if workflow.CompiledWorkflow == nil || workflow.CompiledWorkflow.Primary == nil ||
-		workflow.CompiledWorkflow.Primary.Template == nil || workflow.CompiledWorkflow.Primary.Template.Nodes == nil {
+	if workflow.GetCompiledWorkflow() == nil || workflow.GetCompiledWorkflow().GetPrimary() == nil ||
+		workflow.GetCompiledWorkflow().GetPrimary().GetTemplate() == nil || workflow.GetCompiledWorkflow().GetPrimary().GetTemplate().GetNodes() == nil {
 		logger.Warningf(context.Background(), "workflow [%+v] did not have any primary nodes", identifier)
 		return nil
 	}
-	numUserNodes := len(workflow.CompiledWorkflow.Primary.Template.Nodes) - numSystemNodes
+	numUserNodes := len(workflow.GetCompiledWorkflow().GetPrimary().GetTemplate().GetNodes()) - numSystemNodes
 	if numUserNodes > config.GetWorkflowNodeLimit() {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"number of nodes in workflow [%+v] exceeds limit (%v > %v)", identifier,

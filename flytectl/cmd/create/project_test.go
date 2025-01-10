@@ -8,6 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -36,13 +37,12 @@ func createProjectSetup() {
 	project.DefaultProjectConfig.Description = ""
 	config.GetConfig().Project = ""
 }
+
 func TestCreateProjectFunc(t *testing.T) {
-	s := setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "project created successfully.")
-	defer s.TearDown()
 	project.DefaultProjectConfig.ID = projectValue
 	project.DefaultProjectConfig.Name = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
@@ -54,12 +54,10 @@ func TestCreateProjectFunc(t *testing.T) {
 }
 
 func TestEmptyProjectID(t *testing.T) {
-	s := setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "")
-	defer s.TearDown()
 	project.DefaultProjectConfig = &project.ConfigProject{}
 	s.MockAdminClient.OnRegisterProjectMatch(s.Ctx, projectRegisterRequest).Return(nil, nil)
 	err := createProjectsCommand(s.Ctx, []string{}, s.CmdCtx)
@@ -68,12 +66,10 @@ func TestEmptyProjectID(t *testing.T) {
 }
 
 func TestEmptyProjectName(t *testing.T) {
-	s := setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "")
-	defer s.TearDown()
 	project.DefaultProjectConfig.ID = projectValue
 	project.DefaultProjectConfig.Labels = map[string]string{}
 	project.DefaultProjectConfig.Description = ""

@@ -9,8 +9,8 @@ import (
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
@@ -123,8 +123,9 @@ type autoRefresh struct {
 	toDelete    *syncSet
 	syncPeriod  time.Duration
 	workqueue   workqueue.RateLimitingInterface
-	parallelizm int
+	parallelism uint
 	lock        sync.RWMutex
+	clock       clock.Clock
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -155,7 +156,7 @@ func newMetrics(scope promutils.Scope) metrics {
 }
 
 func (w *autoRefresh) Start(ctx context.Context) error {
-	for i := 0; i < w.parallelizm; i++ {
+	for i := uint(0); i < w.parallelism; i++ {
 		go func(ctx context.Context) {
 			err := w.sync(ctx)
 			if err != nil {
@@ -165,15 +166,27 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	}
 
 	enqueueCtx := contextutils.WithGoroutineLabel(ctx, fmt.Sprintf("%v-enqueue", w.name))
-
-	go wait.Until(func() {
-		err := w.enqueueBatches(enqueueCtx)
-		if err != nil {
-			logger.Errorf(enqueueCtx, "Failed to enqueue. Error: %v", err)
-		}
-	}, w.syncPeriod, enqueueCtx.Done())
+	go w.enqueueLoop(enqueueCtx)
 
 	return nil
+}
+
+func (w *autoRefresh) enqueueLoop(ctx context.Context) {
+	timer := w.clock.NewTimer(w.syncPeriod)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-timer.C():
+			err := w.enqueueBatches(ctx)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to enqueue. Error: %v", err)
+			}
+			timer.Reset(w.syncPeriod)
+		}
+	}
 }
 
 // Update updates the item only if it exists in the cache, return true if we updated the item.
@@ -221,7 +234,7 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	batch := make([]ItemWrapper, 0, 1)
 	batch = append(batch, itemWrapper{id: id, item: item})
 	w.workqueue.AddRateLimited(&batch)
-	w.processing.Store(id, time.Now())
+	w.processing.Store(id, w.clock.Now())
 	return item, nil
 }
 
@@ -265,14 +278,14 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		b := batch
 		w.workqueue.AddRateLimited(&b)
 		for i := 1; i < len(b); i++ {
-			w.processing.Store(b[i].GetID(), time.Now())
+			w.processing.Store(b[i].GetID(), w.clock.Now())
 		}
 	}
 
 	return nil
 }
 
-// There are w.parallelizm instances of this function running all the time, each one will:
+// There are w.parallelism instances of this function running all the time, each one will:
 // - Retrieve an item from the workqueue
 // - For each batch of the keys, call syncCb, which tells us if the items have been updated
 // -- If any has, then overwrite the item in the cache.
@@ -365,7 +378,7 @@ func (w *autoRefresh) inProcessing(key interface{}) bool {
 	item, found := w.processing.Load(key)
 	if found {
 		// handle potential race conditions where the item is in processing but not in the workqueue
-		if timeItem, ok := item.(time.Time); ok && time.Since(timeItem) > (w.syncPeriod*5) {
+		if timeItem, ok := item.(time.Time); ok && w.clock.Since(timeItem) > (w.syncPeriod*5) {
 			w.processing.Delete(key)
 			return false
 		}
@@ -376,10 +389,16 @@ func (w *autoRefresh) inProcessing(key interface{}) bool {
 
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
 func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
-	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	resyncPeriod time.Duration, parallelism, size uint, scope promutils.Scope) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, createBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope, clock.RealClock{})
+}
+
+func newAutoRefreshBatchedCacheWithClock(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
+	resyncPeriod time.Duration, parallelism, size uint, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
 
 	metrics := newMetrics(scope)
-	lruCache, err := lru.NewWithEvict(size, getEvictionFunction(metrics.Evictions))
+	// #nosec G115
+	lruCache, err := lru.NewWithEvict(int(size), getEvictionFunction(metrics.Evictions))
 	if err != nil {
 		return nil, err
 	}
@@ -387,14 +406,18 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 	cache := &autoRefresh{
 		name:            name,
 		metrics:         metrics,
-		parallelizm:     parallelizm,
+		parallelism:     parallelism,
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
 		processing:      &sync.Map{},
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
-		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),
+		workqueue: workqueue.NewRateLimitingQueueWithConfig(syncRateLimiter, workqueue.RateLimitingQueueConfig{
+			Name:  scope.CurrentScope(),
+			Clock: clock,
+		}),
+		clock: clock,
 	}
 
 	return cache, nil
@@ -402,7 +425,12 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 
 // Instantiates a new AutoRefresh Cache that syncs items periodically.
 func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
-	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	parallelism, size uint, scope promutils.Scope) (AutoRefresh, error) {
 
-	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
+	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope)
+}
+
+func newAutoRefreshCacheWithClock(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
+	parallelism, size uint, scope promutils.Scope, clock clock.WithTicker) (AutoRefresh, error) {
+	return newAutoRefreshBatchedCacheWithClock(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelism, size, scope, clock)
 }

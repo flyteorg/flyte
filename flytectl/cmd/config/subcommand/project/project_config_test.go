@@ -20,7 +20,7 @@ func TestGetProjectSpec(t *testing.T) {
 		}
 		response, err := c.GetProjectSpec(cf)
 		assert.Nil(t, err)
-		assert.Equal(t, "flytesnacks1", response.Id)
+		assert.Equal(t, "flytesnacks1", response.GetId())
 	})
 
 	t.Run("Error if project and ID both exist", func(t *testing.T) {
@@ -38,8 +38,8 @@ func TestGetProjectSpec(t *testing.T) {
 		}
 		response, err := c.GetProjectSpec(&config.Config{})
 		assert.Nil(t, err)
-		assert.Equal(t, "flytesnacks", response.Name)
-		assert.Equal(t, "flytesnacks test", response.Description)
+		assert.Equal(t, "flytesnacks", response.GetName())
+		assert.Equal(t, "flytesnacks test", response.GetDescription())
 	})
 }
 

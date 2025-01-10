@@ -19,15 +19,15 @@ func refStr(s string) *string {
 }
 
 func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) *v1alpha1.RetryStrategy {
-	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil && n.GetMetadata().GetRetries().Retries != 0 {
+	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil && n.GetMetadata().GetRetries().GetRetries() != 0 {
 		return &v1alpha1.RetryStrategy{
-			MinAttempts: refInt(int(n.GetMetadata().GetRetries().Retries + 1)),
+			MinAttempts: refInt(int(n.GetMetadata().GetRetries().GetRetries() + 1)),
 		}
 	}
 
-	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil && t.GetMetadata().GetRetries().Retries != 0 {
+	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil && t.GetMetadata().GetRetries().GetRetries() != 0 {
 		return &v1alpha1.RetryStrategy{
-			MinAttempts: refInt(int(t.GetMetadata().GetRetries().Retries + 1)),
+			MinAttempts: refInt(int(t.GetMetadata().GetRetries().GetRetries() + 1)),
 		}
 	}
 
@@ -86,15 +86,25 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 
 	c := *t
 	c.Metadata = nil
-	c.Annotation = nil
+
+	// Special-case the presence of cache-key-metadata. This is a special field that is used to store metadata about
+	// used in the cache key generation. This does not affect compatibility and it is purely used for cache key calculations.
+	if c.GetAnnotation() != nil {
+		annotations := c.GetAnnotation().GetAnnotations().GetFields()
+		// The presence of the key `cache-key-metadata` indicates that we should leave the metadata intact.
+		if _, ok := annotations["cache-key-metadata"]; !ok {
+			c.Annotation = nil
+		}
+	}
+
 	// Note that we cannot strip `Structure` from the type because the dynamic node output type is used to validate the
 	// interface of the dynamically compiled workflow. `Structure` is used to extend type checking information on
 	// different Flyte types and is therefore required to ensure correct type validation.
 
-	switch underlyingType := c.Type.(type) {
+	switch underlyingType := c.GetType().(type) {
 	case *core.LiteralType_UnionType:
-		variants := make([]*core.LiteralType, 0, len(c.GetUnionType().Variants))
-		for _, variant := range c.GetUnionType().Variants {
+		variants := make([]*core.LiteralType, 0, len(c.GetUnionType().GetVariants()))
+		for _, variant := range c.GetUnionType().GetVariants() {
 			variants = append(variants, StripTypeMetadata(variant))
 		}
 
@@ -104,11 +114,11 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 	case *core.LiteralType_CollectionType:
 		underlyingType.CollectionType = StripTypeMetadata(c.GetCollectionType())
 	case *core.LiteralType_StructuredDatasetType:
-		columns := make([]*core.StructuredDatasetType_DatasetColumn, 0, len(c.GetStructuredDatasetType().Columns))
-		for _, column := range c.GetStructuredDatasetType().Columns {
+		columns := make([]*core.StructuredDatasetType_DatasetColumn, 0, len(c.GetStructuredDatasetType().GetColumns()))
+		for _, column := range c.GetStructuredDatasetType().GetColumns() {
 			columns = append(columns, &core.StructuredDatasetType_DatasetColumn{
-				Name:        column.Name,
-				LiteralType: StripTypeMetadata(column.LiteralType),
+				Name:        column.GetName(),
+				LiteralType: StripTypeMetadata(column.GetLiteralType()),
 			})
 		}
 
@@ -125,17 +135,17 @@ func StripInterfaceTypeMetadata(iface *core.TypedInterface) *core.TypedInterface
 
 	newIface := *iface
 
-	if iface.Inputs != nil {
-		for name, i := range iface.Inputs.Variables {
-			i.Type = StripTypeMetadata(i.Type)
+	if iface.GetInputs() != nil {
+		for name, i := range iface.GetInputs().GetVariables() {
+			i.Type = StripTypeMetadata(i.GetType())
 			i.Description = ""
 			newIface.Inputs.Variables[name] = i
 		}
 	}
 
-	if iface.Outputs != nil {
-		for name, i := range iface.Outputs.Variables {
-			i.Type = StripTypeMetadata(i.Type)
+	if iface.GetOutputs() != nil {
+		for name, i := range iface.GetOutputs().GetVariables() {
+			i.Type = StripTypeMetadata(i.GetType())
 			i.Description = ""
 			iface.Outputs.Variables[name] = i
 		}

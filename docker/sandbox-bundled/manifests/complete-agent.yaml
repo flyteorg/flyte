@@ -431,6 +431,8 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
+      literal-offloading-config:
+        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -444,6 +446,9 @@ data:
         disabled: false
         seedProjects:
         - flytesnacks
+        seedProjectsWithDetails:
+        - description: Default project setup.
+          name: flytesnacks
       dataCatalog:
         disabled: false
       propeller:
@@ -461,6 +466,7 @@ data:
         - sidecar
         - k8s-array
         - agent-service
+        - echo
     plugins:
       logs:
         kubernetes-enabled: true
@@ -469,7 +475,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc0"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.1"
       k8s-array:
         logs:
           config:
@@ -484,8 +490,6 @@ data:
           insecure: true
           timeouts:
             GetTask: 10s
-        supportedTaskTypes:
-        - default_task
   002-database.yaml: |
     database:
       postgres:
@@ -515,6 +519,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - FLYTE_PLATFORM_URL: 'flyte-sandbox-grpc.flyte:8089'
+        - FLYTE_PLATFORM_INSECURE: true
     storage:
       signedURL:
         stowConfigOverride:
@@ -817,7 +823,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: cEJlTDl0bXN6NVE4ZEdFag==
+  haSharedSecret: VFRKYXBKM2xsTERQb1ZDaQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1248,7 +1254,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 9207564b9b5f0358f7b8507232200ac759f58ae16af8561f72a4488274629eaf
+        checksum/configuration: 5a537c05dbd27a7f2884eb78f4e762205c3bcc3248ab9e509ab7074c7e5f953d
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1414,7 +1420,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ad16b8a2ae1014673d354d27f8f9e4307e588f439534e5894ecb7b0e4c8c7692
+        checksum/secret: 4c7bc4fbd20227034bda9ead9cd941c94879028d6920b98113f9a08ef3c6f9d9
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1757,7 +1763,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.13.3
+        image: cr.flyte.org/flyteorg/flyteagent:1.14.2
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

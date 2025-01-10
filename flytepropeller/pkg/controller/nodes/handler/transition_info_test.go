@@ -110,8 +110,8 @@ func TestPhaseInfo(t *testing.T) {
 		assert.Equal(t, EPhaseFailed, p.GetPhase())
 		assert.Equal(t, i, p.GetInfo())
 		if assert.NotNil(t, p.GetErr()) {
-			assert.Equal(t, "code", p.GetErr().Code)
-			assert.Equal(t, "reason", p.GetErr().Message)
+			assert.Equal(t, "code", p.GetErr().GetCode())
+			assert.Equal(t, "reason", p.GetErr().GetMessage())
 		}
 		assert.NotNil(t, p.GetOccurredAt())
 	})
@@ -141,8 +141,8 @@ func TestPhaseInfo(t *testing.T) {
 		assert.Equal(t, EPhaseRetryableFailure, p.GetPhase())
 		assert.Equal(t, i, p.GetInfo())
 		if assert.NotNil(t, p.GetErr()) {
-			assert.Equal(t, "code", p.GetErr().Code)
-			assert.Equal(t, "reason", p.GetErr().Message)
+			assert.Equal(t, "code", p.GetErr().GetCode())
+			assert.Equal(t, "reason", p.GetErr().GetMessage())
 		}
 		assert.NotNil(t, p.GetOccurredAt())
 	})

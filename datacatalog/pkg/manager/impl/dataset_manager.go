@@ -44,12 +44,12 @@ type datasetManager struct {
 
 func (dm *datasetManager) validateCreateRequest(request *datacatalog.CreateDatasetRequest) error {
 	errorSet := make([]error, 0)
-	err := validators.ValidateDatasetID(request.Dataset.Id)
+	err := validators.ValidateDatasetID(request.GetDataset().GetId())
 	if err != nil {
 		errorSet = append(errorSet, err)
 	}
 
-	err = validators.ValidateUniquePartitionKeys(request.Dataset.PartitionKeys)
+	err = validators.ValidateUniquePartitionKeys(request.GetDataset().GetPartitionKeys())
 	if err != nil {
 		errorSet = append(errorSet, err)
 	}
@@ -71,7 +71,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request *datacatalo
 		return nil, err
 	}
 
-	datasetModel, err := transformers.CreateDatasetModel(request.Dataset)
+	datasetModel, err := transformers.CreateDatasetModel(request.GetDataset())
 	if err != nil {
 		logger.Errorf(ctx, "Unable to transform create dataset request %+v err: %v", request, err)
 		dm.systemMetrics.transformerErrorCounter.Inc(ctx)
@@ -81,7 +81,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request *datacatalo
 	err = dm.repo.DatasetRepo().Create(ctx, *datasetModel)
 	if err != nil {
 		if errors.IsAlreadyExistsError(err) {
-			logger.Warnf(ctx, "Dataset already exists key: %+v, err %v", request.Dataset, err)
+			logger.Warnf(ctx, "Dataset already exists key: %+v, err %v", request.GetDataset(), err)
 			dm.systemMetrics.alreadyExistsCounter.Inc(ctx)
 		} else {
 			logger.Errorf(ctx, "Failed to create dataset model: %+v err: %v", datasetModel, err)
@@ -90,7 +90,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request *datacatalo
 		return nil, err
 	}
 
-	logger.Debugf(ctx, "Successfully created dataset %+v", request.Dataset)
+	logger.Debugf(ctx, "Successfully created dataset %+v", request.GetDataset())
 	dm.systemMetrics.createSuccessCounter.Inc(ctx)
 	return &datacatalog.CreateDatasetResponse{}, nil
 }
@@ -100,14 +100,14 @@ func (dm *datasetManager) GetDataset(ctx context.Context, request *datacatalog.G
 	timer := dm.systemMetrics.getResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	err := validators.ValidateDatasetID(request.Dataset)
+	err := validators.ValidateDatasetID(request.GetDataset())
 	if err != nil {
 		logger.Warnf(ctx, "Invalid get dataset request %+v err: %v", request, err)
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
 
-	datasetKey := transformers.FromDatasetID(request.Dataset)
+	datasetKey := transformers.FromDatasetID(request.GetDataset())
 	datasetModel, err := dm.repo.DatasetRepo().Get(ctx, datasetKey)
 
 	if err != nil {
@@ -150,7 +150,7 @@ func (dm *datasetManager) ListDatasets(ctx context.Context, request *datacatalog
 		return nil, err
 	}
 
-	err = transformers.ApplyPagination(request.Pagination, &listInput)
+	err = transformers.ApplyPagination(request.GetPagination(), &listInput)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid pagination options in list datasets request %v, err: %v", request, err)
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)
@@ -171,7 +171,7 @@ func (dm *datasetManager) ListDatasets(ctx context.Context, request *datacatalog
 	for idx, datasetModel := range datasetModels {
 		dataset, err := transformers.FromDatasetModel(datasetModel)
 		if err != nil {
-			logger.Errorf(ctx, "Unable to transform Dataset %+v err: %v", dataset.Id, err)
+			logger.Errorf(ctx, "Unable to transform Dataset %+v err: %v", dataset.GetId(), err)
 			transformerErrs = append(transformerErrs, err)
 		}
 

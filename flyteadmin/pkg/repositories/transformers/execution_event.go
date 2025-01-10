@@ -10,19 +10,19 @@ import (
 )
 
 // Transforms a ExecutionEventCreateRequest to a ExecutionEvent model
-func CreateExecutionEventModel(request admin.WorkflowExecutionEventRequest) (*models.ExecutionEvent, error) {
-	occurredAt, err := ptypes.Timestamp(request.Event.OccurredAt)
+func CreateExecutionEventModel(request *admin.WorkflowExecutionEventRequest) (*models.ExecutionEvent, error) {
+	occurredAt, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to marshal occurred at timestamp")
 	}
 	return &models.ExecutionEvent{
 		ExecutionKey: models.ExecutionKey{
-			Project: request.Event.ExecutionId.Project,
-			Domain:  request.Event.ExecutionId.Domain,
-			Name:    request.Event.ExecutionId.Name,
+			Project: request.GetEvent().GetExecutionId().GetProject(),
+			Domain:  request.GetEvent().GetExecutionId().GetDomain(),
+			Name:    request.GetEvent().GetExecutionId().GetName(),
 		},
-		RequestID:  request.RequestId,
+		RequestID:  request.GetRequestId(),
 		OccurredAt: occurredAt,
-		Phase:      request.Event.Phase.String(),
+		Phase:      request.GetEvent().GetPhase().String(),
 	}, nil
 }

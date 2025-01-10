@@ -27,7 +27,7 @@ type NodeExecutionRepoInterface interface {
 }
 
 type NodeExecutionResource struct {
-	NodeExecutionIdentifier core.NodeExecutionIdentifier
+	NodeExecutionIdentifier *core.NodeExecutionIdentifier
 }
 
 // Response format for a query on node executions.

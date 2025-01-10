@@ -8,5 +8,5 @@ import (
 
 type WorkflowExecutionEventWriter interface {
 	Run()
-	Write(workflowExecutionEvent admin.WorkflowExecutionEventRequest)
+	Write(workflowExecutionEvent *admin.WorkflowExecutionEventRequest)
 }

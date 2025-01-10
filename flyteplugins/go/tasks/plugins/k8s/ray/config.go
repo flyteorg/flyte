@@ -22,7 +22,7 @@ var (
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
-		ServiceAccount:           "default",
+		ServiceAccount:           "",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{

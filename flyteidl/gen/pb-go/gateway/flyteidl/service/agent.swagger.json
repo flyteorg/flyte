@@ -466,6 +466,16 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
+    "ExecutionErrorErrorKind": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "SYSTEM"
+      ],
+      "default": "UNKNOWN",
+      "title": "Error type: System or User"
+    },
     "IOStrategyDownloadMode": {
       "type": "string",
       "enum": [
@@ -619,6 +629,33 @@
         }
       },
       "description": "A message containing the agent metadata."
+    },
+    "adminAgentError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "A simplified code for errors, so that we can provide a glossary of all possible errors."
+        },
+        "kind": {
+          "$ref": "#/definitions/adminAgentErrorKind",
+          "description": "An abstract error kind for this error. Defaults to Non_Recoverable if not specified."
+        },
+        "origin": {
+          "$ref": "#/definitions/ExecutionErrorErrorKind",
+          "description": "Defines the origin of the error (system, user, unknown)."
+        }
+      },
+      "description": "Error message to propagate detailed errors from agent executions to the execution\nengine."
+    },
+    "adminAgentErrorKind": {
+      "type": "string",
+      "enum": [
+        "NON_RECOVERABLE",
+        "RECOVERABLE"
+      ],
+      "default": "NON_RECOVERABLE",
+      "description": "Defines a generic error type that dictates the behavior of the retry strategy."
     },
     "adminCreateRequestHeader": {
       "type": "object",
@@ -817,6 +854,10 @@
         "custom_info": {
           "type": "object",
           "description": "Custom data specific to the agent."
+        },
+        "agent_error": {
+          "$ref": "#/definitions/adminAgentError",
+          "title": "The error raised during execution"
         }
       }
     },
@@ -903,10 +944,12 @@
       "properties": {
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict."
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "description": "The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization."
         }
       },
       "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
@@ -1255,6 +1298,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "A map of strings to literals."
         },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -1265,15 +1312,6 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
-        },
-        "uri": {
-          "type": "string",
-          "description": "If this literal is offloaded, this field will contain metadata including the offload location."
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Includes information about the size of the literal."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -1302,6 +1340,25 @@
         }
       },
       "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralOffloadedMetadata": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The location of the offloaded core.Literal."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The size of the offloaded data."
+        },
+        "inferred_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The inferred literal type of the offloaded data."
+        }
+      },
+      "description": "A message that contains the metadata of the offloaded data."
     },
     "coreLiteralType": {
       "type": "object",
@@ -1798,6 +1855,10 @@
             "type": "string"
           },
           "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
         }
       },
       "title": "Task Metadata"
