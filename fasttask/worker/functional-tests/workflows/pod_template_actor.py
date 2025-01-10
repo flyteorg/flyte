@@ -23,7 +23,7 @@ pod_template = PodTemplate(
 actor_env = ActorEnvironment(
     name="template",
     pod_template=pod_template,
-    ttl_seconds=10,
+    ttl_seconds=30,
 )
 
 
