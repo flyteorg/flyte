@@ -255,6 +255,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
 | flytepropeller.image.tag | string | `"v1.14.1"` |  |
 | flytepropeller.manager | bool | `false` |  |
+| flytepropeller.manager_resources | object | `{"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}}` | If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flytepropeller.podEnv | object | `{}` | Additional Flytepropeller container environment variables |
