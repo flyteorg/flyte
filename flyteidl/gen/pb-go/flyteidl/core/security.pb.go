@@ -148,6 +148,7 @@ type Secret struct {
 	MountRequirement Secret_MountType `protobuf:"varint,4,opt,name=mount_requirement,json=mountRequirement,proto3,enum=flyteidl.core.Secret_MountType" json:"mount_requirement,omitempty"`
 	// env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,
 	// then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+	// +optional
 	EnvName string `protobuf:"bytes,5,opt,name=env_name,json=envName,proto3" json:"env_name,omitempty"`
 }
 

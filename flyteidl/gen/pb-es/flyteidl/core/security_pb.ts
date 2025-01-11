@@ -58,6 +58,7 @@ export class Secret extends Message<Secret> {
   /**
    * env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,
    * then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+   * +optional
    *
    * @generated from field: string env_name = 5;
    */
