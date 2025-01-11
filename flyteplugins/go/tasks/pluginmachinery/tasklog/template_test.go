@@ -63,6 +63,7 @@ func Test_Input_templateVars(t *testing.T) {
 	}
 	podBase := Input{
 		HostName:             "my-host",
+		NodeName:             "my-node-name",
 		PodName:              "my-pod",
 		PodUID:               "my-pod-uid",
 		Namespace:            "my-namespace",
@@ -103,6 +104,7 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.ContainerName, "my-container"},
 				{defaultRegexes.ContainerID, "containerID"},
 				{defaultRegexes.Hostname, "my-host"},
+				{defaultRegexes.NodeName, "my-node-name"},
 				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
 				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
 				{defaultRegexes.PodUnixStartTime, "123"},
@@ -139,6 +141,7 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.ContainerName, ""},
 				{defaultRegexes.ContainerID, ""},
 				{defaultRegexes.Hostname, ""},
+				{defaultRegexes.NodeName, ""},
 				{defaultRegexes.NodeID, "n0-0-n0"},
 				{defaultRegexes.GeneratedName, "generated-name"},
 				{defaultRegexes.TaskRetryAttempt, "1"},
@@ -327,12 +330,13 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"ddog",
 			TemplateLogPlugin{
-				TemplateURIs:  []TemplateURI{"https://app.datadoghq.com/logs?event&from_ts={{ .podUnixStartTime }}&live=true&query=pod_name%3A{{ .podName }}&to_ts={{ .podUnixFinishTime }}"},
+				TemplateURIs:  []TemplateURI{"https://app.datadoghq.com/logs?event&from_ts={{ .podUnixStartTime }}&live=true&query=pod_name%3A{{ .podName }}&to_ts={{ .podUnixFinishTime }}&host={{ .nodeName }}"},
 				MessageFormat: core.TaskLog_JSON,
 			},
 			args{
 				input: Input{
 					HostName:             "my-host",
+					NodeName:             "ip-1-2-3-4",
 					PodName:              "my-pod",
 					Namespace:            "my-namespace",
 					ContainerName:        "my-container",
@@ -347,7 +351,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "https://app.datadoghq.com/logs?event&from_ts=123&live=true&query=pod_name%3Amy-pod&to_ts=12345",
+						Uri:           "https://app.datadoghq.com/logs?event&from_ts=123&live=true&query=pod_name%3Amy-pod&to_ts=12345&host=ip-1-2-3-4",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},

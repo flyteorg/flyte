@@ -86,7 +86,17 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 
 	c := *t
 	c.Metadata = nil
-	c.Annotation = nil
+
+	// Special-case the presence of cache-key-metadata. This is a special field that is used to store metadata about
+	// used in the cache key generation. This does not affect compatibility and it is purely used for cache key calculations.
+	if c.GetAnnotation() != nil {
+		annotations := c.GetAnnotation().GetAnnotations().GetFields()
+		// The presence of the key `cache-key-metadata` indicates that we should leave the metadata intact.
+		if _, ok := annotations["cache-key-metadata"]; !ok {
+			c.Annotation = nil
+		}
+	}
+
 	// Note that we cannot strip `Structure` from the type because the dynamic node output type is used to validate the
 	// interface of the dynamically compiled workflow. `Structure` is used to extend type checking information on
 	// different Flyte types and is therefore required to ensure correct type validation.
