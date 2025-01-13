@@ -27,16 +27,25 @@ Please join us on:
     :alt: LinkedIn
 
 
-Open Source Community Meeting 
------------------------------
+Community Sync 
+--------------
 
-When: Every other Thursday, 11:00 AM Pacific Time.
+#. When: First tuesday of every month, 9:00 AM Pacific Time.
+#. Where: live streamed on `YouTube <https://www.youtube.com/@flyteorg/streams>`__ and `LinkedIn <https://www.linkedin.com/company/union-ai/events/>`__. 
+#. Watch the `recordings <https://www.youtube.com/live/d81Jd4rfmzw?feature=shared>`__
+#. Import the public `calendar <https://lists.lfaidata.foundation/g/flyte-announce/ics/12031983/2145304139/feed.ics>`_ to not miss any event. 
+#. If you want to give a presentation to the Flyte community, please fill out `this form <https://tally.so/r/wgN8LM>__`. We're eager to learn from you!
+
 You're welcome to join and learn from other community members sharing their experiences with Flyte or any other technology from the AI ecosystem.
-Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
-.. image:: https://img.shields.io/badge/Join-Zoom-blue?style=for-the-badge
-    :target: https://www.addevent.com/event/EA7823958
-    :alt: Zoom Link
+Contributor's Sync
+------------------
+
+#. When: every 2 weeks on Thursdays. Alternating schedule between 11:00 am PT and 7:00 am PT.
+#. Where: live on `Zoom <https://zoom-lfx.platform.linuxfoundation.org/meeting/92309721545?password=c93d76a7-801a-47c6-9916-08e38e5a5c1f>`__.
+#. Purpose: address questions from new contributors, discuss active initiatives and RFCs.
+#. Import the public `calendar <https://lists.lfaidata.foundation/g/flyte-announce/ics/12031983/2145304139/feed.ics>`_ to not miss any event. 
+
 
 Newsletter
 ----------

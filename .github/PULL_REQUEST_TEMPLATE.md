@@ -33,6 +33,17 @@ If tests were added, say they were added here. Please make sure to add some test
 If it was tested in a way different from regular unit tests, please clarify how you tested step by step, ideally copy and paste-able, so that other reviewers can test and check, and descendants can verify in the future.
 If tests were not added, please describe why they were not added and/or why it was difficult to add.
 -->
+### Labels
+
+Please add one or more of the following labels to categorize your PR:
+- **added**: For new features.
+- **changed**: For changes in existing functionality.
+- **deprecated**: For soon-to-be-removed features.
+- **removed**: For features being removed.
+- **fixed**: For any bug fixed.
+- **security**: In case of vulnerabilities
+
+This is important to improve the readability of release notes.
 
 ### Setup process
 
