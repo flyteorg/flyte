@@ -229,12 +229,8 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	token, err := s.tokenCache.GetToken()
-	if err != nil {
-		logger.Warnf(s.ctx, "failed to get token from cache: %v", err)
-	} else {
+	if token, err := s.tokenCache.GetToken(); err == nil {
 		if isValid := utils.Valid(token); isValid {
-			logger.Infof(context.Background(), "retrieved token from cache with expiry %v", token.Expiry)
 			return token, nil
 		}
 	}
@@ -245,27 +241,25 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 		Steps:    totalAttempts,
 	}
 
-	err = retry.OnError(backoff, func(err error) bool {
+	var token *oauth2.Token
+	err := retry.OnError(backoff, func(err error) bool {
 		return err != nil
 	}, func() (err error) {
 		token, err = s.new.Token()
 		if err != nil {
-			logger.Infof(s.ctx, "failed to get new token: %w", err)
-			return fmt.Errorf("failed to get new token: %w", err)
+			logger.Debugf(s.ctx, "failed to get new token: %w", err)
+			return err
 		}
-		logger.Infof(context.Background(), "Fetched new token with expiry %v", token.Expiry)
 		return nil
 	})
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to get new token: %v", err)
+		logger.Errorf(s.ctx, "failed to get new token: %v", err)
 		return nil, fmt.Errorf("failed to get new token: %w", err)
 	}
 
-	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
-
 	err = s.tokenCache.SaveToken(token)
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to cache token: %v", err)
+		logger.Debugf(s.ctx, "failed to cache token: %v", err)
 	}
 
 	return token, nil
