@@ -41,6 +41,13 @@ import (
 
 const pluginContextKey = contextutils.Key("plugin")
 
+type DeckStatus int
+
+const (
+	DeckUnknown DeckStatus = iota
+	DeckEnabled
+)
+
 type metrics struct {
 	pluginPanics           labeled.Counter
 	unsupportedTaskType    labeled.Counter
@@ -71,10 +78,47 @@ func getPluginMetricKey(pluginID, taskType string) string {
 	return taskType + "_" + pluginID
 }
 
-func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, deckPath *storage.DataReference, entry catalog.Entry) {
+func (p *pluginRequestedTransition) AddDeckURI(tCtx *taskExecutionContext) {
+	var deckURI *storage.DataReference
+	deckURIValue := tCtx.ow.GetDeckPath()
+	deckURI = &deckURIValue
+
+	if p.execInfo.OutputInfo == nil {
+		p.execInfo.OutputInfo = &handler.OutputInfo{}
+	}
+
+	p.execInfo.OutputInfo.DeckURI = deckURI
+}
+
+func (p *pluginRequestedTransition) AddDeckURIIfDeckExists(ctx context.Context, tCtx *taskExecutionContext) error {
+	reader := tCtx.ow.GetReader()
+	if reader == nil && p.execInfo.OutputInfo != nil {
+		p.execInfo.OutputInfo.DeckURI = nil
+		return nil
+	}
+
+	exists, err := reader.DeckExists(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+		return regErrors.Wrapf(err, "failed to check existence of deck file")
+	}
+
+	if p.execInfo.OutputInfo == nil {
+		p.execInfo.OutputInfo = &handler.OutputInfo{}
+	}
+
+	if exists {
+		deckURIValue := tCtx.ow.GetDeckPath()
+		p.execInfo.OutputInfo.DeckURI = &deckURIValue
+	}
+
+	return nil
+}
+
+func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, entry catalog.Entry) {
 	p.ttype = handler.TransitionTypeEphemeral
 	p.pInfo = pluginCore.PhaseInfoSuccess(nil)
-	p.ObserveSuccess(outputPath, deckPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
+	p.ObserveSuccess(outputPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
 }
 
 func (p *pluginRequestedTransition) PopulateCacheInfo(entry catalog.Entry) {
@@ -144,10 +188,13 @@ func (p *pluginRequestedTransition) FinalTaskEvent(input ToTaskExecutionEventInp
 	return ToTaskExecutionEvent(input)
 }
 
-func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, deckPath *storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
-	p.execInfo.OutputInfo = &handler.OutputInfo{
-		OutputURI: outputPath,
-		DeckURI:   deckPath,
+func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
+	if p.execInfo.OutputInfo == nil {
+		p.execInfo.OutputInfo = &handler.OutputInfo{
+			OutputURI: outputPath,
+		}
+	} else {
+		p.execInfo.OutputInfo.OutputURI = outputPath
 	}
 
 	p.execInfo.TaskNodeInfo = &handler.TaskNodeInfo{
@@ -171,7 +218,8 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 	}
 
 	logger.Debugf(ctx, "Task still running")
-	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(nil)), nil
+	// Here will send the deck uri to flyteadmin
+	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(&p.execInfo)), nil
 }
 
 // The plugin interface available especially for testing.
@@ -380,6 +428,32 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	return t.taskMetricsMap[metricNameKey], nil
 }
 
+func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
+	// GetDeckStatus determines whether a task generates a deck based on its execution context.
+	//
+	// This function ensures backward compatibility with older Flytekit versions using the following logic:
+	// 1. For Flytekit > 1.14.3, the task template's metadata includes the `generates_deck` flag:
+	//    - If `generates_deck` is set to true, it indicates that the task generates a deck, and DeckEnabled is returned.
+	// 2. If `generates_deck` is set to false or is not set (likely from older Flytekit versions):
+	//    - DeckUnknown is returned as a placeholder status.
+	//    - In terminal states, a HEAD request can be made to check if the deck file exists.
+	//
+	// In future implementations, a `DeckDisabled` status could be introduced for better performance optimization:
+	//    - This would eliminate the need for a HEAD request in the final phase.
+	//    - However, the tradeoff is that a new field would need to be added to FlyteIDL to support this behavior.
+
+	template, err := tCtx.tr.Read(ctx)
+	if err != nil {
+		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
+	}
+
+	if template.GetMetadata().GetGeneratesDeck() {
+		return DeckEnabled, nil
+	}
+
+	return DeckUnknown, nil
+}
+
 func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *taskExecutionContext, ts handler.TaskNodeState) (*pluginRequestedTransition, error) {
 	pluginTrns := &pluginRequestedTransition{}
 
@@ -464,8 +538,26 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}
 	}
 
+	// Regardless of the observed phase, we always add the DeckUri to support real-time deck functionality.
+	// The deck should be accessible even if the task is still running or has failed.
+	// It's possible that the deck URI may not exist in remote storage yet or will never exist.
+	// So, it is console's responsibility to handle the case when the deck URI actually does not exist.
+	deckStatus, err := GetDeckStatus(ctx, tCtx)
+	if err != nil {
+		return nil, err
+	}
+	if deckStatus == DeckEnabled {
+		pluginTrns.AddDeckURI(tCtx)
+	}
+
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
+		if deckStatus == DeckUnknown {
+			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
+		}
+		if err != nil {
+			return pluginTrns, err
+		}
 		// -------------------------------------
 		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes
 		// This code only exists to support Dynamic tasks. Eventually dynamic tasks will use closure nodes to execute
@@ -501,18 +593,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		} else {
-			var deckURI *storage.DataReference
-			if tCtx.ow.GetReader() != nil {
-				exists, err := tCtx.ow.GetReader().DeckExists(ctx)
-				if err != nil {
-					logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
-					return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
-				} else if exists {
-					deckURIValue := tCtx.ow.GetDeckPath()
-					deckURI = &deckURIValue
-				}
-			}
-			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
+			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(),
 				&event.TaskNodeMetadata{
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
@@ -520,6 +601,13 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	case pluginCore.PhaseRetryableFailure:
 		fallthrough
 	case pluginCore.PhasePermanentFailure:
+		// This is for backward compatibility with older Flytekit versions.
+		if deckStatus == DeckUnknown {
+			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
+		}
+		if err != nil {
+			return pluginTrns, err
+		}
 		pluginTrns.ObservedFailure(
 			&event.TaskNodeMetadata{
 				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
