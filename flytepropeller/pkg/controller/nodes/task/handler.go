@@ -432,16 +432,14 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
 	// GetDeckStatus determines whether a task generates a deck based on its execution context.
 	//
-	// This function ensures backward compatibility with older Flytekit versions using the following logic:
-	// 1. For Flytekit > 1.14.3, the task template's metadata includes the `generates_deck` flag:
-	//    - If `generates_deck` is set to true, it indicates that the task generates a deck, and DeckEnabled is returned.
-	// 2. If `generates_deck` is set to false or is not set (likely from older Flytekit versions):
-	//    - DeckUnknown is returned as a placeholder status.
-	//    - In terminal states, a HEAD request can be made to check if the deck file exists.
+	// This function evaluates the `generates_deck` flag in the task template's metadata to determine the deck status:
+	// 1. If `generates_deck` is set to true, it indicates that the task generates a deck, and DeckEnabled is returned.
+	// 2. If `generates_deck` is set to false, it indicates that the task does not generate a deck, and DeckDisabled is returned.
+	// 3. If `generates_deck` is nil (likely from older Flytekit versions), DeckUnknown is returned as a placeholder status.
 	//
-	// In future implementations, a `DeckDisabled` status could be introduced for better performance optimization:
-	//    - This would eliminate the need for a HEAD request in the final phase.
-	//    - However, the tradeoff is that a new field would need to be added to FlyteIDL to support this behavior.
+	// The lifecycle of deck generation is as follows:
+	// - During task execution, the `generates_deck` flag is checked to determine if a deck should be generated.
+	// - In terminal states, if the status is DeckUnknown, a HEAD request can be made to verify the existence of the deck file.
 
 	template, err := tCtx.tr.Read(ctx)
 	if err != nil {
