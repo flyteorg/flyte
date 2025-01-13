@@ -544,8 +544,6 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 
 	// Regardless of the observed phase, we always add the DeckUri to support real-time deck functionality.
 	// The deck should be accessible even if the task is still running or has failed.
-	// It's possible that the deck URI may not exist in remote storage yet or will never exist (likely from older Flytekit versions).
-	// So, it is console's responsibility to handle the case when the deck URI actually does not exist.
 	deckStatus, err := GetDeckStatus(ctx, tCtx)
 	if err != nil {
 		return nil, err
@@ -557,6 +555,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
 		if deckStatus == DeckUnknown {
+			// This is for backward compatibility with older Flytekit versions.
+			// Older Flytekit versions did not set the `generates_deck` flag in the task template's metadata.
+			// So, we need to add deck URI to the event if it exists.
 			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
 		}
 		if err != nil {
