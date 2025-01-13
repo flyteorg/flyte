@@ -466,16 +466,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			nCtx.ExecutionContext().IncrementParallelism()
 		}
 	case v1alpha1.ArrayNodePhaseFailing:
+		// note: sub node eventing handled during Abort
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {
 			return handler.UnknownTransition, err
-		}
-
-		// ensure task_execution set to failed - this should already be sent by the abort handler
-		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_FAILED, 0, a.eventConfig); err != nil {
-			if !eventsErr.IsAlreadyExists(err) {
-				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-				return handler.UnknownTransition, err
-			}
 		}
 
 		// fail with reported error if one exists
