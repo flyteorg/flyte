@@ -105,3 +105,40 @@ func Resolve(ctx context.Context, outputResolver OutputResolver, nl executors.No
 		Literals: literalMap,
 	}, nil
 }
+
+func ResolveErrorInput(ctx context.Context, nodeInputs *core.LiteralMap, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
+	literals := nodeInputs.GetLiterals()
+	if literal, exists := literals["err"]; exists {
+		// make new Scalar for literal map
+		logger.Debugf(ctx, "Processing literal for key 'err'")
+		errorUnion := &core.Scalar_Union{
+			Union: &core.Union{
+				Value: &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Error{
+								Error: &core.Error{
+									Message: execErr.GetMessage(),
+									FailedNodeId: nodeID,
+								},
+							},
+						},
+					},
+				},
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_ERROR,
+					},
+					Structure: &core.TypeStructure{
+						Tag: "FlyteError",
+					},
+				},
+			},
+		}
+		literal.Value = &core.Literal_Scalar{
+            Scalar: &core.Scalar{
+				Value: errorUnion,
+			},
+        }
+	}
+}

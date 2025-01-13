@@ -765,6 +765,14 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			}
 
 			if nodeInputs != nil {
+				// Resolve error input if current node is an on failure node
+				failureNodeLookup, ok := nCtx.ContextualNodeLookup().(executors.FailureNodeLookup)
+				if ok {
+					originalErr := failureNodeLookup.GetOriginalError()
+					if originalErr != nil {
+						ResolveErrorInput(ctx, nodeInputs, node.GetID(), originalErr)
+					}
+				}
 				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.GetLiterals(), node, c.literalOffloadingConfig)
 				if p != nil {
 					return *p, nil
