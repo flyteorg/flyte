@@ -201,9 +201,9 @@ message NodeMetadata {
         bool cache_serializable = 9;
     }
 
-    Labels labels = 10;
+    flyteidl.admin.Labels labels = 10;
 
-    Annotations annotations = 11;
+    flyteidl.admin.Annotations annotations = 11;
 }
 
 // Links a variable to an alias.
