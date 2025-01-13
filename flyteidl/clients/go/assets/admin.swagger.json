@@ -8273,10 +8273,6 @@
           "type": "boolean",
           "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
         },
-        "generates_deck": {
-          "type": "boolean",
-          "description": "Indicates whether the task will generate a Deck URI when it finishes executing."
-        },
         "tags": {
           "type": "object",
           "additionalProperties": {
@@ -8298,6 +8294,9 @@
         "is_eager": {
           "type": "boolean",
           "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
+        },
+        "generates_deck": {
+          "type": "boolean"
         }
       },
       "title": "Task Metadata"
@@ -8693,8 +8692,6 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "title": "log information for the external resource execution"
-<<<<<<< HEAD
-=======
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -8702,7 +8699,6 @@
         "custom_info": {
           "type": "object",
           "title": "Extensible field for custom, plugin-specific info"
->>>>>>> 33bca79f0 (Send actor worker assignment in task events (#394)(#393))
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."

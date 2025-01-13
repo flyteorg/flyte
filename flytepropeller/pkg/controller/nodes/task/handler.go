@@ -46,6 +46,7 @@ type DeckStatus int
 const (
 	DeckUnknown DeckStatus = iota
 	DeckEnabled
+	DeckDisabled
 )
 
 type metrics struct {
@@ -447,11 +448,16 @@ func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus,
 		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
 	}
 
-	if template.GetMetadata().GetGeneratesDeck() {
+	deckValue := template.GetMetadata().GetGeneratesDeck()
+	if deckValue == nil {
+		return DeckUnknown, nil
+	}
+
+	if deckValue.GetValue() {
 		return DeckEnabled, nil
 	}
 
-	return DeckUnknown, nil
+	return DeckDisabled, nil
 }
 
 func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *taskExecutionContext, ts handler.TaskNodeState) (*pluginRequestedTransition, error) {

@@ -6,6 +6,7 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 
 package flyteidl.core;
 
@@ -88,6 +89,8 @@ message RuntimeMetadata {
 
 // Task Metadata
 message TaskMetadata {
+    // Remove generates_deck from here.
+    reserved 10;
     // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
     bool discoverable = 1;
 
@@ -121,9 +124,6 @@ message TaskMetadata {
     // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     bool cache_serializable = 9;
 
-    // Indicates whether the task will generate a Deck URI when it finishes executing.
-    bool generates_deck = 10;
-
     // Arbitrary tags that allow users and the platform to store small but arbitrary labels
     map<string, string> tags = 11;
 
@@ -137,6 +137,8 @@ message TaskMetadata {
     // is_eager indicates whether the task is eager or not.
     // This would be used by CreateTask endpoint.
     bool is_eager = 14;
+
+    google.protobuf.BoolValue generates_deck = 15;
 }
 
 // A Task structure that uniquely identifies a task in the system
