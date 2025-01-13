@@ -137,34 +137,32 @@ func TestSendEmail(t *testing.T) {
 		bademailer:send_error 1
 		`)))
 	})
-	t.Run("succeed within allowed retry attempts", func(t *testing.T) {
-		t.Run("exhaust all retry attempts", func(t *testing.T) {
-			ctx := context.TODO()
-			sendgridClient := &mocks.SendgridClient{}
-			expectedEmail := getSendgridEmail(emailNotification)
-			sendgridClient.OnSendMatch(expectedEmail).
-				Return(nil, expectedErr).Once()
-			sendgridClient.OnSendMatch(expectedEmail).
-				Return(&rest.Response{Body: "email body"}, nil).Once()
-			scope := promutils.NewScope("goodemailer")
-			emailerMetrics := newEmailMetrics(scope)
+	t.Run("exhaust all retry attempts", func(t *testing.T) {
+		ctx := context.TODO()
+		sendgridClient := &mocks.SendgridClient{}
+		expectedEmail := getSendgridEmail(emailNotification)
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(nil, expectedErr).Once()
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(&rest.Response{Body: "email body"}, nil).Once()
+		scope := promutils.NewScope("goodemailer")
+		emailerMetrics := newEmailMetrics(scope)
 
-			emailer := SendgridEmailer{
-				client:        sendgridClient,
-				systemMetrics: emailerMetrics,
-				cfg: &runtimeInterfaces.NotificationsConfig{
-					ReconnectAttempts: 1,
-				},
-			}
+		emailer := SendgridEmailer{
+			client:        sendgridClient,
+			systemMetrics: emailerMetrics,
+			cfg: &runtimeInterfaces.NotificationsConfig{
+				ReconnectAttempts: 1,
+			},
+		}
 
-			err := emailer.SendEmail(ctx, emailNotification)
-			assert.NoError(t, err)
+		err := emailer.SendEmail(ctx, emailNotification)
+		assert.NoError(t, err)
 
-			assert.NoError(t, testutil.CollectAndCompare(emailerMetrics.SendError, strings.NewReader(`
+		assert.NoError(t, testutil.CollectAndCompare(emailerMetrics.SendError, strings.NewReader(`
 		# HELP goodemailer:send_error Number of errors when sending email via Emailer
 		# TYPE goodemailer:send_error counter
 		goodemailer:send_error 0
 		`)))
-		})
 	})
 }
