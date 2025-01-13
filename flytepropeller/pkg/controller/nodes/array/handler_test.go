@@ -260,25 +260,36 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 func TestAbort(t *testing.T) {
 	ctx := context.Background()
 
-	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
 	tests := []struct {
 		name                           string
 		inputMap                       map[string][]int64
 		subNodePhases                  []v1alpha1.NodePhase
 		subNodeTaskPhases              []core.Phase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
+		arrayNodeState                 v1alpha1.ArrayNodePhase
+		expectedTaskExecutionPhase     idlcore.TaskExecution_Phase
 	}{
 		{
-			name: "Success",
+			name: "Aborted after failed",
 			inputMap: map[string][]int64{
 				"foo": []int64{0, 1, 2},
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			arrayNodeState:                 v1alpha1.ArrayNodePhaseFailing,
+			expectedTaskExecutionPhase:     idlcore.TaskExecution_FAILED,
+		},
+		{
+			name: "Aborted while running",
+			inputMap: map[string][]int64{
+				"foo": []int64{0, 1, 2},
+			},
+			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
+			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			arrayNodeState:                 v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskExecutionPhase:     idlcore.TaskExecution_ABORTED,
 		},
 	}
 
@@ -313,7 +324,7 @@ func TestAbort(t *testing.T) {
 
 				// initialize ArrayNodeState
 				arrayNodeState := &handler.ArrayNodeState{
-					Phase: v1alpha1.ArrayNodePhaseFailing,
+					Phase: test.arrayNodeState,
 				}
 				for _, item := range []struct {
 					arrayReference *bitarray.CompactArray
@@ -360,6 +371,7 @@ func TestAbort(t *testing.T) {
 				nodeHandler.AssertNumberOfCalls(t, "Abort", len(test.expectedExternalResourcePhases))
 				if len(test.expectedExternalResourcePhases) > 0 {
 					assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+					assert.Equal(t, test.expectedTaskExecutionPhase, eventRecorder.taskExecutionEvents[0].GetPhase())
 
 					externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
 					assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
@@ -1455,6 +1467,9 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 						assert.Equal(t, int64(*outputValue), collection.GetLiterals()[i].GetScalar().GetPrimitive().GetInteger())
 					}
 				}
+
+				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				assert.Equal(t, idlcore.TaskExecution_SUCCEEDED, eventRecorder.taskExecutionEvents[0].GetPhase())
 			})
 		}
 	}
@@ -1554,6 +1569,9 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 				assert.Equal(t, test.expectedArrayNodePhase, arrayNodeState.Phase)
 				assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
 				nodeHandler.AssertNumberOfCalls(t, "Abort", test.expectedAbortCalls)
+
+				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				assert.Equal(t, idlcore.TaskExecution_FAILED, eventRecorder.taskExecutionEvents[0].GetPhase())
 			})
 		}
 	}
