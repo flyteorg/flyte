@@ -606,13 +606,6 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	case pluginCore.PhaseRetryableFailure:
 		fallthrough
 	case pluginCore.PhasePermanentFailure:
-		// This is for backward compatibility with older Flytekit versions.
-		if deckStatus == DeckUnknown {
-			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
-		}
-		if err != nil {
-			return pluginTrns, err
-		}
 		pluginTrns.ObservedFailure(
 			&event.TaskNodeMetadata{
 				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
