@@ -7678,6 +7678,12 @@
         },
         "cache_serializable": {
           "type": "boolean"
+        },
+        "labels": {
+          "$ref": "#/definitions/adminLabels"
+        },
+        "annotations": {
+          "$ref": "#/definitions/adminAnnotations"
         }
       },
       "description": "Defines extra information about the Node."

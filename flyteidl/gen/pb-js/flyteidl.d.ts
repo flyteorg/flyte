@@ -4707,6 +4707,12 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable */
             cacheSerializable?: (boolean|null);
+
+            /** NodeMetadata labels */
+            labels?: (flyteidl.admin.ILabels|null);
+
+            /** NodeMetadata annotations */
+            annotations?: (flyteidl.admin.IAnnotations|null);
         }
 
         /** Represents a NodeMetadata. */
@@ -4738,6 +4744,12 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable. */
             public cacheSerializable: boolean;
+
+            /** NodeMetadata labels. */
+            public labels?: (flyteidl.admin.ILabels|null);
+
+            /** NodeMetadata annotations. */
+            public annotations?: (flyteidl.admin.IAnnotations|null);
 
             /** NodeMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -8077,1390 +8089,1485 @@ export namespace flyteidl {
         }
     }
 
-    /** Namespace event. */
-    namespace event {
-
-        /** Properties of a CloudEventWorkflowExecution. */
-        interface ICloudEventWorkflowExecution {
-
-            /** CloudEventWorkflowExecution rawEvent */
-            rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
-
-            /** CloudEventWorkflowExecution outputInterface */
-            outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventWorkflowExecution artifactIds */
-            artifactIds?: (flyteidl.core.IArtifactID[]|null);
-
-            /** CloudEventWorkflowExecution referenceExecution */
-            referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** CloudEventWorkflowExecution principal */
-            principal?: (string|null);
-
-            /** CloudEventWorkflowExecution launchPlanId */
-            launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventWorkflowExecution labels */
-            labels?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a CloudEventWorkflowExecution. */
-        class CloudEventWorkflowExecution implements ICloudEventWorkflowExecution {
-
-            /**
-             * Constructs a new CloudEventWorkflowExecution.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ICloudEventWorkflowExecution);
-
-            /** CloudEventWorkflowExecution rawEvent. */
-            public rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
-
-            /** CloudEventWorkflowExecution outputInterface. */
-            public outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventWorkflowExecution artifactIds. */
-            public artifactIds: flyteidl.core.IArtifactID[];
-
-            /** CloudEventWorkflowExecution referenceExecution. */
-            public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** CloudEventWorkflowExecution principal. */
-            public principal: string;
-
-            /** CloudEventWorkflowExecution launchPlanId. */
-            public launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventWorkflowExecution labels. */
-            public labels: { [k: string]: string };
-
-            /**
-             * Creates a new CloudEventWorkflowExecution instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CloudEventWorkflowExecution instance
-             */
-            public static create(properties?: flyteidl.event.ICloudEventWorkflowExecution): flyteidl.event.CloudEventWorkflowExecution;
-
-            /**
-             * Encodes the specified CloudEventWorkflowExecution message. Does not implicitly {@link flyteidl.event.CloudEventWorkflowExecution.verify|verify} messages.
-             * @param message CloudEventWorkflowExecution message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ICloudEventWorkflowExecution, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CloudEventWorkflowExecution message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CloudEventWorkflowExecution
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventWorkflowExecution;
-
-            /**
-             * Verifies a CloudEventWorkflowExecution message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a CloudEventNodeExecution. */
-        interface ICloudEventNodeExecution {
-
-            /** CloudEventNodeExecution rawEvent */
-            rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
-
-            /** CloudEventNodeExecution taskExecId */
-            taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
-
-            /** CloudEventNodeExecution outputInterface */
-            outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventNodeExecution artifactIds */
-            artifactIds?: (flyteidl.core.IArtifactID[]|null);
-
-            /** CloudEventNodeExecution principal */
-            principal?: (string|null);
-
-            /** CloudEventNodeExecution launchPlanId */
-            launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventNodeExecution labels */
-            labels?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a CloudEventNodeExecution. */
-        class CloudEventNodeExecution implements ICloudEventNodeExecution {
-
-            /**
-             * Constructs a new CloudEventNodeExecution.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ICloudEventNodeExecution);
-
-            /** CloudEventNodeExecution rawEvent. */
-            public rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
-
-            /** CloudEventNodeExecution taskExecId. */
-            public taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
-
-            /** CloudEventNodeExecution outputInterface. */
-            public outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventNodeExecution artifactIds. */
-            public artifactIds: flyteidl.core.IArtifactID[];
-
-            /** CloudEventNodeExecution principal. */
-            public principal: string;
-
-            /** CloudEventNodeExecution launchPlanId. */
-            public launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventNodeExecution labels. */
-            public labels: { [k: string]: string };
-
-            /**
-             * Creates a new CloudEventNodeExecution instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CloudEventNodeExecution instance
-             */
-            public static create(properties?: flyteidl.event.ICloudEventNodeExecution): flyteidl.event.CloudEventNodeExecution;
-
-            /**
-             * Encodes the specified CloudEventNodeExecution message. Does not implicitly {@link flyteidl.event.CloudEventNodeExecution.verify|verify} messages.
-             * @param message CloudEventNodeExecution message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ICloudEventNodeExecution, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CloudEventNodeExecution message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CloudEventNodeExecution
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventNodeExecution;
-
-            /**
-             * Verifies a CloudEventNodeExecution message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a CloudEventTaskExecution. */
-        interface ICloudEventTaskExecution {
-
-            /** CloudEventTaskExecution rawEvent */
-            rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
-
-            /** CloudEventTaskExecution labels */
-            labels?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a CloudEventTaskExecution. */
-        class CloudEventTaskExecution implements ICloudEventTaskExecution {
-
-            /**
-             * Constructs a new CloudEventTaskExecution.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ICloudEventTaskExecution);
-
-            /** CloudEventTaskExecution rawEvent. */
-            public rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
-
-            /** CloudEventTaskExecution labels. */
-            public labels: { [k: string]: string };
-
-            /**
-             * Creates a new CloudEventTaskExecution instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CloudEventTaskExecution instance
-             */
-            public static create(properties?: flyteidl.event.ICloudEventTaskExecution): flyteidl.event.CloudEventTaskExecution;
-
-            /**
-             * Encodes the specified CloudEventTaskExecution message. Does not implicitly {@link flyteidl.event.CloudEventTaskExecution.verify|verify} messages.
-             * @param message CloudEventTaskExecution message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ICloudEventTaskExecution, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CloudEventTaskExecution message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CloudEventTaskExecution
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventTaskExecution;
-
-            /**
-             * Verifies a CloudEventTaskExecution message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a CloudEventExecutionStart. */
-        interface ICloudEventExecutionStart {
-
-            /** CloudEventExecutionStart executionId */
-            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** CloudEventExecutionStart launchPlanId */
-            launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventExecutionStart workflowId */
-            workflowId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventExecutionStart artifactIds */
-            artifactIds?: (flyteidl.core.IArtifactID[]|null);
-
-            /** CloudEventExecutionStart artifactTrackers */
-            artifactTrackers?: (string[]|null);
-
-            /** CloudEventExecutionStart principal */
-            principal?: (string|null);
-        }
-
-        /** Represents a CloudEventExecutionStart. */
-        class CloudEventExecutionStart implements ICloudEventExecutionStart {
-
-            /**
-             * Constructs a new CloudEventExecutionStart.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ICloudEventExecutionStart);
-
-            /** CloudEventExecutionStart executionId. */
-            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** CloudEventExecutionStart launchPlanId. */
-            public launchPlanId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventExecutionStart workflowId. */
-            public workflowId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventExecutionStart artifactIds. */
-            public artifactIds: flyteidl.core.IArtifactID[];
-
-            /** CloudEventExecutionStart artifactTrackers. */
-            public artifactTrackers: string[];
-
-            /** CloudEventExecutionStart principal. */
-            public principal: string;
-
-            /**
-             * Creates a new CloudEventExecutionStart instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CloudEventExecutionStart instance
-             */
-            public static create(properties?: flyteidl.event.ICloudEventExecutionStart): flyteidl.event.CloudEventExecutionStart;
-
-            /**
-             * Encodes the specified CloudEventExecutionStart message. Does not implicitly {@link flyteidl.event.CloudEventExecutionStart.verify|verify} messages.
-             * @param message CloudEventExecutionStart message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ICloudEventExecutionStart, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CloudEventExecutionStart message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CloudEventExecutionStart
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventExecutionStart;
-
-            /**
-             * Verifies a CloudEventExecutionStart message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowExecutionEvent. */
-        interface IWorkflowExecutionEvent {
-
-            /** WorkflowExecutionEvent executionId */
-            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** WorkflowExecutionEvent producerId */
-            producerId?: (string|null);
-
-            /** WorkflowExecutionEvent phase */
-            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
-
-            /** WorkflowExecutionEvent occurredAt */
-            occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** WorkflowExecutionEvent outputUri */
-            outputUri?: (string|null);
-
-            /** WorkflowExecutionEvent error */
-            error?: (flyteidl.core.IExecutionError|null);
-
-            /** WorkflowExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
-        }
-
-        /** Represents a WorkflowExecutionEvent. */
-        class WorkflowExecutionEvent implements IWorkflowExecutionEvent {
-
-            /**
-             * Constructs a new WorkflowExecutionEvent.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IWorkflowExecutionEvent);
-
-            /** WorkflowExecutionEvent executionId. */
-            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /** WorkflowExecutionEvent producerId. */
-            public producerId: string;
-
-            /** WorkflowExecutionEvent phase. */
-            public phase: flyteidl.core.WorkflowExecution.Phase;
-
-            /** WorkflowExecutionEvent occurredAt. */
-            public occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** WorkflowExecutionEvent outputUri. */
-            public outputUri: string;
-
-            /** WorkflowExecutionEvent error. */
-            public error?: (flyteidl.core.IExecutionError|null);
-
-            /** WorkflowExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** WorkflowExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
-
-            /**
-             * Creates a new WorkflowExecutionEvent instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowExecutionEvent instance
-             */
-            public static create(properties?: flyteidl.event.IWorkflowExecutionEvent): flyteidl.event.WorkflowExecutionEvent;
-
-            /**
-             * Encodes the specified WorkflowExecutionEvent message. Does not implicitly {@link flyteidl.event.WorkflowExecutionEvent.verify|verify} messages.
-             * @param message WorkflowExecutionEvent message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IWorkflowExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowExecutionEvent message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowExecutionEvent
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.WorkflowExecutionEvent;
-
-            /**
-             * Verifies a WorkflowExecutionEvent message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NodeExecutionEvent. */
-        interface INodeExecutionEvent {
-
-            /** NodeExecutionEvent id */
-            id?: (flyteidl.core.INodeExecutionIdentifier|null);
-
-            /** NodeExecutionEvent producerId */
-            producerId?: (string|null);
-
-            /** NodeExecutionEvent phase */
-            phase?: (flyteidl.core.NodeExecution.Phase|null);
-
-            /** NodeExecutionEvent occurredAt */
-            occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** NodeExecutionEvent inputUri */
-            inputUri?: (string|null);
-
-            /** NodeExecutionEvent inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** NodeExecutionEvent outputUri */
-            outputUri?: (string|null);
-
-            /** NodeExecutionEvent error */
-            error?: (flyteidl.core.IExecutionError|null);
-
-            /** NodeExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** NodeExecutionEvent workflowNodeMetadata */
-            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
-
-            /** NodeExecutionEvent taskNodeMetadata */
-            taskNodeMetadata?: (flyteidl.event.ITaskNodeMetadata|null);
-
-            /** NodeExecutionEvent parentTaskMetadata */
-            parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
-
-            /** NodeExecutionEvent parentNodeMetadata */
-            parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
-
-            /** NodeExecutionEvent retryGroup */
-            retryGroup?: (string|null);
-
-            /** NodeExecutionEvent specNodeId */
-            specNodeId?: (string|null);
-
-            /** NodeExecutionEvent nodeName */
-            nodeName?: (string|null);
-
-            /** NodeExecutionEvent eventVersion */
-            eventVersion?: (number|null);
-
-            /** NodeExecutionEvent isParent */
-            isParent?: (boolean|null);
-
-            /** NodeExecutionEvent isDynamic */
-            isDynamic?: (boolean|null);
-
-            /** NodeExecutionEvent deckUri */
-            deckUri?: (string|null);
-
-            /** NodeExecutionEvent reportedAt */
-            reportedAt?: (google.protobuf.ITimestamp|null);
-
-            /** NodeExecutionEvent isArray */
-            isArray?: (boolean|null);
-
-            /** NodeExecutionEvent targetEntity */
-            targetEntity?: (flyteidl.core.IIdentifier|null);
-
-            /** NodeExecutionEvent isInDynamicChain */
-            isInDynamicChain?: (boolean|null);
-
-            /** NodeExecutionEvent isEager */
-            isEager?: (boolean|null);
-        }
-
-        /** Represents a NodeExecutionEvent. */
-        class NodeExecutionEvent implements INodeExecutionEvent {
-
-            /**
-             * Constructs a new NodeExecutionEvent.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.INodeExecutionEvent);
-
-            /** NodeExecutionEvent id. */
-            public id?: (flyteidl.core.INodeExecutionIdentifier|null);
-
-            /** NodeExecutionEvent producerId. */
-            public producerId: string;
-
-            /** NodeExecutionEvent phase. */
-            public phase: flyteidl.core.NodeExecution.Phase;
-
-            /** NodeExecutionEvent occurredAt. */
-            public occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** NodeExecutionEvent inputUri. */
-            public inputUri: string;
-
-            /** NodeExecutionEvent inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** NodeExecutionEvent outputUri. */
-            public outputUri: string;
-
-            /** NodeExecutionEvent error. */
-            public error?: (flyteidl.core.IExecutionError|null);
-
-            /** NodeExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** NodeExecutionEvent workflowNodeMetadata. */
-            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
-
-            /** NodeExecutionEvent taskNodeMetadata. */
-            public taskNodeMetadata?: (flyteidl.event.ITaskNodeMetadata|null);
-
-            /** NodeExecutionEvent parentTaskMetadata. */
-            public parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
-
-            /** NodeExecutionEvent parentNodeMetadata. */
-            public parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
-
-            /** NodeExecutionEvent retryGroup. */
-            public retryGroup: string;
-
-            /** NodeExecutionEvent specNodeId. */
-            public specNodeId: string;
-
-            /** NodeExecutionEvent nodeName. */
-            public nodeName: string;
-
-            /** NodeExecutionEvent eventVersion. */
-            public eventVersion: number;
-
-            /** NodeExecutionEvent isParent. */
-            public isParent: boolean;
-
-            /** NodeExecutionEvent isDynamic. */
-            public isDynamic: boolean;
-
-            /** NodeExecutionEvent deckUri. */
-            public deckUri: string;
-
-            /** NodeExecutionEvent reportedAt. */
-            public reportedAt?: (google.protobuf.ITimestamp|null);
-
-            /** NodeExecutionEvent isArray. */
-            public isArray: boolean;
-
-            /** NodeExecutionEvent targetEntity. */
-            public targetEntity?: (flyteidl.core.IIdentifier|null);
-
-            /** NodeExecutionEvent isInDynamicChain. */
-            public isInDynamicChain: boolean;
-
-            /** NodeExecutionEvent isEager. */
-            public isEager: boolean;
-
-            /** NodeExecutionEvent inputValue. */
-            public inputValue?: ("inputUri"|"inputData");
-
-            /** NodeExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
-
-            /** NodeExecutionEvent targetMetadata. */
-            public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
-
-            /**
-             * Creates a new NodeExecutionEvent instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NodeExecutionEvent instance
-             */
-            public static create(properties?: flyteidl.event.INodeExecutionEvent): flyteidl.event.NodeExecutionEvent;
-
-            /**
-             * Encodes the specified NodeExecutionEvent message. Does not implicitly {@link flyteidl.event.NodeExecutionEvent.verify|verify} messages.
-             * @param message NodeExecutionEvent message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.INodeExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NodeExecutionEvent message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NodeExecutionEvent
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.NodeExecutionEvent;
-
-            /**
-             * Verifies a NodeExecutionEvent message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowNodeMetadata. */
-        interface IWorkflowNodeMetadata {
-
-            /** WorkflowNodeMetadata executionId */
-            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-        }
-
-        /** Represents a WorkflowNodeMetadata. */
-        class WorkflowNodeMetadata implements IWorkflowNodeMetadata {
-
-            /**
-             * Constructs a new WorkflowNodeMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IWorkflowNodeMetadata);
-
-            /** WorkflowNodeMetadata executionId. */
-            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
-
-            /**
-             * Creates a new WorkflowNodeMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowNodeMetadata instance
-             */
-            public static create(properties?: flyteidl.event.IWorkflowNodeMetadata): flyteidl.event.WorkflowNodeMetadata;
-
-            /**
-             * Encodes the specified WorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.WorkflowNodeMetadata.verify|verify} messages.
-             * @param message WorkflowNodeMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowNodeMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowNodeMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.WorkflowNodeMetadata;
-
-            /**
-             * Verifies a WorkflowNodeMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskNodeMetadata. */
-        interface ITaskNodeMetadata {
-
-            /** TaskNodeMetadata cacheStatus */
-            cacheStatus?: (flyteidl.core.CatalogCacheStatus|null);
-
-            /** TaskNodeMetadata catalogKey */
-            catalogKey?: (flyteidl.core.ICatalogMetadata|null);
-
-            /** TaskNodeMetadata reservationStatus */
-            reservationStatus?: (flyteidl.core.CatalogReservation.Status|null);
-
-            /** TaskNodeMetadata checkpointUri */
-            checkpointUri?: (string|null);
-
-            /** TaskNodeMetadata dynamicWorkflow */
-            dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
-        }
-
-        /** Represents a TaskNodeMetadata. */
-        class TaskNodeMetadata implements ITaskNodeMetadata {
-
-            /**
-             * Constructs a new TaskNodeMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ITaskNodeMetadata);
-
-            /** TaskNodeMetadata cacheStatus. */
-            public cacheStatus: flyteidl.core.CatalogCacheStatus;
-
-            /** TaskNodeMetadata catalogKey. */
-            public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
-
-            /** TaskNodeMetadata reservationStatus. */
-            public reservationStatus: flyteidl.core.CatalogReservation.Status;
-
-            /** TaskNodeMetadata checkpointUri. */
-            public checkpointUri: string;
-
-            /** TaskNodeMetadata dynamicWorkflow. */
-            public dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
-
-            /**
-             * Creates a new TaskNodeMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskNodeMetadata instance
-             */
-            public static create(properties?: flyteidl.event.ITaskNodeMetadata): flyteidl.event.TaskNodeMetadata;
-
-            /**
-             * Encodes the specified TaskNodeMetadata message. Does not implicitly {@link flyteidl.event.TaskNodeMetadata.verify|verify} messages.
-             * @param message TaskNodeMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ITaskNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskNodeMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskNodeMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskNodeMetadata;
-
-            /**
-             * Verifies a TaskNodeMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a DynamicWorkflowNodeMetadata. */
-        interface IDynamicWorkflowNodeMetadata {
-
-            /** DynamicWorkflowNodeMetadata id */
-            id?: (flyteidl.core.IIdentifier|null);
-
-            /** DynamicWorkflowNodeMetadata compiledWorkflow */
-            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
-
-            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri */
-            dynamicJobSpecUri?: (string|null);
-        }
-
-        /** Represents a DynamicWorkflowNodeMetadata. */
-        class DynamicWorkflowNodeMetadata implements IDynamicWorkflowNodeMetadata {
-
-            /**
-             * Constructs a new DynamicWorkflowNodeMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata);
-
-            /** DynamicWorkflowNodeMetadata id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /** DynamicWorkflowNodeMetadata compiledWorkflow. */
-            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
-
-            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri. */
-            public dynamicJobSpecUri: string;
-
-            /**
-             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DynamicWorkflowNodeMetadata instance
-             */
-            public static create(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata): flyteidl.event.DynamicWorkflowNodeMetadata;
-
-            /**
-             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.DynamicWorkflowNodeMetadata.verify|verify} messages.
-             * @param message DynamicWorkflowNodeMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IDynamicWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DynamicWorkflowNodeMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.DynamicWorkflowNodeMetadata;
-
-            /**
-             * Verifies a DynamicWorkflowNodeMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ParentTaskExecutionMetadata. */
-        interface IParentTaskExecutionMetadata {
-
-            /** ParentTaskExecutionMetadata id */
-            id?: (flyteidl.core.ITaskExecutionIdentifier|null);
-        }
-
-        /** Represents a ParentTaskExecutionMetadata. */
-        class ParentTaskExecutionMetadata implements IParentTaskExecutionMetadata {
-
-            /**
-             * Constructs a new ParentTaskExecutionMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IParentTaskExecutionMetadata);
-
-            /** ParentTaskExecutionMetadata id. */
-            public id?: (flyteidl.core.ITaskExecutionIdentifier|null);
-
-            /**
-             * Creates a new ParentTaskExecutionMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ParentTaskExecutionMetadata instance
-             */
-            public static create(properties?: flyteidl.event.IParentTaskExecutionMetadata): flyteidl.event.ParentTaskExecutionMetadata;
-
-            /**
-             * Encodes the specified ParentTaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.ParentTaskExecutionMetadata.verify|verify} messages.
-             * @param message ParentTaskExecutionMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IParentTaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ParentTaskExecutionMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ParentTaskExecutionMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ParentTaskExecutionMetadata;
-
-            /**
-             * Verifies a ParentTaskExecutionMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ParentNodeExecutionMetadata. */
-        interface IParentNodeExecutionMetadata {
-
-            /** ParentNodeExecutionMetadata nodeId */
-            nodeId?: (string|null);
-        }
-
-        /** Represents a ParentNodeExecutionMetadata. */
-        class ParentNodeExecutionMetadata implements IParentNodeExecutionMetadata {
-
-            /**
-             * Constructs a new ParentNodeExecutionMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IParentNodeExecutionMetadata);
-
-            /** ParentNodeExecutionMetadata nodeId. */
-            public nodeId: string;
-
-            /**
-             * Creates a new ParentNodeExecutionMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ParentNodeExecutionMetadata instance
-             */
-            public static create(properties?: flyteidl.event.IParentNodeExecutionMetadata): flyteidl.event.ParentNodeExecutionMetadata;
-
-            /**
-             * Encodes the specified ParentNodeExecutionMetadata message. Does not implicitly {@link flyteidl.event.ParentNodeExecutionMetadata.verify|verify} messages.
-             * @param message ParentNodeExecutionMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IParentNodeExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ParentNodeExecutionMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ParentNodeExecutionMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ParentNodeExecutionMetadata;
-
-            /**
-             * Verifies a ParentNodeExecutionMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an EventReason. */
-        interface IEventReason {
-
-            /** EventReason reason */
-            reason?: (string|null);
-
-            /** EventReason occurredAt */
-            occurredAt?: (google.protobuf.ITimestamp|null);
-        }
-
-        /** Represents an EventReason. */
-        class EventReason implements IEventReason {
-
-            /**
-             * Constructs a new EventReason.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IEventReason);
-
-            /** EventReason reason. */
-            public reason: string;
-
-            /** EventReason occurredAt. */
-            public occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /**
-             * Creates a new EventReason instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns EventReason instance
-             */
-            public static create(properties?: flyteidl.event.IEventReason): flyteidl.event.EventReason;
-
-            /**
-             * Encodes the specified EventReason message. Does not implicitly {@link flyteidl.event.EventReason.verify|verify} messages.
-             * @param message EventReason message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IEventReason, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an EventReason message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns EventReason
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.EventReason;
-
-            /**
-             * Verifies an EventReason message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskExecutionEvent. */
-        interface ITaskExecutionEvent {
-
-            /** TaskExecutionEvent taskId */
-            taskId?: (flyteidl.core.IIdentifier|null);
-
-            /** TaskExecutionEvent parentNodeExecutionId */
-            parentNodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
-
-            /** TaskExecutionEvent retryAttempt */
-            retryAttempt?: (number|null);
-
-            /** TaskExecutionEvent phase */
-            phase?: (flyteidl.core.TaskExecution.Phase|null);
-
-            /** TaskExecutionEvent producerId */
-            producerId?: (string|null);
-
-            /** TaskExecutionEvent logs */
-            logs?: (flyteidl.core.ITaskLog[]|null);
-
-            /** TaskExecutionEvent occurredAt */
-            occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** TaskExecutionEvent inputUri */
-            inputUri?: (string|null);
-
-            /** TaskExecutionEvent inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskExecutionEvent outputUri */
-            outputUri?: (string|null);
-
-            /** TaskExecutionEvent error */
-            error?: (flyteidl.core.IExecutionError|null);
-
-            /** TaskExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskExecutionEvent customInfo */
-            customInfo?: (google.protobuf.IStruct|null);
-
-            /** TaskExecutionEvent phaseVersion */
-            phaseVersion?: (number|null);
-
-            /** TaskExecutionEvent reason */
-            reason?: (string|null);
-
-            /** TaskExecutionEvent reasons */
-            reasons?: (flyteidl.event.IEventReason[]|null);
-
-            /** TaskExecutionEvent taskType */
-            taskType?: (string|null);
-
-            /** TaskExecutionEvent metadata */
-            metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
-
-            /** TaskExecutionEvent eventVersion */
-            eventVersion?: (number|null);
-
-            /** TaskExecutionEvent reportedAt */
-            reportedAt?: (google.protobuf.ITimestamp|null);
-        }
-
-        /** Represents a TaskExecutionEvent. */
-        class TaskExecutionEvent implements ITaskExecutionEvent {
-
-            /**
-             * Constructs a new TaskExecutionEvent.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ITaskExecutionEvent);
-
-            /** TaskExecutionEvent taskId. */
-            public taskId?: (flyteidl.core.IIdentifier|null);
-
-            /** TaskExecutionEvent parentNodeExecutionId. */
-            public parentNodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
-
-            /** TaskExecutionEvent retryAttempt. */
-            public retryAttempt: number;
-
-            /** TaskExecutionEvent phase. */
-            public phase: flyteidl.core.TaskExecution.Phase;
-
-            /** TaskExecutionEvent producerId. */
-            public producerId: string;
-
-            /** TaskExecutionEvent logs. */
-            public logs: flyteidl.core.ITaskLog[];
-
-            /** TaskExecutionEvent occurredAt. */
-            public occurredAt?: (google.protobuf.ITimestamp|null);
-
-            /** TaskExecutionEvent inputUri. */
-            public inputUri: string;
-
-            /** TaskExecutionEvent inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskExecutionEvent outputUri. */
-            public outputUri: string;
-
-            /** TaskExecutionEvent error. */
-            public error?: (flyteidl.core.IExecutionError|null);
-
-            /** TaskExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
-
-            /** TaskExecutionEvent customInfo. */
-            public customInfo?: (google.protobuf.IStruct|null);
-
-            /** TaskExecutionEvent phaseVersion. */
-            public phaseVersion: number;
-
-            /** TaskExecutionEvent reason. */
-            public reason: string;
-
-            /** TaskExecutionEvent reasons. */
-            public reasons: flyteidl.event.IEventReason[];
-
-            /** TaskExecutionEvent taskType. */
-            public taskType: string;
-
-            /** TaskExecutionEvent metadata. */
-            public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
-
-            /** TaskExecutionEvent eventVersion. */
-            public eventVersion: number;
-
-            /** TaskExecutionEvent reportedAt. */
-            public reportedAt?: (google.protobuf.ITimestamp|null);
-
-            /** TaskExecutionEvent inputValue. */
-            public inputValue?: ("inputUri"|"inputData");
-
-            /** TaskExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
-
-            /**
-             * Creates a new TaskExecutionEvent instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskExecutionEvent instance
-             */
-            public static create(properties?: flyteidl.event.ITaskExecutionEvent): flyteidl.event.TaskExecutionEvent;
-
-            /**
-             * Encodes the specified TaskExecutionEvent message. Does not implicitly {@link flyteidl.event.TaskExecutionEvent.verify|verify} messages.
-             * @param message TaskExecutionEvent message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ITaskExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskExecutionEvent message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskExecutionEvent
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskExecutionEvent;
-
-            /**
-             * Verifies a TaskExecutionEvent message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an ExternalResourceInfo. */
-        interface IExternalResourceInfo {
-
-            /** ExternalResourceInfo externalId */
-            externalId?: (string|null);
-
-            /** ExternalResourceInfo index */
-            index?: (number|null);
-
-            /** ExternalResourceInfo retryAttempt */
-            retryAttempt?: (number|null);
-
-            /** ExternalResourceInfo phase */
-            phase?: (flyteidl.core.TaskExecution.Phase|null);
-
-            /** ExternalResourceInfo cacheStatus */
-            cacheStatus?: (flyteidl.core.CatalogCacheStatus|null);
-
-            /** ExternalResourceInfo logs */
-            logs?: (flyteidl.core.ITaskLog[]|null);
-
-            /** ExternalResourceInfo workflowNodeMetadata */
-            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
-
-            /** ExternalResourceInfo customInfo */
-            customInfo?: (google.protobuf.IStruct|null);
-        }
-
-        /** Represents an ExternalResourceInfo. */
-        class ExternalResourceInfo implements IExternalResourceInfo {
-
-            /**
-             * Constructs a new ExternalResourceInfo.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IExternalResourceInfo);
-
-            /** ExternalResourceInfo externalId. */
-            public externalId: string;
-
-            /** ExternalResourceInfo index. */
-            public index: number;
-
-            /** ExternalResourceInfo retryAttempt. */
-            public retryAttempt: number;
-
-            /** ExternalResourceInfo phase. */
-            public phase: flyteidl.core.TaskExecution.Phase;
-
-            /** ExternalResourceInfo cacheStatus. */
-            public cacheStatus: flyteidl.core.CatalogCacheStatus;
-
-            /** ExternalResourceInfo logs. */
-            public logs: flyteidl.core.ITaskLog[];
-
-            /** ExternalResourceInfo workflowNodeMetadata. */
-            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
-
-            /** ExternalResourceInfo customInfo. */
-            public customInfo?: (google.protobuf.IStruct|null);
-
-            /** ExternalResourceInfo targetMetadata. */
-            public targetMetadata?: "workflowNodeMetadata";
-
-            /**
-             * Creates a new ExternalResourceInfo instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ExternalResourceInfo instance
-             */
-            public static create(properties?: flyteidl.event.IExternalResourceInfo): flyteidl.event.ExternalResourceInfo;
-
-            /**
-             * Encodes the specified ExternalResourceInfo message. Does not implicitly {@link flyteidl.event.ExternalResourceInfo.verify|verify} messages.
-             * @param message ExternalResourceInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IExternalResourceInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ExternalResourceInfo message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ExternalResourceInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ExternalResourceInfo;
-
-            /**
-             * Verifies an ExternalResourceInfo message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ResourcePoolInfo. */
-        interface IResourcePoolInfo {
-
-            /** ResourcePoolInfo allocationToken */
-            allocationToken?: (string|null);
-
-            /** ResourcePoolInfo namespace */
-            namespace?: (string|null);
-        }
-
-        /** Represents a ResourcePoolInfo. */
-        class ResourcePoolInfo implements IResourcePoolInfo {
-
-            /**
-             * Constructs a new ResourcePoolInfo.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.IResourcePoolInfo);
-
-            /** ResourcePoolInfo allocationToken. */
-            public allocationToken: string;
-
-            /** ResourcePoolInfo namespace. */
-            public namespace: string;
-
-            /**
-             * Creates a new ResourcePoolInfo instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ResourcePoolInfo instance
-             */
-            public static create(properties?: flyteidl.event.IResourcePoolInfo): flyteidl.event.ResourcePoolInfo;
-
-            /**
-             * Encodes the specified ResourcePoolInfo message. Does not implicitly {@link flyteidl.event.ResourcePoolInfo.verify|verify} messages.
-             * @param message ResourcePoolInfo message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.IResourcePoolInfo, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ResourcePoolInfo message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ResourcePoolInfo
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ResourcePoolInfo;
-
-            /**
-             * Verifies a ResourcePoolInfo message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a TaskExecutionMetadata. */
-        interface ITaskExecutionMetadata {
-
-            /** TaskExecutionMetadata generatedName */
-            generatedName?: (string|null);
-
-            /** TaskExecutionMetadata externalResources */
-            externalResources?: (flyteidl.event.IExternalResourceInfo[]|null);
-
-            /** TaskExecutionMetadata resourcePoolInfo */
-            resourcePoolInfo?: (flyteidl.event.IResourcePoolInfo[]|null);
-
-            /** TaskExecutionMetadata pluginIdentifier */
-            pluginIdentifier?: (string|null);
-
-            /** TaskExecutionMetadata instanceClass */
-            instanceClass?: (flyteidl.event.TaskExecutionMetadata.InstanceClass|null);
-        }
-
-        /** Represents a TaskExecutionMetadata. */
-        class TaskExecutionMetadata implements ITaskExecutionMetadata {
-
-            /**
-             * Constructs a new TaskExecutionMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.event.ITaskExecutionMetadata);
-
-            /** TaskExecutionMetadata generatedName. */
-            public generatedName: string;
-
-            /** TaskExecutionMetadata externalResources. */
-            public externalResources: flyteidl.event.IExternalResourceInfo[];
-
-            /** TaskExecutionMetadata resourcePoolInfo. */
-            public resourcePoolInfo: flyteidl.event.IResourcePoolInfo[];
-
-            /** TaskExecutionMetadata pluginIdentifier. */
-            public pluginIdentifier: string;
-
-            /** TaskExecutionMetadata instanceClass. */
-            public instanceClass: flyteidl.event.TaskExecutionMetadata.InstanceClass;
-
-            /**
-             * Creates a new TaskExecutionMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns TaskExecutionMetadata instance
-             */
-            public static create(properties?: flyteidl.event.ITaskExecutionMetadata): flyteidl.event.TaskExecutionMetadata;
-
-            /**
-             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.TaskExecutionMetadata.verify|verify} messages.
-             * @param message TaskExecutionMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.event.ITaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns TaskExecutionMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskExecutionMetadata;
-
-            /**
-             * Verifies a TaskExecutionMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        namespace TaskExecutionMetadata {
-
-            /** InstanceClass enum. */
-            enum InstanceClass {
-                DEFAULT = 0,
-                INTERRUPTIBLE = 1
-            }
-        }
-    }
-
     /** Namespace admin. */
     namespace admin {
+
+        /** Properties of a NamedEntityIdentifier. */
+        interface INamedEntityIdentifier {
+
+            /** NamedEntityIdentifier project */
+            project?: (string|null);
+
+            /** NamedEntityIdentifier domain */
+            domain?: (string|null);
+
+            /** NamedEntityIdentifier name */
+            name?: (string|null);
+
+            /** NamedEntityIdentifier org */
+            org?: (string|null);
+        }
+
+        /** Represents a NamedEntityIdentifier. */
+        class NamedEntityIdentifier implements INamedEntityIdentifier {
+
+            /**
+             * Constructs a new NamedEntityIdentifier.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityIdentifier);
+
+            /** NamedEntityIdentifier project. */
+            public project: string;
+
+            /** NamedEntityIdentifier domain. */
+            public domain: string;
+
+            /** NamedEntityIdentifier name. */
+            public name: string;
+
+            /** NamedEntityIdentifier org. */
+            public org: string;
+
+            /**
+             * Creates a new NamedEntityIdentifier instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityIdentifier instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityIdentifier): flyteidl.admin.NamedEntityIdentifier;
+
+            /**
+             * Encodes the specified NamedEntityIdentifier message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifier.verify|verify} messages.
+             * @param message NamedEntityIdentifier message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityIdentifier, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityIdentifier message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityIdentifier
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifier;
+
+            /**
+             * Verifies a NamedEntityIdentifier message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** NamedEntityState enum. */
+        enum NamedEntityState {
+            NAMED_ENTITY_ACTIVE = 0,
+            NAMED_ENTITY_ARCHIVED = 1,
+            SYSTEM_GENERATED = 2
+        }
+
+        /** Properties of a NamedEntityMetadata. */
+        interface INamedEntityMetadata {
+
+            /** NamedEntityMetadata description */
+            description?: (string|null);
+
+            /** NamedEntityMetadata state */
+            state?: (flyteidl.admin.NamedEntityState|null);
+        }
+
+        /** Represents a NamedEntityMetadata. */
+        class NamedEntityMetadata implements INamedEntityMetadata {
+
+            /**
+             * Constructs a new NamedEntityMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityMetadata);
+
+            /** NamedEntityMetadata description. */
+            public description: string;
+
+            /** NamedEntityMetadata state. */
+            public state: flyteidl.admin.NamedEntityState;
+
+            /**
+             * Creates a new NamedEntityMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityMetadata): flyteidl.admin.NamedEntityMetadata;
+
+            /**
+             * Encodes the specified NamedEntityMetadata message. Does not implicitly {@link flyteidl.admin.NamedEntityMetadata.verify|verify} messages.
+             * @param message NamedEntityMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityMetadata;
+
+            /**
+             * Verifies a NamedEntityMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntity. */
+        interface INamedEntity {
+
+            /** NamedEntity resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntity id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntity metadata */
+            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+        }
+
+        /** Represents a NamedEntity. */
+        class NamedEntity implements INamedEntity {
+
+            /**
+             * Constructs a new NamedEntity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntity);
+
+            /** NamedEntity resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntity id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntity metadata. */
+            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+
+            /**
+             * Creates a new NamedEntity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntity instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntity): flyteidl.admin.NamedEntity;
+
+            /**
+             * Encodes the specified NamedEntity message. Does not implicitly {@link flyteidl.admin.NamedEntity.verify|verify} messages.
+             * @param message NamedEntity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntity;
+
+            /**
+             * Verifies a NamedEntity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Sort. */
+        interface ISort {
+
+            /** Sort key */
+            key?: (string|null);
+
+            /** Sort direction */
+            direction?: (flyteidl.admin.Sort.Direction|null);
+        }
+
+        /** Represents a Sort. */
+        class Sort implements ISort {
+
+            /**
+             * Constructs a new Sort.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISort);
+
+            /** Sort key. */
+            public key: string;
+
+            /** Sort direction. */
+            public direction: flyteidl.admin.Sort.Direction;
+
+            /**
+             * Creates a new Sort instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Sort instance
+             */
+            public static create(properties?: flyteidl.admin.ISort): flyteidl.admin.Sort;
+
+            /**
+             * Encodes the specified Sort message. Does not implicitly {@link flyteidl.admin.Sort.verify|verify} messages.
+             * @param message Sort message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISort, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Sort message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Sort
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Sort;
+
+            /**
+             * Verifies a Sort message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Sort {
+
+            /** Direction enum. */
+            enum Direction {
+                DESCENDING = 0,
+                ASCENDING = 1
+            }
+        }
+
+        /** Properties of a NamedEntityIdentifierListRequest. */
+        interface INamedEntityIdentifierListRequest {
+
+            /** NamedEntityIdentifierListRequest project */
+            project?: (string|null);
+
+            /** NamedEntityIdentifierListRequest domain */
+            domain?: (string|null);
+
+            /** NamedEntityIdentifierListRequest limit */
+            limit?: (number|null);
+
+            /** NamedEntityIdentifierListRequest token */
+            token?: (string|null);
+
+            /** NamedEntityIdentifierListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityIdentifierListRequest filters */
+            filters?: (string|null);
+
+            /** NamedEntityIdentifierListRequest org */
+            org?: (string|null);
+        }
+
+        /** Represents a NamedEntityIdentifierListRequest. */
+        class NamedEntityIdentifierListRequest implements INamedEntityIdentifierListRequest {
+
+            /**
+             * Constructs a new NamedEntityIdentifierListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityIdentifierListRequest);
+
+            /** NamedEntityIdentifierListRequest project. */
+            public project: string;
+
+            /** NamedEntityIdentifierListRequest domain. */
+            public domain: string;
+
+            /** NamedEntityIdentifierListRequest limit. */
+            public limit: number;
+
+            /** NamedEntityIdentifierListRequest token. */
+            public token: string;
+
+            /** NamedEntityIdentifierListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityIdentifierListRequest filters. */
+            public filters: string;
+
+            /** NamedEntityIdentifierListRequest org. */
+            public org: string;
+
+            /**
+             * Creates a new NamedEntityIdentifierListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityIdentifierListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityIdentifierListRequest): flyteidl.admin.NamedEntityIdentifierListRequest;
+
+            /**
+             * Encodes the specified NamedEntityIdentifierListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifierListRequest.verify|verify} messages.
+             * @param message NamedEntityIdentifierListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityIdentifierListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityIdentifierListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityIdentifierListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifierListRequest;
+
+            /**
+             * Verifies a NamedEntityIdentifierListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityListRequest. */
+        interface INamedEntityListRequest {
+
+            /** NamedEntityListRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityListRequest project */
+            project?: (string|null);
+
+            /** NamedEntityListRequest domain */
+            domain?: (string|null);
+
+            /** NamedEntityListRequest limit */
+            limit?: (number|null);
+
+            /** NamedEntityListRequest token */
+            token?: (string|null);
+
+            /** NamedEntityListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityListRequest filters */
+            filters?: (string|null);
+
+            /** NamedEntityListRequest org */
+            org?: (string|null);
+        }
+
+        /** Represents a NamedEntityListRequest. */
+        class NamedEntityListRequest implements INamedEntityListRequest {
+
+            /**
+             * Constructs a new NamedEntityListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityListRequest);
+
+            /** NamedEntityListRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityListRequest project. */
+            public project: string;
+
+            /** NamedEntityListRequest domain. */
+            public domain: string;
+
+            /** NamedEntityListRequest limit. */
+            public limit: number;
+
+            /** NamedEntityListRequest token. */
+            public token: string;
+
+            /** NamedEntityListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityListRequest filters. */
+            public filters: string;
+
+            /** NamedEntityListRequest org. */
+            public org: string;
+
+            /**
+             * Creates a new NamedEntityListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityListRequest): flyteidl.admin.NamedEntityListRequest;
+
+            /**
+             * Encodes the specified NamedEntityListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityListRequest.verify|verify} messages.
+             * @param message NamedEntityListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityListRequest;
+
+            /**
+             * Verifies a NamedEntityListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityIdentifierList. */
+        interface INamedEntityIdentifierList {
+
+            /** NamedEntityIdentifierList entities */
+            entities?: (flyteidl.admin.INamedEntityIdentifier[]|null);
+
+            /** NamedEntityIdentifierList token */
+            token?: (string|null);
+        }
+
+        /** Represents a NamedEntityIdentifierList. */
+        class NamedEntityIdentifierList implements INamedEntityIdentifierList {
+
+            /**
+             * Constructs a new NamedEntityIdentifierList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityIdentifierList);
+
+            /** NamedEntityIdentifierList entities. */
+            public entities: flyteidl.admin.INamedEntityIdentifier[];
+
+            /** NamedEntityIdentifierList token. */
+            public token: string;
+
+            /**
+             * Creates a new NamedEntityIdentifierList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityIdentifierList instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityIdentifierList): flyteidl.admin.NamedEntityIdentifierList;
+
+            /**
+             * Encodes the specified NamedEntityIdentifierList message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifierList.verify|verify} messages.
+             * @param message NamedEntityIdentifierList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityIdentifierList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityIdentifierList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityIdentifierList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifierList;
+
+            /**
+             * Verifies a NamedEntityIdentifierList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityList. */
+        interface INamedEntityList {
+
+            /** NamedEntityList entities */
+            entities?: (flyteidl.admin.INamedEntity[]|null);
+
+            /** NamedEntityList token */
+            token?: (string|null);
+        }
+
+        /** Represents a NamedEntityList. */
+        class NamedEntityList implements INamedEntityList {
+
+            /**
+             * Constructs a new NamedEntityList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityList);
+
+            /** NamedEntityList entities. */
+            public entities: flyteidl.admin.INamedEntity[];
+
+            /** NamedEntityList token. */
+            public token: string;
+
+            /**
+             * Creates a new NamedEntityList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityList instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityList): flyteidl.admin.NamedEntityList;
+
+            /**
+             * Encodes the specified NamedEntityList message. Does not implicitly {@link flyteidl.admin.NamedEntityList.verify|verify} messages.
+             * @param message NamedEntityList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityList;
+
+            /**
+             * Verifies a NamedEntityList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityGetRequest. */
+        interface INamedEntityGetRequest {
+
+            /** NamedEntityGetRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityGetRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+        }
+
+        /** Represents a NamedEntityGetRequest. */
+        class NamedEntityGetRequest implements INamedEntityGetRequest {
+
+            /**
+             * Constructs a new NamedEntityGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityGetRequest);
+
+            /** NamedEntityGetRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityGetRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /**
+             * Creates a new NamedEntityGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityGetRequest): flyteidl.admin.NamedEntityGetRequest;
+
+            /**
+             * Encodes the specified NamedEntityGetRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityGetRequest.verify|verify} messages.
+             * @param message NamedEntityGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityGetRequest;
+
+            /**
+             * Verifies a NamedEntityGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityUpdateRequest. */
+        interface INamedEntityUpdateRequest {
+
+            /** NamedEntityUpdateRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityUpdateRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntityUpdateRequest metadata */
+            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+        }
+
+        /** Represents a NamedEntityUpdateRequest. */
+        class NamedEntityUpdateRequest implements INamedEntityUpdateRequest {
+
+            /**
+             * Constructs a new NamedEntityUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityUpdateRequest);
+
+            /** NamedEntityUpdateRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityUpdateRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntityUpdateRequest metadata. */
+            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+
+            /**
+             * Creates a new NamedEntityUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityUpdateRequest): flyteidl.admin.NamedEntityUpdateRequest;
+
+            /**
+             * Encodes the specified NamedEntityUpdateRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateRequest.verify|verify} messages.
+             * @param message NamedEntityUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateRequest;
+
+            /**
+             * Verifies a NamedEntityUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityUpdateResponse. */
+        interface INamedEntityUpdateResponse {
+        }
+
+        /** Represents a NamedEntityUpdateResponse. */
+        class NamedEntityUpdateResponse implements INamedEntityUpdateResponse {
+
+            /**
+             * Constructs a new NamedEntityUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityUpdateResponse);
+
+            /**
+             * Creates a new NamedEntityUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityUpdateResponse): flyteidl.admin.NamedEntityUpdateResponse;
+
+            /**
+             * Encodes the specified NamedEntityUpdateResponse message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateResponse.verify|verify} messages.
+             * @param message NamedEntityUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateResponse;
+
+            /**
+             * Verifies a NamedEntityUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ObjectGetRequest. */
+        interface IObjectGetRequest {
+
+            /** ObjectGetRequest id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents an ObjectGetRequest. */
+        class ObjectGetRequest implements IObjectGetRequest {
+
+            /**
+             * Constructs a new ObjectGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IObjectGetRequest);
+
+            /** ObjectGetRequest id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new ObjectGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ObjectGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IObjectGetRequest): flyteidl.admin.ObjectGetRequest;
+
+            /**
+             * Encodes the specified ObjectGetRequest message. Does not implicitly {@link flyteidl.admin.ObjectGetRequest.verify|verify} messages.
+             * @param message ObjectGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IObjectGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ObjectGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ObjectGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ObjectGetRequest;
+
+            /**
+             * Verifies an ObjectGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ResourceListRequest. */
+        interface IResourceListRequest {
+
+            /** ResourceListRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** ResourceListRequest limit */
+            limit?: (number|null);
+
+            /** ResourceListRequest token */
+            token?: (string|null);
+
+            /** ResourceListRequest filters */
+            filters?: (string|null);
+
+            /** ResourceListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+        }
+
+        /** Represents a ResourceListRequest. */
+        class ResourceListRequest implements IResourceListRequest {
+
+            /**
+             * Constructs a new ResourceListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IResourceListRequest);
+
+            /** ResourceListRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** ResourceListRequest limit. */
+            public limit: number;
+
+            /** ResourceListRequest token. */
+            public token: string;
+
+            /** ResourceListRequest filters. */
+            public filters: string;
+
+            /** ResourceListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /**
+             * Creates a new ResourceListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResourceListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IResourceListRequest): flyteidl.admin.ResourceListRequest;
+
+            /**
+             * Encodes the specified ResourceListRequest message. Does not implicitly {@link flyteidl.admin.ResourceListRequest.verify|verify} messages.
+             * @param message ResourceListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IResourceListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ResourceListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ResourceListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ResourceListRequest;
+
+            /**
+             * Verifies a ResourceListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an EmailNotification. */
+        interface IEmailNotification {
+
+            /** EmailNotification recipientsEmail */
+            recipientsEmail?: (string[]|null);
+        }
+
+        /** Represents an EmailNotification. */
+        class EmailNotification implements IEmailNotification {
+
+            /**
+             * Constructs a new EmailNotification.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IEmailNotification);
+
+            /** EmailNotification recipientsEmail. */
+            public recipientsEmail: string[];
+
+            /**
+             * Creates a new EmailNotification instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EmailNotification instance
+             */
+            public static create(properties?: flyteidl.admin.IEmailNotification): flyteidl.admin.EmailNotification;
+
+            /**
+             * Encodes the specified EmailNotification message. Does not implicitly {@link flyteidl.admin.EmailNotification.verify|verify} messages.
+             * @param message EmailNotification message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IEmailNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EmailNotification message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EmailNotification
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.EmailNotification;
+
+            /**
+             * Verifies an EmailNotification message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a PagerDutyNotification. */
+        interface IPagerDutyNotification {
+
+            /** PagerDutyNotification recipientsEmail */
+            recipientsEmail?: (string[]|null);
+        }
+
+        /** Represents a PagerDutyNotification. */
+        class PagerDutyNotification implements IPagerDutyNotification {
+
+            /**
+             * Constructs a new PagerDutyNotification.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IPagerDutyNotification);
+
+            /** PagerDutyNotification recipientsEmail. */
+            public recipientsEmail: string[];
+
+            /**
+             * Creates a new PagerDutyNotification instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PagerDutyNotification instance
+             */
+            public static create(properties?: flyteidl.admin.IPagerDutyNotification): flyteidl.admin.PagerDutyNotification;
+
+            /**
+             * Encodes the specified PagerDutyNotification message. Does not implicitly {@link flyteidl.admin.PagerDutyNotification.verify|verify} messages.
+             * @param message PagerDutyNotification message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IPagerDutyNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PagerDutyNotification message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PagerDutyNotification
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.PagerDutyNotification;
+
+            /**
+             * Verifies a PagerDutyNotification message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SlackNotification. */
+        interface ISlackNotification {
+
+            /** SlackNotification recipientsEmail */
+            recipientsEmail?: (string[]|null);
+        }
+
+        /** Represents a SlackNotification. */
+        class SlackNotification implements ISlackNotification {
+
+            /**
+             * Constructs a new SlackNotification.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISlackNotification);
+
+            /** SlackNotification recipientsEmail. */
+            public recipientsEmail: string[];
+
+            /**
+             * Creates a new SlackNotification instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SlackNotification instance
+             */
+            public static create(properties?: flyteidl.admin.ISlackNotification): flyteidl.admin.SlackNotification;
+
+            /**
+             * Encodes the specified SlackNotification message. Does not implicitly {@link flyteidl.admin.SlackNotification.verify|verify} messages.
+             * @param message SlackNotification message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISlackNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SlackNotification message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SlackNotification
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SlackNotification;
+
+            /**
+             * Verifies a SlackNotification message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Notification. */
+        interface INotification {
+
+            /** Notification phases */
+            phases?: (flyteidl.core.WorkflowExecution.Phase[]|null);
+
+            /** Notification email */
+            email?: (flyteidl.admin.IEmailNotification|null);
+
+            /** Notification pagerDuty */
+            pagerDuty?: (flyteidl.admin.IPagerDutyNotification|null);
+
+            /** Notification slack */
+            slack?: (flyteidl.admin.ISlackNotification|null);
+        }
+
+        /** Represents a Notification. */
+        class Notification implements INotification {
+
+            /**
+             * Constructs a new Notification.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INotification);
+
+            /** Notification phases. */
+            public phases: flyteidl.core.WorkflowExecution.Phase[];
+
+            /** Notification email. */
+            public email?: (flyteidl.admin.IEmailNotification|null);
+
+            /** Notification pagerDuty. */
+            public pagerDuty?: (flyteidl.admin.IPagerDutyNotification|null);
+
+            /** Notification slack. */
+            public slack?: (flyteidl.admin.ISlackNotification|null);
+
+            /** Notification type. */
+            public type?: ("email"|"pagerDuty"|"slack");
+
+            /**
+             * Creates a new Notification instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Notification instance
+             */
+            public static create(properties?: flyteidl.admin.INotification): flyteidl.admin.Notification;
+
+            /**
+             * Encodes the specified Notification message. Does not implicitly {@link flyteidl.admin.Notification.verify|verify} messages.
+             * @param message Notification message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Notification message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Notification
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Notification;
+
+            /**
+             * Verifies a Notification message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an UrlBlob. */
+        interface IUrlBlob {
+
+            /** UrlBlob url */
+            url?: (string|null);
+
+            /** UrlBlob bytes */
+            bytes?: (Long|null);
+        }
+
+        /** Represents an UrlBlob. */
+        class UrlBlob implements IUrlBlob {
+
+            /**
+             * Constructs a new UrlBlob.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IUrlBlob);
+
+            /** UrlBlob url. */
+            public url: string;
+
+            /** UrlBlob bytes. */
+            public bytes: Long;
+
+            /**
+             * Creates a new UrlBlob instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UrlBlob instance
+             */
+            public static create(properties?: flyteidl.admin.IUrlBlob): flyteidl.admin.UrlBlob;
+
+            /**
+             * Encodes the specified UrlBlob message. Does not implicitly {@link flyteidl.admin.UrlBlob.verify|verify} messages.
+             * @param message UrlBlob message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IUrlBlob, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an UrlBlob message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UrlBlob
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.UrlBlob;
+
+            /**
+             * Verifies an UrlBlob message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Labels. */
+        interface ILabels {
+
+            /** Labels values */
+            values?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a Labels. */
+        class Labels implements ILabels {
+
+            /**
+             * Constructs a new Labels.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ILabels);
+
+            /** Labels values. */
+            public values: { [k: string]: string };
+
+            /**
+             * Creates a new Labels instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Labels instance
+             */
+            public static create(properties?: flyteidl.admin.ILabels): flyteidl.admin.Labels;
+
+            /**
+             * Encodes the specified Labels message. Does not implicitly {@link flyteidl.admin.Labels.verify|verify} messages.
+             * @param message Labels message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ILabels, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Labels message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Labels
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Labels;
+
+            /**
+             * Verifies a Labels message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Annotations. */
+        interface IAnnotations {
+
+            /** Annotations values */
+            values?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents an Annotations. */
+        class Annotations implements IAnnotations {
+
+            /**
+             * Constructs a new Annotations.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAnnotations);
+
+            /** Annotations values. */
+            public values: { [k: string]: string };
+
+            /**
+             * Creates a new Annotations instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Annotations instance
+             */
+            public static create(properties?: flyteidl.admin.IAnnotations): flyteidl.admin.Annotations;
+
+            /**
+             * Encodes the specified Annotations message. Does not implicitly {@link flyteidl.admin.Annotations.verify|verify} messages.
+             * @param message Annotations message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAnnotations, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Annotations message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Annotations
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Annotations;
+
+            /**
+             * Verifies an Annotations message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Envs. */
+        interface IEnvs {
+
+            /** Envs values */
+            values?: (flyteidl.core.IKeyValuePair[]|null);
+        }
+
+        /** Represents an Envs. */
+        class Envs implements IEnvs {
+
+            /**
+             * Constructs a new Envs.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IEnvs);
+
+            /** Envs values. */
+            public values: flyteidl.core.IKeyValuePair[];
+
+            /**
+             * Creates a new Envs instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Envs instance
+             */
+            public static create(properties?: flyteidl.admin.IEnvs): flyteidl.admin.Envs;
+
+            /**
+             * Encodes the specified Envs message. Does not implicitly {@link flyteidl.admin.Envs.verify|verify} messages.
+             * @param message Envs message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IEnvs, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Envs message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Envs
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Envs;
+
+            /**
+             * Verifies an Envs message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an AuthRole. */
+        interface IAuthRole {
+
+            /** AuthRole assumableIamRole */
+            assumableIamRole?: (string|null);
+
+            /** AuthRole kubernetesServiceAccount */
+            kubernetesServiceAccount?: (string|null);
+        }
+
+        /** Represents an AuthRole. */
+        class AuthRole implements IAuthRole {
+
+            /**
+             * Constructs a new AuthRole.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAuthRole);
+
+            /** AuthRole assumableIamRole. */
+            public assumableIamRole: string;
+
+            /** AuthRole kubernetesServiceAccount. */
+            public kubernetesServiceAccount: string;
+
+            /**
+             * Creates a new AuthRole instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AuthRole instance
+             */
+            public static create(properties?: flyteidl.admin.IAuthRole): flyteidl.admin.AuthRole;
+
+            /**
+             * Encodes the specified AuthRole message. Does not implicitly {@link flyteidl.admin.AuthRole.verify|verify} messages.
+             * @param message AuthRole message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAuthRole, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AuthRole message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AuthRole
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AuthRole;
+
+            /**
+             * Verifies an AuthRole message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a RawOutputDataConfig. */
+        interface IRawOutputDataConfig {
+
+            /** RawOutputDataConfig outputLocationPrefix */
+            outputLocationPrefix?: (string|null);
+        }
+
+        /** Represents a RawOutputDataConfig. */
+        class RawOutputDataConfig implements IRawOutputDataConfig {
+
+            /**
+             * Constructs a new RawOutputDataConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IRawOutputDataConfig);
+
+            /** RawOutputDataConfig outputLocationPrefix. */
+            public outputLocationPrefix: string;
+
+            /**
+             * Creates a new RawOutputDataConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RawOutputDataConfig instance
+             */
+            public static create(properties?: flyteidl.admin.IRawOutputDataConfig): flyteidl.admin.RawOutputDataConfig;
+
+            /**
+             * Encodes the specified RawOutputDataConfig message. Does not implicitly {@link flyteidl.admin.RawOutputDataConfig.verify|verify} messages.
+             * @param message RawOutputDataConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IRawOutputDataConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RawOutputDataConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RawOutputDataConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.RawOutputDataConfig;
+
+            /**
+             * Verifies a RawOutputDataConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a FlyteURLs. */
+        interface IFlyteURLs {
+
+            /** FlyteURLs inputs */
+            inputs?: (string|null);
+
+            /** FlyteURLs outputs */
+            outputs?: (string|null);
+
+            /** FlyteURLs deck */
+            deck?: (string|null);
+        }
+
+        /** Represents a FlyteURLs. */
+        class FlyteURLs implements IFlyteURLs {
+
+            /**
+             * Constructs a new FlyteURLs.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IFlyteURLs);
+
+            /** FlyteURLs inputs. */
+            public inputs: string;
+
+            /** FlyteURLs outputs. */
+            public outputs: string;
+
+            /** FlyteURLs deck. */
+            public deck: string;
+
+            /**
+             * Creates a new FlyteURLs instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns FlyteURLs instance
+             */
+            public static create(properties?: flyteidl.admin.IFlyteURLs): flyteidl.admin.FlyteURLs;
+
+            /**
+             * Encodes the specified FlyteURLs message. Does not implicitly {@link flyteidl.admin.FlyteURLs.verify|verify} messages.
+             * @param message FlyteURLs message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IFlyteURLs, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a FlyteURLs message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns FlyteURLs
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.FlyteURLs;
+
+            /**
+             * Verifies a FlyteURLs message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
 
         /** State enum. */
         enum State {
@@ -11093,1483 +11200,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a ClusterAssignment message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityIdentifier. */
-        interface INamedEntityIdentifier {
-
-            /** NamedEntityIdentifier project */
-            project?: (string|null);
-
-            /** NamedEntityIdentifier domain */
-            domain?: (string|null);
-
-            /** NamedEntityIdentifier name */
-            name?: (string|null);
-
-            /** NamedEntityIdentifier org */
-            org?: (string|null);
-        }
-
-        /** Represents a NamedEntityIdentifier. */
-        class NamedEntityIdentifier implements INamedEntityIdentifier {
-
-            /**
-             * Constructs a new NamedEntityIdentifier.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityIdentifier);
-
-            /** NamedEntityIdentifier project. */
-            public project: string;
-
-            /** NamedEntityIdentifier domain. */
-            public domain: string;
-
-            /** NamedEntityIdentifier name. */
-            public name: string;
-
-            /** NamedEntityIdentifier org. */
-            public org: string;
-
-            /**
-             * Creates a new NamedEntityIdentifier instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityIdentifier instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityIdentifier): flyteidl.admin.NamedEntityIdentifier;
-
-            /**
-             * Encodes the specified NamedEntityIdentifier message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifier.verify|verify} messages.
-             * @param message NamedEntityIdentifier message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityIdentifier, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityIdentifier message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityIdentifier
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifier;
-
-            /**
-             * Verifies a NamedEntityIdentifier message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** NamedEntityState enum. */
-        enum NamedEntityState {
-            NAMED_ENTITY_ACTIVE = 0,
-            NAMED_ENTITY_ARCHIVED = 1,
-            SYSTEM_GENERATED = 2
-        }
-
-        /** Properties of a NamedEntityMetadata. */
-        interface INamedEntityMetadata {
-
-            /** NamedEntityMetadata description */
-            description?: (string|null);
-
-            /** NamedEntityMetadata state */
-            state?: (flyteidl.admin.NamedEntityState|null);
-        }
-
-        /** Represents a NamedEntityMetadata. */
-        class NamedEntityMetadata implements INamedEntityMetadata {
-
-            /**
-             * Constructs a new NamedEntityMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityMetadata);
-
-            /** NamedEntityMetadata description. */
-            public description: string;
-
-            /** NamedEntityMetadata state. */
-            public state: flyteidl.admin.NamedEntityState;
-
-            /**
-             * Creates a new NamedEntityMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityMetadata instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityMetadata): flyteidl.admin.NamedEntityMetadata;
-
-            /**
-             * Encodes the specified NamedEntityMetadata message. Does not implicitly {@link flyteidl.admin.NamedEntityMetadata.verify|verify} messages.
-             * @param message NamedEntityMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityMetadata;
-
-            /**
-             * Verifies a NamedEntityMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntity. */
-        interface INamedEntity {
-
-            /** NamedEntity resourceType */
-            resourceType?: (flyteidl.core.ResourceType|null);
-
-            /** NamedEntity id */
-            id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** NamedEntity metadata */
-            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
-        }
-
-        /** Represents a NamedEntity. */
-        class NamedEntity implements INamedEntity {
-
-            /**
-             * Constructs a new NamedEntity.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntity);
-
-            /** NamedEntity resourceType. */
-            public resourceType: flyteidl.core.ResourceType;
-
-            /** NamedEntity id. */
-            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** NamedEntity metadata. */
-            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
-
-            /**
-             * Creates a new NamedEntity instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntity instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntity): flyteidl.admin.NamedEntity;
-
-            /**
-             * Encodes the specified NamedEntity message. Does not implicitly {@link flyteidl.admin.NamedEntity.verify|verify} messages.
-             * @param message NamedEntity message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntity, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntity message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntity
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntity;
-
-            /**
-             * Verifies a NamedEntity message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a Sort. */
-        interface ISort {
-
-            /** Sort key */
-            key?: (string|null);
-
-            /** Sort direction */
-            direction?: (flyteidl.admin.Sort.Direction|null);
-        }
-
-        /** Represents a Sort. */
-        class Sort implements ISort {
-
-            /**
-             * Constructs a new Sort.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ISort);
-
-            /** Sort key. */
-            public key: string;
-
-            /** Sort direction. */
-            public direction: flyteidl.admin.Sort.Direction;
-
-            /**
-             * Creates a new Sort instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Sort instance
-             */
-            public static create(properties?: flyteidl.admin.ISort): flyteidl.admin.Sort;
-
-            /**
-             * Encodes the specified Sort message. Does not implicitly {@link flyteidl.admin.Sort.verify|verify} messages.
-             * @param message Sort message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ISort, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Sort message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Sort
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Sort;
-
-            /**
-             * Verifies a Sort message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        namespace Sort {
-
-            /** Direction enum. */
-            enum Direction {
-                DESCENDING = 0,
-                ASCENDING = 1
-            }
-        }
-
-        /** Properties of a NamedEntityIdentifierListRequest. */
-        interface INamedEntityIdentifierListRequest {
-
-            /** NamedEntityIdentifierListRequest project */
-            project?: (string|null);
-
-            /** NamedEntityIdentifierListRequest domain */
-            domain?: (string|null);
-
-            /** NamedEntityIdentifierListRequest limit */
-            limit?: (number|null);
-
-            /** NamedEntityIdentifierListRequest token */
-            token?: (string|null);
-
-            /** NamedEntityIdentifierListRequest sortBy */
-            sortBy?: (flyteidl.admin.ISort|null);
-
-            /** NamedEntityIdentifierListRequest filters */
-            filters?: (string|null);
-
-            /** NamedEntityIdentifierListRequest org */
-            org?: (string|null);
-        }
-
-        /** Represents a NamedEntityIdentifierListRequest. */
-        class NamedEntityIdentifierListRequest implements INamedEntityIdentifierListRequest {
-
-            /**
-             * Constructs a new NamedEntityIdentifierListRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityIdentifierListRequest);
-
-            /** NamedEntityIdentifierListRequest project. */
-            public project: string;
-
-            /** NamedEntityIdentifierListRequest domain. */
-            public domain: string;
-
-            /** NamedEntityIdentifierListRequest limit. */
-            public limit: number;
-
-            /** NamedEntityIdentifierListRequest token. */
-            public token: string;
-
-            /** NamedEntityIdentifierListRequest sortBy. */
-            public sortBy?: (flyteidl.admin.ISort|null);
-
-            /** NamedEntityIdentifierListRequest filters. */
-            public filters: string;
-
-            /** NamedEntityIdentifierListRequest org. */
-            public org: string;
-
-            /**
-             * Creates a new NamedEntityIdentifierListRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityIdentifierListRequest instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityIdentifierListRequest): flyteidl.admin.NamedEntityIdentifierListRequest;
-
-            /**
-             * Encodes the specified NamedEntityIdentifierListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifierListRequest.verify|verify} messages.
-             * @param message NamedEntityIdentifierListRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityIdentifierListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityIdentifierListRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityIdentifierListRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifierListRequest;
-
-            /**
-             * Verifies a NamedEntityIdentifierListRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityListRequest. */
-        interface INamedEntityListRequest {
-
-            /** NamedEntityListRequest resourceType */
-            resourceType?: (flyteidl.core.ResourceType|null);
-
-            /** NamedEntityListRequest project */
-            project?: (string|null);
-
-            /** NamedEntityListRequest domain */
-            domain?: (string|null);
-
-            /** NamedEntityListRequest limit */
-            limit?: (number|null);
-
-            /** NamedEntityListRequest token */
-            token?: (string|null);
-
-            /** NamedEntityListRequest sortBy */
-            sortBy?: (flyteidl.admin.ISort|null);
-
-            /** NamedEntityListRequest filters */
-            filters?: (string|null);
-
-            /** NamedEntityListRequest org */
-            org?: (string|null);
-        }
-
-        /** Represents a NamedEntityListRequest. */
-        class NamedEntityListRequest implements INamedEntityListRequest {
-
-            /**
-             * Constructs a new NamedEntityListRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityListRequest);
-
-            /** NamedEntityListRequest resourceType. */
-            public resourceType: flyteidl.core.ResourceType;
-
-            /** NamedEntityListRequest project. */
-            public project: string;
-
-            /** NamedEntityListRequest domain. */
-            public domain: string;
-
-            /** NamedEntityListRequest limit. */
-            public limit: number;
-
-            /** NamedEntityListRequest token. */
-            public token: string;
-
-            /** NamedEntityListRequest sortBy. */
-            public sortBy?: (flyteidl.admin.ISort|null);
-
-            /** NamedEntityListRequest filters. */
-            public filters: string;
-
-            /** NamedEntityListRequest org. */
-            public org: string;
-
-            /**
-             * Creates a new NamedEntityListRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityListRequest instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityListRequest): flyteidl.admin.NamedEntityListRequest;
-
-            /**
-             * Encodes the specified NamedEntityListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityListRequest.verify|verify} messages.
-             * @param message NamedEntityListRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityListRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityListRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityListRequest;
-
-            /**
-             * Verifies a NamedEntityListRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityIdentifierList. */
-        interface INamedEntityIdentifierList {
-
-            /** NamedEntityIdentifierList entities */
-            entities?: (flyteidl.admin.INamedEntityIdentifier[]|null);
-
-            /** NamedEntityIdentifierList token */
-            token?: (string|null);
-        }
-
-        /** Represents a NamedEntityIdentifierList. */
-        class NamedEntityIdentifierList implements INamedEntityIdentifierList {
-
-            /**
-             * Constructs a new NamedEntityIdentifierList.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityIdentifierList);
-
-            /** NamedEntityIdentifierList entities. */
-            public entities: flyteidl.admin.INamedEntityIdentifier[];
-
-            /** NamedEntityIdentifierList token. */
-            public token: string;
-
-            /**
-             * Creates a new NamedEntityIdentifierList instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityIdentifierList instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityIdentifierList): flyteidl.admin.NamedEntityIdentifierList;
-
-            /**
-             * Encodes the specified NamedEntityIdentifierList message. Does not implicitly {@link flyteidl.admin.NamedEntityIdentifierList.verify|verify} messages.
-             * @param message NamedEntityIdentifierList message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityIdentifierList, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityIdentifierList message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityIdentifierList
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityIdentifierList;
-
-            /**
-             * Verifies a NamedEntityIdentifierList message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityList. */
-        interface INamedEntityList {
-
-            /** NamedEntityList entities */
-            entities?: (flyteidl.admin.INamedEntity[]|null);
-
-            /** NamedEntityList token */
-            token?: (string|null);
-        }
-
-        /** Represents a NamedEntityList. */
-        class NamedEntityList implements INamedEntityList {
-
-            /**
-             * Constructs a new NamedEntityList.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityList);
-
-            /** NamedEntityList entities. */
-            public entities: flyteidl.admin.INamedEntity[];
-
-            /** NamedEntityList token. */
-            public token: string;
-
-            /**
-             * Creates a new NamedEntityList instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityList instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityList): flyteidl.admin.NamedEntityList;
-
-            /**
-             * Encodes the specified NamedEntityList message. Does not implicitly {@link flyteidl.admin.NamedEntityList.verify|verify} messages.
-             * @param message NamedEntityList message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityList, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityList message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityList
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityList;
-
-            /**
-             * Verifies a NamedEntityList message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityGetRequest. */
-        interface INamedEntityGetRequest {
-
-            /** NamedEntityGetRequest resourceType */
-            resourceType?: (flyteidl.core.ResourceType|null);
-
-            /** NamedEntityGetRequest id */
-            id?: (flyteidl.admin.INamedEntityIdentifier|null);
-        }
-
-        /** Represents a NamedEntityGetRequest. */
-        class NamedEntityGetRequest implements INamedEntityGetRequest {
-
-            /**
-             * Constructs a new NamedEntityGetRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityGetRequest);
-
-            /** NamedEntityGetRequest resourceType. */
-            public resourceType: flyteidl.core.ResourceType;
-
-            /** NamedEntityGetRequest id. */
-            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /**
-             * Creates a new NamedEntityGetRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityGetRequest instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityGetRequest): flyteidl.admin.NamedEntityGetRequest;
-
-            /**
-             * Encodes the specified NamedEntityGetRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityGetRequest.verify|verify} messages.
-             * @param message NamedEntityGetRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityGetRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityGetRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityGetRequest;
-
-            /**
-             * Verifies a NamedEntityGetRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityUpdateRequest. */
-        interface INamedEntityUpdateRequest {
-
-            /** NamedEntityUpdateRequest resourceType */
-            resourceType?: (flyteidl.core.ResourceType|null);
-
-            /** NamedEntityUpdateRequest id */
-            id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** NamedEntityUpdateRequest metadata */
-            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
-        }
-
-        /** Represents a NamedEntityUpdateRequest. */
-        class NamedEntityUpdateRequest implements INamedEntityUpdateRequest {
-
-            /**
-             * Constructs a new NamedEntityUpdateRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityUpdateRequest);
-
-            /** NamedEntityUpdateRequest resourceType. */
-            public resourceType: flyteidl.core.ResourceType;
-
-            /** NamedEntityUpdateRequest id. */
-            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** NamedEntityUpdateRequest metadata. */
-            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
-
-            /**
-             * Creates a new NamedEntityUpdateRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityUpdateRequest instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityUpdateRequest): flyteidl.admin.NamedEntityUpdateRequest;
-
-            /**
-             * Encodes the specified NamedEntityUpdateRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateRequest.verify|verify} messages.
-             * @param message NamedEntityUpdateRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityUpdateRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityUpdateRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateRequest;
-
-            /**
-             * Verifies a NamedEntityUpdateRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a NamedEntityUpdateResponse. */
-        interface INamedEntityUpdateResponse {
-        }
-
-        /** Represents a NamedEntityUpdateResponse. */
-        class NamedEntityUpdateResponse implements INamedEntityUpdateResponse {
-
-            /**
-             * Constructs a new NamedEntityUpdateResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INamedEntityUpdateResponse);
-
-            /**
-             * Creates a new NamedEntityUpdateResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns NamedEntityUpdateResponse instance
-             */
-            public static create(properties?: flyteidl.admin.INamedEntityUpdateResponse): flyteidl.admin.NamedEntityUpdateResponse;
-
-            /**
-             * Encodes the specified NamedEntityUpdateResponse message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateResponse.verify|verify} messages.
-             * @param message NamedEntityUpdateResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INamedEntityUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a NamedEntityUpdateResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns NamedEntityUpdateResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateResponse;
-
-            /**
-             * Verifies a NamedEntityUpdateResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an ObjectGetRequest. */
-        interface IObjectGetRequest {
-
-            /** ObjectGetRequest id */
-            id?: (flyteidl.core.IIdentifier|null);
-        }
-
-        /** Represents an ObjectGetRequest. */
-        class ObjectGetRequest implements IObjectGetRequest {
-
-            /**
-             * Constructs a new ObjectGetRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IObjectGetRequest);
-
-            /** ObjectGetRequest id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /**
-             * Creates a new ObjectGetRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ObjectGetRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IObjectGetRequest): flyteidl.admin.ObjectGetRequest;
-
-            /**
-             * Encodes the specified ObjectGetRequest message. Does not implicitly {@link flyteidl.admin.ObjectGetRequest.verify|verify} messages.
-             * @param message ObjectGetRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IObjectGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ObjectGetRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ObjectGetRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ObjectGetRequest;
-
-            /**
-             * Verifies an ObjectGetRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ResourceListRequest. */
-        interface IResourceListRequest {
-
-            /** ResourceListRequest id */
-            id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** ResourceListRequest limit */
-            limit?: (number|null);
-
-            /** ResourceListRequest token */
-            token?: (string|null);
-
-            /** ResourceListRequest filters */
-            filters?: (string|null);
-
-            /** ResourceListRequest sortBy */
-            sortBy?: (flyteidl.admin.ISort|null);
-        }
-
-        /** Represents a ResourceListRequest. */
-        class ResourceListRequest implements IResourceListRequest {
-
-            /**
-             * Constructs a new ResourceListRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IResourceListRequest);
-
-            /** ResourceListRequest id. */
-            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /** ResourceListRequest limit. */
-            public limit: number;
-
-            /** ResourceListRequest token. */
-            public token: string;
-
-            /** ResourceListRequest filters. */
-            public filters: string;
-
-            /** ResourceListRequest sortBy. */
-            public sortBy?: (flyteidl.admin.ISort|null);
-
-            /**
-             * Creates a new ResourceListRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ResourceListRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IResourceListRequest): flyteidl.admin.ResourceListRequest;
-
-            /**
-             * Encodes the specified ResourceListRequest message. Does not implicitly {@link flyteidl.admin.ResourceListRequest.verify|verify} messages.
-             * @param message ResourceListRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IResourceListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ResourceListRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ResourceListRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ResourceListRequest;
-
-            /**
-             * Verifies a ResourceListRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an EmailNotification. */
-        interface IEmailNotification {
-
-            /** EmailNotification recipientsEmail */
-            recipientsEmail?: (string[]|null);
-        }
-
-        /** Represents an EmailNotification. */
-        class EmailNotification implements IEmailNotification {
-
-            /**
-             * Constructs a new EmailNotification.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IEmailNotification);
-
-            /** EmailNotification recipientsEmail. */
-            public recipientsEmail: string[];
-
-            /**
-             * Creates a new EmailNotification instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns EmailNotification instance
-             */
-            public static create(properties?: flyteidl.admin.IEmailNotification): flyteidl.admin.EmailNotification;
-
-            /**
-             * Encodes the specified EmailNotification message. Does not implicitly {@link flyteidl.admin.EmailNotification.verify|verify} messages.
-             * @param message EmailNotification message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IEmailNotification, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an EmailNotification message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns EmailNotification
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.EmailNotification;
-
-            /**
-             * Verifies an EmailNotification message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a PagerDutyNotification. */
-        interface IPagerDutyNotification {
-
-            /** PagerDutyNotification recipientsEmail */
-            recipientsEmail?: (string[]|null);
-        }
-
-        /** Represents a PagerDutyNotification. */
-        class PagerDutyNotification implements IPagerDutyNotification {
-
-            /**
-             * Constructs a new PagerDutyNotification.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IPagerDutyNotification);
-
-            /** PagerDutyNotification recipientsEmail. */
-            public recipientsEmail: string[];
-
-            /**
-             * Creates a new PagerDutyNotification instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns PagerDutyNotification instance
-             */
-            public static create(properties?: flyteidl.admin.IPagerDutyNotification): flyteidl.admin.PagerDutyNotification;
-
-            /**
-             * Encodes the specified PagerDutyNotification message. Does not implicitly {@link flyteidl.admin.PagerDutyNotification.verify|verify} messages.
-             * @param message PagerDutyNotification message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IPagerDutyNotification, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a PagerDutyNotification message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns PagerDutyNotification
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.PagerDutyNotification;
-
-            /**
-             * Verifies a PagerDutyNotification message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a SlackNotification. */
-        interface ISlackNotification {
-
-            /** SlackNotification recipientsEmail */
-            recipientsEmail?: (string[]|null);
-        }
-
-        /** Represents a SlackNotification. */
-        class SlackNotification implements ISlackNotification {
-
-            /**
-             * Constructs a new SlackNotification.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ISlackNotification);
-
-            /** SlackNotification recipientsEmail. */
-            public recipientsEmail: string[];
-
-            /**
-             * Creates a new SlackNotification instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns SlackNotification instance
-             */
-            public static create(properties?: flyteidl.admin.ISlackNotification): flyteidl.admin.SlackNotification;
-
-            /**
-             * Encodes the specified SlackNotification message. Does not implicitly {@link flyteidl.admin.SlackNotification.verify|verify} messages.
-             * @param message SlackNotification message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ISlackNotification, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a SlackNotification message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns SlackNotification
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SlackNotification;
-
-            /**
-             * Verifies a SlackNotification message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a Notification. */
-        interface INotification {
-
-            /** Notification phases */
-            phases?: (flyteidl.core.WorkflowExecution.Phase[]|null);
-
-            /** Notification email */
-            email?: (flyteidl.admin.IEmailNotification|null);
-
-            /** Notification pagerDuty */
-            pagerDuty?: (flyteidl.admin.IPagerDutyNotification|null);
-
-            /** Notification slack */
-            slack?: (flyteidl.admin.ISlackNotification|null);
-        }
-
-        /** Represents a Notification. */
-        class Notification implements INotification {
-
-            /**
-             * Constructs a new Notification.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.INotification);
-
-            /** Notification phases. */
-            public phases: flyteidl.core.WorkflowExecution.Phase[];
-
-            /** Notification email. */
-            public email?: (flyteidl.admin.IEmailNotification|null);
-
-            /** Notification pagerDuty. */
-            public pagerDuty?: (flyteidl.admin.IPagerDutyNotification|null);
-
-            /** Notification slack. */
-            public slack?: (flyteidl.admin.ISlackNotification|null);
-
-            /** Notification type. */
-            public type?: ("email"|"pagerDuty"|"slack");
-
-            /**
-             * Creates a new Notification instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Notification instance
-             */
-            public static create(properties?: flyteidl.admin.INotification): flyteidl.admin.Notification;
-
-            /**
-             * Encodes the specified Notification message. Does not implicitly {@link flyteidl.admin.Notification.verify|verify} messages.
-             * @param message Notification message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.INotification, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Notification message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Notification
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Notification;
-
-            /**
-             * Verifies a Notification message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an UrlBlob. */
-        interface IUrlBlob {
-
-            /** UrlBlob url */
-            url?: (string|null);
-
-            /** UrlBlob bytes */
-            bytes?: (Long|null);
-        }
-
-        /** Represents an UrlBlob. */
-        class UrlBlob implements IUrlBlob {
-
-            /**
-             * Constructs a new UrlBlob.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IUrlBlob);
-
-            /** UrlBlob url. */
-            public url: string;
-
-            /** UrlBlob bytes. */
-            public bytes: Long;
-
-            /**
-             * Creates a new UrlBlob instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns UrlBlob instance
-             */
-            public static create(properties?: flyteidl.admin.IUrlBlob): flyteidl.admin.UrlBlob;
-
-            /**
-             * Encodes the specified UrlBlob message. Does not implicitly {@link flyteidl.admin.UrlBlob.verify|verify} messages.
-             * @param message UrlBlob message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IUrlBlob, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an UrlBlob message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns UrlBlob
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.UrlBlob;
-
-            /**
-             * Verifies an UrlBlob message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a Labels. */
-        interface ILabels {
-
-            /** Labels values */
-            values?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a Labels. */
-        class Labels implements ILabels {
-
-            /**
-             * Constructs a new Labels.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ILabels);
-
-            /** Labels values. */
-            public values: { [k: string]: string };
-
-            /**
-             * Creates a new Labels instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Labels instance
-             */
-            public static create(properties?: flyteidl.admin.ILabels): flyteidl.admin.Labels;
-
-            /**
-             * Encodes the specified Labels message. Does not implicitly {@link flyteidl.admin.Labels.verify|verify} messages.
-             * @param message Labels message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ILabels, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Labels message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Labels
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Labels;
-
-            /**
-             * Verifies a Labels message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an Annotations. */
-        interface IAnnotations {
-
-            /** Annotations values */
-            values?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents an Annotations. */
-        class Annotations implements IAnnotations {
-
-            /**
-             * Constructs a new Annotations.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IAnnotations);
-
-            /** Annotations values. */
-            public values: { [k: string]: string };
-
-            /**
-             * Creates a new Annotations instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Annotations instance
-             */
-            public static create(properties?: flyteidl.admin.IAnnotations): flyteidl.admin.Annotations;
-
-            /**
-             * Encodes the specified Annotations message. Does not implicitly {@link flyteidl.admin.Annotations.verify|verify} messages.
-             * @param message Annotations message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IAnnotations, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Annotations message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Annotations
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Annotations;
-
-            /**
-             * Verifies an Annotations message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an Envs. */
-        interface IEnvs {
-
-            /** Envs values */
-            values?: (flyteidl.core.IKeyValuePair[]|null);
-        }
-
-        /** Represents an Envs. */
-        class Envs implements IEnvs {
-
-            /**
-             * Constructs a new Envs.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IEnvs);
-
-            /** Envs values. */
-            public values: flyteidl.core.IKeyValuePair[];
-
-            /**
-             * Creates a new Envs instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Envs instance
-             */
-            public static create(properties?: flyteidl.admin.IEnvs): flyteidl.admin.Envs;
-
-            /**
-             * Encodes the specified Envs message. Does not implicitly {@link flyteidl.admin.Envs.verify|verify} messages.
-             * @param message Envs message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IEnvs, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Envs message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Envs
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Envs;
-
-            /**
-             * Verifies an Envs message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an AuthRole. */
-        interface IAuthRole {
-
-            /** AuthRole assumableIamRole */
-            assumableIamRole?: (string|null);
-
-            /** AuthRole kubernetesServiceAccount */
-            kubernetesServiceAccount?: (string|null);
-        }
-
-        /** Represents an AuthRole. */
-        class AuthRole implements IAuthRole {
-
-            /**
-             * Constructs a new AuthRole.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IAuthRole);
-
-            /** AuthRole assumableIamRole. */
-            public assumableIamRole: string;
-
-            /** AuthRole kubernetesServiceAccount. */
-            public kubernetesServiceAccount: string;
-
-            /**
-             * Creates a new AuthRole instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns AuthRole instance
-             */
-            public static create(properties?: flyteidl.admin.IAuthRole): flyteidl.admin.AuthRole;
-
-            /**
-             * Encodes the specified AuthRole message. Does not implicitly {@link flyteidl.admin.AuthRole.verify|verify} messages.
-             * @param message AuthRole message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IAuthRole, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an AuthRole message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns AuthRole
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AuthRole;
-
-            /**
-             * Verifies an AuthRole message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a RawOutputDataConfig. */
-        interface IRawOutputDataConfig {
-
-            /** RawOutputDataConfig outputLocationPrefix */
-            outputLocationPrefix?: (string|null);
-        }
-
-        /** Represents a RawOutputDataConfig. */
-        class RawOutputDataConfig implements IRawOutputDataConfig {
-
-            /**
-             * Constructs a new RawOutputDataConfig.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IRawOutputDataConfig);
-
-            /** RawOutputDataConfig outputLocationPrefix. */
-            public outputLocationPrefix: string;
-
-            /**
-             * Creates a new RawOutputDataConfig instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns RawOutputDataConfig instance
-             */
-            public static create(properties?: flyteidl.admin.IRawOutputDataConfig): flyteidl.admin.RawOutputDataConfig;
-
-            /**
-             * Encodes the specified RawOutputDataConfig message. Does not implicitly {@link flyteidl.admin.RawOutputDataConfig.verify|verify} messages.
-             * @param message RawOutputDataConfig message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IRawOutputDataConfig, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a RawOutputDataConfig message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns RawOutputDataConfig
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.RawOutputDataConfig;
-
-            /**
-             * Verifies a RawOutputDataConfig message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a FlyteURLs. */
-        interface IFlyteURLs {
-
-            /** FlyteURLs inputs */
-            inputs?: (string|null);
-
-            /** FlyteURLs outputs */
-            outputs?: (string|null);
-
-            /** FlyteURLs deck */
-            deck?: (string|null);
-        }
-
-        /** Represents a FlyteURLs. */
-        class FlyteURLs implements IFlyteURLs {
-
-            /**
-             * Constructs a new FlyteURLs.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IFlyteURLs);
-
-            /** FlyteURLs inputs. */
-            public inputs: string;
-
-            /** FlyteURLs outputs. */
-            public outputs: string;
-
-            /** FlyteURLs deck. */
-            public deck: string;
-
-            /**
-             * Creates a new FlyteURLs instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns FlyteURLs instance
-             */
-            public static create(properties?: flyteidl.admin.IFlyteURLs): flyteidl.admin.FlyteURLs;
-
-            /**
-             * Encodes the specified FlyteURLs message. Does not implicitly {@link flyteidl.admin.FlyteURLs.verify|verify} messages.
-             * @param message FlyteURLs message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IFlyteURLs, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a FlyteURLs message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns FlyteURLs
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.FlyteURLs;
-
-            /**
-             * Verifies a FlyteURLs message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -21664,6 +20294,1388 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+    }
+
+    /** Namespace event. */
+    namespace event {
+
+        /** Properties of a CloudEventWorkflowExecution. */
+        interface ICloudEventWorkflowExecution {
+
+            /** CloudEventWorkflowExecution rawEvent */
+            rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
+
+            /** CloudEventWorkflowExecution outputInterface */
+            outputInterface?: (flyteidl.core.ITypedInterface|null);
+
+            /** CloudEventWorkflowExecution artifactIds */
+            artifactIds?: (flyteidl.core.IArtifactID[]|null);
+
+            /** CloudEventWorkflowExecution referenceExecution */
+            referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution principal */
+            principal?: (string|null);
+
+            /** CloudEventWorkflowExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels */
+            labels?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a CloudEventWorkflowExecution. */
+        class CloudEventWorkflowExecution implements ICloudEventWorkflowExecution {
+
+            /**
+             * Constructs a new CloudEventWorkflowExecution.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ICloudEventWorkflowExecution);
+
+            /** CloudEventWorkflowExecution rawEvent. */
+            public rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
+
+            /** CloudEventWorkflowExecution outputInterface. */
+            public outputInterface?: (flyteidl.core.ITypedInterface|null);
+
+            /** CloudEventWorkflowExecution artifactIds. */
+            public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** CloudEventWorkflowExecution referenceExecution. */
+            public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution principal. */
+            public principal: string;
+
+            /** CloudEventWorkflowExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventWorkflowExecution labels. */
+            public labels: { [k: string]: string };
+
+            /**
+             * Creates a new CloudEventWorkflowExecution instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventWorkflowExecution instance
+             */
+            public static create(properties?: flyteidl.event.ICloudEventWorkflowExecution): flyteidl.event.CloudEventWorkflowExecution;
+
+            /**
+             * Encodes the specified CloudEventWorkflowExecution message. Does not implicitly {@link flyteidl.event.CloudEventWorkflowExecution.verify|verify} messages.
+             * @param message CloudEventWorkflowExecution message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ICloudEventWorkflowExecution, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventWorkflowExecution message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventWorkflowExecution
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventWorkflowExecution;
+
+            /**
+             * Verifies a CloudEventWorkflowExecution message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CloudEventNodeExecution. */
+        interface ICloudEventNodeExecution {
+
+            /** CloudEventNodeExecution rawEvent */
+            rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
+
+            /** CloudEventNodeExecution taskExecId */
+            taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CloudEventNodeExecution outputInterface */
+            outputInterface?: (flyteidl.core.ITypedInterface|null);
+
+            /** CloudEventNodeExecution artifactIds */
+            artifactIds?: (flyteidl.core.IArtifactID[]|null);
+
+            /** CloudEventNodeExecution principal */
+            principal?: (string|null);
+
+            /** CloudEventNodeExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels */
+            labels?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a CloudEventNodeExecution. */
+        class CloudEventNodeExecution implements ICloudEventNodeExecution {
+
+            /**
+             * Constructs a new CloudEventNodeExecution.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ICloudEventNodeExecution);
+
+            /** CloudEventNodeExecution rawEvent. */
+            public rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
+
+            /** CloudEventNodeExecution taskExecId. */
+            public taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CloudEventNodeExecution outputInterface. */
+            public outputInterface?: (flyteidl.core.ITypedInterface|null);
+
+            /** CloudEventNodeExecution artifactIds. */
+            public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** CloudEventNodeExecution principal. */
+            public principal: string;
+
+            /** CloudEventNodeExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventNodeExecution labels. */
+            public labels: { [k: string]: string };
+
+            /**
+             * Creates a new CloudEventNodeExecution instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventNodeExecution instance
+             */
+            public static create(properties?: flyteidl.event.ICloudEventNodeExecution): flyteidl.event.CloudEventNodeExecution;
+
+            /**
+             * Encodes the specified CloudEventNodeExecution message. Does not implicitly {@link flyteidl.event.CloudEventNodeExecution.verify|verify} messages.
+             * @param message CloudEventNodeExecution message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ICloudEventNodeExecution, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventNodeExecution message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventNodeExecution
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventNodeExecution;
+
+            /**
+             * Verifies a CloudEventNodeExecution message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CloudEventTaskExecution. */
+        interface ICloudEventTaskExecution {
+
+            /** CloudEventTaskExecution rawEvent */
+            rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels */
+            labels?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a CloudEventTaskExecution. */
+        class CloudEventTaskExecution implements ICloudEventTaskExecution {
+
+            /**
+             * Constructs a new CloudEventTaskExecution.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ICloudEventTaskExecution);
+
+            /** CloudEventTaskExecution rawEvent. */
+            public rawEvent?: (flyteidl.event.ITaskExecutionEvent|null);
+
+            /** CloudEventTaskExecution labels. */
+            public labels: { [k: string]: string };
+
+            /**
+             * Creates a new CloudEventTaskExecution instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventTaskExecution instance
+             */
+            public static create(properties?: flyteidl.event.ICloudEventTaskExecution): flyteidl.event.CloudEventTaskExecution;
+
+            /**
+             * Encodes the specified CloudEventTaskExecution message. Does not implicitly {@link flyteidl.event.CloudEventTaskExecution.verify|verify} messages.
+             * @param message CloudEventTaskExecution message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ICloudEventTaskExecution, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventTaskExecution message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventTaskExecution
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventTaskExecution;
+
+            /**
+             * Verifies a CloudEventTaskExecution message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CloudEventExecutionStart. */
+        interface ICloudEventExecutionStart {
+
+            /** CloudEventExecutionStart executionId */
+            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventExecutionStart launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventExecutionStart workflowId */
+            workflowId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventExecutionStart artifactIds */
+            artifactIds?: (flyteidl.core.IArtifactID[]|null);
+
+            /** CloudEventExecutionStart artifactTrackers */
+            artifactTrackers?: (string[]|null);
+
+            /** CloudEventExecutionStart principal */
+            principal?: (string|null);
+        }
+
+        /** Represents a CloudEventExecutionStart. */
+        class CloudEventExecutionStart implements ICloudEventExecutionStart {
+
+            /**
+             * Constructs a new CloudEventExecutionStart.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ICloudEventExecutionStart);
+
+            /** CloudEventExecutionStart executionId. */
+            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventExecutionStart launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventExecutionStart workflowId. */
+            public workflowId?: (flyteidl.core.IIdentifier|null);
+
+            /** CloudEventExecutionStart artifactIds. */
+            public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** CloudEventExecutionStart artifactTrackers. */
+            public artifactTrackers: string[];
+
+            /** CloudEventExecutionStart principal. */
+            public principal: string;
+
+            /**
+             * Creates a new CloudEventExecutionStart instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventExecutionStart instance
+             */
+            public static create(properties?: flyteidl.event.ICloudEventExecutionStart): flyteidl.event.CloudEventExecutionStart;
+
+            /**
+             * Encodes the specified CloudEventExecutionStart message. Does not implicitly {@link flyteidl.event.CloudEventExecutionStart.verify|verify} messages.
+             * @param message CloudEventExecutionStart message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ICloudEventExecutionStart, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventExecutionStart message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventExecutionStart
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.CloudEventExecutionStart;
+
+            /**
+             * Verifies a CloudEventExecutionStart message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowExecutionEvent. */
+        interface IWorkflowExecutionEvent {
+
+            /** WorkflowExecutionEvent executionId */
+            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowExecutionEvent producerId */
+            producerId?: (string|null);
+
+            /** WorkflowExecutionEvent phase */
+            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
+
+            /** WorkflowExecutionEvent occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** WorkflowExecutionEvent outputUri */
+            outputUri?: (string|null);
+
+            /** WorkflowExecutionEvent error */
+            error?: (flyteidl.core.IExecutionError|null);
+
+            /** WorkflowExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents a WorkflowExecutionEvent. */
+        class WorkflowExecutionEvent implements IWorkflowExecutionEvent {
+
+            /**
+             * Constructs a new WorkflowExecutionEvent.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IWorkflowExecutionEvent);
+
+            /** WorkflowExecutionEvent executionId. */
+            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowExecutionEvent producerId. */
+            public producerId: string;
+
+            /** WorkflowExecutionEvent phase. */
+            public phase: flyteidl.core.WorkflowExecution.Phase;
+
+            /** WorkflowExecutionEvent occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** WorkflowExecutionEvent outputUri. */
+            public outputUri: string;
+
+            /** WorkflowExecutionEvent error. */
+            public error?: (flyteidl.core.IExecutionError|null);
+
+            /** WorkflowExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** WorkflowExecutionEvent outputResult. */
+            public outputResult?: ("outputUri"|"error"|"outputData");
+
+            /**
+             * Creates a new WorkflowExecutionEvent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowExecutionEvent instance
+             */
+            public static create(properties?: flyteidl.event.IWorkflowExecutionEvent): flyteidl.event.WorkflowExecutionEvent;
+
+            /**
+             * Encodes the specified WorkflowExecutionEvent message. Does not implicitly {@link flyteidl.event.WorkflowExecutionEvent.verify|verify} messages.
+             * @param message WorkflowExecutionEvent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IWorkflowExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowExecutionEvent message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowExecutionEvent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.WorkflowExecutionEvent;
+
+            /**
+             * Verifies a WorkflowExecutionEvent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NodeExecutionEvent. */
+        interface INodeExecutionEvent {
+
+            /** NodeExecutionEvent id */
+            id?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** NodeExecutionEvent producerId */
+            producerId?: (string|null);
+
+            /** NodeExecutionEvent phase */
+            phase?: (flyteidl.core.NodeExecution.Phase|null);
+
+            /** NodeExecutionEvent occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent inputUri */
+            inputUri?: (string|null);
+
+            /** NodeExecutionEvent inputData */
+            inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionEvent outputUri */
+            outputUri?: (string|null);
+
+            /** NodeExecutionEvent error */
+            error?: (flyteidl.core.IExecutionError|null);
+
+            /** NodeExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionEvent workflowNodeMetadata */
+            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** NodeExecutionEvent taskNodeMetadata */
+            taskNodeMetadata?: (flyteidl.event.ITaskNodeMetadata|null);
+
+            /** NodeExecutionEvent parentTaskMetadata */
+            parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
+
+            /** NodeExecutionEvent parentNodeMetadata */
+            parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
+
+            /** NodeExecutionEvent retryGroup */
+            retryGroup?: (string|null);
+
+            /** NodeExecutionEvent specNodeId */
+            specNodeId?: (string|null);
+
+            /** NodeExecutionEvent nodeName */
+            nodeName?: (string|null);
+
+            /** NodeExecutionEvent eventVersion */
+            eventVersion?: (number|null);
+
+            /** NodeExecutionEvent isParent */
+            isParent?: (boolean|null);
+
+            /** NodeExecutionEvent isDynamic */
+            isDynamic?: (boolean|null);
+
+            /** NodeExecutionEvent deckUri */
+            deckUri?: (string|null);
+
+            /** NodeExecutionEvent reportedAt */
+            reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent isArray */
+            isArray?: (boolean|null);
+
+            /** NodeExecutionEvent targetEntity */
+            targetEntity?: (flyteidl.core.IIdentifier|null);
+
+            /** NodeExecutionEvent isInDynamicChain */
+            isInDynamicChain?: (boolean|null);
+
+            /** NodeExecutionEvent isEager */
+            isEager?: (boolean|null);
+        }
+
+        /** Represents a NodeExecutionEvent. */
+        class NodeExecutionEvent implements INodeExecutionEvent {
+
+            /**
+             * Constructs a new NodeExecutionEvent.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.INodeExecutionEvent);
+
+            /** NodeExecutionEvent id. */
+            public id?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** NodeExecutionEvent producerId. */
+            public producerId: string;
+
+            /** NodeExecutionEvent phase. */
+            public phase: flyteidl.core.NodeExecution.Phase;
+
+            /** NodeExecutionEvent occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent inputUri. */
+            public inputUri: string;
+
+            /** NodeExecutionEvent inputData. */
+            public inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionEvent outputUri. */
+            public outputUri: string;
+
+            /** NodeExecutionEvent error. */
+            public error?: (flyteidl.core.IExecutionError|null);
+
+            /** NodeExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionEvent workflowNodeMetadata. */
+            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** NodeExecutionEvent taskNodeMetadata. */
+            public taskNodeMetadata?: (flyteidl.event.ITaskNodeMetadata|null);
+
+            /** NodeExecutionEvent parentTaskMetadata. */
+            public parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
+
+            /** NodeExecutionEvent parentNodeMetadata. */
+            public parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
+
+            /** NodeExecutionEvent retryGroup. */
+            public retryGroup: string;
+
+            /** NodeExecutionEvent specNodeId. */
+            public specNodeId: string;
+
+            /** NodeExecutionEvent nodeName. */
+            public nodeName: string;
+
+            /** NodeExecutionEvent eventVersion. */
+            public eventVersion: number;
+
+            /** NodeExecutionEvent isParent. */
+            public isParent: boolean;
+
+            /** NodeExecutionEvent isDynamic. */
+            public isDynamic: boolean;
+
+            /** NodeExecutionEvent deckUri. */
+            public deckUri: string;
+
+            /** NodeExecutionEvent reportedAt. */
+            public reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent isArray. */
+            public isArray: boolean;
+
+            /** NodeExecutionEvent targetEntity. */
+            public targetEntity?: (flyteidl.core.IIdentifier|null);
+
+            /** NodeExecutionEvent isInDynamicChain. */
+            public isInDynamicChain: boolean;
+
+            /** NodeExecutionEvent isEager. */
+            public isEager: boolean;
+
+            /** NodeExecutionEvent inputValue. */
+            public inputValue?: ("inputUri"|"inputData");
+
+            /** NodeExecutionEvent outputResult. */
+            public outputResult?: ("outputUri"|"error"|"outputData");
+
+            /** NodeExecutionEvent targetMetadata. */
+            public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
+
+            /**
+             * Creates a new NodeExecutionEvent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NodeExecutionEvent instance
+             */
+            public static create(properties?: flyteidl.event.INodeExecutionEvent): flyteidl.event.NodeExecutionEvent;
+
+            /**
+             * Encodes the specified NodeExecutionEvent message. Does not implicitly {@link flyteidl.event.NodeExecutionEvent.verify|verify} messages.
+             * @param message NodeExecutionEvent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.INodeExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NodeExecutionEvent message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NodeExecutionEvent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.NodeExecutionEvent;
+
+            /**
+             * Verifies a NodeExecutionEvent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowNodeMetadata. */
+        interface IWorkflowNodeMetadata {
+
+            /** WorkflowNodeMetadata executionId */
+            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+        }
+
+        /** Represents a WorkflowNodeMetadata. */
+        class WorkflowNodeMetadata implements IWorkflowNodeMetadata {
+
+            /**
+             * Constructs a new WorkflowNodeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IWorkflowNodeMetadata);
+
+            /** WorkflowNodeMetadata executionId. */
+            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /**
+             * Creates a new WorkflowNodeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowNodeMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IWorkflowNodeMetadata): flyteidl.event.WorkflowNodeMetadata;
+
+            /**
+             * Encodes the specified WorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.WorkflowNodeMetadata.verify|verify} messages.
+             * @param message WorkflowNodeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowNodeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.WorkflowNodeMetadata;
+
+            /**
+             * Verifies a WorkflowNodeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskNodeMetadata. */
+        interface ITaskNodeMetadata {
+
+            /** TaskNodeMetadata cacheStatus */
+            cacheStatus?: (flyteidl.core.CatalogCacheStatus|null);
+
+            /** TaskNodeMetadata catalogKey */
+            catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata reservationStatus */
+            reservationStatus?: (flyteidl.core.CatalogReservation.Status|null);
+
+            /** TaskNodeMetadata checkpointUri */
+            checkpointUri?: (string|null);
+
+            /** TaskNodeMetadata dynamicWorkflow */
+            dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
+        }
+
+        /** Represents a TaskNodeMetadata. */
+        class TaskNodeMetadata implements ITaskNodeMetadata {
+
+            /**
+             * Constructs a new TaskNodeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ITaskNodeMetadata);
+
+            /** TaskNodeMetadata cacheStatus. */
+            public cacheStatus: flyteidl.core.CatalogCacheStatus;
+
+            /** TaskNodeMetadata catalogKey. */
+            public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata reservationStatus. */
+            public reservationStatus: flyteidl.core.CatalogReservation.Status;
+
+            /** TaskNodeMetadata checkpointUri. */
+            public checkpointUri: string;
+
+            /** TaskNodeMetadata dynamicWorkflow. */
+            public dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
+
+            /**
+             * Creates a new TaskNodeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskNodeMetadata instance
+             */
+            public static create(properties?: flyteidl.event.ITaskNodeMetadata): flyteidl.event.TaskNodeMetadata;
+
+            /**
+             * Encodes the specified TaskNodeMetadata message. Does not implicitly {@link flyteidl.event.TaskNodeMetadata.verify|verify} messages.
+             * @param message TaskNodeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ITaskNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskNodeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskNodeMetadata;
+
+            /**
+             * Verifies a TaskNodeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DynamicWorkflowNodeMetadata. */
+        interface IDynamicWorkflowNodeMetadata {
+
+            /** DynamicWorkflowNodeMetadata id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri */
+            dynamicJobSpecUri?: (string|null);
+        }
+
+        /** Represents a DynamicWorkflowNodeMetadata. */
+        class DynamicWorkflowNodeMetadata implements IDynamicWorkflowNodeMetadata {
+
+            /**
+             * Constructs a new DynamicWorkflowNodeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata);
+
+            /** DynamicWorkflowNodeMetadata id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** DynamicWorkflowNodeMetadata dynamicJobSpecUri. */
+            public dynamicJobSpecUri: string;
+
+            /**
+             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DynamicWorkflowNodeMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata): flyteidl.event.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.DynamicWorkflowNodeMetadata.verify|verify} messages.
+             * @param message DynamicWorkflowNodeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IDynamicWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DynamicWorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Verifies a DynamicWorkflowNodeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ParentTaskExecutionMetadata. */
+        interface IParentTaskExecutionMetadata {
+
+            /** ParentTaskExecutionMetadata id */
+            id?: (flyteidl.core.ITaskExecutionIdentifier|null);
+        }
+
+        /** Represents a ParentTaskExecutionMetadata. */
+        class ParentTaskExecutionMetadata implements IParentTaskExecutionMetadata {
+
+            /**
+             * Constructs a new ParentTaskExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IParentTaskExecutionMetadata);
+
+            /** ParentTaskExecutionMetadata id. */
+            public id?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /**
+             * Creates a new ParentTaskExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ParentTaskExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IParentTaskExecutionMetadata): flyteidl.event.ParentTaskExecutionMetadata;
+
+            /**
+             * Encodes the specified ParentTaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.ParentTaskExecutionMetadata.verify|verify} messages.
+             * @param message ParentTaskExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IParentTaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ParentTaskExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ParentTaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ParentTaskExecutionMetadata;
+
+            /**
+             * Verifies a ParentTaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ParentNodeExecutionMetadata. */
+        interface IParentNodeExecutionMetadata {
+
+            /** ParentNodeExecutionMetadata nodeId */
+            nodeId?: (string|null);
+        }
+
+        /** Represents a ParentNodeExecutionMetadata. */
+        class ParentNodeExecutionMetadata implements IParentNodeExecutionMetadata {
+
+            /**
+             * Constructs a new ParentNodeExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IParentNodeExecutionMetadata);
+
+            /** ParentNodeExecutionMetadata nodeId. */
+            public nodeId: string;
+
+            /**
+             * Creates a new ParentNodeExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ParentNodeExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IParentNodeExecutionMetadata): flyteidl.event.ParentNodeExecutionMetadata;
+
+            /**
+             * Encodes the specified ParentNodeExecutionMetadata message. Does not implicitly {@link flyteidl.event.ParentNodeExecutionMetadata.verify|verify} messages.
+             * @param message ParentNodeExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IParentNodeExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ParentNodeExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ParentNodeExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ParentNodeExecutionMetadata;
+
+            /**
+             * Verifies a ParentNodeExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an EventReason. */
+        interface IEventReason {
+
+            /** EventReason reason */
+            reason?: (string|null);
+
+            /** EventReason occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+        }
+
+        /** Represents an EventReason. */
+        class EventReason implements IEventReason {
+
+            /**
+             * Constructs a new EventReason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IEventReason);
+
+            /** EventReason reason. */
+            public reason: string;
+
+            /** EventReason occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /**
+             * Creates a new EventReason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EventReason instance
+             */
+            public static create(properties?: flyteidl.event.IEventReason): flyteidl.event.EventReason;
+
+            /**
+             * Encodes the specified EventReason message. Does not implicitly {@link flyteidl.event.EventReason.verify|verify} messages.
+             * @param message EventReason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IEventReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EventReason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EventReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.EventReason;
+
+            /**
+             * Verifies an EventReason message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskExecutionEvent. */
+        interface ITaskExecutionEvent {
+
+            /** TaskExecutionEvent taskId */
+            taskId?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskExecutionEvent parentNodeExecutionId */
+            parentNodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** TaskExecutionEvent retryAttempt */
+            retryAttempt?: (number|null);
+
+            /** TaskExecutionEvent phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
+
+            /** TaskExecutionEvent producerId */
+            producerId?: (string|null);
+
+            /** TaskExecutionEvent logs */
+            logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** TaskExecutionEvent occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** TaskExecutionEvent inputUri */
+            inputUri?: (string|null);
+
+            /** TaskExecutionEvent inputData */
+            inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionEvent outputUri */
+            outputUri?: (string|null);
+
+            /** TaskExecutionEvent error */
+            error?: (flyteidl.core.IExecutionError|null);
+
+            /** TaskExecutionEvent outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionEvent customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
+
+            /** TaskExecutionEvent phaseVersion */
+            phaseVersion?: (number|null);
+
+            /** TaskExecutionEvent reason */
+            reason?: (string|null);
+
+            /** TaskExecutionEvent reasons */
+            reasons?: (flyteidl.event.IEventReason[]|null);
+
+            /** TaskExecutionEvent taskType */
+            taskType?: (string|null);
+
+            /** TaskExecutionEvent metadata */
+            metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionEvent eventVersion */
+            eventVersion?: (number|null);
+
+            /** TaskExecutionEvent reportedAt */
+            reportedAt?: (google.protobuf.ITimestamp|null);
+        }
+
+        /** Represents a TaskExecutionEvent. */
+        class TaskExecutionEvent implements ITaskExecutionEvent {
+
+            /**
+             * Constructs a new TaskExecutionEvent.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ITaskExecutionEvent);
+
+            /** TaskExecutionEvent taskId. */
+            public taskId?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskExecutionEvent parentNodeExecutionId. */
+            public parentNodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** TaskExecutionEvent retryAttempt. */
+            public retryAttempt: number;
+
+            /** TaskExecutionEvent phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
+
+            /** TaskExecutionEvent producerId. */
+            public producerId: string;
+
+            /** TaskExecutionEvent logs. */
+            public logs: flyteidl.core.ITaskLog[];
+
+            /** TaskExecutionEvent occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /** TaskExecutionEvent inputUri. */
+            public inputUri: string;
+
+            /** TaskExecutionEvent inputData. */
+            public inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionEvent outputUri. */
+            public outputUri: string;
+
+            /** TaskExecutionEvent error. */
+            public error?: (flyteidl.core.IExecutionError|null);
+
+            /** TaskExecutionEvent outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionEvent customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** TaskExecutionEvent phaseVersion. */
+            public phaseVersion: number;
+
+            /** TaskExecutionEvent reason. */
+            public reason: string;
+
+            /** TaskExecutionEvent reasons. */
+            public reasons: flyteidl.event.IEventReason[];
+
+            /** TaskExecutionEvent taskType. */
+            public taskType: string;
+
+            /** TaskExecutionEvent metadata. */
+            public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
+            /** TaskExecutionEvent eventVersion. */
+            public eventVersion: number;
+
+            /** TaskExecutionEvent reportedAt. */
+            public reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** TaskExecutionEvent inputValue. */
+            public inputValue?: ("inputUri"|"inputData");
+
+            /** TaskExecutionEvent outputResult. */
+            public outputResult?: ("outputUri"|"error"|"outputData");
+
+            /**
+             * Creates a new TaskExecutionEvent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionEvent instance
+             */
+            public static create(properties?: flyteidl.event.ITaskExecutionEvent): flyteidl.event.TaskExecutionEvent;
+
+            /**
+             * Encodes the specified TaskExecutionEvent message. Does not implicitly {@link flyteidl.event.TaskExecutionEvent.verify|verify} messages.
+             * @param message TaskExecutionEvent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ITaskExecutionEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionEvent message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionEvent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskExecutionEvent;
+
+            /**
+             * Verifies a TaskExecutionEvent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExternalResourceInfo. */
+        interface IExternalResourceInfo {
+
+            /** ExternalResourceInfo externalId */
+            externalId?: (string|null);
+
+            /** ExternalResourceInfo index */
+            index?: (number|null);
+
+            /** ExternalResourceInfo retryAttempt */
+            retryAttempt?: (number|null);
+
+            /** ExternalResourceInfo phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
+
+            /** ExternalResourceInfo cacheStatus */
+            cacheStatus?: (flyteidl.core.CatalogCacheStatus|null);
+
+            /** ExternalResourceInfo logs */
+            logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo workflowNodeMetadata */
+            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents an ExternalResourceInfo. */
+        class ExternalResourceInfo implements IExternalResourceInfo {
+
+            /**
+             * Constructs a new ExternalResourceInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IExternalResourceInfo);
+
+            /** ExternalResourceInfo externalId. */
+            public externalId: string;
+
+            /** ExternalResourceInfo index. */
+            public index: number;
+
+            /** ExternalResourceInfo retryAttempt. */
+            public retryAttempt: number;
+
+            /** ExternalResourceInfo phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
+
+            /** ExternalResourceInfo cacheStatus. */
+            public cacheStatus: flyteidl.core.CatalogCacheStatus;
+
+            /** ExternalResourceInfo logs. */
+            public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo workflowNodeMetadata. */
+            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo targetMetadata. */
+            public targetMetadata?: "workflowNodeMetadata";
+
+            /**
+             * Creates a new ExternalResourceInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExternalResourceInfo instance
+             */
+            public static create(properties?: flyteidl.event.IExternalResourceInfo): flyteidl.event.ExternalResourceInfo;
+
+            /**
+             * Encodes the specified ExternalResourceInfo message. Does not implicitly {@link flyteidl.event.ExternalResourceInfo.verify|verify} messages.
+             * @param message ExternalResourceInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IExternalResourceInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExternalResourceInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExternalResourceInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ExternalResourceInfo;
+
+            /**
+             * Verifies an ExternalResourceInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ResourcePoolInfo. */
+        interface IResourcePoolInfo {
+
+            /** ResourcePoolInfo allocationToken */
+            allocationToken?: (string|null);
+
+            /** ResourcePoolInfo namespace */
+            namespace?: (string|null);
+        }
+
+        /** Represents a ResourcePoolInfo. */
+        class ResourcePoolInfo implements IResourcePoolInfo {
+
+            /**
+             * Constructs a new ResourcePoolInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IResourcePoolInfo);
+
+            /** ResourcePoolInfo allocationToken. */
+            public allocationToken: string;
+
+            /** ResourcePoolInfo namespace. */
+            public namespace: string;
+
+            /**
+             * Creates a new ResourcePoolInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResourcePoolInfo instance
+             */
+            public static create(properties?: flyteidl.event.IResourcePoolInfo): flyteidl.event.ResourcePoolInfo;
+
+            /**
+             * Encodes the specified ResourcePoolInfo message. Does not implicitly {@link flyteidl.event.ResourcePoolInfo.verify|verify} messages.
+             * @param message ResourcePoolInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IResourcePoolInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ResourcePoolInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ResourcePoolInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ResourcePoolInfo;
+
+            /**
+             * Verifies a ResourcePoolInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskExecutionMetadata. */
+        interface ITaskExecutionMetadata {
+
+            /** TaskExecutionMetadata generatedName */
+            generatedName?: (string|null);
+
+            /** TaskExecutionMetadata externalResources */
+            externalResources?: (flyteidl.event.IExternalResourceInfo[]|null);
+
+            /** TaskExecutionMetadata resourcePoolInfo */
+            resourcePoolInfo?: (flyteidl.event.IResourcePoolInfo[]|null);
+
+            /** TaskExecutionMetadata pluginIdentifier */
+            pluginIdentifier?: (string|null);
+
+            /** TaskExecutionMetadata instanceClass */
+            instanceClass?: (flyteidl.event.TaskExecutionMetadata.InstanceClass|null);
+        }
+
+        /** Represents a TaskExecutionMetadata. */
+        class TaskExecutionMetadata implements ITaskExecutionMetadata {
+
+            /**
+             * Constructs a new TaskExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ITaskExecutionMetadata);
+
+            /** TaskExecutionMetadata generatedName. */
+            public generatedName: string;
+
+            /** TaskExecutionMetadata externalResources. */
+            public externalResources: flyteidl.event.IExternalResourceInfo[];
+
+            /** TaskExecutionMetadata resourcePoolInfo. */
+            public resourcePoolInfo: flyteidl.event.IResourcePoolInfo[];
+
+            /** TaskExecutionMetadata pluginIdentifier. */
+            public pluginIdentifier: string;
+
+            /** TaskExecutionMetadata instanceClass. */
+            public instanceClass: flyteidl.event.TaskExecutionMetadata.InstanceClass;
+
+            /**
+             * Creates a new TaskExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.event.ITaskExecutionMetadata): flyteidl.event.TaskExecutionMetadata;
+
+            /**
+             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.TaskExecutionMetadata.verify|verify} messages.
+             * @param message TaskExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ITaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskExecutionMetadata;
+
+            /**
+             * Verifies a TaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace TaskExecutionMetadata {
+
+            /** InstanceClass enum. */
+            enum InstanceClass {
+                DEFAULT = 0,
+                INTERRUPTIBLE = 1
+            }
         }
     }
 

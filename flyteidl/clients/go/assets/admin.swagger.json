@@ -7678,6 +7678,12 @@
         },
         "cache_serializable": {
           "type": "boolean"
+        },
+        "labels": {
+          "$ref": "#/definitions/adminLabels"
+        },
+        "annotations": {
+          "$ref": "#/definitions/adminAnnotations"
         }
       },
       "description": "Defines extra information about the Node."
@@ -8693,8 +8699,6 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "title": "log information for the external resource execution"
-<<<<<<< HEAD
-=======
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -8702,7 +8706,6 @@
         "custom_info": {
           "type": "object",
           "title": "Extensible field for custom, plugin-specific info"
->>>>>>> 33bca79f0 (Send actor worker assignment in task events (#394)(#393))
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
