@@ -226,16 +226,16 @@ func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID core.Exe
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
+	statuses := make(map[string]*v1.Pod, 0)
+
 	// check if environment exists
 	environment, exists := i.environments[executionEnvID.String()]
 	if !exists {
 		logger.Debugf(ctx, "environment '%s' not found", executionEnvID)
-		return nil, nil
+		return statuses, nil
 	}
 
 	// retrieve pod details from kubeclient cache
-	statuses := make(map[string]*v1.Pod, 0)
-
 	podTemplateSpec := &v1.PodTemplateSpec{}
 	if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 		return nil, flyteerrors.Errorf(flyteerrors.BadTaskSpecification,

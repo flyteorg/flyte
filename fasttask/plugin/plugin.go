@@ -46,6 +46,7 @@ const maxErrorMessageLength = 102400 // 100kb
 var (
 	statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
 	taskContextNotFoundError  = errors.New("TaskContextNotFound")
+	podContainerNotFound      = errors.New("PodContainerNotFound")
 
 	taskStartTimeTemplateVar       = tasklog.MustCreateRegex("taskStartTime")
 	taskStartTimeUnixMsTemplateVar = tasklog.MustCreateRegex("taskStartTimeUnixMs")
@@ -555,8 +556,8 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		// `!ok` indicates that the status map does not have a worker status, since this works over
 		// an in-memory store the may occur during restarts.
 		// `pod == nil` may occur if it has not yet been populated in the kubeclient cache or was deleted
-		logger.Warnf(ctx, "Worker %q not found (exists=%s) in status map for queue '%s'", workerID, ok, queueID)
-		return &taskInfo, nil
+		logger.Warnf(ctx, "Worker %q not found (exists=%t) in status map for queue %q", workerID, ok, queueID)
+		return &taskInfo, podContainerNotFound
 	}
 
 	containerIndex := -1
@@ -568,12 +569,32 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 	if containerIndex == -1 {
 		logger.Warnf(ctx, "Container %q not found in pod %q", pod.GetName(), pod.GetName())
-		return &taskInfo, nil
+		return &taskInfo, podContainerNotFound
+	}
+
+	taskInfo.LogContext = &idlcore.LogContext{
+		PrimaryPodName: pod.Name,
+		Pods: []*idlcore.PodLogContext{
+			{
+				Namespace:            pod.Namespace,
+				PodName:              pod.Name,
+				PrimaryContainerName: pod.Spec.Containers[containerIndex].Name,
+				Containers: []*idlcore.ContainerContext{
+					{
+						ContainerName: pod.Spec.Containers[containerIndex].Name,
+						Process: &idlcore.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(start),
+							ContainerEndTime:   timestamppb.New(end),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	if len(pod.Status.ContainerStatuses) <= containerIndex || pod.Status.ContainerStatuses[containerIndex].ContainerID == "" {
 		// no container id yet
-		return &taskInfo, nil
+		return &taskInfo, podContainerNotFound
 	}
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -620,26 +641,6 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 
 	taskInfo.Logs = logs.TaskLogs
-
-	taskInfo.LogContext = &idlcore.LogContext{
-		PrimaryPodName: pod.Name,
-		Pods: []*idlcore.PodLogContext{
-			{
-				Namespace:            pod.Namespace,
-				PodName:              pod.Name,
-				PrimaryContainerName: pod.Spec.Containers[containerIndex].Name,
-				Containers: []*idlcore.ContainerContext{
-					{
-						ContainerName: pod.Spec.Containers[containerIndex].Name,
-						Process: &idlcore.ContainerContext_ProcessContext{
-							ContainerStartTime: timestamppb.New(start),
-							ContainerEndTime:   timestamppb.New(end),
-						},
-					},
-				},
-			},
-		},
-	}
 	return &taskInfo, nil
 }
 

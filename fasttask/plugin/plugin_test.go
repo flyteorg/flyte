@@ -446,7 +446,6 @@ func TestHandleNotYetStarted(t *testing.T) {
 		executionEnvStatus map[string]*v1.Pod
 		expectedPhase      core.Phase
 		expectedReason     string
-		expectedError      error
 	}{
 		{
 			name:     "NoWorkersAvailable",
@@ -456,13 +455,12 @@ func TestHandleNotYetStarted(t *testing.T) {
 			},
 			expectedPhase:  core.PhaseWaitingForResources,
 			expectedReason: "no workers available",
-			expectedError:  nil,
 		},
 		{
 			name:     "NoWorkersAllFailed",
 			workerID: "",
 			executionEnvStatus: map[string]*v1.Pod{
-				"foo": &v1.Pod{
+				"foo": {
 					Status: v1.PodStatus{
 						Phase: v1.PodFailed,
 					},
@@ -470,14 +468,34 @@ func TestHandleNotYetStarted(t *testing.T) {
 			},
 			expectedPhase:  core.PhasePermanentFailure,
 			expectedReason: "",
-			expectedError:  nil,
 		},
 		{
-			name:           "AssignedToWorker",
-			workerID:       "w0",
+			name:     "AssignedToWorker",
+			workerID: "w0",
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": {
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "w0",
+					},
+					Spec: v1.PodSpec{
+						Containers: []v1.Container{
+							{
+								Name: "w0",
+							},
+						},
+					},
+					Status: v1.PodStatus{
+						ContainerStatuses: []v1.ContainerStatus{
+							{
+								Name:        "w0",
+								ContainerID: "foo",
+							},
+						},
+					},
+				},
+			},
 			expectedPhase:  core.PhaseQueued,
 			expectedReason: "task offered to worker w0",
-			expectedError:  nil,
 		},
 	}
 
@@ -565,17 +583,20 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 				// initialize plugin
 				plugin := &Plugin{
+					cfg: &Config{
+						Logs: logs.LogConfig{},
+					},
 					fastTaskService: fastTaskService,
 					metrics:         newPluginMetrics(scope),
 				}
 
 				// call handle
 				transition, err := plugin.Handle(ctx, tCtx)
-				assert.Equal(t, test.expectedError, err)
+
+				assert.NoError(t, err)
 				assert.Equal(t, test.expectedPhase, transition.Info().Phase())
 				assert.Equal(t, test.expectedReason, transition.Info().Reason())
 				assert.Len(t, transition.Info().Info().Logs, 0)
-
 				require.Len(t, transition.Info().Info().ExternalResources, 1)
 				assignment := pb.FastTaskAssignment{}
 				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
@@ -633,7 +654,7 @@ func TestHandleRunning(t *testing.T) {
 		expectedLogs           bool
 	}{
 		{
-			name:             "Running",
+			name:             "PodNotFound",
 			lastUpdated:      time.Now().Add(-5 * time.Second),
 			taskStatusPhase:  core.PhaseRunning,
 			taskStatusReason: "",
@@ -641,11 +662,11 @@ func TestHandleRunning(t *testing.T) {
 			executionEnvStatus: map[string]*v1.Pod{
 				"w0": nil,
 			},
-			expectedPhase:          core.PhaseRunning,
-			expectedPhaseVersion:   1,
+			expectedPhase:          core.PhaseUndefined,
+			expectedPhaseVersion:   0,
 			expectedReason:         "",
-			expectedError:          nil,
-			expectedLastUpdatedInc: true,
+			expectedError:          podContainerNotFound,
+			expectedLastUpdatedInc: false,
 			expectedLogs:           false,
 		},
 		{
@@ -825,19 +846,24 @@ func TestHandleRunning(t *testing.T) {
 
 			if test.expectedLogs {
 				assert.Len(t, transition.Info().Info().Logs, 1)
+				assert.NotNil(t, transition.Info().Info().LogContext)
 			} else {
-				assert.Len(t, transition.Info().Info().Logs, 0)
+				if transition.Info().Info() != nil {
+					assert.Len(t, transition.Info().Info().Logs, 0)
+				}
 			}
 
-			require.Len(t, transition.Info().Info().ExternalResources, 1)
-			assignment := pb.FastTaskAssignment{}
-			require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
-			assert.Equal(t, "", assignment.GetEnvironmentOrg())
-			assert.Equal(t, "project", assignment.GetEnvironmentProject())
-			assert.Equal(t, "domain", assignment.GetEnvironmentDomain())
-			assert.Equal(t, "foo", assignment.GetEnvironmentName())
-			assert.Equal(t, "0", assignment.GetEnvironmentVersion())
-			assert.Equal(t, "w0", assignment.GetAssignedWorker())
+			if test.expectedError == nil {
+				require.Len(t, transition.Info().Info().ExternalResources, 1)
+				assignment := pb.FastTaskAssignment{}
+				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+				assert.Equal(t, "", assignment.GetEnvironmentOrg())
+				assert.Equal(t, "project", assignment.GetEnvironmentProject())
+				assert.Equal(t, "domain", assignment.GetEnvironmentDomain())
+				assert.Equal(t, "foo", assignment.GetEnvironmentName())
+				assert.Equal(t, "0", assignment.GetEnvironmentVersion())
+				assert.Equal(t, "w0", assignment.GetAssignedWorker())
+			}
 		})
 	}
 }
@@ -867,15 +893,16 @@ func TestGetTaskInfo(t *testing.T) {
 		},
 	}
 
+	podName := "pod-name"
 	expectedLogCtx := &idlcore.LogContext{
 		Pods: []*idlcore.PodLogContext{
 			{
 				Namespace:            "namespace",
-				PodName:              "pod-name",
-				PrimaryContainerName: "pod-name",
+				PodName:              podName,
+				PrimaryContainerName: podName,
 				Containers: []*idlcore.ContainerContext{
 					{
-						ContainerName: "pod-name",
+						ContainerName: podName,
 						Process: &idlcore.ContainerContext_ProcessContext{
 							ContainerStartTime: timestamppb.New(start),
 							ContainerEndTime:   timestamppb.New(now),
@@ -884,7 +911,7 @@ func TestGetTaskInfo(t *testing.T) {
 				},
 			},
 		},
-		PrimaryPodName: "pod-name",
+		PrimaryPodName: podName,
 	}
 
 	t.Run("available", func(t *testing.T) {
@@ -893,12 +920,12 @@ func TestGetTaskInfo(t *testing.T) {
 			"w0": {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "namespace",
-					Name:      "pod-name",
+					Name:      podName,
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						{
-							Name: "pod-name",
+							Name: podName,
 						},
 					},
 					Hostname: "hostname",
@@ -948,13 +975,45 @@ func TestGetTaskInfo(t *testing.T) {
 		assert.Equal(t, expectedLogCtx, taskInfo.LogContext)
 	})
 
+	t.Run("missing pod", func(t *testing.T) {
+		executionEnvClient := &coremocks.ExecutionEnvClient{}
+		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{}, nil)
+		tCtx := &coremocks.TaskExecutionContext{}
+		tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+		taskMetadata := &coremocks.TaskExecutionMetadata{}
+		taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
+			Namespace: "namespace",
+			Name:      "execution_id",
+		})
+		taskExecutionID := &coremocks.TaskExecutionID{}
+		taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+			TaskId: &idlcore.Identifier{
+				Project: "project",
+				Domain:  "domain",
+			},
+		})
+		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
+		taskExecutionID.OnGetGeneratedName().Return("task-name")
+		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		taskMetadata.OnGetLabels().Return(map[string]string{})
+		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
+
+		assert.Equal(t, podContainerNotFound, err)
+		assert.Empty(t, taskInfo.Logs)
+		assert.Nil(t, taskInfo.LogContext)
+	})
+
 	t.Run("mismatched container name", func(t *testing.T) {
 		executionEnvClient := &coremocks.ExecutionEnvClient{}
 		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
 			"w0": {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "namespace",
-					Name:      "pod-name",
+					Name:      podName,
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
@@ -991,8 +1050,8 @@ func TestGetTaskInfo(t *testing.T) {
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-		require.Nil(t, err)
-		require.Empty(t, taskInfo.Logs)
+		assert.Equal(t, podContainerNotFound, err)
+		assert.Empty(t, taskInfo.Logs)
 		assert.Nil(t, taskInfo.LogContext)
 	})
 
@@ -1002,12 +1061,12 @@ func TestGetTaskInfo(t *testing.T) {
 			"w0": {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "namespace",
-					Name:      "pod-name",
+					Name:      podName,
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						{
-							Name: "pod-name",
+							Name: podName,
 						},
 					},
 					Hostname: "hostname",
@@ -1039,9 +1098,9 @@ func TestGetTaskInfo(t *testing.T) {
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-		require.Nil(t, err)
-		require.Empty(t, taskInfo.Logs)
-		assert.Nil(t, taskInfo.LogContext)
+		assert.Equal(t, podContainerNotFound, err)
+		assert.Empty(t, taskInfo.Logs)
+		assert.Equal(t, expectedLogCtx, taskInfo.LogContext)
 	})
 }
 
