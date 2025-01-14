@@ -147,10 +147,12 @@ class TaskTemplate(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ContainerPort(_message.Message):
-    __slots__ = ["container_port"]
+    __slots__ = ["container_port", "name"]
     CONTAINER_PORT_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
     container_port: int
-    def __init__(self, container_port: _Optional[int] = ...) -> None: ...
+    name: str
+    def __init__(self, container_port: _Optional[int] = ..., name: _Optional[str] = ...) -> None: ...
 
 class Container(_message.Message):
     __slots__ = ["image", "command", "args", "resources", "env", "config", "ports", "data_config", "architecture"]
