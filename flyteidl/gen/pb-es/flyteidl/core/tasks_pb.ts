@@ -449,6 +449,12 @@ export class TaskMetadata extends Message<TaskMetadata> {
   isEager = false;
 
   /**
+   * Indicates whether the task will generate a Deck URI when it finishes executing.
+   * The BoolValue can have three states:
+   * - nil: The value is not set.
+   * - true: The task will generate a Deck URI.
+   * - false: The task will not generate a Deck URI.
+   *
    * @generated from field: google.protobuf.BoolValue generates_deck = 15;
    */
   generatesDeck?: boolean;

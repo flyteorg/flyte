@@ -1391,6 +1391,11 @@ pub struct TaskMetadata {
     /// This would be used by CreateTask endpoint.
     #[prost(bool, tag="14")]
     pub is_eager: bool,
+    /// Indicates whether the task will generate a Deck URI when it finishes executing.
+    /// The BoolValue can have three states:
+    /// - nil: The value is not set.
+    /// - true: The task will generate a Deck URI.
+    /// - false: The task will not generate a Deck URI.
     #[prost(message, optional, tag="15")]
     pub generates_deck: ::core::option::Option<bool>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata

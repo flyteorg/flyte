@@ -1857,7 +1857,8 @@
           "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
         },
         "generates_deck": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Indicates whether the task will generate a Deck URI when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a Deck URI.\n- false: The task will not generate a Deck URI."
         }
       },
       "title": "Task Metadata"

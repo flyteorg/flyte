@@ -715,7 +715,12 @@ type TaskMetadata struct {
 	CacheIgnoreInputVars []string `protobuf:"bytes,13,rep,name=cache_ignore_input_vars,json=cacheIgnoreInputVars,proto3" json:"cache_ignore_input_vars,omitempty"`
 	// is_eager indicates whether the task is eager or not.
 	// This would be used by CreateTask endpoint.
-	IsEager       bool                  `protobuf:"varint,14,opt,name=is_eager,json=isEager,proto3" json:"is_eager,omitempty"`
+	IsEager bool `protobuf:"varint,14,opt,name=is_eager,json=isEager,proto3" json:"is_eager,omitempty"`
+	// Indicates whether the task will generate a Deck URI when it finishes executing.
+	// The BoolValue can have three states:
+	// - nil: The value is not set.
+	// - true: The task will generate a Deck URI.
+	// - false: The task will not generate a Deck URI.
 	GeneratesDeck *wrapperspb.BoolValue `protobuf:"bytes,15,opt,name=generates_deck,json=generatesDeck,proto3" json:"generates_deck,omitempty"`
 }
 
