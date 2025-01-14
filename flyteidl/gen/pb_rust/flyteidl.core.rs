@@ -2782,6 +2782,7 @@ pub struct TaskNodeOverrides {
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
     /// Override for the pod template used by task pods
+    /// +optional
     #[prost(message, optional, tag="4")]
     pub pod_template: ::core::option::Option<K8sPod>,
 }

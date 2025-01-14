@@ -1653,6 +1653,7 @@ type TaskNodeOverrides struct {
 	// Override for the image used by task pods.
 	ContainerImage string `protobuf:"bytes,3,opt,name=container_image,json=containerImage,proto3" json:"container_image,omitempty"`
 	// Override for the pod template used by task pods
+	// +optional
 	PodTemplate *K8SPod `protobuf:"bytes,4,opt,name=pod_template,json=podTemplate,proto3" json:"pod_template,omitempty"`
 }
 

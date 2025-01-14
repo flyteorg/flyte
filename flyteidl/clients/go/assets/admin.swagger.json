@@ -8337,7 +8337,7 @@
         },
         "pod_template": {
           "$ref": "#/definitions/coreK8sPod",
-          "title": "Override for the pod template used by task pods"
+          "title": "Override for the pod template used by task pods\n+optional"
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."

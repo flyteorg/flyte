@@ -25,6 +25,7 @@ import (
 	config1 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string, podtemplate *core.K8SPod) pluginsCore.TaskExecutionMetadata {
@@ -1060,6 +1061,47 @@ func TestToK8sPodContainerImage(t *testing.T) {
 		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo:latest", p.Containers[0].Image)
+	})
+}
+
+func TestPodTemplateOverride(t *testing.T) {
+	metadata := &core.K8SObjectMetadata{
+		Labels: map[string]string{
+			"l": "a",
+		},
+		Annotations: map[string]string{
+			"a": "b",
+		},
+	}
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name:  "foo",
+				Image: "foo:latest",
+				Args:  []string{"foo", "bar"},
+			},
+		},
+	}
+
+	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	assert.NoError(t, err)
+
+	t.Run("Override pod template", func(t *testing.T) {
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1024m"),
+			}}, nil, "", &core.K8SPod{
+			PrimaryContainerName: "foo",
+			PodSpec:              podSpecStruct,
+			Metadata:             metadata,
+		})
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, "a", m.Labels["l"])
+		assert.Equal(t, "b", m.Annotations["a"])
+		assert.Equal(t, "foo:latest", p.Containers[0].Image)
+		assert.Equal(t, "foo", p.Containers[0].Name)
 	})
 }
 

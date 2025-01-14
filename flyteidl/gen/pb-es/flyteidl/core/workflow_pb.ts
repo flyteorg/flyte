@@ -1216,6 +1216,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
 
   /**
    * Override for the pod template used by task pods
+   * +optional
    *
    * @generated from field: flyteidl.core.K8sPod pod_template = 4;
    */

@@ -286,7 +286,10 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
-		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil {
 			if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName) > 0 {
 				podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
 				primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName
@@ -318,6 +321,16 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
 			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil {
+			if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName) > 0 {
+				podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+				primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().PrimaryContainerName
+			}
+		}
+
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 			"invalid TaskSpecification, unable to determine Pod configuration")
@@ -453,23 +466,20 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
-func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta metav1.ObjectMeta, podtemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
-	if podtemplate.Metadata.Annotations != nil {
-		mergeMapInto(podtemplate.Metadata.Annotations, objectMeta.Annotations)
+func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podTemplate.Metadata.Annotations != nil {
+		mergeMapInto(podTemplate.Metadata.Annotations, objectMeta.Annotations)
 	}
-	if podtemplate.Metadata.Labels != nil {
-		mergeMapInto(podtemplate.Metadata.Labels, objectMeta.Labels)
+	if podTemplate.Metadata.Labels != nil {
+		mergeMapInto(podTemplate.Metadata.Labels, objectMeta.Labels)
 	}
 	var podspec_override *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podtemplate.PodSpec, &podspec_override)
+	err := utils.UnmarshalStructToObj(podTemplate.PodSpec, &podspec_override)
 	if err != nil {
 		return nil, objectMeta, err
 	}
-	if podspec_override.Containers == nil {
-		return podSpec, objectMeta, nil
-	} else {
-		return podspec_override, objectMeta, nil
-	}
+
+	return podspec_override, objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
