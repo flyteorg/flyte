@@ -2558,6 +2558,9 @@ pub struct NodeMetadata {
     /// Number of retries per task.
     #[prost(message, optional, tag="5")]
     pub retries: ::core::option::Option<RetryStrategy>,
+    /// Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+    #[prost(map="string, string", tag="10")]
+    pub config: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,
