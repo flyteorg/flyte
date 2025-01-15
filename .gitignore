@@ -39,3 +39,7 @@ docs/_src
 docs/_projects
 docs/tests
 empty-config.yaml
+flyteidl/clients/go/admin/pkce/*.html
+!flyteidl/clients/go/admin/pkce/callback.html
+
+.go-version
