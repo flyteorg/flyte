@@ -379,4 +379,18 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_enable-distributed-error-aggregation", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("enable-distributed-error-aggregation", testValue)
+			if vBool, err := cmdFlags.GetBool("enable-distributed-error-aggregation"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vBool), &actual.EnableDistributedErrorAggregation)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

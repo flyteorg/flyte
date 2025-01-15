@@ -54,6 +54,8 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
 	to.On("GetContainerImage").Return(containerImage)
+	to.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
+	to.On("GetLabels").Return(map[string]string{"label-1": "val1"})
 	taskExecutionMetadata.On("GetOverrides").Return(to)
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})

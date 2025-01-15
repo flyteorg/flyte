@@ -442,7 +442,7 @@ type ExecutableNode interface {
 	GetActiveDeadline() *time.Duration
 	IsInterruptible() *bool
 	GetName() string
-	GetContainerImage()
+	GetContainerImage() string
 	GetAnnotations() map[string]string
 	GetLabels() map[string]string
 }
