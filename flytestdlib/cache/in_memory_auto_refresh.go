@@ -96,7 +96,7 @@ type InMemoryAutoRefresh struct {
 	toDelete           *syncSet
 	syncPeriod         time.Duration
 	workqueue          workqueue.RateLimitingInterface
-	parallelizm        int
+	parallelizm        uint
 	lock               sync.RWMutex
 	clock              clock.Clock  // pluggable clock for unit testing
 	syncCount          atomic.Int32 // internal sync counter for unit testing
@@ -110,8 +110,8 @@ func NewInMemoryAutoRefresh(
 	syncCb SyncFunc,
 	syncRateLimiter workqueue.RateLimiter,
 	resyncPeriod time.Duration,
-	parallelizm int,
-	size int,
+	parallelizm uint,
+	size uint,
 	scope promutils.Scope,
 	options ...Option,
 ) (*InMemoryAutoRefresh, error) {
@@ -121,7 +121,8 @@ func NewInMemoryAutoRefresh(
 	}
 
 	metrics := newMetrics(scope)
-	lruCache, err := lru.NewWithEvict(size, getEvictionFunction(metrics.Evictions))
+	// #nosec G115
+	lruCache, err := lru.NewWithEvict(int(size), getEvictionFunction(metrics.Evictions))
 	if err != nil {
 		return nil, fmt.Errorf("creating LRU cache: %w", err)
 	}
@@ -150,7 +151,7 @@ func NewInMemoryAutoRefresh(
 }
 
 func (w *InMemoryAutoRefresh) Start(ctx context.Context) error {
-	for i := 0; i < w.parallelizm; i++ {
+	for i := uint(0); i < w.parallelizm; i++ {
 		go func(ctx context.Context) {
 			err := w.sync(ctx)
 			if err != nil {
@@ -389,13 +390,13 @@ func (w *InMemoryAutoRefresh) inProcessing(key interface{}) bool {
 
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
 func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
-	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	resyncPeriod time.Duration, parallelizm, size uint, scope promutils.Scope) (AutoRefresh, error) {
 	return NewInMemoryAutoRefresh(name, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope, WithCreateBatchesFunc(createBatches))
 }
 
 // Instantiates a new AutoRefresh Cache that syncs items periodically.
 func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
-	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
+	parallelizm, size uint, scope promutils.Scope) (AutoRefresh, error) {
 	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
 }
 

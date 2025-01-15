@@ -262,7 +262,7 @@ func TestQueueBuildUp(t *testing.T) {
 		return nil, fmt.Errorf("expected error")
 	}
 
-	size := 100
+	size := uint(100)
 	cache, err := NewInMemoryAutoRefresh("fake2", alwaysFailing, rateLimiter, testResyncPeriod, 10, size, promutils.NewTestScope(), WithClock(fakeClock))
 	assert.NoError(t, err)
 
@@ -270,9 +270,9 @@ func TestQueueBuildUp(t *testing.T) {
 	assert.NoError(t, cache.Start(ctx))
 	defer cancel()
 
-	for i := 0; i < size; i++ {
+	for i := uint(0); i < size; i++ {
 		// #nosec G115
-		_, err := cache.GetOrCreate(strconv.Itoa(i), fakeCacheItem{val: 3})
+		_, err := cache.GetOrCreate(strconv.Itoa(int(i)), fakeCacheItem{val: 3})
 		assert.NoError(t, err)
 	}
 
