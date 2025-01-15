@@ -9,6 +9,9 @@ Contributing code
 
 To understand how the below components interact with each other, refer to :ref:`Understand the lifecycle of a workflow <workflow-lifecycle>`.
 
+.. note::
+    With the exception of ``flytekit``, the below components are maintained in the `flyte <https://github.com/flyteorg/flyte>`__ monorepo.
+
 .. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/dependency_graph.png
     :alt: Dependency graph between various flyteorg repos
     :align: center
@@ -24,39 +27,6 @@ To understand how the below components interact with each other, refer to :ref:`
     * - `Repo <https://github.com/flyteorg/flyte>`__
     * - **Purpose**: Deployment, Documentation, and Issues
     * - **Languages**: RST
-
-In the ``flyteorg/flyte`` root directory you can run ``make dev-docs`` to build the documentation locally. The generated documentation will be in the ``docs/_build/html`` directory.
-
-**Setup process**
-
-1. First you need to make sure you can run linux/amd64 container
-2. Run the following commands to build the documentation and serve it locally
-
-.. prompt:: bash $
-
- make dev-docs
- python -m http.server --directory docs/_build/html
-
-3. Go to http://localhost:8000 to see the documentation.
-
-**Supported environment variables of** ``make dev-docs``
-
-* ``DEV_DOCS_WATCH``: If set, the docs will be built and served using `sphinx-autobuild <https://github.com/sphinx-doc/sphinx-autobuild>`__ for live updates.
-* ``FLYTEKIT_LOCAL_PATH``: If set, the local path to flytekit will be used instead of the source code from the ``flyteorg/flytekit repo``.
-* ``FLYTECTL_LOCAL_PATH``: If set, the local path to flytectl will be used instead of the source code from the ``flyteorg/flytectl repo``.
-* ``FLYTESNACKS_LOCAL_PATH``: If set, the local path to flytesnacks will be used instead of the source code from the ``flyteorg/flytesnacks`` repo.
-
-For example, to use the local flytekit source code instead of the source code from the ``flyteorg/flytekit`` repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
-
-**Alternative conda setup steps**
-
-* Install ``conda``.
-    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
-* Install `conda-lock <https://github.com/conda/conda-lock>`__.
-* In the ``flyteorg/flyte`` root directory run:
-    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
-    * ``conda activate monodocs-env``
-    * ``pip install ./flyteidl``
 
 ``flyteidl``
 ************
