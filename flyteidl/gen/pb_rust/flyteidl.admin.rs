@@ -2079,6 +2079,10 @@ pub struct LaunchPlanSpec {
     /// Execution environment assignments to be set for the execution.
     #[prost(message, repeated, tag="22")]
     pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
+    /// ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.
+    /// This can be overwritten at execution creation level.
+    #[prost(message, optional, tag="23")]
+    pub cluster_assignment: ::core::option::Option<ClusterAssignment>,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
