@@ -138,7 +138,7 @@ func TestListSignals(t *testing.T) {
 	signalModels := []map[string]interface{}{toSignalMap(*signalModel)}
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "signals" WHERE project = $1 AND domain = $2 AND name = $3 LIMIT 20`).WithReply(signalModels)
+		`SELECT * FROM "signals" WHERE execution_project = $1 AND execution_domain = $2 AND execution_name = $3 LIMIT 20`).WithReply(signalModels)
 
 	signals, err := signalRepo.List(ctx, interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
