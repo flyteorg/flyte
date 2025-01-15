@@ -4713,6 +4713,9 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable */
             cacheSerializable?: (boolean|null);
+
+            /** NodeMetadata config */
+            config?: ({ [k: string]: string }|null);
         }
 
         /** Represents a NodeMetadata. */
@@ -4744,6 +4747,9 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable. */
             public cacheSerializable: boolean;
+
+            /** NodeMetadata config. */
+            public config: { [k: string]: string };
 
             /** NodeMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -18051,6 +18057,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** LaunchPlanSpec clusterAssignment */
+            clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -18112,6 +18121,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** LaunchPlanSpec clusterAssignment. */
+            public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.

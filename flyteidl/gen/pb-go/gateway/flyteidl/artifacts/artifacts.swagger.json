@@ -554,6 +554,15 @@
       },
       "description": "Defines permissions associated with executions created by this launch plan spec.\nUse either of these roles when they have permissions required by your workflow execution.\nDeprecated."
     },
+    "adminClusterAssignment": {
+      "type": "object",
+      "properties": {
+        "cluster_pool_name": {
+          "type": "string"
+        }
+      },
+      "description": "Encapsulates specifications for routing an execution onto a specific cluster."
+    },
     "adminCronSchedule": {
       "type": "object",
       "properties": {
@@ -773,6 +782,10 @@
             "$ref": "#/definitions/coreExecutionEnvAssignment"
           },
           "description": "Execution environment assignments to be set for the execution."
+        },
+        "cluster_assignment": {
+          "$ref": "#/definitions/adminClusterAssignment",
+          "description": "ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.\nThis can be overwritten at execution creation level."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
