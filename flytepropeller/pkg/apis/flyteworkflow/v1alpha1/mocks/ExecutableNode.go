@@ -52,6 +52,40 @@ func (_m *ExecutableNode) GetActiveDeadline() *time.Duration {
 	return r0
 }
 
+type ExecutableNode_GetAnnotations struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetAnnotations) Return(_a0 map[string]string) *ExecutableNode_GetAnnotations {
+	return &ExecutableNode_GetAnnotations{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetAnnotations() *ExecutableNode_GetAnnotations {
+	c_call := _m.On("GetAnnotations")
+	return &ExecutableNode_GetAnnotations{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetAnnotationsMatch(matchers ...interface{}) *ExecutableNode_GetAnnotations {
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &ExecutableNode_GetAnnotations{Call: c_call}
+}
+
+// GetAnnotations provides a mock function with given fields:
+func (_m *ExecutableNode) GetAnnotations() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetArrayNode struct {
 	*mock.Call
 }
@@ -381,6 +415,40 @@ func (_m *ExecutableNode) GetKind() v1alpha1.NodeKind {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1alpha1.NodeKind)
+	}
+
+	return r0
+}
+
+type ExecutableNode_GetLabels struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetLabels) Return(_a0 map[string]string) *ExecutableNode_GetLabels {
+	return &ExecutableNode_GetLabels{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetLabels() *ExecutableNode_GetLabels {
+	c_call := _m.On("GetLabels")
+	return &ExecutableNode_GetLabels{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetLabelsMatch(matchers ...interface{}) *ExecutableNode_GetLabels {
+	c_call := _m.On("GetLabels", matchers...)
+	return &ExecutableNode_GetLabels{Call: c_call}
+}
+
+// GetLabels provides a mock function with given fields:
+func (_m *ExecutableNode) GetLabels() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
 	}
 
 	return r0

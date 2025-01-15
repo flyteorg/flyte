@@ -159,6 +159,12 @@ type NodeSpec struct {
 	Interruptible *bool `json:"interruptible,omitempty"`
 
 	ContainerImage string `json:"containerImage,omitempty"`
+	// If specified, includes overrides for annotations to allocate to the node
+	//+optional
+	Annotations map[string]string `json:"annotation,omitempty" protobuf:"bytes,22,opt,name=annotation"`
+	// If specified, includes overrides for labels to allocate to the node
+	//+optional
+	Labels map[string]string `json:"label,omitempty" protobuf:"bytes,22,opt,name=label"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -267,4 +273,12 @@ func (in *NodeSpec) GetInputBindings() []*Binding {
 
 func (in *NodeSpec) GetContainerImage() string {
 	return in.ContainerImage
+}
+
+func (in *NodeSpec) GetAnnotations() map[string]string {
+	return in.Annotations
+}
+
+func (in *NodeSpec) GetLabels() map[string]string {
+	return in.Labels
 }

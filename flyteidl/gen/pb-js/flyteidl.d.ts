@@ -5175,6 +5175,12 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
+
+            /** TaskNodeOverrides labels */
+            labels?: ({ [k: string]: string }|null);
+
+            /** TaskNodeOverrides annotations */
+            annotations?: ({ [k: string]: string }|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5194,6 +5200,12 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
+
+            /** TaskNodeOverrides labels. */
+            public labels: { [k: string]: string };
+
+            /** TaskNodeOverrides annotations. */
+            public annotations: { [k: string]: string };
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.

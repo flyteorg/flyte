@@ -14,6 +14,40 @@ type TaskOverrides struct {
 	mock.Mock
 }
 
+type TaskOverrides_GetAnnotations struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetAnnotations) Return(_a0 map[string]string) *TaskOverrides_GetAnnotations {
+	return &TaskOverrides_GetAnnotations{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetAnnotations() *TaskOverrides_GetAnnotations {
+	c_call := _m.On("GetAnnotations")
+	return &TaskOverrides_GetAnnotations{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetAnnotationsMatch(matchers ...interface{}) *TaskOverrides_GetAnnotations {
+	c_call := _m.On("GetAnnotations", matchers...)
+	return &TaskOverrides_GetAnnotations{Call: c_call}
+}
+
+// GetAnnotations provides a mock function with given fields:
+func (_m *TaskOverrides) GetAnnotations() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
 type TaskOverrides_GetConfig struct {
 	*mock.Call
 }
@@ -108,6 +142,40 @@ func (_m *TaskOverrides) GetExtendedResources() *flyteidlcore.ExtendedResources 
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*flyteidlcore.ExtendedResources)
+		}
+	}
+
+	return r0
+}
+
+type TaskOverrides_GetLabels struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetLabels) Return(_a0 map[string]string) *TaskOverrides_GetLabels {
+	return &TaskOverrides_GetLabels{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetLabels() *TaskOverrides_GetLabels {
+	c_call := _m.On("GetLabels")
+	return &TaskOverrides_GetLabels{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetLabelsMatch(matchers ...interface{}) *TaskOverrides_GetLabels {
+	c_call := _m.On("GetLabels", matchers...)
+	return &TaskOverrides_GetLabels{Call: c_call}
+}
+
+// GetLabels provides a mock function with given fields:
+func (_m *TaskOverrides) GetLabels() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
 		}
 	}
 

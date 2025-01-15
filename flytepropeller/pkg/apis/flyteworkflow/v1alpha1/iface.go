@@ -443,6 +443,8 @@ type ExecutableNode interface {
 	IsInterruptible() *bool
 	GetName() string
 	GetContainerImage() string
+	GetAnnotations() map[string]string
+	GetLabels() map[string]string
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow
