@@ -6646,6 +6646,9 @@ export namespace flyteidl {
 
             /** ContainerPort containerPort */
             containerPort?: (number|null);
+
+            /** ContainerPort name */
+            name?: (string|null);
         }
 
         /** Represents a ContainerPort. */
@@ -6659,6 +6662,9 @@ export namespace flyteidl {
 
             /** ContainerPort containerPort. */
             public containerPort: number;
+
+            /** ContainerPort name. */
+            public name: string;
 
             /**
              * Creates a new ContainerPort instance using the specified properties.

@@ -651,6 +651,13 @@ export class ContainerPort extends Message<ContainerPort> {
    */
   containerPort = 0;
 
+  /**
+   * Name of the port to expose on the pod's IP address.
+   *
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
   constructor(data?: PartialMessage<ContainerPort>) {
     super();
     proto3.util.initPartial(data, this);
@@ -660,6 +667,7 @@ export class ContainerPort extends Message<ContainerPort> {
   static readonly typeName = "flyteidl.core.ContainerPort";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "container_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerPort {
