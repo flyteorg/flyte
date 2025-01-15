@@ -9,6 +9,7 @@ import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
 import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
+import { Annotations, Labels } from "../admin/common_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
 import { ExtendedResources, Resources } from "./tasks_pb.js";
@@ -737,6 +738,16 @@ export class NodeMetadata extends Message<NodeMetadata> {
     case: "cacheSerializable";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * @generated from field: flyteidl.admin.Labels labels = 10;
+   */
+  labels?: Labels;
+
+  /**
+   * @generated from field: flyteidl.admin.Annotations annotations = 11;
+   */
+  annotations?: Annotations;
+
   constructor(data?: PartialMessage<NodeMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -752,6 +763,8 @@ export class NodeMetadata extends Message<NodeMetadata> {
     { no: 7, name: "cacheable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cacheable_value" },
     { no: 8, name: "cache_version", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "cache_version_value" },
     { no: 9, name: "cache_serializable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cache_serializable_value" },
+    { no: 10, name: "labels", kind: "message", T: Labels },
+    { no: 11, name: "annotations", kind: "message", T: Annotations },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeMetadata {

@@ -6,6 +6,7 @@ from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.core import types_pb2 as _types_pb2
 from flyteidl.core import security_pb2 as _security_pb2
+from flyteidl.admin import common_pb2 as _common_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from google.protobuf.internal import containers as _containers
@@ -121,7 +122,7 @@ class ArrayNode(_message.Message):
     def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., data_mode: _Optional[_Union[ArrayNode.DataMode, str]] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
-    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]
+    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable", "labels", "annotations"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
@@ -129,6 +130,8 @@ class NodeMetadata(_message.Message):
     CACHEABLE_FIELD_NUMBER: _ClassVar[int]
     CACHE_VERSION_FIELD_NUMBER: _ClassVar[int]
     CACHE_SERIALIZABLE_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
+    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     name: str
     timeout: _duration_pb2.Duration
     retries: _literals_pb2.RetryStrategy
@@ -136,7 +139,9 @@ class NodeMetadata(_message.Message):
     cacheable: bool
     cache_version: str
     cache_serializable: bool
-    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ...) -> None: ...
+    labels: _common_pb2.Labels
+    annotations: _common_pb2.Annotations
+    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ...) -> None: ...
 
 class Alias(_message.Message):
     __slots__ = ["var", "alias"]
