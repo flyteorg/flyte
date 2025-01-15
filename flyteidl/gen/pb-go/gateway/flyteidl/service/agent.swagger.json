@@ -1877,6 +1877,20 @@
         "container_image": {
           "type": "string",
           "description": "Override for the image used by task pods."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional labels to add to the pod definition."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional annotations to add to the pod definition."
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."

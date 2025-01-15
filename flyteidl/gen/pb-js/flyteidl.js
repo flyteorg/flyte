@@ -12561,6 +12561,8 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+                 * @property {Object.<string,string>|null} [labels] TaskNodeOverrides labels
+                 * @property {Object.<string,string>|null} [annotations] TaskNodeOverrides annotations
                  */
     
                 /**
@@ -12572,6 +12574,8 @@
                  * @param {flyteidl.core.ITaskNodeOverrides=} [properties] Properties to set
                  */
                 function TaskNodeOverrides(properties) {
+                    this.labels = {};
+                    this.annotations = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -12603,6 +12607,22 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
+                 * TaskNodeOverrides labels.
+                 * @member {Object.<string,string>} labels
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.labels = $util.emptyObject;
+    
+                /**
+                 * TaskNodeOverrides annotations.
+                 * @member {Object.<string,string>} annotations
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.annotations = $util.emptyObject;
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12632,6 +12652,12 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        for (var keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 4, wireType 2 =*/34).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
+                    if (message.annotations != null && message.hasOwnProperty("annotations"))
+                        for (var keys = Object.keys(message.annotations), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.annotations[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -12649,7 +12675,7 @@
                 TaskNodeOverrides.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskNodeOverrides();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskNodeOverrides(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -12661,6 +12687,22 @@
                             break;
                         case 3:
                             message.containerImage = reader.string();
+                            break;
+                        case 4:
+                            reader.skip().pos++;
+                            if (message.labels === $util.emptyObject)
+                                message.labels = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.labels[key] = reader.string();
+                            break;
+                        case 5:
+                            reader.skip().pos++;
+                            if (message.annotations === $util.emptyObject)
+                                message.annotations = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.annotations[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12694,6 +12736,22 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        if (!$util.isObject(message.labels))
+                            return "labels: object expected";
+                        var key = Object.keys(message.labels);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.labels[key[i]]))
+                                return "labels: string{k:string} expected";
+                    }
+                    if (message.annotations != null && message.hasOwnProperty("annotations")) {
+                        if (!$util.isObject(message.annotations))
+                            return "annotations: object expected";
+                        var key = Object.keys(message.annotations);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.annotations[key[i]]))
+                                return "annotations: string{k:string} expected";
+                    }
                     return null;
                 };
     

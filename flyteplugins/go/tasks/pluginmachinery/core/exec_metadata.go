@@ -14,6 +14,8 @@ type TaskOverrides interface {
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
 	GetConfig() *v1.ConfigMap
+	GetAnnotations() map[string]string
+	GetLabels() map[string]string
 }
 
 // TaskExecutionID is a simple Interface to expose the ExecutionID of the running Task

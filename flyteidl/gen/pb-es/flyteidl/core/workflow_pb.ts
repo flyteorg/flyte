@@ -1214,6 +1214,20 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
    */
   containerImage = "";
 
+  /**
+   * Optional labels to add to the pod definition.
+   *
+   * @generated from field: map<string, string> labels = 4;
+   */
+  labels: { [key: string]: string } = {};
+
+  /**
+   * Optional annotations to add to the pod definition.
+   *
+   * @generated from field: map<string, string> annotations = 5;
+   */
+  annotations: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1225,6 +1239,8 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
     { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 5, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {

@@ -31,6 +31,14 @@ func (to *pluginTaskOverrides) GetContainerImage() string {
 	return to.TaskOverrides.GetContainerImage()
 }
 
+func (to *pluginTaskOverrides) GetAnnotations() map[string]string {
+	return to.TaskOverrides.GetAnnotations()
+}
+
+func (to *pluginTaskOverrides) GetLabels() map[string]string {
+	return to.TaskOverrides.GetLabels()
+}
+
 type pluginTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	interruptible *bool

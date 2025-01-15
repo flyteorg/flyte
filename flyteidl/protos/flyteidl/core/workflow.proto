@@ -336,6 +336,12 @@ message TaskNodeOverrides {
 
     // Override for the image used by task pods.
     string container_image = 3;
+
+    // Optional labels to add to the pod definition.
+    map<string, string> labels = 4;
+
+    // Optional annotations to add to the pod definition.
+    map<string, string> annotations = 5;
 }
 
 // A structure that uniquely identifies a launch plan in the system.

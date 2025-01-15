@@ -434,6 +434,22 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
 	}
 
+	// Override annotation if necessary
+	if tCtx.TaskExecutionMetadata().GetOverrides().GetAnnotations() != nil {
+		objectMeta, err = ApplyAnnotationOverride(objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetAnnotations())
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	// Override label if  necessary
+	if tCtx.TaskExecutionMetadata().GetOverrides().GetLabels() != nil {
+		objectMeta, err = ApplyLabelOverride(objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetLabels())
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	return podSpec, objectMeta, nil
 }
 
@@ -444,6 +460,20 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 			return
 		}
 	}
+}
+
+func ApplyAnnotationOverride(objectMeta *metav1.ObjectMeta, annotations map[string]string) (*metav1.ObjectMeta, error) {
+	if annotations != nil {
+		mergeMapInto(annotations, objectMeta.Annotations)
+	}
+	return objectMeta, nil
+}
+
+func ApplyLabelOverride(objectMeta *metav1.ObjectMeta, labels map[string]string) (*metav1.ObjectMeta, error) {
+	if labels != nil {
+		mergeMapInto(labels, objectMeta.Labels)
+	}
+	return objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
