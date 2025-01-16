@@ -152,7 +152,7 @@ class SystemMetadata(_message.Message):
     def __init__(self, execution_cluster: _Optional[str] = ..., namespace: _Optional[str] = ...) -> None: ...
 
 class ExecutionMetadata(_message.Message):
-    __slots__ = ["mode", "principal", "nesting", "scheduled_at", "parent_node_execution", "reference_execution", "system_metadata", "artifact_ids"]
+    __slots__ = ["mode", "principal", "nesting", "scheduled_at", "parent_node_execution", "reference_execution", "system_metadata", "artifact_ids", "user_identity"]
     class ExecutionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         MANUAL: _ClassVar[ExecutionMetadata.ExecutionMode]
@@ -179,6 +179,7 @@ class ExecutionMetadata(_message.Message):
     REFERENCE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
     SYSTEM_METADATA_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_IDS_FIELD_NUMBER: _ClassVar[int]
+    USER_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     mode: ExecutionMetadata.ExecutionMode
     principal: str
     nesting: int
@@ -187,7 +188,8 @@ class ExecutionMetadata(_message.Message):
     reference_execution: _identifier_pb2.WorkflowExecutionIdentifier
     system_metadata: SystemMetadata
     artifact_ids: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
-    def __init__(self, mode: _Optional[_Union[ExecutionMetadata.ExecutionMode, str]] = ..., principal: _Optional[str] = ..., nesting: _Optional[int] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., system_metadata: _Optional[_Union[SystemMetadata, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ...) -> None: ...
+    user_identity: _common_pb2.UserIdentity
+    def __init__(self, mode: _Optional[_Union[ExecutionMetadata.ExecutionMode, str]] = ..., principal: _Optional[str] = ..., nesting: _Optional[int] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., system_metadata: _Optional[_Union[SystemMetadata, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., user_identity: _Optional[_Union[_common_pb2.UserIdentity, _Mapping]] = ...) -> None: ...
 
 class NotificationList(_message.Message):
     __slots__ = ["notifications"]

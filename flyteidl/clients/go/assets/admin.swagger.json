@@ -11098,6 +11098,10 @@
             "$ref": "#/definitions/coreArtifactID"
           },
           "description": "Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping\nsince we don't have a structure to handle nested ones anyways."
+        },
+        "user_identity": {
+          "$ref": "#/definitions/adminUserIdentity",
+          "title": "Optional, the user identity that launched this execution"
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
@@ -12673,6 +12677,20 @@
         }
       },
       "description": "Represents a string url and associated metadata used throughout the platform."
+    },
+    "adminUserIdentity": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
     },
     "adminVersion": {
       "type": "object",

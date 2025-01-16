@@ -8,7 +8,7 @@ import { BoolValue, Duration, Message, proto3, protoInt64, Timestamp } from "@bu
 import { LiteralMap } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
-import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig, UrlBlob } from "./common_pb.js";
+import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig, UrlBlob, UserIdentity } from "./common_pb.js";
 import { ArtifactID } from "../core/artifact_id_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
@@ -847,6 +847,13 @@ export class ExecutionMetadata extends Message<ExecutionMetadata> {
    */
   artifactIds: ArtifactID[] = [];
 
+  /**
+   * Optional, the user identity that launched this execution
+   *
+   * @generated from field: flyteidl.admin.UserIdentity user_identity = 19;
+   */
+  userIdentity?: UserIdentity;
+
   constructor(data?: PartialMessage<ExecutionMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -863,6 +870,7 @@ export class ExecutionMetadata extends Message<ExecutionMetadata> {
     { no: 16, name: "reference_execution", kind: "message", T: WorkflowExecutionIdentifier },
     { no: 17, name: "system_metadata", kind: "message", T: SystemMetadata },
     { no: 18, name: "artifact_ids", kind: "message", T: ArtifactID, repeated: true },
+    { no: 19, name: "user_identity", kind: "message", T: UserIdentity },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionMetadata {

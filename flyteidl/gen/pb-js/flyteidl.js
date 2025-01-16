@@ -31376,6 +31376,150 @@
                 return FlyteURLs;
             })();
     
+            admin.UserIdentity = (function() {
+    
+                /**
+                 * Properties of a UserIdentity.
+                 * @memberof flyteidl.admin
+                 * @interface IUserIdentity
+                 * @property {string|null} [firstName] UserIdentity firstName
+                 * @property {string|null} [lastName] UserIdentity lastName
+                 * @property {string|null} [email] UserIdentity email
+                 */
+    
+                /**
+                 * Constructs a new UserIdentity.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a UserIdentity.
+                 * @implements IUserIdentity
+                 * @constructor
+                 * @param {flyteidl.admin.IUserIdentity=} [properties] Properties to set
+                 */
+                function UserIdentity(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * UserIdentity firstName.
+                 * @member {string} firstName
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @instance
+                 */
+                UserIdentity.prototype.firstName = "";
+    
+                /**
+                 * UserIdentity lastName.
+                 * @member {string} lastName
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @instance
+                 */
+                UserIdentity.prototype.lastName = "";
+    
+                /**
+                 * UserIdentity email.
+                 * @member {string} email
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @instance
+                 */
+                UserIdentity.prototype.email = "";
+    
+                /**
+                 * Creates a new UserIdentity instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @static
+                 * @param {flyteidl.admin.IUserIdentity=} [properties] Properties to set
+                 * @returns {flyteidl.admin.UserIdentity} UserIdentity instance
+                 */
+                UserIdentity.create = function create(properties) {
+                    return new UserIdentity(properties);
+                };
+    
+                /**
+                 * Encodes the specified UserIdentity message. Does not implicitly {@link flyteidl.admin.UserIdentity.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @static
+                 * @param {flyteidl.admin.IUserIdentity} message UserIdentity message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                UserIdentity.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.firstName != null && message.hasOwnProperty("firstName"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.firstName);
+                    if (message.lastName != null && message.hasOwnProperty("lastName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.lastName);
+                    if (message.email != null && message.hasOwnProperty("email"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.email);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a UserIdentity message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.UserIdentity} UserIdentity
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                UserIdentity.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.UserIdentity();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.firstName = reader.string();
+                            break;
+                        case 2:
+                            message.lastName = reader.string();
+                            break;
+                        case 3:
+                            message.email = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a UserIdentity message.
+                 * @function verify
+                 * @memberof flyteidl.admin.UserIdentity
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                UserIdentity.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.firstName != null && message.hasOwnProperty("firstName"))
+                        if (!$util.isString(message.firstName))
+                            return "firstName: string expected";
+                    if (message.lastName != null && message.hasOwnProperty("lastName"))
+                        if (!$util.isString(message.lastName))
+                            return "lastName: string expected";
+                    if (message.email != null && message.hasOwnProperty("email"))
+                        if (!$util.isString(message.email))
+                            return "email: string expected";
+                    return null;
+                };
+    
+                return UserIdentity;
+            })();
+    
             admin.ConfigurationID = (function() {
     
                 /**
@@ -40370,6 +40514,7 @@
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] ExecutionMetadata referenceExecution
                  * @property {flyteidl.admin.ISystemMetadata|null} [systemMetadata] ExecutionMetadata systemMetadata
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] ExecutionMetadata artifactIds
+                 * @property {flyteidl.admin.IUserIdentity|null} [userIdentity] ExecutionMetadata userIdentity
                  */
     
                 /**
@@ -40453,6 +40598,14 @@
                 ExecutionMetadata.prototype.artifactIds = $util.emptyArray;
     
                 /**
+                 * ExecutionMetadata userIdentity.
+                 * @member {flyteidl.admin.IUserIdentity|null|undefined} userIdentity
+                 * @memberof flyteidl.admin.ExecutionMetadata
+                 * @instance
+                 */
+                ExecutionMetadata.prototype.userIdentity = null;
+    
+                /**
                  * Creates a new ExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.ExecutionMetadata
@@ -40493,6 +40646,8 @@
                     if (message.artifactIds != null && message.artifactIds.length)
                         for (var i = 0; i < message.artifactIds.length; ++i)
                             $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
+                    if (message.userIdentity != null && message.hasOwnProperty("userIdentity"))
+                        $root.flyteidl.admin.UserIdentity.encode(message.userIdentity, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                     return writer;
                 };
     
@@ -40539,6 +40694,9 @@
                             if (!(message.artifactIds && message.artifactIds.length))
                                 message.artifactIds = [];
                             message.artifactIds.push($root.flyteidl.core.ArtifactID.decode(reader, reader.uint32()));
+                            break;
+                        case 19:
+                            message.userIdentity = $root.flyteidl.admin.UserIdentity.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -40607,6 +40765,11 @@
                             if (error)
                                 return "artifactIds." + error;
                         }
+                    }
+                    if (message.userIdentity != null && message.hasOwnProperty("userIdentity")) {
+                        var error = $root.flyteidl.admin.UserIdentity.verify(message.userIdentity);
+                        if (error)
+                            return "userIdentity." + error;
                     }
                     return null;
                 };

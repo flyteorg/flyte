@@ -254,3 +254,13 @@ class FlyteURLs(_message.Message):
     outputs: str
     deck: str
     def __init__(self, inputs: _Optional[str] = ..., outputs: _Optional[str] = ..., deck: _Optional[str] = ...) -> None: ...
+
+class UserIdentity(_message.Message):
+    __slots__ = ["first_name", "last_name", "email"]
+    FIRST_NAME_FIELD_NUMBER: _ClassVar[int]
+    LAST_NAME_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    first_name: str
+    last_name: str
+    email: str
+    def __init__(self, first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., email: _Optional[str] = ...) -> None: ...

@@ -802,6 +802,16 @@ pub struct FlyteUrLs {
     #[prost(string, tag="3")]
     pub deck: ::prost::alloc::string::String,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UserIdentity {
+    #[prost(string, tag="1")]
+    pub first_name: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub last_name: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub email: ::prost::alloc::string::String,
+}
 /// The status of the named entity is used to control its visibility in the UI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -2292,6 +2302,9 @@ pub struct ExecutionMetadata {
     /// since we don't have a structure to handle nested ones anyways.
     #[prost(message, repeated, tag="18")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    /// Optional, the user identity that launched this execution
+    #[prost(message, optional, tag="19")]
+    pub user_identity: ::core::option::Option<UserIdentity>,
 }
 /// Nested message and enum types in `ExecutionMetadata`.
 pub mod execution_metadata {

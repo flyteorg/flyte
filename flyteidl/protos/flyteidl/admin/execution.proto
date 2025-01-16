@@ -270,6 +270,9 @@ message ExecutionMetadata {
     // Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
     // since we don't have a structure to handle nested ones anyways.
     repeated core.ArtifactID artifact_ids = 18;
+
+    // Optional, the user identity that launched this execution
+    UserIdentity user_identity = 19;
 }
 
 message NotificationList {

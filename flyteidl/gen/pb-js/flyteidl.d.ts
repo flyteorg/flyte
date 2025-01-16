@@ -12851,6 +12851,70 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a UserIdentity. */
+        interface IUserIdentity {
+
+            /** UserIdentity firstName */
+            firstName?: (string|null);
+
+            /** UserIdentity lastName */
+            lastName?: (string|null);
+
+            /** UserIdentity email */
+            email?: (string|null);
+        }
+
+        /** Represents a UserIdentity. */
+        class UserIdentity implements IUserIdentity {
+
+            /**
+             * Constructs a new UserIdentity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IUserIdentity);
+
+            /** UserIdentity firstName. */
+            public firstName: string;
+
+            /** UserIdentity lastName. */
+            public lastName: string;
+
+            /** UserIdentity email. */
+            public email: string;
+
+            /**
+             * Creates a new UserIdentity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns UserIdentity instance
+             */
+            public static create(properties?: flyteidl.admin.IUserIdentity): flyteidl.admin.UserIdentity;
+
+            /**
+             * Encodes the specified UserIdentity message. Does not implicitly {@link flyteidl.admin.UserIdentity.verify|verify} messages.
+             * @param message UserIdentity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IUserIdentity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a UserIdentity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns UserIdentity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.UserIdentity;
+
+            /**
+             * Verifies a UserIdentity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ConfigurationID. */
         interface IConfigurationID {
 
@@ -16610,6 +16674,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
+
+            /** ExecutionMetadata userIdentity */
+            userIdentity?: (flyteidl.admin.IUserIdentity|null);
         }
 
         /** Represents an ExecutionMetadata. */
@@ -16644,6 +16711,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** ExecutionMetadata userIdentity. */
+            public userIdentity?: (flyteidl.admin.IUserIdentity|null);
 
             /**
              * Creates a new ExecutionMetadata instance using the specified properties.
