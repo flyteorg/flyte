@@ -15406,11 +15406,11 @@
                  * @property {string|null} [deprecatedErrorMessage] TaskMetadata deprecatedErrorMessage
                  * @property {boolean|null} [interruptible] TaskMetadata interruptible
                  * @property {boolean|null} [cacheSerializable] TaskMetadata cacheSerializable
-                 * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  * @property {boolean|null} [isEager] TaskMetadata isEager
+                 * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
                  */
     
                 /**
@@ -15495,14 +15495,6 @@
                 TaskMetadata.prototype.cacheSerializable = false;
     
                 /**
-                 * TaskMetadata generatesDeck.
-                 * @member {boolean} generatesDeck
-                 * @memberof flyteidl.core.TaskMetadata
-                 * @instance
-                 */
-                TaskMetadata.prototype.generatesDeck = false;
-    
-                /**
                  * TaskMetadata tags.
                  * @member {Object.<string,string>} tags
                  * @memberof flyteidl.core.TaskMetadata
@@ -15533,6 +15525,14 @@
                  * @instance
                  */
                 TaskMetadata.prototype.isEager = false;
+    
+                /**
+                 * TaskMetadata generatesDeck.
+                 * @member {google.protobuf.IBoolValue|null|undefined} generatesDeck
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.generatesDeck = null;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -15588,8 +15588,6 @@
                         writer.uint32(/* id 8, wireType 0 =*/64).bool(message.interruptible);
                     if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
                         writer.uint32(/* id 9, wireType 0 =*/72).bool(message.cacheSerializable);
-                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
-                        writer.uint32(/* id 10, wireType 0 =*/80).bool(message.generatesDeck);
                     if (message.tags != null && message.hasOwnProperty("tags"))
                         for (var keys = Object.keys(message.tags), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
@@ -15600,6 +15598,8 @@
                             writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
                     if (message.isEager != null && message.hasOwnProperty("isEager"))
                         writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
+                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
+                        $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
                     return writer;
                 };
     
@@ -15645,9 +15645,6 @@
                         case 9:
                             message.cacheSerializable = reader.bool();
                             break;
-                        case 10:
-                            message.generatesDeck = reader.bool();
-                            break;
                         case 11:
                             reader.skip().pos++;
                             if (message.tags === $util.emptyObject)
@@ -15666,6 +15663,9 @@
                             break;
                         case 14:
                             message.isEager = reader.bool();
+                            break;
+                        case 15:
+                            message.generatesDeck = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15719,9 +15719,6 @@
                     if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
                         if (typeof message.cacheSerializable !== "boolean")
                             return "cacheSerializable: boolean expected";
-                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
-                        if (typeof message.generatesDeck !== "boolean")
-                            return "generatesDeck: boolean expected";
                     if (message.tags != null && message.hasOwnProperty("tags")) {
                         if (!$util.isObject(message.tags))
                             return "tags: object expected";
@@ -15743,6 +15740,11 @@
                     if (message.isEager != null && message.hasOwnProperty("isEager"))
                         if (typeof message.isEager !== "boolean")
                             return "isEager: boolean expected";
+                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck")) {
+                        var error = $root.google.protobuf.BoolValue.verify(message.generatesDeck);
+                        if (error)
+                            return "generatesDeck." + error;
+                    }
                     return null;
                 };
     
