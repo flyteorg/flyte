@@ -138,7 +138,7 @@ message TaskMetadata {
     // This would be used by CreateTask endpoint.
     bool is_eager = 14;
 
-    // Indicates whether the task will generate a Deck URI when it finishes executing.
+    // Indicates whether the task will generate a deck when it finishes executing.
     // The BoolValue can have three states:
     // - nil: The value is not set.
     // - true: The task will generate a Deck URI.
