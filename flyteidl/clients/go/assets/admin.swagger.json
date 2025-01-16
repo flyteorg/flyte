@@ -11585,6 +11585,10 @@
             "$ref": "#/definitions/coreExecutionEnvAssignment"
           },
           "description": "Execution environment assignments to be set for the execution."
+        },
+        "cluster_assignment": {
+          "$ref": "#/definitions/adminClusterAssignment",
+          "description": "ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.\nThis can be overwritten at execution creation level."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -13503,6 +13507,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 \u003c x \u003c 65536."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the port to expose on the pod's IP address."
         }
       },
       "description": "Defines port properties for a container."
@@ -14117,6 +14125,13 @@
         },
         "cache_serializable": {
           "type": "boolean"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Config is a bag of properties that can be used to instruct propeller on how to execute the node."
         }
       },
       "description": "Defines extra information about the Node."

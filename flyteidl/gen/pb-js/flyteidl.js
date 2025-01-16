@@ -16689,6 +16689,7 @@
                  * @memberof flyteidl.core
                  * @interface IContainerPort
                  * @property {number|null} [containerPort] ContainerPort containerPort
+                 * @property {string|null} [name] ContainerPort name
                  */
     
                 /**
@@ -16713,6 +16714,14 @@
                  * @instance
                  */
                 ContainerPort.prototype.containerPort = 0;
+    
+                /**
+                 * ContainerPort name.
+                 * @member {string} name
+                 * @memberof flyteidl.core.ContainerPort
+                 * @instance
+                 */
+                ContainerPort.prototype.name = "";
     
                 /**
                  * Creates a new ContainerPort instance using the specified properties.
@@ -16740,6 +16749,8 @@
                         writer = $Writer.create();
                     if (message.containerPort != null && message.hasOwnProperty("containerPort"))
                         writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.containerPort);
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.name);
                     return writer;
                 };
     
@@ -16764,6 +16775,9 @@
                         case 1:
                             message.containerPort = reader.uint32();
                             break;
+                        case 2:
+                            message.name = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -16786,6 +16800,9 @@
                     if (message.containerPort != null && message.hasOwnProperty("containerPort"))
                         if (!$util.isInteger(message.containerPort))
                             return "containerPort: integer expected";
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
                     return null;
                 };
     

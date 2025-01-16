@@ -1509,12 +1509,15 @@ pub mod task_template {
 
 /// Defines port properties for a container.
 #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ContainerPort {
     /// Number of port to expose on the pod's IP address.
     /// This must be a valid port number, 0 < x < 65536.
     #[prost(uint32, tag="1")]
     pub container_port: u32,
+    /// Name of the port to expose on the pod's IP address.
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
