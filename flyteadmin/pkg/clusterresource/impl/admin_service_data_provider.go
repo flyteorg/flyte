@@ -25,9 +25,9 @@ func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	if resource != nil && resource.Attributes != nil && resource.Attributes.MatchingAttributes != nil &&
-		resource.Attributes.MatchingAttributes.GetClusterResourceAttributes() != nil {
-		return resource.Attributes.MatchingAttributes.GetClusterResourceAttributes(), nil
+	if resource != nil && resource.GetAttributes() != nil && resource.GetAttributes().GetMatchingAttributes() != nil &&
+		resource.GetAttributes().GetMatchingAttributes().GetClusterResourceAttributes() != nil {
+		return resource.GetAttributes().GetMatchingAttributes().GetClusterResourceAttributes(), nil
 	}
 	return nil, NewMissingEntityError("cluster resource attributes")
 }
@@ -56,11 +56,11 @@ func (p serviceAdminProvider) GetProjects(ctx context.Context) (*admin.Projects,
 		if err != nil {
 			return nil, err
 		}
-		projects = append(projects, projectResp.Projects...)
-		if len(projectResp.Token) == 0 {
+		projects = append(projects, projectResp.GetProjects()...)
+		if len(projectResp.GetToken()) == 0 {
 			break
 		}
-		listReq.Token = projectResp.Token
+		listReq.Token = projectResp.GetToken()
 	}
 	return &admin.Projects{
 		Projects: projects,

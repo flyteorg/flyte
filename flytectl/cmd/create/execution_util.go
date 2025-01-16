@@ -51,7 +51,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
+	return createExecutionRequest(lp.GetId(), inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
@@ -95,8 +95,8 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		ResourceType: core.ResourceType_TASK,
 		Project:      project,
 		Domain:       domain,
-		Name:         task.Id.Name,
-		Version:      task.Id.Version,
+		Name:         task.GetId().GetName(),
+		Version:      task.GetId().GetVersion(),
 	}
 
 	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
@@ -120,7 +120,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 	if err != nil {
 		return err
 	}
-	fmt.Printf("execution identifier %v\n", relaunchedExec.Id)
+	fmt.Printf("execution identifier %v\n", relaunchedExec.GetId())
 	return nil
 }
 
@@ -141,7 +141,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 	if err != nil {
 		return err
 	}
-	fmt.Printf("execution identifier %v\n", recoveredExec.Id)
+	fmt.Printf("execution identifier %v\n", recoveredExec.GetId())
 	return nil
 }
 

@@ -55,7 +55,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -83,7 +83,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -112,9 +112,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 	})
 
 	t.Run("non-homogenous ensure ordering", func(t *testing.T) {
@@ -125,9 +125,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			coreutils.MustMakeLiteral(2),
 		})
 
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.Len(t, lt.GetUnionType().GetVariants(), 2)
+		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().GetVariants()[0].GetSimple().String())
+		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().GetVariants()[1].GetSimple().String())
 	})
 
 	t.Run("list with mixed types", func(t *testing.T) {

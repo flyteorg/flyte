@@ -44,7 +44,7 @@ func validateSparkJob(sparkJob *plugins.SparkJob) error {
 		return fmt.Errorf("empty sparkJob")
 	}
 
-	if len(sparkJob.MainApplicationFile) == 0 && len(sparkJob.MainClass) == 0 {
+	if len(sparkJob.GetMainApplicationFile()) == 0 && len(sparkJob.GetMainClass()) == 0 {
 		return fmt.Errorf("either MainApplicationFile or MainClass must be set")
 	}
 
@@ -262,10 +262,10 @@ func createSparkApplication(sparkJob *plugins.SparkJob, sparkConfig map[string]s
 		app.Spec.BatchScheduler = &val
 	}
 
-	if sparkJob.MainApplicationFile != "" {
+	if sparkJob.GetMainApplicationFile() != "" {
 		app.Spec.MainApplicationFile = &sparkJob.MainApplicationFile
 	}
-	if sparkJob.MainClass != "" {
+	if sparkJob.GetMainClass() != "" {
 		app.Spec.MainClass = &sparkJob.MainClass
 	}
 	return app

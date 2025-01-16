@@ -26,10 +26,10 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 	}
 
 	return catalog.Key{
-		Identifier:           *taskTemplate.Id,
-		CacheVersion:         taskTemplate.Metadata.DiscoveryVersion,
-		CacheIgnoreInputVars: taskTemplate.Metadata.CacheIgnoreInputVars,
-		TypedInterface:       *taskTemplate.Interface,
+		Identifier:           *taskTemplate.Id, //nolint:protogetter
+		CacheVersion:         taskTemplate.GetMetadata().GetDiscoveryVersion(),
+		CacheIgnoreInputVars: taskTemplate.GetMetadata().GetCacheIgnoreInputVars(),
+		TypedInterface:       *taskTemplate.GetInterface(),
 		InputReader:          nCtx.InputReader(),
 	}, nil
 }
@@ -62,5 +62,5 @@ func (t *Handler) IsCacheable(ctx context.Context, nCtx interfaces.NodeExecution
 		return false, false, err
 	}
 
-	return taskTemplate.Metadata.Discoverable, taskTemplate.Metadata.Discoverable && taskTemplate.Metadata.CacheSerializable, nil
+	return taskTemplate.GetMetadata().GetDiscoverable(), taskTemplate.GetMetadata().GetDiscoverable() && taskTemplate.GetMetadata().GetCacheSerializable(), nil
 }

@@ -20,6 +20,7 @@ const (
 
 func TestPluginOverrideUpdateRequiresAttributeFile(t *testing.T) {
 	testWorkflowPluginOverrideUpdate(
+		t,
 		/* setup */ nil,
 		/* assert */ func(s *testutils.TestStruct, err error) {
 			assert.ErrorContains(t, err, "attrFile is mandatory")
@@ -29,6 +30,7 @@ func TestPluginOverrideUpdateRequiresAttributeFile(t *testing.T) {
 
 func TestPluginOverrideUpdateFailsWhenAttributeFileDoesNotExist(t *testing.T) {
 	testWorkflowPluginOverrideUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataNonExistentFile
 			config.Force = true
@@ -42,6 +44,7 @@ func TestPluginOverrideUpdateFailsWhenAttributeFileDoesNotExist(t *testing.T) {
 
 func TestPluginOverrideUpdateFailsWhenAttributeFileIsMalformed(t *testing.T) {
 	testWorkflowPluginOverrideUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataInvalidAttrFile
 			config.Force = true
@@ -56,6 +59,7 @@ func TestPluginOverrideUpdateFailsWhenAttributeFileIsMalformed(t *testing.T) {
 func TestPluginOverrideUpdateHappyPath(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowPluginOverrideFilePath
 				config.Force = true
@@ -69,6 +73,7 @@ func TestPluginOverrideUpdateHappyPath(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainPluginOverrideFilePath
 				config.Force = true
@@ -82,6 +87,7 @@ func TestPluginOverrideUpdateHappyPath(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectPluginOverrideFilePath
 				config.Force = true
@@ -97,6 +103,7 @@ func TestPluginOverrideUpdateHappyPath(t *testing.T) {
 func TestPluginOverrideUpdateFailsWithoutForceFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowPluginOverrideFilePath
 				config.Force = false
@@ -109,6 +116,7 @@ func TestPluginOverrideUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainPluginOverrideFilePath
 				config.Force = false
@@ -121,6 +129,7 @@ func TestPluginOverrideUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectPluginOverrideFilePath
 				config.Force = false
@@ -135,6 +144,7 @@ func TestPluginOverrideUpdateFailsWithoutForceFlag(t *testing.T) {
 func TestPluginOverrideUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowPluginOverrideFilePath
 				config.DryRun = true
@@ -147,6 +157,7 @@ func TestPluginOverrideUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainPluginOverrideFilePath
 				config.DryRun = true
@@ -159,6 +170,7 @@ func TestPluginOverrideUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectPluginOverrideFilePath
 				config.DryRun = true
@@ -173,6 +185,7 @@ func TestPluginOverrideUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 	t.Run("workflow without --force", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowPluginOverrideFilePath
 				config.Force = false
@@ -186,6 +199,7 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("workflow with --force", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowPluginOverrideFilePath
 				config.Force = true
@@ -199,6 +213,7 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain without --force", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainPluginOverrideFilePath
 				config.Force = false
@@ -212,6 +227,7 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain with --force", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainPluginOverrideFilePath
 				config.Force = true
@@ -225,6 +241,7 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project without --force", func(t *testing.T) {
 		testProjectPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectPluginOverrideFilePath
 				config.Force = false
@@ -238,6 +255,7 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project with --force", func(t *testing.T) {
 		testProjectPluginOverrideUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectPluginOverrideFilePath
 				config.Force = true
@@ -253,12 +271,13 @@ func TestPluginOverrideUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 func TestPluginOverrideUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -274,12 +293,13 @@ func TestPluginOverrideUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -295,12 +315,13 @@ func TestPluginOverrideUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(nil, ext.NewNotFoundError("attribute"))
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -318,12 +339,13 @@ func TestPluginOverrideUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 func TestPluginOverrideUpdateFailsWhenAdminClientFails(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
-					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+					OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes) {
@@ -338,12 +360,13 @@ func TestPluginOverrideUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
-					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+					OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
@@ -358,12 +381,13 @@ func TestPluginOverrideUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectPluginOverrideUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
-					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_PLUGIN_OVERRIDE).
+					OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_PLUGIN_OVERRIDE).
 					Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 				s.UpdaterExt.
-					OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+					OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes) {
@@ -378,16 +402,18 @@ func TestPluginOverrideUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func testWorkflowPluginOverrideUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testWorkflowPluginOverrideUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
-				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_PLUGIN_OVERRIDE).
+				OnFetchWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), admin.MatchableResource_PLUGIN_OVERRIDE).
 				Return(&admin.WorkflowAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, mock.Anything).
+				OnUpdateWorkflowAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), target.GetWorkflow(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -396,11 +422,13 @@ func testWorkflowPluginOverrideUpdate(
 }
 
 func testWorkflowPluginOverrideUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.WorkflowAttributes),
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestWorkflowPluginOverride()
 
@@ -449,16 +477,18 @@ func newTestWorkflowPluginOverride() *admin.WorkflowAttributes {
 }
 
 func testProjectPluginOverrideUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectPluginOverrideUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
-				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_PLUGIN_OVERRIDE).
+				OnFetchProjectAttributesMatch(s.Ctx, target.GetProject(), admin.MatchableResource_PLUGIN_OVERRIDE).
 				Return(&admin.ProjectAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectAttributesMatch(s.Ctx, target.Project, mock.Anything).
+				OnUpdateProjectAttributesMatch(s.Ctx, target.GetProject(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -467,11 +497,13 @@ func testProjectPluginOverrideUpdate(
 }
 
 func testProjectPluginOverrideUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectAttributes),
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestProjectPluginOverride()
 
@@ -518,16 +550,18 @@ func newTestProjectPluginOverride() *admin.ProjectAttributes {
 }
 
 func testProjectDomainPluginOverrideUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectDomainPluginOverrideUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
-				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_PLUGIN_OVERRIDE).
+				OnFetchProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), admin.MatchableResource_PLUGIN_OVERRIDE).
 				Return(&admin.ProjectDomainAttributesGetResponse{Attributes: target}, nil)
 			s.UpdaterExt.
-				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, mock.Anything).
+				OnUpdateProjectDomainAttributesMatch(s.Ctx, target.GetProject(), target.GetDomain(), mock.Anything).
 				Return(nil)
 		},
 		setup,
@@ -536,11 +570,13 @@ func testProjectDomainPluginOverrideUpdate(
 }
 
 func testProjectDomainPluginOverrideUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes),
 	setup func(s *testutils.TestStruct, config *pluginoverride.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestProjectDomainPluginOverride()
 

@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import logging
 import sys
+import inspect
 
 import sphinx.application
 import sphinx.errors
@@ -36,7 +37,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.13.2"
+release = "1.14.1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -58,8 +59,8 @@ extensions = [
     "sphinx.ext.graphviz",
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
+    "sphinx.ext.linkcode",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
     "sphinx-prompt",
     "sphinx_copybutton",
@@ -156,7 +157,8 @@ redirects = {
     "flyte_fundamentals/visualizing_task_input_and_output": "../user_guide/flyte_fundamentals/visualizing_task_input_and_output.html",
 
     # flytesnacks
-    "flytesnacks/contribute": "../community/contribute_docs.html",
+    "flytesnacks/contribute": "../community/contribute/contribute_docs.html",
+    "community/contribute": "community/contribute/contribute_code.html",
     "flytesnacks/integrations": "../flytesnacks/integrations/index.html",
     "flytesnacks/tutorials": "../flytesnacks/tutorials.html",
 
@@ -341,6 +343,22 @@ exclude_patterns = [
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
+    "examples/advanced_composition/**",
+    "examples/basics/**",
+    "examples/customizing_dependencies/**",
+    "examples/data_types_and_io/**",
+    "examples/development_lifecycle/**",
+    "examples/extending/**",
+    "examples/productionizing/**",
+    "examples/testing/**",
+    "flytesnacks/examples/advanced_composition/*.md",
+    "flytesnacks/examples/basics/*.md",
+    "flytesnacks/examples/customizing_dependencies/*.md",
+    "flytesnacks/examples/data_types_and_io/*.md",
+    "flytesnacks/examples/development_lifecycle/*.md",
+    "flytesnacks/examples/extending/*.md",
+    "flytesnacks/examples/productionizing/*.md",
+    "flytesnacks/examples/testing/*.md",
     "api/flytectl/index.rst",
     "protos/boilerplate/**",
     "protos/tmp/**",
@@ -620,14 +638,6 @@ import_projects = [
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
                 "flytesnacks/index.md",
-                "examples/advanced_composition",
-                "examples/basics",
-                "examples/customizing_dependencies",
-                "examples/data_types_and_io",
-                "examples/development_lifecycle",
-                "examples/extending",
-                "examples/productionizing",
-                "examples/testing"
             ]
         ],
         "local": flytesnacks_local_path is not None,
@@ -688,6 +698,15 @@ os.environ["FLYTE_SDK_LOGGING_LEVEL_ROOT"] = "50"
 # Disable warnings from tensorflow
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
 
 class CustomWarningSuppressor(logging.Filter):
     """Filter logs by `suppress_warnings`."""
@@ -723,6 +742,67 @@ class CustomWarningSuppressor(logging.Filter):
             return False
 
         return True
+
+
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    if domain != "py":
+        return None
+
+    import flytekit
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    if inspect.isfunction(obj):
+        obj = inspect.unwrap(obj)
+    try:
+        fn = inspect.getsourcefile(obj)
+    except TypeError:
+        fn = None
+    if not fn or fn.endswith("__init__.py"):
+        try:
+            fn = inspect.getsourcefile(sys.modules[obj.__module__])
+        except (TypeError, AttributeError, KeyError):
+            fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except (OSError, TypeError):
+        lineno = None
+
+    linespec = f"#L{lineno:d}-L{lineno + len(source) - 1:d}" if lineno else ""
+
+    startdir = Path(flytekit.__file__).parent.parent
+    try:
+        fn = os.path.relpath(fn, start=startdir).replace(os.path.sep, "/")
+    except ValueError:
+        return None
+
+    if not fn.startswith("flytekit/"):
+        return None
+
+    if flytekit.__version__ == "dev":
+        tag = "master"
+    else:
+        tag = f"v{flytekit.__version__}"
+
+    return f"https://github.com/flyteorg/flytekit/blob/{tag}/{fn}{linespec}"
 
 
 def setup(app: sphinx.application.Sphinx) -> None:

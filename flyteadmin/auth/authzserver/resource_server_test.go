@@ -61,7 +61,7 @@ func newMockResourceServer(t testing.TB, publicKey rsa.PublicKey) (resourceServe
 			}
 
 			w.Header().Set("Content-Type", "application/json")
-			_, err = io.WriteString(w, string(raw))
+			_, err = io.Writer.Write(w, raw)
 
 			if !assert.NoError(t, err) {
 				t.FailNow()

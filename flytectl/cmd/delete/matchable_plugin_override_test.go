@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	pluginoverride "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/plugin_override"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +19,8 @@ func deletePluginOverrideSetup() {
 
 func TestPluginOverride(t *testing.T) {
 	t.Run("successful project domain attribute deletion commandline", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
@@ -31,7 +33,8 @@ func TestPluginOverride(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("failed project domain attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// No args implying project domain attribute deletion
 		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -43,7 +46,8 @@ func TestPluginOverride(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("successful project domain attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_plugin_override.yaml"
@@ -56,7 +60,8 @@ func TestPluginOverride(t *testing.T) {
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("successful workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
@@ -70,7 +75,8 @@ func TestPluginOverride(t *testing.T) {
 			admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("failed workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
@@ -85,7 +91,8 @@ func TestPluginOverride(t *testing.T) {
 			admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("successful workflow attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = "testdata/valid_workflow_plugin_override.yaml"
@@ -99,7 +106,8 @@ func TestPluginOverride(t *testing.T) {
 			admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("workflow attribute deletion non existent file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = testDataNonExistentFile
@@ -113,7 +121,8 @@ func TestPluginOverride(t *testing.T) {
 			admin.MatchableResource_PLUGIN_OVERRIDE)
 	})
 	t.Run("attribute deletion invalid file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deletePluginOverrideSetup()
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = testDataInvalidAttrFile

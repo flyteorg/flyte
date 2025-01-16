@@ -6,6 +6,7 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 
 package flyteidl.core;
 
@@ -88,6 +89,10 @@ message RuntimeMetadata {
 
 // Task Metadata
 message TaskMetadata {
+    // Field number 10 is reserved because we are reusing the name generates_deck for field number 15,
+    // but with a different type.
+    reserved 10;
+
     // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
     bool discoverable = 1;
 
@@ -121,9 +126,6 @@ message TaskMetadata {
     // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     bool cache_serializable = 9;
 
-    // Indicates whether the task will generate a Deck URI when it finishes executing.
-    bool generates_deck = 10;
-
     // Arbitrary tags that allow users and the platform to store small but arbitrary labels
     map<string, string> tags = 11;
 
@@ -134,6 +136,16 @@ message TaskMetadata {
 
     // cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     repeated string cache_ignore_input_vars  = 13;
+    // is_eager indicates whether the task is eager or not.
+    // This would be used by CreateTask endpoint.
+    bool is_eager = 14;
+
+    // Indicates whether the task will generate a deck when it finishes executing.
+    // The BoolValue can have three states:
+    // - nil: The value is not set.
+    // - true: The task will generate a deck.
+    // - false: The task will not generate a deck.
+    google.protobuf.BoolValue generates_deck = 15;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -189,6 +201,8 @@ message ContainerPort {
     // Number of port to expose on the pod's IP address.
     // This must be a valid port number, 0 < x < 65536.
     uint32 container_port = 1;
+    // Name of the port to expose on the pod's IP address.
+    string name = 2;
 }
 
 message Container {

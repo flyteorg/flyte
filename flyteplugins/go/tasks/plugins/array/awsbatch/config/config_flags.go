@@ -51,7 +51,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "jobStoreConfig.jacheSize"), defaultConfig.JobStoreConfig.CacheSize, "Maximum informer cache size as number of items. Caches are used as an optimization to lessen the load on AWS Services.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "jobStoreConfig.parallelizm"), defaultConfig.JobStoreConfig.Parallelizm, "")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "jobStoreConfig.parallelism"), defaultConfig.JobStoreConfig.Parallelism, "")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "jobStoreConfig.batchChunkSize"), defaultConfig.JobStoreConfig.BatchChunkSize, "Determines the size of each batch sent to GetJobDetails api.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "jobStoreConfig.resyncPeriod"), defaultConfig.JobStoreConfig.ResyncPeriod.String(), "Defines the duration for syncing job details from AWS Batch.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "defCacheSize"), defaultConfig.JobDefCacheSize, "Maximum job definition cache size as number of items. Caches are used as an optimization to lessen the load on AWS Services.")

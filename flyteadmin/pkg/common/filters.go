@@ -22,6 +22,7 @@ type GormQueryExpr struct {
 // Complete set of filters available for database queries.
 const (
 	Contains FilterExpression = iota
+	NotLike
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -37,6 +38,7 @@ const (
 	joinArgsFormat          = "%s.%s"
 	containsQuery           = "%s LIKE ?"
 	containsArgs            = "%%%s%%"
+	notLikeQuery            = "%s NOT LIKE ?"
 	greaterThanQuery        = "%s > ?"
 	greaterThanOrEqualQuery = "%s >= ?"
 	lessThanQuery           = "%s < ?"
@@ -50,6 +52,7 @@ const (
 // Set of available filters which exclusively accept a single argument value.
 var singleValueFilters = map[FilterExpression]bool{
 	Contains:           true,
+	NotLike:            true,
 	GreaterThan:        true,
 	GreaterThanOrEqual: true,
 	LessThan:           true,
@@ -68,6 +71,7 @@ const EqualExpression = "eq"
 
 var filterNameMappings = map[string]FilterExpression{
 	"contains":      Contains,
+	"not_like":      NotLike,
 	"gt":            GreaterThan,
 	"gte":           GreaterThanOrEqual,
 	"lt":            LessThan,
@@ -80,6 +84,7 @@ var filterNameMappings = map[string]FilterExpression{
 
 var filterQueryMappings = map[FilterExpression]string{
 	Contains:           containsQuery,
+	NotLike:            notLikeQuery,
 	GreaterThan:        greaterThanQuery,
 	GreaterThanOrEqual: greaterThanOrEqualQuery,
 	LessThan:           lessThanQuery,
@@ -96,6 +101,15 @@ var executionIdentifierFields = map[string]bool{
 	"name":    true,
 }
 
+// Entities that have special case handling for execution identifier fields.
+var executionIdentifierEntities = map[Entity]bool{
+	Execution:          true,
+	NodeExecution:      true,
+	NodeExecutionEvent: true,
+	TaskExecution:      true,
+	Signal:             true,
+}
+
 var entityMetadataFields = map[string]bool{
 	"description": true,
 	"state":       true,
@@ -110,6 +124,8 @@ func getFilterExpressionName(expression FilterExpression) string {
 	switch expression {
 	case Contains:
 		return "contains"
+	case NotLike:
+		return "not like"
 	case GreaterThan:
 		return "greater than"
 	case GreaterThanOrEqual:
@@ -201,6 +217,12 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 			// args renders to something like: "%value%"
 			Args: fmt.Sprintf(containsArgs, f.value),
 		}, nil
+	case NotLike:
+		return GormQueryExpr{
+			// WHERE field NOT LIKE value
+			Query: fmt.Sprintf(notLikeQuery, formattedField),
+			Args:  f.value,
+		}, nil
 	case GreaterThan:
 		return GormQueryExpr{
 			// WHERE field > value
@@ -253,7 +275,7 @@ func (f *inlineFilterImpl) GetGormJoinTableQueryExpr(tableName string) (GormQuer
 
 func customizeField(field string, entity Entity) string {
 	// Execution identifier fields have to be customized because we differ from convention in those column names.
-	if entity == Execution && executionIdentifierFields[field] {
+	if executionIdentifierEntities[entity] && executionIdentifierFields[field] {
 		return fmt.Sprintf("execution_%s", field)
 	}
 	// admin_tag table has been migrated to an execution_tag table, so we need to customize the field name.

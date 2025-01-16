@@ -3,6 +3,7 @@ package branch
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -15,6 +16,7 @@ import (
 	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type metrics struct {
@@ -74,8 +76,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 		childNodeStatus.SetParentNodeID(&i)
 
 		logger.Debugf(ctx, "Recursively executing branchNode's chosen path")
-		nodeStatus := nl.GetNodeExecutionStatus(ctx, nCtx.NodeID())
-		return b.recurseDownstream(ctx, nCtx, nodeStatus, finalNode)
+		return b.recurseDownstream(ctx, nCtx, finalNode)
 	}
 
 	// If the branchNodestatus was already evaluated i.e, Node is in Running status
@@ -99,8 +100,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 	}
 
 	// Recurse downstream
-	nodeStatus := nl.GetNodeExecutionStatus(ctx, nCtx.NodeID())
-	return b.recurseDownstream(ctx, nCtx, nodeStatus, branchTakenNode)
+	return b.recurseDownstream(ctx, nCtx, branchTakenNode)
 }
 
 func (b *branchHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
@@ -123,7 +123,7 @@ func (b *branchHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExe
 	return executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), nil
 }
 
-func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, branchTakenNode v1alpha1.ExecutableNode) (handler.Transition, error) {
+func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.NodeExecutionContext, branchTakenNode v1alpha1.ExecutableNode) (handler.Transition, error) {
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
 	// The parent of the BranchTaken Node is the actual Branch Node and all the data is just forwarded from the Branch to the executed node.
@@ -134,8 +134,16 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 	}
 
 	childNodeStatus := nl.GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
-	childNodeStatus.SetDataDir(nodeStatus.GetDataDir())
-	childNodeStatus.SetOutputDir(nodeStatus.GetOutputDir())
+	childDataDir, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), branchTakenNode.GetID())
+	if err != nil {
+		return handler.UnknownTransition, err
+	}
+	childOutputDir, err := nCtx.DataStore().ConstructReference(ctx, childDataDir, strconv.Itoa(int(childNodeStatus.GetAttempts())))
+	if err != nil {
+		return handler.UnknownTransition, err
+	}
+	childNodeStatus.SetDataDir(childDataDir)
+	childNodeStatus.SetOutputDir(childOutputDir)
 	upstreamNodeIds, err := nCtx.ContextualNodeLookup().ToNode(branchTakenNode.GetID())
 	if err != nil {
 		return handler.UnknownTransition, err
@@ -151,9 +159,14 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 	}
 
 	if downstreamStatus.IsComplete() {
-		// For branch node we set the output node to be the same as the child nodes output
+		childOutputsPath := v1alpha1.GetOutputsFile(childOutputDir)
+		outputsPath := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
+		if err := nCtx.DataStore().CopyRaw(ctx, childOutputsPath, outputsPath, storage.Options{}); err != nil {
+			errMsg := fmt.Sprintf("Failed to copy child node outputs from [%v] to [%v]", childOutputsPath, outputsPath)
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.OutputsNotFoundError, errMsg, nil)), nil
+		}
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
-			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetOutputDir())},
+			OutputInfo: &handler.OutputInfo{OutputURI: outputsPath},
 		})
 
 		return handler.DoTransition(handler.TransitionTypeEphemeral, phase), nil
@@ -183,7 +196,7 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecution
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {
-			errMsg = branch.GetElseFail().Message
+			errMsg = branch.GetElseFail().GetMessage()
 		}
 		logger.Errorf(ctx, errMsg)
 		return nil
@@ -227,7 +240,7 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecut
 		// We should never reach here, but for safety and completeness
 		errMsg := "branch evaluation failed"
 		if branch.GetElseFail() != nil {
-			errMsg = branch.GetElseFail().Message
+			errMsg = branch.GetElseFail().GetMessage()
 		}
 		logger.Errorf(ctx, "failed to evaluate branch - user error: %s", errMsg)
 		return nil

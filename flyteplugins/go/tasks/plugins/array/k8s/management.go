@@ -69,7 +69,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	newArrayStatus := &arraystatus.ArrayStatus{
 		Summary:  arraystatus.ArraySummary{},
-		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
+		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())), // #nosec G115
 	}
 	externalResources = make([]*core.ExternalResource, 0, len(currentState.GetArrayStatus().Detailed.GetItems()))
 
@@ -82,7 +82,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	// If the current State is newly minted then we must initialize RetryAttempts to track how many
 	// times each subtask is executed.
 	if len(currentState.RetryAttempts.GetItems()) == 0 {
-		count := uint(currentState.GetExecutionArraySize())
+		count := uint(currentState.GetExecutionArraySize()) // #nosec G115
 		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetMaxAttempts())
 
 		retryAttemptsArray, err := bitarray.NewCompactArray(count, maxValue)
@@ -104,7 +104,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	// times the subtask failed due to system issues, this is necessary to correctly evaluate
 	// interruptible subtasks.
 	if len(currentState.SystemFailures.GetItems()) == 0 {
-		count := uint(currentState.GetExecutionArraySize())
+		count := uint(currentState.GetExecutionArraySize()) // #nosec G115
 		maxValue := bitarray.Item(tCtx.TaskExecutionMetadata().GetMaxAttempts())
 
 		systemFailuresArray, err := bitarray.NewCompactArray(count, maxValue)
@@ -134,13 +134,13 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		return currentState, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
-	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
+	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.GetTaskTypeVersion())
 	if err != nil {
 		return currentState, externalResources, err
 	}
 
 	currentParallelism := 0
-	maxParallelism := int(arrayJob.Parallelism)
+	maxParallelism := int(arrayJob.GetParallelism())
 
 	currentSubTaskPhaseHash, err := currentState.GetArrayStatus().HashCode()
 	if err != nil {
@@ -155,7 +155,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			retryAttempt++
 			newState.RetryAttempts.SetItem(childIdx, retryAttempt)
 		} else if existingPhase.IsTerminal() {
-			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase))
+			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase)) // #nosec G115
 			continue
 		}
 
@@ -246,12 +246,13 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			}
 		}
 
+		// #nosec G115
 		if actualPhase == core.PhaseRetryableFailure && uint32(retryAttempt+1) >= stCtx.TaskExecutionMetadata().GetMaxAttempts() {
 			// If we see a retryable failure we must check if the number of retries exceeds the maximum
 			// attempts. If so, transition to a permanent failure so that is not attempted again.
 			actualPhase = core.PhasePermanentFailure
 		}
-		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
+		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase)) // #nosec G115
 
 		if actualPhase.IsTerminal() {
 			err = deallocateResource(ctx, stCtx, config, podName)
@@ -275,9 +276,9 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		externalResources = append(externalResources, &core.ExternalResource{
 			ExternalID:   podName,
-			Index:        uint32(originalIdx),
+			Index:        uint32(originalIdx), // #nosec G115
 			Logs:         logLinks,
-			RetryAttempt: uint32(retryAttempt),
+			RetryAttempt: uint32(retryAttempt), // #nosec G115
 			Phase:        actualPhase,
 		})
 
@@ -383,15 +384,15 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		} else {
 			externalResources = append(externalResources, &core.ExternalResource{
 				ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-				Index:        uint32(originalIdx),
-				RetryAttempt: uint32(retryAttempt),
+				Index:        uint32(originalIdx),  // #nosec G115
+				RetryAttempt: uint32(retryAttempt), // #nosec G115
 				Phase:        core.PhaseAborted,
 			})
 		}
 	}
 
 	if messageCollector.Length() > 0 {
-		return currentState, externalResources, fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength))
+		return currentState, externalResources, fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength)) //nolint
 	}
 
 	return currentState.SetPhase(arrayCore.PhaseWriteToDiscoveryThenFail, currentState.PhaseVersion+1), externalResources, nil

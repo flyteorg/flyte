@@ -68,6 +68,6 @@ func NewBase36PrefixShardSelector(ctx context.Context) (ShardSelector, error) {
 func NewConstantShardSelector(shards []string) ShardSelector {
 	return &PrecomputedShardSelector{
 		precomputedPrefixes: shards,
-		buckets:             uint32(len(shards)),
+		buckets:             uint32(len(shards)), // #nosec G115
 	}
 }

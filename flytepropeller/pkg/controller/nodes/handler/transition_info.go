@@ -173,7 +173,7 @@ func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) Ph
 		}
 	}
 
-	return phaseInfo(p, err, info, err.Message)
+	return phaseInfo(p, err, info, err.GetMessage())
 }
 
 func PhaseInfoFailure(kind core.ExecutionError_ErrorKind, code, reason string, info *ExecutionInfo) PhaseInfo {

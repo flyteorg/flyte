@@ -144,7 +144,7 @@ pyflyte run --remote -p my-project -d development example.py wf --name Ada
 You should see a URL to the workflow execution on your demo Flyte cluster, where `<execution_name>` is a unique identifier for the workflow execution:
 
 ```{prompt} bash $
-Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution_name> to see execution in the console.
+Go to http://localhost:30080/console/projects/my-project/domains/development/executions/<execution_name> to see execution in the console.
 ```
 
 ### Inspecting a workflow run in the FlyteConsole web interface

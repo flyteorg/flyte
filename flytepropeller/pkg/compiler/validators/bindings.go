@@ -109,7 +109,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 			return nil, nil, !errs.HasErrors()
 		}
 
-		if upNode, found := validateNodeID(w, val.Promise.NodeId, errs.NewScope()); found {
+		if upNode, found := validateNodeID(w, val.Promise.GetNodeId(), errs.NewScope()); found {
 			v, err := typing.ParseVarName(val.Promise.GetVar())
 			if err != nil {
 				errs.Collect(errors.NewSyntaxError(nodeID, val.Promise.GetVar(), err))
@@ -117,28 +117,28 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 			}
 
 			inputVar := nodeParam
-			outputVar := val.Promise.Var
+			outputVar := val.Promise.GetVar()
 
 			if node.GetMetadata() != nil {
-				inputVar = fmt.Sprintf("%s.%s", node.GetMetadata().Name, nodeParam)
+				inputVar = fmt.Sprintf("%s.%s", node.GetMetadata().GetName(), nodeParam)
 			}
 			if upNode.GetMetadata() != nil {
-				outputVar = fmt.Sprintf("%s.%s", upNode.GetMetadata().Name, val.Promise.Var)
+				outputVar = fmt.Sprintf("%s.%s", upNode.GetMetadata().GetName(), val.Promise.GetVar())
 			}
 
 			if param, paramFound := validateOutputVar(upNode, v.Name, errs.NewScope()); paramFound {
-				sourceType := param.Type
+				sourceType := param.GetType()
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, param.Type.String(), inputVar, expectedType.String()))
+						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, c.LiteralTypeToStr(param.GetType()), inputVar, c.LiteralTypeToStr(expectedType)))
 					} else {
 						sourceType = cType
 					}
 				}
 
 				// If the variable has an attribute path. Extract the type of the last attribute.
-				for _, attr := range val.Promise.AttrPath {
+				for _, attr := range val.Promise.GetAttrPath() {
 					var tmpType *flyte.LiteralType
 					var exist bool
 
@@ -152,7 +152,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 
 						if !exist {
 							// the error should output the sourceType instead of tmpType because tmpType is nil
-							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), attr.GetStringValue()))
+							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.GetVar(), sourceType.String(), attr.GetStringValue()))
 							return nil, nil, !errs.HasErrors()
 						}
 						sourceType = tmpType
@@ -161,10 +161,10 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 
 				if !validateParamTypes || AreTypesCastable(sourceType, expectedType) {
 					val.Promise.NodeId = upNode.GetId()
-					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
+					return param.GetType(), []c.NodeID{val.Promise.GetNodeId()}, true
 				}
 
-				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, sourceType.String(), inputVar, expectedType.String()))
+				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, c.LiteralTypeToStr(sourceType), inputVar, c.LiteralTypeToStr(expectedType)))
 				return nil, nil, !errs.HasErrors()
 			}
 		}
@@ -180,21 +180,21 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, c.LiteralTypeToStr(literalType), c.LiteralTypeToStr(expectedType)))
 		}
 
 		if expectedType.GetEnumType() != nil {
 			v := val.Scalar.GetPrimitive().GetStringValue()
 			// Let us assert that the bound value is a correct enum Value
 			found := false
-			for _, ev := range expectedType.GetEnumType().Values {
+			for _, ev := range expectedType.GetEnumType().GetValues() {
 				if ev == v {
 					found = true
 					break
 				}
 			}
 			if !found {
-				errs.Collect(errors.NewIllegalEnumValueError(nodeID, nodeParam, v, expectedType.GetEnumType().Values))
+				errs.Collect(errors.NewIllegalEnumValueError(nodeID, nodeParam, v, expectedType.GetEnumType().GetValues()))
 			}
 		}
 
@@ -237,7 +237,7 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 
 			providedBindings.Insert(binding.GetVar())
 			if resolvedType, upstreamNodes, bindingOk := validateBinding(w, node, binding.GetVar(), binding.GetBinding(),
-				param.Type, errs.NewScope(), validateParamTypes); bindingOk {
+				param.GetType(), errs.NewScope(), validateParamTypes); bindingOk {
 				for _, upNode := range upstreamNodes {
 					// Add implicit Edges
 					switch edgeDirection {
@@ -259,7 +259,7 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 
 	// If we missed binding some params, add errors
 	if params != nil {
-		for paramName, Variable := range params.Variables {
+		for paramName, Variable := range params.GetVariables() {
 			if !providedBindings.Has(paramName) && !IsOptionalType(*Variable) {
 				errs.Collect(errors.NewParameterNotBoundErr(node.GetId(), paramName))
 			}
@@ -271,10 +271,10 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 
 // IsOptionalType Return true if there is a None type in Union Type
 func IsOptionalType(variable flyte.Variable) bool {
-	if variable.Type.GetUnionType() == nil {
+	if variable.GetType().GetUnionType() == nil {
 		return false
 	}
-	for _, variant := range variable.Type.GetUnionType().Variants {
+	for _, variant := range variable.GetType().GetUnionType().GetVariants() {
 		if flyte.SimpleType_NONE == variant.GetSimple() {
 			return true
 		}

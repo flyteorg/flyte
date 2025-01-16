@@ -279,7 +279,7 @@ func TestEvaluateBooleanExpression(t *testing.T) {
 			},
 		}
 
-		for k, v := range inputs.Literals {
+		for k, v := range inputs.GetLiterals() {
 			outerInputs.Literals[k] = v
 		}
 
