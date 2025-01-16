@@ -89,8 +89,10 @@ message RuntimeMetadata {
 
 // Task Metadata
 message TaskMetadata {
-    // Remove generates_deck from here.
+    // Field number 10 is reserved because we are reusing the name generates_deck for field number 15,
+    // but with a different type.
     reserved 10;
+
     // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
     bool discoverable = 1;
 

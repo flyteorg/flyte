@@ -1050,6 +1050,11 @@ pub struct Secret {
     /// +optional
     #[prost(enumeration="secret::MountType", tag="4")]
     pub mount_requirement: i32,
+    /// env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,
+    /// then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+    /// +optional
+    #[prost(string, tag="5")]
+    pub env_name: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Secret`.
 pub mod secret {
@@ -1391,11 +1396,11 @@ pub struct TaskMetadata {
     /// This would be used by CreateTask endpoint.
     #[prost(bool, tag="14")]
     pub is_eager: bool,
-    /// Indicates whether the task will generate a Deck URI when it finishes executing.
+    /// Indicates whether the task will generate a deck when it finishes executing.
     /// The BoolValue can have three states:
     /// - nil: The value is not set.
-    /// - true: The task will generate a Deck URI.
-    /// - false: The task will not generate a Deck URI.
+    /// - true: The task will generate a deck.
+    /// - false: The task will not generate a deck.
     #[prost(message, optional, tag="15")]
     pub generates_deck: ::core::option::Option<bool>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
@@ -2562,6 +2567,9 @@ pub struct NodeMetadata {
     /// Number of retries per task.
     #[prost(message, optional, tag="5")]
     pub retries: ::core::option::Option<RetryStrategy>,
+    /// Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+    #[prost(map="string, string", tag="10")]
+    pub config: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,
