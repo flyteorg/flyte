@@ -6420,9 +6420,6 @@ export namespace flyteidl {
             /** TaskMetadata cacheSerializable */
             cacheSerializable?: (boolean|null);
 
-            /** TaskMetadata generatesDeck */
-            generatesDeck?: (boolean|null);
-
             /** TaskMetadata tags */
             tags?: ({ [k: string]: string }|null);
 
@@ -6434,6 +6431,9 @@ export namespace flyteidl {
 
             /** TaskMetadata isEager */
             isEager?: (boolean|null);
+
+            /** TaskMetadata generatesDeck */
+            generatesDeck?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6469,9 +6469,6 @@ export namespace flyteidl {
             /** TaskMetadata cacheSerializable. */
             public cacheSerializable: boolean;
 
-            /** TaskMetadata generatesDeck. */
-            public generatesDeck: boolean;
-
             /** TaskMetadata tags. */
             public tags: { [k: string]: string };
 
@@ -6483,6 +6480,9 @@ export namespace flyteidl {
 
             /** TaskMetadata isEager. */
             public isEager: boolean;
+
+            /** TaskMetadata generatesDeck. */
+            public generatesDeck?: (google.protobuf.IBoolValue|null);
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

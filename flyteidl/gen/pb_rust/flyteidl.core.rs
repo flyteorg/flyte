@@ -1381,9 +1381,6 @@ pub struct TaskMetadata {
     /// Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     #[prost(bool, tag="9")]
     pub cache_serializable: bool,
-    /// Indicates whether the task will generate a Deck URI when it finishes executing.
-    #[prost(bool, tag="10")]
-    pub generates_deck: bool,
     /// Arbitrary tags that allow users and the platform to store small but arbitrary labels
     #[prost(map="string, string", tag="11")]
     pub tags: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
@@ -1399,6 +1396,13 @@ pub struct TaskMetadata {
     /// This would be used by CreateTask endpoint.
     #[prost(bool, tag="14")]
     pub is_eager: bool,
+    /// Indicates whether the task will generate a deck when it finishes executing.
+    /// The BoolValue can have three states:
+    /// - nil: The value is not set.
+    /// - true: The task will generate a deck.
+    /// - false: The task will not generate a deck.
+    #[prost(message, optional, tag="15")]
+    pub generates_deck: ::core::option::Option<bool>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
