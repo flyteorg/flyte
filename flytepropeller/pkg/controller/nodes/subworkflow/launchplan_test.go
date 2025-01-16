@@ -62,8 +62,9 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 	})
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.On("GetID").Return("n1")
-	mockNode.On("GetWorkflowNode").Return(mockWfNode)
+	mockNode.OnGetID().Return("n1")
+	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.OnGetConfig().Return(make(map[string]string))
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.On("GetAttempts").Return(attempts)
@@ -300,8 +301,9 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 	})
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.On("GetID").Return("n1")
-	mockNode.On("GetWorkflowNode").Return(mockWfNode)
+	mockNode.OnGetID().Return("n1")
+	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.OnGetConfig().Return(make(map[string]string))
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.On("GetAttempts").Return(attempts)
@@ -651,8 +653,9 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 	})
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.On("GetID").Return(nodeID)
-	mockNode.On("GetWorkflowNode").Return(mockWfNode)
+	mockNode.OnGetID().Return(nodeID)
+	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.OnGetConfig().Return(make(map[string]string))
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.On("GetAttempts").Return(attempts)

@@ -16,7 +16,8 @@ type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
-	GetConfig() *v1.ConfigMap
+	GetConfigMap() *v1.ConfigMap
+	GetConfig() map[string]string
 }
 
 type ConnectionWrapper struct {

@@ -144,6 +144,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	if a.cfg.ClusterID != "" {
 		labels[k8s.ParentClusterLabel] = a.cfg.ClusterID
 	}
+
 	parentShardLabel := launchCtx.Labels[k8s.ShardKeyLabel]
 	if parentShardLabel != "" {
 		labels[k8s.ParentShardLabel] = parentShardLabel
@@ -171,15 +172,24 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			Interruptible:       interruptible,
 			OverwriteCache:      launchCtx.OverwriteCache,
 			Envs:                &admin.Envs{Values: environmentVariables},
+			ClusterAssignment:   launchCtx.ClusterAssignment,
 		},
 	}
 
-	_, err = a.adminClient.CreateExecution(ctx, req)
+	if logger.IsLoggable(ctx, logger.DebugLevel) {
+		logger.Debugf(ctx, "Creating execution [%+v]", req)
+	}
+
+	resp, err := a.adminClient.CreateExecution(ctx, req)
 	if err != nil {
 		launchErr := a.handleLaunchError(ctx, !isRecovery, executionID, launchPlan.GetId(), err)
 		if launchErr != nil {
 			return launchErr
 		}
+	}
+
+	if logger.IsLoggable(ctx, logger.DebugLevel) {
+		logger.Debugf(ctx, "Create execution response [%+v]", resp)
 	}
 
 	hasOutputs := len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
@@ -189,6 +199,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		ParentWorkflowID:            parentWorkflowID,
 		UpdatedAt:                   time.Now(),
 	})
+
 	if err != nil {
 		logger.Infof(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}

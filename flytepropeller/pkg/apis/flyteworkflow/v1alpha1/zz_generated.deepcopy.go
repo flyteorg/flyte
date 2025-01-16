@@ -415,8 +415,8 @@ func (in *NodeSpec) DeepCopyInto(out *NodeSpec) {
 			}
 		}
 	}
-	if in.Config != nil {
-		in, out := &in.Config, &out.Config
+	if in.ConfigMap != nil {
+		in, out := &in.ConfigMap, &out.ConfigMap
 		*out = new(v1.ConfigMap)
 		(*in).DeepCopyInto(*out)
 	}

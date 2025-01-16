@@ -142,11 +142,12 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	id.OnGetID().Return(core.TaskExecutionIdentifier{})
 
 	to := &mocks.TaskOverrides{}
-	to.OnGetConfig().Return(&v12.ConfigMap{
+	to.OnGetConfigMap().Return(&v12.ConfigMap{
 		Data: map[string]string{
 			DynamicTaskQueueKey: "child_queue",
 		},
 	})
+	to.OnGetConfig().Return(nil)
 
 	to.OnGetResources().Return(&v12.ResourceRequirements{
 		Limits:   v12.ResourceList{},

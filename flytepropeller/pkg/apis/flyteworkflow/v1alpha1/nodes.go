@@ -130,9 +130,9 @@ type NodeSpec struct {
 	GateNode      *GateNodeSpec                 `json:"gate,omitempty"`
 	ArrayNode     *ArrayNodeSpec                `json:"array,omitempty"`
 	InputBindings []*Binding                    `json:"inputBindings,omitempty"`
-	Config        *typesv1.ConfigMap            `json:"config,omitempty"`
 	RetryStrategy *RetryStrategy                `json:"retry,omitempty"`
 	OutputAliases []Alias                       `json:"outputAlias,omitempty"`
+	ConfigMap     *typesv1.ConfigMap            `json:"configMap,omitempty"`
 
 	// SecurityContext holds pod-level security attributes and common container settings.
 	// Optional: Defaults to empty.  See type description for default values of each field.
@@ -188,6 +188,9 @@ type NodeSpec struct {
 	CacheSerializable *bool `json:"cacheSerializable,omitempty"`
 
 	ContainerImage string `json:"containerImage,omitempty"`
+
+	// Config maps to the Config in the NodeMetadata: https://github.com/unionai/flyte/blob/b28ffa1ec253effc60f102e572e0fdf9b617ba16/flyteidl/protos/flyteidl/core/workflow.proto#L204
+	Config map[string]string `json:"config,omitempty"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -228,7 +231,11 @@ func (in *NodeSpec) IsCacheSerializable() *bool {
 	return in.CacheSerializable
 }
 
-func (in *NodeSpec) GetConfig() *typesv1.ConfigMap {
+func (in *NodeSpec) GetConfigMap() *typesv1.ConfigMap {
+	return in.ConfigMap
+}
+
+func (in *NodeSpec) GetConfig() map[string]string {
 	return in.Config
 }
 

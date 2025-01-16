@@ -49,7 +49,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 
 	jobConfig := newJobConfig().
 		MergeFromKeyValuePairs(taskTemplate.GetContainer().GetConfig()).
-		MergeFromConfigMap(tCtx.TaskExecutionMetadata().GetOverrides().GetConfig())
+		MergeFromConfigMap(tCtx.TaskExecutionMetadata().GetOverrides().GetConfigMap())
 	if len(jobConfig.DynamicTaskQueue) == 0 {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "config[%v] is missing", DynamicTaskQueueKey)
 	}

@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -19,6 +20,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
+
+const ConfigClusterPool = "cluster_pool"
 
 type launchPlanHandler struct {
 	launchPlan     launchplan.Executor
@@ -77,6 +80,13 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 		Interruptible:        nCtx.ExecutionContext().GetExecutionConfig().Interruptible,
 		OverwriteCache:       nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache,
 		EnvironmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+	}
+
+	// If the node has a cluster pool, set it in the launch context
+	if clusterPoolName, found := nCtx.Node().GetConfig()[ConfigClusterPool]; found {
+		launchCtx.ClusterAssignment = &admin.ClusterAssignment{
+			ClusterPoolName: clusterPoolName,
+		}
 	}
 
 	if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {

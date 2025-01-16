@@ -412,25 +412,29 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	return workflowExecConfig, nil
 }
 
-func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.ExecutionCreateRequest) (*admin.ClusterAssignment, error) {
-	storedAssignment, err := m.fetchClusterAssignment(ctx, req.Org, req.Project, req.Domain)
-	if err != nil {
-		return nil, err
-	}
+// getClusterAssignment returns the cluster assignment for the execution. The precedence is as follows:
+// 1. Requested cluster assignment
+// 2. Launch plan cluster assignment
+// 3. Stored cluster assignment
+func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.ExecutionCreateRequest,
+	lpClusterAssignment *admin.ClusterAssignment) (*admin.ClusterAssignment, error) {
 
 	reqAssignment := req.GetSpec().GetClusterAssignment()
 	reqPool := reqAssignment.GetClusterPoolName()
-	storedPool := storedAssignment.GetClusterPoolName()
-	if reqPool == "" {
-		return storedAssignment, nil
-	}
+	lpPool := lpClusterAssignment.GetClusterPoolName()
 
-	if storedPool == "" {
+	// Precedence: Request > LaunchPlan > Stored
+	if len(reqPool) > 0 {
 		return reqAssignment, nil
 	}
 
-	if reqPool != storedPool {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "execution with project %q and domain %q cannot run on cluster pool %q, because its configured to run on pool %q", req.Project, req.Domain, reqPool, storedPool)
+	if len(lpPool) > 0 {
+		return lpClusterAssignment, nil
+	}
+
+	storedAssignment, err := m.fetchClusterAssignment(ctx, req.Org, req.Project, req.Domain)
+	if err != nil {
+		return nil, err
 	}
 
 	return storedAssignment, nil
@@ -675,7 +679,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		rawOutputDataConfig = executionConfig.RawOutputDataConfig
 	}
 
-	clusterAssignment, err := m.getClusterAssignment(ctx, request)
+	clusterAssignment, err := m.getClusterAssignment(ctx, request, launchPlan.Spec.ClusterAssignment)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1366,6 +1370,7 @@ func (m *ExecutionManager) launchExecution(
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		}
+
 		return err
 	})
 
@@ -1450,7 +1455,7 @@ func (m *ExecutionManager) launchExecution(
 		rawOutputDataConfig = executionConfig.RawOutputDataConfig
 	}
 
-	clusterAssignment, err := m.getClusterAssignment(ctx, request)
+	clusterAssignment, err := m.getClusterAssignment(ctx, request, launchPlan.GetSpec().GetClusterAssignment())
 	if err != nil {
 		return nil, nil, nil, err
 	}

@@ -160,6 +160,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	mockNode := &mocks2.ExecutableNode{}
 	mockNode.OnGetID().Return("n1")
 	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.OnGetConfig().Return(make(map[string]string))
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttempts().Return(attempts)

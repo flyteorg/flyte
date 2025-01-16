@@ -44,14 +44,14 @@ type NodeExecutionMetadata interface {
 }
 
 type NodeExecutionContext interface {
-	// This path is never read by propeller, but allows using some container or prefix in a specific container for all output from tasks
+	// RawOutputPrefix path is never read by propeller, but allows using some container or prefix in a specific container for all output from tasks
 	// Sandboxes provide exactly once execution semantics and only the successful sandbox wins. Ideally a sandbox should be a path that is
 	// available to the task at High Bandwidth (for example the base path of a sharded s3 bucket.
 	// This with a prefix based sharded strategy, could improve the throughput from S3 manifold)
 	RawOutputPrefix() storage.DataReference
 	RawOutputSuffix() []string
 
-	// Sharding strategy for the output data for this node execution.
+	// OutputShardSelector is the sharding strategy for the output data for this node execution.
 	OutputShardSelector() ioutils.ShardSelector
 
 	DataStore() *storage.DataStore

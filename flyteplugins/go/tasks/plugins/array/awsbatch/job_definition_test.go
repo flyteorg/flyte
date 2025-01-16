@@ -51,9 +51,10 @@ func TestEnsureJobDefinition(t *testing.T) {
 	}, nil)
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
+	overrides.OnGetConfig().Return(nil)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetGeneratedName().Return("found")
@@ -122,9 +123,10 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 	}, nil)
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
+	overrides.OnGetConfig().Return(nil)
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetGeneratedName().Return("found")

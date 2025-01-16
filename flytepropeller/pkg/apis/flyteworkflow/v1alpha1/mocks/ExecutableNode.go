@@ -158,7 +158,7 @@ type ExecutableNode_GetConfig struct {
 	*mock.Call
 }
 
-func (_m ExecutableNode_GetConfig) Return(_a0 *v1.ConfigMap) *ExecutableNode_GetConfig {
+func (_m ExecutableNode_GetConfig) Return(_a0 map[string]string) *ExecutableNode_GetConfig {
 	return &ExecutableNode_GetConfig{Call: _m.Call.Return(_a0)}
 }
 
@@ -173,7 +173,41 @@ func (_m *ExecutableNode) OnGetConfigMatch(matchers ...interface{}) *ExecutableN
 }
 
 // GetConfig provides a mock function with given fields:
-func (_m *ExecutableNode) GetConfig() *v1.ConfigMap {
+func (_m *ExecutableNode) GetConfig() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_GetConfigMap struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetConfigMap) Return(_a0 *v1.ConfigMap) *ExecutableNode_GetConfigMap {
+	return &ExecutableNode_GetConfigMap{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetConfigMap() *ExecutableNode_GetConfigMap {
+	c_call := _m.On("GetConfigMap")
+	return &ExecutableNode_GetConfigMap{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetConfigMapMatch(matchers ...interface{}) *ExecutableNode_GetConfigMap {
+	c_call := _m.On("GetConfigMap", matchers...)
+	return &ExecutableNode_GetConfigMap{Call: c_call}
+}
+
+// GetConfigMap provides a mock function with given fields:
+func (_m *ExecutableNode) GetConfigMap() *v1.ConfigMap {
 	ret := _m.Called()
 
 	var r0 *v1.ConfigMap

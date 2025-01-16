@@ -18,7 +18,7 @@ type TaskOverrides_GetConfig struct {
 	*mock.Call
 }
 
-func (_m TaskOverrides_GetConfig) Return(_a0 *v1.ConfigMap) *TaskOverrides_GetConfig {
+func (_m TaskOverrides_GetConfig) Return(_a0 map[string]string) *TaskOverrides_GetConfig {
 	return &TaskOverrides_GetConfig{Call: _m.Call.Return(_a0)}
 }
 
@@ -33,7 +33,41 @@ func (_m *TaskOverrides) OnGetConfigMatch(matchers ...interface{}) *TaskOverride
 }
 
 // GetConfig provides a mock function with given fields:
-func (_m *TaskOverrides) GetConfig() *v1.ConfigMap {
+func (_m *TaskOverrides) GetConfig() map[string]string {
+	ret := _m.Called()
+
+	var r0 map[string]string
+	if rf, ok := ret.Get(0).(func() map[string]string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
+type TaskOverrides_GetConfigMap struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetConfigMap) Return(_a0 *v1.ConfigMap) *TaskOverrides_GetConfigMap {
+	return &TaskOverrides_GetConfigMap{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetConfigMap() *TaskOverrides_GetConfigMap {
+	c_call := _m.On("GetConfigMap")
+	return &TaskOverrides_GetConfigMap{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetConfigMapMatch(matchers ...interface{}) *TaskOverrides_GetConfigMap {
+	c_call := _m.On("GetConfigMap", matchers...)
+	return &TaskOverrides_GetConfigMap{Call: c_call}
+}
+
+// GetConfigMap provides a mock function with given fields:
+func (_m *TaskOverrides) GetConfigMap() *v1.ConfigMap {
 	ret := _m.Called()
 
 	var r0 *v1.ConfigMap

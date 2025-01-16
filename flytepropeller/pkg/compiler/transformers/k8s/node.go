@@ -118,6 +118,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		CacheVersion:      cacheVersion,
 		CacheSerializable: cacheSerializable,
 		ContainerImage:    containerImage,
+		Config:            n.GetMetadata().GetConfig(),
 	}
 
 	switch v := n.GetTarget().(type) {

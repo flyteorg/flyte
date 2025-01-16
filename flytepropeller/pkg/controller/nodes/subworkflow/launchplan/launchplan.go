@@ -32,6 +32,7 @@ type LaunchContext struct {
 	Interruptible        *bool
 	OverwriteCache       bool
 	EnvironmentVariables map[string]string
+	ClusterAssignment    *admin.ClusterAssignment
 }
 
 // Executor interface to be implemented by the remote system that can allow workflow launching capabilities

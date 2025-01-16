@@ -140,7 +140,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		"dynamic-queue": "queue1",
 	}})
 	overrides.OnGetResources().Return(&v1.ResourceRequirements{

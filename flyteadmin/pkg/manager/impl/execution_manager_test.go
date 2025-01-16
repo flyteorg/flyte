@@ -466,21 +466,6 @@ func TestCreateExecution(t *testing.T) {
 		OnGetResourceMatch(mock.Anything, managerInterfaces.ResourceRequest{
 			Org:          request.Org,
 			Project:      request.Project,
-			Domain:       request.Domain,
-			ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
-		}).
-		Return(&managerInterfaces.ResourceResponse{
-			Attributes: &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ClusterAssignment{
-					ClusterAssignment: &admin.ClusterAssignment{ClusterPoolName: "gpu"},
-				},
-			},
-		}, nil).
-		Once()
-	mockResourceManager.
-		OnGetResourceMatch(mock.Anything, managerInterfaces.ResourceRequest{
-			Org:          request.Org,
-			Project:      request.Project,
 			ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
 		}).
 		Return(&managerInterfaces.ResourceResponse{}, nil).
@@ -6198,7 +6183,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			Project: workflowIdentifier.Project,
 			Domain:  workflowIdentifier.Domain,
 			Spec:    &admin.ExecutionSpec{},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &clusterAssignment))
 	})
@@ -6222,7 +6207,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			Project: workflowIdentifier.Project,
 			Domain:  workflowIdentifier.Domain,
 			Spec:    &admin.ExecutionSpec{},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, customCP, ca.GetClusterPoolName())
 	})
@@ -6234,7 +6219,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			Spec: &admin.ExecutionSpec{
 				ClusterAssignment: &reqClusterAssignment,
 			},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
 	})
@@ -6253,7 +6238,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			Spec: &admin.ExecutionSpec{
 				ClusterAssignment: &reqClusterAssignment,
 			},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
 	})
@@ -6279,23 +6264,9 @@ func TestGetClusterAssignment(t *testing.T) {
 			Spec: &admin.ExecutionSpec{
 				ClusterAssignment: &reqClusterAssignment,
 			},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
-	})
-	t.Run("value from request doesn't match value from config", func(t *testing.T) {
-		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
-		_, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
-			Project: workflowIdentifier.Project,
-			Domain:  workflowIdentifier.Domain,
-			Spec: &admin.ExecutionSpec{
-				ClusterAssignment: &reqClusterAssignment,
-			},
-		})
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.InvalidArgument, st.Code())
-		assert.Equal(t, `execution with project "project" and domain "domain" cannot run on cluster pool "swimming-pool", because its configured to run on pool "gpu"`, st.Message())
 	})
 }
 

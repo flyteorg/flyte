@@ -438,7 +438,7 @@ type ExecutableNode interface {
 	GetInputBindings() []*Binding
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
-	GetConfig() *v1.ConfigMap
+	GetConfigMap() *v1.ConfigMap
 	GetRetryStrategy() *RetryStrategy
 	GetExecutionDeadline() *time.Duration
 	GetActiveDeadline() *time.Duration
@@ -448,6 +448,7 @@ type ExecutableNode interface {
 	GetCacheVersion() *string
 	IsCacheSerializable() *bool
 	GetContainerImage() string
+	GetConfig() map[string]string
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow

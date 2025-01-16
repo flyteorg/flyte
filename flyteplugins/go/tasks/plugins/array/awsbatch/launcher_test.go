@@ -55,9 +55,10 @@ func TestLaunchSubTasks(t *testing.T) {
 	})
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
+	overrides.OnGetConfig().Return(nil)
 	overrides.OnGetResources().Return(&v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU: resource.MustParse("10"),

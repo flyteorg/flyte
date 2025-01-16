@@ -111,9 +111,10 @@ func TestExecutor_Handle(t *testing.T) {
 	})
 
 	overrides := &pluginMocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.OnGetConfigMap().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
+	overrides.OnGetConfig().Return(make(map[string]string))
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
