@@ -4707,6 +4707,9 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable */
             cacheSerializable?: (boolean|null);
+
+            /** NodeMetadata config */
+            config?: ({ [k: string]: string }|null);
         }
 
         /** Represents a NodeMetadata. */
@@ -4738,6 +4741,9 @@ export namespace flyteidl {
 
             /** NodeMetadata cacheSerializable. */
             public cacheSerializable: boolean;
+
+            /** NodeMetadata config. */
+            public config: { [k: string]: string };
 
             /** NodeMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -6640,6 +6646,9 @@ export namespace flyteidl {
 
             /** ContainerPort containerPort */
             containerPort?: (number|null);
+
+            /** ContainerPort name */
+            name?: (string|null);
         }
 
         /** Represents a ContainerPort. */
@@ -6653,6 +6662,9 @@ export namespace flyteidl {
 
             /** ContainerPort containerPort. */
             public containerPort: number;
+
+            /** ContainerPort name. */
+            public name: string;
 
             /**
              * Creates a new ContainerPort instance using the specified properties.
@@ -7165,6 +7177,9 @@ export namespace flyteidl {
 
             /** Secret mountRequirement */
             mountRequirement?: (flyteidl.core.Secret.MountType|null);
+
+            /** Secret envName */
+            envName?: (string|null);
         }
 
         /** Represents a Secret. */
@@ -7187,6 +7202,9 @@ export namespace flyteidl {
 
             /** Secret mountRequirement. */
             public mountRequirement: flyteidl.core.Secret.MountType;
+
+            /** Secret envName. */
+            public envName: string;
 
             /**
              * Creates a new Secret instance using the specified properties.
@@ -16140,6 +16158,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** LaunchPlanSpec clusterAssignment */
+            clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -16201,6 +16222,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** LaunchPlanSpec clusterAssignment. */
+            public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.

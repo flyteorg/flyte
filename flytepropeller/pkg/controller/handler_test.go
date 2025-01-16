@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -249,7 +250,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -268,7 +269,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("handlingPanics", func(t *testing.T) {
@@ -276,7 +277,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -294,7 +295,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 		assert.Equal(t, uint32(1), r.Status.FailedAttempts)
 	})
 
@@ -303,7 +304,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -322,7 +323,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("retriesExhaustedFinalize", func(t *testing.T) {
@@ -330,7 +331,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -351,7 +352,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 		assert.True(t, abortCalled)
 	})
@@ -362,7 +363,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,
 				Namespace:         namespace,
-				Finalizers:        []string{"f1"},
+				Finalizers:        []string{Finalizer, "f1"},
 				DeletionTimestamp: &n,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
@@ -381,7 +382,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseAborted, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 
@@ -420,7 +421,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -435,7 +436,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSuccess, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 
@@ -444,7 +445,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -459,7 +460,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 	t.Run("failOnExecutionNotFoundError", func(t *testing.T) {
@@ -638,7 +639,7 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -662,7 +663,7 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("happy-nochange", func(t *testing.T) {
@@ -843,7 +844,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
-			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !HasFinalizer(w) && HasCompletedLabel(w)
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !controllerutil.ContainsFinalizer(w, Finalizer) && HasCompletedLabel(w)
 		}), mock.Anything).Return(nil, nil).Once()
 		err := p.Handle(ctx, namespace, name)
 		assert.NoError(t, err)

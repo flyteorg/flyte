@@ -5356,6 +5356,10 @@
             "$ref": "#/definitions/coreExecutionEnvAssignment"
           },
           "description": "Execution environment assignments to be set for the execution."
+        },
+        "cluster_assignment": {
+          "$ref": "#/definitions/adminClusterAssignment",
+          "description": "ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.\nThis can be overwritten at execution creation level."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -7083,6 +7087,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 \u003c x \u003c 65536."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the port to expose on the pod's IP address."
         }
       },
       "description": "Defines port properties for a container."
@@ -7690,6 +7698,13 @@
         },
         "cache_serializable": {
           "type": "boolean"
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Config is a bag of properties that can be used to instruct propeller on how to execute the node."
         }
       },
       "description": "Defines extra information about the Node."
@@ -8021,6 +8036,10 @@
         "mount_requirement": {
           "$ref": "#/definitions/SecretMountType",
           "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        },
+        "env_name": {
+          "type": "string",
+          "title": "env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,\nthen the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.\n+optional"
         }
       },
       "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."

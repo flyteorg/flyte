@@ -5,10 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -16,9 +19,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+//go:generate mockery -all -case=underscore -output=../mocks -case=underscore
+
+type SendgridClient interface {
+	Send(email *mail.SGMailV3) (*rest.Response, error)
+}
+
 type SendgridEmailer struct {
-	client        *sendgrid.Client
+	client        SendgridClient
 	systemMetrics emailMetrics
+	cfg           *runtimeInterfaces.NotificationsConfig
 }
 
 func getEmailAddresses(addresses []string) []*mail.Email {
@@ -63,9 +73,18 @@ func getAPIKey(config runtimeInterfaces.EmailServerConfig) string {
 func (s SendgridEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	m := getSendgridEmail(email)
 	s.systemMetrics.SendTotal.Inc()
-	response, err := s.client.Send(m)
+	var response *rest.Response
+	var err error
+	err = async.Retry(s.cfg.ReconnectAttempts, time.Duration(s.cfg.ReconnectDelaySeconds)*time.Second, func() error {
+		response, err = s.client.Send(m)
+		if err != nil {
+			logger.Errorf(ctx, "Sendgrid error sending email: %+v with: %+v", email, err)
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		logger.Errorf(ctx, "Sendgrid error sending %s", err)
+		logger.Errorf(ctx, "all attempts to send email %+v via sendgrid failed: %+v", email, err)
 		s.systemMetrics.SendError.Inc()
 		return err
 	}
@@ -79,5 +98,6 @@ func NewSendGridEmailer(config runtimeInterfaces.NotificationsConfig, scope prom
 	return &SendgridEmailer{
 		client:        sendgrid.NewSendClient(getAPIKey(config.NotificationsEmailerConfig.EmailerConfig)),
 		systemMetrics: newEmailMetrics(scope.NewSubScope("sendgrid")),
+		cfg:           &config,
 	}
 }

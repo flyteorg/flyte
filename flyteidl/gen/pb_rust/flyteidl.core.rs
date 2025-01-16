@@ -1050,6 +1050,11 @@ pub struct Secret {
     /// +optional
     #[prost(enumeration="secret::MountType", tag="4")]
     pub mount_requirement: i32,
+    /// env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,
+    /// then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+    /// +optional
+    #[prost(string, tag="5")]
+    pub env_name: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Secret`.
 pub mod secret {
@@ -1484,12 +1489,15 @@ pub mod task_template {
 
 /// Defines port properties for a container.
 #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ContainerPort {
     /// Number of port to expose on the pod's IP address.
     /// This must be a valid port number, 0 < x < 65536.
     #[prost(uint32, tag="1")]
     pub container_port: u32,
+    /// Name of the port to expose on the pod's IP address.
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2555,6 +2563,9 @@ pub struct NodeMetadata {
     /// Number of retries per task.
     #[prost(message, optional, tag="5")]
     pub retries: ::core::option::Option<RetryStrategy>,
+    /// Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+    #[prost(map="string, string", tag="10")]
+    pub config: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,

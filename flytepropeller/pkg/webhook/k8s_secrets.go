@@ -75,10 +75,25 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, prefixEnvVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, prefixEnvVar)
+
+		if secret.GetEnvName() != "" {
+			extraEnvVar := CreateVolumeMountEnvVarForSecretWithEnvName(secret)
+			p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, extraEnvVar)
+			p.Spec.Containers = AppendEnvVars(p.Spec.Containers, extraEnvVar)
+		}
+
 	case core.Secret_ENV_VAR:
 		envVar := CreateEnvVarForSecret(secret)
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
+
+		if secret.GetEnvName() != "" {
+			extraEnvVar := *envVar.DeepCopy()
+			extraEnvVar.Name = secret.GetEnvName()
+
+			p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, extraEnvVar)
+			p.Spec.Containers = AppendEnvVars(p.Spec.Containers, extraEnvVar)
+		}
 
 		prefixEnvVar := corev1.EnvVar{
 			Name:  SecretEnvVarPrefix,

@@ -68,7 +68,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
-	github.com/flyteorg/stow v0.3.10 // indirect
+	github.com/flyteorg/stow v0.3.11 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.1.1 // indirect
@@ -144,7 +144,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/ncw/swift v1.0.53 // indirect
-	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/ory/fosite v0.42.2 // indirect
 	github.com/ory/go-acc v0.2.6 // indirect
 	github.com/ory/go-convenience v0.1.0 // indirect
