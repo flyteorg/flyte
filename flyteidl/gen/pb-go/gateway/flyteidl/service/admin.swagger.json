@@ -5672,6 +5672,9 @@
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs"
         },
+        "input_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
+        },
         "output_variable_map": {
           "$ref": "#/definitions/coreVariableMap"
         }
@@ -6193,6 +6196,9 @@
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs",
           "title": "flyte tiny url to fetch a core.LiteralMap of task execution's IO\nDeck will be empty for task"
+        },
+        "input_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
         },
         "output_variable_map": {
           "$ref": "#/definitions/coreVariableMap"

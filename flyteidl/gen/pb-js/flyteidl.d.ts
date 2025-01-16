@@ -17606,6 +17606,9 @@ export namespace flyteidl {
             /** NodeExecutionGetDataResponse flyteUrls */
             flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
 
+            /** NodeExecutionGetDataResponse inputVariableMap */
+            inputVariableMap?: (flyteidl.core.IVariableMap|null);
+
             /** NodeExecutionGetDataResponse outputVariableMap */
             outputVariableMap?: (flyteidl.core.IVariableMap|null);
         }
@@ -17636,6 +17639,9 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse flyteUrls. */
             public flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** NodeExecutionGetDataResponse inputVariableMap. */
+            public inputVariableMap?: (flyteidl.core.IVariableMap|null);
 
             /** NodeExecutionGetDataResponse outputVariableMap. */
             public outputVariableMap?: (flyteidl.core.IVariableMap|null);
@@ -20515,6 +20521,9 @@ export namespace flyteidl {
             /** TaskExecutionGetDataResponse flyteUrls */
             flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
 
+            /** TaskExecutionGetDataResponse inputVariableMap */
+            inputVariableMap?: (flyteidl.core.IVariableMap|null);
+
             /** TaskExecutionGetDataResponse outputVariableMap */
             outputVariableMap?: (flyteidl.core.IVariableMap|null);
         }
@@ -20542,6 +20551,9 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse flyteUrls. */
             public flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
+
+            /** TaskExecutionGetDataResponse inputVariableMap. */
+            public inputVariableMap?: (flyteidl.core.IVariableMap|null);
 
             /** TaskExecutionGetDataResponse outputVariableMap. */
             public outputVariableMap?: (flyteidl.core.IVariableMap|null);

@@ -2474,6 +2474,8 @@ pub struct NodeExecutionGetDataResponse {
     #[prost(message, optional, tag="17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
     #[prost(message, optional, tag="18")]
+    pub input_variable_map: ::core::option::Option<super::core::VariableMap>,
+    #[prost(message, optional, tag="19")]
     pub output_variable_map: ::core::option::Option<super::core::VariableMap>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -3184,6 +3186,8 @@ pub struct TaskExecutionGetDataResponse {
     #[prost(message, optional, tag="5")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
     #[prost(message, optional, tag="6")]
+    pub input_variable_map: ::core::option::Option<super::core::VariableMap>,
+    #[prost(message, optional, tag="7")]
     pub output_variable_map: ::core::option::Option<super::core::VariableMap>,
 }
 /// Response for the GetVersion API

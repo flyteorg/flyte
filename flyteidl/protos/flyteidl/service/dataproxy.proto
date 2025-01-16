@@ -163,7 +163,6 @@ message GetDataResponse {
 
   // Return VariableMap if the request is for a node execution input/output with dataclasses.
   optional core.VariableMap variable_map = 4;
-
 }
 
 // DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.

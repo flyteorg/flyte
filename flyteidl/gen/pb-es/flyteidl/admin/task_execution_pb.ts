@@ -560,7 +560,12 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
   flyteUrls?: FlyteURLs;
 
   /**
-   * @generated from field: flyteidl.core.VariableMap output_variable_map = 6;
+   * @generated from field: flyteidl.core.VariableMap input_variable_map = 6;
+   */
+  inputVariableMap?: VariableMap;
+
+  /**
+   * @generated from field: flyteidl.core.VariableMap output_variable_map = 7;
    */
   outputVariableMap?: VariableMap;
 
@@ -577,7 +582,8 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
     { no: 5, name: "flyte_urls", kind: "message", T: FlyteURLs },
-    { no: 6, name: "output_variable_map", kind: "message", T: VariableMap },
+    { no: 6, name: "input_variable_map", kind: "message", T: VariableMap },
+    { no: 7, name: "output_variable_map", kind: "message", T: VariableMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionGetDataResponse {

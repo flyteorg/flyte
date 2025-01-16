@@ -5672,6 +5672,9 @@
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs"
         },
+        "input_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
+        },
         "output_variable_map": {
           "$ref": "#/definitions/coreVariableMap"
         }
@@ -6193,6 +6196,9 @@
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs",
           "title": "flyte tiny url to fetch a core.LiteralMap of task execution's IO\nDeck will be empty for task"
+        },
+        "input_variable_map": {
+          "$ref": "#/definitions/coreVariableMap"
         },
         "output_variable_map": {
           "$ref": "#/definitions/coreVariableMap"
@@ -8699,8 +8705,6 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "title": "log information for the external resource execution"
-<<<<<<< HEAD
-=======
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -8708,7 +8712,6 @@
         "custom_info": {
           "type": "object",
           "title": "Extensible field for custom, plugin-specific info"
->>>>>>> 33bca79f0 (Send actor worker assignment in task events (#394)(#393))
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."

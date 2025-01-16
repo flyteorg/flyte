@@ -238,7 +238,9 @@ message NodeExecutionGetDataResponse {
 
     FlyteURLs flyte_urls = 17;
 
-    core.VariableMap output_variable_map = 18;
+    core.VariableMap input_variable_map = 18;
+
+    core.VariableMap output_variable_map = 19;
 
 }
 

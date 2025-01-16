@@ -370,6 +370,7 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.
 	var vm *core.VariableMap
 	if ioType == common.ArtifactTypeI {
 		lm = resp.GetFullInputs()
+		vm = resp.GetInputVariableMap()
 	} else if ioType == common.ArtifactTypeO {
 		lm = resp.GetFullOutputs()
 		vm = resp.GetOutputVariableMap()
@@ -423,6 +424,7 @@ func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.
 
 	if ioType == common.ArtifactTypeI {
 		lm = resp.GetFullInputs()
+		vm = resp.GetInputVariableMap()
 	} else if ioType == common.ArtifactTypeO {
 		lm = resp.GetFullOutputs()
 		vm = resp.GetOutputVariableMap()

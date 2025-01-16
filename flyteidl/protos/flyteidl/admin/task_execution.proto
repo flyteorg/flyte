@@ -167,5 +167,7 @@ message TaskExecutionGetDataResponse {
     // Deck will be empty for task
     FlyteURLs flyte_urls = 5;
 
-    core.VariableMap output_variable_map = 6;
+    core.VariableMap input_variable_map = 6;
+
+    core.VariableMap output_variable_map = 7;
 }

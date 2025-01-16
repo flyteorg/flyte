@@ -827,7 +827,12 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
   flyteUrls?: FlyteURLs;
 
   /**
-   * @generated from field: flyteidl.core.VariableMap output_variable_map = 18;
+   * @generated from field: flyteidl.core.VariableMap input_variable_map = 18;
+   */
+  inputVariableMap?: VariableMap;
+
+  /**
+   * @generated from field: flyteidl.core.VariableMap output_variable_map = 19;
    */
   outputVariableMap?: VariableMap;
 
@@ -845,7 +850,8 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
     { no: 16, name: "dynamic_workflow", kind: "message", T: DynamicWorkflowNodeMetadata },
     { no: 17, name: "flyte_urls", kind: "message", T: FlyteURLs },
-    { no: 18, name: "output_variable_map", kind: "message", T: VariableMap },
+    { no: 18, name: "input_variable_map", kind: "message", T: VariableMap },
+    { no: 19, name: "output_variable_map", kind: "message", T: VariableMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeExecutionGetDataResponse {
