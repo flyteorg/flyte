@@ -69,7 +69,7 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 
 func CreateVolumeMountEnvVarForSecretWithEnvName(secret *core.Secret) corev1.EnvVar {
 	return corev1.EnvVar{
-		Name:  secret.GetEnvName(),
+		Name:  secret.GetEnvVar(),
 		Value: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.GetGroup()), strings.ToLower(secret.GetKey())),
 	}
 }

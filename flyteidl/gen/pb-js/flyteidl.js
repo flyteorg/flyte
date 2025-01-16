@@ -17393,7 +17393,7 @@
                  * @property {string|null} [groupVersion] Secret groupVersion
                  * @property {string|null} [key] Secret key
                  * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
-                 * @property {string|null} [envName] Secret envName
+                 * @property {string|null} [envVar] Secret envVar
                  */
     
                 /**
@@ -17444,12 +17444,12 @@
                 Secret.prototype.mountRequirement = 0;
     
                 /**
-                 * Secret envName.
-                 * @member {string} envName
+                 * Secret envVar.
+                 * @member {string} envVar
                  * @memberof flyteidl.core.Secret
                  * @instance
                  */
-                Secret.prototype.envName = "";
+                Secret.prototype.envVar = "";
     
                 /**
                  * Creates a new Secret instance using the specified properties.
@@ -17483,8 +17483,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.key);
                     if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mountRequirement);
-                    if (message.envName != null && message.hasOwnProperty("envName"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.envName);
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.envVar);
                     return writer;
                 };
     
@@ -17519,7 +17519,7 @@
                             message.mountRequirement = reader.int32();
                             break;
                         case 5:
-                            message.envName = reader.string();
+                            message.envVar = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17558,9 +17558,9 @@
                         case 2:
                             break;
                         }
-                    if (message.envName != null && message.hasOwnProperty("envName"))
-                        if (!$util.isString(message.envName))
-                            return "envName: string expected";
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        if (!$util.isString(message.envVar))
+                            return "envVar: string expected";
                     return null;
                 };
     
