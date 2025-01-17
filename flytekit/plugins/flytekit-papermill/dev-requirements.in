@@ -1,0 +1,4 @@
+flyteidl>=1.10.7b0
+-e file:../../.#egg=flytekitplugins-pod&subdirectory=plugins/flytekit-k8s-pod
+-e file:../../.#egg=flytekitplugins-spark&subdirectory=plugins/flytekit-spark
+-e file:../../.#egg=flytekitplugins-awsbatch&subdirectory=plugins/flytekit-aws-batch
