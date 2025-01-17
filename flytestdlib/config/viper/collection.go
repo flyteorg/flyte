@@ -114,7 +114,7 @@ func (c CollectionProxy) MergeConfig(in io.Reader) error {
 }
 
 func (c CollectionProxy) MergeAllConfigs() (all Viper, err error) {
-	combinedConfig := viperLib.New()
+	combinedConfig := viperLib.NewWithOptions(viperLib.KeyDelimiter(KeyDelim))
 	if c.envVars != nil {
 		for _, envConfig := range c.envVars {
 			err = combinedConfig.BindEnv(envConfig...)

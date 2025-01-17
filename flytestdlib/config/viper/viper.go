@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	keyDelim = "."
+	KeyDelim = "::"
 )
 
 var (
@@ -81,7 +81,7 @@ func (v viperAccessor) addSectionsPFlags(flags *pflag.FlagSet) (err error) {
 
 func (v viperAccessor) addSubsectionsPFlags(flags *pflag.FlagSet, rootKey string, root config.Section) error {
 	for key, section := range root.GetSections() {
-		prefix := rootKey + key + keyDelim
+		prefix := rootKey + key + KeyDelim
 		if asPFlagProvider, ok := section.GetConfig().(config.PFlagProvider); ok {
 			flags.AddFlagSet(asPFlagProvider.GetPFlagSet(prefix))
 		}
@@ -110,7 +110,7 @@ func (v viperAccessor) bindViperConfigsEnvDepth(m map[string]interface{}, prefix
 	for key, val := range m {
 		subKey := prefix + key
 		if asMap, ok := val.(map[string]interface{}); ok {
-			errs.Append(v.bindViperConfigsEnvDepth(asMap, subKey+keyDelim))
+			errs.Append(v.bindViperConfigsEnvDepth(asMap, subKey+KeyDelim))
 		} else {
 			errs.Append(v.viper.BindEnv(subKey, strings.ToUpper(strings.Replace(subKey, "-", "_", -1))))
 		}
@@ -272,6 +272,9 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 	if asMap, casted := settings.(map[string]interface{}); casted {
 		myMap := map[string]interface{}{}
 		for childKey, childValue := range asMap {
+			if childKey == "default-annotations" {
+				logger.Debugf(context.Background(), "Found default-annotations in config. Skipping.")
+			}
 			if childSection, found := root.GetSections()[childKey]; found {
 				errs.Append(v.parseViperConfigRecursive(childSection, childValue))
 			} else {
@@ -396,7 +399,7 @@ func (v viperAccessor) sendUpdatedEvents(ctx context.Context, root config.Sectio
 			section.GetConfigUpdatedHandler()(ctx, section.GetConfig())
 		}
 
-		v.sendUpdatedEvents(ctx, section, forceSend, sectionKey+key+keyDelim)
+		v.sendUpdatedEvents(ctx, section, forceSend, sectionKey+key+KeyDelim)
 	}
 }
 
@@ -413,7 +416,7 @@ func newAccessor(opts config.Options) *viperAccessor {
 	vipers := make([]Viper, 0, 1)
 	configFiles := files.FindConfigFiles(opts.SearchPaths)
 	for _, configFile := range configFiles {
-		v := viperLib.New()
+		v := viperLib.NewWithOptions(viperLib.KeyDelimiter(KeyDelim))
 		v.SetConfigFile(configFile)
 
 		vipers = append(vipers, v)
@@ -421,7 +424,7 @@ func newAccessor(opts config.Options) *viperAccessor {
 
 	// Create a default viper even if we couldn't find any matching files
 	if len(configFiles) == 0 {
-		v := viperLib.New()
+		v := viperLib.NewWithOptions(viperLib.KeyDelimiter(KeyDelim))
 		vipers = append(vipers, v)
 	}
 

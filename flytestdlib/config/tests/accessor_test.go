@@ -22,6 +22,7 @@ import (
 	k8sRand "k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
 )
 
@@ -132,7 +133,7 @@ func TestAccessor_InitializePflags(t *testing.T) {
 
 			set := pflag.NewFlagSet("test", pflag.ContinueOnError)
 			v.InitializePflags(set)
-			key := "MY_COMPONENT.STR2"
+			key := fmt.Sprintf("MY_COMPONENT%sSTR2", viper.KeyDelim)
 			assert.NoError(t, os.Setenv(key, "123"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
@@ -179,10 +180,10 @@ func TestAccessor_InitializePflags(t *testing.T) {
 
 			set := pflag.NewFlagSet("test", pflag.ExitOnError)
 			v.InitializePflags(set)
-			assert.NoError(t, set.Parse([]string{"--my-component.nested.int-val=3"}))
+			assert.NoError(t, set.Parse([]string{fmt.Sprintf("--my-component%snested%sint-val=3", viper.KeyDelim, viper.KeyDelim)}))
 			assert.True(t, set.Parsed())
 
-			flagValue, err := set.GetInt("my-component.nested.int-val")
+			flagValue, err := set.GetInt(fmt.Sprintf("my-component%snested%sint-val", viper.KeyDelim, viper.KeyDelim))
 			assert.NoError(t, err)
 			assert.Equal(t, 3, flagValue)
 
@@ -414,7 +415,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				SearchPaths: []string{filepath.Join("testdata", "config.yaml")},
 				RootSection: reg,
 			})
-			key := strings.ToUpper("my-component.str")
+			key := strings.ToUpper(fmt.Sprintf("my-component%sstr", viper.KeyDelim))
 			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
@@ -428,7 +429,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			assert.NoError(t, err)
 
 			v := provider(config.Options{RootSection: reg})
-			key := strings.ToUpper("my-component.str3")
+			key := strings.ToUpper(fmt.Sprintf("my-component%sstr3", viper.KeyDelim))
 			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
@@ -521,7 +522,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				SearchPaths: []string{filepath.Join("testdata", "config.yaml")},
 				RootSection: reg,
 			})
-			key := strings.ToUpper("my-component.str")
+			key := strings.ToUpper(fmt.Sprintf("my-component%sstr", viper.KeyDelim))
 			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
