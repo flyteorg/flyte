@@ -224,7 +224,25 @@ func TestStripTypeMetadata(t *testing.T) {
 											},
 										},
 									},
-									Structure: &core.TypeStructure{Tag: "str"},
+									Structure: &core.TypeStructure{
+										DataclassType: map[string]*core.LiteralType{
+											"foo": {
+												Type: &core.LiteralType_Simple{
+													Simple: core.SimpleType_STRING,
+												},
+												Metadata: &_struct.Struct{
+													Fields: map[string]*_struct.Value{
+														"foo": {
+															Kind: &_struct.Value_StringValue{
+																StringValue: "bar",
+															},
+														},
+													},
+												},
+											},
+										},
+										Tag: "str",
+									},
 								},
 							},
 						},
@@ -241,7 +259,16 @@ func TestStripTypeMetadata(t *testing.T) {
 									Type: &core.LiteralType_Simple{
 										Simple: core.SimpleType_STRING,
 									},
-									Structure: &core.TypeStructure{Tag: "str"},
+									Structure: &core.TypeStructure{
+										DataclassType: map[string]*core.LiteralType{
+											"foo": {
+												Type: &core.LiteralType_Simple{
+													Simple: core.SimpleType_STRING,
+												},
+											},
+										},
+										Tag: "str",
+									},
 								},
 							},
 						},
