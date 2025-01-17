@@ -272,9 +272,6 @@ func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings i
 	if asMap, casted := settings.(map[string]interface{}); casted {
 		myMap := map[string]interface{}{}
 		for childKey, childValue := range asMap {
-			if childKey == "default-annotations" {
-				logger.Debugf(context.Background(), "Found default-annotations in config. Skipping.")
-			}
 			if childSection, found := root.GetSections()[childKey]; found {
 				errs.Append(v.parseViperConfigRecursive(childSection, childValue))
 			} else {
