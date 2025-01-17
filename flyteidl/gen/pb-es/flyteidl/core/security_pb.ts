@@ -56,13 +56,13 @@ export class Secret extends Message<Secret> {
   mountRequirement = Secret_MountType.ANY;
 
   /**
-   * env_name is optional. Custom environment name to set the value of the secret. If mount_requirement is ENV_VAR,
+   * env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,
    * then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
    * +optional
    *
-   * @generated from field: string env_name = 5;
+   * @generated from field: string env_var = 5;
    */
-  envName = "";
+  envVar = "";
 
   constructor(data?: PartialMessage<Secret>) {
     super();
@@ -76,7 +76,7 @@ export class Secret extends Message<Secret> {
     { no: 2, name: "group_version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "mount_requirement", kind: "enum", T: proto3.getEnumType(Secret_MountType) },
-    { no: 5, name: "env_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "env_var", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Secret {
