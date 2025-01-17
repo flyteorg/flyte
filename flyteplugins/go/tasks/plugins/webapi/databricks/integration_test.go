@@ -57,7 +57,12 @@ func TestEndToEnd(t *testing.T) {
 		}
 		databricksConfig, err := utils.MarshalObjToStruct(databricksConfDict)
 		assert.NoError(t, err)
-		sparkJob := plugins.SparkJob{DatabricksConf: databricksConfig, DatabricksToken: "token", SparkConf: map[string]string{"spark.driver.bindAddress": "127.0.0.1"}}
+		sparkJob := plugins.SparkJob{
+			DatabricksConf:     databricksConfig,
+			DatabricksToken:    "token",
+			DatabricksInstance: "Foo",
+			SparkConf:          map[string]string{"spark.driver.bindAddress": "127.0.0.1"},
+		}
 		st, err := utils.MarshalPbToStruct(&sparkJob)
 		assert.NoError(t, err)
 		inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
