@@ -86,6 +86,13 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 	}
 }
 
+func CreateVolumeMountEnvVarForSecretWithEnvName(secret *core.Secret) corev1.EnvVar {
+	return corev1.EnvVar{
+		Name:  secret.GetEnvVar(),
+		Value: filepath.Join(filepath.Join(K8sSecretPathPrefix...), strings.ToLower(secret.GetGroup()), strings.ToLower(secret.GetKey())),
+	}
+}
+
 func AppendVolumeMounts(containers []corev1.Container, mount corev1.VolumeMount) []corev1.Container {
 	res := make([]corev1.Container, 0, len(containers))
 	for _, c := range containers {

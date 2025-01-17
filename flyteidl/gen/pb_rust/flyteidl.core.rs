@@ -1050,6 +1050,11 @@ pub struct Secret {
     /// +optional
     #[prost(enumeration="secret::MountType", tag="4")]
     pub mount_requirement: i32,
+    /// env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,
+    /// then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+    /// +optional
+    #[prost(string, tag="5")]
+    pub env_var: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Secret`.
 pub mod secret {

@@ -17971,6 +17971,7 @@
                  * @property {string|null} [groupVersion] Secret groupVersion
                  * @property {string|null} [key] Secret key
                  * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
+                 * @property {string|null} [envVar] Secret envVar
                  */
     
                 /**
@@ -18021,6 +18022,14 @@
                 Secret.prototype.mountRequirement = 0;
     
                 /**
+                 * Secret envVar.
+                 * @member {string} envVar
+                 * @memberof flyteidl.core.Secret
+                 * @instance
+                 */
+                Secret.prototype.envVar = "";
+    
+                /**
                  * Creates a new Secret instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.Secret
@@ -18052,6 +18061,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.key);
                     if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mountRequirement);
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.envVar);
                     return writer;
                 };
     
@@ -18084,6 +18095,9 @@
                             break;
                         case 4:
                             message.mountRequirement = reader.int32();
+                            break;
+                        case 5:
+                            message.envVar = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18122,6 +18136,9 @@
                         case 2:
                             break;
                         }
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        if (!$util.isString(message.envVar))
+                            return "envVar: string expected";
                     return null;
                 };
     
