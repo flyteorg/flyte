@@ -91,26 +91,21 @@ func (p *pluginRequestedTransition) AddDeckURI(tCtx *taskExecutionContext) {
 	p.execInfo.OutputInfo.DeckURI = deckURI
 }
 
-func (p *pluginRequestedTransition) AddDeckURIIfDeckExists(ctx context.Context, tCtx *taskExecutionContext) error {
+func (p *pluginRequestedTransition) RemoveDeckURIIfDeckNotExists(ctx context.Context, tCtx *taskExecutionContext) error {
 	reader := tCtx.ow.GetReader()
-	if reader == nil && p.execInfo.OutputInfo != nil {
-		p.execInfo.OutputInfo.DeckURI = nil
+	if reader == nil {
 		return nil
 	}
 
 	exists, err := reader.DeckExists(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+		p.execInfo.OutputInfo.DeckURI = nil
 		return regErrors.Wrapf(err, "failed to check existence of deck file")
 	}
 
-	if p.execInfo.OutputInfo == nil {
-		p.execInfo.OutputInfo = &handler.OutputInfo{}
-	}
-
-	if exists {
-		deckURIValue := tCtx.ow.GetDeckPath()
-		p.execInfo.OutputInfo.DeckURI = &deckURIValue
+	if !exists && p.execInfo.OutputInfo != nil {
+		p.execInfo.OutputInfo.DeckURI = nil
 	}
 
 	return nil
@@ -548,20 +543,23 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	if err != nil {
 		return nil, err
 	}
+
 	if deckStatus == DeckEnabled {
 		pluginTrns.AddDeckURI(tCtx)
 	}
 
+	defer func() {
+		if (deckStatus == DeckUnknown || deckStatus == DeckEnabled) && pluginTrns.pInfo.Phase().IsTerminal() {
+			if err := pluginTrns.RemoveDeckURIIfDeckNotExists(ctx, tCtx); err != nil {
+				logger.Errorf(ctx, "Failed to remove deck URI if deck does not exist. Error: %v", err)
+			}
+		}
+	}()
+
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
 		if deckStatus == DeckUnknown {
-			// This is for backward compatibility with older Flytekit versions.
-			// Older Flytekit versions did not set the `generates_deck` flag in the task template's metadata.
-			// So, we need to add deck URI to the event if it exists.
-			err = pluginTrns.AddDeckURIIfDeckExists(ctx, tCtx)
-		}
-		if err != nil {
-			return pluginTrns, err
+			pluginTrns.AddDeckURI(tCtx)
 		}
 		// -------------------------------------
 		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes

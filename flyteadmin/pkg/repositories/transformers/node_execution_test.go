@@ -198,6 +198,36 @@ func TestAddTerminalState_Error(t *testing.T) {
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
 }
 
+func TestAddTerminalState_DeckURIInFailedExecution(t *testing.T) {
+	error := &core.ExecutionError{
+		Code: "foo",
+	}
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Phase: core.NodeExecution_FAILED,
+			OutputResult: &event.NodeExecutionEvent_Error{
+				Error: error,
+			},
+			OccurredAt: occurredAtProto,
+			DeckUri:    DeckURI,
+		},
+	}
+	startedAt := occurredAt.Add(-time.Minute)
+	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	nodeExecutionModel := models.NodeExecution{
+		StartedAt: &startedAt,
+	}
+	closure := admin.NodeExecutionClosure{
+		StartedAt: startedAtProto,
+	}
+	err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(error, closure.GetError()))
+	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
+}
+
 func TestCreateNodeExecutionModel(t *testing.T) {
 	parentTaskExecID := uint(8)
 	request := &admin.NodeExecutionEventRequest{
