@@ -117,7 +117,7 @@ func ResolveOnFailureNodeInput(ctx context.Context, nodeInputs *core.LiteralMap,
 						Scalar: &core.Scalar{
 							Value: &core.Scalar_Error{
 								Error: &core.Error{
-									Message: execErr.GetMessage(),
+									Message:      execErr.GetMessage(),
 									FailedNodeId: nodeID,
 								},
 							},
@@ -135,9 +135,9 @@ func ResolveOnFailureNodeInput(ctx context.Context, nodeInputs *core.LiteralMap,
 			},
 		}
 		literal.Value = &core.Literal_Scalar{
-            Scalar: &core.Scalar{
+			Scalar: &core.Scalar{
 				Value: errorUnion,
 			},
-        }
+		}
 	}
 }

@@ -500,29 +500,29 @@ func TestResolveErrorInput(t *testing.T) {
 			Message: "node failure",
 		}
 		expectedLiterals := make(map[string]*core.Literal, 1)
-			errorLiteral, _ := coreutils.MakeLiteral(&core.Error{Message: execErr.Message, FailedNodeId: nID,})
-			expectedLiterals["err"] = &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Union{
-							Union: &core.Union{
-								Value: errorLiteral,
-								Type: &core.LiteralType{
-									Type: &core.LiteralType_Simple{
-										Simple: core.SimpleType_ERROR,
-									},
-									Structure: &core.TypeStructure{
-										Tag: "FlyteError",
-									},
+		errorLiteral, _ := coreutils.MakeLiteral(&core.Error{Message: execErr.Message, FailedNodeId: nID})
+		expectedLiterals["err"] = &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Union{
+						Union: &core.Union{
+							Value: errorLiteral,
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_ERROR,
+								},
+								Structure: &core.TypeStructure{
+									Tag: "FlyteError",
 								},
 							},
 						},
 					},
 				},
-			}
-			expectedLiteralMap := &core.LiteralMap{
-				Literals: expectedLiterals,
-			}
+			},
+		}
+		expectedLiteralMap := &core.LiteralMap{
+			Literals: expectedLiterals,
+		}
 		// Execute resolve
 		ResolveOnFailureNodeInput(ctx, inputLiteralMap, nID, execErr)
 		flyteassert.EqualLiteralMap(t, expectedLiteralMap, inputLiteralMap)
