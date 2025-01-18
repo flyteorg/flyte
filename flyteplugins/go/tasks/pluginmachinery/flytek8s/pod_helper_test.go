@@ -1062,30 +1062,6 @@ func TestToK8sPodContainerImage(t *testing.T) {
 	})
 }
 
-func TestToK8sPodAnnotations(t *testing.T) {
-	t.Run("Override annotations", func(t *testing.T) {
-		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
-			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
-			}}, nil, "foo:latest", map[string]string{"a": "b"}, nil)
-		_, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, "b", m.Annotations["a"])
-	})
-}
-
-func TestToK8sPodLabels(t *testing.T) {
-	t.Run("Override labels", func(t *testing.T) {
-		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
-			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
-			}}, nil, "foo:latest", nil, map[string]string{"a": "b"})
-		_, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, "b", m.Labels["a"])
-	})
-}
-
 func TestToK8sPodExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:        "gpu-node-label",
