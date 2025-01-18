@@ -207,6 +207,12 @@ func getMockTaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{Name: "x"})
 	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{RunAs: &core.Identity{}})
 
+	to := &pluginsCoreMock.TaskOverrides{}
+	to.On("GetAnnotations").Return(map[string]string{})
+	to.On("GetLabels").Return(map[string]string{})
+
+	taskExecutionMetadata.On("GetOverrides").Return(to)
+
 	id := &pluginsCoreMock.TaskExecutionID{}
 	id.On("GetGeneratedName").Return("test")
 	id.On("GetID").Return(core.TaskExecutionIdentifier{})
@@ -219,12 +225,20 @@ func getMockTaskExecutionMetadataCustom(
 	ns string,
 	annotations map[string]string,
 	labels map[string]string,
-	ownerRef metav1.OwnerReference) pluginsCore.TaskExecutionMetadata {
+	ownerRef metav1.OwnerReference,
+	annotationsOverride map[string]string,
+	labelsOverride map[string]string) pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetNamespace").Return(ns)
 	taskExecutionMetadata.On("GetAnnotations").Return(annotations)
 	taskExecutionMetadata.On("GetLabels").Return(labels)
 	taskExecutionMetadata.On("GetOwnerReference").Return(ownerRef)
+
+	to := &pluginsCoreMock.TaskOverrides{}
+	to.On("GetAnnotations").Return(annotationsOverride)
+	to.On("GetLabels").Return(labelsOverride)
+
+	taskExecutionMetadata.On("GetOverrides").Return(to)
 
 	id := &pluginsCoreMock.TaskExecutionID{}
 	id.On("GetGeneratedName").Return(tid)
@@ -908,7 +922,9 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 	or := metav1.OwnerReference{}
 	l := map[string]string{"l1": "lv1"}
 	a := map[string]string{"aKey": "aVal"}
-	tm := getMockTaskExecutionMetadataCustom(genName, ns, a, l, or)
+	lo := map[string]string{}
+	ao := map[string]string{}
+	tm := getMockTaskExecutionMetadataCustom(genName, ns, a, l, or, lo, ao)
 
 	cfg := config.GetK8sPluginConfig()
 
@@ -1008,6 +1024,24 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		assert.Contains(t, o.GetFinalizers(), finalizer)
 	})
 
+	t.Run("with override annotations and labels", func(t *testing.T) {
+		lo = map[string]string{"l1": "lv2"}
+		ao = map[string]string{"aKey": "bVal"}
+		tm = getMockTaskExecutionMetadataCustom(genName, ns, a, l, or, ao, lo)
+
+		cfg = config.GetK8sPluginConfig()
+
+		o := &v1.Pod{}
+		p := pluginsk8sMock.Plugin{}
+		p.OnGetProperties().Return(k8s.PluginProperties{})
+		pluginManager := PluginManager{plugin: &p}
+		pluginManager.addObjectMetadata(tm, o, cfg)
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "bVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, lo, o.GetLabels())
+	})
 }
 
 func TestResourceManagerConstruction(t *testing.T) {
