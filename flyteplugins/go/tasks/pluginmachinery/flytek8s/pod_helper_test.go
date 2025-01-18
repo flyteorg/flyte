@@ -1065,15 +1065,6 @@ func TestToK8sPodContainerImage(t *testing.T) {
 }
 
 func TestPodTemplateOverride(t *testing.T) {
-	metadata := &core.K8SObjectMetadata{
-		Labels: map[string]string{
-			"l": "a",
-		},
-		Annotations: map[string]string{
-			"a": "b",
-		},
-	}
-
 	podSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			{
@@ -1094,12 +1085,9 @@ func TestPodTemplateOverride(t *testing.T) {
 			}}, nil, "", &core.K8SPod{
 			PrimaryContainerName: "foo",
 			PodSpec:              podSpecStruct,
-			Metadata:             metadata,
 		})
-		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 		assert.NoError(t, err)
-		assert.Equal(t, "a", m.Labels["l"])
-		assert.Equal(t, "b", m.Annotations["a"])
 		assert.Equal(t, "foo:latest", p.Containers[0].Image)
 		assert.Equal(t, "foo", p.Containers[0].Name)
 	})
