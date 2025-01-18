@@ -106,11 +106,10 @@ func Resolve(ctx context.Context, outputResolver OutputResolver, nl executors.No
 	}, nil
 }
 
-func ResolveErrorInput(ctx context.Context, nodeInputs *core.LiteralMap, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
+func ResolveOnFailureNodeInput(ctx context.Context, nodeInputs *core.LiteralMap, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
 	literals := nodeInputs.GetLiterals()
 	if literal, exists := literals["err"]; exists {
 		// make new Scalar for literal map
-		logger.Debugf(ctx, "Processing literal for key 'err'")
 		errorUnion := &core.Scalar_Union{
 			Union: &core.Union{
 				Value: &core.Literal{

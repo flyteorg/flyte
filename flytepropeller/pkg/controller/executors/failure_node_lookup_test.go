@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 )
@@ -26,7 +27,10 @@ func TestNewFailureNodeLookup(t *testing.T) {
 	nl := nl{}
 	en := en{}
 	ns := ns{}
-	nodeLoopUp := NewFailureNodeLookup(nl, en, ns)
+	execErr := &core.ExecutionError{
+		Message: "node failure",
+	}
+	nodeLoopUp := NewFailureNodeLookup(nl, en, ns, execErr)
 	assert.NotNil(t, nl)
 	typed := nodeLoopUp.(FailureNodeLookup)
 	assert.Equal(t, nl, typed.NodeLookup)
@@ -38,6 +42,9 @@ func TestNewTestFailureNodeLookup(t *testing.T) {
 	n := &mocks.ExecutableNode{}
 	ns := &mocks.ExecutableNodeStatus{}
 	failureNodeID := "fn1"
+	originalErr := &core.ExecutionError{
+		Message: "node failure",
+	}
 	nl := NewTestNodeLookup(
 		map[string]v1alpha1.ExecutableNode{v1alpha1.StartNodeID: n, failureNodeID: n},
 		map[string]v1alpha1.ExecutableNodeStatus{v1alpha1.StartNodeID: ns, failureNodeID: ns},
@@ -45,7 +52,7 @@ func TestNewTestFailureNodeLookup(t *testing.T) {
 
 	assert.NotNil(t, nl)
 
-	failureNodeLookup := NewFailureNodeLookup(nl, n, ns)
+	failureNodeLookup := NewFailureNodeLookup(nl, n, ns, originalErr).(FailureNodeLookup)
 	r, ok := failureNodeLookup.GetNode(v1alpha1.StartNodeID)
 	assert.True(t, ok)
 	assert.Equal(t, n, r)
@@ -63,5 +70,10 @@ func TestNewTestFailureNodeLookup(t *testing.T) {
 
 	nodeIDs, err = failureNodeLookup.FromNode(failureNodeID)
 	assert.Nil(t, nodeIDs)
+	assert.Nil(t, err)
+
+	oe, err := failureNodeLookup.GetOriginalError()
+	assert.NotNil(t, oe)
+	assert.Equal(t, originalErr, oe)
 	assert.Nil(t, err)
 }

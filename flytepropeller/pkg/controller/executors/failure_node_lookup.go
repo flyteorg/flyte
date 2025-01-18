@@ -37,8 +37,8 @@ func (f FailureNodeLookup) FromNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, erro
 	return nil, nil
 }
 
-func (f FailureNodeLookup) GetOriginalError() *core.ExecutionError {
-	return f.OriginalError
+func (f FailureNodeLookup) GetOriginalError() (*core.ExecutionError, error) {
+	return f.OriginalError, nil
 }
 
 func NewFailureNodeLookup(nodeLookup NodeLookup, failureNode v1alpha1.ExecutableNode, failureNodeStatus v1alpha1.ExecutableNodeStatus, originalError *core.ExecutionError) NodeLookup {
