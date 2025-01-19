@@ -199,6 +199,9 @@ message NodeMetadata {
     oneof cache_serializable_value {
         bool cache_serializable = 9;
     }
+
+    // Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+    map<string, string> config = 10;
 }
 
 // Links a variable to an alias.

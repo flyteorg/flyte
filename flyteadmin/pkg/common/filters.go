@@ -103,9 +103,11 @@ var executionIdentifierFields = map[string]bool{
 
 // Entities that have special case handling for execution identifier fields.
 var executionIdentifierEntities = map[Entity]bool{
-	Execution:     true,
-	NodeExecution: true,
-	TaskExecution: true,
+	Execution:          true,
+	NodeExecution:      true,
+	NodeExecutionEvent: true,
+	TaskExecution:      true,
+	Signal:             true,
 }
 
 var entityMetadataFields = map[string]bool{

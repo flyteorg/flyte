@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, Struct } from "@bufbuild/protobuf";
+import { BoolValue, Duration, Message, proto3, Struct } from "@bufbuild/protobuf";
 import { KeyValuePair, RetryStrategy } from "./literals_pb.js";
 import { Identifier } from "./identifier_pb.js";
 import { TypedInterface } from "./interface_pb.js";
@@ -418,13 +418,6 @@ export class TaskMetadata extends Message<TaskMetadata> {
   cacheSerializable = false;
 
   /**
-   * Indicates whether the task will generate a Deck URI when it finishes executing.
-   *
-   * @generated from field: bool generates_deck = 10;
-   */
-  generatesDeck = false;
-
-  /**
    * Arbitrary tags that allow users and the platform to store small but arbitrary labels
    *
    * @generated from field: map<string, string> tags = 11;
@@ -455,6 +448,17 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   isEager = false;
 
+  /**
+   * Indicates whether the task will generate a deck when it finishes executing.
+   * The BoolValue can have three states:
+   * - nil: The value is not set.
+   * - true: The task will generate a deck.
+   * - false: The task will not generate a deck.
+   *
+   * @generated from field: google.protobuf.BoolValue generates_deck = 15;
+   */
+  generatesDeck?: boolean;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -471,11 +475,11 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 7, name: "deprecated_error_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "interruptible_value" },
     { no: 9, name: "cache_serializable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 10, name: "generates_deck", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 11, name: "tags", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 12, name: "pod_template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {
@@ -651,6 +655,13 @@ export class ContainerPort extends Message<ContainerPort> {
    */
   containerPort = 0;
 
+  /**
+   * Name of the port to expose on the pod's IP address.
+   *
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
   constructor(data?: PartialMessage<ContainerPort>) {
     super();
     proto3.util.initPartial(data, this);
@@ -660,6 +671,7 @@ export class ContainerPort extends Message<ContainerPort> {
   static readonly typeName = "flyteidl.core.ContainerPort";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "container_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerPort {
