@@ -772,7 +772,10 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 					if err != nil {
 						return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "FailureNodeError", err.Error(), nil), nil
 					} else if originalErr != nil {
-						ResolveOnFailureNodeInput(ctx, nodeInputs, node.GetID(), originalErr)
+						err = ResolveOnFailureNodeInput(ctx, nodeInputs, node.GetID(), originalErr)
+						if err != nil {
+							return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "FailureNodeInputResolvingError", err.Error(), nil), nil
+						}
 					}
 				}
 				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.GetLiterals(), node, c.literalOffloadingConfig)

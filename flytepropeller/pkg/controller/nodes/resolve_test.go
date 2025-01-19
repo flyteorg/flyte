@@ -468,9 +468,9 @@ func TestResolve(t *testing.T) {
 
 }
 
-func TestResolveOnFailureNodeInput(t *testing.T) {
+func TestResolveErrorInputLiteralData(t *testing.T) {
 	ctx := context.Background()
-	t.Run("ResolveErrorInputs", func(t *testing.T) {
+	t.Run("ResolveErrorInputsLiteralData", func(t *testing.T) {
 		noneLiteral, _ := coreutils.MakeLiteral(nil)
 		inputLiterals := make(map[string]*core.Literal, 1)
 		inputLiterals["err"] = &core.Literal{
@@ -491,9 +491,6 @@ func TestResolveOnFailureNodeInput(t *testing.T) {
 					},
 				},
 			},
-		}
-		inputLiteralMap := &core.LiteralMap{
-			Literals: inputLiterals,
 		}
 		nID := "fn"
 		execErr := &core.ExecutionError{
@@ -521,12 +518,23 @@ func TestResolveOnFailureNodeInput(t *testing.T) {
 				},
 			},
 		}
-		expectedLiteralMap := &core.LiteralMap{
-			Literals: expectedLiterals,
-		}
 		// Execute resolve
-		ResolveOnFailureNodeInput(ctx, inputLiteralMap, nID, execErr)
-		flyteassert.EqualLiteralMap(t, expectedLiteralMap, inputLiteralMap)
+		ResolveErrorInputLiteralData(ctx, inputLiterals, nID, execErr)
+		flyteassert.EqualLiterals(t, inputLiterals["err"], expectedLiterals["err"])
 	})
+}
 
+func TestResolveOnFailureNodeInput(t *testing.T) {
+	ctx := context.Background()
+	t.Run("ResolveWithNilInputs", func(t *testing.T) {
+		nID := "fn"
+		execErr := &core.ExecutionError{
+			Message: "node failure",
+		}
+		nilLiteralMap := &core.LiteralMap{
+			Literals: nil,
+		}
+		err := ResolveOnFailureNodeInput(ctx, nilLiteralMap, nID, execErr)
+		assert.Error(t, err)
+	})
 }
