@@ -468,7 +468,7 @@ func TestResolve(t *testing.T) {
 
 }
 
-func TestResolveErrorInput(t *testing.T) {
+func TestResolveOnFailureNodeInput(t *testing.T) {
 	ctx := context.Background()
 	t.Run("ResolveErrorInputs", func(t *testing.T) {
 		noneLiteral, _ := coreutils.MakeLiteral(nil)
@@ -500,7 +500,8 @@ func TestResolveErrorInput(t *testing.T) {
 			Message: "node failure",
 		}
 		expectedLiterals := make(map[string]*core.Literal, 1)
-		errorLiteral, _ := coreutils.MakeLiteral(&core.Error{Message: execErr.GetMessage(), FailedNodeId: nID})
+		errorLiteral, err := coreutils.MakeLiteral(&core.Error{Message: execErr.GetMessage(), FailedNodeId: nID})
+		assert.NoError(t, err)
 		expectedLiterals["err"] = &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{

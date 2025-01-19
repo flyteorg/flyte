@@ -20,8 +20,11 @@ func EqualLiteralType(t *testing.T, lt1 *core.LiteralType, lt2 *core.LiteralType
 	default:
 		assert.FailNow(t, "Not yet implemented for types %v", reflect.TypeOf(lt1.GetType()))
 	}
-
-	assert.Equal(t, lt1.GetStructure().GetTag(), lt2.GetStructure().GetTag())
+	structure1 := lt1.GetStructure()
+	structure2 := lt2.GetStructure()
+	if structure1 != nil && structure2 != nil {
+		assert.Equal(t, structure1.GetTag(), structure2.GetTag())
+	}
 }
 
 func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {

@@ -768,8 +768,10 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				// Resolve error input if current node is an on failure node
 				failureNodeLookup, ok := nCtx.ContextualNodeLookup().(executors.FailureNodeLookup)
 				if ok {
-					originalErr, _ := failureNodeLookup.GetOriginalError()
-					if originalErr != nil {
+					originalErr, err := failureNodeLookup.GetOriginalError()
+					if err != nil {
+						return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "FailureNodeError", err.Error(), nil), nil
+					} else if originalErr != nil {
 						ResolveOnFailureNodeInput(ctx, nodeInputs, node.GetID(), originalErr)
 					}
 				}
