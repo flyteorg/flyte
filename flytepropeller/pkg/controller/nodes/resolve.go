@@ -106,7 +106,7 @@ func Resolve(ctx context.Context, outputResolver OutputResolver, nl executors.No
 	}, nil
 }
 
-func ResolveErrorInputLiteralData(ctx context.Context, literals map[string]*core.Literal,  nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
+func ResolveErrorInputLiteralData(ctx context.Context, literals map[string]*core.Literal, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
 	if literal, exists := literals["err"]; exists {
 		// make new Scalar for literal map
 		errorUnion := &core.Scalar_Union{
