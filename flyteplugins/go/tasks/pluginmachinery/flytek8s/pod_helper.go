@@ -280,7 +280,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			return nil, nil, "", err
 		}
 
-        primaryContainerName = c.Name
+		primaryContainerName = c.Name
 		podSpec = &v1.PodSpec{
 			Containers: []v1.Container{
 				*c,

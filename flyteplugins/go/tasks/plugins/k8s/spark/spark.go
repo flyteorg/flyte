@@ -208,11 +208,11 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 				"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
 		}
 
-        if len(customPodSpec.Containers) != 0 {
-            // As only the container with the name of primary container set in driver pod will be passed into 
-            // here, we can directly take the container name here as the primaryContainerName
-            primaryContainerName = customPodSpec.Containers[0].Name
-        }
+		if len(customPodSpec.Containers) != 0 {
+			// As only the container with the name of primary container set in driver pod will be passed into
+			// here, we can directly take the container name here as the primaryContainerName
+			primaryContainerName = customPodSpec.Containers[0].Name
+		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
 		if err != nil {
@@ -261,11 +261,11 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 				"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
 		}
 
-        if len(customPodSpec.Containers) != 0 {
-            // As only the container with the name of primary container set in executor pod will be passed into 
-            // here, we can directly take the container name here as the primaryContainerName
-            primaryContainerName = customPodSpec.Containers[0].Name
-        }
+		if len(customPodSpec.Containers) != 0 {
+			// As only the container with the name of primary container set in executor pod will be passed into
+			// here, we can directly take the container name here as the primaryContainerName
+			primaryContainerName = customPodSpec.Containers[0].Name
+		}
 
 		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
 		if err != nil {
