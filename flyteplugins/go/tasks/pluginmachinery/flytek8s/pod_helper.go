@@ -280,14 +280,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			return nil, nil, "", err
 		}
 
-		// If primaryContainerName is set in taskTemplate config, use it instead
-		// of c.Name
-		if val, ok := taskTemplate.GetConfig()[PrimaryContainerKey]; ok {
-			primaryContainerName = val
-			c.Name = primaryContainerName
-		} else {
-			primaryContainerName = c.Name
-		}
+        primaryContainerName = c.Name
 		podSpec = &v1.PodSpec{
 			Containers: []v1.Container{
 				*c,
