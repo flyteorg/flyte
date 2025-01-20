@@ -198,7 +198,7 @@ plugins:
   agent-service:
     # By default, all requests will be sent to the default agent.
     defaultAgent:
-      endpoint: "k8s://flyteagent:8000"
+      endpoint: "k8s://flyteagent.flyte:8000"
       insecure: true
       timeouts:
         # CreateTask, GetTask and DeleteTask are for async agents.

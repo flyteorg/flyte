@@ -288,7 +288,7 @@ flyteagent:
         # -- The default agent service to use for plugin tasks.
         defaultAgent:
           # -- The agent service endpoint propeller should connect to.
-          endpoint: "k8s://flyteagent:8000"
+          endpoint: "k8s://flyteagent.flyte:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
         # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
