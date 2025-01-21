@@ -1,4 +1,8 @@
 use std::collections::HashMap;
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::{Arc, Mutex};
+use std::task::{Context, Poll, Waker};
 
 use async_channel::Sender;
 use serde::{Deserialize, Serialize};
@@ -34,4 +38,52 @@ pub struct Response {
     pub reason: Option<String>,
 
     pub executor_corrupt: bool,
+}
+
+pub struct AsyncBoolFuture {
+    async_bool: Arc<Mutex<AsyncBool>>,
+}
+
+impl AsyncBoolFuture {
+    pub fn new(async_bool: Arc<Mutex<AsyncBool>>) -> Self {
+        Self { async_bool }
+    }
+}
+
+impl Future for AsyncBoolFuture {
+    type Output = ();
+
+    fn poll(self: Pin<&mut Self>, ctx: &mut Context<'_>) -> Poll<()> {
+        let mut async_bool = self.async_bool.lock().unwrap();
+        if async_bool.value {
+            async_bool.value = false;
+            return Poll::Ready(());
+        }
+
+        let waker = ctx.waker().clone();
+        async_bool.waker = Some(waker);
+
+        Poll::Pending
+    }
+}
+
+pub struct AsyncBool {
+    value: bool,
+    waker: Option<Waker>,
+}
+
+impl AsyncBool {
+    pub fn new() -> Self {
+        Self {
+            value: false,
+            waker: None,
+        }
+    }
+
+    pub fn trigger(&mut self) {
+        self.value = true;
+        if let Some(waker) = &self.waker {
+            waker.clone().wake();
+        }
+    }
 }

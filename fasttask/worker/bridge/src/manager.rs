@@ -11,7 +11,7 @@ use tokio::process::Command;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use tracing::warn;
 
-use crate::common::{Executor, TaskContext, SUCCEEDED};
+use crate::common::{AsyncBool, Executor, TaskContext, SUCCEEDED};
 use crate::pb::fasttask::{Capacity, TaskStatus};
 use crate::task::{self};
 
@@ -32,7 +32,11 @@ pub trait TaskManager {
 
 #[trait_variant::make(TaskManagerRuntime: Send)]
 pub trait LocalTaskManagerRuntime {
-    async fn run(&self, task_status_tx: Sender<TaskStatus>) -> Result<()>;
+    async fn run(
+        &self,
+        ready: Arc<Mutex<AsyncBool>>,
+        task_status_tx: Sender<TaskStatus>,
+    ) -> Result<()>;
 }
 
 pub struct CapacityReporter {
@@ -316,7 +320,11 @@ pub struct MultiProcessRuntime {
 }
 
 impl TaskManagerRuntime for MultiProcessRuntime {
-    async fn run(&self, task_status_tx: Sender<TaskStatus>) -> Result<()> {
+    async fn run(
+        &self,
+        ready: Arc<Mutex<AsyncBool>>,
+        task_status_tx: Sender<TaskStatus>,
+    ) -> Result<()> {
         let (backlog_tx, backlog_rx) = (self.backlog_tx.clone(), self.backlog_rx.clone());
         let (executor_tx, executor_rx) = (self.executor_tx.clone(), self.executor_rx.clone());
         let (task_assignment_rx, task_contexts) =
@@ -349,6 +357,12 @@ impl TaskManagerRuntime for MultiProcessRuntime {
                     self.executor_tx.send(executor).await?;
 
                     index += 1;
+
+                    // trigger ready if all executors are initialized
+                    if index == self.parallelism {
+                        let mut ready = ready.lock().unwrap();
+                        ready.trigger();
+                    }
                 },
                 task_assignment_result = task_assignment_rx.recv() => {
                     let task_assignment= task_assignment_result?;
@@ -507,7 +521,16 @@ pub struct SuccessRuntime {
 }
 
 impl TaskManagerRuntime for SuccessRuntime {
-    async fn run(&self, task_status_tx: Sender<TaskStatus>) -> Result<()> {
+    async fn run(
+        &self,
+        ready: Arc<Mutex<AsyncBool>>,
+        task_status_tx: Sender<TaskStatus>,
+    ) -> Result<()> {
+        {
+            let mut ready = ready.lock().unwrap();
+            ready.trigger();
+        }
+
         let task_rx = self.task_rx.clone();
         loop {
             let task_result = task_rx.recv().await;
@@ -563,8 +586,9 @@ mod tests {
         assert!(manager_runtime_result.is_ok());
         let manager_runtime = manager_runtime_result.unwrap();
 
+        let ready = Arc::new(Mutex::new(AsyncBool::new()));
         let manager_handle = tokio::spawn(async move {
-            super::TaskManagerRuntime::run(&manager_runtime, task_status_tx).await
+            super::TaskManagerRuntime::run(&manager_runtime, ready, task_status_tx).await
         });
 
         // validate get capacity works

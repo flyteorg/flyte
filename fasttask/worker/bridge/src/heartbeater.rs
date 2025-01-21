@@ -1,14 +1,11 @@
-use std::future::Future;
-use std::pin::Pin;
 use std::sync::{Arc, Mutex, RwLock};
-use std::task::{Context, Poll, Waker};
 use std::time::Duration;
 
 use anyhow::Result;
 use async_channel::{Receiver, Sender};
 use tokio::time::Interval;
 
-use crate::common::{FAILED, SUCCEEDED};
+use crate::common::{AsyncBool, AsyncBoolFuture, FAILED, SUCCEEDED};
 use crate::manager::CapacityReporter;
 use crate::pb::fasttask::{HeartbeatRequest, TaskStatus};
 
@@ -114,48 +111,6 @@ impl HeartbeatRuntime for PeriodicHeartbeatRuntime {
     }
 }
 
-struct AsyncBoolFuture {
-    async_bool: Arc<Mutex<AsyncBool>>,
-}
-
-impl Future for AsyncBoolFuture {
-    type Output = ();
-
-    fn poll(self: Pin<&mut Self>, ctx: &mut Context<'_>) -> Poll<()> {
-        let mut async_bool = self.async_bool.lock().unwrap();
-        if async_bool.value {
-            async_bool.value = false;
-            return Poll::Ready(());
-        }
-
-        let waker = ctx.waker().clone();
-        async_bool.waker = Some(waker);
-
-        Poll::Pending
-    }
-}
-
-struct AsyncBool {
-    value: bool,
-    waker: Option<Waker>,
-}
-
-impl AsyncBool {
-    fn new() -> Self {
-        Self {
-            value: false,
-            waker: None,
-        }
-    }
-
-    fn trigger(&mut self) {
-        self.value = true;
-        if let Some(waker) = &self.waker {
-            waker.clone().wake();
-        }
-    }
-}
-
 struct HeartbeatTrigger {
     interval: Interval,
     async_bool: Arc<Mutex<AsyncBool>>,
@@ -163,10 +118,7 @@ struct HeartbeatTrigger {
 
 impl HeartbeatTrigger {
     async fn trigger(&mut self) -> () {
-        let async_bool_future = AsyncBoolFuture {
-            async_bool: self.async_bool.clone(),
-        };
-
+        let async_bool_future = AsyncBoolFuture::new(self.async_bool.clone());
         tokio::select! {
             _ = self.interval.tick() => {},
             _ = async_bool_future => {},

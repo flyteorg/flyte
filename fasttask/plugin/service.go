@@ -384,7 +384,7 @@ func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID,
 	}
 
 	// create task status channel
-	f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
+	f.taskStatusChannels.LoadOrStore(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
 	return worker.workerID, nil
 }
 

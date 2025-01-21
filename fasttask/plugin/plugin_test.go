@@ -665,7 +665,7 @@ func TestHandleRunning(t *testing.T) {
 			expectedPhase:          core.PhaseUndefined,
 			expectedPhaseVersion:   0,
 			expectedReason:         "",
-			expectedError:          podContainerNotFound,
+			expectedError:          podContainerNotFoundError,
 			expectedLastUpdatedInc: false,
 			expectedLogs:           false,
 		},
@@ -1002,7 +1002,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-		assert.Equal(t, podContainerNotFound, err)
+		assert.Equal(t, podContainerNotFoundError, err)
 		assert.Empty(t, taskInfo.Logs)
 		assert.Nil(t, taskInfo.LogContext)
 	})
@@ -1050,7 +1050,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-		assert.Equal(t, podContainerNotFound, err)
+		assert.Equal(t, podContainerNotFoundError, err)
 		assert.Empty(t, taskInfo.Logs)
 		assert.Nil(t, taskInfo.LogContext)
 	})
@@ -1098,7 +1098,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-		assert.Equal(t, podContainerNotFound, err)
+		assert.Equal(t, podContainerNotFoundError, err)
 		assert.Empty(t, taskInfo.Logs)
 		assert.Equal(t, expectedLogCtx, taskInfo.LogContext)
 	})

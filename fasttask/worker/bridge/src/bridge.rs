@@ -1,5 +1,7 @@
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use crate::common::{AsyncBool, AsyncBoolFuture};
 use crate::connection::{ConnectionBuilder, ConnectionRuntime};
 use crate::heartbeater::{HeartbeatRuntime, Heartbeater};
 use crate::manager::{CapacityReporter, TaskManager, TaskManagerRuntime};
@@ -19,15 +21,24 @@ pub async fn run<T: ConnectionBuilder, U: Heartbeater + Send, V: TaskManager>(
     let (task_status_tx, task_status_rx) = async_channel::unbounded();
 
     // initialize and start manager
+    let manager_runtime_ready = Arc::new(Mutex::new(AsyncBool::new()));
+    let manager_runtime_ready_clone = manager_runtime_ready.clone();
+
     let manager_runtime = manager.get_runtime()?; // TODO @hamersaw - handle error
     let _manager_handle = tokio::spawn(async move {
         // currently panicking if manager runtime fails rather than attempting to restart. this will
         // effectively force a new replica and failover tasks. a manager runtime failure should
         // only occur as a bug.
-        if let Err(e) = manager_runtime.run(task_status_tx).await {
+        if let Err(e) = manager_runtime
+            .run(manager_runtime_ready_clone, task_status_tx)
+            .await
+        {
             panic!("manager failed: {}", e);
         }
     });
+
+    let manager_runtime_future = AsyncBoolFuture::new(manager_runtime_ready);
+    manager_runtime_future.await;
 
     // start heartbeater
     let heartbeat_runtime = heartbeater.get_runtime()?; // TODO @hamersaw - handle error

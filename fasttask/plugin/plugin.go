@@ -46,7 +46,7 @@ const maxErrorMessageLength = 102400 // 100kb
 var (
 	statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
 	taskContextNotFoundError  = errors.New("TaskContextNotFound")
-	podContainerNotFound      = errors.New("PodContainerNotFound")
+	podContainerNotFoundError = errors.New("PodContainerNotFound")
 
 	taskStartTimeTemplateVar       = tasklog.MustCreateRegex("taskStartTime")
 	taskStartTimeUnixMsTemplateVar = tasklog.MustCreateRegex("taskStartTimeUnixMs")
@@ -394,7 +394,7 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 		pluginState.LastUpdated = now
 
 		taskInfo, err := p.getTaskInfo(ctx, tCtx, initialState.SubmittedAt, time.Now(), executionEnv, queueID, workerID)
-		if err != nil {
+		if err != nil && !errors.Is(err, podContainerNotFoundError) {
 			return nil, core.PhaseInfoUndefined, err
 		}
 		phaseInfo = core.PhaseInfoQueuedWithTaskInfo(now, pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID), taskInfo)
@@ -557,7 +557,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		// an in-memory store the may occur during restarts.
 		// `pod == nil` may occur if it has not yet been populated in the kubeclient cache or was deleted
 		logger.Warnf(ctx, "Worker %q not found (exists=%t) in status map for queue %q", workerID, ok, queueID)
-		return &taskInfo, podContainerNotFound
+		return &taskInfo, podContainerNotFoundError
 	}
 
 	containerIndex := -1
@@ -569,7 +569,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 	if containerIndex == -1 {
 		logger.Warnf(ctx, "Container %q not found in pod %q", pod.GetName(), pod.GetName())
-		return &taskInfo, podContainerNotFound
+		return &taskInfo, podContainerNotFoundError
 	}
 
 	taskInfo.LogContext = &idlcore.LogContext{
@@ -594,7 +594,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 
 	if len(pod.Status.ContainerStatuses) <= containerIndex || pod.Status.ContainerStatuses[containerIndex].ContainerID == "" {
 		// no container id yet
-		return &taskInfo, podContainerNotFound
+		return &taskInfo, podContainerNotFoundError
 	}
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
