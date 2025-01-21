@@ -34,6 +34,7 @@ type state int32
 
 const (
 	HEALTHY state = iota
+	INITIALIZING
 	ORPHANED
 	REPAIRING
 	TOMBSTONED
@@ -110,7 +111,7 @@ func (i *InMemoryEnvBuilder) Get(ctx context.Context, executionEnvID core.Execut
 		i.lock.Lock()
 		defer i.lock.Unlock()
 
-		if environment.state != TOMBSTONED {
+		if environment.state != INITIALIZING && environment.state != TOMBSTONED {
 			environment.lastAccessedAt = time.Now()
 			return environment.extant
 		}
@@ -169,7 +170,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 		name:           executionEnvID.Name,
 		replicas:       replicas,
 		spec:           fastTaskEnvironmentSpec,
-		state:          HEALTHY,
+		state:          INITIALIZING,
 		executionEnvID: executionEnvID,
 	}
 
@@ -191,7 +192,8 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 	var errorMessages []string
 	for _, podName := range podNames {
 		logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, executionEnvID)
-		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID, podName); err != nil {
+		err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID, podName)
+		if err != nil && !k8serrors.IsAlreadyExists(err) {
 			logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, executionEnvID, err)
 			errorMessages = append(errorMessages, fmt.Sprintf("pod '%s': %v", podName, err))
 			i.metrics.podCreationErrors.WithLabelValues(metricLabels...).Inc()
@@ -199,15 +201,23 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 			i.metrics.podsCreated.WithLabelValues(metricLabels...).Inc()
 		}
 	}
+
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	// return error only if all pods failed to create
 	// NOTE: this is a temporary solution to ensure that the task fails if all pods fail to create.
 	// This will be removed when persistent replica metadata handles observability issues. @pvditt @hamersaw
 	if len(errorMessages) == len(podNames) {
+		delete(i.environments, executionEnvID.String())
+
 		logger.Errorf(ctx, "failed to create any pods for environment '%s': %s", executionEnvID, strings.Join(errorMessages, "; "))
 		return nil, fmt.Errorf("failed to create any pods for environment '%s': %s", executionEnvID, strings.Join(errorMessages, "; "))
 	}
 
+	env.state = HEALTHY
 	logger.Infof(ctx, "created environment '%s'", executionEnvID)
+
 	return env.extant, nil
 }
 
