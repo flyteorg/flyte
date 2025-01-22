@@ -90,7 +90,7 @@ We could extend existing `flyteadmin` endpoints (and introduce some new ones) to
     * `flyteadmin` would tolerate partial failures while evicting the cache of an execution - any errors encountered would be propagated back to the user. Running the eviction again would attempt to remove the remaining cached entries.
 * We further propose adding a new endpoint equivalent to `UpdateExecution` for handling tasks execution entities (e.g. `UpdateTaskExecution`), supporting the `evict_cache` flag mentioned above.
     * The task execution would be identified using a `TaskExecutionIdentifier`.
-    * Whilst `UpdateTaskExecuion` would only contain the `evict_cache` flag at the moment, this approach would be preferred to not break convention of performing CRUD operations on the entity specified in the message name by e.g. re-using `UpdateExecution` to also handle tasks as well.
+    * Whilst `UpdateTaskExecuion` would only contain the `evict_cache` flag at the moment, this approach would be preferred to not break convention of performing CRUD operations on the entity specified in the message name by e.g. reusing `UpdateExecution` to also handle tasks as well.
 
 #### Standalone `flyteadmin` endpoints
 
