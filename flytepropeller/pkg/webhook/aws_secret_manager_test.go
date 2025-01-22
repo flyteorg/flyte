@@ -44,11 +44,11 @@ func TestAWSSecretManagerInjector_Inject(t *testing.T) {
 					Env: []corev1.EnvVar{
 						{
 							Name:  "SECRET_ARN",
-							Value: inputSecret.Group + ":" + inputSecret.Key,
+							Value: inputSecret.GetGroup() + ":" + inputSecret.GetKey(),
 						},
 						{
 							Name:  "SECRET_FILENAME",
-							Value: "/" + inputSecret.Group + "/" + inputSecret.Key,
+							Value: "/" + inputSecret.GetGroup() + "/" + inputSecret.GetKey(),
 						},
 						{
 							Name:  "FLYTE_SECRETS_DEFAULT_DIR",

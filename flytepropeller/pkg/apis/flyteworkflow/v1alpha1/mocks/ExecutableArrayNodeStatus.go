@@ -82,6 +82,38 @@ func (_m *ExecutableArrayNodeStatus) GetExecutionError() *core.ExecutionError {
 	return r0
 }
 
+type ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps struct {
+	*mock.Call
+}
+
+func (_m ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps) Return(_a0 bitarray.CompactArray) *ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	return &ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableArrayNodeStatus) OnGetSubNodeDeltaTimestamps() *ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	c_call := _m.On("GetSubNodeDeltaTimestamps")
+	return &ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: c_call}
+}
+
+func (_m *ExecutableArrayNodeStatus) OnGetSubNodeDeltaTimestampsMatch(matchers ...interface{}) *ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps {
+	c_call := _m.On("GetSubNodeDeltaTimestamps", matchers...)
+	return &ExecutableArrayNodeStatus_GetSubNodeDeltaTimestamps{Call: c_call}
+}
+
+// GetSubNodeDeltaTimestamps provides a mock function with given fields:
+func (_m *ExecutableArrayNodeStatus) GetSubNodeDeltaTimestamps() bitarray.CompactArray {
+	ret := _m.Called()
+
+	var r0 bitarray.CompactArray
+	if rf, ok := ret.Get(0).(func() bitarray.CompactArray); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bitarray.CompactArray)
+	}
+
+	return r0
+}
+
 type ExecutableArrayNodeStatus_GetSubNodePhases struct {
 	*mock.Call
 }

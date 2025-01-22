@@ -72,9 +72,9 @@ func addGetWorkflowExecutionCallback(repository interfaces.Repository) {
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
-					Project: sampleNodeExecID.ExecutionId.Project,
-					Domain:  sampleNodeExecID.ExecutionId.Domain,
-					Name:    sampleNodeExecID.ExecutionId.Name,
+					Project: sampleNodeExecID.GetExecutionId().GetProject(),
+					Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+					Name:    sampleNodeExecID.GetExecutionId().GetName(),
 				},
 				Cluster: "propeller",
 			}, nil
@@ -88,11 +88,11 @@ func addGetNodeExecutionCallback(repository interfaces.Repository) {
 		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
-					NodeID: sampleNodeExecID.NodeId,
+					NodeID: sampleNodeExecID.GetNodeId(),
 					ExecutionKey: models.ExecutionKey{
-						Project: sampleNodeExecID.ExecutionId.Project,
-						Domain:  sampleNodeExecID.ExecutionId.Domain,
-						Name:    sampleNodeExecID.ExecutionId.Name,
+						Project: sampleNodeExecID.GetExecutionId().GetProject(),
+						Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+						Name:    sampleNodeExecID.GetExecutionId().GetName(),
 					},
 				},
 			}, nil
@@ -105,10 +105,10 @@ func addGetTaskCallback(repository interfaces.Repository) {
 		func(input interfaces.Identifier) (models.Task, error) {
 			return models.Task{
 				TaskKey: models.TaskKey{
-					Project: sampleTaskID.Project,
-					Domain:  sampleTaskID.Domain,
-					Name:    sampleTaskID.Name,
-					Version: sampleTaskID.Version,
+					Project: sampleTaskID.GetProject(),
+					Domain:  sampleTaskID.GetDomain(),
+					Name:    sampleTaskID.GetName(),
+					Version: sampleTaskID.GetVersion(),
 				},
 			}, nil
 		},
@@ -126,15 +126,15 @@ func TestCreateTaskEvent(t *testing.T) {
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			getTaskCalled = true
-			assert.Equal(t, core.ResourceType_TASK, input.TaskExecutionID.TaskId.ResourceType)
-			assert.Equal(t, "task-id", input.TaskExecutionID.TaskId.Name)
-			assert.Equal(t, "project", input.TaskExecutionID.TaskId.Project)
-			assert.Equal(t, "domain", input.TaskExecutionID.TaskId.Domain)
-			assert.Equal(t, "task-v", input.TaskExecutionID.TaskId.Version)
-			assert.Equal(t, "node-id", input.TaskExecutionID.NodeExecutionId.NodeId)
-			assert.Equal(t, "project", input.TaskExecutionID.NodeExecutionId.ExecutionId.Project)
-			assert.Equal(t, "domain", input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain)
-			assert.Equal(t, "name", input.TaskExecutionID.NodeExecutionId.ExecutionId.Name)
+			assert.Equal(t, core.ResourceType_TASK, input.TaskExecutionID.GetTaskId().GetResourceType())
+			assert.Equal(t, "task-id", input.TaskExecutionID.GetTaskId().GetName())
+			assert.Equal(t, "project", input.TaskExecutionID.GetTaskId().GetProject())
+			assert.Equal(t, "domain", input.TaskExecutionID.GetTaskId().GetDomain())
+			assert.Equal(t, "task-v", input.TaskExecutionID.GetTaskId().GetVersion())
+			assert.Equal(t, "node-id", input.TaskExecutionID.GetNodeExecutionId().GetNodeId())
+			assert.Equal(t, "project", input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetProject())
+			assert.Equal(t, "domain", input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetDomain())
+			assert.Equal(t, "name", input.TaskExecutionID.GetNodeExecutionId().GetExecutionId().GetName())
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
@@ -153,17 +153,17 @@ func TestCreateTaskEvent(t *testing.T) {
 			assert.Equal(t, models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,
@@ -219,17 +219,17 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 				},
@@ -266,17 +266,17 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 			assert.EqualValues(t, models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 				},
@@ -368,17 +368,17 @@ func TestCreateTaskEvent_UpdateDatabaseError(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,
@@ -407,17 +407,17 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,
@@ -458,17 +458,17 @@ func TestCreateTaskEvent_PhaseVersionChange(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 				},
@@ -526,23 +526,23 @@ func TestGetTaskExecution(t *testing.T) {
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 			getTaskCalled = true
-			assert.Equal(t, sampleTaskID, input.TaskExecutionID.TaskId)
-			assert.Equal(t, sampleNodeExecID, input.TaskExecutionID.NodeExecutionId)
-			assert.Equal(t, uint32(1), input.TaskExecutionID.RetryAttempt)
+			assert.Equal(t, sampleTaskID, input.TaskExecutionID.GetTaskId())
+			assert.Equal(t, sampleNodeExecID, input.TaskExecutionID.GetNodeExecutionId())
+			assert.Equal(t, uint32(1), input.TaskExecutionID.GetRetryAttempt())
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,
@@ -581,17 +581,17 @@ func TestGetTaskExecution_TransformerError(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,
@@ -644,22 +644,22 @@ func TestListTaskExecutions(t *testing.T) {
 			assert.Equal(t, 1, input.Offset)
 
 			assert.Len(t, input.InlineFilters, 4)
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "exec project b", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "exec domain b", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "exec name b", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
-			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[3].GetEntity())
 			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "nodey b", queryExpr.Args)
 			assert.Equal(t, "node_id = ?", queryExpr.Query)
@@ -752,7 +752,7 @@ func TestListTaskExecutions(t *testing.T) {
 		},
 		InputUri: "input-uri.pb",
 		Closure:  expectedClosure,
-	}, taskExecutions.TaskExecutions[0]))
+	}, taskExecutions.GetTaskExecutions()[0]))
 	assert.True(t, proto.Equal(&admin.TaskExecution{
 		Id: &core.TaskExecutionIdentifier{
 			RetryAttempt: secondRetryAttempt,
@@ -774,7 +774,180 @@ func TestListTaskExecutions(t *testing.T) {
 		},
 		InputUri: "input-uri2.pb",
 		Closure:  expectedClosure,
-	}, taskExecutions.TaskExecutions[1]))
+	}, taskExecutions.GetTaskExecutions()[1]))
+}
+
+func TestListTaskExecutions_Filters(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+
+	expectedLogs := []*core.TaskLog{{Uri: "test-log1.txt"}}
+	extraLongErrMsg := string(make([]byte, 2*100))
+	expectedOutputResult := &admin.TaskExecutionClosure_Error{
+		Error: &core.ExecutionError{
+			Message: extraLongErrMsg,
+		},
+	}
+	expectedClosure := &admin.TaskExecutionClosure{
+		StartedAt:    sampleTaskEventOccurredAt,
+		Phase:        core.TaskExecution_SUCCEEDED,
+		Duration:     ptypes.DurationProto(time.Minute),
+		OutputResult: expectedOutputResult,
+		Logs:         expectedLogs,
+	}
+
+	closureBytes, _ := proto.Marshal(expectedClosure)
+
+	firstRetryAttempt := uint32(1)
+	secondRetryAttempt := uint32(2)
+	listTaskExecutionsCalled := false
+	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetListCallback(
+		func(ctx context.Context, input interfaces.ListResourceInput) (interfaces.TaskExecutionCollectionOutput, error) {
+			listTaskExecutionsCalled = true
+			assert.Equal(t, 99, input.Limit)
+			assert.Equal(t, 1, input.Offset)
+
+			assert.Len(t, input.InlineFilters, 5)
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[0].GetEntity())
+			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+			assert.Equal(t, "exec project b", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[1].GetEntity())
+			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
+			assert.Equal(t, "exec domain b", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[2].GetEntity())
+			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "exec name b", queryExpr.Args)
+			assert.Equal(t, "execution_name = ?", queryExpr.Query)
+
+			assert.Equal(t, common.TaskExecution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, "nodey b", queryExpr.Args)
+			assert.Equal(t, "node_id = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[4].GetEntity())
+			queryExpr, _ = input.InlineFilters[4].GetGormQueryExpr()
+			assert.Equal(t, "SUCCEEDED", queryExpr.Args)
+			assert.Equal(t, "phase = ?", queryExpr.Query)
+			assert.EqualValues(t, input.JoinTableEntities, map[common.Entity]bool{
+				common.TaskExecution: true,
+				common.Execution:     true,
+			})
+
+			return interfaces.TaskExecutionCollectionOutput{
+				TaskExecutions: []models.TaskExecution{
+					{
+						TaskExecutionKey: models.TaskExecutionKey{
+							TaskKey: models.TaskKey{
+								Project: "task project a",
+								Domain:  "task domain a",
+								Name:    "task name a",
+								Version: "task version a",
+							},
+							NodeExecutionKey: models.NodeExecutionKey{
+								NodeID: "nodey a",
+								ExecutionKey: models.ExecutionKey{
+									Project: "exec project a",
+									Domain:  "exec domain a",
+									Name:    "exec name a",
+								},
+							},
+							RetryAttempt: &firstRetryAttempt,
+						},
+						Phase:     core.TaskExecution_SUCCEEDED.String(),
+						InputURI:  "input-uri.pb",
+						StartedAt: &taskStartedAt,
+						Closure:   closureBytes,
+					},
+					{
+						TaskExecutionKey: models.TaskExecutionKey{
+							TaskKey: models.TaskKey{
+								Project: "task project b",
+								Domain:  "task domain b",
+								Name:    "task name b",
+								Version: "task version b",
+							},
+							NodeExecutionKey: models.NodeExecutionKey{
+								NodeID: "nodey b",
+								ExecutionKey: models.ExecutionKey{
+									Project: "exec project b",
+									Domain:  "exec domain b",
+									Name:    "exec name b",
+								},
+							},
+							RetryAttempt: &secondRetryAttempt,
+						},
+						Phase:     core.TaskExecution_SUCCEEDED.String(),
+						InputURI:  "input-uri2.pb",
+						StartedAt: &taskStartedAt,
+						Closure:   closureBytes,
+					},
+				},
+			}, nil
+		})
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
+	taskExecutions, err := taskExecManager.ListTaskExecutions(context.Background(), &admin.TaskExecutionListRequest{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "nodey b",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "exec project b",
+				Domain:  "exec domain b",
+				Name:    "exec name b",
+			},
+		},
+		Token:   "1",
+		Limit:   99,
+		Filters: "eq(execution.phase, SUCCEEDED)",
+	})
+	assert.Nil(t, err)
+	assert.True(t, listTaskExecutionsCalled)
+
+	assert.True(t, proto.Equal(&admin.TaskExecution{
+		Id: &core.TaskExecutionIdentifier{
+			RetryAttempt: firstRetryAttempt,
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "exec project a",
+					Domain:  "exec domain a",
+					Name:    "exec name a",
+				},
+				NodeId: "nodey a",
+			},
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "task project a",
+				Domain:       "task domain a",
+				Name:         "task name a",
+				Version:      "task version a",
+			},
+		},
+		InputUri: "input-uri.pb",
+		Closure:  expectedClosure,
+	}, taskExecutions.GetTaskExecutions()[0]))
+	assert.True(t, proto.Equal(&admin.TaskExecution{
+		Id: &core.TaskExecutionIdentifier{
+			RetryAttempt: secondRetryAttempt,
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "exec project b",
+					Domain:  "exec domain b",
+					Name:    "exec name b",
+				},
+				NodeId: "nodey b",
+			},
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "task project b",
+				Domain:       "task domain b",
+				Name:         "task name b",
+				Version:      "task version b",
+			},
+		},
+		InputUri: "input-uri2.pb",
+		Closure:  expectedClosure,
+	}, taskExecutions.GetTaskExecutions()[1]))
 }
 
 func TestListTaskExecutions_NoFilters(t *testing.T) {
@@ -876,17 +1049,17 @@ func TestGetTaskExecutionData(t *testing.T) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
-						Project: sampleTaskID.Project,
-						Domain:  sampleTaskID.Domain,
-						Name:    sampleTaskID.Name,
-						Version: sampleTaskID.Version,
+						Project: sampleTaskID.GetProject(),
+						Domain:  sampleTaskID.GetDomain(),
+						Name:    sampleTaskID.GetName(),
+						Version: sampleTaskID.GetVersion(),
 					},
 					NodeExecutionKey: models.NodeExecutionKey{
-						NodeID: sampleNodeExecID.NodeId,
+						NodeID: sampleNodeExecID.GetNodeId(),
 						ExecutionKey: models.ExecutionKey{
-							Project: sampleNodeExecID.ExecutionId.Project,
-							Domain:  sampleNodeExecID.ExecutionId.Domain,
-							Name:    sampleNodeExecID.ExecutionId.Name,
+							Project: sampleNodeExecID.GetExecutionId().GetProject(),
+							Domain:  sampleNodeExecID.GetExecutionId().GetDomain(),
+							Name:    sampleNodeExecID.GetExecutionId().GetName(),
 						},
 					},
 					RetryAttempt: &retryAttemptValue,

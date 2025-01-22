@@ -22,7 +22,7 @@ func TestGetClaims(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, claims, withClaimsCtx.Claims())
 
-	assert.NotEmpty(t, withClaimsCtx.UserInfo().AdditionalClaims)
+	assert.NotEmpty(t, withClaimsCtx.UserInfo().GetAdditionalClaims())
 }
 
 func TestWithExecutionUserIdentifier(t *testing.T) {

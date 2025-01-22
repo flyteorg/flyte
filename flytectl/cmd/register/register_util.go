@@ -171,10 +171,10 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					ResourceType: core.ResourceType_LAUNCH_PLAN,
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
-					Name:         launchPlan.Id.Name,
-					Version:      launchPlan.Id.Version,
+					Name:         launchPlan.GetId().GetName(),
+					Version:      launchPlan.GetId().GetVersion(),
 				},
-				Spec: launchPlan.Spec,
+				Spec: launchPlan.GetSpec(),
 			})
 		if err != nil {
 			return err
@@ -185,8 +185,8 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Id: &core.Identifier{
 					Project: config.GetConfig().Project,
 					Domain:  config.GetConfig().Domain,
-					Name:    launchPlan.Id.Name,
-					Version: launchPlan.Id.Version,
+					Name:    launchPlan.GetId().GetName(),
+					Version: launchPlan.GetId().GetVersion(),
 				},
 				State: admin.LaunchPlanState_ACTIVE,
 			})
@@ -205,8 +205,8 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					ResourceType: core.ResourceType_WORKFLOW,
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
-					Name:         workflowSpec.Template.Id.Name,
-					Version:      workflowSpec.Template.Id.Version,
+					Name:         workflowSpec.GetTemplate().GetId().GetName(),
+					Version:      workflowSpec.GetTemplate().GetId().GetVersion(),
 				},
 				Spec: workflowSpec,
 			})
@@ -223,8 +223,8 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 					ResourceType: core.ResourceType_TASK,
 					Project:      config.GetConfig().Project,
 					Domain:       config.GetConfig().Domain,
-					Name:         taskSpec.Template.Id.Name,
-					Version:      taskSpec.Template.Id.Version,
+					Name:         taskSpec.GetTemplate().GetId().GetName(),
+					Version:      taskSpec.GetTemplate().GetId().GetVersion(),
 				},
 				Spec: taskSpec,
 			})
@@ -235,39 +235,39 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 }
 
 func hydrateNode(node *core.Node, version string, force bool) error {
-	targetNode := node.Target
+	targetNode := node.GetTarget()
 	switch v := targetNode.(type) {
 	case *core.Node_TaskNode:
 		taskNodeWrapper := targetNode.(*core.Node_TaskNode)
-		taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
+		taskNodeReference := taskNodeWrapper.TaskNode.GetReference().(*core.TaskNode_ReferenceId)
 		hydrateIdentifier(taskNodeReference.ReferenceId, version, force)
 	case *core.Node_WorkflowNode:
 		workflowNodeWrapper := targetNode.(*core.Node_WorkflowNode)
-		switch workflowNodeWrapper.WorkflowNode.Reference.(type) {
+		switch workflowNodeWrapper.WorkflowNode.GetReference().(type) {
 		case *core.WorkflowNode_SubWorkflowRef:
-			subWorkflowNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_SubWorkflowRef)
+			subWorkflowNodeReference := workflowNodeWrapper.WorkflowNode.GetReference().(*core.WorkflowNode_SubWorkflowRef)
 			hydrateIdentifier(subWorkflowNodeReference.SubWorkflowRef, version, force)
 		case *core.WorkflowNode_LaunchplanRef:
-			launchPlanNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_LaunchplanRef)
+			launchPlanNodeReference := workflowNodeWrapper.WorkflowNode.GetReference().(*core.WorkflowNode_LaunchplanRef)
 			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef, version, force)
 		default:
-			return fmt.Errorf("unknown type %T", workflowNodeWrapper.WorkflowNode.Reference)
+			return fmt.Errorf("unknown type %T", workflowNodeWrapper.WorkflowNode.GetReference())
 		}
 	case *core.Node_BranchNode:
 		branchNodeWrapper := targetNode.(*core.Node_BranchNode)
-		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode, version, force); err != nil {
+		if err := hydrateNode(branchNodeWrapper.BranchNode.GetIfElse().GetCase().GetThenNode(), version, force); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
-		if len(branchNodeWrapper.BranchNode.IfElse.Other) > 0 {
-			for _, ifBlock := range branchNodeWrapper.BranchNode.IfElse.Other {
-				if err := hydrateNode(ifBlock.ThenNode, version, force); err != nil {
+		if len(branchNodeWrapper.BranchNode.GetIfElse().GetOther()) > 0 {
+			for _, ifBlock := range branchNodeWrapper.BranchNode.GetIfElse().GetOther() {
+				if err := hydrateNode(ifBlock.GetThenNode(), version, force); err != nil {
 					return fmt.Errorf("failed to hydrateNode")
 				}
 			}
 		}
-		switch branchNodeWrapper.BranchNode.IfElse.Default.(type) {
+		switch branchNodeWrapper.BranchNode.GetIfElse().GetDefault().(type) {
 		case *core.IfElseBlock_ElseNode:
-			elseNodeReference := branchNodeWrapper.BranchNode.IfElse.Default.(*core.IfElseBlock_ElseNode)
+			elseNodeReference := branchNodeWrapper.BranchNode.GetIfElse().GetDefault().(*core.IfElseBlock_ElseNode)
 			if err := hydrateNode(elseNodeReference.ElseNode, version, force); err != nil {
 				return fmt.Errorf("failed to hydrateNode")
 			}
@@ -275,12 +275,12 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 		case *core.IfElseBlock_Error:
 			// Do nothing.
 		default:
-			return fmt.Errorf("unknown type %T", branchNodeWrapper.BranchNode.IfElse.Default)
+			return fmt.Errorf("unknown type %T", branchNodeWrapper.BranchNode.GetIfElse().GetDefault())
 		}
 	case *core.Node_GateNode:
 		// Do nothing.
 	case *core.Node_ArrayNode:
-		if err := hydrateNode(v.ArrayNode.Node, version, force); err != nil {
+		if err := hydrateNode(v.ArrayNode.GetNode(), version, force); err != nil {
 			return fmt.Errorf("failed to hydrateNode")
 		}
 	default:
@@ -290,33 +290,33 @@ func hydrateNode(node *core.Node, version string, force bool) error {
 }
 
 func hydrateIdentifier(identifier *core.Identifier, version string, force bool) {
-	if identifier.Project == "" || identifier.Project == registrationProjectPattern {
+	if identifier.GetProject() == "" || identifier.GetProject() == registrationProjectPattern {
 		identifier.Project = config.GetConfig().Project
 	}
-	if identifier.Domain == "" || identifier.Domain == registrationDomainPattern {
+	if identifier.GetDomain() == "" || identifier.GetDomain() == registrationDomainPattern {
 		identifier.Domain = config.GetConfig().Domain
 	}
-	if force || identifier.Version == "" || identifier.Version == registrationVersionPattern {
+	if force || identifier.GetVersion() == "" || identifier.GetVersion() == registrationVersionPattern {
 		identifier.Version = version
 	}
 }
 
 func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataReference, destinationDir string) error {
-	if task.Template.GetContainer() != nil {
-		for k := range task.Template.GetContainer().Args {
-			if task.Template.GetContainer().Args[k] == registrationRemotePackagePattern {
+	if task.GetTemplate().GetContainer() != nil {
+		for k := range task.GetTemplate().GetContainer().GetArgs() {
+			if task.GetTemplate().GetContainer().GetArgs()[k] == registrationRemotePackagePattern {
 				task.Template.GetContainer().Args[k] = sourceUploadedLocation.String()
 			}
-			if task.Template.GetContainer().Args[k] == registrationDestDirPattern {
+			if task.GetTemplate().GetContainer().GetArgs()[k] == registrationDestDirPattern {
 				task.Template.GetContainer().Args[k] = "."
 				if len(destinationDir) > 0 {
 					task.Template.GetContainer().Args[k] = destinationDir
 				}
 			}
 		}
-	} else if task.Template.GetK8SPod() != nil && task.Template.GetK8SPod().PodSpec != nil {
+	} else if task.GetTemplate().GetK8SPod() != nil && task.GetTemplate().GetK8SPod().GetPodSpec() != nil {
 		var podSpec = v1.PodSpec{}
-		err := utils.UnmarshalStructToObj(task.Template.GetK8SPod().PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(task.GetTemplate().GetK8SPod().GetPodSpec(), &podSpec)
 		if err != nil {
 			return err
 		}
@@ -339,9 +339,9 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataRe
 		}
 		task.Template.Target = &core.TaskTemplate_K8SPod{
 			K8SPod: &core.K8SPod{
-				Metadata:   task.Template.GetK8SPod().Metadata,
+				Metadata:   task.GetTemplate().GetK8SPod().GetMetadata(),
 				PodSpec:    podSpecStruct,
-				DataConfig: task.Template.GetK8SPod().DataConfig,
+				DataConfig: task.GetTemplate().GetK8SPod().GetDataConfig(),
 			},
 		}
 	}
@@ -349,15 +349,15 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataRe
 }
 
 func validateLPWithSchedule(lpSpec *admin.LaunchPlanSpec, wf *admin.Workflow) error {
-	schedule := lpSpec.EntityMetadata.Schedule
+	schedule := lpSpec.GetEntityMetadata().GetSchedule()
 	var scheduleRequiredParams []string
-	if wf != nil && wf.Closure != nil && wf.Closure.CompiledWorkflow != nil &&
-		wf.Closure.CompiledWorkflow.Primary != nil && wf.Closure.CompiledWorkflow.Primary.Template != nil &&
-		wf.Closure.CompiledWorkflow.Primary.Template.Interface != nil &&
-		wf.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil {
-		variables := wf.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables
+	if wf != nil && wf.GetClosure() != nil && wf.GetClosure().GetCompiledWorkflow() != nil &&
+		wf.GetClosure().GetCompiledWorkflow().GetPrimary() != nil && wf.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate() != nil &&
+		wf.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface() != nil &&
+		wf.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetInputs() != nil {
+		variables := wf.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetInputs().GetVariables()
 		for varName := range variables {
-			if varName != schedule.KickoffTimeInputArg {
+			if varName != schedule.GetKickoffTimeInputArg() {
 				scheduleRequiredParams = append(scheduleRequiredParams, varName)
 			}
 		}
@@ -366,16 +366,16 @@ func validateLPWithSchedule(lpSpec *admin.LaunchPlanSpec, wf *admin.Workflow) er
 	// Either the scheduled param should have default or fixed values
 	var scheduleParamsWithValues []string
 	// Check for default values
-	if lpSpec.DefaultInputs != nil {
-		for paramName, paramValue := range lpSpec.DefaultInputs.Parameters {
-			if paramName != schedule.KickoffTimeInputArg && paramValue.GetDefault() != nil {
+	if lpSpec.GetDefaultInputs() != nil {
+		for paramName, paramValue := range lpSpec.GetDefaultInputs().GetParameters() {
+			if paramName != schedule.GetKickoffTimeInputArg() && paramValue.GetDefault() != nil {
 				scheduleParamsWithValues = append(scheduleParamsWithValues, paramName)
 			}
 		}
 	}
 	// Check for fixed values
-	if lpSpec.FixedInputs != nil && lpSpec.FixedInputs.Literals != nil {
-		for fixedLiteralName := range lpSpec.FixedInputs.Literals {
+	if lpSpec.GetFixedInputs() != nil && lpSpec.FixedInputs.Literals != nil {
+		for fixedLiteralName := range lpSpec.GetFixedInputs().GetLiterals() {
 			scheduleParamsWithValues = append(scheduleParamsWithValues, fixedLiteralName)
 		}
 	}
@@ -389,14 +389,14 @@ func validateLPWithSchedule(lpSpec *admin.LaunchPlanSpec, wf *admin.Workflow) er
 }
 
 func validateLaunchSpec(ctx context.Context, lpSpec *admin.LaunchPlanSpec, cmdCtx cmdCore.CommandContext) error {
-	if lpSpec == nil || lpSpec.WorkflowId == nil || lpSpec.EntityMetadata == nil ||
-		lpSpec.EntityMetadata.Schedule == nil {
+	if lpSpec == nil || lpSpec.GetWorkflowId() == nil || lpSpec.GetEntityMetadata() == nil ||
+		lpSpec.GetEntityMetadata().GetSchedule() == nil {
 		return nil
 	}
 	// Fetch the workflow spec using the identifier
-	workflowID := lpSpec.WorkflowId
-	wf, err := cmdCtx.AdminFetcherExt().FetchWorkflowVersion(ctx, workflowID.Name, workflowID.Version,
-		workflowID.Project, workflowID.Domain)
+	workflowID := lpSpec.GetWorkflowId()
+	wf, err := cmdCtx.AdminFetcherExt().FetchWorkflowVersion(ctx, workflowID.GetName(), workflowID.GetVersion(),
+		workflowID.GetProject(), workflowID.GetDomain())
 	if err != nil {
 		return err
 	}
@@ -464,7 +464,7 @@ func validateSpec(ctx context.Context, message proto.Message, cmdCtx cmdCore.Com
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := v
-		if err := validateLaunchSpec(ctx, launchPlan.Spec, cmdCtx); err != nil {
+		if err := validateLaunchSpec(ctx, launchPlan.GetSpec(), cmdCtx); err != nil {
 			return err
 		}
 	}
@@ -475,26 +475,26 @@ func hydrateSpec(message proto.Message, uploadLocation storage.DataReference, co
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
-		hydrateIdentifier(launchPlan.Id, config.Version, config.Force)
-		hydrateIdentifier(launchPlan.Spec.WorkflowId, config.Version, config.Force)
-		if err := hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.Spec); err != nil {
+		hydrateIdentifier(launchPlan.GetId(), config.Version, config.Force)
+		hydrateIdentifier(launchPlan.GetSpec().GetWorkflowId(), config.Version, config.Force)
+		if err := hydrateLaunchPlanSpec(config.AssumableIamRole, config.K8sServiceAccount, config.OutputLocationPrefix, launchPlan.GetSpec()); err != nil {
 			return err
 		}
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
-		for _, Noderef := range workflowSpec.Template.Nodes {
+		for _, Noderef := range workflowSpec.GetTemplate().GetNodes() {
 			if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
 				return err
 			}
 		}
-		if workflowSpec.Template.GetFailureNode() != nil {
-			if err := hydrateNode(workflowSpec.Template.GetFailureNode(), config.Version, config.Force); err != nil {
+		if workflowSpec.GetTemplate().GetFailureNode() != nil {
+			if err := hydrateNode(workflowSpec.GetTemplate().GetFailureNode(), config.Version, config.Force); err != nil {
 				return err
 			}
 		}
-		hydrateIdentifier(workflowSpec.Template.Id, config.Version, config.Force)
-		for _, subWorkflow := range workflowSpec.SubWorkflows {
-			for _, Noderef := range subWorkflow.Nodes {
+		hydrateIdentifier(workflowSpec.GetTemplate().GetId(), config.Version, config.Force)
+		for _, subWorkflow := range workflowSpec.GetSubWorkflows() {
+			for _, Noderef := range subWorkflow.GetNodes() {
 				if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
 					return err
 				}
@@ -504,11 +504,11 @@ func hydrateSpec(message proto.Message, uploadLocation storage.DataReference, co
 					return err
 				}
 			}
-			hydrateIdentifier(subWorkflow.Id, config.Version, config.Force)
+			hydrateIdentifier(subWorkflow.GetId(), config.Version, config.Force)
 		}
 	case *admin.TaskSpec:
 		taskSpec := message.(*admin.TaskSpec)
-		hydrateIdentifier(taskSpec.Template.Id, config.Version, config.Force)
+		hydrateIdentifier(taskSpec.GetTemplate().GetId(), config.Version, config.Force)
 		// In case of fast serialize input proto also have on additional variable to substitute i.e destination bucket for source code
 		if err := hydrateTaskSpec(taskSpec, uploadLocation, config.DestinationDirectory); err != nil {
 			return err
@@ -607,7 +607,7 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 				}
 			}
 		} else if header.Typeflag == tar.TypeReg {
-			dest, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			dest, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode)) // #nosec G115
 			if err != nil {
 				return unarchivedFiles, err
 			}
@@ -814,8 +814,8 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 		}
 	}
 
-	if resp != nil && len(resp.SignedUrl) > 0 {
-		return storage.DataReference(resp.NativeUrl), DirectUpload(resp.SignedUrl, h, size, dataRefReaderCloser)
+	if resp != nil && len(resp.GetSignedUrl()) > 0 {
+		return storage.DataReference(resp.GetNativeUrl()), DirectUpload(resp.GetSignedUrl(), h, size, dataRefReaderCloser)
 	}
 
 	dataStore, err := getStorageClient(ctx)

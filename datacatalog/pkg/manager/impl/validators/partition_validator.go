@@ -39,15 +39,15 @@ func ValidatePartitions(datasetPartitionKeys []string, artifactPartitions []*dat
 			continue
 		}
 
-		if err := ValidateEmptyStringField(partitionKeyName, artifactPartition.Key); err != nil {
+		if err := ValidateEmptyStringField(partitionKeyName, artifactPartition.GetKey()); err != nil {
 			partitionErrors = append(partitionErrors, NewMissingArgumentError(fmt.Sprintf("%v[%v]", partitionKeyName, idx)))
-		} else if err := ValidateEmptyStringField(partitionValueName, artifactPartition.Value); err != nil {
+		} else if err := ValidateEmptyStringField(partitionValueName, artifactPartition.GetValue()); err != nil {
 			partitionErrors = append(partitionErrors, NewMissingArgumentError(fmt.Sprintf("%v[%v]", partitionValueName, idx)))
 		} else {
-			_, ok := partitionKeyMatches[artifactPartition.Key]
+			_, ok := partitionKeyMatches[artifactPartition.GetKey()]
 
 			if ok {
-				partitionKeyMatches[artifactPartition.Key] = true
+				partitionKeyMatches[artifactPartition.GetKey()] = true
 			} else {
 				keyMismatch = true
 			}

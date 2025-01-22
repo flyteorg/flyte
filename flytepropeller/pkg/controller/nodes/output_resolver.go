@@ -86,7 +86,7 @@ func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, node
 			"Outputs not found at [%v]", outputsFileRef)
 	}
 
-	l, ok := d.Literals[varName]
+	l, ok := d.GetLiterals()[varName]
 	if !ok {
 		return nil, errors.Errorf(errors.BadSpecificationError, nodeID, "Output of array tasks is expected to be "+
 			"a single literal map entry named 'array' of type LiteralCollection.")
@@ -97,7 +97,7 @@ func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, node
 			"is of type [%v]. LiteralCollection is expected.", reflect.TypeOf(l.GetValue()))
 	}
 
-	literals := l.GetCollection().Literals
+	literals := l.GetCollection().GetLiterals()
 	if idx >= len(literals) {
 		return nil, errors.Errorf(errors.OutputsNotFoundError, nodeID, "Failed to find [%v[%v].%v]",
 			nodeID, idx, varName)
@@ -120,7 +120,7 @@ func resolveSingleOutput(ctx context.Context, store storage.ProtobufStore, nodeI
 			"Outputs not found at [%v]", outputsFileRef)
 	}
 
-	l, ok := d.Literals[varName]
+	l, ok := d.GetLiterals()[varName]
 	if !ok {
 		return nil, errors.Errorf(errors.OutputsNotFoundError, nodeID,
 			"Failed to find [%v].[%v]", nodeID, varName)

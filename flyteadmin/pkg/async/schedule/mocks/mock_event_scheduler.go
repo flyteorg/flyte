@@ -22,9 +22,9 @@ func (s *MockEventScheduler) CreateScheduleInput(ctx context.Context, appConfig 
 	payload, _ := aws.SerializeScheduleWorkflowPayload(
 		schedule.GetKickoffTimeInputArg(),
 		&admin.NamedEntityIdentifier{
-			Project: identifier.Project,
-			Domain:  identifier.Domain,
-			Name:    identifier.Name,
+			Project: identifier.GetProject(),
+			Domain:  identifier.GetDomain(),
+			Name:    identifier.GetName(),
 		})
 	return interfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
 }

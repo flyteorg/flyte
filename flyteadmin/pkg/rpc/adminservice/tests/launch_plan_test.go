@@ -47,7 +47,7 @@ func TestCreateLaunchPlanError(t *testing.T) {
 	mockLaunchPlanManager.SetCreateCallback(
 		func(ctx context.Context,
 			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.Id)
+			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

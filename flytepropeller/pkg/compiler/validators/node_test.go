@@ -64,7 +64,7 @@ func TestValidateNode(t *testing.T) {
 		coreN.UpstreamNodeIds = []string{"n1", "n0"}
 		n.OnGetCoreNode().Return(coreN)
 		n.On("GetUpstreamNodeIds").Return(func() []string {
-			return coreN.UpstreamNodeIds
+			return coreN.GetUpstreamNodeIds()
 		})
 
 		wf := &mocks.WorkflowBuilder{}

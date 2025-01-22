@@ -35,10 +35,10 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
 
 	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
-		assert.Equal(t, email.Body, testEmail.Body)
-		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
-		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
-		assert.Equal(t, email.SenderEmail, testEmail.SenderEmail)
+		assert.Equal(t, email.GetBody(), testEmail.GetBody())
+		assert.Equal(t, email.GetRecipientsEmail(), testEmail.GetRecipientsEmail())
+		assert.Equal(t, email.GetSubjectLine(), testEmail.GetSubjectLine())
+		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
 	mockGcpEmailer.SetSendEmailFunc(sendEmailValidationFunc)
@@ -48,7 +48,7 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:{value:1}", m.String())
+	assert.Equal(t, float64(1), m.GetCounter().GetValue())
 }
 
 func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
@@ -63,7 +63,7 @@ func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:{value:0}", m.String())
+	assert.Equal(t, float64(0), m.GetCounter().GetValue())
 }
 
 func TestGcpProcessor_StartProcessingError(t *testing.T) {
@@ -96,7 +96,7 @@ func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageProcessorError.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:{value:1}", m.String())
+	assert.Equal(t, float64(1), m.GetCounter().GetValue())
 }
 
 func TestGcpProcessor_StopProcessing(t *testing.T) {

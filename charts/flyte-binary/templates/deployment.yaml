@@ -94,6 +94,9 @@ spec:
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
           {{- end }}
+          {{- if .Values.deployment.waitForDB.securityContext }}
+          securityContext: {{- toYaml .Values.deployment.waitForDB.securityContext | nindent 12 }}
+          {{- end }}
         {{- end }}
         {{- if .Values.configuration.auth.enabled }}
         - name: gen-admin-auth-secret
@@ -130,6 +133,9 @@ spec:
               mountPath: /etc/flyte/config.d
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.genAdminAuthSecret.securityContext }}
+          securityContext: {{- toYaml .Values.deployment.genAdminAuthSecret.securityContext | nindent 12 }}
           {{- end }}
         {{- end }}
         {{- if .Values.deployment.initContainers }}
@@ -224,6 +230,9 @@ spec:
             {{- if .Values.deployment.extraVolumeMounts }}
             {{- tpl ( .Values.deployment.extraVolumeMounts | toYaml ) . | nindent 12 }}
             {{- end }}
+          {{- if .Values.deployment.securityContext }}
+          securityContext: {{- toYaml .Values.deployment.securityContext | nindent 12 }}
+          {{- end }}
         {{- if .Values.deployment.sidecars }}
         {{- tpl ( .Values.deployment.sidecars | toYaml ) . | nindent 8 }}
         {{- end }}

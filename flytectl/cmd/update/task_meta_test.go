@@ -13,7 +13,7 @@ import (
 )
 
 func TestTaskMetadataCanBeActivated(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -31,7 +31,7 @@ func TestTaskMetadataCanBeActivated(t *testing.T) {
 }
 
 func TestTaskMetadataCanBeArchived(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ACTIVE
 			config.Archive = true
@@ -49,7 +49,7 @@ func TestTaskMetadataCanBeArchived(t *testing.T) {
 }
 
 func TestTaskMetadataCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			config.Activate = true
 			config.Archive = true
@@ -61,7 +61,7 @@ func TestTaskMetadataCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T) {
 }
 
 func TestTaskMetadataUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ACTIVE
 			config.Activate = true
@@ -74,7 +74,7 @@ func TestTaskMetadataUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 }
 
 func TestTaskMetadataUpdateWithoutForceFlagFails(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -87,7 +87,7 @@ func TestTaskMetadataUpdateWithoutForceFlagFails(t *testing.T) {
 }
 
 func TestTaskMetadataUpdateDoesNothingWithDryRunFlag(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_TASK,
+	testNamedEntityUpdate(t, core.ResourceType_TASK,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -101,7 +101,7 @@ func TestTaskMetadataUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 func TestForceFlagIsIgnoredWithDryRunDuringTaskMetadataUpdate(t *testing.T) {
 	t.Run("without --force", func(t *testing.T) {
-		testNamedEntityUpdate(core.ResourceType_TASK,
+		testNamedEntityUpdate(t, core.ResourceType_TASK,
 			/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 				namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 				config.Activate = true
@@ -116,7 +116,7 @@ func TestForceFlagIsIgnoredWithDryRunDuringTaskMetadataUpdate(t *testing.T) {
 	})
 
 	t.Run("with --force", func(t *testing.T) {
-		testNamedEntityUpdate(core.ResourceType_TASK,
+		testNamedEntityUpdate(t, core.ResourceType_TASK,
 			/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 				namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 				config.Activate = true
@@ -133,6 +133,7 @@ func TestForceFlagIsIgnoredWithDryRunDuringTaskMetadataUpdate(t *testing.T) {
 
 func TestTaskMetadataUpdateFailsWhenTaskDoesNotExist(t *testing.T) {
 	testNamedEntityUpdateWithMockSetup(
+		t,
 		core.ResourceType_TASK,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
@@ -154,6 +155,7 @@ func TestTaskMetadataUpdateFailsWhenTaskDoesNotExist(t *testing.T) {
 
 func TestTaskMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 	testNamedEntityUpdateWithMockSetup(
+		t,
 		core.ResourceType_TASK,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
@@ -178,8 +180,7 @@ func TestTaskMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func TestTaskMetadataUpdateRequiresTaskName(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	config := &NamedEntityConfig{}
 

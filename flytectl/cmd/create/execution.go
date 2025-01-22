@@ -260,7 +260,7 @@ func createExecutionCommand(ctx context.Context, args []string, cmdCtx cmdCore.C
 		if _err != nil {
 			return _err
 		}
-		fmt.Printf("execution identifier %v\n", exec.Id)
+		fmt.Printf("execution identifier %v\n", exec.GetId())
 	}
 	return nil
 }

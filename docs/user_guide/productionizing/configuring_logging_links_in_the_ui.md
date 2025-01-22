@@ -40,7 +40,9 @@ The parameters can be used to generate a unique URL to the logs using a template
    * - ``{{ .logName }}``
      - A deployment specific name where to expect the logs to be
    * - ``{{ .hostname }}``
-     - The hostname where the pod is running and logs reside
+     - The value used to override the hostname the pod uses internally within its own network namespace (i.e., the pod's ``.spec.hostname``)
+   * - ``{{ .nodeName }}``
+     - The hostname of the node where the pod is running and logs reside (i.e., the pod's ``.spec.nodeName``)
    * - ``{{ .podRFC3339StartTime }}``
      - The pod creation time (in RFC3339 format, e.g. "2021-01-01T02:07:14Z", also conforming to ISO 8601)
    * - ``{{ .podRFC3339FinishTime }}``

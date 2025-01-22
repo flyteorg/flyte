@@ -3,6 +3,7 @@ package update
 import (
 	"context"
 	"fmt"
+	"testing"
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
@@ -13,11 +14,13 @@ import (
 )
 
 func testNamedEntityUpdate(
+	t *testing.T,
 	resourceType core.ResourceType,
 	setup func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testNamedEntityUpdateWithMockSetup(
+		t,
 		resourceType,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
@@ -35,13 +38,13 @@ func testNamedEntityUpdate(
 }
 
 func testNamedEntityUpdateWithMockSetup(
+	t *testing.T,
 	resourceType core.ResourceType,
 	mockSetup func(s *testutils.TestStruct, namedEntity *admin.NamedEntity),
 	setup func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	config := &NamedEntityConfig{}
 	target := newTestNamedEntity(resourceType)
@@ -52,12 +55,11 @@ func testNamedEntityUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, config, target)
-		defer s.TearDown()
 	}
 
 	updateMetadataFactory := getUpdateMetadataFactory(resourceType)
 
-	args := []string{target.Id.Name}
+	args := []string{target.GetId().GetName()}
 	err := updateMetadataFactory(config)(s.Ctx, args, s.CmdCtx)
 
 	if asserter != nil {
