@@ -84,9 +84,8 @@ func resolveRoles(rbac config.Rbac, identityContext auth.IdentityContext) []stri
 	roleSet := map[string]bool{}
 
 	if rbac.TokenScopeRoleResolver.Enabled {
-		scopeRoles := resolveRolesViaScopes(identityContext.Claims())
 
-		for _, scopeRole := range scopeRoles {
+		for _, scopeRole := range identityContext.Scopes().List() {
 			roleSet[scopeRole] = true
 		}
 	}
@@ -97,27 +96,6 @@ func resolveRoles(rbac config.Rbac, identityContext auth.IdentityContext) []stri
 		for _, claimRole := range claimRoles {
 			roleSet[claimRole] = true
 		}
-	}
-
-	return maps.Keys(roleSet)
-}
-
-func resolveRolesViaScopes(claims map[string]interface{}) []string {
-
-	scopeClaimIntf, ok := claims["scope"]
-	if !ok {
-		return []string{}
-	}
-
-	scopeClaimSlice, ok := scopeClaimIntf.([]interface{})
-	if !ok {
-		return []string{}
-	}
-
-	roleSet := map[string]bool{}
-
-	for _, scope := range scopeClaimSlice {
-		roleSet[scope.(string)] = true
 	}
 
 	return maps.Keys(roleSet)
