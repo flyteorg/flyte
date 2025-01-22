@@ -1,12 +1,12 @@
 .. _deployment-agent-setup-k8sservice:
 
 Kubernetes (K8s) Service Agent
-==================
+==============================
 
-The Kubernetes (K8s) Service Agent enables machine learning (ML) users to efficiently handle non-training tasks—such as data loading, caching, and processing—concurrently with training jobs in Kubernetes clusters.
+The Kubernetes (K8s) Data Service Agent enables machine learning (ML) users to efficiently handle non-training tasks—such as data loading, caching, and processing—concurrently with training jobs in Kubernetes clusters.
 This capability is particularly valuable in deep learning applications, such as those in Graph Neural Networks (GNNs).
 
-This guide offers a comprehensive overview of setting up the K8s Service Agent within your Flyte deployment.
+This guide offers a comprehensive overview of setting up the K8s Data Service Agent within your Flyte deployment.
 
 Spin up a cluster
 -----------------
@@ -71,8 +71,8 @@ Substitute ``<AGENT_ENDPOINT>`` with the endpoint of your MMCloud agent.
 Setup the RBAC
 ----------------------
 
-The k8s agent will create statefulset and expose the service end point for the statefulset pods.
-RBAC needs to be set up to allow the K8s agent to CRUD statefulset and service.
+The K8s Data Service Agent will create a StatefulSet and expose the Service endpoint for the StatefulSet pods.
+RBAC needs to be set up to allow the K8s Data Service Agent to perform CRUD operations on the StatefulSet and Service.
 
 The role `flyte-flyteagent-role` set up:
 .. code-block:: yaml
