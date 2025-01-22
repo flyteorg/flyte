@@ -16,22 +16,34 @@ import (
 
 func GetAuthorizationInterceptor(authCtx interfaces.AuthenticationContext) (grpc.UnaryServerInterceptor, error) {
 
+	noopFunc := func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+		return nil, nil
+	}
+
 	opts := authCtx.Options().Rbac
 	for _, policy := range opts.Policies {
+		// FIXME: Move this to somewhere else?
 		err := validatePolicy(policy)
 		if err != nil {
-			noopFunc := func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-				return nil, nil
-			}
 			return noopFunc, fmt.Errorf("failed to validate authorization policy: %w", err)
 		}
 	}
 
-	// validate auth config
+	bypassMethodPatterns := []*regexp.Regexp{}
+
+	for _, allowedMethod := range opts.BypassMethodPatterns {
+		compiled, err := regexp.Compile(allowedMethod)
+		if err != nil {
+			return noopFunc, fmt.Errorf("compiling bypass method pattern %s: %w", allowedMethod, err)
+		}
+
+		bypassMethodPatterns = append(bypassMethodPatterns, compiled)
+	}
+
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 
-		for _, allowedMethod := range opts.BypassMethodPatterns {
-			if info.FullMethod == allowedMethod {
+		for _, allowedMethod := range bypassMethodPatterns {
+			if allowedMethod.MatchString(info.FullMethod) {
 				logger.Debugf(ctx, "[%s] Authorization bypassed for method", info.FullMethod)
 				return handler(ctx, req)
 			}
