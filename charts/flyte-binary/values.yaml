@@ -166,7 +166,7 @@ configuration:
   # agentService Flyte Agent configuration
   agentService:
     defaultAgent:
-      endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+      endpoint: "k8s://flyteagent.flyte:8000"
       insecure: true
       timeouts:
         GetTask: 10s

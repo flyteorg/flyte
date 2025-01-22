@@ -181,29 +181,29 @@ By default, all agent requests will be sent to the default agent service. Howeve
 you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration.
 
 ```yaml
- plugins:
-   agent-service:
-     # By default, all requests will be sent to the default agent.
-     defaultAgent:
-       endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
-       insecure: true
-       timeouts:
-         # CreateTask, GetTask and DeleteTask are for async agents.
-         # ExecuteTaskSync is for sync agents.
-         CreateTask: 5s
-         GetTask: 5s
-         DeleteTask: 5s
-         ExecuteTaskSync: 10s
-       defaultTimeout: 10s
-     agents:
-       custom_agent:
-         endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
-         insecure: false
-         defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
-         timeouts:
-           GetTask: 5s
-         defaultTimeout: 10s
-     agentForTaskTypes:
-       # It will override the default agent for custom_task, which means propeller will send the request to this agent.
-       - custom_task: custom_agent
+plugins:
+  agent-service:
+    # By default, all requests will be sent to the default agent.
+    defaultAgent:
+      endpoint: "k8s://flyteagent.flyte:8000"
+      insecure: true
+      timeouts:
+        # CreateTask, GetTask and DeleteTask are for async agents.
+        # ExecuteTaskSync is for sync agents.
+        CreateTask: 5s
+        GetTask: 5s
+        DeleteTask: 5s
+        ExecuteTaskSync: 10s
+      defaultTimeout: 10s
+    agents:
+      custom_agent:
+        endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
+        insecure: false
+        defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+        timeouts:
+          GetTask: 5s
+        defaultTimeout: 10s
+    agentForTaskTypes:
+      # It will override the default agent for custom_task, which means propeller will send the request to this agent.
+      - custom_task: custom_agent
 ```
