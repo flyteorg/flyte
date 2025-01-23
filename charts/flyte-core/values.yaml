@@ -487,6 +487,7 @@ secrets:
     enabled: true
     clientSecret: foobar
     clientId: flytepropeller
+    secretName: flyte-secret-auth
 
 #
 # WEBHOOK SETTINGS

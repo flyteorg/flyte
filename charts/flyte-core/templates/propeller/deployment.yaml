@@ -112,7 +112,7 @@ spec:
       {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
-          secretName: flyte-secret-auth
+          secretName: {{ .Values.secrets.adminOauthClientCredentials.secretName }}
       {{- end }}
       {{- with .Values.flytepropeller.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
