@@ -25,6 +25,7 @@ type recordingMetrics struct {
 	EventRecordingResourceExhausted labeled.Counter
 	EventRecordingEventSinkError    labeled.Counter
 	EventRecordingInvalidArgument   labeled.Counter
+	EventRecordingBytes             labeled.Counter
 }
 
 // Recorder for Workflow, Node, and Task events
@@ -56,6 +57,8 @@ func (r *eventRecorder) sinkEvent(ctx context.Context, event proto.Message) erro
 	}
 
 	r.metrics.EventRecordingSuccess.Observe(ctx, startTime, time.Now())
+	eventSize := proto.Size(event)
+	r.metrics.EventRecordingBytes.Add(ctx, float64(eventSize))
 	return nil
 }
 
@@ -103,6 +106,7 @@ func NewEventRecorder(eventSink EventSink, scope promutils.Scope) EventRecorder 
 			EventRecordingResourceExhausted: labeled.NewCounter("resource_exhausted", "The count that recording events was throttled", recordingScope),
 			EventRecordingInvalidArgument:   labeled.NewCounter("invalid_argument", "The count for invalid argument errors", recordingScope),
 			EventRecordingEventSinkError:    labeled.NewCounter("unexpected_err", "The count of event recording failures for unexpected reasons", recordingScope),
+			EventRecordingBytes:             labeled.NewCounter("bytes_total", "The count of bytes recorded", recordingScope),
 		},
 	}
 }

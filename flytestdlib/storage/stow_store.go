@@ -99,10 +99,12 @@ type stowMetrics struct {
 	ReadFailure         labeled.Counter
 	ReadOpenLatency     labeled.StopWatch
 	ReadOpenLatencyHist labeled.HistogramStopWatch
+	ReadBytes           labeled.Counter
 
 	WriteFailure     labeled.Counter
 	WriteLatency     labeled.StopWatch
 	WriteLatencyHist labeled.HistogramStopWatch
+	WriteBytes       labeled.Counter
 
 	DeleteFailure     labeled.Counter
 	DeleteLatency     labeled.StopWatch
@@ -335,7 +337,14 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		}
 	}
 
-	return item.Open()
+	readCloser, err := item.Open()
+	if err != nil {
+		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
+		return nil, err
+	}
+
+	s.metrics.ReadBytes.Add(ctx, float64(sizeBytes))
+	return readCloser, err
 }
 
 func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
@@ -370,6 +379,7 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		}
 	}
 
+	s.metrics.WriteBytes.Add(ctx, float64(size))
 	return nil
 }
 
@@ -496,10 +506,12 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 		ReadFailure:         labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		ReadOpenLatency:     labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		ReadOpenLatencyHist: labeled.NewHistogramStopWatch("read_open", "Indicates time to first byte when reading", scope, labeled.EmitUnlabeledMetric),
+		ReadBytes:           labeled.NewCounter("read_bytes_total", "Indicates number of bytes read", scope, labeled.EmitUnlabeledMetric),
 
 		WriteFailure:     labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		WriteLatency:     labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 		WriteLatencyHist: labeled.NewHistogramStopWatch("write", "Time to write an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
+		WriteBytes:       labeled.NewCounter("write_bytes_total", "Indicates number of bytes written", scope, labeled.EmitUnlabeledMetric),
 
 		DeleteFailure:     labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		DeleteLatency:     labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
