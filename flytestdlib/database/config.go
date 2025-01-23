@@ -19,12 +19,13 @@ var defaultConfig = &DbConfig{
 	ConnMaxLifeTime:    config.Duration{Duration: time.Hour},
 	Postgres: PostgresConfig{
 		// These values are suitable for local sandbox development
-		Host:         "localhost",
-		Port:         30001,
-		DbName:       postgresStr,
-		User:         postgresStr,
-		Password:     postgresStr,
-		ExtraOptions: "sslmode=disable",
+		Host:            "localhost",
+		ReadReplicaHost: "localhost",
+		Port:            30001,
+		DbName:          postgresStr,
+		User:            postgresStr,
+		Password:        postgresStr,
+		ExtraOptions:    "sslmode=disable",
 	},
 }
 var configSection = config.MustRegisterSection(database, defaultConfig)
@@ -59,15 +60,16 @@ type DbConfig struct {
 
 // SQLiteConfig can be used to configure
 type SQLiteConfig struct {
-	File string `json:"file" pflag:",The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created"`
+	File string `json:"file" pflag:",The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be reused, else a new will be created"`
 }
 
 // PostgresConfig includes specific config options for opening a connection to a postgres database.
 type PostgresConfig struct {
-	Host   string `json:"host" pflag:",The host name of the database server"`
-	Port   int    `json:"port" pflag:",The port name of the database server"`
-	DbName string `json:"dbname" pflag:",The database name"`
-	User   string `json:"username" pflag:",The database user who is connecting to the server."`
+	Host            string `json:"host" pflag:",The host name of the database server"`
+	ReadReplicaHost string `json:"readReplicaHost" pflag:",The host name of the read replica database server"`
+	Port            int    `json:"port" pflag:",The port name of the database server"`
+	DbName          string `json:"dbname" pflag:",The database name"`
+	User            string `json:"username" pflag:",The database user who is connecting to the server."`
 	// Either Password or PasswordPath must be set.
 	Password     string `json:"password" pflag:",The database password."`
 	PasswordPath string `json:"passwordPath" pflag:",Points to the file containing the database password."`

@@ -17,6 +17,8 @@ import (
 
 var execConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
+const failedToValidateLiteralType = "Failed to validate literal type"
+
 func TestValidateExecEmptyProject(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Project = ""
@@ -90,11 +92,11 @@ func TestGetExecutionInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value-1"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -102,7 +104,41 @@ func TestGetExecutionInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
+}
+
+func TestGetExecutionWithOffloadedInputs(t *testing.T) {
+	execLiteral := &core.Literal{
+		Value: &core.Literal_OffloadedMetadata{
+			OffloadedMetadata: &core.LiteralOffloadedMetadata{
+				Uri:       "s3://bucket/key",
+				SizeBytes: 100,
+				InferredType: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_STRING,
+					},
+				},
+			},
+		},
+	}
+	executionRequest := testutils.GetExecutionRequestWithOffloadedInputs("foo", execLiteral)
+	lpRequest := testutils.GetLaunchPlanRequest()
+
+	actualInputs, err := CheckAndFetchInputsForExecution(
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
+	)
+	expectedMap := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": execLiteral,
+			"bar": coreutils.MustMakeLiteral("bar-value"),
+		},
+	}
+	assert.Nil(t, err)
+	assert.NotNil(t, actualInputs)
+	assert.EqualValues(t, expectedMap.GetLiterals()["foo"], actualInputs.GetLiterals()["foo"])
+	assert.EqualValues(t, expectedMap.GetLiterals()["bar"], actualInputs.GetLiterals()["bar"])
 }
 
 func TestValidateExecInputsWrongType(t *testing.T) {
@@ -114,9 +150,9 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got simple:INTEGER", err.Error())
 }
@@ -131,9 +167,9 @@ func TestValidateExecInputsExtraInputs(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	assert.EqualError(t, err, "invalid input foo-extra")
 }
@@ -148,9 +184,9 @@ func TestValidateExecInputsOverrideFixed(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
 	assert.EqualError(t, err, "invalid input bar")
 }
@@ -160,11 +196,11 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 	executionRequest.Inputs = nil
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
-		lpRequest.Spec.DefaultInputs,
+		executionRequest.GetInputs(),
+		lpRequest.GetSpec().GetFixedInputs(),
+		lpRequest.GetSpec().GetDefaultInputs(),
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -172,7 +208,43 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
+}
+
+func TestValidateExecUnknownIDLInputs(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	userInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := CheckAndFetchInputsForExecution(
+		userInputs,
+		nil,
+		defaultInputs,
+	)
+	assert.NotNil(t, err)
+
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
 }
 
 func TestValidExecutionId(t *testing.T) {
@@ -196,14 +268,14 @@ func TestValidExecutionIdInvalidChars(t *testing.T) {
 }
 
 func TestValidateCreateWorkflowEventRequest(t *testing.T) {
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 	}
 	err := ValidateCreateWorkflowEventRequest(request, maxOutputSizeInBytes)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Workflow event handler was called without event")
 
-	request = admin.WorkflowExecutionEventRequest{
+	request = &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
 			Phase:        core.WorkflowExecution_FAILED,

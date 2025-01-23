@@ -35,7 +35,7 @@ Specify agent configuration
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
 
         tasks:
           task-plugins:
@@ -48,11 +48,6 @@ Specify agent configuration
               - container: container
               - container_array: k8s-array
               - snowflake: agent-service
-
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - snowflake
 
     .. group-tab:: Flyte core
 
@@ -77,10 +72,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   snowflake: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - snowflake
 
 Ensure that the propeller has the correct service account for Snowflake.
 

@@ -25,42 +25,42 @@ import (
 var whitelistedTaskErr = errors.NewFlyteAdminErrorf(codes.InvalidArgument, "task type must be whitelisted before use")
 
 // This is called for a task with a non-nil container.
-func validateContainer(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
-	if err := ValidateEmptyStringField(task.GetContainer().Image, shared.Image); err != nil {
+func validateContainer(task *core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
+	if err := ValidateEmptyStringField(task.GetContainer().GetImage(), shared.Image); err != nil {
 		return err
 	}
 
-	if task.GetContainer().Resources == nil {
+	if task.GetContainer().GetResources() == nil {
 		return nil
 	}
-	if err := validateTaskResources(task.Id, platformTaskResources.Limits, task.GetContainer().Resources.Requests,
-		task.GetContainer().Resources.Limits); err != nil {
+	if err := validateTaskResources(task.GetId(), platformTaskResources.Limits, task.GetContainer().GetResources().GetRequests(),
+		task.GetContainer().GetResources().GetLimits()); err != nil {
 		logger.Debugf(context.Background(), "encountered errors validating task resources for [%+v]: %v",
-			task.Id, err)
+			task.GetId(), err)
 		return err
 	}
 	return nil
 }
 
 // This is called for a task with a non-nil k8s pod.
-func validateK8sPod(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
-	if task.GetK8SPod().PodSpec == nil {
+func validateK8sPod(task *core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
+	if task.GetK8SPod().GetPodSpec() == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid TaskSpecification, pod tasks should specify their target as a K8sPod with a defined pod spec")
 	}
 	var podSpec corev1.PodSpec
-	if err := utils.UnmarshalStructToObj(task.GetK8SPod().PodSpec, &podSpec); err != nil {
+	if err := utils.UnmarshalStructToObj(task.GetK8SPod().GetPodSpec(), &podSpec); err != nil {
 		logger.Debugf(context.Background(), "failed to unmarshal k8s podspec [%+v]: %v",
-			task.GetK8SPod().PodSpec, err)
+			task.GetK8SPod().GetPodSpec(), err)
 		return err
 	}
 	platformTaskResourceLimits := taskResourceSetToMap(platformTaskResources.Limits)
 	for _, container := range podSpec.Containers {
-		err := validateResource(task.Id, resourceListToQuantity(container.Resources.Requests),
+		err := validateResource(task.GetId(), resourceListToQuantity(container.Resources.Requests),
 			resourceListToQuantity(container.Resources.Limits), platformTaskResourceLimits)
 		if err != nil {
 			logger.Debugf(context.Background(), "encountered errors validating task resources for [%+v]: %v",
-				task.Id, err)
+				task.GetId(), err)
 			return err
 		}
 	}
@@ -68,31 +68,31 @@ func validateK8sPod(task core.TaskTemplate, platformTaskResources workflowengine
 	return nil
 }
 
-func validateRuntimeMetadata(metadata core.RuntimeMetadata) error {
-	if err := ValidateEmptyStringField(metadata.Version, shared.RuntimeVersion); err != nil {
+func validateRuntimeMetadata(metadata *core.RuntimeMetadata) error {
+	if err := ValidateEmptyStringField(metadata.GetVersion(), shared.RuntimeVersion); err != nil {
 		return err
 	}
 	return nil
 }
 
-func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
+func validateTaskTemplate(taskID *core.Identifier, task *core.TaskTemplate,
 	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration) error {
 
-	if err := ValidateEmptyStringField(task.Type, shared.Type); err != nil {
+	if err := ValidateEmptyStringField(task.GetType(), shared.Type); err != nil {
 		return err
 	}
-	if err := validateTaskType(taskID, task.Type, whitelistConfig); err != nil {
+	if err := validateTaskType(taskID, task.GetType(), whitelistConfig); err != nil {
 		return err
 	}
-	if task.Metadata == nil {
+	if task.GetMetadata() == nil {
 		return shared.GetMissingArgumentError(shared.Metadata)
 	}
-	if task.Metadata.Runtime != nil {
-		if err := validateRuntimeMetadata(*task.Metadata.Runtime); err != nil {
+	if task.GetMetadata().GetRuntime() != nil {
+		if err := validateRuntimeMetadata(task.GetMetadata().GetRuntime()); err != nil {
 			return err
 		}
 	}
-	if task.Interface == nil {
+	if task.GetInterface() == nil {
 		// The actual interface proto has nothing to validate.
 		return shared.GetMissingArgumentError(shared.TypedInterface)
 	}
@@ -107,19 +107,19 @@ func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
 }
 
 func ValidateTask(
-	ctx context.Context, request admin.TaskCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, request *admin.TaskCreateRequest, db repositoryInterfaces.Repository,
 	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration,
 	applicationConfig runtime.ApplicationConfiguration) error {
-	if err := ValidateIdentifier(request.Id, common.Task); err != nil {
+	if err := ValidateIdentifier(request.GetId(), common.Task); err != nil {
 		return err
 	}
-	if err := ValidateProjectAndDomain(ctx, db, applicationConfig, request.Id.Project, request.Id.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, applicationConfig, request.GetId().GetProject(), request.GetId().GetDomain()); err != nil {
 		return err
 	}
-	if request.Spec == nil || request.Spec.Template == nil {
+	if request.GetSpec() == nil || request.GetSpec().GetTemplate() == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
-	return validateTaskTemplate(*request.Id, *request.Spec.Template, platformTaskResources, whitelistConfig)
+	return validateTaskTemplate(request.GetId(), request.GetSpec().GetTemplate(), platformTaskResources, whitelistConfig)
 }
 
 func taskResourceSetToMap(
@@ -143,18 +143,18 @@ func taskResourceSetToMap(
 func addResourceEntryToMap(
 	identifier *core.Identifier, entry *core.Resources_ResourceEntry,
 	resourceEntries *map[core.Resources_ResourceName]resource.Quantity) error {
-	if _, ok := (*resourceEntries)[entry.Name]; ok {
+	if _, ok := (*resourceEntries)[entry.GetName()]; ok {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"can't specify %v limit for task [%+v] multiple times", entry.Name, identifier)
+			"can't specify %v limit for task [%+v] multiple times", entry.GetName(), identifier)
 	}
-	quantity, err := resource.ParseQuantity(entry.Value)
+	quantity, err := resource.ParseQuantity(entry.GetValue())
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Parsing of %v request failed for value %v - reason  %v. "+
 				"Please follow K8s conventions for resources "+
-				"https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/", entry.Name, entry.Value, err)
+				"https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/", entry.GetName(), entry.GetValue(), err)
 	}
-	(*resourceEntries)[entry.Name] = quantity
+	(*resourceEntries)[entry.GetName()] = quantity
 	return nil
 }
 
@@ -184,7 +184,7 @@ func requestedResourcesToQuantity(
 
 	var requestedToQuantity = make(map[core.Resources_ResourceName]resource.Quantity)
 	for _, limitEntry := range resources {
-		switch limitEntry.Name {
+		switch limitEntry.GetName() {
 		case core.Resources_CPU:
 			fallthrough
 		case core.Resources_MEMORY:
@@ -199,7 +199,7 @@ func requestedResourcesToQuantity(
 			}
 			if !isWholeNumber(requestedToQuantity[core.Resources_GPU]) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"gpu for [%+v] must be a whole number, got: %s instead", identifier, limitEntry.Value)
+					"gpu for [%+v] must be a whole number, got: %s instead", identifier, limitEntry.GetValue())
 			}
 		case core.Resources_EPHEMERAL_STORAGE:
 			err := addResourceEntryToMap(identifier, limitEntry, &requestedToQuantity)
@@ -252,15 +252,14 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 			if ok && platformLimitOk && limitQuantity.Value() > platformLimit.Value() {
 				// Also check that the requested limit is less than the platform task limit.
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Requested %v limit [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					"Requested %v limit [%v] is greater than current limit set in the platform configuration [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
 					resourceName, limitQuantity.String(), platformLimit.String())
 			}
 			if platformLimitOk && defaultQuantity.Value() > platformTaskResourceLimits[resourceName].Value() {
 				// Also check that the requested limit is less than the platform task limit.
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Requested %v default [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					"Requested %v default [%v] is greater than current limit set in the platform configuration [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+
 					resourceName, defaultQuantity.String(), platformTaskResourceLimits[resourceName].String())
 			}
 		case core.Resources_GPU:
@@ -273,8 +272,7 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 			platformLimit, platformLimitOk := platformTaskResourceLimits[resourceName]
 			if platformLimitOk && defaultQuantity.Value() > platformLimit.Value() {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Requested %v default [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+					"Requested %v default [%v] is greater than current limit set in the platform configuration [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
 					resourceName, defaultQuantity.String(), platformLimit.String())
 			}
 		}
@@ -282,7 +280,7 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 	return nil
 }
 
-func validateTaskType(taskID core.Identifier, taskType string, whitelistConfig runtime.WhitelistConfiguration) error {
+func validateTaskType(taskID *core.Identifier, taskType string, whitelistConfig runtime.WhitelistConfiguration) error {
 	taskTypeWhitelist := whitelistConfig.GetTaskTypeWhitelist()
 	if taskTypeWhitelist == nil {
 		return nil
@@ -295,14 +293,14 @@ func validateTaskType(taskID core.Identifier, taskType string, whitelistConfig r
 		if scope.Project == "" {
 			// All projects whitelisted
 			return nil
-		} else if scope.Project != taskID.Project {
+		} else if scope.Project != taskID.GetProject() {
 			continue
 		}
 		// We have a potential match! Verify that this task type is approved given the specificity of the whitelist.
 		if scope.Domain == "" {
 			// All domains for this project are whitelisted
 			return nil
-		} else if scope.Domain == taskID.Domain {
+		} else if scope.Domain == taskID.GetDomain() {
 			return nil
 		}
 

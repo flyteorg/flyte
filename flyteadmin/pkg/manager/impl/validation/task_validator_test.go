@@ -185,41 +185,41 @@ func TestValidateTaskTypeWhitelist(t *testing.T) {
 			},
 		},
 	}
-	err := validateTaskType(core.Identifier{
+	err := validateTaskType(&core.Identifier{
 		Project: "proj_a",
 		Domain:  "domain_a",
 	}, "type_a", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_a",
 	}, "type_b", whitelistConfig)
 	assert.NotNil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_b",
 	}, "type_a", whitelistConfig)
 	assert.NotNil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_b",
 		Domain:  "domain_b",
 	}, "type_b", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_c",
 	}, "every_type", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{
+	err = validateTaskType(&core.Identifier{
 		Project: "proj_c",
 	}, "type_b", whitelistConfig)
 	assert.Nil(t, err)
 
-	err = validateTaskType(core.Identifier{}, "some_generally_supported_type", whitelistConfig)
+	err = validateTaskType(&core.Identifier{}, "some_generally_supported_type", whitelistConfig)
 	assert.Nil(t, err)
 }
 

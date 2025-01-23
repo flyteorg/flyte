@@ -24,6 +24,8 @@ propeller:
   create-flyteworkflow-crd: true
   kube-config: $HOME/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
+  literal-offloading-config:
+    enabled: true
 
 server:
   kube-config: $HOME/.flyte/sandbox/kubeconfig
@@ -41,6 +43,7 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - agent-service
       - echo
     default-for-task-types:
       - container: container
@@ -57,6 +60,7 @@ plugins:
       - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    image-pull-policy: Always # Helps in better iteration of flytekit changes
   k8s-array:
     logs:
       config:
@@ -86,6 +90,8 @@ storage:
       access_key_id: minio
       secret_key: miniostorage
   container: my-s3-bucket
+  limits:
+    maxDownloadMBs: 1000
 
 task_resources:
   defaults:

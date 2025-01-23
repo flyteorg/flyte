@@ -52,13 +52,13 @@ COPY --from=base /flyteorg/ /flyteorg/
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 
 ARG FLYTE_VERSION="latest"
-ENV FLYTE_VERSION "${FLYTE_VERSION}"
+ENV FLYTE_VERSION="${FLYTE_VERSION}"
 
 ARG FLYTE_TEST="release"
-ENV FLYTE_TEST "${FLYTE_TEST}"
+ENV FLYTE_TEST="${FLYTE_TEST}"
 
 # Update PATH variable
-ENV PATH "/flyteorg/bin:${PATH}"
+ENV PATH="/flyteorg/bin:${PATH}"
 
 # Declare volumes for k3s
 VOLUME /var/lib/kubelet

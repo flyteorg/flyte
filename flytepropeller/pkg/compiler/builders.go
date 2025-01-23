@@ -32,8 +32,8 @@ type workflowBuilder struct {
 }
 
 func (w workflowBuilder) GetFailureNode() c.Node {
-	if w.GetCoreWorkflow() != nil && w.GetCoreWorkflow().GetTemplate() != nil && w.GetCoreWorkflow().GetTemplate().FailureNode != nil {
-		return w.GetOrCreateNodeBuilder(w.GetCoreWorkflow().GetTemplate().FailureNode)
+	if w.GetCoreWorkflow() != nil && w.GetCoreWorkflow().GetTemplate() != nil && w.GetCoreWorkflow().GetTemplate().GetFailureNode() != nil {
+		return w.GetOrCreateNodeBuilder(w.GetCoreWorkflow().GetTemplate().GetFailureNode())
 	}
 
 	return nil
@@ -152,9 +152,9 @@ func (t taskBuilder) GetCoreTask() *core.TaskTemplate {
 }
 
 func (t taskBuilder) GetID() c.Identifier {
-	if t.flyteTask.Id != nil {
-		return *t.flyteTask.Id
+	if t.flyteTask.GetId() != nil {
+		return t.flyteTask.GetId()
 	}
 
-	return c.Identifier{}
+	return &core.Identifier{}
 }

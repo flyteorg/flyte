@@ -14,10 +14,10 @@ import (
 // events, workflow execution processing doesn't have to wait on these to be committed.
 type workflowExecutionEventWriter struct {
 	db     repositoryInterfaces.Repository
-	events chan admin.WorkflowExecutionEventRequest
+	events chan *admin.WorkflowExecutionEventRequest
 }
 
-func (w *workflowExecutionEventWriter) Write(event admin.WorkflowExecutionEventRequest) {
+func (w *workflowExecutionEventWriter) Write(event *admin.WorkflowExecutionEventRequest) {
 	w.events <- event
 }
 
@@ -40,6 +40,6 @@ func (w *workflowExecutionEventWriter) Run() {
 func NewWorkflowExecutionEventWriter(db repositoryInterfaces.Repository, bufferSize int) interfaces.WorkflowExecutionEventWriter {
 	return &workflowExecutionEventWriter{
 		db:     db,
-		events: make(chan admin.WorkflowExecutionEventRequest, bufferSize),
+		events: make(chan *admin.WorkflowExecutionEventRequest, bufferSize),
 	}
 }

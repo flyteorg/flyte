@@ -400,8 +400,10 @@ pub struct BlobMetadata {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Binary {
+    /// Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
     #[prost(bytes="vec", tag="1")]
     pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
@@ -489,13 +491,7 @@ pub struct Literal {
     /// Additional metadata for literals.
     #[prost(map="string, string", tag="5")]
     pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    /// If this literal is offloaded, this field will contain metadata including the offload location.
-    #[prost(string, tag="6")]
-    pub uri: ::prost::alloc::string::String,
-    /// Includes information about the size of the literal.
-    #[prost(uint64, tag="7")]
-    pub size_bytes: u64,
-    #[prost(oneof="literal::Value", tags="1, 2, 3")]
+    #[prost(oneof="literal::Value", tags="1, 2, 3, 8")]
     pub value: ::core::option::Option<literal::Value>,
 }
 /// Nested message and enum types in `Literal`.
@@ -512,7 +508,25 @@ pub mod literal {
         /// A map of strings to literals.
         #[prost(message, tag="3")]
         Map(super::LiteralMap),
+        /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        #[prost(message, tag="8")]
+        OffloadedMetadata(super::LiteralOffloadedMetadata),
     }
+}
+/// A message that contains the metadata of the offloaded data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LiteralOffloadedMetadata {
+    /// The location of the offloaded core.Literal.
+    #[prost(string, tag="1")]
+    pub uri: ::prost::alloc::string::String,
+    /// The size of the offloaded data.
+    #[prost(uint64, tag="2")]
+    pub size_bytes: u64,
+    /// The inferred literal type of the offloaded data.
+    #[prost(message, optional, tag="3")]
+    pub inferred_type: ::core::option::Option<LiteralType>,
 }
 /// A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -554,7 +568,7 @@ pub struct UnionInfo {
 pub struct BindingData {
     #[prost(message, optional, tag="5")]
     pub union: ::core::option::Option<UnionInfo>,
-    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4, 6")]
     pub value: ::core::option::Option<binding_data::Value>,
 }
 /// Nested message and enum types in `BindingData`.
@@ -575,6 +589,11 @@ pub mod binding_data {
         /// A map of bindings. The key is always a string.
         #[prost(message, tag="4")]
         Map(super::BindingDataMap),
+        /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        /// Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+        #[prost(message, tag="6")]
+        OffloadedMetadata(super::LiteralOffloadedMetadata),
     }
 }
 /// An input/output binding of a variable to either static value or a node output.
@@ -1031,6 +1050,11 @@ pub struct Secret {
     /// +optional
     #[prost(enumeration="secret::MountType", tag="4")]
     pub mount_requirement: i32,
+    /// env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,
+    /// then the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.
+    /// +optional
+    #[prost(string, tag="5")]
+    pub env_var: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Secret`.
 pub mod secret {
@@ -1357,9 +1381,6 @@ pub struct TaskMetadata {
     /// Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     #[prost(bool, tag="9")]
     pub cache_serializable: bool,
-    /// Indicates whether the task will generate a Deck URI when it finishes executing.
-    #[prost(bool, tag="10")]
-    pub generates_deck: bool,
     /// Arbitrary tags that allow users and the platform to store small but arbitrary labels
     #[prost(map="string, string", tag="11")]
     pub tags: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
@@ -1371,6 +1392,17 @@ pub struct TaskMetadata {
     /// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     #[prost(string, repeated, tag="13")]
     pub cache_ignore_input_vars: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// is_eager indicates whether the task is eager or not.
+    /// This would be used by CreateTask endpoint.
+    #[prost(bool, tag="14")]
+    pub is_eager: bool,
+    /// Indicates whether the task will generate a deck when it finishes executing.
+    /// The BoolValue can have three states:
+    /// - nil: The value is not set.
+    /// - true: The task will generate a deck.
+    /// - false: The task will not generate a deck.
+    #[prost(message, optional, tag="15")]
+    pub generates_deck: ::core::option::Option<bool>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
@@ -1461,12 +1493,15 @@ pub mod task_template {
 
 /// Defines port properties for a container.
 #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ContainerPort {
     /// Number of port to expose on the pod's IP address.
     /// This must be a valid port number, 0 < x < 65536.
     #[prost(uint32, tag="1")]
     pub container_port: u32,
+    /// Name of the port to expose on the pod's IP address.
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2115,6 +2150,12 @@ pub struct ExecutionError {
     pub error_uri: ::prost::alloc::string::String,
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ExecutionError`.
 pub mod execution_error {
@@ -2411,6 +2452,12 @@ pub struct ArrayNode {
     /// execution_mode determines the execution path for ArrayNode.
     #[prost(enumeration="array_node::ExecutionMode", tag="5")]
     pub execution_mode: i32,
+    /// Indicates whether the sub node's original interface was altered
+    #[prost(message, optional, tag="6")]
+    pub is_original_sub_node_interface: ::core::option::Option<bool>,
+    /// data_mode determines how input data is passed to the sub-nodes
+    #[prost(enumeration="array_node::DataMode", tag="7")]
+    pub data_mode: i32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -2444,6 +2491,40 @@ pub mod array_node {
             match value {
                 "MINIMAL_STATE" => Some(Self::MinimalState),
                 "FULL_STATE" => Some(Self::FullState),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum DataMode {
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// The file path set for the subNode will be the ArrayNode's input file, but the in-memory
+        /// value utilized in propeller will be the individual value for each subNode execution.
+        /// SubNode executions need to be able to read in and parse the individual value to execute correctly.
+        SingleInputFile = 0,
+        /// Indicates the ArrayNode's input is a list of input values that map to subNode executions.
+        /// Propeller will create input files for each ArrayNode subNode by parsing the inputs and
+        /// setting the InputBindings on each subNodeSpec. Both the file path and in-memory input values will
+        /// be the individual value for each subNode execution.
+        IndividualInputFiles = 1,
+    }
+    impl DataMode {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                DataMode::SingleInputFile => "SINGLE_INPUT_FILE",
+                DataMode::IndividualInputFiles => "INDIVIDUAL_INPUT_FILES",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "SINGLE_INPUT_FILE" => Some(Self::SingleInputFile),
+                "INDIVIDUAL_INPUT_FILES" => Some(Self::IndividualInputFiles),
                 _ => None,
             }
         }
@@ -2486,6 +2567,9 @@ pub struct NodeMetadata {
     /// Number of retries per task.
     #[prost(message, optional, tag="5")]
     pub retries: ::core::option::Option<RetryStrategy>,
+    /// Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+    #[prost(map="string, string", tag="10")]
+    pub config: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,
@@ -3077,6 +3161,12 @@ pub struct ContainerError {
     /// Defines the origin of the error (system, user, unknown).
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub origin: i32,
+    /// Timestamp of the error
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Worker that generated the error
+    #[prost(string, tag="6")]
+    pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ContainerError`.
 pub mod container_error {

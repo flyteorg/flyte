@@ -19,7 +19,7 @@ Specify agent configuration
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11-12,16-17
+        :emphasize-lines: 7,11-12
 
         tasks:
           task-plugins:
@@ -33,18 +33,13 @@ Specify agent configuration
               - container_array: k8s-array
               - boto: agent-service
               - sagemaker-endpoint: agent-service
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - boto
-            - sagemaker-endpoint
 
     .. group-tab:: Flyte core
 
       Create a file named ``values-override.yaml`` and add the following configuration to it:
 
       .. code-block:: yaml
-        :emphasize-lines: 9,14-15,19-20
+        :emphasize-lines: 9,14-15
 
         configmap:
           enabled_plugins:
@@ -61,11 +56,6 @@ Specify agent configuration
                   container_array: k8s-array
                   boto: agent-service
                   sagemaker-endpoint: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - boto
-                - sagemaker-endpoint
 
 AWS credentials
 ---------------

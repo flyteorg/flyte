@@ -80,7 +80,7 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 	tn := n.nodeStatus.GetTaskNodeStatus()
 	if tn != nil {
 		return handler.TaskNodeState{
-			PluginPhase:                        pluginCore.Phase(tn.GetPhase()),
+			PluginPhase:                        pluginCore.Phase(tn.GetPhase()), // #nosec G115
 			PluginPhaseVersion:                 tn.GetPhaseVersion(),
 			PluginStateVersion:                 tn.GetPluginStateVersion(),
 			PluginState:                        tn.GetPluginState(),
@@ -180,6 +180,11 @@ func (n nodeStateManager) GetArrayNodeState() handler.ArrayNodeState {
 		subNodeSystemFailures := an.GetSubNodeSystemFailures()
 		if subNodeSystemFailuresCopy := subNodeSystemFailures.DeepCopy(); subNodeSystemFailuresCopy != nil {
 			as.SubNodeSystemFailures = *subNodeSystemFailuresCopy
+		}
+
+		subNodeDeltaTimestamps := an.GetSubNodeDeltaTimestamps()
+		if subNodeDeltaTimestampsCopy := subNodeDeltaTimestamps.DeepCopy(); subNodeDeltaTimestampsCopy != nil {
+			as.SubNodeDeltaTimestamps = *subNodeDeltaTimestampsCopy
 		}
 	}
 	return as

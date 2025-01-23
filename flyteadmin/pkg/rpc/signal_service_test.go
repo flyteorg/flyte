@@ -30,18 +30,6 @@ func TestGetOrCreateSignal(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("NilRequestError", func(t *testing.T) {
-		signalManager := mocks.SignalInterface{}
-		testScope := mockScope.NewTestScope()
-		mockServer := &SignalService{
-			signalManager: &signalManager,
-			metrics:       NewSignalMetrics(testScope),
-		}
-
-		_, err := mockServer.GetOrCreateSignal(ctx, nil)
-		assert.Error(t, err)
-	})
-
 	t.Run("ManagerError", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
 		signalManager.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
@@ -74,18 +62,6 @@ func TestListSignals(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("NilRequestError", func(t *testing.T) {
-		signalManager := mocks.SignalInterface{}
-		testScope := mockScope.NewTestScope()
-		mockServer := &SignalService{
-			signalManager: &signalManager,
-			metrics:       NewSignalMetrics(testScope),
-		}
-
-		_, err := mockServer.ListSignals(ctx, nil)
-		assert.Error(t, err)
-	})
-
 	t.Run("ManagerError", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
 		signalManager.EXPECT().ListSignals(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
@@ -116,18 +92,6 @@ func TestSetSignal(t *testing.T) {
 
 		_, err := mockServer.SetSignal(ctx, &admin.SignalSetRequest{})
 		assert.NoError(t, err)
-	})
-
-	t.Run("NilRequestError", func(t *testing.T) {
-		signalManager := mocks.SignalInterface{}
-		testScope := mockScope.NewTestScope()
-		mockServer := &SignalService{
-			signalManager: &signalManager,
-			metrics:       NewSignalMetrics(testScope),
-		}
-
-		_, err := mockServer.SetSignal(ctx, nil)
-		assert.Error(t, err)
 	})
 
 	t.Run("ManagerError", func(t *testing.T) {

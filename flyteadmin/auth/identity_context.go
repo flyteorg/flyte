@@ -103,7 +103,7 @@ func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Tim
 		userInfo = &service.UserInfoResponse{}
 	}
 
-	if len(userInfo.Subject) == 0 {
+	if len(userInfo.GetSubject()) == 0 {
 		userInfo.Subject = userID
 	}
 

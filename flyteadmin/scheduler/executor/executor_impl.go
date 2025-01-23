@@ -54,7 +54,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}
 
 	// Making the identifier deterministic using the hash of the identifier and scheduled time
-	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, core.Identifier{
+	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, &core.Identifier{
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    s.Name,

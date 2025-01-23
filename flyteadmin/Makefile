@@ -5,11 +5,11 @@ include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
 include ../boilerplate/flyte/end2end/Makefile
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --tags --long --match "v*" --first-parent)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 # TODO(monorepo): Do we need to change this? This is used in the service that provides a version.
-PACKAGE ?=github.com/flyteorg/flytestdlib
+PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
 
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
 
@@ -74,7 +74,7 @@ server:
 
 .PHONY: scheduler
 scheduler:
-	go run scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+	go run cmd/scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 .PHONY: migrate
 migrate:

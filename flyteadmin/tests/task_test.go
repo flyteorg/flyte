@@ -45,7 +45,7 @@ func TestCreateBasic(t *testing.T) {
 
 	// Test that task creation and retrieval works
 	valid := testutils.GetValidTaskRequest()
-	response, err := client.CreateTask(ctx, &valid)
+	response, err := client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 	task, err := client.GetTask(ctx, &admin.ObjectGetRequest{
 		Id: valid.Id,
@@ -56,7 +56,7 @@ func TestCreateBasic(t *testing.T) {
 	// Currently the returned object does not have the URN
 
 	// Test creating twice in a row fails on uniqueness
-	response, err = client.CreateTask(ctx, &valid)
+	response, err = client.CreateTask(ctx, valid)
 	assert.Nil(t, response)
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "already exists"))
@@ -70,7 +70,7 @@ func TestCreateTaskWithoutContainer(t *testing.T) {
 	req.Id.Version = "TestCreateTaskWithoutContainer"
 	req.Spec.Template.Target = nil
 
-	_, err := client.CreateTask(ctx, &req)
+	_, err := client.CreateTask(ctx, req)
 	assert.Nil(t, err)
 }
 
@@ -353,20 +353,20 @@ func TestListTaskIdsWithMultipleTaskVersions(t *testing.T) {
 
 	// Create two versions of one task and one version of another task, and one unrelated task
 	valid := testutils.GetValidTaskRequestWithOverrides("project", "domain", "name", "v1")
-	_, err := client.CreateTask(ctx, &valid)
+	_, err := client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "domain", "name", "v2")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "domain", "secondtask", "v1")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	// This last one should not show up.
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "development", "hidden", "v1")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	// We should only get back two entities
@@ -423,20 +423,20 @@ func TestListTaskIdsWithPagination(t *testing.T) {
 
 	// Create two versions of one task and one version of another task, and one unrelated task
 	valid := testutils.GetValidTaskRequestWithOverrides("project", "domain", "name", "v1")
-	_, err := client.CreateTask(ctx, &valid)
+	_, err := client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "domain", "name", "v2")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "domain", "secondtask", "v1")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	// This last one should not show up.
 	valid = testutils.GetValidTaskRequestWithOverrides("project", "development", "hidden", "v1")
-	_, err = client.CreateTask(ctx, &valid)
+	_, err = client.CreateTask(ctx, valid)
 	assert.NoError(t, err)
 
 	// We should only get back one entity
@@ -502,7 +502,7 @@ func TestCreateInvalidTaskType(t *testing.T) {
 	// Test that task creation fails based on task type
 	valid := testutils.GetValidTaskRequest()
 	valid.Spec.Template.Type = "sparkonk8s"
-	_, err := client.CreateTask(ctx, &valid)
+	_, err := client.CreateTask(ctx, valid)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "task type must be whitelisted before use")
 }

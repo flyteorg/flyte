@@ -85,7 +85,7 @@ func TestUpdateTaskExecution(t *testing.T) {
 	GlobalMock.Logging = true
 
 	taskExecutionQuery := GlobalMock.NewMock()
-	taskExecutionQuery.WithQuery(`UPDATE "task_executions" SET "id"=$1,"created_at"=$2,"updated_at"=$3,"deleted_at"=$4,"phase"=$5,"phase_version"=$6,"input_uri"=$7,"closure"=$8,"started_at"=$9,"task_execution_created_at"=$10,"task_execution_updated_at"=$11,"duration"=$12 WHERE "project" = $13 AND "domain" = $14 AND "name" = $15 AND "version" = $16 AND "execution_project" = $17 AND "execution_domain" = $18 AND "execution_name" = $19 AND "node_id" = $20 AND "retry_attempt" = $21`)
+	taskExecutionQuery.WithQuery(`UPDATE "task_executions" SET "updated_at"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"execution_project"=$6,"execution_domain"=$7,"execution_name"=$8,"node_id"=$9,"retry_attempt"=$10,"phase"=$11,"input_uri"=$12,"closure"=$13,"started_at"=$14,"task_execution_created_at"=$15,"task_execution_updated_at"=$16,"duration"=$17 WHERE id = $18`)
 	err := taskExecutionRepo.Update(context.Background(), testTaskExecution)
 	assert.NoError(t, err)
 	assert.True(t, taskExecutionQuery.Triggered)
@@ -104,7 +104,7 @@ func TestGetTaskExecution(t *testing.T) {
 		WithReply(taskExecutions)
 
 	output, err := taskExecutionRepo.Get(context.Background(), interfaces.GetTaskExecutionInput{
-		TaskExecutionID: core.TaskExecutionIdentifier{
+		TaskExecutionID: &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "project",
@@ -134,7 +134,7 @@ func TestListTaskExecutionForExecution(t *testing.T) {
 	taskExecutions = append(taskExecutions, taskExecution)
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
-	GlobalMock.NewMock().WithQuery(`SELECT "task_executions"."id","task_executions"."created_at","task_executions"."updated_at","task_executions"."deleted_at","task_executions"."project","task_executions"."domain","task_executions"."name","task_executions"."version","task_executions"."execution_project","task_executions"."execution_domain","task_executions"."execution_name","task_executions"."node_id","task_executions"."retry_attempt","task_executions"."phase","task_executions"."phase_version","task_executions"."input_uri","task_executions"."closure","task_executions"."started_at","task_executions"."task_execution_created_at","task_executions"."task_execution_updated_at","task_executions"."duration" FROM "task_executions" LEFT JOIN tasks ON task_executions.project = tasks.project AND task_executions.domain = tasks.domain AND task_executions.name = tasks.name AND task_executions.version = tasks.version INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 LIMIT 20`).WithReply(taskExecutions)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "task_executions" WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 LIMIT 20`).WithReply(taskExecutions)
 
 	collection, err := taskExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -160,7 +160,7 @@ func TestListTaskExecutionForExecution(t *testing.T) {
 	}
 }
 
-func TestListTaskExecutionsForTaskExecution(t *testing.T) {
+func TestListTaskExecutionsForNodeExecution(t *testing.T) {
 	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	taskExecutions := make([]map[string]interface{}, 0)
@@ -168,9 +168,7 @@ func TestListTaskExecutionsForTaskExecution(t *testing.T) {
 	taskExecutions = append(taskExecutions, taskExecution)
 
 	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.Logging = true
-
-	GlobalMock.NewMock().WithQuery(`SELECT "task_executions"."id","task_executions"."created_at","task_executions"."updated_at","task_executions"."deleted_at","task_executions"."project","task_executions"."domain","task_executions"."name","task_executions"."version","task_executions"."execution_project","task_executions"."execution_domain","task_executions"."execution_name","task_executions"."node_id","task_executions"."retry_attempt","task_executions"."phase","task_executions"."phase_version","task_executions"."input_uri","task_executions"."closure","task_executions"."started_at","task_executions"."task_execution_created_at","task_executions"."task_execution_updated_at","task_executions"."duration" FROM "task_executions" LEFT JOIN tasks ON task_executions.project = tasks.project AND task_executions.domain = tasks.domain AND task_executions.name = tasks.name AND task_executions.version = tasks.version INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE tasks.project = $1 AND tasks.domain = $2 AND tasks.name = $3 AND tasks.version = $4 AND node_executions.phase = $5 AND executions.execution_project = $6 AND executions.execution_domain = $7 AND executions.execution_name = $8 LIMIT 20`).WithReply(taskExecutions)
+	GlobalMock.NewMock().WithQuery(`SELECT "task_executions"."id","task_executions"."created_at","task_executions"."updated_at","task_executions"."deleted_at","task_executions"."project","task_executions"."domain","task_executions"."name","task_executions"."version","task_executions"."execution_project","task_executions"."execution_domain","task_executions"."execution_name","task_executions"."node_id","task_executions"."retry_attempt","task_executions"."phase","task_executions"."phase_version","task_executions"."input_uri","task_executions"."closure","task_executions"."started_at","task_executions"."task_execution_created_at","task_executions"."task_execution_updated_at","task_executions"."duration" FROM "task_executions" INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name WHERE tasks.project = $1 AND tasks.domain = $2 AND tasks.name = $3 AND tasks.version = $4 AND node_executions.phase = $5 AND executions.execution_project = $6 AND executions.execution_domain = $7 AND executions.execution_name = $8 LIMIT 20`).WithReply(taskExecutions)
 
 	collection, err := taskExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -183,6 +181,100 @@ func TestListTaskExecutionsForTaskExecution(t *testing.T) {
 			getEqualityFilter(common.Execution, "project", "project_name"),
 			getEqualityFilter(common.Execution, "domain", "domain_name"),
 			getEqualityFilter(common.Execution, "name", "execution_name"),
+		},
+		JoinTableEntities: map[common.Entity]bool{
+			common.NodeExecution: true,
+		},
+		Limit: 20,
+	})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, collection)
+	assert.NotEmpty(t, collection.TaskExecutions)
+	assert.Len(t, collection.TaskExecutions, 1)
+
+	for _, taskExecution := range collection.TaskExecutions {
+		assert.Equal(t, testTaskExecution.TaskExecutionKey, taskExecution.TaskExecutionKey)
+		assert.Equal(t, &retryAttemptValue, taskExecution.RetryAttempt)
+		assert.Equal(t, taskPhase, taskExecution.Phase)
+		assert.Equal(t, []byte("Test"), taskExecution.Closure)
+		assert.Equal(t, "testInput.pb", taskExecution.InputURI)
+		assert.Equal(t, taskStartedAt, *taskExecution.StartedAt)
+		assert.Equal(t, time.Hour, taskExecution.Duration)
+	}
+}
+
+func TestListTaskExecutionsForExecution(t *testing.T) {
+	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	taskExecutions := make([]map[string]interface{}, 0)
+	taskExecution := getMockTaskExecutionResponseFromDb(testTaskExecution)
+	taskExecutions = append(taskExecutions, taskExecution)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(`SELECT "task_executions"."id","task_executions"."created_at","task_executions"."updated_at","task_executions"."deleted_at","task_executions"."project","task_executions"."domain","task_executions"."name","task_executions"."version","task_executions"."execution_project","task_executions"."execution_domain","task_executions"."execution_name","task_executions"."node_id","task_executions"."retry_attempt","task_executions"."phase","task_executions"."phase_version","task_executions"."input_uri","task_executions"."closure","task_executions"."started_at","task_executions"."task_execution_created_at","task_executions"."task_execution_updated_at","task_executions"."duration" FROM "task_executions" INNER JOIN executions ON task_executions.execution_project = executions.execution_project AND task_executions.execution_domain = executions.execution_domain AND task_executions.execution_name = executions.execution_name WHERE tasks.project = $1 AND tasks.domain = $2 AND tasks.name = $3 AND tasks.version = $4 AND tasks.org = $5 AND executions.execution_project = $6 AND executions.execution_domain = $7 AND executions.execution_name = $8 AND executions.org = $9 LIMIT 20`).WithReply(taskExecutions)
+
+	collection, err := taskExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.Task, "project", "project_tn"),
+			getEqualityFilter(common.Task, "domain", "domain_t"),
+			getEqualityFilter(common.Task, "name", "domain_t"),
+			getEqualityFilter(common.Task, "version", "version_t"),
+			getEqualityFilter(common.Task, "org", "org_t"),
+
+			getEqualityFilter(common.Execution, "project", "project_name"),
+			getEqualityFilter(common.Execution, "domain", "domain_name"),
+			getEqualityFilter(common.Execution, "name", "execution_name"),
+			getEqualityFilter(common.Execution, "org", "execution_org"),
+		},
+		JoinTableEntities: map[common.Entity]bool{
+			common.Execution: true,
+		},
+		Limit: 20,
+	})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, collection)
+	assert.NotEmpty(t, collection.TaskExecutions)
+	assert.Len(t, collection.TaskExecutions, 1)
+
+	for _, taskExecution := range collection.TaskExecutions {
+		assert.Equal(t, testTaskExecution.TaskExecutionKey, taskExecution.TaskExecutionKey)
+		assert.Equal(t, &retryAttemptValue, taskExecution.RetryAttempt)
+		assert.Equal(t, taskPhase, taskExecution.Phase)
+		assert.Equal(t, []byte("Test"), taskExecution.Closure)
+		assert.Equal(t, "testInput.pb", taskExecution.InputURI)
+		assert.Equal(t, taskStartedAt, *taskExecution.StartedAt)
+		assert.Equal(t, time.Hour, taskExecution.Duration)
+	}
+}
+
+func TestListTaskExecutionsForNodeAndExecution(t *testing.T) {
+	taskExecutionRepo := NewTaskExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	taskExecutions := make([]map[string]interface{}, 0)
+	taskExecution := getMockTaskExecutionResponseFromDb(testTaskExecution)
+	taskExecutions = append(taskExecutions, taskExecution)
+
+	GlobalMock := mocket.Catcher.Reset()
+
+	GlobalMock.NewMock().WithQuery(`SELECT "task_executions"."id","task_executions"."created_at","task_executions"."updated_at","task_executions"."deleted_at","task_executions"."project","task_executions"."domain","task_executions"."name","task_executions"."version","task_executions"."execution_project","task_executions"."execution_domain","task_executions"."execution_name","task_executions"."node_id","task_executions"."retry_attempt","task_executions"."phase","task_executions"."phase_version","task_executions"."input_uri","task_executions"."closure","task_executions"."started_at","task_executions"."task_execution_created_at","task_executions"."task_execution_updated_at","task_executions"."duration" FROM "task_executions" INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name INNER JOIN executions ON task_executions.execution_project = executions.execution_project AND task_executions.execution_domain = executions.execution_domain AND task_executions.execution_name = executions.execution_name WHERE tasks.project = $1 AND tasks.domain = $2 AND tasks.name = $3 AND tasks.version = $4 AND tasks.org = $5 AND node_executions.phase = $6 AND executions.execution_project = $7 AND executions.execution_domain = $8 AND executions.execution_name = $9 AND executions.org = $10 LIMIT 20`).WithReply(taskExecutions)
+
+	collection, err := taskExecutionRepo.List(context.Background(), interfaces.ListResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.Task, "project", "project_tn"),
+			getEqualityFilter(common.Task, "domain", "domain_t"),
+			getEqualityFilter(common.Task, "name", "domain_t"),
+			getEqualityFilter(common.Task, "version", "version_t"),
+			getEqualityFilter(common.Task, "org", "org_t"),
+
+			getEqualityFilter(common.NodeExecution, "phase", nodePhase),
+			getEqualityFilter(common.Execution, "project", "project_name"),
+			getEqualityFilter(common.Execution, "domain", "domain_name"),
+			getEqualityFilter(common.Execution, "name", "execution_name"),
+			getEqualityFilter(common.Execution, "org", "execution_org"),
+		},
+		JoinTableEntities: map[common.Entity]bool{
+			common.NodeExecution: true,
+			common.Execution:     true,
 		},
 		Limit: 20,
 	})
@@ -219,7 +311,7 @@ func TestCountTaskExecutions_Filters(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
-		`SELECT count(*) FROM "task_executions" LEFT JOIN tasks ON task_executions.project = tasks.project AND task_executions.domain = tasks.domain AND task_executions.name = tasks.name AND task_executions.version = tasks.version INNER JOIN node_executions ON task_executions.node_id = node_executions.node_id AND task_executions.execution_project = node_executions.execution_project AND task_executions.execution_domain = node_executions.execution_domain AND task_executions.execution_name = node_executions.execution_name INNER JOIN executions ON node_executions.execution_project = executions.execution_project AND node_executions.execution_domain = executions.execution_domain AND node_executions.execution_name = executions.execution_name WHERE task_executions.phase = $1 AND "task_execution_updated_at" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
+		`SELECT count(*) FROM "task_executions" WHERE task_executions.phase = $1 AND "task_execution_updated_at" IS NULL`).WithReply([]map[string]interface{}{{"rows": 3}})
 
 	count, err := taskExecutionRepo.Count(context.Background(), interfaces.CountResourceInput{
 		InlineFilters: []common.InlineFilter{

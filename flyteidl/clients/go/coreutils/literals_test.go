@@ -5,6 +5,7 @@ package coreutils
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -25,42 +27,42 @@ func TestMakePrimitive(t *testing.T) {
 		v := 1
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, int64(v), p.GetInteger())
 	}
 	{
 		v := int64(1)
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, v, p.GetInteger())
 	}
 	{
 		v := 1.0
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, v, p.GetFloatValue())
 	}
 	{
 		v := "blah"
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, v, p.GetStringValue())
 	}
 	{
 		v := true
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_Boolean", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Boolean", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, v, p.GetBoolean())
 	}
 	{
 		v := time.Now()
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_Datetime", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Datetime", reflect.TypeOf(p.GetValue()).String())
 		j, err := ptypes.TimestampProto(v)
 		assert.NoError(t, err)
 		assert.Equal(t, j, p.GetDatetime())
@@ -71,7 +73,7 @@ func TestMakePrimitive(t *testing.T) {
 		v := time.Second * 10
 		p, err := MakePrimitive(v)
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, ptypes.DurationProto(v), p.GetDuration())
 	}
 	{
@@ -93,7 +95,7 @@ func TestMustMakePrimitive(t *testing.T) {
 	{
 		v := time.Second * 10
 		p := MustMakePrimitive(v)
-		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.Value).String())
+		assert.Equal(t, "*core.Primitive_Duration", reflect.TypeOf(p.GetValue()).String())
 		assert.Equal(t, ptypes.DurationProto(v), p.GetDuration())
 	}
 }
@@ -104,7 +106,7 @@ func TestMakePrimitiveLiteral(t *testing.T) {
 		p, err := MakePrimitiveLiteral(v)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v, p.GetScalar().GetPrimitive().GetFloatValue())
 	}
 	{
@@ -127,7 +129,7 @@ func TestMustMakePrimitiveLiteral(t *testing.T) {
 		v := 1.0
 		p := MustMakePrimitiveLiteral(v)
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_FloatValue", reflect.TypeOf(p.GetScalar().GetPrimitive().GetValue()).String())
 		assert.Equal(t, v, p.GetScalar().GetPrimitive().GetFloatValue())
 	})
 }
@@ -136,14 +138,14 @@ func TestMakeLiteral(t *testing.T) {
 	t.Run("Primitive", func(t *testing.T) {
 		lit, err := MakeLiteral("test_string")
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(lit.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_StringValue", reflect.TypeOf(lit.GetScalar().GetPrimitive().GetValue()).String())
 	})
 
 	t.Run("Array", func(t *testing.T) {
 		lit, err := MakeLiteral([]interface{}{1, 2, 3})
 		assert.NoError(t, err)
 		assert.Equal(t, "*core.Literal_Collection", reflect.TypeOf(lit.GetValue()).String())
-		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(lit.GetCollection().Literals[0].GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(lit.GetCollection().GetLiterals()[0].GetScalar().GetPrimitive().GetValue()).String())
 	})
 
 	t.Run("Map", func(t *testing.T) {
@@ -153,7 +155,7 @@ func TestMakeLiteral(t *testing.T) {
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, "*core.Literal_Map", reflect.TypeOf(lit.GetValue()).String())
-		assert.Equal(t, "*core.Literal_Collection", reflect.TypeOf(lit.GetMap().Literals["key1"].GetValue()).String())
+		assert.Equal(t, "*core.Literal_Collection", reflect.TypeOf(lit.GetMap().GetLiterals()["key1"].GetValue()).String())
 	})
 
 	t.Run("Binary", func(t *testing.T) {
@@ -165,7 +167,7 @@ func TestMakeLiteral(t *testing.T) {
 		p, err := MakeLiteral(nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.GetScalar())
-		assert.Equal(t, "*core.Scalar_NoneType", reflect.TypeOf(p.GetScalar().Value).String())
+		assert.Equal(t, "*core.Scalar_NoneType", reflect.TypeOf(p.GetScalar().GetValue()).String())
 	})
 }
 
@@ -203,9 +205,9 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 			l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{Simple: test.ty}})
 			assert.NoError(t, err)
 			if test.isPrimitive {
-				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().Value).String())
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().GetValue()).String())
 			} else {
-				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().Value).String())
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().GetValue()).String())
 			}
 		})
 	}
@@ -219,7 +221,7 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 	t.Run("Blob", func(t *testing.T) {
 		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
 		assert.NoError(t, err)
-		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().GetValue()).String())
 	})
 
 	t.Run("Collection", func(t *testing.T) {
@@ -240,6 +242,16 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 		}})
 		assert.NoError(t, err)
 		assert.NotNil(t, l.GetScalar().GetError())
+	})
+
+	t.Run("binary", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
+			Simple: core.SimpleType_BINARY,
+		}})
+		assert.NoError(t, err)
+		assert.NotNil(t, l.GetScalar().GetBinary())
+		assert.NotNil(t, l.GetScalar().GetBinary().GetValue())
+		assert.NotNil(t, l.GetScalar().GetBinary().GetTag())
 	})
 
 	t.Run("struct", func(t *testing.T) {
@@ -288,7 +300,7 @@ func TestMustMakeDefaultLiteralForType(t *testing.T) {
 
 	t.Run("Blob", func(t *testing.T) {
 		l := MustMakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
-		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().GetValue()).String())
 	})
 }
 
@@ -441,6 +453,98 @@ func TestMakeLiteralForType(t *testing.T) {
 			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_FloatValue{FloatValue: 1.0}}}}}}
 		expectedVal, _ := ExtractFromLiteral(literalVal)
 		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("Generic", func(t *testing.T) {
+		os.Setenv(FlyteUseOldDcFormat, "true")
+		literalVal := map[string]interface{}{
+			"x": 1,
+			"y": "ystringvalue",
+		}
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		fieldsMap := map[string]*structpb.Value{
+			"x": {
+				Kind: &structpb.Value_NumberValue{NumberValue: 1},
+			},
+			"y": {
+				Kind: &structpb.Value_StringValue{StringValue: "ystringvalue"},
+			},
+		}
+		expectedStructVal := &structpb.Struct{
+			Fields: fieldsMap,
+		}
+		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
+		assert.Equal(t, len(expectedStructVal.GetFields()), len(extractedStructValue.GetFields()))
+		for key, val := range expectedStructVal.GetFields() {
+			assert.Equal(t, val.GetKind(), extractedStructValue.GetFields()[key].GetKind())
+		}
+		os.Unsetenv(FlyteUseOldDcFormat)
+	})
+
+	t.Run("SimpleBinary", func(t *testing.T) {
+		// We compare the deserialized values instead of the raw msgpack bytes because Go does not guarantee the order
+		// of map keys during serialization. This means that while the serialized bytes may differ, the deserialized
+		// values should be logically equivalent.
+
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		v := map[string]interface{}{
+			"a": int64(1),
+			"b": 3.14,
+			"c": "example_string",
+			"d": map[string]interface{}{
+				"1": int64(100),
+				"2": int64(200),
+			},
+			"e": map[string]interface{}{
+				"a": int64(1),
+				"b": 3.14,
+			},
+			"f": []string{"a", "b", "c"},
+		}
+
+		val, err := MakeLiteralForType(literalType, v)
+		assert.NoError(t, err)
+
+		msgpackBytes, err := msgpack.Marshal(v)
+		assert.NoError(t, err)
+
+		literalVal := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: msgpackBytes,
+							Tag:   MESSAGEPACK,
+						},
+					},
+				},
+			},
+		}
+
+		expectedLiteralVal, err := ExtractFromLiteral(literalVal)
+		assert.NoError(t, err)
+		actualLiteralVal, err := ExtractFromLiteral(val)
+		assert.NoError(t, err)
+
+		// Check if the extracted value is of type *core.Binary (not []byte)
+		expectedBinary, ok := expectedLiteralVal.(*core.Binary)
+		assert.True(t, ok, "expectedLiteralVal is not of type *core.Binary")
+		actualBinary, ok := actualLiteralVal.(*core.Binary)
+		assert.True(t, ok, "actualLiteralVal is not of type *core.Binary")
+
+		// Now check if the Binary values match
+		var expectedVal, actualVal map[string]interface{}
+		err = msgpack.Unmarshal(expectedBinary.GetValue(), &expectedVal)
+		assert.NoError(t, err)
+		err = msgpack.Unmarshal(actualBinary.GetValue(), &actualVal)
+		assert.NoError(t, err)
+
+		// Finally, assert that the deserialized values are equal
 		assert.Equal(t, expectedVal, actualVal)
 	})
 

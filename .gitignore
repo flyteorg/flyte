@@ -30,12 +30,12 @@ vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
 docs/_tags/
-docs/flytectl
-docs/protos
-docs/flytekit
+docs/api/flytectl
+docs/api/flytekit
+docs/api/flyteidl
 docs/flytesnacks
 docs/examples
 docs/_src
 docs/_projects
-docs/api
 docs/tests
+empty-config.yaml

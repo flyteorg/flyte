@@ -34,7 +34,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import `task` from the `flytekit` library:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+```{literalinclude} /examples/basics/basics/task.py
 :caption: basics/task.py
 :lines: 1
 ```
@@ -45,20 +45,20 @@ Learn more about the supported types in the {ref}`type-system section <python_to
 
 We create a task that computes the slope of a regression line:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+```{literalinclude} /examples/basics/basics/task.py
 :caption: basics/task.py
 :pyobject: slope
 ```
 
 :::{note}
-Flytekit will assign a default name to the output variable like `out0`.
+Flytekit will assign a default name to the output variable like `o0`.
 In case of multiple outputs, each output will be numbered in the order
-starting with 0, e.g., -> `out0, out1, out2, ...`.
+starting with 0, e.g., `o0`, `o1`, `o2`, etc.
 :::
 
 You can execute a Flyte task just like any regular Python function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+```{literalinclude} /examples/basics/basics/task.py
 :caption: basics/task.py
 :lines: 14-15
 ```

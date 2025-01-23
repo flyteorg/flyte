@@ -5,6 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
+import { K8sPod } from "../core/tasks_pb.js";
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -153,6 +154,13 @@ export class HeadGroupSpec extends Message<HeadGroupSpec> {
    */
   rayStartParams: { [key: string]: string } = {};
 
+  /**
+   * Pod Spec for the ray head pod
+   *
+   * @generated from field: flyteidl.core.K8sPod k8s_pod = 2;
+   */
+  k8sPod?: K8sPod;
+
   constructor(data?: PartialMessage<HeadGroupSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -162,6 +170,7 @@ export class HeadGroupSpec extends Message<HeadGroupSpec> {
   static readonly typeName = "flyteidl.plugins.HeadGroupSpec";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "ray_start_params", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 2, name: "k8s_pod", kind: "message", T: K8sPod },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HeadGroupSpec {
@@ -223,6 +232,13 @@ export class WorkerGroupSpec extends Message<WorkerGroupSpec> {
    */
   rayStartParams: { [key: string]: string } = {};
 
+  /**
+   * Pod Spec for ray worker pods
+   *
+   * @generated from field: flyteidl.core.K8sPod k8s_pod = 6;
+   */
+  k8sPod?: K8sPod;
+
   constructor(data?: PartialMessage<WorkerGroupSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -236,6 +252,7 @@ export class WorkerGroupSpec extends Message<WorkerGroupSpec> {
     { no: 3, name: "min_replicas", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "max_replicas", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "ray_start_params", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 6, name: "k8s_pod", kind: "message", T: K8sPod },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkerGroupSpec {

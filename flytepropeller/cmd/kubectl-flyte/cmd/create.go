@@ -160,12 +160,12 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 		return err
 	}
 
-	compiledTasks, err := compileTasks(wfClosure.Tasks)
+	compiledTasks, err := compileTasks(wfClosure.GetTasks())
 	if err != nil {
 		return err
 	}
 
-	wf, err := compiler.CompileWorkflow(wfClosure.Workflow, []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
+	wf, err := compiler.CompileWorkflow(wfClosure.GetWorkflow(), []*core.WorkflowTemplate{}, compiledTasks, []common.InterfaceProvider{})
 	if err != nil {
 		return err
 	}
@@ -182,8 +182,8 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 	if len(c.execID) > 0 {
 		executionID = &core.WorkflowExecutionIdentifier{
 			Name:    c.execID,
-			Domain:  wfClosure.Workflow.Id.Domain,
-			Project: wfClosure.Workflow.Id.Project,
+			Domain:  wfClosure.GetWorkflow().GetId().GetDomain(),
+			Project: wfClosure.GetWorkflow().GetId().GetProject(),
 		}
 	}
 

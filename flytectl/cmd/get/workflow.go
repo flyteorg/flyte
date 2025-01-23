@@ -129,15 +129,15 @@ func WorkflowToTableProtoMessages(l []*admin.Workflow) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		m := proto.Clone(m).(*admin.Workflow)
-		if m.Closure != nil && m.Closure.CompiledWorkflow != nil {
-			if m.Closure.CompiledWorkflow.Primary != nil {
-				if m.Closure.CompiledWorkflow.Primary.Template != nil {
-					if m.Closure.CompiledWorkflow.Primary.Template.Interface != nil {
-						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables != nil {
-							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables)
+		if m.GetClosure() != nil && m.GetClosure().GetCompiledWorkflow() != nil {
+			if m.GetClosure().GetCompiledWorkflow().GetPrimary() != nil {
+				if m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate() != nil {
+					if m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface() != nil {
+						if m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetInputs() != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Inputs.Variables != nil {
+							printer.FormatVariableDescriptions(m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetInputs().GetVariables())
 						}
-						if m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables != nil {
-							printer.FormatVariableDescriptions(m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables)
+						if m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetOutputs() != nil && m.Closure.CompiledWorkflow.Primary.Template.Interface.Outputs.Variables != nil {
+							printer.FormatVariableDescriptions(m.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetOutputs().GetVariables())
 						}
 					}
 				}
@@ -183,7 +183,7 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 	domain string) (workflows []*admin.Workflow, isList bool, err error) {
 	var workflow *admin.Workflow
 	if workflowconfig.DefaultConfig.Latest {
-		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain, workflowconfig.DefaultConfig.Filter); err != nil {
+		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain); err != nil {
 			return nil, false, err
 		}
 		workflows = append(workflows, workflow)

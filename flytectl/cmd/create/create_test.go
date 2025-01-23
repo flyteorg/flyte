@@ -4,13 +4,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
 const testDataFolder = "../testdata/"
-
-var setup = testutils.Setup
 
 func TestCreateCommand(t *testing.T) {
 	createCommand := RemoteCreateCommand()

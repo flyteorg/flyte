@@ -4,7 +4,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,8 +11,6 @@ const (
 	testDataNonExistentFile = "testdata/non-existent-file"
 	testDataInvalidAttrFile = "testdata/invalid_attribute.yaml"
 )
-
-var setup = testutils.Setup
 
 func TestDeleteCommand(t *testing.T) {
 	deleteCommand := RemoteDeleteCommand()

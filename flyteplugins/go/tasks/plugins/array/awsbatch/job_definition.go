@@ -19,8 +19,8 @@ const defaultComputeEngine = "EC2"
 const platformCapabilitiesConfigKey = "platformCapabilities"
 
 func getContainerImage(_ context.Context, task *core.TaskTemplate) string {
-	if task.GetContainer() != nil && len(task.GetContainer().Image) > 0 {
-		return task.GetContainer().Image
+	if task.GetContainer() != nil && len(task.GetContainer().GetImage()) > 0 {
+		return task.GetContainer().GetImage()
 	}
 
 	return ""

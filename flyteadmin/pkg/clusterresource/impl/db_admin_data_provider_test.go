@@ -49,7 +49,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		}
 		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
 		assert.NoError(t, err)
-		assert.EqualValues(t, attrs.Attributes, attributes)
+		assert.EqualValues(t, attrs.GetAttributes(), attributes)
 	})
 	t.Run("error", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
@@ -125,7 +125,7 @@ func TestGetProjects(t *testing.T) {
 		}
 		projects, err := provider.GetProjects(context.TODO())
 		assert.NoError(t, err)
-		assert.Len(t, projects.Projects, 2)
+		assert.Len(t, projects.GetProjects(), 2)
 	})
 	t.Run("db error", func(t *testing.T) {
 		mockRepo := repoMocks.NewMockRepository()

@@ -54,6 +54,18 @@ func getPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 		pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
 }
 
+// Produces the DSN (data source name) for the read replica for opening a postgres db connection.
+func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
+	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
+	if len(password) == 0 {
+		// The password-less case is included for development environments.
+		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
+			pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User)
+	}
+	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
+		pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+}
+
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
 	dialector := postgres.Open(getPostgresDsn(ctx, pgConfig))
@@ -91,6 +103,12 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 		logger.Warningf(ctx, "Got DB already exists error for [%s], skipping...", pgConfig.DbName)
 	}
 	// Now try connecting to the db again
+	return gorm.Open(dialector, gormConfig)
+}
+
+// CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the gorm.DB object and error
+func CreatePostgresReadOnlyDbConnection(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
+	dialector := postgres.Open(getPostgresReadDsn(ctx, pgConfig))
 	return gorm.Open(dialector, gormConfig)
 }
 
