@@ -40,9 +40,10 @@ var (
 			},
 		},
 		DefaultAgent: Deployment{
-			Endpoint:       "",
-			Insecure:       true,
-			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
+			Endpoint:             "",
+			Insecure:             true,
+			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
+			DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
 		},
 		// AsyncPlugin should be registered to at least one task type.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
