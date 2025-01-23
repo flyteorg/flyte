@@ -290,7 +290,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
 		if podTemplate != nil {
-			podSpec, err = ApplyPodTemplateOverride(podTemplate)
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
 			}
@@ -326,7 +326,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
 		if podTemplate != nil {
-			podSpec, err = ApplyPodTemplateOverride(podTemplate)
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
 			}
@@ -468,15 +468,21 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
-func ApplyPodTemplateOverride(podTemplate *core.K8SPod) (*v1.PodSpec, error) {
-	// metadata override will be implemented in plugin_manager.go
+func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podTemplate.GetMetadata().GetAnnotations() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+	}
+	if podTemplate.GetMetadata().GetLabels() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetLabels(), objectMeta.Labels)
+	}
+
 	var podSpecOverride *v1.PodSpec
 	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
 	if err != nil {
-		return nil, err
+		return nil, objectMeta, err
 	}
 
-	return podSpecOverride, nil
+	return podSpecOverride, objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
