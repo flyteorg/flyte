@@ -737,6 +737,13 @@ export class NodeMetadata extends Message<NodeMetadata> {
     case: "cacheSerializable";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * Config is a bag of properties that can be used to instruct propeller on how to execute the node.
+   *
+   * @generated from field: map<string, string> config = 10;
+   */
+  config: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<NodeMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -752,6 +759,7 @@ export class NodeMetadata extends Message<NodeMetadata> {
     { no: 7, name: "cacheable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cacheable_value" },
     { no: 8, name: "cache_version", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "cache_version_value" },
     { no: 9, name: "cache_serializable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cache_serializable_value" },
+    { no: 10, name: "config", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeMetadata {

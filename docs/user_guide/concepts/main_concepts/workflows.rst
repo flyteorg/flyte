@@ -23,7 +23,7 @@ Workflows accept inputs and produce outputs and reuse task definitions across :r
 Workflow structure is flexible because:
 
 - Nodes can be executed in parallel.
-- The same task definition can be re-used within a different workflow.
+- The same task definition can be reused within a different workflow.
 - A single workflow can contain any combination of task types.
 - A workflow can contain a single functional node.
 - A workflow can contain multiple nodes in all sorts of arrangements.

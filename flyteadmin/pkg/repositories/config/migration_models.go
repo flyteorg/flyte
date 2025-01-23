@@ -11,7 +11,7 @@ import (
 	postgres requires that index names be unique across *all* tables. If you modify Task, Execution, NodeExecution or
 	TaskExecution models in code be sure to update the appropriate duplicate definitions here.
 	That is, in the actual code, it makes more sense to reuse structs, like how NodeExecutionKey is in both NodeExecution
-	and in TaskExecution. But simply re-using in migrations would result in indices with the same name.
+	and in TaskExecution. But simply reusing in migrations would result in indices with the same name.
 	In the new model where all models are replicated in each function, this is not an issue.
 */
 

@@ -97,9 +97,15 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 		}
 	}
 
-	// Note that we cannot strip `Structure` from the type because the dynamic node output type is used to validate the
-	// interface of the dynamically compiled workflow. `Structure` is used to extend type checking information on
-	// different Flyte types and is therefore required to ensure correct type validation.
+	// strip metadata from dataclass types
+	if c.GetStructure() != nil && len(c.GetStructure().GetDataclassType()) > 0 {
+		dataclassTypes := make(map[string]*core.LiteralType, len(c.GetStructure().GetDataclassType()))
+		for k, v := range c.GetStructure().GetDataclassType() {
+			dataclassTypes[k] = StripTypeMetadata(v)
+		}
+
+		c.GetStructure().DataclassType = dataclassTypes
+	}
 
 	switch underlyingType := c.GetType().(type) {
 	case *core.LiteralType_UnionType:

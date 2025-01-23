@@ -46,7 +46,7 @@ FlytePropeller Manager is used to effectively scale out FlyteWorkflow processing
 
 The FlytePropeller Manager uses a kubernetes PodTemplate to construct the base FlytePropeller PodSpec. This means, apart from the configured sharding scheme, all managed FlytePropeller instances will be identical.
 
-The Manager ensures liveness and correctness by periodically scanning kubernets pods and recovering state (ie. starting missing pods, etc). Live configuration updates are currently unsupported, meaning configuration changes require an application restart.
+The Manager ensures liveness and correctness by periodically scanning kubernetes pods and recovering state (ie. starting missing pods, etc). Live configuration updates are currently unsupported, meaning configuration changes require an application restart.
 
 Sample configuration, illustrating 3 separate sharding techniques, is provided below: 
 

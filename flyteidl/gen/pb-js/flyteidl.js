@@ -11296,6 +11296,7 @@
                  * @property {boolean|null} [cacheable] NodeMetadata cacheable
                  * @property {string|null} [cacheVersion] NodeMetadata cacheVersion
                  * @property {boolean|null} [cacheSerializable] NodeMetadata cacheSerializable
+                 * @property {Object.<string,string>|null} [config] NodeMetadata config
                  */
     
                 /**
@@ -11307,6 +11308,7 @@
                  * @param {flyteidl.core.INodeMetadata=} [properties] Properties to set
                  */
                 function NodeMetadata(properties) {
+                    this.config = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -11368,6 +11370,14 @@
                  * @instance
                  */
                 NodeMetadata.prototype.cacheSerializable = false;
+    
+                /**
+                 * NodeMetadata config.
+                 * @member {Object.<string,string>} config
+                 * @memberof flyteidl.core.NodeMetadata
+                 * @instance
+                 */
+                NodeMetadata.prototype.config = $util.emptyObject;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11454,6 +11464,9 @@
                         writer.uint32(/* id 8, wireType 2 =*/66).string(message.cacheVersion);
                     if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
                         writer.uint32(/* id 9, wireType 0 =*/72).bool(message.cacheSerializable);
+                    if (message.config != null && message.hasOwnProperty("config"))
+                        for (var keys = Object.keys(message.config), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 10, wireType 2 =*/82).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.config[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -11471,7 +11484,7 @@
                 NodeMetadata.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.NodeMetadata();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.NodeMetadata(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -11495,6 +11508,14 @@
                             break;
                         case 9:
                             message.cacheSerializable = reader.bool();
+                            break;
+                        case 10:
+                            reader.skip().pos++;
+                            if (message.config === $util.emptyObject)
+                                message.config = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.config[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11548,6 +11569,14 @@
                         properties.cacheSerializableValue = 1;
                         if (typeof message.cacheSerializable !== "boolean")
                             return "cacheSerializable: boolean expected";
+                    }
+                    if (message.config != null && message.hasOwnProperty("config")) {
+                        if (!$util.isObject(message.config))
+                            return "config: object expected";
+                        var key = Object.keys(message.config);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.config[key[i]]))
+                                return "config: string{k:string} expected";
                     }
                     return null;
                 };
@@ -15396,11 +15425,11 @@
                  * @property {string|null} [deprecatedErrorMessage] TaskMetadata deprecatedErrorMessage
                  * @property {boolean|null} [interruptible] TaskMetadata interruptible
                  * @property {boolean|null} [cacheSerializable] TaskMetadata cacheSerializable
-                 * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  * @property {boolean|null} [isEager] TaskMetadata isEager
+                 * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
                  */
     
                 /**
@@ -15485,14 +15514,6 @@
                 TaskMetadata.prototype.cacheSerializable = false;
     
                 /**
-                 * TaskMetadata generatesDeck.
-                 * @member {boolean} generatesDeck
-                 * @memberof flyteidl.core.TaskMetadata
-                 * @instance
-                 */
-                TaskMetadata.prototype.generatesDeck = false;
-    
-                /**
                  * TaskMetadata tags.
                  * @member {Object.<string,string>} tags
                  * @memberof flyteidl.core.TaskMetadata
@@ -15523,6 +15544,14 @@
                  * @instance
                  */
                 TaskMetadata.prototype.isEager = false;
+    
+                /**
+                 * TaskMetadata generatesDeck.
+                 * @member {google.protobuf.IBoolValue|null|undefined} generatesDeck
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.generatesDeck = null;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -15578,8 +15607,6 @@
                         writer.uint32(/* id 8, wireType 0 =*/64).bool(message.interruptible);
                     if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
                         writer.uint32(/* id 9, wireType 0 =*/72).bool(message.cacheSerializable);
-                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
-                        writer.uint32(/* id 10, wireType 0 =*/80).bool(message.generatesDeck);
                     if (message.tags != null && message.hasOwnProperty("tags"))
                         for (var keys = Object.keys(message.tags), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
@@ -15590,6 +15617,8 @@
                             writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
                     if (message.isEager != null && message.hasOwnProperty("isEager"))
                         writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
+                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
+                        $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
                     return writer;
                 };
     
@@ -15635,9 +15664,6 @@
                         case 9:
                             message.cacheSerializable = reader.bool();
                             break;
-                        case 10:
-                            message.generatesDeck = reader.bool();
-                            break;
                         case 11:
                             reader.skip().pos++;
                             if (message.tags === $util.emptyObject)
@@ -15656,6 +15682,9 @@
                             break;
                         case 14:
                             message.isEager = reader.bool();
+                            break;
+                        case 15:
+                            message.generatesDeck = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15709,9 +15738,6 @@
                     if (message.cacheSerializable != null && message.hasOwnProperty("cacheSerializable"))
                         if (typeof message.cacheSerializable !== "boolean")
                             return "cacheSerializable: boolean expected";
-                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
-                        if (typeof message.generatesDeck !== "boolean")
-                            return "generatesDeck: boolean expected";
                     if (message.tags != null && message.hasOwnProperty("tags")) {
                         if (!$util.isObject(message.tags))
                             return "tags: object expected";
@@ -15733,6 +15759,11 @@
                     if (message.isEager != null && message.hasOwnProperty("isEager"))
                         if (typeof message.isEager !== "boolean")
                             return "isEager: boolean expected";
+                    if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck")) {
+                        var error = $root.google.protobuf.BoolValue.verify(message.generatesDeck);
+                        if (error)
+                            return "generatesDeck." + error;
+                    }
                     return null;
                 };
     
@@ -17398,6 +17429,7 @@
                  * @property {string|null} [groupVersion] Secret groupVersion
                  * @property {string|null} [key] Secret key
                  * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
+                 * @property {string|null} [envVar] Secret envVar
                  */
     
                 /**
@@ -17448,6 +17480,14 @@
                 Secret.prototype.mountRequirement = 0;
     
                 /**
+                 * Secret envVar.
+                 * @member {string} envVar
+                 * @memberof flyteidl.core.Secret
+                 * @instance
+                 */
+                Secret.prototype.envVar = "";
+    
+                /**
                  * Creates a new Secret instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.Secret
@@ -17479,6 +17519,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.key);
                     if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mountRequirement);
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.envVar);
                     return writer;
                 };
     
@@ -17511,6 +17553,9 @@
                             break;
                         case 4:
                             message.mountRequirement = reader.int32();
+                            break;
+                        case 5:
+                            message.envVar = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17549,6 +17594,9 @@
                         case 2:
                             break;
                         }
+                    if (message.envVar != null && message.hasOwnProperty("envVar"))
+                        if (!$util.isString(message.envVar))
+                            return "envVar: string expected";
                     return null;
                 };
     
@@ -39135,6 +39183,7 @@
                  * @property {boolean|null} [overwriteCache] LaunchPlanSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] LaunchPlanSpec envs
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] LaunchPlanSpec executionEnvAssignments
+                 * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] LaunchPlanSpec clusterAssignment
                  */
     
                 /**
@@ -39290,6 +39339,14 @@
                 LaunchPlanSpec.prototype.executionEnvAssignments = $util.emptyArray;
     
                 /**
+                 * LaunchPlanSpec clusterAssignment.
+                 * @member {flyteidl.admin.IClusterAssignment|null|undefined} clusterAssignment
+                 * @memberof flyteidl.admin.LaunchPlanSpec
+                 * @instance
+                 */
+                LaunchPlanSpec.prototype.clusterAssignment = null;
+    
+                /**
                  * Creates a new LaunchPlanSpec instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.LaunchPlanSpec
@@ -39348,6 +39405,8 @@
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
+                        $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     return writer;
                 };
     
@@ -39421,6 +39480,9 @@
                             if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
                                 message.executionEnvAssignments = [];
                             message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
+                            break;
+                        case 23:
+                            message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -39523,6 +39585,11 @@
                             if (error)
                                 return "executionEnvAssignments." + error;
                         }
+                    }
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment")) {
+                        var error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
+                        if (error)
+                            return "clusterAssignment." + error;
                     }
                     return null;
                 };

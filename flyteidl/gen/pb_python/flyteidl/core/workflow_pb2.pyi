@@ -121,7 +121,14 @@ class ArrayNode(_message.Message):
     def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., data_mode: _Optional[_Union[ArrayNode.DataMode, str]] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
-    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]
+    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable", "config"]
+    class ConfigEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAME_FIELD_NUMBER: _ClassVar[int]
     TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
@@ -129,6 +136,7 @@ class NodeMetadata(_message.Message):
     CACHEABLE_FIELD_NUMBER: _ClassVar[int]
     CACHE_VERSION_FIELD_NUMBER: _ClassVar[int]
     CACHE_SERIALIZABLE_FIELD_NUMBER: _ClassVar[int]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
     name: str
     timeout: _duration_pb2.Duration
     retries: _literals_pb2.RetryStrategy
@@ -136,7 +144,8 @@ class NodeMetadata(_message.Message):
     cacheable: bool
     cache_version: str
     cache_serializable: bool
-    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ...) -> None: ...
+    config: _containers.ScalarMap[str, str]
+    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class Alias(_message.Message):
     __slots__ = ["var", "alias"]

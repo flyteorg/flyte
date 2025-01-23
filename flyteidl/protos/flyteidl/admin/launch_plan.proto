@@ -10,6 +10,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/security.proto";
 import "flyteidl/admin/schedule.proto";
+import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
@@ -139,6 +140,10 @@ message LaunchPlanSpec {
 
     // Execution environment assignments to be set for the execution.
     repeated core.ExecutionEnvAssignment execution_env_assignments = 22;
+
+    // ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.
+    // This can be overwritten at execution creation level.
+    ClusterAssignment cluster_assignment = 23;
 }
 
 // Values computed by the flyte platform after launch plan registration.
