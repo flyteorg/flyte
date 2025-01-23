@@ -290,12 +290,11 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
 		if podTemplate != nil {
-			podSpec, err = ApplyPodTemplateOverride(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+			podSpec, err = ApplyPodTemplateOverride(podTemplate)
 			if err != nil {
 				return nil, nil, "", err
 			}
-			primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().GetPrimaryContainerName()
-
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
 		}
 
 	case *core.TaskTemplate_K8SPod:
@@ -327,11 +326,11 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
 		if podTemplate != nil {
-			podSpec, err = ApplyPodTemplateOverride(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+			podSpec, err = ApplyPodTemplateOverride(podTemplate)
 			if err != nil {
 				return nil, nil, "", err
 			}
-			primaryContainerName = tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate().GetPrimaryContainerName()
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
 		}
 
 	default:
