@@ -51,6 +51,7 @@ func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value
 type Options struct {
 	clock           clock.WithTicker
 	createBatchesCb CreateBatchesFunc
+	syncOnCreate    bool
 }
 
 // WithClock configures the clock to use for time related operations. Mainly used for unit testing.
@@ -67,10 +68,20 @@ func WithCreateBatchesFunc(createBatchesCb CreateBatchesFunc) Option {
 	}
 }
 
+// WithSyncOnCreate configures whether the cache will attempt to sync items upon creation or wait until the next
+// sync interval. Disabling this can be useful when the cache is under high load and synchronization both frequently
+// and in large batches. Defaults to true.
+func WithSyncOnCreate(syncOnCreate bool) Option {
+	return func(mo *Options) {
+		mo.syncOnCreate = syncOnCreate
+	}
+}
+
 func defaultOptions() *Options {
 	opts := &Options{}
 	WithClock(clock.RealClock{})(opts)
 	WithCreateBatchesFunc(SingleItemBatches)(opts)
+	WithSyncOnCreate(true)(opts)
 	return opts
 }
 
@@ -102,6 +113,7 @@ type InMemoryAutoRefresh struct {
 	syncCount          atomic.Int32 // internal sync counter for unit testing
 	enqueueCount       atomic.Int32 // internal enqueue counter for unit testing
 	enqueueLoopRunning atomic.Bool  // internal bool to ensure goroutines are running
+	syncOnCreate       bool
 }
 
 // NewInMemoryAutoRefresh creates a new InMemoryAutoRefresh
@@ -145,6 +157,7 @@ func NewInMemoryAutoRefresh(
 		syncCount:          atomic.NewInt32(0),
 		enqueueCount:       atomic.NewInt32(0),
 		enqueueLoopRunning: atomic.NewBool(false),
+		syncOnCreate:       opts.syncOnCreate,
 	}
 
 	return cache, nil
@@ -228,10 +241,12 @@ func (w *InMemoryAutoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 
 	// It fixes cold start issue in the AutoRefreshCache by adding the item to the workqueue when it is created.
 	// This way, the item will be processed without waiting for the next sync cycle (30s by default).
-	batch := make([]ItemWrapper, 0, 1)
-	batch = append(batch, itemWrapper{id: id, item: item})
-	w.workqueue.AddRateLimited(&batch)
-	w.processing.Store(id, w.clock.Now())
+	if w.syncOnCreate {
+		batch := make([]ItemWrapper, 0, 1)
+		batch = append(batch, itemWrapper{id: id, item: item})
+		w.workqueue.AddRateLimited(&batch)
+		w.processing.Store(id, w.clock.Now())
+	}
 	return item, nil
 }
 
