@@ -67,14 +67,14 @@ Enable the K8s service agent by adding the following config to the relevant YAML
 
 Substitute ``<AGENT_ENDPOINT>`` with the endpoint of your MMCloud agent.
 
-
 Setup the RBAC
-----------------------
+--------------
 
 The K8s Data Service Agent will create a StatefulSet and expose the Service endpoint for the StatefulSet pods.
 RBAC needs to be set up to allow the K8s Data Service Agent to perform CRUD operations on the StatefulSet and Service.
 
 The role `flyte-flyteagent-role` set up:
+
 .. code-block:: yaml
 
   # Example of the role/binding set up for the data service to create/update/delete resources in the sandbox flyte namespace
@@ -116,9 +116,10 @@ The role `flyte-flyteagent-role` set up:
     verbs:
     - '*'
 
-  
 The binding `flyte-flyteagent-rolebinding` for the role `flyte-flyteagent-role`
+  
   .. code-block:: yaml
+
     # Example of the role/binding set up for the data service to create/update/delete resources in the sandbox flyte namespace
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
