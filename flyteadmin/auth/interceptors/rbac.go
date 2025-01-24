@@ -116,12 +116,14 @@ func resolveRolesViaClaims(claims map[string]interface{}, targetClaims []config.
 			continue
 		}
 
-		claimStrings, ok := claimIntf.([]interface{})
+		claimListElements, ok := claimIntf.([]interface{})
 		if ok {
-			for _, claimString := range claimStrings {
-				roleSet[claimString.(string)] = true
+			for _, claimListElement := range claimListElements {
+				claimStringElement, ok := claimListElement.(string)
+				if ok {
+					roleSet[claimStringElement] = true
+				}
 			}
-			continue
 		}
 	}
 

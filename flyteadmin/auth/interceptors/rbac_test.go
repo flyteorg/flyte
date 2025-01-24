@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors/interceptorstest"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/stretchr/testify/require"
@@ -65,12 +66,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
 
-		handler := func(ctx context.Context, req any) (any, error) {
-			return nil, nil
-		}
+		handler := &interceptorstest.TestUnaryHandler{}
 
-		_, err = interceptor(ctx, nil, info, handler)
+		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.NoError(t, err)
+		require.Equal(t, 1, handler.GetHandleCallCount())
 	})
 
 	t.Run("bypass method pattern exact match", func(t *testing.T) {
@@ -86,12 +86,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
 
-		handler := func(ctx context.Context, req any) (any, error) {
-			return nil, nil
-		}
+		handler := &interceptorstest.TestUnaryHandler{}
 
-		_, err = interceptor(ctx, nil, info, handler)
+		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.NoError(t, err)
+		require.Equal(t, 1, handler.GetHandleCallCount())
 	})
 
 	t.Run("bypass method pattern no match", func(t *testing.T) {
@@ -107,13 +106,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
 
-		// FIXME: use mocks and validate they aren't called
-		handler := func(ctx context.Context, req any) (any, error) {
-			return nil, nil
-		}
+		handler := &interceptorstest.TestUnaryHandler{}
 
-		_, err = interceptor(ctx, nil, info, handler)
+		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
+		require.Equal(t, 0, handler.GetHandleCallCount())
 	})
 
 	t.Run("authorization fails due to no roles", func(t *testing.T) {
@@ -141,12 +138,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
 
-		handler := func(ctx context.Context, req any) (any, error) {
-			return nil, nil
-		}
+		handler := &interceptorstest.TestUnaryHandler{}
 
-		_, err = interceptor(ctx, nil, info, handler)
+		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
+		require.Equal(t, 0, handler.GetHandleCallCount())
 	})
 
 	t.Run("authorization success with scope based roles resolution", func(t *testing.T) {
@@ -177,15 +173,237 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
 
-		handler := func(ctx context.Context, req any) (any, error) {
-			return nil, nil
-		}
+		handler := &interceptorstest.TestUnaryHandler{}
 
 		scopes := sets.NewString("admin")
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), scopes, nil, nil)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
-		_, err = interceptor(ctxWithIdentity, nil, info, handler)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.NoError(t, err)
+		require.Equal(t, 1, handler.GetHandleCallCount())
+	})
+
+	t.Run("authorization fails with scope based roles resolution", func(t *testing.T) {
+
+		cfg := &config.Config{
+			Rbac: config.Rbac{
+				Policies: []config.AuthorizationPolicy{
+					{
+						Role: "admin",
+						Rules: []config.Rule{
+							{
+								Name:          "example",
+								MethodPattern: ".*",
+								Project:       "flytesnacks",
+								Domain:        "development",
+							},
+						},
+					},
+				},
+				TokenScopeRoleResolver: config.TokenScopeRoleResolver{
+					Enabled: true,
+				},
+			},
+		}
+		authCtx := &mocks.AuthenticationContext{}
+		authCtx.OnOptions().Return(cfg)
+
+		interceptor, err := GetAuthorizationInterceptor(authCtx)
+		require.NoError(t, err)
+
+		handler := &interceptorstest.TestUnaryHandler{}
+
+		scopes := sets.NewString("notadmin")
+		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), scopes, nil, nil)
+		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
+		require.NoError(t, err)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
+		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
+		require.Equal(t, 0, handler.GetHandleCallCount())
+	})
+
+	t.Run("authorization success with string claim based roles resolution", func(t *testing.T) {
+
+		cfg := &config.Config{
+			Rbac: config.Rbac{
+				Policies: []config.AuthorizationPolicy{
+					{
+						Role: "admin",
+						Rules: []config.Rule{
+							{
+								Name:          "example",
+								MethodPattern: ".*",
+								Project:       "flytesnacks",
+								Domain:        "development",
+							},
+						},
+					},
+				},
+				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
+					Enabled: true,
+					TokenClaims: []config.TokenClaim{
+						{
+							Name: "group",
+						},
+					},
+				},
+			},
+		}
+		authCtx := &mocks.AuthenticationContext{}
+		authCtx.OnOptions().Return(cfg)
+
+		interceptor, err := GetAuthorizationInterceptor(authCtx)
+		require.NoError(t, err)
+
+		handler := &interceptorstest.TestUnaryHandler{}
+
+		claims := map[string]interface{}{
+			"group": "admin",
+		}
+		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
+		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
+		require.NoError(t, err)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
+		require.NoError(t, err)
+		require.Equal(t, 1, handler.GetHandleCallCount())
+	})
+
+	t.Run("authorization fails with string claim based roles resolution", func(t *testing.T) {
+
+		cfg := &config.Config{
+			Rbac: config.Rbac{
+				Policies: []config.AuthorizationPolicy{
+					{
+						Role: "admin",
+						Rules: []config.Rule{
+							{
+								Name:          "example",
+								MethodPattern: ".*",
+								Project:       "flytesnacks",
+								Domain:        "development",
+							},
+						},
+					},
+				},
+				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
+					Enabled: true,
+					TokenClaims: []config.TokenClaim{
+						{
+							Name: "group",
+						},
+					},
+				},
+			},
+		}
+		authCtx := &mocks.AuthenticationContext{}
+		authCtx.OnOptions().Return(cfg)
+
+		interceptor, err := GetAuthorizationInterceptor(authCtx)
+		require.NoError(t, err)
+
+		handler := &interceptorstest.TestUnaryHandler{}
+
+		claims := map[string]interface{}{
+			"group": "notadmin",
+		}
+		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
+		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
+		require.NoError(t, err)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
+		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
+		require.Equal(t, 0, handler.GetHandleCallCount())
+	})
+
+	t.Run("authorization success with string list claim based roles resolution", func(t *testing.T) {
+
+		cfg := &config.Config{
+			Rbac: config.Rbac{
+				Policies: []config.AuthorizationPolicy{
+					{
+						Role: "admin",
+						Rules: []config.Rule{
+							{
+								Name:          "example",
+								MethodPattern: ".*",
+								Project:       "flytesnacks",
+								Domain:        "development",
+							},
+						},
+					},
+				},
+				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
+					Enabled: true,
+					TokenClaims: []config.TokenClaim{
+						{
+							Name: "groups",
+						},
+					},
+				},
+			},
+		}
+		authCtx := &mocks.AuthenticationContext{}
+		authCtx.OnOptions().Return(cfg)
+
+		interceptor, err := GetAuthorizationInterceptor(authCtx)
+		require.NoError(t, err)
+
+		handler := &interceptorstest.TestUnaryHandler{}
+
+		claims := map[string]interface{}{
+			"groups": []interface{}{"admin", "notadmin"},
+		}
+		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
+		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
+		require.NoError(t, err)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
+		require.NoError(t, err)
+		require.Equal(t, 1, handler.GetHandleCallCount())
+	})
+
+	t.Run("authorization fails with string claim based roles resolution", func(t *testing.T) {
+
+		cfg := &config.Config{
+			Rbac: config.Rbac{
+				Policies: []config.AuthorizationPolicy{
+					{
+						Role: "admin",
+						Rules: []config.Rule{
+							{
+								Name:          "example",
+								MethodPattern: ".*",
+								Project:       "flytesnacks",
+								Domain:        "development",
+							},
+						},
+					},
+				},
+				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
+					Enabled: true,
+					TokenClaims: []config.TokenClaim{
+						{
+							Name: "groups",
+						},
+					},
+				},
+			},
+		}
+		authCtx := &mocks.AuthenticationContext{}
+		authCtx.OnOptions().Return(cfg)
+
+		interceptor, err := GetAuthorizationInterceptor(authCtx)
+		require.NoError(t, err)
+
+		handler := &interceptorstest.TestUnaryHandler{}
+
+		claims := map[string]interface{}{
+			"groups": []interface{}{"notadmin"},
+		}
+		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
+		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
+		require.NoError(t, err)
+		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
+		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
+		require.Equal(t, 0, handler.GetHandleCallCount())
 	})
 }
