@@ -486,7 +486,7 @@ data:
       agent-service:
         defaultAgent:
           defaultTimeout: 10s
-          endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+          endpoint: k8s://flyteagent.flyte:8000
           insecure: true
           timeouts:
             GetTask: 10s
@@ -823,7 +823,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VFRKYXBKM2xsTERQb1ZDaQ==
+  haSharedSecret: QW5aNWlUNmxVWEpxUUV4ZQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1254,7 +1254,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 5a537c05dbd27a7f2884eb78f4e762205c3bcc3248ab9e509ab7074c7e5f953d
+        checksum/configuration: 7841a55b7d0bd6a6d44f37ccf05297fb7c3338c1ebd9c2608d499e4f8c817383
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1420,7 +1420,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 4c7bc4fbd20227034bda9ead9cd941c94879028d6920b98113f9a08ef3c6f9d9
+        checksum/secret: bbd233a0f62bc60cc8937296e0ba5a8fd30953cb6a67883ee6f687add14e3de7
       labels:
         app: docker-registry
         release: flyte-sandbox

@@ -171,7 +171,7 @@ configuration:
   # agentService Flyte Agent configuration
   agentService:
     defaultAgent:
-      endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+      endpoint: "k8s://flyteagent.flyte:8000"
       insecure: true
       timeouts:
         GetTask: 10s
@@ -275,12 +275,16 @@ deployment:
     command: []
     # args Override default init container args
     args: []
+    # securityContext Specify security context for wait-for-db init container
+    securityContext: {}
   # genAdminAuthSecret Configure init container to generate secrets for internal use
   genAdminAuthSecret:
     # command Override default init container command
     command: []
     # args Override default init container args
     args: []
+    # securityContext Specify security context for gen-admin-auth-secret init container
+    securityContext: {}
   # labels Add labels to Flyte deployment
   labels: {}
   # annotations Add annotations to Flyte deployment
@@ -300,6 +304,8 @@ deployment:
   # extraPodSpec Specify additional configuration for Flyte pod
   # This can be used for adding affinity, tolerations, hostNetwork, etc.
   extraPodSpec: {}
+  # securityContext Specify security context for Flyte container
+  securityContext: {}
 
 # service Configure service for Flyte
 service:
