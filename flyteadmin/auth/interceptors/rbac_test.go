@@ -53,6 +53,18 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		FullMethod: "ExampleMethod",
 	}
 
+	adminAuthPolicy := config.AuthorizationPolicy{
+		Role: "admin",
+		Rules: []config.Rule{
+			{
+				Name:          "example",
+				MethodPattern: ".*",
+				Project:       "flytesnacks",
+				Domain:        "development",
+			},
+		},
+	}
+
 	t.Run("bypass method pattern wildcard match", func(t *testing.T) {
 
 		cfg := &config.Config{
@@ -71,6 +83,9 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
+
+		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		require.Empty(t, isolationCtx.GetResourceScopes())
 	})
 
 	t.Run("bypass method pattern exact match", func(t *testing.T) {
@@ -91,6 +106,9 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		_, err = interceptor(ctx, nil, info, handler.Handle)
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
+
+		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		require.Empty(t, isolationCtx.GetResourceScopes())
 	})
 
 	t.Run("bypass method pattern no match", func(t *testing.T) {
@@ -118,17 +136,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 			},
 		}
@@ -150,17 +158,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenScopeRoleResolver: config.TokenScopeRoleResolver{
 					Enabled: true,
@@ -179,9 +177,20 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), scopes, nil, nil)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
+
 		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
+
+		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		require.Len(t, isolationCtx.GetResourceScopes(), 1)
+
+		resourceScope := isolationCtx.GetResourceScopes()[0]
+		expectedResourceScope := auth.ResourceScope{
+			Project: "flytesnacks",
+			Domain:  "development",
+		}
+		require.Equal(t, expectedResourceScope, resourceScope)
 	})
 
 	t.Run("authorization fails with scope based roles resolution", func(t *testing.T) {
@@ -189,17 +198,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenScopeRoleResolver: config.TokenScopeRoleResolver{
 					Enabled: true,
@@ -218,6 +217,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), scopes, nil, nil)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
+
 		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
 		require.Equal(t, 0, handler.GetHandleCallCount())
@@ -228,17 +228,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
 					Enabled: true,
@@ -264,9 +254,20 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
+
 		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
+
+		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		require.Len(t, isolationCtx.GetResourceScopes(), 1)
+
+		resourceScope := isolationCtx.GetResourceScopes()[0]
+		expectedResourceScope := auth.ResourceScope{
+			Project: "flytesnacks",
+			Domain:  "development",
+		}
+		require.Equal(t, expectedResourceScope, resourceScope)
 	})
 
 	t.Run("authorization fails with string claim based roles resolution", func(t *testing.T) {
@@ -274,17 +275,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
 					Enabled: true,
@@ -310,6 +301,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
+
 		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.ErrorIs(t, err, status.Errorf(codes.PermissionDenied, ""))
 		require.Equal(t, 0, handler.GetHandleCallCount())
@@ -320,17 +312,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
 					Enabled: true,
@@ -356,9 +338,20 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		tokenIdentityContext, err := auth.NewIdentityContext("", "", "", time.Now(), nil, nil, claims)
 		ctxWithIdentity := tokenIdentityContext.WithContext(ctx)
 		require.NoError(t, err)
+
 		_, err = interceptor(ctxWithIdentity, nil, info, handler.Handle)
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
+
+		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		require.Len(t, isolationCtx.GetResourceScopes(), 1)
+
+		resourceScope := isolationCtx.GetResourceScopes()[0]
+		expectedResourceScope := auth.ResourceScope{
+			Project: "flytesnacks",
+			Domain:  "development",
+		}
+		require.Equal(t, expectedResourceScope, resourceScope)
 	})
 
 	t.Run("authorization fails with string claim based roles resolution", func(t *testing.T) {
@@ -366,17 +359,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		cfg := &config.Config{
 			Rbac: config.Rbac{
 				Policies: []config.AuthorizationPolicy{
-					{
-						Role: "admin",
-						Rules: []config.Rule{
-							{
-								Name:          "example",
-								MethodPattern: ".*",
-								Project:       "flytesnacks",
-								Domain:        "development",
-							},
-						},
-					},
+					adminAuthPolicy,
 				},
 				TokenClaimRoleResolver: config.TokenClaimRoleResolver{
 					Enabled: true,

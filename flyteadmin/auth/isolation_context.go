@@ -43,7 +43,7 @@ func (c IsolationContext) WithContext(ctx context.Context) context.Context {
 	return context.WithValue(ctx, ContextKeyIsolationContext, c)
 }
 
-func AuthorizationContextFromContext(ctx context.Context) IsolationContext {
+func IsolationContextFromContext(ctx context.Context) IsolationContext {
 	existing := ctx.Value(ContextKeyIsolationContext)
 	if existing != nil {
 		return existing.(IsolationContext)
