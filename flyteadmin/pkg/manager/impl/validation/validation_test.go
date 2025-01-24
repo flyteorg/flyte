@@ -347,7 +347,7 @@ func TestValidateParameterMap(t *testing.T) {
 		err := validateParameterMap(&exampleMap, fieldName)
 		assert.Error(t, err)
 		fmt.Println(err.Error())
-		assert.Contains(t, err.Error(), failedToValidateLiteralType)
+		assert.Contains(t, err.Error(), "Invalid default value for variable foo in test_field_name - expected type simple:1000, but got literal scalar:{}")
 	})
 }
 
