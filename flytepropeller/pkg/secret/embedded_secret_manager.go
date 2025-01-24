@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 	"unicode/utf8"
@@ -166,14 +167,14 @@ func (i EmbeddedSecretManagerInjector) Inject(
 			}
 			stringValue = string(secretValue.BinaryValue)
 		}
-		i.injectAsEnvVar(secret.Key, stringValue, pod)
+		i.injectAsEnvVar(secret, stringValue, pod)
 	case core.Secret_FILE:
 		if secretValue.BinaryValue == nil {
 			return pod, false, fmt.Errorf(
 				"secret %q is attempted to be mounted as a file, but has no binary "+
 					"value; mount as an environment variable instead", secret.Key)
 		}
-		i.injectAsFile(secret.Key, secretValue.BinaryValue, pod)
+		i.injectAsFile(secret, secretValue.BinaryValue, pod)
 	default:
 		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
 		logger.Error(ctx, err)
@@ -183,24 +184,30 @@ func (i EmbeddedSecretManagerInjector) Inject(
 	return pod, true, nil
 }
 
-func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secretKey string, secretValue string, pod *corev1.Pod) {
+func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
 	envVars := []corev1.EnvVar{
 		{
 			Name:  SecretEnvVarPrefix,
 			Value: UnionSecretEnvVarPrefix,
 		},
 		{
-			Name:  UnionSecretEnvVarPrefix + strings.ToUpper(secretKey),
+			Name:  UnionSecretEnvVarPrefix + strings.ToUpper(secret.GetKey()),
 			Value: secretValue,
 		},
+	}
+	if secret.GetEnvVar() != "" {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  secret.EnvVar,
+			Value: secretValue,
+		})
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
 }
 
-func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValue []byte, pod *corev1.Pod) {
+func (i EmbeddedSecretManagerInjector) injectAsFile(secret *core.Secret, secretValue []byte, pod *corev1.Pod) {
 	initContainer, exists := i.getOrAppendFileMountInitContainer(pod)
-	appendSecretToFileMountInitContainer(initContainer, secretKey, secretValue)
+	appendSecretToFileMountInitContainer(initContainer, secret.GetKey(), secretValue)
 
 	if exists {
 		return
@@ -235,6 +242,12 @@ func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValu
 			Name:  SecretPathFilePrefixEnvVar,
 			Value: "",
 		},
+	}
+	if secret.GetEnvVar() != "" {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  secret.GetEnvVar(),
+			Value: filepath.Join(EmbeddedSecretsFileMountPath, strings.ToLower(secret.GetKey())),
+		})
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)

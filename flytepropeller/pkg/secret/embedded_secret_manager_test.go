@@ -193,76 +193,131 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 	ctx = context.Background()
 
-	secret := &core.Secret{
-		Key:              "secret1",
-		MountRequirement: core.Secret_FILE,
+	type test struct {
+		name   string
+		secret *core.Secret
 	}
-
-	pod := &corev1.Pod{
-		Spec: corev1.PodSpec{},
-		ObjectMeta: metav1.ObjectMeta{
-			Labels: map[string]string{
-				"organization": "organization",
-				"project":      "project",
-				"domain":       "domain",
+	tests := []test{
+		{
+			name: "Without envVar",
+			secret: &core.Secret{
+				Key:              "secret1",
+				MountRequirement: core.Secret_FILE,
+			},
+		},
+		{
+			name: "With envVar",
+			secret: &core.Secret{
+				Key:              "secret1",
+				MountRequirement: core.Secret_FILE,
+				EnvVar:           "MY_ENV_VAR",
 			},
 		},
 	}
 
-	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
-		secretFetcherMock{
-			Secrets: map[string]SecretValue{
-				"u__org__organization__domain__domain__project__project__key__secret1": {
-					BinaryValue: []byte("banana"),
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pod := &corev1.Pod{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{},
+					},
 				},
-			},
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"organization": "organization",
+						"project":      "project",
+						"domain":       "domain",
+					},
+				},
+			}
+
+			injector := NewEmbeddedSecretManagerInjector(
+				config.EmbeddedSecretManagerConfig{},
+				secretFetcherMock{
+					Secrets: map[string]SecretValue{
+						"u__org__organization__domain__domain__project__project__key__secret1": {
+							BinaryValue: []byte("banana"),
+						},
+					},
+				})
+
+			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
+			assert.NoError(t, err)
+			assert.True(t, injected)
+			assert.Len(t, pod.Spec.InitContainers, 1)
+
+			env, found := lo.Find(
+				pod.Spec.InitContainers[0].Env,
+				func(env corev1.EnvVar) bool { return env.Name == "SECRETS" })
+			assert.True(t, found)
+			assert.Equal(t, "secret1=YmFuYW5h\n", env.Value)
+
+			if tt.secret.GetEnvVar() != "" {
+				env, found = lo.Find(
+					pod.Spec.Containers[0].Env,
+					func(env corev1.EnvVar) bool { return env.Name == tt.secret.GetEnvVar() })
+				assert.True(t, found)
+				assert.Equal(t, "/etc/flyte/secrets/secret1", env.Value)
+			}
+
 		})
-
-	pod, injected, err := injector.Inject(ctx, secret, pod)
-	assert.NoError(t, err)
-	assert.True(t, injected)
-	assert.Len(t, pod.Spec.InitContainers, 1)
-
-	env, found := lo.Find(
-		pod.Spec.InitContainers[0].Env,
-		func(env corev1.EnvVar) bool { return env.Name == "SECRETS" })
-	assert.True(t, found)
-	assert.Equal(t, "secret1=YmFuYW5h\n", env.Value)
+	}
 }
 
 func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testing.T) {
 	ctx = context.Background()
-	secret := &core.Secret{Key: "secret1"}
-	pod := &corev1.Pod{
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{},
-			},
+
+	type test struct {
+		name   string
+		secret *core.Secret
+	}
+	tests := []test{
+		{
+			name:   "Without envVar",
+			secret: &core.Secret{Key: "secret1"},
 		},
-		ObjectMeta: metav1.ObjectMeta{
-			Labels: map[string]string{
-				"organization": "o-apple",
-				"domain":       "d-cherry",
-				"project":      "p-banana",
-			},
+		{
+			name:   "With envVar",
+			secret: &core.Secret{Key: "secret1", EnvVar: "MY_VAR"},
 		},
 	}
 
-	injector := NewEmbeddedSecretManagerInjector(
-		config.EmbeddedSecretManagerConfig{},
-		secretFetcherMock{
-			Secrets: map[string]SecretValue{
-				"u__org__o-apple__domain____project____key__secret1": {
-					StringValue: "fruits",
-				},
-			},
-		})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 
-	pod, injected, err := injector.Inject(ctx, secret, pod)
-	assert.NoError(t, err)
-	assert.True(t, injected)
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits"))
+			pod := &corev1.Pod{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{},
+					},
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"organization": "o-apple",
+						"domain":       "d-cherry",
+						"project":      "p-banana",
+					},
+				},
+			}
+
+			injector := NewEmbeddedSecretManagerInjector(
+				config.EmbeddedSecretManagerConfig{},
+				secretFetcherMock{
+					Secrets: map[string]SecretValue{
+						"u__org__o-apple__domain____project____key__secret1": {
+							StringValue: "fruits",
+						},
+					},
+				})
+
+			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
+			assert.NoError(t, err)
+			assert.True(t, injected)
+			assert.True(t, podHasSecretInjected(pod, "secret1", "fruits", tt.secret.GetEnvVar()))
+
+		})
+	}
 }
 
 func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) {
@@ -299,7 +354,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
 	assert.True(t, injected)
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ domain"))
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ domain", ""))
 }
 
 func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T) {
@@ -339,10 +394,10 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
 	assert.True(t, injected)
-	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project"))
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project", ""))
 }
 
-func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string) bool {
+func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {
 	return lo.EveryBy(pod.Spec.Containers, func(container corev1.Container) bool {
 		hasValueEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
 			return env.Name == ("_UNION_"+strings.ToUpper(secretKey)) &&
@@ -351,7 +406,14 @@ func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string)
 		hasPrefixEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
 			return env.Name == "FLYTE_SECRETS_ENV_PREFIX" && env.Value == "_UNION_"
 		})
-		return hasValueEnvVar && hasPrefixEnvVar
+		hasCustomEnvVar := true
+		if envVar != "" {
+			hasCustomEnvVar = lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
+				return env.Name == envVar && env.Value == secretValue
+			})
+		}
+
+		return hasValueEnvVar && hasPrefixEnvVar && hasCustomEnvVar
 	})
 }
 
