@@ -2,6 +2,7 @@ package interceptorstest
 
 import "context"
 
+// TestUnaryHandler is an implementation of grpc.UnaryHandler for test purposes
 type TestUnaryHandler struct {
 	Err             error
 	handleCallCount int
@@ -24,10 +25,12 @@ func (h *TestUnaryHandler) Handle(ctx context.Context, req interface{}) (interfa
 	return nil, nil
 }
 
+// GetHandleCallCount gets the number of times the handle method was called
 func (h *TestUnaryHandler) GetHandleCallCount() int {
 	return h.handleCallCount
 }
 
+// GetCapturedCtx gets the context captured during the last handle method call
 func (h *TestUnaryHandler) GetCapturedCtx() context.Context {
 	return h.capturedCtx
 }
