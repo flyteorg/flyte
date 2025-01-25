@@ -2544,8 +2544,8 @@ func TestApplySharedMemory(t *testing.T) {
 				t,
 				test.podSpec.Containers[0].VolumeMounts[0],
 				v1.VolumeMount{
-					Name:      test.sharedVolume.MountName,
-					MountPath: test.sharedVolume.MountPath,
+					Name:      test.sharedVolume.GetMountName(),
+					MountPath: test.sharedVolume.GetMountPath(),
 				},
 			)
 
@@ -2559,7 +2559,7 @@ func TestApplySharedMemory(t *testing.T) {
 				t,
 				test.podSpec.Volumes[0],
 				v1.Volume{
-					Name: test.sharedVolume.MountName,
+					Name: test.sharedVolume.GetMountName(),
 					VolumeSource: v1.VolumeSource{
 						EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity},
 					},
