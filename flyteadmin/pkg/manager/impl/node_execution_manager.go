@@ -545,17 +545,91 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return err
 	})
 
+	// Get the output variable map from workflow model TypedInterface
+	var inputVariableMap, outputVariableMap *core.VariableMap
+	group.Go(func() error {
+		var err error
+
+		switch nodeExecution.GetClosure().GetTargetMetadata().(type) {
+		case *admin.NodeExecutionClosure_WorkflowNodeMetadata:
+			execID := nodeExecution.GetClosure().GetTargetMetadata().(*admin.NodeExecutionClosure_WorkflowNodeMetadata).WorkflowNodeMetadata.GetExecutionId()
+			workflowModel, err := m.db.WorkflowRepo().Get(groupCtx, repoInterfaces.Identifier{
+				Project: execID.GetProject(),
+				Domain:  execID.GetDomain(),
+				Name:    execID.GetName(),
+			})
+
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to get workflow model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+			workflow, err := transformers.FromWorkflowModel(workflowModel)
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to transform workflow model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+
+			inputVariableMap = workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetInputs()
+			outputVariableMap = workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface().GetOutputs()
+
+		case *admin.NodeExecutionClosure_TaskNodeMetadata:
+			execID := nodeExecution.GetId().GetExecutionId()
+			executionModel, err := m.db.ExecutionRepo().Get(groupCtx, repoInterfaces.Identifier{
+				Project: execID.GetProject(),
+				Domain:  execID.GetDomain(),
+				Name:    execID.GetName(),
+			})
+
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to get execution model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+
+			execution, err := transformers.FromExecutionModel(groupCtx, executionModel, transformers.DefaultExecutionTransformerOptions)
+
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to transform execution model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+
+			taskModel, err := m.db.TaskRepo().Get(groupCtx, repoInterfaces.Identifier{
+				Project: execID.GetProject(),
+				Domain:  execID.GetDomain(),
+				Name:    execution.GetSpec().GetLaunchPlan().GetName(),
+				Version: execution.GetSpec().GetLaunchPlan().GetVersion(),
+			})
+
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to get task model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+
+			task, err := transformers.FromTaskModel(taskModel)
+
+			if err != nil {
+				logger.Debugf(groupCtx, "Failed to transform task model for node execution [%+v] with err %v", request.GetId(), err)
+				return err
+			}
+
+			inputVariableMap = task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs()
+			outputVariableMap = task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetOutputs()
+		}
+		return err
+	})
+
 	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
 
 	response := &admin.NodeExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(request.GetId(), nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
+		Inputs:            inputURLBlob,
+		Outputs:           outputURLBlob,
+		FullInputs:        inputs,
+		FullOutputs:       outputs,
+		FlyteUrls:         common.FlyteURLsFromNodeExecutionID(request.GetId(), nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
+		InputVariableMap:  inputVariableMap,
+		OutputVariableMap: outputVariableMap,
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {

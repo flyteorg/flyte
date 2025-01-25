@@ -202,6 +202,70 @@
         }
       }
     },
+    "coreArtifactBindingData": {
+      "type": "object",
+      "properties": {
+        "partition_key": {
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean"
+        },
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
+          "title": "This is only relevant in the time partition case"
+        }
+      },
+      "title": "Only valid for triggers"
+    },
+    "coreArtifactID": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
+        }
+      }
+    },
+    "coreArtifactKey": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "org": {
+          "type": "string"
+        }
+      }
+    },
+    "coreArtifactTag": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
+    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -263,6 +327,49 @@
         }
       },
       "description": "Represents an error thrown from a node."
+    },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "UNSET",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "UNSET",
+      "title": "- DAY: default"
+    },
+    "coreInputBindingData": {
+      "type": "object",
+      "properties": {
+        "var": {
+          "type": "string"
+        }
+      }
+    },
+    "coreLabelValue": {
+      "type": "object",
+      "properties": {
+        "static_value": {
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
+        },
+        "triggered_binding": {
+          "$ref": "#/definitions/coreArtifactBindingData"
+        },
+        "input_binding": {
+          "$ref": "#/definitions/coreInputBindingData"
+        },
+        "runtime_binding": {
+          "$ref": "#/definitions/coreRuntimeBinding"
+        }
+      }
     },
     "coreLiteral": {
       "type": "object",
@@ -403,6 +510,17 @@
       },
       "description": "Encapsulation of fields that identify a Flyte node execution entity."
     },
+    "corePartitions": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLabelValue"
+          }
+        }
+      }
+    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -429,6 +547,9 @@
         }
       },
       "title": "Primitive Types"
+    },
+    "coreRuntimeBinding": {
+      "type": "object"
     },
     "coreScalar": {
       "type": "object",
@@ -540,6 +661,28 @@
         }
       }
     },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
+        }
+      }
+    },
     "coreTypeAnnotation": {
       "type": "object",
       "properties": {
@@ -593,6 +736,40 @@
       },
       "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
     },
+    "coreVariable": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Variable literal type."
+        },
+        "description": {
+          "type": "string",
+          "title": "+optional string describing input variable"
+        },
+        "artifact_partial_id": {
+          "$ref": "#/definitions/coreArtifactID",
+          "description": "+optional This object allows the user to specify how Artifacts are created.\nname, tag, partitions can be specified. The other fields (version and project/domain) are ignored."
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreArtifactTag"
+        }
+      },
+      "description": "Defines a strongly typed variable."
+    },
+    "coreVariableMap": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreVariable"
+          },
+          "description": "Defines a map of variable names to variables."
+        }
+      },
+      "title": "A map of Variables"
+    },
     "coreVoid": {
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
@@ -631,6 +808,14 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS",
+        "PLUS"
+      ],
+      "default": "MINUS"
     },
     "flyteidlcoreSchema": {
       "type": "object",
@@ -824,6 +1009,10 @@
         "literal": {
           "$ref": "#/definitions/coreLiteral",
           "description": "Single literal will be returned. This is returned when the user/url requests a specific output or input\nby name. See the o3 example above."
+        },
+        "variable_map": {
+          "$ref": "#/definitions/coreVariableMap",
+          "description": "Return VariableMap if the request is for a node execution input/output with dataclasses."
         }
       }
     },

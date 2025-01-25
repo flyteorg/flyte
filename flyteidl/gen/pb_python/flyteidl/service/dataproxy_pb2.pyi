@@ -4,6 +4,7 @@ from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
+from flyteidl.core import interface_pb2 as _interface_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -109,11 +110,13 @@ class GetDataRequest(_message.Message):
     def __init__(self, flyte_url: _Optional[str] = ...) -> None: ...
 
 class GetDataResponse(_message.Message):
-    __slots__ = ["literal_map", "pre_signed_urls", "literal"]
+    __slots__ = ["literal_map", "pre_signed_urls", "literal", "variable_map"]
     LITERAL_MAP_FIELD_NUMBER: _ClassVar[int]
     PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
     LITERAL_FIELD_NUMBER: _ClassVar[int]
+    VARIABLE_MAP_FIELD_NUMBER: _ClassVar[int]
     literal_map: _literals_pb2.LiteralMap
     pre_signed_urls: PreSignedURLs
     literal: _literals_pb2.Literal
-    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., literal: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...
+    variable_map: _interface_pb2.VariableMap
+    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., literal: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., variable_map: _Optional[_Union[_interface_pb2.VariableMap, _Mapping]] = ...) -> None: ...

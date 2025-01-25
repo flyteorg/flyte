@@ -7,6 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { NodeExecutionIdentifier } from "../core/identifier_pb.js";
 import { Literal, LiteralMap } from "../core/literals_pb.js";
+import { VariableMap } from "../core/interface_pb.js";
 
 /**
  * ArtifactType
@@ -564,6 +565,13 @@ export class GetDataResponse extends Message<GetDataResponse> {
     case: "literal";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * Return VariableMap if the request is for a node execution input/output with dataclasses.
+   *
+   * @generated from field: optional flyteidl.core.VariableMap variable_map = 4;
+   */
+  variableMap?: VariableMap;
+
   constructor(data?: PartialMessage<GetDataResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -575,6 +583,7 @@ export class GetDataResponse extends Message<GetDataResponse> {
     { no: 1, name: "literal_map", kind: "message", T: LiteralMap, oneof: "data" },
     { no: 2, name: "pre_signed_urls", kind: "message", T: PreSignedURLs, oneof: "data" },
     { no: 3, name: "literal", kind: "message", T: Literal, oneof: "data" },
+    { no: 4, name: "variable_map", kind: "message", T: VariableMap, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDataResponse {

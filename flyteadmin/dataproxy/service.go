@@ -367,10 +367,13 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.
 	}
 
 	var lm *core.LiteralMap
+	var vm *core.VariableMap
 	if ioType == common.ArtifactTypeI {
 		lm = resp.GetFullInputs()
+		vm = resp.GetInputVariableMap()
 	} else if ioType == common.ArtifactTypeO {
 		lm = resp.GetFullOutputs()
+		vm = resp.GetOutputVariableMap()
 	} else {
 		// Assume deck, and create a download link request
 		dlRequest := service.CreateDownloadLinkRequest{
@@ -402,6 +405,7 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.
 		Data: &service.GetDataResponse_LiteralMap{
 			LiteralMap: lm,
 		},
+		VariableMap: vm,
 	}, nil
 }
 
@@ -409,6 +413,7 @@ func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.
 	*service.GetDataResponse, error) {
 
 	var lm *core.LiteralMap
+	var vm *core.VariableMap
 	reqT := &admin.TaskExecutionGetDataRequest{
 		Id: taskExecID,
 	}
@@ -419,8 +424,10 @@ func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.
 
 	if ioType == common.ArtifactTypeI {
 		lm = resp.GetFullInputs()
+		vm = resp.GetInputVariableMap()
 	} else if ioType == common.ArtifactTypeO {
 		lm = resp.GetFullOutputs()
+		vm = resp.GetOutputVariableMap()
 	} else {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "deck type cannot be specified with a retry attempt, just use the node instead")
 	}
@@ -440,6 +447,7 @@ func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.
 		Data: &service.GetDataResponse_LiteralMap{
 			LiteralMap: lm,
 		},
+		VariableMap: vm,
 	}, nil
 
 }

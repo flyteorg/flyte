@@ -226,6 +226,9 @@ pub struct GetDataRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDataResponse {
+    /// Return VariableMap if the request is for a node execution input/output with dataclasses.
+    #[prost(message, optional, tag="4")]
+    pub variable_map: ::core::option::Option<super::core::VariableMap>,
     #[prost(oneof="get_data_response::Data", tags="1, 2, 3")]
     pub data: ::core::option::Option<get_data_response::Data>,
 }

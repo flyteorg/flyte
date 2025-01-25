@@ -328,10 +328,38 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 
 	var outputs *core.LiteralMap
 	var outputURLBlob *admin.UrlBlob
+	var inputVariableMap, outputVariableMap *core.VariableMap
 	group.Go(func() error {
 		var err error
 		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 			m.storageClient, taskExecution.GetClosure())
+		return err
+	})
+
+	group.Go(func() error {
+		var err error
+		taskModel, err := m.db.TaskRepo().Get(groupCtx, repoInterfaces.Identifier{
+			Project: taskExecution.GetId().GetTaskId().GetProject(),
+			Domain:  taskExecution.GetId().GetTaskId().GetDomain(),
+			Name:    taskExecution.GetId().GetTaskId().GetName(),
+			Version: taskExecution.GetId().GetTaskId().GetVersion(),
+		})
+
+		if err != nil {
+			logger.Debugf(groupCtx, "Failed to get task [%+v] with err %v", taskExecution.GetId().GetTaskId(), err)
+			return err
+		}
+
+		task, err := transformers.FromTaskModel(taskModel)
+
+		if err != nil {
+			logger.Debugf(groupCtx, "Failed to transform task model [%+v] with err %v", taskModel, err)
+			return err
+		}
+
+		inputVariableMap = task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetInputs()
+		outputVariableMap = task.GetClosure().GetCompiledTask().GetTemplate().GetInterface().GetOutputs()
+
 		return err
 	})
 
@@ -341,11 +369,13 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	}
 
 	response := &admin.TaskExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(request.GetId(), false),
+		Inputs:            inputURLBlob,
+		Outputs:           outputURLBlob,
+		FullInputs:        inputs,
+		FullOutputs:       outputs,
+		FlyteUrls:         common.FlyteURLsFromTaskExecutionID(request.GetId(), false),
+		OutputVariableMap: outputVariableMap,
+		InputVariableMap:  inputVariableMap,
 	}
 
 	m.metrics.TaskExecutionInputBytes.Observe(float64(response.GetInputs().GetBytes()))
