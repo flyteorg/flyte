@@ -2354,3 +2354,218 @@ func TestAddTolerationsForExtendedResources(t *testing.T) {
 	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
 	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
 }
+
+func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
+	SharedMemory := &core.ExtendedResources{
+		SharedMemory: &core.SharedMemory{
+			MountName: "flyte-shared-memory",
+			MountPath: "/dev/shm",
+		},
+	}
+
+	newSharedMemory := &core.ExtendedResources{
+		SharedMemory: &core.SharedMemory{
+			MountName: "flyte-shared-memory-v2",
+			MountPath: "/dev/shm",
+		},
+	}
+
+	t.Run("base is nil", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(nil, SharedMemory)
+		assert.EqualValues(
+			t,
+			SharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+
+	t.Run("overrides is nil", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(SharedMemory, nil)
+		assert.EqualValues(
+			t,
+			SharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+
+	t.Run("merging", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
+		assert.EqualValues(
+			t,
+			newSharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+}
+
+func TestApplySharedMemoryErrors(t *testing.T) {
+
+	type test struct {
+		name                 string
+		podSpec              *v1.PodSpec
+		primaryContainerName string
+		sharedVolume         *core.SharedMemory
+		errorMsg             string
+	}
+
+	tests := []test{
+		{
+			name:                 "No mount name",
+			podSpec:              nil,
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountPath: "/dev/shm"},
+			errorMsg:             "mount name is not set",
+		},
+		{
+			name:                 "No mount path name",
+			podSpec:              nil,
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory"},
+			errorMsg:             "mount path is not set",
+		},
+		{
+			name: "No primary container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "secondary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "Unable to find primary container",
+		},
+
+		{
+			name: "Volume already exists in spec",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+				Volumes: []v1.Volume{{
+					Name: "flyte-shared-memory",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "A volume is already named flyte-shared-memory in pod spec",
+		},
+		{
+			name: "Volume already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+					VolumeMounts: []v1.VolumeMount{{
+						Name:      "flyte-shared-memory",
+						MountPath: "/dev/shm",
+					}},
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "A volume is already named flyte-shared-memory in container",
+		},
+		{
+			name: "Mount path already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+					VolumeMounts: []v1.VolumeMount{{
+						Name:      "flyte-shared-memory-v2",
+						MountPath: "/dev/shm",
+					}},
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "/dev/shm is already mounted in container",
+		},
+		{
+			name: "Mount path already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm", SizeLimit: "bad-name"},
+			errorMsg:             "Unable to parse size limit: bad-name",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ApplySharedMemory(test.podSpec, test.primaryContainerName, test.sharedVolume)
+			assert.Errorf(t, err, test.errorMsg)
+		})
+	}
+}
+
+func TestApplySharedMemory(t *testing.T) {
+
+	type test struct {
+		name                 string
+		podSpec              *v1.PodSpec
+		primaryContainerName string
+		sharedVolume         *core.SharedMemory
+	}
+
+	tests := []test{
+		{
+			name: "No size limit works",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+		},
+		{
+			name: "With size limits works",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm", SizeLimit: "2Gi"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ApplySharedMemory(test.podSpec, test.primaryContainerName, test.sharedVolume)
+			assert.NoError(t, err)
+
+			assert.Len(t, test.podSpec.Volumes, 1)
+			assert.Len(t, test.podSpec.Containers[0].VolumeMounts, 1)
+
+			assert.Equal(
+				t,
+				test.podSpec.Containers[0].VolumeMounts[0],
+				v1.VolumeMount{
+					Name:      test.sharedVolume.MountName,
+					MountPath: test.sharedVolume.MountPath,
+				},
+			)
+
+			var quantity resource.Quantity
+			if test.sharedVolume.GetSizeLimit() != "" {
+				quantity, err = resource.ParseQuantity(test.sharedVolume.GetSizeLimit())
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(
+				t,
+				test.podSpec.Volumes[0],
+				v1.Volume{
+					Name: test.sharedVolume.MountName,
+					VolumeSource: v1.VolumeSource{
+						EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity},
+					},
+				},
+			)
+
+		})
+	}
+}
