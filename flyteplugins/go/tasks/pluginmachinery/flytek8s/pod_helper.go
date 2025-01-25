@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -129,7 +130,67 @@ func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *c
 		new.GpuAccelerator = overrides.GetGpuAccelerator()
 	}
 
+	if overrides.GetSharedMemory() != nil {
+		new.SharedMemory = overrides.GetSharedMemory()
+	}
+
 	return new
+}
+
+func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedMemory *core.SharedMemory) error {
+	sharedMountName := SharedMemory.GetMountName()
+	sharedMountPath := SharedMemory.GetMountPath()
+	if sharedMountName == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount name is not set")
+	}
+	if sharedMountPath == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount path is not set")
+	}
+
+	var primaryContainer *v1.Container
+	for index, container := range podSpec.Containers {
+		if container.Name == primaryContainerName {
+			primaryContainer = &podSpec.Containers[index]
+		}
+	}
+	if primaryContainer == nil {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to find primary container")
+	}
+
+	for _, volume := range podSpec.Volumes {
+		if volume.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in pod spec", sharedMountName)
+		}
+	}
+
+	for _, volume_mount := range primaryContainer.VolumeMounts {
+		if volume_mount.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in container", sharedMountName)
+		}
+		if volume_mount.MountPath == sharedMountPath {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "%s is already mounted in container", sharedMountPath)
+		}
+	}
+
+	var quantity resource.Quantity
+	var err error
+	if SharedMemory.GetSizeLimit() != "" {
+		quantity, err = resource.ParseQuantity(SharedMemory.GetSizeLimit())
+		if err != nil {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to parse size limit: %v", err.Error())
+		}
+	}
+
+	podSpec.Volumes = append(
+		podSpec.Volumes,
+		v1.Volume{
+			Name:         sharedMountName,
+			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity}},
+		},
+	)
+	primaryContainer.VolumeMounts = append(primaryContainer.VolumeMounts, v1.VolumeMount{Name: sharedMountName, MountPath: sharedMountPath})
+
+	return nil
 }
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
@@ -427,6 +488,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+	}
+
+	// Shared memory volume
+	if extendedResources.GetSharedMemory() != nil {
+		err = ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory())
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	// Override container image if necessary

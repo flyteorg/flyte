@@ -1301,6 +1301,22 @@ pub mod gpu_accelerator {
         PartitionSize(::prost::alloc::string::String),
     }
 }
+/// Metadata associated with configuring a shared memory volume for a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SharedMemory {
+    /// Mount path to place in container
+    #[prost(string, tag="1")]
+    pub mount_path: ::prost::alloc::string::String,
+    /// Name for volume
+    #[prost(string, tag="2")]
+    pub mount_name: ::prost::alloc::string::String,
+    /// Size limit for shared memory. If not set, then the shared memory is equal
+    /// to the allocated memory.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub size_limit: ::prost::alloc::string::String,
+}
 /// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
 /// allocate to a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1310,6 +1326,8 @@ pub struct ExtendedResources {
     /// for multi-instance GPUs, the partition size to use.
     #[prost(message, optional, tag="1")]
     pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
+    #[prost(message, optional, tag="2")]
+    pub shared_memory: ::core::option::Option<SharedMemory>,
 }
 /// Runtime information. This is loosely defined to allow for extensibility.
 #[allow(clippy::derive_partial_eq_without_eq)]

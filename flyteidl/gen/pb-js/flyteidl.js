@@ -15117,6 +15117,150 @@
                 return GPUAccelerator;
             })();
     
+            core.SharedMemory = (function() {
+    
+                /**
+                 * Properties of a SharedMemory.
+                 * @memberof flyteidl.core
+                 * @interface ISharedMemory
+                 * @property {string|null} [mountPath] SharedMemory mountPath
+                 * @property {string|null} [mountName] SharedMemory mountName
+                 * @property {string|null} [sizeLimit] SharedMemory sizeLimit
+                 */
+    
+                /**
+                 * Constructs a new SharedMemory.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a SharedMemory.
+                 * @implements ISharedMemory
+                 * @constructor
+                 * @param {flyteidl.core.ISharedMemory=} [properties] Properties to set
+                 */
+                function SharedMemory(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * SharedMemory mountPath.
+                 * @member {string} mountPath
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.mountPath = "";
+    
+                /**
+                 * SharedMemory mountName.
+                 * @member {string} mountName
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.mountName = "";
+    
+                /**
+                 * SharedMemory sizeLimit.
+                 * @member {string} sizeLimit
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.sizeLimit = "";
+    
+                /**
+                 * Creates a new SharedMemory instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {flyteidl.core.ISharedMemory=} [properties] Properties to set
+                 * @returns {flyteidl.core.SharedMemory} SharedMemory instance
+                 */
+                SharedMemory.create = function create(properties) {
+                    return new SharedMemory(properties);
+                };
+    
+                /**
+                 * Encodes the specified SharedMemory message. Does not implicitly {@link flyteidl.core.SharedMemory.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {flyteidl.core.ISharedMemory} message SharedMemory message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                SharedMemory.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.mountPath != null && message.hasOwnProperty("mountPath"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.mountPath);
+                    if (message.mountName != null && message.hasOwnProperty("mountName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.mountName);
+                    if (message.sizeLimit != null && message.hasOwnProperty("sizeLimit"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.sizeLimit);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a SharedMemory message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.SharedMemory} SharedMemory
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                SharedMemory.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SharedMemory();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.mountPath = reader.string();
+                            break;
+                        case 2:
+                            message.mountName = reader.string();
+                            break;
+                        case 3:
+                            message.sizeLimit = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a SharedMemory message.
+                 * @function verify
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                SharedMemory.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.mountPath != null && message.hasOwnProperty("mountPath"))
+                        if (!$util.isString(message.mountPath))
+                            return "mountPath: string expected";
+                    if (message.mountName != null && message.hasOwnProperty("mountName"))
+                        if (!$util.isString(message.mountName))
+                            return "mountName: string expected";
+                    if (message.sizeLimit != null && message.hasOwnProperty("sizeLimit"))
+                        if (!$util.isString(message.sizeLimit))
+                            return "sizeLimit: string expected";
+                    return null;
+                };
+    
+                return SharedMemory;
+            })();
+    
             core.ExtendedResources = (function() {
     
                 /**
@@ -15124,6 +15268,7 @@
                  * @memberof flyteidl.core
                  * @interface IExtendedResources
                  * @property {flyteidl.core.IGPUAccelerator|null} [gpuAccelerator] ExtendedResources gpuAccelerator
+                 * @property {flyteidl.core.ISharedMemory|null} [sharedMemory] ExtendedResources sharedMemory
                  */
     
                 /**
@@ -15148,6 +15293,14 @@
                  * @instance
                  */
                 ExtendedResources.prototype.gpuAccelerator = null;
+    
+                /**
+                 * ExtendedResources sharedMemory.
+                 * @member {flyteidl.core.ISharedMemory|null|undefined} sharedMemory
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @instance
+                 */
+                ExtendedResources.prototype.sharedMemory = null;
     
                 /**
                  * Creates a new ExtendedResources instance using the specified properties.
@@ -15175,6 +15328,8 @@
                         writer = $Writer.create();
                     if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator"))
                         $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.sharedMemory != null && message.hasOwnProperty("sharedMemory"))
+                        $root.flyteidl.core.SharedMemory.encode(message.sharedMemory, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -15199,6 +15354,9 @@
                         case 1:
                             message.gpuAccelerator = $root.flyteidl.core.GPUAccelerator.decode(reader, reader.uint32());
                             break;
+                        case 2:
+                            message.sharedMemory = $root.flyteidl.core.SharedMemory.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -15222,6 +15380,11 @@
                         var error = $root.flyteidl.core.GPUAccelerator.verify(message.gpuAccelerator);
                         if (error)
                             return "gpuAccelerator." + error;
+                    }
+                    if (message.sharedMemory != null && message.hasOwnProperty("sharedMemory")) {
+                        var error = $root.flyteidl.core.SharedMemory.verify(message.sharedMemory);
+                        if (error)
+                            return "sharedMemory." + error;
                     }
                     return null;
                 };
