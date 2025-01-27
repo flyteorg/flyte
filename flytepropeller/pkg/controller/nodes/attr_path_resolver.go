@@ -184,6 +184,65 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}, nil
 	}
 
+	// Check if the current value is a primitive type, and if it is convert that to a literal scalar
+	if _, ok := currVal.(string); ok {
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_StringValue{
+								StringValue: currVal.(string),
+							},
+						},
+					},
+				},
+			},
+		}, nil
+	} else if _, ok := currVal.(int); ok {
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_Integer{
+								Integer: int64(currVal.(int)),
+							},
+						},
+					},
+				},
+			},
+		}, nil
+	} else if _, ok := currVal.(float64); ok {
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_FloatValue{
+								FloatValue: currVal.(float64),
+							},
+						},
+					},
+				},
+			},
+		}, nil
+	} else if _, ok := currVal.(bool); ok {
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Primitive{
+						Primitive: &core.Primitive{
+							Value: &core.Primitive_Boolean{
+								Boolean: currVal.(bool),
+							},
+						},
+					},
+				},
+			},
+		}, nil
+	}
+
 	// Marshal the current value to MessagePack bytes
 	resolvedBinaryBytes, err := msgpack.Marshal(currVal)
 	if err != nil {
