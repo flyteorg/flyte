@@ -5024,10 +5024,6 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("matchable resource failure", func(t *testing.T) {
 		resourceManager.ExpectedCalls = nil
-		executionManager := ExecutionManager{
-			resourceManager: &resourceManager,
-			config:          applicationConfig,
-		}
 		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
