@@ -36,6 +36,7 @@ func TestNewFailureNodeLookup(t *testing.T) {
 	assert.Equal(t, nl, typed.NodeLookup)
 	assert.Equal(t, en, typed.FailureNode)
 	assert.Equal(t, ns, typed.FailureNodeStatus)
+	assert.Equal(t, execErr, typed.OriginalError)
 }
 
 func TestNewTestFailureNodeLookup(t *testing.T) {

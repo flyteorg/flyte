@@ -22,6 +22,9 @@ func EqualLiteralType(t *testing.T, lt1 *core.LiteralType, lt2 *core.LiteralType
 	}
 	structure1 := lt1.GetStructure()
 	structure2 := lt2.GetStructure()
+	if (structure1 == nil && structure2 != nil) || (structure1 != nil && structure2 == nil) {
+		assert.FailNow(t, "One of the structures is nil while the other is not")
+	}
 	if structure1 != nil && structure2 != nil {
 		assert.Equal(t, structure1.GetTag(), structure2.GetTag())
 	}
