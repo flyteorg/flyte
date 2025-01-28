@@ -146,17 +146,16 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 	}
 
 	jobSpec := kubeflowv1.PyTorchJobSpec{}
-	if *workerReplicaSpec.Replicas <= 0 {
-		replicaSpecs := map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
-		}
-		if workerReplicaSpec != nil {
-			replicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker] = workerReplicaSpec
-		}
-		jobSpec = kubeflowv1.PyTorchJobSpec{
-			PyTorchReplicaSpecs: replicaSpecs,
-			RunPolicy: runPolicy,
-		}
+	replicaSpecs := map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+		kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
+	}
+	if *workerReplicaSpec.Replicas > 0 {
+		replicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker] = workerReplicaSpec
+	}
+
+	jobSpec = kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: replicaSpecs,
+		RunPolicy:           runPolicy,
 	}
 
 	if elasticPolicy != nil {
