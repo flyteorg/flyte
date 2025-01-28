@@ -467,3 +467,74 @@ func TestResolve(t *testing.T) {
 	})
 
 }
+
+func TestResolveErrorInputLiteralData(t *testing.T) {
+	ctx := context.Background()
+	t.Run("ResolveErrorInputsLiteralData", func(t *testing.T) {
+		noneLiteral, _ := coreutils.MakeLiteral(nil)
+		inputLiterals := make(map[string]*core.Literal, 1)
+		inputLiterals["err"] = &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Union{
+						Union: &core.Union{
+							Value: noneLiteral,
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_NONE,
+								},
+								Structure: &core.TypeStructure{
+									Tag: "none",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		nID := "fn"
+		execErr := &core.ExecutionError{
+			Message: "node failure",
+		}
+		expectedLiterals := make(map[string]*core.Literal, 1)
+		errorLiteral, err := coreutils.MakeLiteral(&core.Error{Message: execErr.GetMessage(), FailedNodeId: nID})
+		assert.NoError(t, err)
+		expectedLiterals["err"] = &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Union{
+						Union: &core.Union{
+							Value: errorLiteral,
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_ERROR,
+								},
+								Structure: &core.TypeStructure{
+									Tag: "FlyteError",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		// Execute resolve
+		ResolveErrorInputLiteralData(ctx, inputLiterals, nID, execErr)
+		flyteassert.EqualLiterals(t, inputLiterals["err"], expectedLiterals["err"])
+	})
+}
+
+func TestResolveOnFailureNodeInput(t *testing.T) {
+	ctx := context.Background()
+	t.Run("ResolveWithNilInputs", func(t *testing.T) {
+		nID := "fn"
+		execErr := &core.ExecutionError{
+			Message: "node failure",
+		}
+		nilLiteralMap := &core.LiteralMap{
+			Literals: nil,
+		}
+		err := ResolveOnFailureNodeInput(ctx, nilLiteralMap, nID, execErr)
+		assert.Error(t, err)
+	})
+}

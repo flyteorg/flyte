@@ -203,7 +203,7 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 
 	failureNodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
-	failureNodeLookup := executors.NewFailureNodeLookup(w, failureNode, failureNodeStatus)
+	failureNodeLookup := executors.NewFailureNodeLookup(w, failureNode, failureNodeStatus, execErr)
 	state, handlerErr := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
 	c.updateExecutionStats(ctx, execcontext)
 
