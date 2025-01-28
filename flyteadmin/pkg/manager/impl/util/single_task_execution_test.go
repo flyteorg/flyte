@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -86,8 +87,8 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 
-	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+	mockNamedEntityManager := managerMocks.NamedEntityInterface{}
+	mockNamedEntityManager.EXPECT().UpdateNamedEntity(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 		assert.Equal(t, request.GetResourceType(), core.ResourceType_WORKFLOW)
 		assert.True(t, proto.Equal(request.GetId(), &admin.NamedEntityIdentifier{
 			Project: "flytekit",
@@ -98,10 +99,10 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			State: admin.NamedEntityState_SYSTEM_GENERATED,
 		}))
 		return &admin.NamedEntityUpdateResponse{}, nil
-	}
+	})
 
-	mockWorkflowManager := managerMocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+	mockWorkflowManager := managerMocks.WorkflowInterface{}
+	mockWorkflowManager.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 		assert.True(t, proto.Equal(request.GetId(), &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "flytekit",
@@ -218,8 +219,8 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	}
 	workflowID := uint(12)
 
-	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+	mockNamedEntityManager := managerMocks.NamedEntityInterface{}
+	mockNamedEntityManager.EXPECT().UpdateNamedEntity(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 		assert.Equal(t, request.GetResourceType(), core.ResourceType_LAUNCH_PLAN)
 		assert.True(t, proto.Equal(request.GetId(), &admin.NamedEntityIdentifier{
 			Project: "flytekit",
@@ -230,7 +231,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 			State: admin.NamedEntityState_SYSTEM_GENERATED,
 		}))
 		return &admin.NamedEntityUpdateResponse{}, nil
-	}
+	})
 
 	taskIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,

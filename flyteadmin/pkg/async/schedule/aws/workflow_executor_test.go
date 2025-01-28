@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -138,8 +139,8 @@ func TestGetActiveLaunchPlanVersion(t *testing.T) {
 		Version: "foo",
 	}
 
-	launchPlanManager := mocks.NewMockLaunchPlanManager()
-	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
+	launchPlanManager := mocks.LaunchPlanInterface{}
+	launchPlanManager.EXPECT().ListLaunchPlans(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, request.GetId()))
@@ -153,7 +154,7 @@ func TestGetActiveLaunchPlanVersion(t *testing.T) {
 				},
 			}, nil
 		})
-	testExecutor := newWorkflowExecutorForTest(nil, nil, launchPlanManager)
+	testExecutor := newWorkflowExecutorForTest(nil, nil, &launchPlanManager)
 	launchPlan, err := testExecutor.getActiveLaunchPlanVersion(launchPlanNamedIdentifier)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&launchPlanIdentifier, launchPlan.GetId()))
@@ -167,13 +168,13 @@ func TestGetActiveLaunchPlanVersion_ManagerError(t *testing.T) {
 	}
 
 	expectedErr := errors.New("expected error")
-	launchPlanManager := mocks.NewMockLaunchPlanManager()
-	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
+	launchPlanManager := mocks.LaunchPlanInterface{}
+	launchPlanManager.EXPECT().ListLaunchPlans(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
 			return nil, expectedErr
 		})
-	testExecutor := newWorkflowExecutorForTest(nil, nil, launchPlanManager)
+	testExecutor := newWorkflowExecutorForTest(nil, nil, &launchPlanManager)
 	_, err := testExecutor.getActiveLaunchPlanVersion(launchPlanIdentifier)
 	assert.EqualError(t, err, expectedErr.Error())
 }
@@ -229,9 +230,9 @@ func TestRun(t *testing.T) {
 	testSubscriber := pubsubtest.TestSubscriber{
 		JSONMessages: messages,
 	}
-	testExecutionManager := mocks.MockExecutionManager{}
+	testExecutionManager := mocks.ExecutionInterface{}
 	var messagesSeen int
-	testExecutionManager.SetCreateCallback(func(
+	testExecutionManager.EXPECT().CreateExecution(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(func(
 		ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (
 		*admin.ExecutionCreateResponse, error) {
 		assert.Equal(t, "project", request.GetProject())
@@ -239,13 +240,13 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "ar8fphnlc5wh9dksjncj", request.GetName())
 		if messagesSeen == 0 {
 			assert.Contains(t, request.GetInputs().GetLiterals(), testKickoffTime)
-			assert.Equal(t, testKickoffTimeProtoLiteral, request.GetInputs().GetLiterals()[testKickoffTime])
+			assert.True(t, proto.Equal(testKickoffTimeProtoLiteral, request.GetInputs().GetLiterals()[testKickoffTime]))
 		}
 		messagesSeen++
 		return &admin.ExecutionCreateResponse{}, nil
 	})
-	launchPlanManager := mocks.NewMockLaunchPlanManager()
-	launchPlanManager.(*mocks.MockLaunchPlanManager).SetListLaunchPlansCallback(
+	launchPlanManager := mocks.LaunchPlanInterface{}
+	launchPlanManager.EXPECT().ListLaunchPlans(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.ResourceListRequest) (
 			*admin.LaunchPlanList, error) {
 			assert.Equal(t, "project", request.GetId().GetProject())
@@ -280,7 +281,7 @@ func TestRun(t *testing.T) {
 				},
 			}, nil
 		})
-	testExecutor := newWorkflowExecutorForTest(&testSubscriber, &testExecutionManager, launchPlanManager)
+	testExecutor := newWorkflowExecutorForTest(&testSubscriber, &testExecutionManager, &launchPlanManager)
 	err := testExecutor.run()
 	assert.Len(t, messages, messagesSeen)
 	assert.Nil(t, err)

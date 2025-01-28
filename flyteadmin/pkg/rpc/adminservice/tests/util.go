@@ -7,14 +7,14 @@ import (
 )
 
 type NewMockAdminServerInput struct {
-	executionManager     *mocks.MockExecutionManager
-	launchPlanManager    *mocks.MockLaunchPlanManager
-	nodeExecutionManager *mocks.MockNodeExecutionManager
-	projectManager       *mocks.MockProjectManager
-	resourceManager      *mocks.MockResourceManager
-	taskManager          *mocks.MockTaskManager
-	workflowManager      *mocks.MockWorkflowManager
-	taskExecutionManager *mocks.MockTaskExecutionManager
+	executionManager     *mocks.ExecutionInterface
+	launchPlanManager    *mocks.LaunchPlanInterface
+	nodeExecutionManager *mocks.NodeExecutionInterface
+	projectManager       *mocks.ProjectInterface
+	resourceManager      *mocks.ResourceInterface
+	taskManager          *mocks.TaskInterface
+	workflowManager      *mocks.WorkflowInterface
+	taskExecutionManager *mocks.TaskExecutionInterface
 }
 
 func NewMockAdminServer(input NewMockAdminServerInput) *adminservice.AdminService {

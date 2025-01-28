@@ -6,6 +6,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+//go:generate mockery-v2 --name=TaskExecutionInterface --output=../mocks --case=underscore --with-expecter
+
 // Interface for managing Flyte Workflow TaskExecutions
 type TaskExecutionInterface interface {
 	CreateTaskExecutionEvent(ctx context.Context, request *admin.TaskExecutionEventRequest) (

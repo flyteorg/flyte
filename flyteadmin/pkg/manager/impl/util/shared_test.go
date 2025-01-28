@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -485,8 +486,8 @@ func TestGetMatchableResource(t *testing.T) {
 	domain := "dummyDomain"
 	workflow := "dummyWorkflow"
 	t.Run("successful fetch", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -502,15 +503,15 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
 		assert.Nil(t, err)
 	})
 	t.Run("successful fetch workflow matchable", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -527,7 +528,7 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, workflow)
 		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
@@ -535,8 +536,8 @@ func TestGetMatchableResource(t *testing.T) {
 	})
 
 	t.Run("not found", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -544,15 +545,15 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "resource not found")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.Nil(t, err)
 	})
 
 	t.Run("internal error", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -560,7 +561,7 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.NotNil(t, err)
