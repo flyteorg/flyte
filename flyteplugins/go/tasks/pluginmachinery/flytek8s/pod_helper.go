@@ -289,7 +289,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate.GetPodSpec() != nil {
+		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
 			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
