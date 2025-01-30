@@ -746,7 +746,7 @@ func TestReplicaCounts(t *testing.T) {
 		contains           []commonOp.ReplicaType
 		notContains        []commonOp.ReplicaType
 	}{
-		{"NoWorkers", 0, true, nil, nil},
+		{"NoWorkers", 0, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster}, []commonOp.ReplicaType{}},
 		{"Works", 1, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster, kubeflowv1.PyTorchJobReplicaTypeWorker}, []commonOp.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -1266,7 +1266,7 @@ func TestBuildResourcePytorchV1WithDifferentWorkersNumber(t *testing.T) {
 			pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
 			assert.True(t, ok)
 
-			if taskConfig.WorkerReplicas.Replicas == 0 {
+			if taskConfig.GetWorkerReplicas().GetReplicas() == 0 {
 				// Should only contain master spec
 				assert.Equal(t, 1, len(pytorchJob.Spec.PyTorchReplicaSpecs))
 				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
