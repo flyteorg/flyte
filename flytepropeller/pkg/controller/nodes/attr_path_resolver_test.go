@@ -566,10 +566,11 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 			expected: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
-						Value: &core.Scalar_Binary{
-							Binary: &core.Binary{
-								Value: toMsgpackBytes(1),
-								Tag:   "msgpack",
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 1,
+								},
 							},
 						},
 					},
@@ -589,10 +590,11 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 			expected: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
-						Value: &core.Scalar_Binary{
-							Binary: &core.Binary{
-								Value: toMsgpackBytes(2.1),
-								Tag:   "msgpack",
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_FloatValue{
+									FloatValue: 2.1,
+								},
 							},
 						},
 					},
@@ -612,10 +614,11 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 			expected: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
-						Value: &core.Scalar_Binary{
-							Binary: &core.Binary{
-								Value: toMsgpackBytes("Hello, Flyte"),
-								Tag:   "msgpack",
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_StringValue{
+									StringValue: "Hello, Flyte",
+								},
 							},
 						},
 					},
@@ -635,10 +638,11 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 			expected: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
-						Value: &core.Scalar_Binary{
-							Binary: &core.Binary{
-								Value: toMsgpackBytes(false),
-								Tag:   "msgpack",
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Boolean{
+									Boolean: false,
+								},
 							},
 						},
 					},
@@ -1432,7 +1436,7 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 		} else {
 			var expectedValue, actualValue any
 
-			// Helper function to unmarshal a Binary Literal into an any
+			// Helper function to unmarshal a Binary Literal into an any or a primitive type
 			unmarshalBinaryLiteral := func(literal *core.Literal) (any, error) {
 				if scalar, ok := literal.GetValue().(*core.Literal_Scalar); ok {
 					if binary, ok := scalar.Scalar.GetValue().(*core.Scalar_Binary); ok {
@@ -1440,8 +1444,21 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 						err := msgpack.Unmarshal(binary.Binary.GetValue(), &value)
 						return value, err
 					}
+					if primitive, ok := scalar.Scalar.GetValue().(*core.Scalar_Primitive); ok {
+						if str, ok := primitive.Primitive.GetValue().(*core.Primitive_StringValue); ok {
+							return str.StringValue, nil
+						} else if integer, ok := primitive.Primitive.GetValue().(*core.Primitive_Integer); ok {
+							return integer.Integer, nil
+						} else if boolean, ok := primitive.Primitive.GetValue().(*core.Primitive_Boolean); ok {
+							return boolean.Boolean, nil
+						} else if float, ok := primitive.Primitive.GetValue().(*core.Primitive_FloatValue); ok {
+							return float.FloatValue, nil
+						} else {
+							return nil, fmt.Errorf("invalid primitive")
+						}
+					}
 				}
-				return nil, fmt.Errorf("literal is not a Binary Scalar")
+				return nil, fmt.Errorf("invalid literal")
 			}
 
 			if arg.expected.GetCollection() != nil {
@@ -1462,9 +1479,17 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 				}
 			}
 
-			// Deeply compare the expected and actual values, ignoring map ordering
-			if !reflect.DeepEqual(expectedValue, actualValue) {
-				t.Fatalf("Test case %d: Expected %+v, but got %+v", i, expectedValue, actualValue)
+			// special-case int64 and uint for comparison because msgpack unmarshals int64 as int64 and uint8 as uint8
+			if expectedValueInt, ok := expectedValue.(int64); ok {
+				if actualValueInt, ok := actualValue.(uint8); ok {
+					// Compare the int64 and uint8 values
+					if expectedValueInt != int64(actualValueInt) {
+						t.Fatalf("Test case %d: Expected %v, but got %v", i, expectedValueInt, actualValueInt)
+					}
+				}
+				// Deeply compare the expected and actual values, ignoring map ordering
+			} else if !reflect.DeepEqual(expectedValue, actualValue) {
+				t.Fatalf("Test case %d: %+v %+v Expected %+v, but got %+v", i, reflect.TypeOf(expectedValue), reflect.TypeOf(actualValue), expectedValue, actualValue)
 			}
 		}
 	}
