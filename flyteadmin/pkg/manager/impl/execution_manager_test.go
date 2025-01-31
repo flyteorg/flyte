@@ -34,6 +34,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -4574,12 +4575,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	rmInterruptible := false
 	rmOverwriteCache := false
 
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
 	executionManager := ExecutionManager{
 		resourceManager: &resourceManager,
 		config:          applicationConfig,
 	}
-	resourceManager.GetResourceFunc = func(ctx context.Context,
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		// two requests will be made, one with empty domain and one with filled in domain
 		assert.Contains(t, []managerInterfaces.ResourceRequest{{
@@ -4627,7 +4628,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			return projectResponse, nil
 		}
 		return projectDomainResponse, nil
-	}
+	})
 
 	t.Run("request with full config", func(t *testing.T) {
 		request := &admin.ExecutionCreateRequest{
@@ -4832,7 +4833,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource partial config", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -4858,7 +4860,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.GetProject(),
 			Domain:  workflowIdentifier.GetDomain(),
@@ -4879,7 +4881,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource with no config", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -4896,7 +4899,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.GetProject(),
 			Domain:  workflowIdentifier.GetDomain(),
@@ -4917,7 +4920,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("fetch security context from deprecated config", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -4935,7 +4939,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.GetProject(),
 			Domain:  workflowIdentifier.GetDomain(),
@@ -4960,7 +4964,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource workflow resource", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		executionManager := ExecutionManager{
+			resourceManager: &resourceManager,
+			config:          applicationConfig,
+		}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -4989,7 +4998,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.GetProject(),
 			Domain:  workflowIdentifier.GetDomain(),
@@ -5014,7 +5023,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Nil(t, execConfig.GetEnvs())
 	})
 	t.Run("matchable resource failure", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -5025,7 +5035,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
 			}, request)
 			return nil, fmt.Errorf("failed to fetch the resources")
-		}
+		})
 		request := &admin.ExecutionCreateRequest{
 			Project: workflowIdentifier.GetProject(),
 			Domain:  workflowIdentifier.GetDomain(),
@@ -5046,7 +5056,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 
 	t.Run("application configuration", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager.ExpectedCalls = nil
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.Contains(t, []managerInterfaces.ResourceRequest{{
 				Project:      workflowIdentifier.GetProject(),
@@ -5063,12 +5074,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		executionManager.config.ApplicationConfiguration().GetTopLevelConfig().Interruptible = true
 		executionManager.config.ApplicationConfiguration().GetTopLevelConfig().OverwriteCache = true
 
 		t.Run("request with interruptible override disabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5087,6 +5104,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request with interruptible override enabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5105,6 +5128,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request with no interruptible override specified", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5121,6 +5150,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("launch plan with interruptible override disabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5143,6 +5178,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("launch plan with interruptible override enabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5169,6 +5210,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Equal(t, "bar", execConfig.GetEnvs().GetValues()[0].GetValue())
 		})
 		t.Run("launch plan with no interruptible override specified", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5189,6 +5236,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request and launch plan with different interruptible overrides", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5213,6 +5266,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request with skip cache override enabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5231,6 +5290,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request with no skip cache override specified", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5247,6 +5312,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("launch plan with skip cache override enabled", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5269,6 +5340,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("launch plan with no skip cache override specified", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5289,6 +5366,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 			assert.Nil(t, execConfig.GetAnnotations())
 		})
 		t.Run("request and launch plan with different skip cache overrides", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
@@ -5314,6 +5397,12 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		})
 
 		t.Run("test pick up security context from admin system config", func(t *testing.T) {
+			resourceManager.ExpectedCalls = nil
+			resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
+			executionManager := ExecutionManager{
+				resourceManager: &resourceManager,
+				config:          applicationConfig,
+			}
 			executionManager.config.ApplicationConfiguration().GetTopLevelConfig().K8SServiceAccount = "flyte-test"
 			request := &admin.ExecutionCreateRequest{
 				Project: workflowIdentifier.GetProject(),
@@ -5329,8 +5418,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 }
 
 func TestGetExecutionConfig(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
-	resourceManager.GetResourceFunc = func(ctx context.Context,
+	resourceManager := managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		assert.Contains(t, []managerInterfaces.ResourceRequest{{
 			Project:      workflowIdentifier.GetProject(),
@@ -5350,7 +5439,7 @@ func TestGetExecutionConfig(t *testing.T) {
 				},
 			},
 		}, nil
-	}
+	})
 
 	applicationConfig := runtime.NewConfigurationProvider()
 	executionManager := ExecutionManager{
@@ -5368,11 +5457,11 @@ func TestGetExecutionConfig(t *testing.T) {
 }
 
 func TestGetExecutionConfig_Spec(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
-	resourceManager.GetResourceFunc = func(ctx context.Context,
+	resourceManager := managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		return nil, nil
-	}
+	})
 	applicationConfig := runtime.NewConfigurationProvider()
 	executionManager := ExecutionManager{
 		resourceManager: &resourceManager,
@@ -5409,11 +5498,11 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 	assert.Equal(t, int32(50), execConfig.GetMaxParallelism())
 	assert.True(t, execConfig.GetOverwriteCache())
 
-	resourceManager = managerMocks.MockResourceManager{}
-	resourceManager.GetResourceFunc = func(ctx context.Context,
+	resourceManager = managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		return nil, nil
-	}
+	})
 	executionManager = ExecutionManager{
 		resourceManager: &resourceManager,
 		config:          applicationConfig,
@@ -5435,8 +5524,8 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 
 func TestGetClusterAssignment(t *testing.T) {
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
-	resourceManager := managerMocks.MockResourceManager{}
-	resourceManager.GetResourceFunc = func(ctx context.Context,
+	resourceManager := managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 			Project:      workflowIdentifier.GetProject(),
@@ -5450,7 +5539,7 @@ func TestGetClusterAssignment(t *testing.T) {
 				},
 			},
 		}, nil
-	}
+	})
 
 	executionManager := ExecutionManager{
 		resourceManager: &resourceManager,
@@ -5475,8 +5564,10 @@ func TestGetClusterAssignment(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
 		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
 
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 		executionManager := ExecutionManager{
-			resourceManager: &managerMocks.MockResourceManager{},
+			resourceManager: &resourceManager,
 			config:          mockConfig,
 		}
 
@@ -5502,9 +5593,11 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 	t.Run("no value in DB nor in config, takes value from request", func(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 
 		executionManager := ExecutionManager{
-			resourceManager: &managerMocks.MockResourceManager{},
+			resourceManager: &resourceManager,
 			config:          mockConfig,
 		}
 
@@ -5529,8 +5622,10 @@ func TestGetClusterAssignment(t *testing.T) {
 		mockConfig := getMockExecutionsConfigProvider()
 		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
 
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 		executionManager := ExecutionManager{
-			resourceManager: &managerMocks.MockResourceManager{},
+			resourceManager: &resourceManager,
 			config:          mockConfig,
 		}
 
@@ -5561,7 +5656,8 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 	t.Run("db error", func(t *testing.T) {
 		expected := errors.New("fail db")
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      workflowIdentifier.GetProject(),
@@ -5575,6 +5671,9 @@ func TestGetClusterAssignment(t *testing.T) {
 					},
 				},
 			}, expected
+		})
+		executionManager := ExecutionManager{
+			resourceManager: &resourceManager,
 		}
 
 		_, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{

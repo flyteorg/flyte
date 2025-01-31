@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -16,8 +17,8 @@ import (
 func TestCreateLaunchPlanHappyCase(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetCreateCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 			return &admin.LaunchPlanCreateResponse{}, nil
@@ -43,8 +44,8 @@ func TestCreateLaunchPlanHappyCase(t *testing.T) {
 func TestCreateLaunchPlanError(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetCreateCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.GetId())
@@ -71,8 +72,8 @@ func TestCreateLaunchPlanError(t *testing.T) {
 func TestGetActiveLaunchPlan(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().GetActiveLaunchPlan(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return &admin.LaunchPlan{}, nil
@@ -96,8 +97,8 @@ func TestGetActiveLaunchPlan(t *testing.T) {
 func TestGetActiveLaunchPlan_Error(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().GetActiveLaunchPlan(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return nil, errors.GetInvalidInputError("invalid input")
@@ -121,8 +122,8 @@ func TestGetActiveLaunchPlan_Error(t *testing.T) {
 func TestListActiveLaunchPlans(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().ListActiveLaunchPlans(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return &admin.LaunchPlanList{}, nil
@@ -143,8 +144,8 @@ func TestListActiveLaunchPlans(t *testing.T) {
 func TestListActiveLaunchPlans_Error(t *testing.T) {
 	ctx := context.Background()
 
-	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
-	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
+	mockLaunchPlanManager := mocks.LaunchPlanInterface{}
+	mockLaunchPlanManager.EXPECT().ListActiveLaunchPlans(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return nil, errors.GetInvalidInputError("oops")

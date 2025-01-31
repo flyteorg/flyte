@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -33,8 +34,8 @@ func TestNewService(t *testing.T) {
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{
 		Upload: config.DataProxyUploadConfig{},
 	}, nodeExecutionManager, dataStore, taskExecutionManager)
@@ -59,8 +60,8 @@ func Test_createStorageLocation(t *testing.T) {
 func TestCreateUploadLocation(t *testing.T) {
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, dataStore, taskExecutionManager)
 	assert.NoError(t, err)
 	t.Run("No project/domain", func(t *testing.T) {
@@ -113,8 +114,8 @@ func TestCreateUploadLocationMore(t *testing.T) {
 	}
 
 	assert.NoError(t, err)
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, &ds, taskExecutionManager)
 	assert.NoError(t, err)
 
@@ -171,15 +172,15 @@ func (t testMetadata) Exists() bool {
 
 func TestCreateDownloadLink(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	nodeExecutionManager.SetGetNodeExecutionFunc(func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	nodeExecutionManager.EXPECT().GetNodeExecution(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 		return &admin.NodeExecution{
 			Closure: &admin.NodeExecutionClosure{
 				DeckUri: "s3://something/something",
 			},
 		}, nil
 	})
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 
 	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, nodeExecutionManager, dataStore, taskExecutionManager)
 	assert.NoError(t, err)
@@ -262,8 +263,8 @@ func TestCreateDownloadLink(t *testing.T) {
 
 func TestCreateDownloadLocation(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, nodeExecutionManager, dataStore, taskExecutionManager)
 	assert.NoError(t, err)
 
@@ -300,8 +301,8 @@ func TestCreateDownloadLocation(t *testing.T) {
 
 func TestService_GetData(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, dataStore, taskExecutionManager)
 	assert.NoError(t, err)
 
@@ -340,7 +341,7 @@ func TestService_GetData(t *testing.T) {
 		},
 	}
 
-	nodeExecutionManager.SetGetNodeExecutionDataFunc(
+	nodeExecutionManager.EXPECT().GetNodeExecutionData(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 			return &admin.NodeExecutionGetDataResponse{
 				FullInputs:  inputsLM,
@@ -348,7 +349,7 @@ func TestService_GetData(t *testing.T) {
 			}, nil
 		},
 	)
-	taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+	taskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 		return &admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{
 				{
@@ -374,7 +375,7 @@ func TestService_GetData(t *testing.T) {
 			},
 		}, nil
 	})
-	taskExecutionManager.SetGetTaskExecutionDataCallback(func(ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
+	taskExecutionManager.EXPECT().GetTaskExecutionData(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 		return &admin.TaskExecutionGetDataResponse{
 			FullInputs:  inputsLM,
 			FullOutputs: outputsLM,
@@ -441,13 +442,13 @@ func TestService_GetData(t *testing.T) {
 
 func TestService_Error(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
-	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	taskExecutionManager := &mocks.MockTaskExecutionManager{}
+	nodeExecutionManager := &mocks.NodeExecutionInterface{}
+	taskExecutionManager := &mocks.TaskExecutionInterface{}
 	s, err := NewService(config.DataProxyConfig{}, nodeExecutionManager, dataStore, taskExecutionManager)
 	assert.NoError(t, err)
 
 	t.Run("get a working set of urls without retry attempt", func(t *testing.T) {
-		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+		taskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return nil, errors.NewFlyteAdminErrorf(1, "not found")
 		})
 		nodeExecID := &core.NodeExecutionIdentifier{
@@ -463,7 +464,7 @@ func TestService_Error(t *testing.T) {
 	})
 
 	t.Run("get a working set of urls without retry attempt", func(t *testing.T) {
-		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+		taskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return &admin.TaskExecutionList{
 				TaskExecutions: nil,
 				Token:          "",

@@ -7,6 +7,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+//go:generate mockery-v2 --name=ExecutionInterface --output=../mocks --case=underscore --with-expecter
+
 // Interface for managing Flyte Workflow Executions
 type ExecutionInterface interface {
 	CreateExecution(ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (
