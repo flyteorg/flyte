@@ -38,6 +38,10 @@ if [ -n "$FLYTESNACKS_LOCAL_PATH" ]; then
   DOCKER_ENV+=("--env" "FLYTESNACKS_LOCAL_PATH=/flytesnacks")
 fi
 
+if [ -n "$DOCSEARCH_API_KEY" ]; then
+  DOCKER_ENV+=("--env" "DOCSEARCH_API_KEY=$DOCSEARCH_API_KEY")
+fi
+
 DOCKER_CMD=("docker" "run" "--platform" "linux/amd64" "--rm" "--pull" "never" "${DOCKER_ENV[@]}" "${DOCKER_PORT_MAPPING[@]}" "${DOCKER_VOLUME_MAPPING[@]}" "flyte-dev-docs:latest" "${BUILD_CMD[@]}")
 
 echo "${DOCKER_CMD[*]}"
