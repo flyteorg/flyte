@@ -228,6 +228,7 @@ type ImageBuilderConfig struct {
 	HostnameReplacement    HostnameReplacement  `json:"hostnameReplacement"`
 	LabelSelector          metav1.LabelSelector `json:"labelSelector"`
 	ExcludedContainerNames []string             `json:"excludedContainerNames"`
+	ExcludedImagePrefixes  []string             `json:"excludedImagePrefixes"`
 }
 
 func GetConfig() *Config {

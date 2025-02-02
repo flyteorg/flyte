@@ -1894,7 +1894,7 @@ database.SQLiteConfig
 file (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created
+The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be reused, else a new will be created
 
 **Default Value**: 
 

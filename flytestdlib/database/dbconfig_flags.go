@@ -63,6 +63,6 @@ func (cfg DbConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.passwordPath"), defaultConfig.Postgres.PasswordPath, "Points to the file containing the database password.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.options"), defaultConfig.Postgres.ExtraOptions, "See http://gorm.io/docs/connecting_to_the_database.html for available options passed,  in addition to the above.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "postgres.debug"), defaultConfig.Postgres.Debug, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "sqlite.file"), defaultConfig.SQLite.File, "The path to the file (existing or new) where the DB should be created / stored. If existing,  then this will be re-used,  else a new will be created")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "sqlite.file"), defaultConfig.SQLite.File, "The path to the file (existing or new) where the DB should be created / stored. If existing,  then this will be reused,  else a new will be created")
 	return cmdFlags
 }

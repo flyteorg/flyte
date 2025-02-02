@@ -197,11 +197,11 @@ func (i ImageBuilderMutatorV1) replaceV1Hostname(ctx context.Context, c *corev1.
 // Validates non versioned URI formats as version 1 for backwards compatibility
 // Returns true if the image is authorized, false otherwise
 func (i ImageBuilderMutatorV1) verifyV1Prefix(ctx context.Context, containerImage string, targetHostname string, podNamespace string) bool {
-	// Note, theoeretically, Prefix Tree is a better datastructure to use here, but the number of prefixes is small
+	// Note, theoretically, Prefix Tree is a better data structure to use here, but the number of prefixes is small
 	// Consider using if the number of prefixes grows significantly.
 	orgPart := fmt.Sprintf(v1OrgsPart, podNamespace)
 	validPrefixes := []string{
-		// Support versionless URIs for V1. This is for backward compatibility with pre-versioned URI formats.
+		// Support version-less URIs for V1. This is for backward compatibility with pre-versioned URI formats.
 		fmt.Sprintf("%s/%s", targetHostname, orgPart),
 		fmt.Sprintf("%s/%s/%s", targetHostname, version1URIPart, orgPart),
 	}
@@ -263,6 +263,8 @@ func NewImageBuilderMutator(cfg *config.ImageBuilderConfig, scope promutils.Scop
 		// Support version 1 URI formats
 		validPrefixes[ip+len(parts)] = fmt.Sprintf("%s/%s/%s", cfg.HostnameReplacement.Replacement, version1URIPart, part)
 	}
+
+	validPrefixes = append(validPrefixes, cfg.ExcludedImagePrefixes...)
 
 	return &ImageBuilderMutatorV1{
 		hostnameReplacement: cfg.HostnameReplacement,
