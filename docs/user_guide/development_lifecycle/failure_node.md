@@ -42,7 +42,8 @@ Create a task that will be executed if any of the tasks in the workflow fail:
 Specify the `on_failure` to a cleanup task. This task will be executed if any of the tasks in the workflow fail:
 
 :::{note}
-The input of `clean_up` should be the exact same as the input of the workflow.
+The inputs of `clean_up` must exactly match the workflow's inputs. Additionally, the `err` parameter will be 
+populated with the error message encountered during execution.
 :::
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/failure_node.py
