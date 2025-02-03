@@ -91,7 +91,7 @@ pyflyte run --remote hello_world.py hello_world_wf
 
 **Do you want to see more but don't want to install anything?**
 
-Head over to https://sandbox.union.ai/. It allows you to experiment with Flyte's capabilities from a hosted Jupyter notebook.
+[Try out the Union platform](https://signup.union.ai) built on top of Flyte, and get free access to GPUs, data lineage, and more!
 
 **Ready to productionize?**
 
