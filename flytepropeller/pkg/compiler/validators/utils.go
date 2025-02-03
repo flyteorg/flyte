@@ -275,7 +275,7 @@ func (t blobInstanceChecker) isInstance(lit *core.Literal) bool {
 		return true
 	}
 
-	return blobType.GetFormat() == t.literalType.GetBlob().GetFormat()
+	return blobType.GetFormat() == t.literalType.GetBlob().GetFormat() && blobType.GetDimensionality() == t.literalType.GetBlob().GetDimensionality()
 }
 
 type schemaInstanceChecker struct {
