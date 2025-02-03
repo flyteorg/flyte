@@ -33,6 +33,8 @@ If you are using a managed deployment of Flyte, you will need to contact your de
   - Configuring your Flyte deployment for the SnowFlake agent.
 * - {ref}`OpenAI Batch <deployment-agent-setup-openai-batch>`
   - Submit requests to OpenAI GPT models for asynchronous batch processing.
+* - {ref}`LinkedIn K8s Service Batch <deployment-agent-setup-k8sservice>`
+  - Configuring your Flyte deployment for the K8s service agent.
 ```
 
 ```{toctree}
@@ -49,4 +51,5 @@ sagemaker_inference
 sensor
 snowflake
 openai_batch
+k8sservice
 ```

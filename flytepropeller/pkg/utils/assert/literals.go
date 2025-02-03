@@ -9,6 +9,27 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+func EqualLiteralType(t *testing.T, lt1 *core.LiteralType, lt2 *core.LiteralType) {
+	if !assert.Equal(t, lt1 == nil, lt2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	assert.Equal(t, reflect.TypeOf(lt1.GetType()), reflect.TypeOf(lt2.GetType()))
+	switch lt1.GetType().(type) {
+	case *core.LiteralType_Simple:
+		assert.Equal(t, lt1.GetType().(*core.LiteralType_Simple).Simple, lt2.GetType().(*core.LiteralType_Simple).Simple)
+	default:
+		assert.FailNow(t, "Not yet implemented for types %v", reflect.TypeOf(lt1.GetType()))
+	}
+	structure1 := lt1.GetStructure()
+	structure2 := lt2.GetStructure()
+	if (structure1 == nil && structure2 != nil) || (structure1 != nil && structure2 == nil) {
+		assert.FailNow(t, "One of the structures is nil while the other is not")
+	}
+	if structure1 != nil && structure2 != nil {
+		assert.Equal(t, structure1.GetTag(), structure2.GetTag())
+	}
+}
+
 func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {
 	if !assert.Equal(t, p1 == nil, p2 == nil) {
 		assert.FailNow(t, "One of the values is nil")
@@ -27,6 +48,23 @@ func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {
 	}
 }
 
+func EqualError(t *testing.T, e1 *core.Error, e2 *core.Error) {
+	if !assert.Equal(t, e1 == nil, e2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	assert.Equal(t, e1.GetMessage(), e2.GetMessage())
+	assert.Equal(t, e1.GetFailedNodeId(), e2.GetFailedNodeId())
+}
+
+func EqualUnion(t *testing.T, u1 *core.Union, u2 *core.Union) {
+	if !assert.Equal(t, u1 == nil, u2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	assert.Equal(t, reflect.TypeOf(u1.GetValue()), reflect.TypeOf(u2.GetValue()))
+	EqualLiterals(t, u1.GetValue(), u2.GetValue())
+	EqualLiteralType(t, u1.GetType(), u2.GetType())
+}
+
 func EqualScalar(t *testing.T, p1 *core.Scalar, p2 *core.Scalar) {
 	if !assert.Equal(t, p1 == nil, p2 == nil) {
 		assert.FailNow(t, "One of the values is nil")
@@ -38,6 +76,10 @@ func EqualScalar(t *testing.T, p1 *core.Scalar, p2 *core.Scalar) {
 	switch p1.GetValue().(type) {
 	case *core.Scalar_Primitive:
 		EqualPrimitive(t, p1.GetPrimitive(), p2.GetPrimitive())
+	case *core.Scalar_Error:
+		EqualError(t, p1.GetError(), p2.GetError())
+	case *core.Scalar_Union:
+		EqualUnion(t, p1.GetUnion(), p2.GetUnion())
 	default:
 		assert.FailNow(t, "Not yet implemented for types %v", reflect.TypeOf(p1.GetValue()))
 	}
