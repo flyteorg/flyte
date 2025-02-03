@@ -747,7 +747,7 @@ func TestReplicaCounts(t *testing.T) {
 		contains           []commonOp.ReplicaType
 		notContains        []commonOp.ReplicaType
 	}{
-		{"NoWorkers", 0, true, nil, nil},
+		{"NoWorkers", 0, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster}, []commonOp.ReplicaType{}},
 		{"Works", 1, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster, kubeflowv1.PyTorchJobReplicaTypeWorker}, []commonOp.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -1211,29 +1211,88 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 	}
 }
 
-func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
+func TestBuildResourcePytorchV1WithDifferentWorkersNumber(t *testing.T) {
 	taskConfigs := []*kfplugins.DistributedPyTorchTrainingTask{
 		{
+			// Test case 1: Zero workers - should only have master
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
 				Replicas: 0,
 			},
+			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+				Image: testImageMaster,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
+				},
+			},
 		},
 		{
+			// Test case 2: One worker - should have both master and worker
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
-					Replicas: 0,
+				Replicas: 1,
+			},
+			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+				Image: testImageMaster,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
 				},
 			},
 		},
 	}
 
-	for _, taskConfig := range taskConfigs {
-		pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	for i, taskConfig := range taskConfigs {
+		t.Run(fmt.Sprintf("Case %d", i+1), func(t *testing.T) {
+			pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
-		taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
-		taskTemplate.TaskTypeVersion = 1
-		_, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
-		assert.Error(t, err)
+			taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
+			taskTemplate.TaskTypeVersion = 1
+
+			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+			assert.NoError(t, err)
+			assert.NotNil(t, res)
+
+			pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
+			assert.True(t, ok)
+
+			if taskConfig.GetWorkerReplicas().GetReplicas() == 0 {
+				// Should only contain master spec
+				assert.Equal(t, 1, len(pytorchJob.Spec.PyTorchReplicaSpecs))
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
+				assert.NotContains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
+
+				// Verify master spec details
+				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
+				assert.Equal(t, int32(1), *masterSpec.Replicas)
+				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
+			} else {
+				// Should contain both master and worker specs
+				assert.Equal(t, 2, len(pytorchJob.Spec.PyTorchReplicaSpecs))
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
+
+				// Verify master spec details
+				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
+				assert.Equal(t, int32(1), *masterSpec.Replicas)
+				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
+
+				// Verify worker spec details
+				workerSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker]
+				assert.Equal(t, int32(1), *workerSpec.Replicas)
+			}
+		})
 	}
 }
 
