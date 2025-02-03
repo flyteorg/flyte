@@ -60,5 +60,6 @@ For feedback at any point in the contribution process, feel free to reach out to
     :hidden:
 
     Contributing code <contribute_code>
+    Contributing integrations <contribute_integrations>
     Contributing docs <contribute_docs>
     Contributing tutorials or integrations examples <contribute_examples>
