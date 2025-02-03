@@ -995,7 +995,7 @@ agent-service (`agent.Config`_)
   agentForTaskTypes: null
   agents: null
   defaultAgent:
-    defaultServiceConfig: ""
+    defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
     defaultTimeout: 10s
     endpoint: ""
     insecure: true
@@ -1557,7 +1557,7 @@ The default agent.
 
 .. code-block:: yaml
 
-  defaultServiceConfig: ""
+  defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
   defaultTimeout: 10s
   endpoint: ""
   insecure: true
@@ -1639,7 +1639,7 @@ defaultServiceConfig (string)
 
 .. code-block:: yaml
 
-  ""
+  '{"loadBalancingConfig": [{"round_robin":{}}]}'
   
 
 timeouts (map[string]config.Duration)
