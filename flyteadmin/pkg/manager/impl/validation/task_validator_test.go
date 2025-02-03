@@ -46,7 +46,7 @@ func TestValidateTask(t *testing.T) {
 	request.Spec.Template.GetContainer().Resources = &core.Resources{Requests: resources}
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
 		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
-	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 
 	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{}}
 	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
@@ -58,7 +58,7 @@ func TestValidateTask(t *testing.T) {
 	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{PodSpec: transformStructToStructPB(t, podSpec)}}
 	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
 		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
-	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 
 	resourceList = corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("200m")}
 	podSpec = &corev1.PodSpec{Containers: []corev1.Container{{Resources: corev1.ResourceRequirements{Requests: resourceList}}}}
@@ -418,7 +418,7 @@ func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		})
-	assert.EqualError(t, err, "Requested CPU limit [1536Mi] is greater than current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested CPU limit [1536Mi] is greater than current limit set in the platform configuration [1Gi]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 }
 
 func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
@@ -433,7 +433,7 @@ func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [1Gi]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [1Gi]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 }
 
 func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
@@ -472,7 +472,7 @@ func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		})
-	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 }
 
 func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
@@ -487,7 +487,7 @@ func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. Please contact Flyte Admins to change these limits or consult the configuration")
+	assert.EqualError(t, err, "Requested GPU default [2] is greater than current limit set in the platform configuration [1]. For more details, visit: https://docs.union.ai/byoc/user-guide/core-concepts/tasks/task-hardware-environment/customizing-task-resources#execution-defaults-and-resource-quotas")
 }
 
 func TestIsWholeNumber(t *testing.T) {

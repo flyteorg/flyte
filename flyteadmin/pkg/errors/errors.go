@@ -70,6 +70,13 @@ func NewFlyteAdminErrorf(code codes.Code, format string, a ...interface{}) Flyte
 	return NewFlyteAdminError(code, fmt.Sprintf(format, a...))
 }
 
+func NewFlyteAdminErrorWithDoc(code codes.Code, docKey DocKey, format string, a ...interface{}) FlyteAdminError {
+	message := fmt.Sprintf(format, a...)
+	link := GetDocLink(docKey)
+	fullMessage := fmt.Sprintf("%s. For more details, visit: %s", message, link)
+	return NewFlyteAdminError(code, fullMessage)
+}
+
 func toStringSlice(errors []error) []string {
 	errSlice := make([]string, len(errors))
 	for idx, err := range errors {

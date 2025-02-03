@@ -251,16 +251,16 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 			platformLimit, platformLimitOk := platformTaskResourceLimits[resourceName]
 			if ok && platformLimitOk && limitQuantity.Value() > platformLimit.Value() {
 				// Also check that the requested limit is less than the platform task limit.
-				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+				return errors.NewFlyteAdminErrorWithDoc(codes.InvalidArgument, errors.ResourceLimitError,
 					"Requested %v limit [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+						" [%v]",
 					resourceName, limitQuantity.String(), platformLimit.String())
 			}
 			if platformLimitOk && defaultQuantity.Value() > platformTaskResourceLimits[resourceName].Value() {
 				// Also check that the requested limit is less than the platform task limit.
-				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+				return errors.NewFlyteAdminErrorWithDoc(codes.InvalidArgument, errors.ResourceLimitError,
 					"Requested %v default [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+						" [%v]",
 					resourceName, defaultQuantity.String(), platformTaskResourceLimits[resourceName].String())
 			}
 		case core.Resources_GPU:
@@ -272,9 +272,9 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 			}
 			platformLimit, platformLimitOk := platformTaskResourceLimits[resourceName]
 			if platformLimitOk && defaultQuantity.Value() > platformLimit.Value() {
-				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+				return errors.NewFlyteAdminErrorWithDoc(codes.InvalidArgument, errors.ResourceLimitError,
 					"Requested %v default [%v] is greater than current limit set in the platform configuration"+
-						" [%v]. Please contact Flyte Admins to change these limits or consult the configuration",
+						" [%v]",
 					resourceName, defaultQuantity.String(), platformLimit.String())
 			}
 		}
