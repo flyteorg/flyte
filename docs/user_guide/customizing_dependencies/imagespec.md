@@ -17,7 +17,7 @@ For example, [flytekitplugins-envd](https://github.com/flyteorg/flytekit/blob/c0
 For every {py:class}`flytekit.PythonFunctionTask` task or a task decorated with the `@task` decorator,
 you can specify rules for binding container images. By default, flytekit binds a single container image, i.e.,
 the [default Docker image](https://ghcr.io/flyteorg/flytekit), to all tasks. To modify this behavior,
-use the `container_image` parameter available in the {py:func}`flytekit.task` decorator, and pass an
+use the `image` parameter available in the {py:func}`flytekit.task` decorator, and pass an
 `ImageSpec`.
 
 Before building the image, Flytekit checks the container registry to see if the image already exists.
@@ -100,12 +100,12 @@ tensorflow_image_spec = ImageSpec(
 if tensorflow_image_spec.is_container(): 
   import tensorflow as tf
 
-@task(container_image=pandas_image_spec)
+@task(image=pandas_image_spec)
 def task1() -> pd.DataFrame:
   return pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [1, 22]})
 
 
-@task(container_image=tensorflow_image_spec)
+@task(image=tensorflow_image_spec)
 def task2() -> int:
   num_gpus = len(tf.config.list_physical_devices('GPU'))
   print("Num GPUs Available: ", num_gpus)
@@ -189,7 +189,7 @@ image_spec = ImageSpec(
     copy=["files/input.txt"],
 )
 
-@task(container_image=image_spec)
+@task(image=image_spec)
 def my_task() -> str:
     with open("/root/files/input.txt", "r") as f:
         return f.read()
