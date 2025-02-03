@@ -22,14 +22,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/failure_node.py
 :caption: development_lifecycle/failure_node.py
-:lines: 1-6
+:lines: 1-7
 ```
 
 Create a task that will fail during execution:
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/failure_node.py
 :caption: development_lifecycle/failure_node.py
-:lines: 10-18
+:lines: 11-19
 ```
 
 Create a task that will be executed if any of the tasks in the workflow fail:
@@ -55,7 +55,7 @@ By setting the failure policy to `FAIL_AFTER_EXECUTABLE_NODES_COMPLETE` to ensur
 
 ```{literalinclude} /examples/development_lifecycle/development_lifecycle/failure_node.py
 :caption: development_lifecycle/failure_node.py
-:lines: 42-53
+:lines: 43-54
 ```
 
 You can also set the `on_failure` to a workflow. This workflow will be executed if any of the tasks in the workflow fail:
