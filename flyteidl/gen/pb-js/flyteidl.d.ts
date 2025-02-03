@@ -5181,6 +5181,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
+
+            /** TaskNodeOverrides podTemplate */
+            podTemplate?: (flyteidl.core.IK8sPod|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5200,6 +5203,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
+
+            /** TaskNodeOverrides podTemplate. */
+            public podTemplate?: (flyteidl.core.IK8sPod|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -6983,6 +6989,9 @@ export namespace flyteidl {
 
             /** K8sPod dataConfig */
             dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
+
+            /** K8sPod primaryContainerName */
+            primaryContainerName?: (string|null);
         }
 
         /** Represents a K8sPod. */
@@ -7002,6 +7011,9 @@ export namespace flyteidl {
 
             /** K8sPod dataConfig. */
             public dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
+
+            /** K8sPod primaryContainerName. */
+            public primaryContainerName: string;
 
             /**
              * Creates a new K8sPod instance using the specified properties.
