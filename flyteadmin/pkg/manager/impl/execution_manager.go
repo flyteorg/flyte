@@ -17,7 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
-	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -1420,9 +1419,6 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 
 func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *admin.WorkflowExecutionEventRequest) (
 	*admin.WorkflowExecutionEventResponse, error) {
-	for i, call := range m.dbEventWriter.(*eventWriterMocks.WorkflowExecutionEventWriter).ExpectedCalls {
-		fmt.Printf("Expected call %d: Method: %s, Arguments: %v\n", i, call.Method, call.Arguments)
-	}
 	err := validation.ValidateCreateWorkflowEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes)
 	if err != nil {
 		logger.Debugf(ctx, "received invalid CreateWorkflowEventRequest [%s]: %v", request.GetRequestId(), err)
