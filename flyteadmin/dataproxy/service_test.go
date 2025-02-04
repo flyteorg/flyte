@@ -172,13 +172,14 @@ func (t testMetadata) Exists() bool {
 func TestCreateDownloadLink(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
 	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	nodeExecutionManager.SetGetNodeExecutionFunc(func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+	nodeExecutionFunc := func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 		return &admin.NodeExecution{
 			Closure: &admin.NodeExecutionClosure{
 				DeckUri: "s3://something/something",
 			},
 		}, nil
-	})
+	}
+	nodeExecutionManager.SetGetNodeExecutionFunc(nodeExecutionFunc)
 	taskExecutionManager := &mocks.MockTaskExecutionManager{}
 
 	s, err := NewService(config.DataProxyConfig{Download: config.DataProxyDownloadConfig{MaxExpiresIn: stdlibConfig.Duration{Duration: time.Hour}}}, nodeExecutionManager, dataStore, taskExecutionManager)
@@ -224,6 +225,31 @@ func TestCreateDownloadLink(t *testing.T) {
 		})
 
 		assert.NoError(t, err)
+	})
+
+	t.Run("no deckUrl found", func(t *testing.T) {
+		nodeExecutionFuncWithoutDecks := func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+			return &admin.NodeExecution{
+				Closure: &admin.NodeExecutionClosure{
+					DeckUri: "",
+				},
+			}, nil
+		}
+		nodeExecutionManager.SetGetNodeExecutionFunc(nodeExecutionFuncWithoutDecks)
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
+				NodeExecutionId: &core.NodeExecutionIdentifier{},
+			},
+			ExpiresIn: durationpb.New(time.Hour),
+		})
+		assert.Error(t, err)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+		assert.Contains(t, st.Message(), "no deckUrl found for request")
+		// Reset the nodeExecutionFunc
+		nodeExecutionManager.SetGetNodeExecutionFunc(nodeExecutionFunc)
 	})
 
 	t.Run("head failed", func(t *testing.T) {
