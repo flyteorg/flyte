@@ -179,7 +179,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 	}
 
 	if len(nativeURL) == 0 {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "no deckUrl found for request [%+v]", req)
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "no deckUrl found for request [%+v]", req)
 	}
 
 	ref := storage.DataReference(nativeURL)
