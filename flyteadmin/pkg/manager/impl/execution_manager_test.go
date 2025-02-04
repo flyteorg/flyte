@@ -78,7 +78,7 @@ var executionIdentifier = core.WorkflowExecutionIdentifier{
 	Domain:  "domain",
 	Name:    "name",
 }
-var mockPublisher notificationMocks.MockPublisher
+var mockPublisher notificationMocks.Publisher
 var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 var requestedAt = time.Now()
 var testCluster = "C1"
@@ -2281,6 +2281,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 	}
 	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
 	mockDbEventWriter.On("Write", request)
+	mockPublisher.EXPECT().Publish(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter)
@@ -2370,6 +2371,8 @@ func TestCreateWorkflowEvent_NoRunningToQueued(t *testing.T) {
 
 func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
+	mockPublisher := notificationMocks.Publisher{}
+	mockPublisher.EXPECT().Publish(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
@@ -2407,14 +2410,28 @@ func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
 
-	req.Event.Phase = core.WorkflowExecution_QUEUED
+	req = &admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			Phase:       core.WorkflowExecution_QUEUED,
+			OccurredAt:  timestamppb.New(time.Now()),
+		},
+	}
 	resp, err = execManager.CreateWorkflowEvent(context.Background(), req)
 	assert.Nil(t, resp)
 	assert.NotNil(t, err)
 	adminError := err.(flyteAdminErrors.FlyteAdminError)
 	assert.Equal(t, adminError.Code(), codes.FailedPrecondition)
 
-	req.Event.Phase = core.WorkflowExecution_RUNNING
+	req = &admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			Phase:       core.WorkflowExecution_RUNNING,
+			OccurredAt:  timestamppb.New(time.Now()),
+		},
+	}
 	resp, err = execManager.CreateWorkflowEvent(context.Background(), req)
 	assert.Nil(t, resp)
 	assert.NotNil(t, err)
@@ -3315,7 +3332,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 		return errors.New("error publishing message")
 	}
 
-	mockPublisher.SetPublishCallback(publishFunc)
+	mockPublisher.EXPECT().Publish(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(publishFunc)
 	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
 	mockApplicationConfig.SetNotificationsConfig(runtimeInterfaces.NotificationsConfig{
 		NotificationsEmailerConfig: runtimeInterfaces.NotificationsEmailerConfig{
