@@ -2410,18 +2410,28 @@ func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
 
-	mockDbEventWriter.On("Write", req)
-	req.Event.Phase = core.WorkflowExecution_QUEUED
+	req = &admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			Phase:       core.WorkflowExecution_QUEUED,
+			OccurredAt:  timestamppb.New(time.Now()),
+		},
+	}
 	resp, err = execManager.CreateWorkflowEvent(context.Background(), req)
 	assert.Nil(t, resp)
 	assert.NotNil(t, err)
 	adminError := err.(flyteAdminErrors.FlyteAdminError)
 	assert.Equal(t, adminError.Code(), codes.FailedPrecondition)
 
-	mockDbEventWriter = &eventWriterMocks.WorkflowExecutionEventWriter{}
-	mockDbEventWriter.On("Write", req)
-	execManager = NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter)
-	req.Event.Phase = core.WorkflowExecution_RUNNING
+	req = &admin.WorkflowExecutionEventRequest{
+		RequestId: "1",
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &executionIdentifier,
+			Phase:       core.WorkflowExecution_RUNNING,
+			OccurredAt:  timestamppb.New(time.Now()),
+		},
+	}
 	resp, err = execManager.CreateWorkflowEvent(context.Background(), req)
 	assert.Nil(t, resp)
 	assert.NotNil(t, err)
