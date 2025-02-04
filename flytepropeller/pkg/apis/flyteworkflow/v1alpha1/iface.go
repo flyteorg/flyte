@@ -449,6 +449,7 @@ type ExecutableNode interface {
 	IsCacheSerializable() *bool
 	GetContainerImage() string
 	GetConfig() map[string]string
+	GetPodTemplate() *core.K8SPod
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow

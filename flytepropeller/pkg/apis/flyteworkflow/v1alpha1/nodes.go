@@ -191,6 +191,8 @@ type NodeSpec struct {
 
 	// Config maps to the Config in the NodeMetadata: https://github.com/unionai/flyte/blob/b28ffa1ec253effc60f102e572e0fdf9b617ba16/flyteidl/protos/flyteidl/core/workflow.proto#L204
 	Config map[string]string `json:"config,omitempty"`
+
+	PodTemplate *core.K8SPod `json:"podTemplate,omitempty" protobuf:"bytes,23,opt,name=podTemplate"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -315,4 +317,8 @@ func (in *NodeSpec) GetInputBindings() []*Binding {
 
 func (in *NodeSpec) GetContainerImage() string {
 	return in.ContainerImage
+}
+
+func (in *NodeSpec) GetPodTemplate() *core.K8SPod {
+	return in.PodTemplate
 }

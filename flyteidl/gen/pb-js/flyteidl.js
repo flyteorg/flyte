@@ -12609,6 +12609,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+                 * @property {flyteidl.core.IK8sPod|null} [podTemplate] TaskNodeOverrides podTemplate
                  */
     
                 /**
@@ -12651,6 +12652,14 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
+                 * TaskNodeOverrides podTemplate.
+                 * @member {flyteidl.core.IK8sPod|null|undefined} podTemplate
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.podTemplate = null;
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12680,6 +12689,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
+                        $root.flyteidl.core.K8sPod.encode(message.podTemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12709,6 +12720,9 @@
                             break;
                         case 3:
                             message.containerImage = reader.string();
+                            break;
+                        case 4:
+                            message.podTemplate = $root.flyteidl.core.K8sPod.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12742,6 +12756,11 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate")) {
+                        var error = $root.flyteidl.core.K8sPod.verify(message.podTemplate);
+                        if (error)
+                            return "podTemplate." + error;
+                    }
                     return null;
                 };
     
@@ -17517,6 +17536,7 @@
                  * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] K8sPod metadata
                  * @property {google.protobuf.IStruct|null} [podSpec] K8sPod podSpec
                  * @property {flyteidl.core.IDataLoadingConfig|null} [dataConfig] K8sPod dataConfig
+                 * @property {string|null} [primaryContainerName] K8sPod primaryContainerName
                  */
     
                 /**
@@ -17559,6 +17579,14 @@
                 K8sPod.prototype.dataConfig = null;
     
                 /**
+                 * K8sPod primaryContainerName.
+                 * @member {string} primaryContainerName
+                 * @memberof flyteidl.core.K8sPod
+                 * @instance
+                 */
+                K8sPod.prototype.primaryContainerName = "";
+    
+                /**
                  * Creates a new K8sPod instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.K8sPod
@@ -17588,6 +17616,8 @@
                         $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.dataConfig != null && message.hasOwnProperty("dataConfig"))
                         $root.flyteidl.core.DataLoadingConfig.encode(message.dataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.primaryContainerName);
                     return writer;
                 };
     
@@ -17617,6 +17647,9 @@
                             break;
                         case 3:
                             message.dataConfig = $root.flyteidl.core.DataLoadingConfig.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.primaryContainerName = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17652,6 +17685,9 @@
                         if (error)
                             return "dataConfig." + error;
                     }
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        if (!$util.isString(message.primaryContainerName))
+                            return "primaryContainerName: string expected";
                     return null;
                 };
     

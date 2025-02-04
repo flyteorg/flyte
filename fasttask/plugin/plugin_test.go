@@ -321,6 +321,7 @@ func TestGetExecutionEnv(t *testing.T) {
 	taskOverrides.OnGetResourcesMatch().Return(&v1.ResourceRequirements{})
 	taskOverrides.OnGetExtendedResourcesMatch().Return(nil)
 	taskOverrides.OnGetContainerImageMatch().Return("")
+	taskOverrides.OnGetPodTemplate().Return(nil)
 	taskMetadata.OnGetOverridesMatch().Return(taskOverrides)
 
 	for _, test := range tests {

@@ -102,6 +102,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	})
 	overrides.OnGetExtendedResources().Return(nil)
 	overrides.OnGetContainerImage().Return("")
+	overrides.OnGetPodTemplate().Return(nil)
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

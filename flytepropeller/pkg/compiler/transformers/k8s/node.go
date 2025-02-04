@@ -31,6 +31,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
 	var containerImage string
+	var podtemplate *core.K8SPod
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -59,6 +60,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 			if len(overrides.GetContainerImage()) > 0 {
 				containerImage = overrides.GetContainerImage()
+			}
+
+			if overrides.GetPodTemplate() != nil {
+				podtemplate = overrides.GetPodTemplate()
 			}
 		}
 	}
@@ -119,6 +124,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		CacheSerializable: cacheSerializable,
 		ContainerImage:    containerImage,
 		Config:            n.GetMetadata().GetConfig(),
+		PodTemplate:       podtemplate,
 	}
 
 	switch v := n.GetTarget().(type) {

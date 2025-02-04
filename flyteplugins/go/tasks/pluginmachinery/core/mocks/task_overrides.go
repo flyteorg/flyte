@@ -148,6 +148,40 @@ func (_m *TaskOverrides) GetExtendedResources() *flyteidlcore.ExtendedResources 
 	return r0
 }
 
+type TaskOverrides_GetPodTemplate struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetPodTemplate) Return(_a0 *flyteidlcore.K8SPod) *TaskOverrides_GetPodTemplate {
+	return &TaskOverrides_GetPodTemplate{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetPodTemplate() *TaskOverrides_GetPodTemplate {
+	c_call := _m.On("GetPodTemplate")
+	return &TaskOverrides_GetPodTemplate{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetPodTemplateMatch(matchers ...interface{}) *TaskOverrides_GetPodTemplate {
+	c_call := _m.On("GetPodTemplate", matchers...)
+	return &TaskOverrides_GetPodTemplate{Call: c_call}
+}
+
+// GetPodTemplate provides a mock function with given fields:
+func (_m *TaskOverrides) GetPodTemplate() *flyteidlcore.K8SPod {
+	ret := _m.Called()
+
+	var r0 *flyteidlcore.K8SPod
+	if rf, ok := ret.Get(0).(func() *flyteidlcore.K8SPod); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidlcore.K8SPod)
+		}
+	}
+
+	return r0
+}
+
 type TaskOverrides_GetResources struct {
 	*mock.Call
 }

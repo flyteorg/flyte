@@ -286,6 +286,17 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
 		if target.K8SPod.PodSpec == nil {
@@ -311,6 +322,17 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
 			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate.GetPodSpec() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 			"invalid TaskSpecification, unable to determine Pod configuration")
@@ -445,6 +467,23 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 			return
 		}
 	}
+}
+
+func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podTemplate.GetMetadata().GetAnnotations() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+	}
+	if podTemplate.GetMetadata().GetLabels() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetLabels(), objectMeta.Labels)
+	}
+
+	var podSpecOverride *v1.PodSpec
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	if err != nil {
+		return nil, objectMeta, err
+	}
+
+	return podSpecOverride, objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {

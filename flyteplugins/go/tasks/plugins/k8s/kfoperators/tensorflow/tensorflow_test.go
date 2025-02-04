@@ -157,6 +157,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 	overrides.OnGetResources().Return(resources)
 	overrides.OnGetExtendedResources().Return(extendedResources)
 	overrides.OnGetContainerImage().Return("")
+	overrides.OnGetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)

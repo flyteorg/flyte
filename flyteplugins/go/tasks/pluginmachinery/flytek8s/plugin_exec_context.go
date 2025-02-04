@@ -37,6 +37,10 @@ func (to *pluginTaskOverrides) GetContainerImage() string {
 	return to.TaskOverrides.GetContainerImage()
 }
 
+func (to *pluginTaskOverrides) GetPodTemplate() *core.K8SPod {
+	return to.TaskOverrides.GetPodTemplate()
+}
+
 type pluginTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	interruptible *bool

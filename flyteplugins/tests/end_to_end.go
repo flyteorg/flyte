@@ -149,6 +149,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	})
 	overrides.OnGetExtendedResources().Return(&idlCore.ExtendedResources{})
 	overrides.OnGetContainerImage().Return("")
+	overrides.OnGetPodTemplate().Return(nil)
 
 	connections := map[string]pluginCore.ConnectionWrapper{
 		"my-openai": {

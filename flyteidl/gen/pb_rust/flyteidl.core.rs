@@ -1778,6 +1778,9 @@ pub struct K8sPod {
     /// Only K8s
     #[prost(message, optional, tag="3")]
     pub data_config: ::core::option::Option<DataLoadingConfig>,
+    /// Defines the primary container name when pod template override is executed.
+    #[prost(string, tag="4")]
+    pub primary_container_name: ::prost::alloc::string::String,
 }
 /// Metadata for building a kubernetes object when a task is executed.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2857,6 +2860,10 @@ pub struct TaskNodeOverrides {
     /// Override for the image used by task pods.
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
+    /// Override for the pod template used by task pods
+    /// +optional
+    #[prost(message, optional, tag="4")]
+    pub pod_template: ::core::option::Option<K8sPod>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]
