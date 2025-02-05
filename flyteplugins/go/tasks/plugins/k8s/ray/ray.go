@@ -540,10 +540,13 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 			continue
 		}
 
-		// Just handle resources for now
 		if len(container.Resources.Requests) > 0 || len(container.Resources.Limits) > 0 {
 			primaryContainer.Resources = container.Resources
 		}
+	}
+
+	if customPodSpec.RuntimeClassName != nil {
+		podSpec.RuntimeClassName = customPodSpec.RuntimeClassName
 	}
 
 	return podSpec, nil

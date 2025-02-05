@@ -10,8 +10,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -31,7 +33,7 @@ import (
 
 var active = int32(admin.LaunchPlanState_ACTIVE)
 var inactive = int32(admin.LaunchPlanState_INACTIVE)
-var mockScheduler = mocks.NewMockEventScheduler()
+var mockScheduler = &mocks.EventScheduler{}
 var launchPlanIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_LAUNCH_PLAN,
 	Project:      project,
@@ -393,7 +395,7 @@ func makeLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFu
 
 func TestEnableSchedule(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	scheduleExpression := &admin.Schedule{
 		ScheduleExpression: &admin.Schedule_Rate{
 			Rate: &admin.FixedRate{
@@ -402,7 +404,7 @@ func TestEnableSchedule(t *testing.T) {
 			},
 		},
 	}
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			assert.True(t, proto.Equal(scheduleExpression, input.ScheduleExpression))
@@ -411,6 +413,19 @@ func TestEnableSchedule(t *testing.T) {
 				*input.Payload)
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
@@ -427,11 +442,24 @@ func TestEnableSchedule_Error(t *testing.T) {
 	expectedErr := errors.New("expected error")
 
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			return expectedErr
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
@@ -445,8 +473,8 @@ func TestEnableSchedule_Error(t *testing.T) {
 
 func TestDisableSchedule(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			return nil
@@ -460,8 +488,8 @@ func TestDisableSchedule_Error(t *testing.T) {
 	expectedErr := errors.New("expected error")
 
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			return expectedErr
 		})
@@ -496,22 +524,35 @@ func TestUpdateSchedules(t *testing.T) {
 		},
 	}
 	newLaunchPlanSpecBytes, _ := proto.Marshal(&newLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			assert.True(t, proto.Equal(&newScheduleExpression, input.ScheduleExpression))
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(
@@ -551,9 +592,9 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 		},
 	}
 	newLaunchPlanSpecBytes, _ := proto.Marshal(&newLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(&core.Identifier{
 				Project: project,
@@ -565,6 +606,19 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -580,11 +634,25 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 	assert.True(t, addCalled)
 
 	addCalled = false
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.ExpectedCalls = nil
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	oldLaunchPlanSpec := admin.LaunchPlanSpec{
 		EntityMetadata: &admin.LaunchPlanMetadata{},
 	}
@@ -619,9 +687,9 @@ func TestUpdateSchedules_NothingToEnableButRedo(t *testing.T) {
 		},
 	}
 	oldLaunchPlanSpecBytes, _ := proto.Marshal(&oldLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			areEqual := proto.Equal(&core.Identifier{
 				Project: project,
@@ -669,20 +737,32 @@ func TestUpdateSchedules_NothingToDoButRedo(t *testing.T) {
 	}
 	launchPlanSpecBytes, _ := proto.Marshal(&launchPlanSpec)
 
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
-
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -730,20 +810,32 @@ func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {
 	launchPlanSpec := admin.LaunchPlanSpec{}
 	launchPlanSpecBytes, _ := proto.Marshal(&launchPlanSpec)
 
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
-
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -816,8 +908,8 @@ func TestDisableLaunchPlan(t *testing.T) {
 	}
 
 	var removeScheduleFuncCalled bool
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			removeScheduleFuncCalled = true

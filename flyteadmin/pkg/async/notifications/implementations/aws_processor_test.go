@@ -8,12 +8,13 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-var mockEmailer mocks.MockEmailer
+var mockEmailer mocks.Emailer
 
 // This method should be invoked before every test to Subscriber.
 func initializeProcessor() {
@@ -37,7 +38,7 @@ func TestProcessor_StartProcessing(t *testing.T) {
 		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
-	mockEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	testProcessor.(*Processor).email.(*mocks.Emailer).EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	// TODO Add test for metric inc for number of messages processed.
 	// Assert 1 message processed and 1 total.
 	assert.Nil(t, testProcessor.(*Processor).run())
@@ -118,7 +119,7 @@ func TestProcessor_StartProcessingEmailError(t *testing.T) {
 	sendEmailErrorFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
-	mockEmailer.SetSendEmailFunc(sendEmailErrorFunc)
+	mockEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailErrorFunc)
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
 	// Even if there is an error in sending an email StartProcessing will return no errors.

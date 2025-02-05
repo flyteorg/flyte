@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -13,9 +14,9 @@ import (
 func TestUpdateProjectDomain(t *testing.T) {
 	ctx := context.Background()
 
-	mockProjectDomainManager := mocks.MockResourceManager{}
+	mockProjectDomainManager := mocks.ResourceInterface{}
 	var updateCalled bool
-	mockProjectDomainManager.SetUpdateProjectDomainAttributes(
+	mockProjectDomainManager.EXPECT().UpdateProjectDomainAttributes(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 			updateCalled = true
@@ -40,14 +41,13 @@ func TestUpdateProjectDomain(t *testing.T) {
 func TestUpdateProjectAttr(t *testing.T) {
 	ctx := context.Background()
 
-	mockProjectDomainManager := mocks.MockResourceManager{}
+	mockProjectDomainManager := mocks.ResourceInterface{}
 	var updateCalled bool
-	mockProjectDomainManager.SetUpdateProjectAttributes(
-		func(ctx context.Context,
-			request *admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
-			updateCalled = true
-			return &admin.ProjectAttributesUpdateResponse{}, nil
-		},
+	mockProjectDomainManager.EXPECT().UpdateProjectAttributes(mock.Anything, mock.Anything).RunAndReturn((func(ctx context.Context,
+		request *admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
+		updateCalled = true
+		return &admin.ProjectAttributesUpdateResponse{}, nil
+	}),
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
 		resourceManager: &mockProjectDomainManager,
@@ -66,14 +66,13 @@ func TestUpdateProjectAttr(t *testing.T) {
 func TestDeleteProjectAttr(t *testing.T) {
 	ctx := context.Background()
 
-	mockProjectDomainManager := mocks.MockResourceManager{}
+	mockProjectDomainManager := mocks.ResourceInterface{}
 	var deleteCalled bool
-	mockProjectDomainManager.SetDeleteProjectAttributes(
-		func(ctx context.Context,
-			request *admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
-			deleteCalled = true
-			return &admin.ProjectAttributesDeleteResponse{}, nil
-		},
+	mockProjectDomainManager.EXPECT().DeleteProjectAttributes(mock.Anything, mock.Anything).RunAndReturn((func(ctx context.Context,
+		request *admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
+		deleteCalled = true
+		return &admin.ProjectAttributesDeleteResponse{}, nil
+	}),
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
 		resourceManager: &mockProjectDomainManager,
@@ -91,14 +90,13 @@ func TestDeleteProjectAttr(t *testing.T) {
 func TestGetProjectAttr(t *testing.T) {
 	ctx := context.Background()
 
-	mockProjectDomainManager := mocks.MockResourceManager{}
+	mockProjectDomainManager := mocks.ResourceInterface{}
 	var getCalled bool
-	mockProjectDomainManager.SetGetProjectAttributes(
-		func(ctx context.Context,
-			request *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
-			getCalled = true
-			return &admin.ProjectAttributesGetResponse{}, nil
-		},
+	mockProjectDomainManager.EXPECT().GetProjectAttributes(mock.Anything, mock.Anything).RunAndReturn((func(ctx context.Context,
+		request *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
+		getCalled = true
+		return &admin.ProjectAttributesGetResponse{}, nil
+	}),
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
 		resourceManager: &mockProjectDomainManager,

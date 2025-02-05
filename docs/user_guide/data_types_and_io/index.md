@@ -92,14 +92,13 @@ Here's a breakdown of these mappings:
       - Use ``typing.Dict[str, V]`` or ``dict[str, V]``, where ``V`` can be one of the other supported types in the table,
         including a nested dictionary.
     * - ``dict``
-      - JSON (``struct.pb``)
+      - ``Binary``
       - Automatic
-      - Use ``dict``. It's assumed that the untyped dictionary can be converted to JSON.
-        However, this may not always be possible and could result in a ``RuntimeError``.
+      - Use ``dict``. Starting with flytekit 1.14, it uses the MSGPACK serialization format. 
     * - ``@dataclass``
-      - ``Struct``
+      - ``Binary``
       - Automatic
-      - The class should be a pure value class annotated with the ``@dataclass`` decorator.
+      - The class should be a pure value class annotated with the ``@dataclass`` decorator. 
     * - ``np.ndarray``
       - File
       - Automatic
@@ -121,9 +120,9 @@ Here's a breakdown of these mappings:
       - To utilize the type, install the ``flytekitplugins-spark`` plugin.
       - Use ``pyspark.DataFrame`` as a type hint.
     * - ``pydantic.BaseModel``
-      - ``Map``
-      - To utilize the type, install the ``pydantic>2`` module.
-      - Use ``pydantic.BaseModel`` as a type hint.
+      - ``Binary``
+      - ``Pydantic BaseModel v2`` is supported in ``flytekit >=1.14``.
+      - Use ``BaseModel`` as the type hint.
     * - ``torch.Tensor`` / ``torch.nn.Module``
       - File
       - To utilize the type, install the ``torch`` library.

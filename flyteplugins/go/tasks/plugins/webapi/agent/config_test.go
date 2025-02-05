@@ -39,3 +39,23 @@ func TestGetAndSetConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &cfg, GetConfig())
 }
+
+func TestDefaultAgentConfig(t *testing.T) {
+	cfg := defaultConfig
+
+	assert.Equal(t, "", cfg.DefaultAgent.Endpoint)
+	assert.True(t, cfg.DefaultAgent.Insecure)
+	assert.Equal(t, 10*time.Second, cfg.DefaultAgent.DefaultTimeout.Duration)
+	assert.Equal(t, `{"loadBalancingConfig": [{"round_robin":{}}]}`, cfg.DefaultAgent.DefaultServiceConfig)
+
+	assert.Empty(t, cfg.DefaultAgent.Timeouts)
+
+	expectedTaskTypes := []string{"task_type_1", "task_type_2"}
+	assert.Equal(t, expectedTaskTypes, cfg.SupportedTaskTypes)
+
+	assert.Empty(t, cfg.AgentDeployments)
+
+	assert.Empty(t, cfg.AgentForTaskTypes)
+
+	assert.Equal(t, 10*time.Second, cfg.PollInterval.Duration)
+}

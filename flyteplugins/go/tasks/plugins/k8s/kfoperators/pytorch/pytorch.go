@@ -145,16 +145,17 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
-	if *workerReplicaSpec.Replicas <= 0 {
-		return nil, fmt.Errorf("number of workers must be greater than 0")
+	jobSpec := kubeflowv1.PyTorchJobSpec{}
+	replicaSpecs := map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+		kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
+	}
+	if *workerReplicaSpec.Replicas > 0 {
+		replicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker] = workerReplicaSpec
 	}
 
-	jobSpec := kubeflowv1.PyTorchJobSpec{
-		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
-			kubeflowv1.PyTorchJobReplicaTypeWorker: workerReplicaSpec,
-		},
-		RunPolicy: runPolicy,
+	jobSpec = kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: replicaSpecs,
+		RunPolicy:           runPolicy,
 	}
 
 	if elasticPolicy != nil {

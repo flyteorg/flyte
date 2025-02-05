@@ -51,6 +51,7 @@ var childExecutionID = &core.WorkflowExecutionIdentifier{
 const dynamicWorkflowClosureRef = "s3://bucket/admin/metadata/workflow"
 
 const testInputURI = "fake://bucket/inputs.pb"
+const DeckURI = "fake://bucket/deck.html"
 
 var testInputs = &core.LiteralMap{
 	Literals: map[string]*core.Literal{
@@ -65,6 +66,7 @@ func TestAddRunningState(t *testing.T) {
 		Event: &event.NodeExecutionEvent{
 			Phase:      core.NodeExecution_RUNNING,
 			OccurredAt: startedAtProto,
+			DeckUri:    DeckURI,
 		},
 	}
 	nodeExecutionModel := models.NodeExecution{}
@@ -73,6 +75,7 @@ func TestAddRunningState(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, startedAt, *nodeExecutionModel.StartedAt)
 	assert.True(t, proto.Equal(startedAtProto, closure.GetStartedAt()))
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
 }
 
 func TestAddTerminalState_OutputURI(t *testing.T) {
@@ -84,6 +87,7 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 				OutputUri: outputURI,
 			},
 			OccurredAt: occurredAtProto,
+			DeckUri:    DeckURI,
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
@@ -99,6 +103,7 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 	assert.Nil(t, err)
 	assert.EqualValues(t, outputURI, closure.GetOutputUri())
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
 }
 
 func TestAddTerminalState_OutputData(t *testing.T) {
@@ -191,6 +196,36 @@ func TestAddTerminalState_Error(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(error, closure.GetError()))
 	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+}
+
+func TestAddTerminalState_DeckURIInFailedExecution(t *testing.T) {
+	error := &core.ExecutionError{
+		Code: "foo",
+	}
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Phase: core.NodeExecution_FAILED,
+			OutputResult: &event.NodeExecutionEvent_Error{
+				Error: error,
+			},
+			OccurredAt: occurredAtProto,
+			DeckUri:    DeckURI,
+		},
+	}
+	startedAt := occurredAt.Add(-time.Minute)
+	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	nodeExecutionModel := models.NodeExecution{
+		StartedAt: &startedAt,
+	}
+	closure := admin.NodeExecutionClosure{
+		StartedAt: startedAtProto,
+	}
+	err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(error, closure.GetError()))
+	assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
+	assert.Equal(t, DeckURI, closure.GetDeckUri())
 }
 
 func TestCreateNodeExecutionModel(t *testing.T) {
