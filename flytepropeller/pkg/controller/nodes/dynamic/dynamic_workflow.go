@@ -201,6 +201,8 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return dynamicWorkflowContext{}, err
 	}
 
+	// Clear the inputs of the nodes in the dynamic workflow. This is done to avoid bloating the node event.
+	clearNodeInputs(ctx, closure.GetPrimary().GetTemplate().GetNodes())
 	if err := f.Cache(ctx, dynamicWf, closure); err != nil {
 		logger.Errorf(ctx, "Failed to cache Dynamic workflow [%s]", err.Error())
 	}
@@ -219,6 +221,19 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		nodeLookup:         executors.NewNodeLookup(dynamicWf, dynamicNodeStatus, dynamicWf),
 		dynamicJobSpecURI:  string(f.GetLoc()),
 	}, nil
+}
+
+// This function is used to clear the inputs of the nodes in the dynamic workflow. This is done to avoid bloating the node event.
+func clearNodeInputs(ctx context.Context, nodes []*core.Node) {
+	for _, node := range nodes {
+		node.Inputs = nil
+		switch node.Target.(type) {
+		case *core.Node_ArrayNode:
+			node.Target.(*core.Node_ArrayNode).ArrayNode.Node.Inputs = nil
+		default:
+			logger.Debugf(ctx, "node type %T not supported for clearing inputs", node.Target)
+		}
+	}
 }
 
 func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext,

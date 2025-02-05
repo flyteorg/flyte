@@ -604,6 +604,41 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 	})
 }
 
+func TestClearNodeInputs_WithCoreBindings(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("clear inputs for regular nodes with core bindings", func(t *testing.T) {
+		nodes := []*core.Node{
+			{Inputs: []*core.Binding{{Var: "input1"}}},
+			{Inputs: []*core.Binding{{Var: "input2"}}},
+		}
+		clearNodeInputs(ctx, nodes)
+		for _, node := range nodes {
+			assert.Nil(t, node.Inputs)
+		}
+	})
+
+	t.Run("clear inputs for array nodes with core bindings", func(t *testing.T) {
+		nodes := []*core.Node{
+			{
+				Inputs: []*core.Binding{{Var: "input1"}},
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: &core.Node{Inputs: []*core.Binding{{Var: "input2"}}},
+					},
+				},
+			},
+		}
+		clearNodeInputs(ctx, nodes)
+		for _, node := range nodes {
+			assert.Nil(t, node.Inputs)
+			if arrayNode, ok := node.Target.(*core.Node_ArrayNode); ok {
+				assert.Nil(t, arrayNode.ArrayNode.Node.Inputs)
+			}
+		}
+	})
+}
+
 type existsMetadata struct{}
 
 func (e existsMetadata) ContentMD5() string {
