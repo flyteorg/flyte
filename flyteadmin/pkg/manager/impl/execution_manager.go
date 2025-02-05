@@ -1348,14 +1348,14 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 	projectKey := execution.GetId().GetProject()
 	val, ok := m.userMetrics.ScheduledExecutionDelays.Load(projectKey)
 	if !ok {
-		val = make(map[string]*promutils.StopWatch)
+		val = &sync.Map{}
 		m.userMetrics.ScheduledExecutionDelays.Store(projectKey, val)
 	}
 
-	domainCounterMap := val.(map[string]*promutils.StopWatch)
+	domainCounterMap := val.(*sync.Map)
 
-	var watch *promutils.StopWatch
-	watch, ok = domainCounterMap[execution.GetId().GetDomain()]
+	domainKey := execution.GetId().GetDomain()
+	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
 		newWatch, err := m.systemMetrics.Scope.NewSubScope(execution.GetId().GetProject()).NewSubScope(execution.GetId().GetDomain()).NewStopWatch(
 			"scheduled_execution_delay",
@@ -1367,9 +1367,11 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 				"failed to emit scheduled workflow execution delay stat, couldn't find or create counter")
 			return
 		}
-		watch = &newWatch
-		domainCounterMap[execution.GetId().GetDomain()] = watch
+		watchVal = &newWatch
+		domainCounterMap.Store(domainKey, watchVal)
 	}
+
+	watch := watchVal.(*promutils.StopWatch)
 	watch.Observe(scheduledKickoffTime, runningEventTime)
 }
 
@@ -1384,14 +1386,14 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 	projectKey := executionModel.Project
 	val, ok := m.userMetrics.WorkflowExecutionDurations.Load(projectKey)
 	if !ok {
-		val = make(map[string]*promutils.StopWatch)
+		val = &sync.Map{}
 		m.userMetrics.WorkflowExecutionDurations.Store(projectKey, val)
 	}
 
-	domainCounterMap := val.(map[string]*promutils.StopWatch)
+	domainCounterMap := val.(*sync.Map)
 
-	var watch *promutils.StopWatch
-	watch, ok = domainCounterMap[executionModel.Domain]
+	domainKey := executionModel.Domain
+	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
 		newWatch, err := m.systemMetrics.Scope.NewSubScope(executionModel.Project).NewSubScope(executionModel.Domain).NewStopWatch(
 			"workflow_execution_duration",
@@ -1403,9 +1405,11 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 				"failed to emit workflow execution duration stat, couldn't find or create counter")
 			return
 		}
-		watch = &newWatch
-		domainCounterMap[executionModel.Domain] = watch
+		watchVal = &newWatch
+		domainCounterMap.Store(domainKey, watchVal)
 	}
+
+	watch := watchVal.(*promutils.StopWatch)
 
 	terminalEventTime, err := ptypes.Timestamp(terminalEventTimeProto)
 	if err != nil {
