@@ -1357,7 +1357,7 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 	domainKey := execution.GetId().GetDomain()
 	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
-		newWatch, err := m.systemMetrics.Scope.NewSubScope(execution.GetId().GetProject()).NewSubScope(execution.GetId().GetDomain()).NewStopWatch(
+		newWatch, err := m.systemMetrics.Scope.NewSubScope(execution.GetId().GetProject()).NewSubScope(domainKey).NewStopWatch(
 			"scheduled_execution_delay",
 			"delay between scheduled execution time and time execution was observed running",
 			time.Nanosecond)
@@ -1395,7 +1395,7 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 	domainKey := executionModel.Domain
 	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
-		newWatch, err := m.systemMetrics.Scope.NewSubScope(executionModel.Project).NewSubScope(executionModel.Domain).NewStopWatch(
+		newWatch, err := m.systemMetrics.Scope.NewSubScope(executionModel.Project).NewSubScope(domainKey).NewStopWatch(
 			"workflow_execution_duration",
 			"overall time from when when a workflow create request was sent to k8s to the workflow terminating",
 			time.Nanosecond)
