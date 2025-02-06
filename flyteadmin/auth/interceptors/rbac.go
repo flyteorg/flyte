@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -71,7 +72,7 @@ func GetAuthorizationInterceptor(authCtx interfaces.AuthenticationContext) (grpc
 		}
 
 		// Add authorized resource scopes to context
-		isolationContext := auth.NewIsolationContext(authorizedResourceScopes)
+		isolationContext := isolation.NewIsolationContext(authorizedResourceScopes)
 
 		isolationCtx := isolationContext.WithContext(ctx)
 		return handler(isolationCtx, req)
@@ -130,8 +131,8 @@ func resolveRolesViaClaims(claims map[string]interface{}, targetClaims []config.
 	return maps.Keys(roleSet)
 }
 
-func calculateAuthorizedResourceScopes(ctx context.Context, roles []string, policies []config.AuthorizationPolicy, info *grpc.UnaryServerInfo) ([]auth.ResourceScope, error) {
-	authorizedScopes := []auth.ResourceScope{}
+func calculateAuthorizedResourceScopes(ctx context.Context, roles []string, policies []config.AuthorizationPolicy, info *grpc.UnaryServerInfo) ([]isolation.ResourceScope, error) {
+	authorizedScopes := []isolation.ResourceScope{}
 
 	policiesByRole := map[string]config.AuthorizationPolicy{}
 	for _, policy := range policies {
@@ -159,7 +160,7 @@ func calculateAuthorizedResourceScopes(ctx context.Context, roles []string, poli
 		if len(matchingRules) > 0 {
 			logger.Debugf(ctx, "[%s]Found matching rules for role %s: %s", info.FullMethod, role, matchingRules)
 			for _, matchingRule := range matchingRules {
-				authorizedScopes = append(authorizedScopes, auth.ResourceScope{
+				authorizedScopes = append(authorizedScopes, isolation.ResourceScope{
 					Project: matchingRule.Project,
 					Domain:  matchingRule.Domain,
 				})

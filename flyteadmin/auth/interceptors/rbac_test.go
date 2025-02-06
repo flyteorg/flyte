@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors/interceptorstest"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -84,7 +85,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
 
-		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		isolationCtx := isolation.IsolationContextFromContext(handler.GetCapturedCtx())
 		require.Empty(t, isolationCtx.GetResourceScopes())
 	})
 
@@ -107,7 +108,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
 
-		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		isolationCtx := isolation.IsolationContextFromContext(handler.GetCapturedCtx())
 		require.Empty(t, isolationCtx.GetResourceScopes())
 	})
 
@@ -182,11 +183,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
 
-		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		isolationCtx := isolation.IsolationContextFromContext(handler.GetCapturedCtx())
 		require.Len(t, isolationCtx.GetResourceScopes(), 1)
 
 		resourceScope := isolationCtx.GetResourceScopes()[0]
-		expectedResourceScope := auth.ResourceScope{
+		expectedResourceScope := isolation.ResourceScope{
 			Project: "flytesnacks",
 			Domain:  "development",
 		}
@@ -259,11 +260,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
 
-		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		isolationCtx := isolation.IsolationContextFromContext(handler.GetCapturedCtx())
 		require.Len(t, isolationCtx.GetResourceScopes(), 1)
 
 		resourceScope := isolationCtx.GetResourceScopes()[0]
-		expectedResourceScope := auth.ResourceScope{
+		expectedResourceScope := isolation.ResourceScope{
 			Project: "flytesnacks",
 			Domain:  "development",
 		}
@@ -343,11 +344,11 @@ func TestAuthorizationInterceptor(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, 1, handler.GetHandleCallCount())
 
-		isolationCtx := auth.IsolationContextFromContext(handler.GetCapturedCtx())
+		isolationCtx := isolation.IsolationContextFromContext(handler.GetCapturedCtx())
 		require.Len(t, isolationCtx.GetResourceScopes(), 1)
 
 		resourceScope := isolationCtx.GetResourceScopes()[0]
-		expectedResourceScope := auth.ResourceScope{
+		expectedResourceScope := isolation.ResourceScope{
 			Project: "flytesnacks",
 			Domain:  "development",
 		}

@@ -1,4 +1,4 @@
-package auth
+package isolation
 
 import (
 	"context"
