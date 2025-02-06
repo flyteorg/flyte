@@ -104,13 +104,15 @@ func (p *pluginRequestedTransition) RemoveDeckURIIfDeckNotExists(ctx context.Con
 	}
 
 	exists, err := reader.DeckExists(ctx)
-	if err != nil || !exists {
+	if err != nil {
+		p.execInfo.OutputInfo.DeckURI = nil
+		return regErrors.Wrapf(err, "failed to check existence of deck file")
+	}
+
+	if !exists {
 		p.execInfo.OutputInfo.DeckURI = nil
 	}
 
-	if err != nil {
-		return regErrors.Wrapf(err, "failed to check existence of deck file")
-	}
 	return nil
 }
 
