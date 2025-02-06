@@ -777,7 +777,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	return pluginTrns.FinalTransition(ctx)
 }
 
-func (t Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 	r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
 	tr ioutils.SimpleTaskReader) (*io.ExecutionError, error) {
 
