@@ -72,5 +72,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.stackdriver-template-uri"), defaultConfig.Logs.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "nonce-length"), defaultConfig.NonceLength, "The length of the nonce value to uniquely link a fasttask replica to the environment instance,  ensuring fast turnover of environments regardless of cache freshness.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "task-status-buffer-size"), defaultConfig.TaskStatusBufferSize, "The size of the task status buffer for each task.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "worker-log-level"), defaultConfig.WorkerLogLevel, "The log level for the fasttask worker.")
 	return cmdFlags
 }

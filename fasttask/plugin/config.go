@@ -26,10 +26,22 @@ var (
 		},
 		NonceLength:          12,
 		TaskStatusBufferSize: 512,
+		WorkerLogLevel:       logLevelInfo,
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("fasttask", defaultConfig)
 )
+
+type logLevel = string
+
+const (
+	logLevelDebug logLevel = "debug"
+	logLevelInfo  logLevel = "info"
+	logLevelWarn  logLevel = "warn"
+	logLevelError logLevel = "error"
+)
+
+var logLevels = []logLevel{logLevelDebug, logLevelInfo, logLevelWarn, logLevelError}
 
 type Config struct {
 	AdditionalWorkerArgs      []string        `json:"additional-worker-args" pflag:",Additional arguments to pass to the fasttask worker binary."`
@@ -44,6 +56,7 @@ type Config struct {
 	Logs                      logs.LogConfig  `json:"logs" pflag:",Log configuration for fasttasks"`
 	NonceLength               int             `json:"nonce-length" pflag:",The length of the nonce value to uniquely link a fasttask replica to the environment instance, ensuring fast turnover of environments regardless of cache freshness."`
 	TaskStatusBufferSize      int             `json:"task-status-buffer-size" pflag:",The size of the task status buffer for each task."`
+	WorkerLogLevel            logLevel        `json:"worker-log-level" pflag:",The log level for the fasttask worker."`
 }
 
 func GetConfig() *Config {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -341,6 +342,18 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 		"--fasttask-url",
 		GetConfig().CallbackURI,
 	)
+
+	// set rust log level
+	logLevel := GetConfig().WorkerLogLevel
+	if !slices.Contains(logLevels, logLevel) {
+		logger.Warnf(ctx, "invalid worker log level [%s], defaulting to info", logLevel)
+		logLevel = logLevelInfo
+	}
+
+	container.Env = append(container.Env, v1.EnvVar{
+		Name:  "RUST_LOG",
+		Value: logLevel,
+	})
 
 	// use kubeclient to create worker
 	return i.kubeClient.GetClient().Create(ctx, &v1.Pod{
