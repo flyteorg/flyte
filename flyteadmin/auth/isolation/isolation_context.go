@@ -1,3 +1,4 @@
+// This is its own package to resolve a circular dependency issues between auth -> common -> auth
 package isolation
 
 import (
