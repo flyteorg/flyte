@@ -159,6 +159,8 @@ type NodeSpec struct {
 	Interruptible *bool `json:"interruptible,omitempty"`
 
 	ContainerImage string `json:"containerImage,omitempty"`
+
+	PodTemplate *core.K8SPod `json:"podTemplate,omitempty" protobuf:"bytes,23,opt,name=podTemplate"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -267,4 +269,8 @@ func (in *NodeSpec) GetInputBindings() []*Binding {
 
 func (in *NodeSpec) GetContainerImage() string {
 	return in.ContainerImage
+}
+
+func (in *NodeSpec) GetPodTemplate() *core.K8SPod {
+	return in.PodTemplate
 }

@@ -344,6 +344,10 @@ message K8sPod {
     // to understand the default paths.
     // Only K8s
     DataLoadingConfig data_config = 3;
+
+
+    // Defines the primary container name when pod template override is executed.
+    string primary_container_name = 4;
 }
 
 // Metadata for building a kubernetes object when a task is executed.

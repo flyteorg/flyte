@@ -7405,6 +7405,10 @@
         "data_config": {
           "$ref": "#/definitions/coreDataLoadingConfig",
           "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+        },
+        "primary_container_name": {
+          "type": "string",
+          "description": "Defines the primary container name when pod template override is executed."
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
@@ -8370,6 +8374,10 @@
         "container_image": {
           "type": "string",
           "description": "Override for the image used by task pods."
+        },
+        "pod_template": {
+          "$ref": "#/definitions/coreK8sPod",
+          "title": "Override for the pod template used by task pods\n+optional"
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."
