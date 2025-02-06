@@ -92,23 +92,25 @@ func (p *pluginRequestedTransition) AddDeckURI(tCtx *taskExecutionContext) {
 }
 
 func (p *pluginRequestedTransition) RemoveDeckURIIfDeckNotExists(ctx context.Context, tCtx *taskExecutionContext) error {
+	// If there's no output info, nothing to do.
+	if p.execInfo.OutputInfo == nil {
+		return nil
+	}
+
 	reader := tCtx.ow.GetReader()
 	if reader == nil {
+		p.execInfo.OutputInfo.DeckURI = nil
 		return nil
 	}
 
 	exists, err := reader.DeckExists(ctx)
-	if err != nil {
-		if p.execInfo.OutputInfo != nil {
-			p.execInfo.OutputInfo.DeckURI = nil
-		}
-		return regErrors.Wrapf(err, "failed to check existence of deck file")
-	}
-
-	if !exists && p.execInfo.OutputInfo != nil {
+	if err != nil || !exists {
 		p.execInfo.OutputInfo.DeckURI = nil
 	}
 
+	if err != nil {
+		return regErrors.Wrapf(err, "failed to check existence of deck file")
+	}
 	return nil
 }
 
@@ -775,7 +777,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	return pluginTrns.FinalTransition(ctx)
 }
 
-func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+func (t Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 	r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
 	tr ioutils.SimpleTaskReader) (*io.ExecutionError, error) {
 
