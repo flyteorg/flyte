@@ -28,65 +28,16 @@ pub async fn run(py: Python<'_>, args: ExecutorArgs) -> Result<(), Box<dyn std::
     let _fast_task = PyModule::from_code_bound(
         py,
         r#"
-def _get_loaded_user_modules():
-    # Returns modules that are user defined
-    import os
-    import site
+def reset_env(original_sys_modules):
+    # Unload modules that are not in the original set and resets Launchplan cache
     import sys
+    delete_modules = []
+    for k in sys.modules:
+        if k not in original_sys_modules:
+            delete_modules.append(k)
 
-    builtin_names = set(sys.builtin_module_names)
-
-    non_user_directories = site.getsitepackages() + [
-        site.getusersitepackages(),
-        sys.prefix,
-        sys.base_prefix,
-    ]
-    outputs = []
-
-    all_modules = list(sys.modules)
-
-    for name in all_modules:
-        if name in builtin_names:
-            continue
-
-        try:
-            mod = sys.modules[name]
-        except KeyError:
-            continue
-
-        try:
-            mod_file = mod.__file__
-        except Exception:
-            continue
-
-        if not isinstance(mod_file, str):
-            continue
-
-        try:
-            is_non_user = any(
-                os.path.commonpath([mod_file, non_user_directory]) == non_user_directory
-                for non_user_directory in non_user_directories
-            )
-            if is_non_user:
-                continue
-
-        except ValueError:
-            # This means that the files are not in the same drive, which means the
-            # mod_file are not in any of the directories
-            pass
-
-        outputs.append(name)
-
-    return outputs
-
-def reset_env():
-    # Unload modules that are user defined and resets Launchplan cache
-    import sys
-    from contextlib import suppress
-    user_modules = _get_loaded_user_modules()
-    for name in user_modules:
-        with suppress(KeyError):
-            del sys.modules[name]
+    for k in delete_modules:
+        del sys.modules[k]
 
     from flytekit import LaunchPlan
 
@@ -120,7 +71,7 @@ def reset_env():
         let mut original_env_vars = HashMap::new();
 
         // python env setup
-        if let Err(e) = setup_python_env(
+        let original_sys_modules = match setup_python_env(
             py,
             _fast_registration.clone(),
             _os.clone(),
@@ -131,9 +82,12 @@ def reset_env():
         )
         .await
         {
-            error!("executor '{}' failed to setup python env: {}", args.id, e);
-            break;
-        }
+            Ok(sys_modules) => sys_modules,
+            Err(e) => {
+                error!("executor '{}' failed to setup python env: {}", args.id, e);
+                break;
+            }
+        };
 
         let entrypoint_method = task.cmd.get(0).map(|s| s.as_str());
         let entrypoint_cmd = match entrypoint_method {
@@ -169,6 +123,7 @@ def reset_env():
             &task.fast_register_dir,
             &task.env_vars,
             &mut original_env_vars,
+            original_sys_modules,
             cwd.clone(),
         )
         .await
@@ -214,7 +169,7 @@ async fn setup_python_env<'a>(
     additional_distribution: &Option<String>,
     env_vars: &Option<HashMap<String, String>>,
     original_env_vars: &mut HashMap<String, Option<String>>,
-) -> Result<(), PyErr> {
+) -> Result<Bound<'a, PyAny>, PyErr> {
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
 
     if let Some(ref fast_register_dir) = fast_register_dir {
@@ -253,7 +208,8 @@ async fn setup_python_env<'a>(
         }
     }
 
-    Ok(())
+    // return current system modules
+    py.eval_bound("set(sys.modules)", None, Some(&locals))
 }
 
 async fn cleanup_python_env<'a>(
@@ -263,6 +219,7 @@ async fn cleanup_python_env<'a>(
     fast_register_dir: &Option<String>,
     env_vars: &Option<HashMap<String, String>>,
     original_env_vars: &mut HashMap<String, Option<String>>,
+    original_sys_modules: Bound<'_, PyAny>,
     cwd: Bound<'_, PyAny>,
 ) -> Result<(), PyErr> {
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
@@ -294,7 +251,7 @@ async fn cleanup_python_env<'a>(
     _os.call_method1("chdir", (cwd,))?;
 
     // reset to environment
-    _fast_task.call_method0("reset_env")?;
+    _fast_task.call_method1("reset_env", (original_sys_modules,))?;
 
     Ok(())
 }
