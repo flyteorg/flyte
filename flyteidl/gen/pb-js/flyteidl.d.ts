@@ -6274,11 +6274,78 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a SharedMemory. */
+        interface ISharedMemory {
+
+            /** SharedMemory mountPath */
+            mountPath?: (string|null);
+
+            /** SharedMemory mountName */
+            mountName?: (string|null);
+
+            /** SharedMemory sizeLimit */
+            sizeLimit?: (string|null);
+        }
+
+        /** Represents a SharedMemory. */
+        class SharedMemory implements ISharedMemory {
+
+            /**
+             * Constructs a new SharedMemory.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISharedMemory);
+
+            /** SharedMemory mountPath. */
+            public mountPath: string;
+
+            /** SharedMemory mountName. */
+            public mountName: string;
+
+            /** SharedMemory sizeLimit. */
+            public sizeLimit: string;
+
+            /**
+             * Creates a new SharedMemory instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SharedMemory instance
+             */
+            public static create(properties?: flyteidl.core.ISharedMemory): flyteidl.core.SharedMemory;
+
+            /**
+             * Encodes the specified SharedMemory message. Does not implicitly {@link flyteidl.core.SharedMemory.verify|verify} messages.
+             * @param message SharedMemory message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISharedMemory, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SharedMemory message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SharedMemory
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SharedMemory;
+
+            /**
+             * Verifies a SharedMemory message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ExtendedResources. */
         interface IExtendedResources {
 
             /** ExtendedResources gpuAccelerator */
             gpuAccelerator?: (flyteidl.core.IGPUAccelerator|null);
+
+            /** ExtendedResources sharedMemory */
+            sharedMemory?: (flyteidl.core.ISharedMemory|null);
         }
 
         /** Represents an ExtendedResources. */
@@ -6292,6 +6359,9 @@ export namespace flyteidl {
 
             /** ExtendedResources gpuAccelerator. */
             public gpuAccelerator?: (flyteidl.core.IGPUAccelerator|null);
+
+            /** ExtendedResources sharedMemory. */
+            public sharedMemory?: (flyteidl.core.ISharedMemory|null);
 
             /**
              * Creates a new ExtendedResources instance using the specified properties.

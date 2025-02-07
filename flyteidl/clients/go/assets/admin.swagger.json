@@ -7205,6 +7205,9 @@
         "gpu_accelerator": {
           "$ref": "#/definitions/coreGPUAccelerator",
           "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        },
+        "shared_memory": {
+          "$ref": "#/definitions/coreSharedMemory"
         }
       },
       "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
@@ -8061,6 +8064,24 @@
         }
       },
       "description": "SecurityContext holds security attributes that apply to tasks."
+    },
+    "coreSharedMemory": {
+      "type": "object",
+      "properties": {
+        "mount_path": {
+          "type": "string",
+          "title": "Mount path to place in container"
+        },
+        "mount_name": {
+          "type": "string",
+          "title": "Name for volume"
+        },
+        "size_limit": {
+          "type": "string",
+          "title": "Size limit for shared memory. If not set, then the shared memory is equal\nto the allocated memory.\n+optional"
+        }
+      },
+      "description": "Metadata associated with configuring a shared memory volume for a task."
     },
     "coreSignalCondition": {
       "type": "object",
