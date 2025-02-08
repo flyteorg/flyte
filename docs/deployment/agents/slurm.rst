@@ -211,7 +211,130 @@ Finally, enable ``slurmctld`` and ``slurmd`` to start at boot and restart them.
 
 You can verify the status of the daemons using ``systemctl status <daemon>`` or check the logs in ``/var/log/slurm/slurmctld.log`` and ``/var/log/slurm/slurmd.log`` to ensure the Slurm cluster is running correctly.
 
+Test your Slurm agent locally
+-----------------------------
 
+This section provides a brief guide on setting up an environment to test the Slurm agent locally without running the backend service (e.g., `flyte agent gRPC server <https://docs.flyte.org/en/latest/user_guide/flyte_agents/index.html#flyte-agents-guide>`_). It covers both basic and advanced use cases: the basic use case runs a shell script directly, while the advanced use case executes user-defined task functions on a Slurm cluster.
 
+Overview
+~~~~~~~~
 
+The Slurm agent on the highest level has three core methods to interact with a Slurm cluster:
 
+1. ``create``:  Send a ``srun`` or ``sbatch`` command to run a Slurm job on a Slurm cluster
+2. ``get``: Use ``scontrol show job <job-id>`` to monitor the Slurm job state
+3. ``delete``: Use ``scancel <job-id>`` to cancel the Slurm job
+
+In its simplest form, the Slurm agent supports running a batch script using ``sbatch`` on a Slurm cluster, as shown below:
+
+.. image:: https://github.com/JiangJiaWei1103/flytekit/blob/slurm-agent-dev/plugins/flytekit-slurm/assets/basic_arch.png?raw=true
+
+Set up a local test environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This setup consists of three main components: a client (localhost), a remote Slurm cluster, and an S3-compatible object storage. First, you need to configure SSH connection to facilitate communication between the two, which relies on ``asyncssh``. Then, an S3-compatible object storage is required for advanced use cases. Here, we use `Amazon S3 <https://aws.amazon.com/s3/>`_ as an example.
+
+.. note::
+
+  A persistence layer, such as an S3-compatible object storage, is essential for managing complex workflows, particularly when integrating heterogeneous task types.
+
+1. Install the Slurm agent on your local machine (Flyte client)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+  It is recommended to create a virtual environment when using Python to avoid contaminating the base environment and prevent conflicts between different projects.
+
+.. code-block:: shell
+
+  # Install flytekit
+  git clone https://github.com/flyteorg/flytekit.git
+  gh pr checkout 3005
+  make setup && pip install -e .
+
+  # Install the Slurm agent
+  cd plugins/flytekit-slurm/
+  pip install -e .
+
+2. Install the Slurm agent on the Slurm cluster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To run user-defined task functions on the Slurm cluster, you need to install the Slurm agent on it:
+
+.. code-block:: shell
+
+  # Install flytekit
+  git clone https://github.com/flyteorg/flytekit.git
+  gh pr checkout 3005
+  make setup && pip install -e .
+
+  # Install the Slurm agent
+  cd plugins/flytekit-slurm/
+  pip install -e .
+
+3. Set up SSH configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To facilitate communication between your local machine and the Slurm cluster, please setup SSH on the local machine as follows:
+
+1. Create a new authentication key pair:
+
+.. code-block:: shell
+
+  ssh-keygen -t rsa -b 4096
+
+2. Copy the public key into the Slurm cluster:
+
+.. code-block:: shell
+
+  ssh-copy-id <username>@<fqdn-or-ip>
+
+3. Enable the key-based authentication by writing the following content to ``~/.ssh/config``:
+
+.. code-block:: shell
+
+  Host <host-alias>
+    HostName <fqdn-or-ip>
+    Port <ssh-port>
+    User <username>
+    IdentityFile <path-to-private-key>
+
+Finally, run a sanity check to verify connectivity to the Slurm cluster:
+
+.. code-block:: shell
+
+  ssh <host-alias>
+
+4. Set up Amazon S3 bucket
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For advanced use cases where user-defined task functions are executed on the Slurm cluster, an S3-compatible object storage is essential. The setup process is summarized below:
+
+1. Click "Create bucket" button (marked in yellow) to create a bucket on this `page <http://us-west-2.console.aws.amazon.com/s3/get-started?region=us-west-2&bucketType=general>`_
+
+.. note::
+
+  Please choose a unique bucket name and adjust the settings as needed.
+
+2. Click the user on the top right corner and go to "Security credentials"
+3. Create an access key and save it
+4. Set up AWS credentials to enable access to the Amazon S3 bucket on both machines
+
+.. tabs::
+
+  .. group-tab:: ~/.aws/config
+
+    .. code-block:: ini
+
+      [default]
+      region = <your-region>
+
+  .. group-tab:: ~/.aws/credentials
+
+    .. code-block:: ini
+
+      [default]
+      aws_access_key_id = <aws-access-key-id>
+      aws_secret_access_key = <aws-secret-access-key>
+
+Once configured, both machines will have access to the Amazon S3 bucket.
