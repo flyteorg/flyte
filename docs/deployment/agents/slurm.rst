@@ -93,7 +93,7 @@ Once the system user is created, you can verify it using the following command:
 
   cat /etc/passwd | grep <uid>
 
-It's of vital importance to set correct ownership of specific Slurm-related directories to prevent access issue. Directories mentioned below will be created automatically when the Slurm services start. However, manually creating them and altering the ownership beforehand help reduce erros:
+It's of vital importance to set correct ownership of specific Slurm-related directories to prevent access issue. Directories mentioned below will be created automatically when the Slurm services start. However, manually creating them and altering the ownership beforehand help reduce errors:
 
 Properly setting ownership of specific Slurm-related directories is crucial to avoid access issues. These directories are created automatically when Slurm services start, but manually creating them and adjusting ownership beforehand can make setup easier:
 
@@ -146,7 +146,7 @@ Then, Debian packages can be built following this `official guide <https://slurm
   # Build the Slurm packages
   debuild -b -uc -us
 
-Debian pakcages are built and placed under the parent directory ``<your-dir>``. Since the single-host Slurm cluster functions as both a controller and a compute node, the following packages are required: ``slurm-smd``, ``slurm-smd-client`` (for CLI), ``slurm-smd-slurmctld``, and ``slurm-smd-slurmd``.
+Debian packages are built and placed under the parent directory ``<your-dir>``. Since the single-host Slurm cluster functions as both a controller and a compute node, the following packages are required: ``slurm-smd``, ``slurm-smd-client`` (for CLI), ``slurm-smd-slurmctld``, and ``slurm-smd-slurmd``.
 
 .. code-block:: shell
 
