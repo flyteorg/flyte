@@ -227,11 +227,11 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 func clearNodeInputs(ctx context.Context, nodes []*core.Node) {
 	for _, node := range nodes {
 		node.Inputs = nil
-		switch node.Target.(type) {
+		switch node.GetTarget().(type) {
 		case *core.Node_ArrayNode:
-			node.Target.(*core.Node_ArrayNode).ArrayNode.Node.Inputs = nil
+			node.GetTarget().(*core.Node_ArrayNode).ArrayNode.Node.Inputs = nil
 		default:
-			logger.Debugf(ctx, "node type %T not supported for clearing inputs", node.Target)
+			logger.Debugf(ctx, "node type %T not supported for clearing inputs", node.GetTarget())
 		}
 	}
 }

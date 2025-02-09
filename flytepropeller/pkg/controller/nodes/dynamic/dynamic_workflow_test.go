@@ -596,7 +596,7 @@ func TestClearNodeInputs_WithCoreBindings(t *testing.T) {
 		}
 		clearNodeInputs(ctx, nodes)
 		for _, node := range nodes {
-			assert.Nil(t, node.Inputs)
+			assert.Nil(t, node.GetInputs())
 		}
 	})
 
@@ -613,9 +613,9 @@ func TestClearNodeInputs_WithCoreBindings(t *testing.T) {
 		}
 		clearNodeInputs(ctx, nodes)
 		for _, node := range nodes {
-			assert.Nil(t, node.Inputs)
-			if arrayNode, ok := node.Target.(*core.Node_ArrayNode); ok {
-				assert.Nil(t, arrayNode.ArrayNode.Node.Inputs)
+			assert.Nil(t, node.GetInputs())
+			if arrayNode, ok := node.GetTarget().(*core.Node_ArrayNode); ok {
+				assert.Nil(t, arrayNode.ArrayNode.GetNode().GetInputs())
 			}
 		}
 	})
