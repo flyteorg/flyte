@@ -3,7 +3,7 @@ members = ["bridge", "executor"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.7"
+version = "0.1.5"
 
 [workspace.dependencies]
 bincode = "1.3"
