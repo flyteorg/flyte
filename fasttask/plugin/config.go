@@ -26,7 +26,7 @@ var (
 		},
 		NonceLength:          12,
 		TaskStatusBufferSize: 512,
-		WorkerLogLevel:       logLevelInfo,
+		WorkerLogLevel:       logLevelWarn,
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("fasttask", defaultConfig)
