@@ -218,6 +218,7 @@ Finally, enable ``slurmctld`` and ``slurmd`` to start at boot and restart them.
 
   # For compute
   sudo systemctl enable slurmd
+  sudo systemctl restart slurmd
 
 You can verify the status of the daemons using ``systemctl status <daemon>`` or check the logs in ``/var/log/slurm/slurmctld.log`` and ``/var/log/slurm/slurmd.log`` to ensure the Slurm cluster is running correctly.
 
