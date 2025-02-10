@@ -81,7 +81,7 @@ Please make sure that ``uid`` is equal to ``gid`` to avoid some troubles:
 
 .. code-block:: shell
 
-  adduser --system --uid <uid> --group --home /var/lib/slurm slurm
+  sudo adduser --system --uid <uid> --group --home /var/lib/slurm slurm
 
 .. note::
  
@@ -112,7 +112,8 @@ First, you can download the Slurm source from `here <https://www.schedmd.com/dow
 
 .. code-block:: shell
 
-  wget -P <your-dir> https://download.schedmd.com/slurm/slurm-24.05.5.tar.bz2
+  mkdir <your-clean-dir> && cd <your-clean-dir>
+  wget https://download.schedmd.com/slurm/slurm-24.05.5.tar.bz2
 
 .. note::
 
@@ -124,7 +125,7 @@ Then, Debian packages can be built following this `official guide <https://slurm
 
   # Install basic Debian package build requirements
   sudo apt-get update
-  sudo apt-get install build-essential fakeroot devscripts equivs
+  sudo apt-get install -y build-essential fakeroot devscripts equivs
 
   # (Optional) Install dependencies if missing
   sudo apt install -y \
@@ -140,13 +141,20 @@ Then, Debian packages can be built following this `official guide <https://slurm
   # cd to the directory containing the Slurm source
   cd slurm-24.05.5
 
+  # (Optional) Enable source packages for Ubuntu 24.04
+  # For details, please refer to
+  # https://manpages.debian.org/stretch/apt/sources.list.5.en.html
+  # and https://askubuntu.com/questions/1512042/
+  sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+  sudo apt update
+
   # Install the Slurm package dependencies
-  sudo mk-build-deps -i Debian/control
+  sudo mk-build-deps -i debian/control
 
   # Build the Slurm packages
   debuild -b -uc -us
 
-Debian packages are built and placed under the parent directory ``<your-dir>``. Since the single-host Slurm cluster functions as both a controller and a compute node, the following packages are required: ``slurm-smd``, ``slurm-smd-client`` (for CLI), ``slurm-smd-slurmctld``, and ``slurm-smd-slurmd``.
+Debian packages are built and placed under the parent directory ``<your-clean-dir>``. Since the single-host Slurm cluster functions as both a controller and a compute node, the following packages are required: ``slurm-smd``, ``slurm-smd-client`` (for CLI), ``slurm-smd-slurmctld``, and ``slurm-smd-slurmd``.
 
 .. code-block:: shell
 
@@ -186,7 +194,9 @@ The following key-value pairs need to be set manually. Please leave the other op
   SlurmdLogFile=/var/log/slurm/slurmd.log
 
   # == Compute Nodes == 
-  NodeName=localhost CPUs=16 RealMemory=30528 Sockets=1 CoresPerSocket=8 ThreadsPerCore=2 State=UNKNOWN
+  # For checking CPU info, please use `lscpu | egrep 'Socket|Thread|CPU\(s\)'`
+  # For checking Mem info, please use `free -m` and write "available" value
+  NodeName=localhost CPUs=<cpus> RealMemory=<available-mem> Sockets=<sockets> CoresPerSocket=<cores-per-socket> ThreadsPerCore=<threads-per-core> State=UNKNOWN
   PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
 
 After completing the form, submit it, copy the content, and save it to ``/etc/slurm/slurm.conf``.
@@ -249,6 +259,7 @@ This setup consists of three main components: a client (localhost), a remote Slu
 
   # Install flytekit
   git clone https://github.com/flyteorg/flytekit.git
+  cd flytekit
   gh pr checkout 3005
   make setup && pip install -e .
 
@@ -265,6 +276,7 @@ To run user-defined task functions on the Slurm cluster, you need to install the
 
   # Install flytekit
   git clone https://github.com/flyteorg/flytekit.git
+  cd flytekit
   gh pr checkout 3005
   make setup && pip install -e .
 
