@@ -28,62 +28,37 @@ pub async fn run(py: Python<'_>, args: ExecutorArgs) -> Result<(), Box<dyn std::
     let _fast_task = PyModule::from_code_bound(
         py,
         r#"
-def _get_loaded_user_modules():
-    # Returns modules that are user defined
-    import os
-    import site
-    import sys
+import inspect
+import sys
+import os
+from contextlib import suppress
 
-    builtin_names = set(sys.builtin_module_names)
+def _get_fast_register_modules(fast_register_path):
+    # Get modules that are defined in fast_register_path
+    fast_register_modules = []
 
-    non_user_directories = site.getsitepackages() + [
-        site.getusersitepackages(),
-        sys.prefix,
-        sys.base_prefix,
-    ]
-    outputs = []
-
-    all_modules = list(sys.modules)
-
-    for name in all_modules:
-        if name in builtin_names:
+    module_names = list(sys.modules)
+    for module_name in module_names:
+        # Do not unload this module
+        if module_name == "_union_fast_task":
             continue
 
         try:
-            mod = sys.modules[name]
-        except KeyError:
+            module_file_path = inspect.getfile(sys.modules[module_name])
+        except (TypeError, KeyError):
             continue
 
-        try:
-            mod_file = mod.__file__
-        except Exception:
+        absolute_file_path = os.path.abspath(module_file_path)
+        if not os.path.commonpath([fast_register_path, absolute_file_path]) == fast_register_path:
             continue
 
-        if not isinstance(mod_file, str):
-            continue
+        fast_register_modules.append(module_name)
 
-        try:
-            is_non_user = any(
-                os.path.commonpath([mod_file, non_user_directory]) == non_user_directory
-                for non_user_directory in non_user_directories
-            )
-            if is_non_user:
-                continue
+    return fast_register_modules
 
-        except ValueError:
-            # This means that the files are not in the same drive, which means the
-            # mod_file are not in any of the directories
-            pass
-
-        outputs.append(name)
-
-    return outputs
-
-def reset_env():
+def reset_env(fast_register_path):
     # Unload modules that are user defined and resets Launchplan cache
-    import sys
-    from contextlib import suppress
-    user_modules = _get_loaded_user_modules()
+    user_modules = _get_fast_register_modules(fast_register_path)
     for name in user_modules:
         with suppress(KeyError):
             del sys.modules[name]
@@ -277,6 +252,9 @@ async fn cleanup_python_env<'a>(
             None,
             Some(&locals),
         )?;
+
+        // reset to environment
+        _fast_task.call_method1("reset_env", (fast_register_dir,))?;
     }
 
     // Unset environment variables if provided
@@ -292,9 +270,5 @@ async fn cleanup_python_env<'a>(
 
     // update workdir to original;
     _os.call_method1("chdir", (cwd,))?;
-
-    // reset to environment
-    _fast_task.call_method0("reset_env")?;
-
     Ok(())
 }
