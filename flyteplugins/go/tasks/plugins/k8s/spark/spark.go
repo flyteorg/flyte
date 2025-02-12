@@ -200,21 +200,23 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 
 	driverPod := sparkJob.GetDriverPod()
 	if driverPod != nil {
-		var customPodSpec *v1.PodSpec
+		if driverPod.GetPodSpec() != nil {
+			var customPodSpec *v1.PodSpec
 
-		err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
-		if err != nil {
-			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
+			err = utils.UnmarshalStructToObj(driverPod.GetPodSpec(), &customPodSpec)
+			if err != nil {
+				return nil, errors.Errorf(errors.BadTaskSpecification,
+					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
+			}
+
+			podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		if driverPod.GetPrimaryContainerName() != "" {
 			primaryContainerName = driverPod.GetPrimaryContainerName()
-		}
-
-		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
-		if err != nil {
-			return nil, err
 		}
 	}
 
@@ -251,21 +253,22 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 
 	executorPod := sparkJob.GetExecutorPod()
 	if executorPod != nil {
-		var customPodSpec *v1.PodSpec
+		if executorPod.GetPodSpec() != nil {
+			var customPodSpec *v1.PodSpec
 
-		err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
-		if err != nil {
-			return nil, errors.Errorf(errors.BadTaskSpecification,
-				"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
+			err = utils.UnmarshalStructToObj(executorPod.GetPodSpec(), &customPodSpec)
+			if err != nil {
+				return nil, errors.Errorf(errors.BadTaskSpecification,
+					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
+			}
+
+			podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+			if err != nil {
+				return nil, err
+			}
 		}
-
 		if executorPod.GetPrimaryContainerName() != "" {
 			primaryContainerName = executorPod.GetPrimaryContainerName()
-		}
-
-		podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
-		if err != nil {
-			return nil, err
 		}
 	}
 
