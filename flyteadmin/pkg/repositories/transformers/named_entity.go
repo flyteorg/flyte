@@ -6,16 +6,16 @@ import (
 )
 
 func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.NamedEntity {
-	stateInt := int32(request.Metadata.State)
+	stateInt := int32(request.GetMetadata().GetState())
 	return models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
-			ResourceType: request.ResourceType,
-			Project:      request.Id.Project,
-			Domain:       request.Id.Domain,
-			Name:         request.Id.Name,
+			ResourceType: request.GetResourceType(),
+			Project:      request.GetId().GetProject(),
+			Domain:       request.GetId().GetDomain(),
+			Name:         request.GetId().GetName(),
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
-			Description: request.Metadata.Description,
+			Description: request.GetMetadata().GetDescription(),
 			State:       &stateInt,
 		},
 	}

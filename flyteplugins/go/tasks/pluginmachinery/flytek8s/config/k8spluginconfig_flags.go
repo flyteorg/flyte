@@ -69,5 +69,7 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "send-object-events"), defaultK8sConfig.SendObjectEvents, "If true,  will send k8s object events in TaskExecutionEvent updates.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "update-base-backoff-duration"), defaultK8sConfig.UpdateBaseBackoffDuration, "Initial delay in exponential backoff when updating a resource in milliseconds.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "update-backoff-retries"), defaultK8sConfig.UpdateBackoffRetries, "Number of retries for exponential backoff when updating a resource.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "add-tolerations-for-extended-resources"), defaultK8sConfig.AddTolerationsForExtendedResources, "Name of the extended resources for which tolerations should be added.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-distributed-error-aggregation"), defaultK8sConfig.EnableDistributedErrorAggregation, "If true,  will aggregate errors of different worker pods for distributed tasks.")
 	return cmdFlags
 }

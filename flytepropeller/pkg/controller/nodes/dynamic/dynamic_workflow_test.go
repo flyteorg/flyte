@@ -532,7 +532,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 		mockLPLauncher := &mocks5.Reader{}
 		mockLPLauncher.OnGetLaunchPlanMatch(mock.Anything, mock.MatchedBy(func(id *core.Identifier) bool {
-			return lpID.Name == id.Name && lpID.Domain == id.Domain && lpID.Project == id.Project && lpID.ResourceType == id.ResourceType
+			return lpID.GetName() == id.GetName() && lpID.GetDomain() == id.GetDomain() && lpID.GetProject() == id.GetProject() && lpID.GetResourceType() == id.GetResourceType()
 		})).Return(&admin.LaunchPlan{
 			Id: lpID,
 			Closure: &admin.LaunchPlanClosure{

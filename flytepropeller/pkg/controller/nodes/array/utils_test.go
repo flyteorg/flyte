@@ -29,10 +29,10 @@ func TestAppendLiteral(t *testing.T) {
 	}
 
 	for _, v := range outputLiterals {
-		collection, ok := v.Value.(*idlcore.Literal_Collection)
+		collection, ok := v.GetValue().(*idlcore.Literal_Collection)
 		assert.True(t, ok)
 
-		assert.Equal(t, 2, len(collection.Collection.Literals))
+		assert.Equal(t, 2, len(collection.Collection.GetLiterals()))
 	}
 }
 

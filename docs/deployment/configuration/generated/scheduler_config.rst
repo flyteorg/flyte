@@ -8,6 +8,8 @@ Flyte Scheduler Configuration
 
 - `auth <#section-auth>`_
 
+- `catalog-cache <#section-catalog-cache>`_
+
 - `cloudevents <#section-cloudevents>`_
 
 - `cluster_resources <#section-cluster_resources>`_
@@ -19,6 +21,8 @@ Flyte Scheduler Configuration
 - `database <#section-database>`_
 
 - `domains <#section-domains>`_
+
+- `event <#section-event>`_
 
 - `externalevents <#section-externalevents>`_
 
@@ -55,6 +59,8 @@ Flyte Scheduler Configuration
 - `task_resources <#section-task_resources>`_
 
 - `task_type_whitelist <#section-task_type_whitelist>`_
+
+- `tasks <#section-tasks>`_
 
 Section: admin
 ========================================================================================================================
@@ -141,6 +147,18 @@ Max number of gRPC retries
 .. code-block:: yaml
 
   "4"
+  
+
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 authType (uint8)
@@ -1338,6 +1356,117 @@ scopes ([]string)
   - profile
   
 
+Section: catalog-cache
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Catalog Implementation to use
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+endpoint (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Endpoint for catalog service
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+insecure (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use insecure grpc connection
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+max-cache-age (`config.Duration`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Cache entries past this age will incur cache miss. 0 means cache never expires
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
+  
+
+use-admin-auth (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use the same gRPC credentials option as the flyteadmin client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+max-retries (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
+  
+
+default-service-config (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Set the default service config for the catalog gRPC client
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
 Section: cloudevents
 ========================================================================================================================
 
@@ -1389,6 +1518,18 @@ kafka (`interfaces.KafkaConfig`_)
 .. code-block:: yaml
 
   brokers: null
+  saslConfig:
+    enabled: false
+    handshake: false
+    mechanism: ""
+    password: ""
+    passwordPath: ""
+    user: ""
+  tlsConfig:
+    certPath: ""
+    enabled: false
+    insecureSkipVerify: false
+    keyPath: ""
   version: ""
   
 
@@ -1399,6 +1540,7 @@ eventsPublisher (`interfaces.EventsPublisherConfig`_)
 
 .. code-block:: yaml
 
+  enrichAllWorkflowEventTypes: false
   eventTypes: null
   topicName: ""
   
@@ -1469,6 +1611,16 @@ eventTypes ([]string)
   null
   
 
+enrichAllWorkflowEventTypes (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 interfaces.GCPConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1503,6 +1655,140 @@ brokers ([]string)
 .. code-block:: yaml
 
   null
+  
+
+saslConfig (`interfaces.SASLConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  handshake: false
+  mechanism: ""
+  password: ""
+  passwordPath: ""
+  user: ""
+  
+
+tlsConfig (`interfaces.TLSConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  certPath: ""
+  enabled: false
+  insecureSkipVerify: false
+  keyPath: ""
+  
+
+interfaces.SASLConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+user (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+passwordPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+handshake (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+mechanism (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.TLSConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureSkipVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+certPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+keyPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 Section: cluster_resources
@@ -1751,6 +2037,7 @@ postgres (`database.PostgresConfig`_)
   password: postgres
   passwordPath: ""
   port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -1771,6 +2058,18 @@ host (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
 
 **Default Value**: 
 
@@ -1869,7 +2168,7 @@ database.SQLiteConfig
 file (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created
+The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be reused, else a new will be created
 
 **Default Value**: 
 
@@ -1899,6 +2198,93 @@ name (string)
 .. code-block:: yaml
 
   development
+  
+
+Section: event
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of EventSink to configure [log/admin/file].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  admin
+  
+
+file-path (string)
+------------------------------------------------------------------------------------------------------------------------
+
+For file types, specify where the file should be located.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+rate (int64)
+------------------------------------------------------------------------------------------------------------------------
+
+Max rate at which events can be recorded per second.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "500"
+  
+
+capacity (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max bucket size for event recording tokens.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+max-retries (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
   
 
 Section: externalevents
@@ -1951,6 +2337,7 @@ eventsPublisher (`interfaces.EventsPublisherConfig`_)
 
 .. code-block:: yaml
 
+  enrichAllWorkflowEventTypes: false
   eventTypes: null
   topicName: ""
   
@@ -2745,6 +3132,47 @@ traceIdRatio (float64)
 Section: plugins
 ========================================================================================================================
 
+agent-service (`agent.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  agentForTaskTypes: null
+  agents: null
+  defaultAgent:
+    defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+    defaultTimeout: 10s
+    endpoint: ""
+    insecure: true
+    timeouts: null
+  pollInterval: 10s
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  supportedTaskTypes:
+  - task_type_1
+  - task_type_2
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
+  
+
 catalogcache (`catalog.Config`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -2769,6 +3197,7 @@ k8s (`config.K8sPluginConfig`_)
 
 .. code-block:: yaml
 
+  add-tolerations-for-extended-resources: []
   co-pilot:
     cpu: 500m
     default-input-path: /var/flyte/inputs
@@ -2799,6 +3228,7 @@ k8s (`config.K8sPluginConfig`_)
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  enable-distributed-error-aggregation: false
   enable-host-networking-pod: null
   gpu-device-node-label: k8s.amazonaws.com/accelerator
   gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
@@ -2818,6 +3248,412 @@ k8s (`config.K8sPluginConfig`_)
   send-object-events: false
   update-backoff-retries: 5
   update-base-backoff-duration: 10
+  
+
+k8s-array (`k8s.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ErrorAssembler:
+    maxItems: 100000
+    maxRetries: 5
+    workers: 10
+  OutputAssembler:
+    maxItems: 100000
+    maxRetries: 5
+    workers: 10
+  logs:
+    config:
+      cloudwatch-enabled: false
+      cloudwatch-log-group: ""
+      cloudwatch-region: ""
+      cloudwatch-template-uri: ""
+      dynamic-log-links: null
+      gcp-project: ""
+      kubernetes-enabled: true
+      kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+        }}/pod?namespace={{ .namespace }}
+      kubernetes-url: ""
+      stackdriver-enabled: false
+      stackdriver-logresourcename: ""
+      stackdriver-template-uri: ""
+      templates: null
+  maxArrayJobSize: 5000
+  maxErrorLength: 1000
+  namespaceTemplate: ""
+  node-selector: null
+  remoteClusterConfig:
+    auth:
+      certPath: ""
+      tokenPath: ""
+      type: ""
+    enabled: false
+    endpoint: ""
+    name: ""
+  resourceConfig:
+    limit: 0
+    primaryLabel: ""
+  scheduler: ""
+  tolerations: null
+  
+
+logs (`logs.LogConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  dynamic-log-links: null
+  gcp-project: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+agent.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultAgent (`agent.Deployment`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The default agent.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+  defaultTimeout: 10s
+  endpoint: ""
+  insecure: true
+  timeouts: null
+  
+
+agents (map[string]*agent.Deployment)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The agents.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+agentForTaskTypes (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_1
+  - task_type_2
+  
+
+pollInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The interval at which the plugin should poll the agent for metadata updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
+  
+
+agent.Deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+insecure (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+defaultServiceConfig (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  '{"loadBalancingConfig": [{"round_robin":{}}]}'
+  
+
+timeouts (map[string]config.Duration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+defaultTimeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
+  
+
+core.ResourceConstraintsSpec
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ProjectScopeResourceConstraint (`core.ResourceConstraint`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Value: 100
+  
+
+NamespaceScopeResourceConstraint (`core.ResourceConstraint`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Value: 50
+  
+
+core.ResourceConstraint
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Value (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+webapi.PluginConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+resourceQuotas (webapi.ResourceQuotas)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default: 1000
+  
+
+readRateLimiter (`webapi.RateLimiterConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines rate limiter properties for read actions (e.g. retrieve status).
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 100
+  qps: 10
+  
+
+writeRateLimiter (`webapi.RateLimiterConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines rate limiter properties for write actions.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 100
+  qps: 10
+  
+
+caching (`webapi.CachingConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines caching characteristics.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxSystemFailures: 5
+  resyncInterval: 30s
+  size: 500000
+  workers: 10
+  
+
+resourceMeta (interface)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  <nil>
+  
+
+webapi.CachingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+size (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the maximum number of items to cache.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "500000"
+  
+
+resyncInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the sync interval.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
+  
+
+workers (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the number of workers to start up to process items.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+maxSystemFailures (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the number of failures to fetch a task before failing the task.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+webapi.RateLimiterConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+qps (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the max rate of calls per second.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+burst (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the maximum burst size.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
   
 
 catalog.Config
@@ -3314,6 +4150,30 @@ Number of retries for exponential backoff when updating a resource.
   "5"
   
 
+add-tolerations-for-extended-resources ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the extended resources for which tolerations should be added.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+enable-distributed-error-aggregation (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will aggregate errors of different worker pods for distributed tasks.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 config.FlyteCoPilotConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -3512,6 +4372,609 @@ scale (int32)
 .. code-block:: yaml
 
   "0"
+  
+
+k8s.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scheduler (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Decides the scheduler to use when launching array-pods.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+maxErrorLength (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Determines the maximum length of the error string returned for the array.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+maxArrayJobSize (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum size of array job.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5000"
+  
+
+resourceConfig (`k8s.ResourceConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  limit: 0
+  primaryLabel: ""
+  
+
+remoteClusterConfig (`k8s.ClusterConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  auth:
+    certPath: ""
+    tokenPath: ""
+    type: ""
+  enabled: false
+  endpoint: ""
+  name: ""
+  
+
+node-selector (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+tolerations ([]v1.Toleration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+namespaceTemplate (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+OutputAssembler (`workqueue.Config`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxItems: 100000
+  maxRetries: 5
+  workers: 10
+  
+
+ErrorAssembler (`workqueue.Config`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  maxItems: 100000
+  maxRetries: 5
+  workers: 10
+  
+
+logs (`k8s.LogConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Config for log links for k8s array jobs.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  config:
+    cloudwatch-enabled: false
+    cloudwatch-log-group: ""
+    cloudwatch-region: ""
+    cloudwatch-template-uri: ""
+    dynamic-log-links: null
+    gcp-project: ""
+    kubernetes-enabled: true
+    kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+      }}/pod?namespace={{ .namespace }}
+    kubernetes-url: ""
+    stackdriver-enabled: false
+    stackdriver-logresourcename: ""
+    stackdriver-template-uri: ""
+    templates: null
+  
+
+k8s.ClusterConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+name (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Friendly name of the remote cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Remote K8s cluster endpoint
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+auth (`k8s.Auth`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  certPath: ""
+  tokenPath: ""
+  type: ""
+  
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Boolean flag to enable or disable
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+k8s.Auth
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+type (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Authentication type
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+tokenPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Token path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+certPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Certificate path
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+k8s.LogConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+config (`logs.LogConfig (config)`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines the log config for k8s logs.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  dynamic-log-links: null
+  gcp-project: ""
+  kubernetes-enabled: true
+  kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
+    }}/pod?namespace={{ .namespace }}
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+logs.LogConfig (config)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+cloudwatch-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Cloudwatch Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+cloudwatch-region (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+AWS region in which Cloudwatch logs are stored.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-log-group (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Log group to which streams are associated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building cloudwatch log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Kubernetes Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+kubernetes-url (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Console URL for Kubernetes logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building kubernetes log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
+  
+
+stackdriver-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Log-links to stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+gcp-project (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the project in GCP
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-logresourcename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the logresource in stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building stackdriver log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+templates ([]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+k8s.ResourceConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+primaryLabel (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+PrimaryLabel of a given service cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+limit (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Resource quota (in the number of outstanding requests) for the cluster
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+logs.LogConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+cloudwatch-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Cloudwatch Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+cloudwatch-region (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+AWS region in which Cloudwatch logs are stored.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-log-group (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Log group to which streams are associated.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+cloudwatch-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building cloudwatch log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Kubernetes Logging
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+kubernetes-url (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Console URL for Kubernetes logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+kubernetes-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building kubernetes log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace
+    }}
+  
+
+stackdriver-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Log-links to stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+gcp-project (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the project in GCP
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-logresourcename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Name of the logresource in stackdriver
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+stackdriver-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building stackdriver log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+templates ([]tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 Section: propeller
@@ -3956,6 +5419,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  use-map-plugin-logs: false
   
 
 literal-offloading-config (`config.LiteralOffloadingConfig`_)
@@ -3971,7 +5435,48 @@ config used for literal offloading.
   max-size-in-mb-for-offloading: 1000
   min-size-in-mb-for-offloading: 10
   supported-sdk-versions:
-    FLYTE_SDK: 1.13.5
+    FLYTE_SDK: 1.13.14
+  
+
+admin-launcher (`launchplan.AdminConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  burst: 10
+  cache-resync-duration: 30s
+  cacheSize: 10000
+  tps: 100
+  workers: 10
+  
+
+resourcemanager (`config.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  redis:
+    hostKey: ""
+    hostPath: ""
+    hostPaths: []
+    maxRetries: 0
+    primaryName: ""
+  resourceMaxQuota: 1000
+  type: noop
+  
+
+workflowstore (`workflowstore.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  policy: ResourceVersionCache
   
 
 config.ArrayNodeConfig
@@ -3999,6 +5504,18 @@ Default parallelism behavior for array nodes
 .. code-block:: yaml
 
   unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
@@ -4131,6 +5648,112 @@ Bucket capacity as number of items
 .. code-block:: yaml
 
   "10000"
+  
+
+config.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+type (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Which resource manager to use, redis or noop. Default is noop.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+resourceMaxQuota (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Global limit for concurrent Qubole queries
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
+  
+
+redis (`config.RedisConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Config for Redis resourcemanager.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  hostKey: ""
+  hostPath: ""
+  hostPaths: []
+  maxRetries: 0
+  primaryName: ""
+  
+
+config.RedisConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+hostPaths ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Redis hosts locations.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+primaryName (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Redis primary name, fill in only if you are connecting to a redis sentinel cluster.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+hostPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Redis host location
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+hostKey (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Key for local Redis access
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+maxRetries (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+See Redis client options for more info
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 config.EventConfig
@@ -4316,7 +5939,7 @@ Maps flytekit and union SDK names to minimum supported version that can handle r
 
 .. code-block:: yaml
 
-  FLYTE_SDK: 1.13.5
+  FLYTE_SDK: 1.13.14
   
 
 min-size-in-mb-for-offloading (int64)
@@ -4470,6 +6093,84 @@ port (int)
 .. code-block:: yaml
 
   "10254"
+  
+
+launchplan.AdminConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tps (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The maximum number of transactions per second to flyte admin from this client.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+burst (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum burst for throttle
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+cacheSize (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum cache in terms of number of items stored.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10000"
+  
+
+workers (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Number of parallel workers to work on the queue.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+cache-resync-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Frequency of re-syncing launchplans within the auto refresh cache.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  30s
+  
+
+workflowstore.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Workflow Store Policy to initialize
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ResourceVersionCache
   
 
 Section: qualityofservice
@@ -5014,6 +6715,7 @@ security (`config.ServerSecurityOptions`_)
   allowedOrigins:
   - '*'
   auditAccess: false
+  insecureCookieHeader: false
   secure: false
   ssl:
     certificateFile: ""
@@ -5305,6 +7007,16 @@ ssl (`config.SslOptions`_)
   
 
 useAuth (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+insecureCookieHeader (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -5744,5 +7456,110 @@ ephemeralStorage (`resource.Quantity`_)
 .. code-block:: yaml
 
   "0"
+  
+
+Section: tasks
+========================================================================================================================
+
+task-plugins (`config.TaskPluginConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Task plugin configuration
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-for-task-types: {}
+  enabled-plugins: []
+  
+
+max-plugin-phase-versions (int32)
+------------------------------------------------------------------------------------------------------------------------
+
+Maximum number of plugin phase versions allowed for one phase.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100000"
+  
+
+backoff (`config.BackOffConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Config for Exponential BackOff implementation
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  base-second: 2
+  max-duration: 20s
+  
+
+maxLogMessageLength (int)
+------------------------------------------------------------------------------------------------------------------------
+
+Deprecated!!! Max length of error message.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+config.BackOffConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+base-second (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The number of seconds representing the base duration of the exponential backoff
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "2"
+  
+
+max-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The cap of the backoff duration
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  20s
+  
+
+config.TaskPluginConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled-plugins ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Plugins enabled currently
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+default-for-task-types (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
   
 

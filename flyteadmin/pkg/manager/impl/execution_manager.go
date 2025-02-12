@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/benbjohnson/clock"
@@ -46,9 +47,6 @@ import (
 
 const childContainerQueueKey = "child_queue"
 
-// Map of [project] -> map of [domain] -> stop watch
-type projectDomainScopedStopWatchMap = map[string]map[string]*promutils.StopWatch
-
 type executionSystemMetrics struct {
 	Scope                      promutils.Scope
 	ActiveExecutions           prometheus.Gauge
@@ -68,8 +66,8 @@ type executionSystemMetrics struct {
 
 type executionUserMetrics struct {
 	Scope                        promutils.Scope
-	ScheduledExecutionDelays     projectDomainScopedStopWatchMap
-	WorkflowExecutionDurations   projectDomainScopedStopWatchMap
+	ScheduledExecutionDelays     sync.Map // Map of [project] -> map of [domain] -> stop watch
+	WorkflowExecutionDurations   sync.Map // Map of [project] -> map of [domain] -> stop watch
 	WorkflowExecutionInputBytes  prometheus.Summary
 	WorkflowExecutionOutputBytes prometheus.Summary
 }
@@ -81,7 +79,7 @@ type ExecutionManager struct {
 	queueAllocator            executions.QueueAllocator
 	_clock                    clock.Clock
 	systemMetrics             executionSystemMetrics
-	userMetrics               executionUserMetrics
+	userMetrics               *executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
@@ -95,8 +93,8 @@ type ExecutionManager struct {
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
-	ctx = contextutils.WithExecutionID(ctx, id.Name)
-	return contextutils.WithProjectDomain(ctx, id.Project, id.Domain)
+	ctx = contextutils.WithExecutionID(ctx, id.GetName())
+	return contextutils.WithProjectDomain(ctx, id.GetProject(), id.GetDomain())
 }
 
 // Returns the unique string which identifies the authenticated end user (if any).
@@ -108,16 +106,16 @@ func getUser(ctx context.Context) string {
 func (m *ExecutionManager) populateExecutionQueue(
 	ctx context.Context, identifier *core.Identifier, compiledWorkflow *core.CompiledWorkflowClosure) {
 	queueConfig := m.queueAllocator.GetQueue(ctx, identifier)
-	for _, task := range compiledWorkflow.Tasks {
-		container := task.Template.GetContainer()
+	for _, task := range compiledWorkflow.GetTasks() {
+		container := task.GetTemplate().GetContainer()
 		if container == nil {
 			// Unrecognized target type, nothing to do
 			continue
 		}
 
 		if queueConfig.DynamicQueue != "" {
-			logger.Debugf(ctx, "Assigning %s as child queue for task %+v", queueConfig.DynamicQueue, task.Template.Id)
-			container.Config = append(container.Config, &core.KeyValuePair{
+			logger.Debugf(ctx, "Assigning %s as child queue for task %+v", queueConfig.DynamicQueue, task.GetTemplate().GetId())
+			container.Config = append(container.GetConfig(), &core.KeyValuePair{
 				Key:   childContainerQueueKey,
 				Value: queueConfig.DynamicQueue,
 			})
@@ -159,8 +157,8 @@ func resolveStringMap(preferredValues, defaultValues mapWithValues, valueName st
 func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
 	workflowName, launchPlanName string) ([]*admin.PluginOverride, error) {
 	override, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      executionID.Project,
-		Domain:       executionID.Domain,
+		Project:      executionID.GetProject(),
+		Domain:       executionID.GetDomain(),
 		Workflow:     workflowName,
 		LaunchPlan:   launchPlanName,
 		ResourceType: admin.MatchableResource_PLUGIN_OVERRIDE,
@@ -169,7 +167,7 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 		return nil, err
 	}
 	if override != nil && override.Attributes != nil && override.Attributes.GetPluginOverrides() != nil {
-		return override.Attributes.GetPluginOverrides().Overrides, nil
+		return override.Attributes.GetPluginOverrides().GetOverrides(), nil
 	}
 	return nil, nil
 }
@@ -188,13 +186,13 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		return
 	}
 
-	if task.Template == nil || task.Template.GetContainer() == nil {
+	if task.GetTemplate() == nil || task.GetTemplate().GetContainer() == nil {
 		// Nothing to do
 		logger.Debugf(ctx, "Not setting default resources for task [%+v], no container resources found to check", task)
 		return
 	}
 
-	if task.Template.GetContainer().Resources == nil {
+	if task.GetTemplate().GetContainer().GetResources() == nil {
 		// In case of no resources on the container, create empty requests and limits
 		// so the container will still have resources configure properly
 		task.Template.GetContainer().Resources = &core.Resources{
@@ -209,7 +207,7 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 	// The IDL representation for container-type tasks represents resources as a list with string quantities.
 	// In order to easily reason about them we convert them to a set where we can O(1) fetch specific resources (e.g. CPU)
 	// and represent them as comparable quantities rather than strings.
-	taskResourceRequirements := util.GetCompleteTaskResourceRequirements(ctx, task.Template.Id, task)
+	taskResourceRequirements := util.GetCompleteTaskResourceRequirements(ctx, task.GetTemplate().GetId(), task)
 
 	cpu := flytek8s.AdjustOrDefaultResource(taskResourceRequirements.Defaults.CPU, taskResourceRequirements.Limits.CPU,
 		platformTaskResources.Defaults.CPU, platformTaskResources.Limits.CPU)
@@ -276,22 +274,22 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 // as well as sets request spec metadata with the inherited principal and adjusted nesting data.
 func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, requestSpec *admin.ExecutionSpec,
 	workflowExecutionID *core.WorkflowExecutionIdentifier) (parentNodeExecutionID uint, sourceExecutionID uint, err error) {
-	if requestSpec.Metadata == nil || requestSpec.Metadata.ParentNodeExecution == nil {
+	if requestSpec.GetMetadata() == nil || requestSpec.GetMetadata().GetParentNodeExecution() == nil {
 		return parentNodeExecutionID, sourceExecutionID, nil
 	}
-	parentNodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, requestSpec.Metadata.ParentNodeExecution)
+	parentNodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, requestSpec.GetMetadata().GetParentNodeExecution())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get node execution [%+v] that launched this execution [%+v] with error %v",
-			requestSpec.Metadata.ParentNodeExecution, workflowExecutionID, err)
+			requestSpec.GetMetadata().GetParentNodeExecution(), workflowExecutionID, err)
 		return parentNodeExecutionID, sourceExecutionID, err
 	}
 
 	parentNodeExecutionID = parentNodeExecutionModel.ID
 
-	sourceExecutionModel, err := util.GetExecutionModel(ctx, m.db, requestSpec.Metadata.ParentNodeExecution.ExecutionId)
+	sourceExecutionModel, err := util.GetExecutionModel(ctx, m.db, requestSpec.GetMetadata().GetParentNodeExecution().GetExecutionId())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get workflow execution [%+v] that launched this execution [%+v] with error %v",
-			requestSpec.Metadata.ParentNodeExecution, workflowExecutionID, err)
+			requestSpec.GetMetadata().GetParentNodeExecution(), workflowExecutionID, err)
 		return parentNodeExecutionID, sourceExecutionID, err
 	}
 	sourceExecutionID = sourceExecutionModel.ID
@@ -301,16 +299,16 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 		logger.Errorf(ctx, "Failed transform parent execution model for child execution [%+v] with err: %v", workflowExecutionID, err)
 		return parentNodeExecutionID, sourceExecutionID, err
 	}
-	if sourceExecution.Spec.Metadata != nil {
-		requestSpec.Metadata.Nesting = sourceExecution.Spec.Metadata.Nesting + 1
+	if sourceExecution.GetSpec().GetMetadata() != nil {
+		requestSpec.Metadata.Nesting = sourceExecution.GetSpec().GetMetadata().GetNesting() + 1
 	} else {
 		requestSpec.Metadata.Nesting = 1
 	}
 
 	// If the source execution has a cluster label, inherit it.
-	if sourceExecution.Spec.ExecutionClusterLabel != nil {
-		logger.Infof(ctx, "Inherited execution label from source execution [%+v]", sourceExecution.Spec.ExecutionClusterLabel.Value)
-		requestSpec.ExecutionClusterLabel = sourceExecution.Spec.ExecutionClusterLabel
+	if sourceExecution.GetSpec().GetExecutionClusterLabel() != nil {
+		logger.Infof(ctx, "Inherited execution label from source execution [%+v]", sourceExecution.GetSpec().GetExecutionClusterLabel().GetValue())
+		requestSpec.ExecutionClusterLabel = sourceExecution.GetSpec().GetExecutionClusterLabel()
 	}
 	return parentNodeExecutionID, sourceExecutionID, nil
 }
@@ -324,20 +322,20 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 
 	workflowExecConfig := &admin.WorkflowExecutionConfig{}
 	// Merge the request spec into workflowExecConfig
-	workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, request.Spec)
+	workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, request.GetSpec())
 
 	var workflowName string
-	if launchPlan != nil && launchPlan.Spec != nil {
+	if launchPlan != nil && launchPlan.GetSpec() != nil {
 		// Merge the launch plan spec into workflowExecConfig
-		workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, launchPlan.Spec)
-		if launchPlan.Spec.WorkflowId != nil {
-			workflowName = launchPlan.Spec.WorkflowId.Name
+		workflowExecConfig = util.MergeIntoExecConfig(workflowExecConfig, launchPlan.GetSpec())
+		if launchPlan.GetSpec().GetWorkflowId() != nil {
+			workflowName = launchPlan.GetSpec().GetWorkflowId().GetName()
 		}
 	}
 
 	// This will get the most specific Workflow Execution Config.
 	matchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain, workflowName)
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.GetProject(), request.GetDomain(), workflowName)
 	if err != nil {
 		return nil, err
 	}
@@ -356,7 +354,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	// system level defaults for the rest.
 	// See FLYTE-2322 for more background information.
 	projectMatchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, "", "")
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.GetProject(), "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -404,7 +402,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 }
 
 func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.ExecutionCreateRequest) (*admin.ClusterAssignment, error) {
-	storedAssignment, err := m.fetchClusterAssignment(ctx, req.Project, req.Domain)
+	storedAssignment, err := m.fetchClusterAssignment(ctx, req.GetProject(), req.GetDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +419,7 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.
 	}
 
 	if reqPool != storedPool {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "execution with project %q and domain %q cannot run on cluster pool %q, because its configured to run on pool %q", req.Project, req.Domain, reqPool, storedPool)
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "execution with project %q and domain %q cannot run on cluster pool %q, because its configured to run on pool %q", req.GetProject(), req.GetDomain(), reqPool, storedPool)
 	}
 
 	return storedAssignment, nil
@@ -454,10 +452,10 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	context.Context, *models.Execution, error) {
 
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
-		Project: request.Spec.LaunchPlan.Project,
-		Domain:  request.Spec.LaunchPlan.Domain,
-		Name:    request.Spec.LaunchPlan.Name,
-		Version: request.Spec.LaunchPlan.Version,
+		Project: request.GetSpec().GetLaunchPlan().GetProject(),
+		Domain:  request.GetSpec().GetLaunchPlan().GetDomain(),
+		Name:    request.GetSpec().GetLaunchPlan().GetName(),
+		Version: request.GetSpec().GetLaunchPlan().GetVersion(),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -468,7 +466,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	// Prepare a skeleton workflow and launch plan
-	taskIdentifier := request.Spec.LaunchPlan
+	taskIdentifier := request.GetSpec().GetLaunchPlan()
 	workflowModel, err :=
 		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
 	if err != nil {
@@ -481,27 +479,27 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, m.namedEntityManager, taskIdentifier,
-		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
+		workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(), workflowModel.ID, request.GetSpec())
 	if err != nil {
 		return nil, nil, err
 	}
 
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		request.GetInputs(),
+		launchPlan.GetSpec().GetFixedInputs(),
+		launchPlan.GetClosure().GetExpectedInputs(),
 	)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
-			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
+			request.GetInputs(), launchPlan.GetSpec().GetFixedInputs(), launchPlan.GetClosure().GetExpectedInputs(), err)
 		return nil, nil, err
 	}
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := &core.WorkflowExecutionIdentifier{
-		Project: request.Project,
-		Domain:  request.Domain,
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
 		Name:    name,
 	}
 
@@ -519,15 +517,15 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	offloadInputsGroup.Go(func() error {
 		var err error
 		inputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, executionInputs, // or request.Inputs?
-			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+			workflowExecutionID.GetProject(), workflowExecutionID.GetDomain(), workflowExecutionID.GetName(), shared.Inputs)
 		return err
 	})
 
 	var userInputsURI storage.DataReference
 	offloadInputsGroup.Go(func() error {
 		var err error
-		userInputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, request.Inputs,
-			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+		userInputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, request.GetInputs(),
+			workflowExecutionID.GetProject(), workflowExecutionID.GetDomain(), workflowExecutionID.GetName(), shared.UserInputs)
 		return err
 	})
 
@@ -535,15 +533,15 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		return nil, nil, err
 	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
+	closure.CreatedAt = workflow.GetClosure().GetCreatedAt()
 	workflow.Closure = closure
 
 	ctx = getExecutionContext(ctx, workflowExecutionID)
 	namespace := common.GetNamespaceName(
-		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
+		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.GetProject(), workflowExecutionID.GetDomain())
 
-	requestSpec := request.Spec
-	if requestSpec.Metadata == nil {
+	requestSpec := request.GetSpec()
+	if requestSpec.GetMetadata() == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
@@ -557,13 +555,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	// Dynamically assign task resource defaults.
-	platformTaskResources := util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
-	for _, t := range workflow.Closure.CompiledWorkflow.Tasks {
+	platformTaskResources := util.GetTaskResources(ctx, workflow.GetId(), m.resourceManager, m.config.TaskResourceConfiguration())
+	for _, t := range workflow.GetClosure().GetCompiledWorkflow().GetTasks() {
 		m.setCompiledTaskDefaults(ctx, t, platformTaskResources)
 	}
 
 	// Dynamically assign execution queues.
-	m.populateExecutionQueue(ctx, workflow.Id, workflow.Closure.CompiledWorkflow)
+	m.populateExecutionQueue(ctx, workflow.GetId(), workflow.GetClosure().GetCompiledWorkflow())
 
 	executionConfig, err := m.getExecutionConfig(ctx, request, nil)
 	if err != nil {
@@ -571,23 +569,23 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	var labels map[string]string
-	if executionConfig.Labels != nil {
-		labels = executionConfig.Labels.Values
+	if executionConfig.GetLabels() != nil {
+		labels = executionConfig.GetLabels().GetValues()
 	}
 
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.GetProject(), labels)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var annotations map[string]string
-	if executionConfig.Annotations != nil {
-		annotations = executionConfig.Annotations.Values
+	if executionConfig.GetAnnotations() != nil {
+		annotations = executionConfig.GetAnnotations().GetValues()
 	}
 
 	var rawOutputDataConfig *admin.RawOutputDataConfig
-	if executionConfig.RawOutputDataConfig != nil {
-		rawOutputDataConfig = executionConfig.RawOutputDataConfig
+	if executionConfig.GetRawOutputDataConfig() != nil {
+		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
 	}
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, request)
@@ -596,8 +594,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	var executionClusterLabel *admin.ExecutionClusterLabel
-	if requestSpec.ExecutionClusterLabel != nil {
-		executionClusterLabel = requestSpec.ExecutionClusterLabel
+	if requestSpec.GetExecutionClusterLabel() != nil {
+		executionClusterLabel = requestSpec.GetExecutionClusterLabel()
 	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
 		Inputs:                executionInputs,
@@ -613,16 +611,16 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		ExecutionClusterLabel: executionClusterLabel,
 	}
 
-	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, workflowExecutionID.Name, "")
+	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, workflowExecutionID.GetName(), "")
 	if err != nil {
 		return nil, nil, err
 	}
 	if overrides != nil {
 		executionParameters.TaskPluginOverrides = overrides
 	}
-	if request.Spec.Metadata != nil && request.Spec.Metadata.ReferenceExecution != nil &&
-		request.Spec.Metadata.Mode == admin.ExecutionMetadata_RECOVERED {
-		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
+	if request.GetSpec().GetMetadata() != nil && request.GetSpec().GetMetadata().GetReferenceExecution() != nil &&
+		request.GetSpec().GetMetadata().GetMode() == admin.ExecutionMetadata_RECOVERED {
+		executionParameters.RecoveryExecution = request.GetSpec().GetMetadata().GetReferenceExecution()
 	}
 
 	err = offloadInputsGroup.Wait()
@@ -634,9 +632,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
 		ExecutionID:              workflowExecutionID,
-		ReferenceWorkflowName:    workflow.Id.Name,
-		ReferenceLaunchPlanName:  launchPlan.Id.Name,
-		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
+		ReferenceWorkflowName:    workflow.GetId().GetName(),
+		ReferenceLaunchPlanName:  launchPlan.GetId().GetName(),
+		WorkflowClosure:          workflow.GetClosure().GetCompiledWorkflow(),
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
 		OffloadedInputsReference: inputsURI,
@@ -645,7 +643,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
-			request, &workflowExecutionID, request.Inputs, err)
+			request, &workflowExecutionID, request.GetInputs(), err)
 		return nil, nil, err
 	}
 	executionCreatedAt := time.Now()
@@ -655,13 +653,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Request notification settings takes precedence over the launch plan settings.
 	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
 	var notificationsSettings []*admin.Notification
-	if launchPlan.Spec.GetEntityMetadata() != nil {
-		notificationsSettings = launchPlan.Spec.EntityMetadata.GetNotifications()
+	if launchPlan.GetSpec().GetEntityMetadata() != nil {
+		notificationsSettings = launchPlan.GetSpec().GetEntityMetadata().GetNotifications()
 	}
-	if request.Spec.GetNotifications() != nil && request.Spec.GetNotifications().Notifications != nil &&
-		len(request.Spec.GetNotifications().Notifications) > 0 {
-		notificationsSettings = request.Spec.GetNotifications().Notifications
-	} else if request.Spec.GetDisableAll() {
+	if request.GetSpec().GetNotifications() != nil && request.GetSpec().GetNotifications().GetNotifications() != nil &&
+		len(request.GetSpec().GetNotifications().GetNotifications()) > 0 {
+		notificationsSettings = request.GetSpec().GetNotifications().GetNotifications()
+	} else if request.GetSpec().GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
@@ -673,14 +671,14 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		// The execution is not considered running until the propeller sends a specific event saying so.
 		CreatedAt:             m._clock.Now(),
 		Notifications:         notificationsSettings,
-		WorkflowIdentifier:    workflow.Id,
+		WorkflowIdentifier:    workflow.GetId(),
 		ParentNodeExecutionID: parentNodeExecutionID,
 		SourceExecutionID:     sourceExecutionID,
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       executionConfig.SecurityContext,
-		LaunchEntity:          taskIdentifier.ResourceType,
+		SecurityContext:       executionConfig.GetSecurityContext(),
+		LaunchEntity:          taskIdentifier.GetResourceType(),
 		Namespace:             namespace,
 	})
 	if err != nil {
@@ -688,27 +686,27 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 			workflowExecutionID, err)
 		return nil, nil, err
 	}
-	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.Inputs)))
+	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.GetInputs())))
 	return ctx, executionModel, nil
 }
 
 func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
-	if request.Spec.AuthRole != nil {
-		return request.Spec.AuthRole
+	if request.GetSpec().GetAuthRole() != nil {
+		return request.GetSpec().GetAuthRole()
 	}
 
-	if launchPlan == nil || launchPlan.Spec == nil {
+	if launchPlan == nil || launchPlan.GetSpec() == nil {
 		return &admin.AuthRole{}
 	}
 
 	// Set role permissions based on launch plan Auth values.
 	// The branched-ness of this check is due to the presence numerous deprecated fields
-	if launchPlan.Spec.GetAuthRole() != nil {
-		return launchPlan.Spec.GetAuthRole()
+	if launchPlan.GetSpec().GetAuthRole() != nil {
+		return launchPlan.GetSpec().GetAuthRole()
 	} else if launchPlan.GetSpec().GetAuth() != nil {
 		return &admin.AuthRole{
-			AssumableIamRole:         launchPlan.GetSpec().GetAuth().AssumableIamRole,
-			KubernetesServiceAccount: launchPlan.GetSpec().GetAuth().KubernetesServiceAccount,
+			AssumableIamRole:         launchPlan.GetSpec().GetAuth().GetAssumableIamRole(),
+			KubernetesServiceAccount: launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount(),
 		}
 	} else if len(launchPlan.GetSpec().GetRole()) > 0 {
 		return &admin.AuthRole{
@@ -722,17 +720,17 @@ func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.La
 func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.SecurityContext,
 	resolvedAuthRole *admin.AuthRole) *core.SecurityContext {
 	// Use security context from the executionConfigSecurityCtx if its set and non empty or else resolve from authRole
-	if executionConfigSecurityCtx != nil && executionConfigSecurityCtx.RunAs != nil &&
-		(len(executionConfigSecurityCtx.RunAs.K8SServiceAccount) > 0 ||
-			len(executionConfigSecurityCtx.RunAs.IamRole) > 0 ||
-			len(executionConfigSecurityCtx.RunAs.ExecutionIdentity) > 0) {
+	if executionConfigSecurityCtx != nil && executionConfigSecurityCtx.GetRunAs() != nil &&
+		(len(executionConfigSecurityCtx.GetRunAs().GetK8SServiceAccount()) > 0 ||
+			len(executionConfigSecurityCtx.GetRunAs().GetIamRole()) > 0 ||
+			len(executionConfigSecurityCtx.GetRunAs().GetExecutionIdentity()) > 0) {
 		return executionConfigSecurityCtx
 	}
 	logger.Warn(ctx, "Setting security context from auth Role")
 	return &core.SecurityContext{
 		RunAs: &core.Identity{
-			IamRole:           resolvedAuthRole.AssumableIamRole,
-			K8SServiceAccount: resolvedAuthRole.KubernetesServiceAccount,
+			IamRole:           resolvedAuthRole.GetAssumableIamRole(),
+			K8SServiceAccount: resolvedAuthRole.GetKubernetesServiceAccount(),
 		},
 	}
 }
@@ -755,7 +753,7 @@ func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding 
 		case *core.Primitive_Integer:
 			strVal = p.GetStringValue()
 		case *core.Primitive_Datetime:
-			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
+			t := time.Unix(p.GetDatetime().GetSeconds(), int64(p.GetDatetime().GetNanos()))
 			t = t.In(time.UTC)
 			strVal = t.Format("2006-01-02")
 		case *core.Primitive_StringValue:
@@ -812,7 +810,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query *core.A
 		var partitions map[string]*core.LabelValue
 
 		if artifactID.GetPartitions().GetValue() != nil {
-			partitions = make(map[string]*core.LabelValue, len(artifactID.GetPartitions().Value))
+			partitions = make(map[string]*core.LabelValue, len(artifactID.GetPartitions().GetValue()))
 			for k, v := range artifactID.GetPartitions().GetValue() {
 				newValue, err := m.getLabelValue(ctx, v, inputs)
 				if err != nil {
@@ -825,20 +823,20 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query *core.A
 
 		var timePartition *core.TimePartition
 		if artifactID.GetTimePartition().GetValue() != nil {
-			if artifactID.GetTimePartition().Value.GetTimeValue() != nil {
+			if artifactID.GetTimePartition().GetValue().GetTimeValue() != nil {
 				// If the time value is set, then just pass it through, nothing to fill in.
 				timePartition = artifactID.GetTimePartition()
-			} else if artifactID.GetTimePartition().Value.GetInputBinding() != nil {
+			} else if artifactID.GetTimePartition().GetValue().GetInputBinding() != nil {
 				// Evaluate the time partition input binding
-				lit, ok := inputs[artifactID.GetTimePartition().Value.GetInputBinding().GetVar()]
+				lit, ok := inputs[artifactID.GetTimePartition().GetValue().GetInputBinding().GetVar()]
 				if !ok {
-					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition input binding var [%s] not found in inputs %v", artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), inputs)
+					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition input binding var [%s] not found in inputs %v", artifactID.GetTimePartition().GetValue().GetInputBinding().GetVar(), inputs)
 				}
 
 				if lit.GetScalar().GetPrimitive().GetDatetime() == nil {
 					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 						"time partition binding to input var [%s] failing because %v is not a datetime",
-						artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), lit)
+						artifactID.GetTimePartition().GetValue().GetInputBinding().GetVar(), lit)
 				}
 				timePartition = &core.TimePartition{
 					Value: &core.LabelValue{
@@ -881,8 +879,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, nil, err
 	}
 
-	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
-		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
+	if request.GetSpec().GetLaunchPlan().GetResourceType() == core.ResourceType_TASK {
+		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.GetSpec().GetLaunchPlan())
 		// When tasks can have defaults this will need to handle Artifacts as well.
 		ctx, model, err := m.launchSingleTaskExecution(ctx, request, requestedAt)
 		return ctx, model, nil, err
@@ -892,7 +890,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 func (m *ExecutionManager) launchExecution(
 	ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (context.Context, *models.Execution, []*models.ExecutionTag, error) {
-	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Spec.LaunchPlan)
+	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.GetSpec().GetLaunchPlan())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get launch plan model for ExecutionCreateRequest %+v with err %v", request, err)
 		return nil, nil, nil, err
@@ -905,38 +903,38 @@ func (m *ExecutionManager) launchExecution(
 
 	var lpExpectedInputs *core.ParameterMap
 	var usedArtifactIDs []*core.ArtifactID
-	lpExpectedInputs = launchPlan.Closure.ExpectedInputs
+	lpExpectedInputs = launchPlan.GetClosure().GetExpectedInputs()
 
 	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
 	// in the future, and also to make sure that relaunch and recover can use it if necessary.
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
+		request.GetInputs(),
+		launchPlan.GetSpec().GetFixedInputs(),
 		lpExpectedInputs,
 	)
 
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
-			request.Inputs, launchPlan.Spec.FixedInputs, lpExpectedInputs, err)
+			request.GetInputs(), launchPlan.GetSpec().GetFixedInputs(), lpExpectedInputs, err)
 		return nil, nil, nil, err
 	}
 
-	workflowModel, err := util.GetWorkflowModel(ctx, m.db, launchPlan.Spec.WorkflowId)
+	workflowModel, err := util.GetWorkflowModel(ctx, m.db, launchPlan.GetSpec().GetWorkflowId())
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
+		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.GetSpec().GetWorkflowId(), err)
 		return nil, nil, nil, err
 	}
 	workflow, err := transformers.FromWorkflowModel(workflowModel)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
+		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.GetSpec().GetWorkflowId(), err)
 		return nil, nil, nil, err
 	}
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := &core.WorkflowExecutionIdentifier{
-		Project: request.Project,
-		Domain:  request.Domain,
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
 		Name:    name,
 	}
 
@@ -947,7 +945,7 @@ func (m *ExecutionManager) launchExecution(
 		var err error
 		closure, err = util.FetchAndGetWorkflowClosure(groupCtx, m.storageClient, workflowModel.RemoteClosureIdentifier)
 		if err != nil {
-			logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
+			logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.GetSpec().GetWorkflowId(), err)
 		}
 		return err
 	})
@@ -956,15 +954,15 @@ func (m *ExecutionManager) launchExecution(
 	group.Go(func() error {
 		var err error
 		inputsURI, err = common.OffloadLiteralMap(groupCtx, m.storageClient, executionInputs,
-			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+			workflowExecutionID.GetProject(), workflowExecutionID.GetDomain(), workflowExecutionID.GetName(), shared.Inputs)
 		return err
 	})
 
 	var userInputsURI storage.DataReference
 	group.Go(func() error {
 		var err error
-		userInputsURI, err = common.OffloadLiteralMap(groupCtx, m.storageClient, request.Inputs,
-			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+		userInputsURI, err = common.OffloadLiteralMap(groupCtx, m.storageClient, request.GetInputs(),
+			workflowExecutionID.GetProject(), workflowExecutionID.GetDomain(), workflowExecutionID.GetName(), shared.UserInputs)
 		return err
 	})
 
@@ -972,12 +970,12 @@ func (m *ExecutionManager) launchExecution(
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
+	closure.CreatedAt = workflow.GetClosure().GetCreatedAt()
 	workflow.Closure = closure
 
 	ctx = getExecutionContext(ctx, workflowExecutionID)
-	var requestSpec = request.Spec
-	if requestSpec.Metadata == nil {
+	var requestSpec = request.GetSpec()
+	if requestSpec.GetMetadata() == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
@@ -992,13 +990,13 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	// Dynamically assign task resource defaults.
-	platformTaskResources := util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
-	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
+	platformTaskResources := util.GetTaskResources(ctx, workflow.GetId(), m.resourceManager, m.config.TaskResourceConfiguration())
+	for _, task := range workflow.GetClosure().GetCompiledWorkflow().GetTasks() {
 		m.setCompiledTaskDefaults(ctx, task, platformTaskResources)
 	}
 
 	// Dynamically assign execution queues.
-	m.populateExecutionQueue(ctx, workflow.Id, workflow.Closure.CompiledWorkflow)
+	m.populateExecutionQueue(ctx, workflow.GetId(), workflow.GetClosure().GetCompiledWorkflow())
 
 	executionConfig, err := m.getExecutionConfig(ctx, request, launchPlan)
 	if err != nil {
@@ -1006,23 +1004,23 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	namespace := common.GetNamespaceName(
-		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
+		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.GetProject(), workflowExecutionID.GetDomain())
 
-	labels, err := resolveStringMap(executionConfig.GetLabels(), launchPlan.Spec.Labels, "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
+	labels, err := resolveStringMap(executionConfig.GetLabels(), launchPlan.GetSpec().GetLabels(), "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.GetProject(), labels)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	annotations, err := resolveStringMap(executionConfig.GetAnnotations(), launchPlan.Spec.Annotations, "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
+	annotations, err := resolveStringMap(executionConfig.GetAnnotations(), launchPlan.GetSpec().GetAnnotations(), "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	var rawOutputDataConfig *admin.RawOutputDataConfig
-	if executionConfig.RawOutputDataConfig != nil {
-		rawOutputDataConfig = executionConfig.RawOutputDataConfig
+	if executionConfig.GetRawOutputDataConfig() != nil {
+		rawOutputDataConfig = executionConfig.GetRawOutputDataConfig()
 	}
 
 	clusterAssignment, err := m.getClusterAssignment(ctx, request)
@@ -1031,8 +1029,8 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	var executionClusterLabel *admin.ExecutionClusterLabel
-	if requestSpec.ExecutionClusterLabel != nil {
-		executionClusterLabel = requestSpec.ExecutionClusterLabel
+	if requestSpec.GetExecutionClusterLabel() != nil {
+		executionClusterLabel = requestSpec.GetExecutionClusterLabel()
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
@@ -1049,7 +1047,7 @@ func (m *ExecutionManager) launchExecution(
 		ExecutionClusterLabel: executionClusterLabel,
 	}
 
-	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)
+	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, launchPlan.GetSpec().GetWorkflowId().GetName(), launchPlan.GetId().GetName())
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1057,9 +1055,9 @@ func (m *ExecutionManager) launchExecution(
 		executionParameters.TaskPluginOverrides = overrides
 	}
 
-	if request.Spec.Metadata != nil && request.Spec.Metadata.ReferenceExecution != nil &&
-		request.Spec.Metadata.Mode == admin.ExecutionMetadata_RECOVERED {
-		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
+	if request.GetSpec().GetMetadata() != nil && request.GetSpec().GetMetadata().GetReferenceExecution() != nil &&
+		request.GetSpec().GetMetadata().GetMode() == admin.ExecutionMetadata_RECOVERED {
+		executionParameters.RecoveryExecution = request.GetSpec().GetMetadata().GetReferenceExecution()
 	}
 
 	executionCreatedAt := time.Now()
@@ -1068,12 +1066,12 @@ func (m *ExecutionManager) launchExecution(
 	// Request notification settings takes precedence over the launch plan settings.
 	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
 	var notificationsSettings []*admin.Notification
-	if launchPlan.Spec.GetEntityMetadata() != nil {
-		notificationsSettings = launchPlan.Spec.EntityMetadata.GetNotifications()
+	if launchPlan.GetSpec().GetEntityMetadata() != nil {
+		notificationsSettings = launchPlan.GetSpec().GetEntityMetadata().GetNotifications()
 	}
-	if requestSpec.GetNotifications() != nil && requestSpec.GetNotifications().Notifications != nil &&
-		len(requestSpec.GetNotifications().Notifications) > 0 {
-		notificationsSettings = requestSpec.GetNotifications().Notifications
+	if requestSpec.GetNotifications() != nil && requestSpec.GetNotifications().GetNotifications() != nil &&
+		len(requestSpec.GetNotifications().GetNotifications()) > 0 {
+		notificationsSettings = requestSpec.GetNotifications().GetNotifications()
 	} else if requestSpec.GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
@@ -1086,13 +1084,13 @@ func (m *ExecutionManager) launchExecution(
 		// The execution is not considered running until the propeller sends a specific event saying so.
 		CreatedAt:             m._clock.Now(),
 		Notifications:         notificationsSettings,
-		WorkflowIdentifier:    workflow.Id,
+		WorkflowIdentifier:    workflow.GetId(),
 		ParentNodeExecutionID: parentNodeExecutionID,
 		SourceExecutionID:     sourceExecutionID,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
-		SecurityContext:       executionConfig.SecurityContext,
-		LaunchEntity:          launchPlan.Id.ResourceType,
+		SecurityContext:       executionConfig.GetSecurityContext(),
+		LaunchEntity:          launchPlan.GetId().GetResourceType(),
 		Namespace:             namespace,
 	}
 
@@ -1100,9 +1098,9 @@ func (m *ExecutionManager) launchExecution(
 	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
 		ExecutionID:              workflowExecutionID,
-		ReferenceWorkflowName:    workflow.Id.Name,
-		ReferenceLaunchPlanName:  launchPlan.Id.Name,
-		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
+		ReferenceWorkflowName:    workflow.GetId().GetName(),
+		ReferenceLaunchPlanName:  launchPlan.GetId().GetName(),
+		WorkflowClosure:          workflow.GetClosure().GetCompiledWorkflow(),
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
 		OffloadedInputsReference: inputsURI,
@@ -1160,7 +1158,7 @@ func (m *ExecutionManager) CreateExecution(
 	*admin.ExecutionCreateResponse, error) {
 
 	// Prior to flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
-	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
+	if request.GetInputs() == nil || len(request.GetInputs().GetLiterals()) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
 	}
 	var executionModel *models.Execution
@@ -1182,7 +1180,7 @@ func (m *ExecutionManager) CreateExecution(
 func (m *ExecutionManager) RelaunchExecution(
 	ctx context.Context, request *admin.ExecutionRelaunchRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
-	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, request.Id)
+	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
 		return nil, err
@@ -1192,8 +1190,8 @@ func (m *ExecutionManager) RelaunchExecution(
 		return nil, err
 	}
 
-	executionSpec := existingExecution.Spec
-	if executionSpec.Metadata == nil {
+	executionSpec := existingExecution.GetSpec()
+	if executionSpec.GetMetadata() == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	var inputs *core.LiteralMap
@@ -1209,17 +1207,17 @@ func (m *ExecutionManager) RelaunchExecution(
 		if err != nil {
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
 		}
-		inputs = spec.Inputs
+		inputs = spec.GetInputs()
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
-	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
+	executionSpec.Metadata.ReferenceExecution = existingExecution.GetId()
 	executionSpec.OverwriteCache = request.GetOverwriteCache()
 	var executionModel *models.Execution
 	var executionTagModel []*models.ExecutionTag
 	ctx, executionModel, executionTagModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Name,
+		Project: request.GetId().GetProject(),
+		Domain:  request.GetId().GetDomain(),
+		Name:    request.GetName(),
 		Spec:    executionSpec,
 		Inputs:  inputs,
 	}, requestedAt)
@@ -1231,7 +1229,7 @@ func (m *ExecutionManager) RelaunchExecution(
 	if err != nil {
 		return nil, err
 	}
-	logger.Debugf(ctx, "Successfully relaunched [%+v] as [%+v]", request.Id, workflowExecutionIdentifier)
+	logger.Debugf(ctx, "Successfully relaunched [%+v] as [%+v]", request.GetId(), workflowExecutionIdentifier)
 	return &admin.ExecutionCreateResponse{
 		Id: workflowExecutionIdentifier,
 	}, nil
@@ -1240,7 +1238,7 @@ func (m *ExecutionManager) RelaunchExecution(
 func (m *ExecutionManager) RecoverExecution(
 	ctx context.Context, request *admin.ExecutionRecoverRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
-	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, request.Id)
+	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
 		return nil, err
@@ -1250,8 +1248,8 @@ func (m *ExecutionManager) RecoverExecution(
 		return nil, err
 	}
 
-	executionSpec := existingExecution.Spec
-	if executionSpec.Metadata == nil {
+	executionSpec := existingExecution.GetSpec()
+	if executionSpec.GetMetadata() == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	var inputs *core.LiteralMap
@@ -1261,17 +1259,17 @@ func (m *ExecutionManager) RecoverExecution(
 			return nil, err
 		}
 	}
-	if request.Metadata != nil {
-		executionSpec.Metadata.ParentNodeExecution = request.Metadata.ParentNodeExecution
+	if request.GetMetadata() != nil {
+		executionSpec.Metadata.ParentNodeExecution = request.GetMetadata().GetParentNodeExecution()
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RECOVERED
-	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
+	executionSpec.Metadata.ReferenceExecution = existingExecution.GetId()
 	var executionModel *models.Execution
 	var executionTagModel []*models.ExecutionTag
 	ctx, executionModel, executionTagModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Name,
+		Project: request.GetId().GetProject(),
+		Domain:  request.GetId().GetDomain(),
+		Name:    request.GetName(),
 		Spec:    executionSpec,
 		Inputs:  inputs,
 	}, requestedAt)
@@ -1283,7 +1281,7 @@ func (m *ExecutionManager) RecoverExecution(
 	if err != nil {
 		return nil, err
 	}
-	logger.Infof(ctx, "Successfully recovered [%+v] as [%+v]", request.Id, workflowExecutionIdentifier)
+	logger.Infof(ctx, "Successfully recovered [%+v] as [%+v]", request.GetId(), workflowExecutionIdentifier)
 	return &admin.ExecutionCreateResponse{
 		Id: workflowExecutionIdentifier,
 	}, nil
@@ -1304,20 +1302,20 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 				"[%s/%s/%s]", executionModel.Project, executionModel.Domain, executionModel.Name)
 		return
 	}
-	launchPlan, err := util.GetLaunchPlan(context.Background(), m.db, execution.Spec.LaunchPlan)
+	launchPlan, err := util.GetLaunchPlan(context.Background(), m.db, execution.GetSpec().GetLaunchPlan())
 	if err != nil {
 		logger.Warningf(context.Background(),
 			"failed to find launch plan when emitting scheduled workflow execution stats with for "+
-				"execution: [%+v] and launch plan [%+v]", execution.Id, execution.Spec.LaunchPlan)
+				"execution: [%+v] and launch plan [%+v]", execution.GetId(), execution.GetSpec().GetLaunchPlan())
 		return
 	}
 
-	if launchPlan.Spec.EntityMetadata == nil ||
-		launchPlan.Spec.EntityMetadata.Schedule == nil ||
-		launchPlan.Spec.EntityMetadata.Schedule.KickoffTimeInputArg == "" {
+	if launchPlan.GetSpec().GetEntityMetadata() == nil ||
+		launchPlan.GetSpec().GetEntityMetadata().GetSchedule() == nil ||
+		launchPlan.GetSpec().GetEntityMetadata().GetSchedule().GetKickoffTimeInputArg() == "" {
 		// Kickoff time arguments aren't always required for scheduled workflows.
 		logger.Debugf(context.Background(), "no kickoff time to report for scheduled workflow execution [%+v]",
-			execution.Id)
+			execution.GetId())
 		return
 	}
 
@@ -1327,13 +1325,13 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 		logger.Errorf(ctx, "Failed to find inputs for emitting schedule delay event from uri: [%v]", executionModel.InputsURI)
 		return
 	}
-	scheduledKickoffTimeProto := inputs.Literals[launchPlan.Spec.EntityMetadata.Schedule.KickoffTimeInputArg]
+	scheduledKickoffTimeProto := inputs.GetLiterals()[launchPlan.GetSpec().GetEntityMetadata().GetSchedule().GetKickoffTimeInputArg()]
 	if scheduledKickoffTimeProto == nil || scheduledKickoffTimeProto.GetScalar() == nil ||
 		scheduledKickoffTimeProto.GetScalar().GetPrimitive() == nil ||
 		scheduledKickoffTimeProto.GetScalar().GetPrimitive().GetDatetime() == nil {
 		logger.Warningf(context.Background(),
 			"failed to find scheduled kickoff time datetime value for scheduled workflow execution [%+v] "+
-				"although one was expected", execution.Id)
+				"although one was expected", execution.GetId())
 		return
 	}
 	scheduledKickoffTime, err := ptypes.Timestamp(scheduledKickoffTimeProto.GetScalar().GetPrimitive().GetDatetime())
@@ -1347,16 +1345,19 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 		return
 	}
 
-	domainCounterMap, ok := m.userMetrics.ScheduledExecutionDelays[execution.Id.Project]
+	projectKey := execution.GetId().GetProject()
+	val, ok := m.userMetrics.ScheduledExecutionDelays.Load(projectKey)
 	if !ok {
-		domainCounterMap = make(map[string]*promutils.StopWatch)
-		m.userMetrics.ScheduledExecutionDelays[execution.Id.Project] = domainCounterMap
+		val = &sync.Map{}
+		m.userMetrics.ScheduledExecutionDelays.Store(projectKey, val)
 	}
 
-	var watch *promutils.StopWatch
-	watch, ok = domainCounterMap[execution.Id.Domain]
+	domainCounterMap := val.(*sync.Map)
+
+	domainKey := execution.GetId().GetDomain()
+	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
-		newWatch, err := m.systemMetrics.Scope.NewSubScope(execution.Id.Project).NewSubScope(execution.Id.Domain).NewStopWatch(
+		newWatch, err := m.systemMetrics.Scope.NewSubScope(execution.GetId().GetProject()).NewSubScope(domainKey).NewStopWatch(
 			"scheduled_execution_delay",
 			"delay between scheduled execution time and time execution was observed running",
 			time.Nanosecond)
@@ -1366,9 +1367,11 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 				"failed to emit scheduled workflow execution delay stat, couldn't find or create counter")
 			return
 		}
-		watch = &newWatch
-		domainCounterMap[execution.Id.Domain] = watch
+		watchVal = &newWatch
+		domainCounterMap.Store(domainKey, watchVal)
 	}
+
+	watch := watchVal.(*promutils.StopWatch)
 	watch.Observe(scheduledKickoffTime, runningEventTime)
 }
 
@@ -1380,16 +1383,19 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 		return
 	}
 
-	domainCounterMap, ok := m.userMetrics.WorkflowExecutionDurations[executionModel.Project]
+	projectKey := executionModel.Project
+	val, ok := m.userMetrics.WorkflowExecutionDurations.Load(projectKey)
 	if !ok {
-		domainCounterMap = make(map[string]*promutils.StopWatch)
-		m.userMetrics.WorkflowExecutionDurations[executionModel.Project] = domainCounterMap
+		val = &sync.Map{}
+		m.userMetrics.WorkflowExecutionDurations.Store(projectKey, val)
 	}
 
-	var watch *promutils.StopWatch
-	watch, ok = domainCounterMap[executionModel.Domain]
+	domainCounterMap := val.(*sync.Map)
+
+	domainKey := executionModel.Domain
+	watchVal, ok := domainCounterMap.Load(domainKey)
 	if !ok {
-		newWatch, err := m.systemMetrics.Scope.NewSubScope(executionModel.Project).NewSubScope(executionModel.Domain).NewStopWatch(
+		newWatch, err := m.systemMetrics.Scope.NewSubScope(executionModel.Project).NewSubScope(domainKey).NewStopWatch(
 			"workflow_execution_duration",
 			"overall time from when when a workflow create request was sent to k8s to the workflow terminating",
 			time.Nanosecond)
@@ -1399,9 +1405,11 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 				"failed to emit workflow execution duration stat, couldn't find or create counter")
 			return
 		}
-		watch = &newWatch
-		domainCounterMap[executionModel.Domain] = watch
+		watchVal = &newWatch
+		domainCounterMap.Store(domainKey, watchVal)
 	}
+
+	watch := watchVal.(*promutils.StopWatch)
 
 	terminalEventTime, err := ptypes.Timestamp(terminalEventTimeProto)
 	if err != nil {
@@ -1421,30 +1429,30 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 	*admin.WorkflowExecutionEventResponse, error) {
 	err := validation.ValidateCreateWorkflowEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes)
 	if err != nil {
-		logger.Debugf(ctx, "received invalid CreateWorkflowEventRequest [%s]: %v", request.RequestId, err)
+		logger.Debugf(ctx, "received invalid CreateWorkflowEventRequest [%s]: %v", request.GetRequestId(), err)
 		return nil, err
 	}
-	ctx = getExecutionContext(ctx, request.Event.ExecutionId)
+	ctx = getExecutionContext(ctx, request.GetEvent().GetExecutionId())
 	logger.Debugf(ctx, "Received workflow execution event for [%+v] transitioning to phase [%v]",
-		request.Event.ExecutionId, request.Event.Phase)
+		request.GetEvent().GetExecutionId(), request.GetEvent().GetPhase())
 
-	executionModel, err := util.GetExecutionModel(ctx, m.db, request.Event.ExecutionId)
+	executionModel, err := util.GetExecutionModel(ctx, m.db, request.GetEvent().GetExecutionId())
 	if err != nil {
 		logger.Debugf(ctx, "failed to find execution [%+v] for recorded event [%s]: %v",
-			request.Event.ExecutionId, request.RequestId, err)
+			request.GetEvent().GetExecutionId(), request.GetRequestId(), err)
 		return nil, err
 	}
 
 	wfExecPhase := core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])
 	// Subsequent queued events announcing a cluster reassignment are permitted.
-	if request.Event.Phase != core.WorkflowExecution_QUEUED {
-		if wfExecPhase == request.Event.Phase {
+	if request.GetEvent().GetPhase() != core.WorkflowExecution_QUEUED {
+		if wfExecPhase == request.GetEvent().GetPhase() {
 			logger.Debugf(ctx, "This phase %s was already recorded for workflow execution %v",
-				wfExecPhase.String(), request.Event.ExecutionId)
+				wfExecPhase.String(), request.GetEvent().GetExecutionId())
 			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
 				"This phase %s was already recorded for workflow execution %v",
-				wfExecPhase.String(), request.Event.ExecutionId)
-		} else if err := validation.ValidateCluster(ctx, executionModel.Cluster, request.Event.ProducerId); err != nil {
+				wfExecPhase.String(), request.GetEvent().GetExecutionId())
+		} else if err := validation.ValidateCluster(ctx, executionModel.Cluster, request.GetEvent().GetProducerId()); err != nil {
 			// Only perform event cluster validation **after** an execution has moved on from QUEUED.
 			return nil, err
 		}
@@ -1453,22 +1461,22 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 	if common.IsExecutionTerminal(wfExecPhase) {
 		// Cannot go backwards in time from a terminal state to anything else
 		curPhase := wfExecPhase.String()
-		errorMsg := fmt.Sprintf("Invalid phase change from %s to %s for workflow execution %v", curPhase, request.Event.Phase.String(), request.Event.ExecutionId)
+		errorMsg := fmt.Sprintf("Invalid phase change from %s to %s for workflow execution %v", curPhase, request.GetEvent().GetPhase().String(), request.GetEvent().GetExecutionId())
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
-	} else if wfExecPhase == core.WorkflowExecution_RUNNING && request.Event.Phase == core.WorkflowExecution_QUEUED {
+	} else if wfExecPhase == core.WorkflowExecution_RUNNING && request.GetEvent().GetPhase() == core.WorkflowExecution_QUEUED {
 		// Cannot go back in time from RUNNING -> QUEUED
 		return nil, errors.NewFlyteAdminErrorf(codes.FailedPrecondition,
 			"Cannot go from %s to %s for workflow execution %v",
-			wfExecPhase.String(), request.Event.Phase.String(), request.Event.ExecutionId)
-	} else if wfExecPhase == core.WorkflowExecution_ABORTING && !common.IsExecutionTerminal(request.Event.Phase) {
+			wfExecPhase.String(), request.GetEvent().GetPhase().String(), request.GetEvent().GetExecutionId())
+	} else if wfExecPhase == core.WorkflowExecution_ABORTING && !common.IsExecutionTerminal(request.GetEvent().GetPhase()) {
 		return nil, errors.NewFlyteAdminErrorf(codes.FailedPrecondition,
-			"Invalid phase change from aborting to %s for workflow execution %v", request.Event.Phase.String(), request.Event.ExecutionId)
+			"Invalid phase change from aborting to %s for workflow execution %v", request.GetEvent().GetPhase().String(), request.GetEvent().GetExecutionId())
 	}
 
 	err = transformers.UpdateExecutionModelState(ctx, executionModel, request, m.config.ApplicationConfiguration().GetRemoteDataConfig().InlineEventDataPolicy, m.storageClient)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform updated workflow execution model [%+v] after receiving event with err: %v",
-			request.Event.ExecutionId, err)
+			request.GetEvent().GetExecutionId(), err)
 		return nil, err
 	}
 	err = m.db.ExecutionRepo().Update(ctx, *executionModel)
@@ -1479,28 +1487,28 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 	}
 	m.dbEventWriter.Write(request)
 
-	if request.Event.Phase == core.WorkflowExecution_RUNNING {
+	if request.GetEvent().GetPhase() == core.WorkflowExecution_RUNNING {
 		// Workflow executions are created in state "UNDEFINED". All the time up until a RUNNING event is received is
 		// considered system-induced delay.
 		if executionModel.Mode == int32(admin.ExecutionMetadata_SCHEDULED) {
-			go m.emitScheduledWorkflowMetrics(ctx, executionModel, request.Event.OccurredAt)
+			go m.emitScheduledWorkflowMetrics(ctx, executionModel, request.GetEvent().GetOccurredAt())
 		}
-	} else if common.IsExecutionTerminal(request.Event.Phase) {
-		if request.Event.Phase == core.WorkflowExecution_FAILED {
+	} else if common.IsExecutionTerminal(request.GetEvent().GetPhase()) {
+		if request.GetEvent().GetPhase() == core.WorkflowExecution_FAILED {
 			// request.Event is expected to be of type WorkflowExecutionEvent_Error when workflow fails.
 			// if not, log the error and continue
-			if err := request.Event.GetError(); err != nil {
-				ctx = context.WithValue(ctx, common.ErrorKindKey, err.Kind.String())
+			if err := request.GetEvent().GetError(); err != nil {
+				ctx = context.WithValue(ctx, common.ErrorKindKey, err.GetKind().String())
 			} else {
 				logger.Warning(ctx, "Failed to parse error for FAILED request [%+v]", request)
 			}
 		}
 
 		m.systemMetrics.ActiveExecutions.Dec()
-		m.systemMetrics.ExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.Event.Phase.String()))
-		go m.emitOverallWorkflowExecutionTime(executionModel, request.Event.OccurredAt)
-		if request.Event.GetOutputData() != nil {
-			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		m.systemMetrics.ExecutionsTerminated.Inc(contextutils.WithPhase(ctx, request.GetEvent().GetPhase().String()))
+		go m.emitOverallWorkflowExecutionTime(executionModel, request.GetEvent().GetOccurredAt())
+		if request.GetEvent().GetOutputData() != nil {
+			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.GetEvent().GetOutputData())))
 		}
 
 		err = m.publishNotifications(ctx, request, *executionModel)
@@ -1515,14 +1523,14 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 
 	if err := m.eventPublisher.Publish(ctx, proto.MessageName(request), request); err != nil {
 		m.systemMetrics.PublishEventError.Inc()
-		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
 	go func() {
 		ceCtx := context.TODO()
 		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
-			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.GetRequestId(), err)
 		}
 	}()
 
@@ -1531,12 +1539,12 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 
 func (m *ExecutionManager) GetExecution(
 	ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
-	if err := validation.ValidateWorkflowExecutionIdentifier(request.Id); err != nil {
+	if err := validation.ValidateWorkflowExecutionIdentifier(request.GetId()); err != nil {
 		logger.Debugf(ctx, "GetExecution request [%+v] failed validation with err: %v", request, err)
 		return nil, err
 	}
-	ctx = getExecutionContext(ctx, request.Id)
-	executionModel, err := util.GetExecutionModel(ctx, m.db, request.Id)
+	ctx = getExecutionContext(ctx, request.GetId())
+	executionModel, err := util.GetExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
@@ -1547,7 +1555,7 @@ func (m *ExecutionManager) GetExecution(
 		DefaultNamespace: namespace,
 	})
 	if transformerErr != nil {
-		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id,
+		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.GetId(),
 			transformerErr)
 		return nil, transformerErr
 	}
@@ -1557,18 +1565,18 @@ func (m *ExecutionManager) GetExecution(
 
 func (m *ExecutionManager) UpdateExecution(ctx context.Context, request *admin.ExecutionUpdateRequest,
 	requestedAt time.Time) (*admin.ExecutionUpdateResponse, error) {
-	if err := validation.ValidateWorkflowExecutionIdentifier(request.Id); err != nil {
+	if err := validation.ValidateWorkflowExecutionIdentifier(request.GetId()); err != nil {
 		logger.Debugf(ctx, "UpdateExecution request [%+v] failed validation with err: %v", request, err)
 		return nil, err
 	}
-	ctx = getExecutionContext(ctx, request.Id)
-	executionModel, err := util.GetExecutionModel(ctx, m.db, request.Id)
+	ctx = getExecutionContext(ctx, request.GetId())
+	executionModel, err := util.GetExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
 
-	if err = transformers.UpdateExecutionModelStateChangeDetails(executionModel, request.State, requestedAt,
+	if err = transformers.UpdateExecutionModelStateChangeDetails(executionModel, request.GetState(), requestedAt,
 		getUser(ctx)); err != nil {
 		return nil, err
 	}
@@ -1582,15 +1590,15 @@ func (m *ExecutionManager) UpdateExecution(ctx context.Context, request *admin.E
 
 func (m *ExecutionManager) GetExecutionData(
 	ctx context.Context, request *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
-	ctx = getExecutionContext(ctx, request.Id)
-	executionModel, err := util.GetExecutionModel(ctx, m.db, request.Id)
+	ctx = getExecutionContext(ctx, request.GetId())
+	executionModel, err := util.GetExecutionModel(ctx, m.db, request.GetId())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
 	execution, err := transformers.FromExecutionModel(ctx, *executionModel, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id, err)
+		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.GetId(), err)
 		return nil, err
 	}
 	// Prior to flyteidl v0.15.0, Inputs were held in ExecutionClosure and were not offloaded. Ensure we can return the inputs as expected.
@@ -1600,7 +1608,7 @@ func (m *ExecutionManager) GetExecutionData(
 		if err := proto.Unmarshal(executionModel.Closure, closure); err != nil {
 			return nil, err
 		}
-		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
+		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.GetComputedInputs(), request.GetId().GetProject(), request.GetId().GetDomain(), request.GetId().GetName(), shared.Inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -1626,7 +1634,7 @@ func (m *ExecutionManager) GetExecutionData(
 	group.Go(func() error {
 		var err error
 		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-			m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
+			m.storageClient, util.ToExecutionClosureInterface(execution.GetClosure()))
 		return err
 	})
 
@@ -1642,11 +1650,11 @@ func (m *ExecutionManager) GetExecutionData(
 		FullOutputs: outputs,
 	}
 
-	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
-		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
+	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.GetInputs().GetBytes()))
+	if response.GetOutputs().GetBytes() > 0 {
+		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.GetOutputs().GetBytes()))
+	} else if response.GetFullOutputs() != nil {
+		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.GetFullOutputs())))
 	}
 	return response, nil
 }
@@ -1658,26 +1666,26 @@ func (m *ExecutionManager) ListExecutions(
 		logger.Debugf(ctx, "ListExecutions request [%+v] failed validation with err: %v", request, err)
 		return nil, err
 	}
-	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetId().GetProject(), request.GetId().GetDomain())
 	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name, // Optional, may be empty.
-		RequestFilters: request.Filters,
+		Project:        request.GetId().GetProject(),
+		Domain:         request.GetId().GetDomain(),
+		Name:           request.GetId().GetName(), // Optional, may be empty.
+		RequestFilters: request.GetFilters(),
 	}, common.Execution)
 	if err != nil {
 		return nil, err
 	}
 
-	sortParameter, err := common.NewSortParameter(request.SortBy, models.ExecutionColumns)
+	sortParameter, err := common.NewSortParameter(request.GetSortBy(), models.ExecutionColumns)
 	if err != nil {
 		return nil, err
 	}
 
-	offset, err := validation.ValidateToken(request.Token)
+	offset, err := validation.ValidateToken(request.GetToken())
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid pagination token %s for ListExecutions",
-			request.Token)
+			request.GetToken())
 	}
 	joinTableEntities := make(map[common.Entity]bool)
 	for _, filter := range filters {
@@ -1690,7 +1698,7 @@ func (m *ExecutionManager) ListExecutions(
 	}
 
 	listExecutionsInput := repositoryInterfaces.ListResourceInput{
-		Limit:             int(request.Limit),
+		Limit:             int(request.GetLimit()),
 		Offset:            offset,
 		InlineFilters:     filters,
 		SortParameter:     sortParameter,
@@ -1717,7 +1725,7 @@ func (m *ExecutionManager) ListExecutions(
 
 	// END TO BE DELETED
 	var token string
-	if len(executionList) == int(request.Limit) {
+	if len(executionList) == int(request.GetLimit()) {
 		token = strconv.Itoa(offset + len(executionList))
 	}
 	return &admin.ExecutionList{
@@ -1736,16 +1744,16 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request *ad
 	if err != nil {
 		// This shouldn't happen because execution manager marshaled the data into models.Execution.
 		m.systemMetrics.TransformerError.Inc()
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to transform execution [%+v] with err: %v", request.Event.ExecutionId, err)
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to transform execution [%+v] with err: %v", request.GetEvent().GetExecutionId(), err)
 	}
-	var notificationsList = adminExecution.Closure.Notifications
+	var notificationsList = adminExecution.GetClosure().GetNotifications()
 	logger.Debugf(ctx, "publishing notifications for execution [%+v] in state [%+v] for notifications [%+v]",
-		request.Event.ExecutionId, request.Event.Phase, notificationsList)
+		request.GetEvent().GetExecutionId(), request.GetEvent().GetPhase(), notificationsList)
 	for _, notification := range notificationsList {
 		// Check if the notification phase matches the current one.
 		var matchPhase = false
-		for _, phase := range notification.Phases {
-			if phase == request.Event.Phase {
+		for _, phase := range notification.GetPhases() {
+			if phase == request.GetEvent().GetPhase() {
 				matchPhase = true
 			}
 		}
@@ -1765,11 +1773,11 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request *ad
 		} else if notification.GetSlack() != nil {
 			emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
 		} else {
-			logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
+			logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.GetType())
 			m.systemMetrics.UnexpectedDataError.Inc()
 			// Unsupported notification types should have been caught when the launch plan was being created.
 			return errors.NewFlyteAdminErrorf(codes.Internal, "Unsupported notification type [%v] for execution [%+v]",
-				notification.Type, request.Event.ExecutionId)
+				notification.GetType(), request.GetEvent().GetExecutionId())
 		}
 
 		// Convert the email Notification into an email message to be published.
@@ -1789,19 +1797,19 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request *ad
 
 func (m *ExecutionManager) TerminateExecution(
 	ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
-	if err := validation.ValidateWorkflowExecutionIdentifier(request.Id); err != nil {
+	if err := validation.ValidateWorkflowExecutionIdentifier(request.GetId()); err != nil {
 		logger.Debugf(ctx, "received terminate execution request: %v with invalid identifier: %v", request, err)
 		return nil, err
 	}
-	ctx = getExecutionContext(ctx, request.Id)
+	ctx = getExecutionContext(ctx, request.GetId())
 	// Save the abort reason (best effort)
 	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Id.Name,
+		Project: request.GetId().GetProject(),
+		Domain:  request.GetId().GetDomain(),
+		Name:    request.GetId().GetName(),
 	})
 	if err != nil {
-		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", request.Id)
+		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", request.GetId())
 		return nil, err
 	}
 
@@ -1809,24 +1817,24 @@ func (m *ExecutionManager) TerminateExecution(
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, "Cannot abort an already terminated workflow execution", executionModel.Phase)
 	}
 
-	err = transformers.SetExecutionAborting(&executionModel, request.Cause, getUser(ctx))
+	err = transformers.SetExecutionAborting(&executionModel, request.GetCause(), getUser(ctx))
 	if err != nil {
-		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.Id, err)
+		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.GetId(), err)
 		return nil, err
 	}
 
 	err = m.db.ExecutionRepo().Update(ctx, executionModel)
 	if err != nil {
-		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.Id, err)
+		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.GetId(), err)
 		return nil, err
 	}
 
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	err = workflowExecutor.Abort(ctx, workflowengineInterfaces.AbortData{
 		Namespace: common.GetNamespaceName(
-			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.Id.Project, request.Id.Domain),
+			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.GetId().GetProject(), request.GetId().GetDomain()),
 
-		ExecutionID: request.Id,
+		ExecutionID: request.GetId(),
 		Cluster:     executionModel.Cluster,
 	})
 	if err != nil {
@@ -1878,8 +1886,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 
 	userMetrics := executionUserMetrics{
 		Scope:                      userScope,
-		ScheduledExecutionDelays:   make(map[string]map[string]*promutils.StopWatch),
-		WorkflowExecutionDurations: make(map[string]map[string]*promutils.StopWatch),
+		ScheduledExecutionDelays:   sync.Map{},
+		WorkflowExecutionDurations: sync.Map{},
 		WorkflowExecutionInputBytes: userScope.MustNewSummary("input_size_bytes",
 			"size in bytes of serialized execution inputs"),
 		WorkflowExecutionOutputBytes: userScope.MustNewSummary("output_size_bytes",
@@ -1894,7 +1902,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		queueAllocator:            queueAllocator,
 		_clock:                    clock.New(),
 		systemMetrics:             systemMetrics,
-		userMetrics:               userMetrics,
+		userMetrics:               &userMetrics,
 		notificationClient:        publisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
@@ -1916,7 +1924,7 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 		return nil, err
 	}
 	// passing nil domain as not needed to retrieve labels
-	projectLabels := transformers.FromProjectModel(project, nil).Labels.GetValues()
+	projectLabels := transformers.FromProjectModel(project, nil).GetLabels().GetValues()
 
 	if initialLabels == nil {
 		initialLabels = make(map[string]string)

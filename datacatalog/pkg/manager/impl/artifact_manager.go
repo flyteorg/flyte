@@ -58,7 +58,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 	timer := m.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	artifact := request.Artifact
+	artifact := request.GetArtifact()
 	err := validators.ValidateArtifact(artifact)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid create artifact request %v, err: %v", request, err)
@@ -66,8 +66,8 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 		return nil, err
 	}
 
-	ctx = contextutils.WithProjectDomain(ctx, artifact.Dataset.Project, artifact.Dataset.Domain)
-	datasetKey := transformers.FromDatasetID(artifact.Dataset)
+	ctx = contextutils.WithProjectDomain(ctx, artifact.GetDataset().GetProject(), artifact.GetDataset().GetDomain())
+	datasetKey := transformers.FromDatasetID(artifact.GetDataset())
 
 	// The dataset must exist for the artifact, let's verify that first
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
@@ -80,16 +80,16 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 	// TODO: when adding a tag, need to verify one tag per partition combo
 	// check that the artifact's partitions are the same partition values of the dataset
 	datasetPartitionKeys := transformers.FromPartitionKeyModel(dataset.PartitionKeys)
-	err = validators.ValidatePartitions(datasetPartitionKeys, artifact.Partitions)
+	err = validators.ValidatePartitions(datasetPartitionKeys, artifact.GetPartitions())
 	if err != nil {
-		logger.Warnf(ctx, "Invalid artifact partitions %v, err: %+v", artifact.Partitions, err)
+		logger.Warnf(ctx, "Invalid artifact partitions %v, err: %+v", artifact.GetPartitions(), err)
 		m.systemMetrics.createFailureCounter.Inc(ctx)
 		return nil, err
 	}
 
 	// create Artifact Data offloaded storage files
-	artifactDataModels := make([]models.ArtifactData, len(request.Artifact.Data))
-	for i, artifactData := range request.Artifact.Data {
+	artifactDataModels := make([]models.ArtifactData, len(request.GetArtifact().GetData()))
+	for i, artifactData := range request.GetArtifact().GetData() {
 		dataLocation, err := m.artifactStore.PutData(ctx, artifact, artifactData)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to store artifact data err: %v", err)
@@ -97,12 +97,12 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 			return nil, err
 		}
 
-		artifactDataModels[i].Name = artifactData.Name
+		artifactDataModels[i].Name = artifactData.GetName()
 		artifactDataModels[i].Location = dataLocation.String()
 		m.systemMetrics.createDataSuccessCounter.Inc(ctx)
 	}
 
-	logger.Debugf(ctx, "Stored %v data for artifact %+v", len(artifactDataModels), artifact.Id)
+	logger.Debugf(ctx, "Stored %v data for artifact %+v", len(artifactDataModels), artifact.GetId())
 
 	artifactModel, err := transformers.CreateArtifactModel(request, artifactDataModels, dataset)
 	if err != nil {
@@ -114,7 +114,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 	err = m.repo.ArtifactRepo().Create(ctx, artifactModel)
 	if err != nil {
 		if errors.IsAlreadyExistsError(err) {
-			logger.Warnf(ctx, "Artifact already exists key: %+v, err %v", artifact.Id, err)
+			logger.Warnf(ctx, "Artifact already exists key: %+v, err %v", artifact.GetId(), err)
 			m.systemMetrics.alreadyExistsCounter.Inc(ctx)
 		} else {
 			logger.Errorf(ctx, "Failed to create artifact %v, err: %v", artifactDataModels, err)
@@ -123,7 +123,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 		return nil, err
 	}
 
-	logger.Debugf(ctx, "Successfully created artifact id: %v", artifact.Id)
+	logger.Debugf(ctx, "Successfully created artifact id: %v", artifact.GetId())
 
 	m.systemMetrics.createSuccessCounter.Inc(ctx)
 	return &datacatalog.CreateArtifactResponse{}, nil
@@ -141,7 +141,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.
 		return nil, err
 	}
 
-	datasetID := request.Dataset
+	datasetID := request.GetDataset()
 
 	artifactModel, err := m.findArtifact(ctx, datasetID, request)
 	if err != nil {
@@ -164,7 +164,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.
 	}
 	artifact.Data = artifactDataList
 
-	logger.Debugf(ctx, "Retrieved artifact dataset %v, id: %v", artifact.Dataset, artifact.Id)
+	logger.Debugf(ctx, "Retrieved artifact dataset %v, id: %v", artifact.GetDataset(), artifact.GetId())
 	m.systemMetrics.getSuccessCounter.Inc(ctx)
 	return &datacatalog.GetArtifactResponse{
 		Artifact: artifact,
@@ -249,7 +249,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	}
 
 	// Verify the dataset exists before listing artifacts
-	datasetKey := transformers.FromDatasetID(request.Dataset)
+	datasetKey := transformers.FromDatasetID(request.GetDataset())
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get dataset for listing artifacts %v, err: %v", datasetKey, err)
@@ -265,7 +265,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 		return nil, err
 	}
 
-	err = transformers.ApplyPagination(request.Pagination, &listInput)
+	err = transformers.ApplyPagination(request.GetPagination(), &listInput)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid pagination options in list artifact request %v, err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
@@ -311,7 +311,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 // stored data will be overwritten in the underlying blob storage, no longer existing data (based on ArtifactData name)
 // will be deleted.
 func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatalog.UpdateArtifactRequest) (*datacatalog.UpdateArtifactResponse, error) {
-	ctx = contextutils.WithProjectDomain(ctx, request.Dataset.Project, request.Dataset.Domain)
+	ctx = contextutils.WithProjectDomain(ctx, request.GetDataset().GetProject(), request.GetDataset().GetDomain())
 
 	timer := m.systemMetrics.updateResponseTime.Start(ctx)
 	defer timer.Stop()
@@ -333,9 +333,9 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	}
 
 	// artifactModel needs to be updated with new SerializedMetadata
-	serializedMetadata, err := transformers.SerializedMetadata(request.Metadata)
+	serializedMetadata, err := transformers.SerializedMetadata(request.GetMetadata())
 	if err != nil {
-		logger.Errorf(ctx, "Error in transforming Metadata from request %+v, err %v", request.Metadata, err)
+		logger.Errorf(ctx, "Error in transforming Metadata from request %+v, err %v", request.GetMetadata(), err)
 		m.systemMetrics.transformerErrorCounter.Inc(ctx)
 		m.systemMetrics.updateFailureCounter.Inc(ctx)
 		return nil, err
@@ -353,9 +353,9 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	// overwrite existing artifact data and upload new entries, building a map of artifact data names to remove
 	// deleted entries from the blob storage after the upload completed
 	artifactDataNames := make(map[string]struct{})
-	artifactDataModels := make([]models.ArtifactData, len(request.Data))
-	for i, artifactData := range request.Data {
-		artifactDataNames[artifactData.Name] = struct{}{}
+	artifactDataModels := make([]models.ArtifactData, len(request.GetData()))
+	for i, artifactData := range request.GetData() {
+		artifactDataNames[artifactData.GetName()] = struct{}{}
 
 		dataLocation, err := m.artifactStore.PutData(ctx, artifact, artifactData)
 		if err != nil {
@@ -365,7 +365,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 			return nil, err
 		}
 
-		artifactDataModels[i].Name = artifactData.Name
+		artifactDataModels[i].Name = artifactData.GetName()
 		artifactDataModels[i].Location = dataLocation.String()
 		m.systemMetrics.updateDataSuccessCounter.Inc(ctx)
 	}
@@ -384,7 +384,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
-			logger.Warnf(ctx, "Artifact does not exist key: %+v, err %v", artifact.Id, err)
+			logger.Warnf(ctx, "Artifact does not exist key: %+v, err %v", artifact.GetId(), err)
 			m.systemMetrics.doesNotExistCounter.Inc(ctx)
 		} else {
 			logger.Errorf(ctx, "Failed to update artifact %v, err: %v", artifactModel, err)
@@ -408,11 +408,11 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 		m.systemMetrics.deleteDataSuccessCounter.Inc(ctx)
 	}
 
-	logger.Debugf(ctx, "Successfully updated artifact id: %v", artifact.Id)
+	logger.Debugf(ctx, "Successfully updated artifact id: %v", artifact.GetId())
 
 	m.systemMetrics.updateSuccessCounter.Inc(ctx)
 	return &datacatalog.UpdateArtifactResponse{
-		ArtifactId: artifact.Id,
+		ArtifactId: artifact.GetId(),
 	}, nil
 }
 

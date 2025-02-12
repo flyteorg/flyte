@@ -30,58 +30,58 @@ const launchPlanVersion = "launch_plan.version"
 const replaceAllInstances = -1
 
 func getProject(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Id.Project
+	return exec.GetId().GetProject()
 }
 
 func getDomain(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Id.Domain
+	return exec.GetId().GetDomain()
 }
 
 func getName(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Id.Name
+	return exec.GetId().GetName()
 }
 
 func getPhase(request *admin.WorkflowExecutionEventRequest, _ *admin.Execution) string {
-	return strings.ToLower(request.Event.Phase.String())
+	return strings.ToLower(request.GetEvent().GetPhase().String())
 }
 
 func getError(request *admin.WorkflowExecutionEventRequest, _ *admin.Execution) string {
-	if request.Event.GetError() != nil {
-		return fmt.Sprintf(executionError, request.Event.GetError().Message)
+	if request.GetEvent().GetError() != nil {
+		return fmt.Sprintf(executionError, request.GetEvent().GetError().GetMessage())
 	}
 	return ""
 }
 
 func getWorkflowProject(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Closure.WorkflowId.Project
+	return exec.GetClosure().GetWorkflowId().GetProject()
 }
 
 func getWorkflowDomain(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Closure.WorkflowId.Domain
+	return exec.GetClosure().GetWorkflowId().GetDomain()
 }
 
 func getWorkflowName(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Closure.WorkflowId.Name
+	return exec.GetClosure().GetWorkflowId().GetName()
 }
 
 func getWorkflowVersion(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Closure.WorkflowId.Version
+	return exec.GetClosure().GetWorkflowId().GetVersion()
 }
 
 func getLaunchPlanProject(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Spec.LaunchPlan.Project
+	return exec.GetSpec().GetLaunchPlan().GetProject()
 }
 
 func getLaunchPlanDomain(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Spec.LaunchPlan.Domain
+	return exec.GetSpec().GetLaunchPlan().GetDomain()
 }
 
 func getLaunchPlanName(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Spec.LaunchPlan.Name
+	return exec.GetSpec().GetLaunchPlan().GetName()
 }
 
 func getLaunchPlanVersion(_ *admin.WorkflowExecutionEventRequest, exec *admin.Execution) string {
-	return exec.Spec.LaunchPlan.Version
+	return exec.GetSpec().GetLaunchPlan().GetVersion()
 }
 
 var getTemplateValueFuncs = map[string]GetTemplateValue{

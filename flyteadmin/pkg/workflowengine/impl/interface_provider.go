@@ -42,8 +42,8 @@ func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier *co
 		return &LaunchPlanInterfaceProvider{}, err
 	}
 	return &LaunchPlanInterfaceProvider{
-		expectedInputs:  closure.ExpectedInputs,
-		expectedOutputs: closure.ExpectedOutputs,
+		expectedInputs:  closure.GetExpectedInputs(),
+		expectedOutputs: closure.GetExpectedOutputs(),
 		identifier:      identifier,
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -40,17 +41,17 @@ func TestGetTaskResources(t *testing.T) {
 	}
 
 	t.Run("use runtime application values", func(t *testing.T) {
-		resourceManager := managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				Workflow:     workflowIdentifier.Name,
+				Project:      workflowIdentifier.GetProject(),
+				Domain:       workflowIdentifier.GetDomain(),
+				Workflow:     workflowIdentifier.GetName(),
 				ResourceType: admin.MatchableResource_TASK_RESOURCE,
 			})
 			return &managerInterfaces.ResourceResponse{}, nil
-		}
+		})
 
 		taskResourceAttrs := GetTaskResources(context.TODO(), &workflowIdentifier, &resourceManager, &taskConfig)
 		assert.EqualValues(t, taskResourceAttrs, workflowengineInterfaces.TaskResources{
@@ -69,13 +70,13 @@ func TestGetTaskResources(t *testing.T) {
 		})
 	})
 	t.Run("use specific overrides", func(t *testing.T) {
-		resourceManager := managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				Workflow:     workflowIdentifier.Name,
+				Project:      workflowIdentifier.GetProject(),
+				Domain:       workflowIdentifier.GetDomain(),
+				Workflow:     workflowIdentifier.GetName(),
 				ResourceType: admin.MatchableResource_TASK_RESOURCE,
 			})
 			return &managerInterfaces.ResourceResponse{
@@ -98,7 +99,7 @@ func TestGetTaskResources(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		taskResourceAttrs := GetTaskResources(context.TODO(), &workflowIdentifier, &resourceManager, &taskConfig)
 		assert.EqualValues(t, taskResourceAttrs, workflowengineInterfaces.TaskResources{
 			Defaults: runtimeInterfaces.TaskResourceSet{

@@ -26,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	k8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -163,6 +164,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	overrides.OnGetResources().Return(resources)
 	overrides.OnGetExtendedResources().Return(extendedResources)
 	overrides.OnGetContainerImage().Return(containerImage)
+	overrides.OnGetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -473,9 +475,10 @@ func TestBuildResourcePytorchContainerImage(t *testing.T) {
 
 func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
-		GpuDeviceNodeLabel:        "gpu-node-label",
-		GpuPartitionSizeNodeLabel: "gpu-partition-size",
-		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+		GpuDeviceNodeLabel:                 "gpu-node-label",
+		GpuPartitionSizeNodeLabel:          "gpu-partition-size",
+		GpuResourceName:                    flytek8s.ResourceNvidiaGPU,
+		AddTolerationsForExtendedResources: []string{"nvidia.com/gpu"},
 	}))
 
 	fixtures := []struct {
@@ -515,6 +518,11 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-t4",
 					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
@@ -566,6 +574,11 @@ func TestBuildResourcePytorchExtendedResources(t *testing.T) {
 					Key:      "gpu-partition-size",
 					Value:    "1g.5gb",
 					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "nvidia.com/gpu",
+					Operator: corev1.TolerationOpExists,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
@@ -688,9 +701,9 @@ func TestGetLogs(t *testing.T) {
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].GetUri())
 }
 
 func TestGetLogsElastic(t *testing.T) {
@@ -708,13 +721,19 @@ func TestGetLogsElastic(t *testing.T) {
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
 }
 
 func TestGetProperties(t *testing.T) {
+	config := k8sConfig.GetK8sPluginConfig()
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	expected := k8s.PluginProperties{
+
+	expected := k8s.PluginProperties{}
+	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
+
+	config.EnableDistributedErrorAggregation = true
+	expected = k8s.PluginProperties{
 		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
 	}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
@@ -728,7 +747,7 @@ func TestReplicaCounts(t *testing.T) {
 		contains           []commonOp.ReplicaType
 		notContains        []commonOp.ReplicaType
 	}{
-		{"NoWorkers", 0, true, nil, nil},
+		{"NoWorkers", 0, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster}, []commonOp.ReplicaType{}},
 		{"Works", 1, false, []commonOp.ReplicaType{kubeflowv1.PyTorchJobReplicaTypeMaster, kubeflowv1.PyTorchJobReplicaTypeWorker}, []commonOp.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -850,6 +869,8 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			},
 		}
 
+		config := k8sConfig.GetK8sPluginConfig()
+		config.EnableDistributedErrorAggregation = true
 		pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
 		taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
@@ -1190,29 +1211,88 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 	}
 }
 
-func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
+func TestBuildResourcePytorchV1WithDifferentWorkersNumber(t *testing.T) {
 	taskConfigs := []*kfplugins.DistributedPyTorchTrainingTask{
 		{
+			// Test case 1: Zero workers - should only have master
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
 				Replicas: 0,
 			},
+			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+				Image: testImageMaster,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
+				},
+			},
 		},
 		{
+			// Test case 2: One worker - should have both master and worker
 			WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
-				Common: &kfplugins.CommonReplicaSpec{
-					Replicas: 0,
+				Replicas: 1,
+			},
+			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+				Image: testImageMaster,
+				Resources: &core.Resources{
+					Requests: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "250m"},
+						{Name: core.Resources_MEMORY, Value: "250Mi"},
+					},
+					Limits: []*core.Resources_ResourceEntry{
+						{Name: core.Resources_CPU, Value: "500m"},
+						{Name: core.Resources_MEMORY, Value: "500Mi"},
+					},
 				},
 			},
 		},
 	}
 
-	for _, taskConfig := range taskConfigs {
-		pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	for i, taskConfig := range taskConfigs {
+		t.Run(fmt.Sprintf("Case %d", i+1), func(t *testing.T) {
+			pytorchResourceHandler := pytorchOperatorResourceHandler{}
 
-		taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
-		taskTemplate.TaskTypeVersion = 1
-		_, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
-		assert.Error(t, err)
+			taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
+			taskTemplate.TaskTypeVersion = 1
+
+			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil, "", k8s.PluginState{}))
+			assert.NoError(t, err)
+			assert.NotNil(t, res)
+
+			pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
+			assert.True(t, ok)
+
+			if taskConfig.GetWorkerReplicas().GetReplicas() == 0 {
+				// Should only contain master spec
+				assert.Equal(t, 1, len(pytorchJob.Spec.PyTorchReplicaSpecs))
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
+				assert.NotContains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
+
+				// Verify master spec details
+				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
+				assert.Equal(t, int32(1), *masterSpec.Replicas)
+				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
+			} else {
+				// Should contain both master and worker specs
+				assert.Equal(t, 2, len(pytorchJob.Spec.PyTorchReplicaSpecs))
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeMaster)
+				assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
+
+				// Verify master spec details
+				masterSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster]
+				assert.Equal(t, int32(1), *masterSpec.Replicas)
+				assert.Equal(t, testImageMaster, masterSpec.Template.Spec.Containers[0].Image)
+
+				// Verify worker spec details
+				workerSpec := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker]
+				assert.Equal(t, int32(1), *workerSpec.Replicas)
+			}
+		})
 	}
 }
 

@@ -33,13 +33,13 @@ func (a *AdminFetcherExtClient) GetProjectByID(ctx context.Context, projectID st
 		return nil, err
 	}
 
-	if len(response.Projects) == 0 {
+	if len(response.GetProjects()) == 0 {
 		return nil, NewNotFoundError("project %s", projectID)
 	}
 
-	if len(response.Projects) > 1 {
-		panic(fmt.Sprintf("unexpected number of projects in ListProjects response: %d - 0 or 1 expected", len(response.Projects)))
+	if len(response.GetProjects()) > 1 {
+		panic(fmt.Sprintf("unexpected number of projects in ListProjects response: %d - 0 or 1 expected", len(response.GetProjects())))
 	}
 
-	return response.Projects[0], nil
+	return response.GetProjects()[0], nil
 }

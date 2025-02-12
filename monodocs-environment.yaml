@@ -62,7 +62,7 @@ dependencies:
   - memray                      # memray
 
   - pip:
-    - flytekit>=1.12.1b2
+    - flytekit>=1.15.0a1
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude

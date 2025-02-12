@@ -41,6 +41,14 @@ import (
 
 const pluginContextKey = contextutils.Key("plugin")
 
+type DeckStatus int
+
+const (
+	DeckUnknown DeckStatus = iota
+	DeckEnabled
+	DeckDisabled
+)
+
 type metrics struct {
 	pluginPanics           labeled.Counter
 	unsupportedTaskType    labeled.Counter
@@ -71,10 +79,47 @@ func getPluginMetricKey(pluginID, taskType string) string {
 	return taskType + "_" + pluginID
 }
 
-func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, deckPath *storage.DataReference, entry catalog.Entry) {
+func (p *pluginRequestedTransition) AddDeckURI(tCtx *taskExecutionContext) {
+	var deckURI *storage.DataReference
+	deckURIValue := tCtx.ow.GetDeckPath()
+	deckURI = &deckURIValue
+
+	if p.execInfo.OutputInfo == nil {
+		p.execInfo.OutputInfo = &handler.OutputInfo{}
+	}
+
+	p.execInfo.OutputInfo.DeckURI = deckURI
+}
+
+func (p *pluginRequestedTransition) RemoveDeckURIIfDeckNotExists(ctx context.Context, tCtx *taskExecutionContext) error {
+	// If there's no output info, nothing to do.
+	if p.execInfo.OutputInfo == nil {
+		return nil
+	}
+
+	reader := tCtx.ow.GetReader()
+	if reader == nil {
+		p.execInfo.OutputInfo.DeckURI = nil
+		return nil
+	}
+
+	exists, err := reader.DeckExists(ctx)
+	if err != nil {
+		p.execInfo.OutputInfo.DeckURI = nil
+		return regErrors.Wrapf(err, "failed to check existence of deck file")
+	}
+
+	if !exists {
+		p.execInfo.OutputInfo.DeckURI = nil
+	}
+
+	return nil
+}
+
+func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference, entry catalog.Entry) {
 	p.ttype = handler.TransitionTypeEphemeral
 	p.pInfo = pluginCore.PhaseInfoSuccess(nil)
-	p.ObserveSuccess(outputPath, deckPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
+	p.ObserveSuccess(outputPath, &event.TaskNodeMetadata{CacheStatus: entry.GetStatus().GetCacheStatus(), CatalogKey: entry.GetStatus().GetMetadata()})
 }
 
 func (p *pluginRequestedTransition) PopulateCacheInfo(entry catalog.Entry) {
@@ -144,10 +189,13 @@ func (p *pluginRequestedTransition) FinalTaskEvent(input ToTaskExecutionEventInp
 	return ToTaskExecutionEvent(input)
 }
 
-func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, deckPath *storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
-	p.execInfo.OutputInfo = &handler.OutputInfo{
-		OutputURI: outputPath,
-		DeckURI:   deckPath,
+func (p *pluginRequestedTransition) ObserveSuccess(outputPath storage.DataReference, taskMetadata *event.TaskNodeMetadata) {
+	if p.execInfo.OutputInfo == nil {
+		p.execInfo.OutputInfo = &handler.OutputInfo{
+			OutputURI: outputPath,
+		}
+	} else {
+		p.execInfo.OutputInfo.OutputURI = outputPath
 	}
 
 	p.execInfo.TaskNodeInfo = &handler.TaskNodeInfo{
@@ -171,7 +219,8 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 	}
 
 	logger.Debugf(ctx, "Task still running")
-	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(nil)), nil
+	// Here will send the deck uri to flyteadmin
+	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(&p.execInfo)), nil
 }
 
 // The plugin interface available especially for testing.
@@ -380,6 +429,40 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	return t.taskMetricsMap[metricNameKey], nil
 }
 
+func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
+	// GetDeckStatus determines whether a task generates a deck based on its execution context.
+	//
+	// This function evaluates the current condition of the task to determine the deck status:
+	//
+	// | Condition Description          | Has Deck |
+	// |--------------------------------|----------|
+	// | Enabled and Running            | Yes      |
+	// | Unknown State with Deck        | Yes      |
+	// | Unknown State without Deck     | No       |
+	// | Enabled and Succeeded          | Yes      |
+	// | Enabled but Memory Exceeded    | No       |
+	// | Disabled                       | No       |
+	//
+	// The lifecycle of deck generation is as follows:
+	// - During task execution, the condition is checked to determine if a deck should be generated.
+	// - In terminal states, if the status is DeckUnknown or DeckEnabled, a HEAD request can be made to verify the existence of the deck file.
+	template, err := tCtx.tr.Read(ctx)
+	if err != nil {
+		return DeckUnknown, regErrors.Wrapf(err, "failed to read task template")
+	}
+
+	deckValue := template.GetMetadata().GetGeneratesDeck()
+	if deckValue == nil {
+		return DeckUnknown, nil
+	}
+
+	if deckValue.GetValue() {
+		return DeckEnabled, nil
+	}
+
+	return DeckDisabled, nil
+}
+
 func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *taskExecutionContext, ts handler.TaskNodeState) (*pluginRequestedTransition, error) {
 	pluginTrns := &pluginRequestedTransition{}
 
@@ -434,6 +517,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			pluginTrns.TransitionPreviouslyRecorded()
 			return pluginTrns, nil
 		}
+		// #nosec G115
 		if pluginTrns.pInfo.Version() > uint32(t.cfg.MaxPluginPhaseVersions) {
 			logger.Errorf(ctx, "Too many Plugin p versions for plugin [%s]. p versions [%d/%d]", p.GetID(), pluginTrns.pInfo.Version(), t.cfg.MaxPluginPhaseVersions)
 			pluginTrns.ObservedExecutionError(&io.ExecutionError{
@@ -463,8 +547,30 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}
 	}
 
+	// Regardless of the observed phase, we always add the DeckUri to support real-time deck functionality.
+	// The deck should be accessible even if the task is still running or has failed.
+	deckStatus, err := GetDeckStatus(ctx, tCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	if deckStatus == DeckEnabled {
+		pluginTrns.AddDeckURI(tCtx)
+	}
+
+	defer func() {
+		if (deckStatus == DeckUnknown || deckStatus == DeckEnabled) && pluginTrns.pInfo.Phase().IsTerminal() {
+			if err := pluginTrns.RemoveDeckURIIfDeckNotExists(ctx, tCtx); err != nil {
+				logger.Errorf(ctx, "Failed to remove deck URI if deck does not exist. Error: %v", err)
+			}
+		}
+	}()
+
 	switch pluginTrns.pInfo.Phase() {
 	case pluginCore.PhaseSuccess:
+		if deckStatus == DeckUnknown {
+			pluginTrns.AddDeckURI(tCtx)
+		}
 		// -------------------------------------
 		// TODO: @kumare create Issue# Remove the code after we use closures to handle dynamic nodes
 		// This code only exists to support Dynamic tasks. Eventually dynamic tasks will use closure nodes to execute
@@ -500,18 +606,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		} else {
-			var deckURI *storage.DataReference
-			if tCtx.ow.GetReader() != nil {
-				exists, err := tCtx.ow.GetReader().DeckExists(ctx)
-				if err != nil {
-					logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
-					return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
-				} else if exists {
-					deckURIValue := tCtx.ow.GetDeckPath()
-					deckURI = &deckURIValue
-				}
-			}
-			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
+			pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(),
 				&event.TaskNodeMetadata{
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
@@ -565,7 +660,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 			logger.Errorf(ctx, "failed to read TaskTemplate, error :%s", err.Error())
 			return handler.UnknownTransition, err
 		}
-		if tk.Interface != nil && tk.Interface.Inputs != nil && len(tk.Interface.Inputs.Variables) > 0 {
+		if tk.GetInterface() != nil && tk.GetInterface().GetInputs() != nil && len(tk.GetInterface().GetInputs().GetVariables()) > 0 {
 			inputs, err = nCtx.InputReader().Get(ctx)
 			if err != nil {
 				logger.Errorf(ctx, "failed to read inputs when checking catalog cache %w", err)
@@ -577,7 +672,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	occurredAt := time.Now()
 	// STEP 2: If no cache-hit and not transitioning to PhaseWaitingForCache, then lets invoke the plugin and wait for a transition out of undefined
 	if pluginTrns.execInfo.TaskNodeInfo == nil || (pluginTrns.pInfo.Phase() != pluginCore.PhaseWaitingForCache &&
-		pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.CacheStatus != core.CatalogCacheStatus_CACHE_HIT) {
+		pluginTrns.execInfo.TaskNodeInfo.TaskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) {
 
 		var err error
 		pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
@@ -624,7 +719,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 			return handler.UnknownTransition, err
 		}
 		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
-			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
+			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.GetPhase().String(), err.Error())
 			// Check for idempotency
 			// Check for terminate state error
 			return handler.UnknownTransition, err
@@ -694,8 +789,8 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 		return nil, err
 	}
 
-	iface := tk.Interface
-	outputsDeclared := iface != nil && iface.Outputs != nil && len(iface.Outputs.Variables) > 0
+	iface := tk.GetInterface()
+	outputsDeclared := iface != nil && iface.GetOutputs() != nil && len(iface.GetOutputs().GetVariables()) > 0
 
 	if r == nil {
 		if outputsDeclared {
@@ -838,7 +933,7 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 			evInfo.Phase = core.TaskExecution_ABORTED
 		}
 		if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
-			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
+			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.GetPhase().String(), err.Error())
 			// Check for idempotency
 			// Check for terminate state error
 			return err

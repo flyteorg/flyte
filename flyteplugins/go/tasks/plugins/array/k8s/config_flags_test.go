@@ -14,13 +14,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dereferencableKindsConfig = map[reflect.Kind]struct{}{
+var dereferenceableKindsConfig = map[reflect.Kind]struct{}{
 	reflect.Array: {}, reflect.Chan: {}, reflect.Map: {}, reflect.Ptr: {}, reflect.Slice: {},
 }
 
 // Checks if t is a kind that can be dereferenced to get its underlying type.
 func canGetElementConfig(t reflect.Kind) bool {
-	_, exists := dereferencableKindsConfig[t]
+	_, exists := dereferenceableKindsConfig[t]
 	return exists
 }
 

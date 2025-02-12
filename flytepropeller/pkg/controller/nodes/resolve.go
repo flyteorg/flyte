@@ -105,3 +105,48 @@ func Resolve(ctx context.Context, outputResolver OutputResolver, nl executors.No
 		Literals: literalMap,
 	}, nil
 }
+
+func ResolveErrorInputLiteralData(ctx context.Context, literals map[string]*core.Literal, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) {
+	if literal, exists := literals["err"]; exists {
+		// make new Scalar for literal map
+		errorUnion := &core.Scalar_Union{
+			Union: &core.Union{
+				Value: &core.Literal{
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Error{
+								Error: &core.Error{
+									Message:      execErr.GetMessage(),
+									FailedNodeId: nodeID,
+								},
+							},
+						},
+					},
+				},
+				Type: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_ERROR,
+					},
+					Structure: &core.TypeStructure{
+						Tag: "FlyteError",
+					},
+				},
+			},
+		}
+		literal.Value = &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: errorUnion,
+			},
+		}
+	}
+}
+
+func ResolveOnFailureNodeInput(ctx context.Context, nodeInputs *core.LiteralMap, nodeID v1alpha1.NodeID, execErr *core.ExecutionError) error {
+	literals := nodeInputs.GetLiterals()
+	if literals != nil {
+		ResolveErrorInputLiteralData(ctx, literals, nodeID, execErr)
+	} else {
+		return errors.Errorf(errors.BindingResolutionError, "id", nodeID, "Node inputs are empty")
+	}
+	return nil
+}

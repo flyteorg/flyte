@@ -10,7 +10,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -128,7 +130,67 @@ func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *c
 		new.GpuAccelerator = overrides.GetGpuAccelerator()
 	}
 
+	if overrides.GetSharedMemory() != nil {
+		new.SharedMemory = overrides.GetSharedMemory()
+	}
+
 	return new
+}
+
+func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedMemory *core.SharedMemory) error {
+	sharedMountName := SharedMemory.GetMountName()
+	sharedMountPath := SharedMemory.GetMountPath()
+	if sharedMountName == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount name is not set")
+	}
+	if sharedMountPath == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount path is not set")
+	}
+
+	var primaryContainer *v1.Container
+	for index, container := range podSpec.Containers {
+		if container.Name == primaryContainerName {
+			primaryContainer = &podSpec.Containers[index]
+		}
+	}
+	if primaryContainer == nil {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to find primary container")
+	}
+
+	for _, volume := range podSpec.Volumes {
+		if volume.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in pod spec", sharedMountName)
+		}
+	}
+
+	for _, volume_mount := range primaryContainer.VolumeMounts {
+		if volume_mount.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in container", sharedMountName)
+		}
+		if volume_mount.MountPath == sharedMountPath {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "%s is already mounted in container", sharedMountPath)
+		}
+	}
+
+	var quantity resource.Quantity
+	var err error
+	if SharedMemory.GetSizeLimit() != "" {
+		quantity, err = resource.ParseQuantity(SharedMemory.GetSizeLimit())
+		if err != nil {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to parse size limit: %v", err.Error())
+		}
+	}
+
+	podSpec.Volumes = append(
+		podSpec.Volumes,
+		v1.Volume{
+			Name:         sharedMountName,
+			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity}},
+		},
+	)
+	primaryContainer.VolumeMounts = append(primaryContainer.VolumeMounts, v1.VolumeMount{Name: sharedMountName, MountPath: sharedMountPath})
+
+	return nil
 }
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
@@ -285,17 +347,28 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
-		if target.K8SPod.PodSpec == nil {
+		if target.K8SPod.GetPodSpec() == nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 				"Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 		}
 
-		err := utils.UnmarshalStructToObj(target.K8SPod.PodSpec, &podSpec)
+		err := utils.UnmarshalStructToObj(target.K8SPod.GetPodSpec(), &podSpec)
 		if err != nil {
 			return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.PodSpec, err.Error())
+				"Unable to unmarshal task k8s pod [%v], Err: [%v]", target.K8SPod.GetPodSpec(), err.Error())
 		}
 
 		// get primary container name
@@ -306,10 +379,21 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod().Metadata != nil {
-			mergeMapInto(target.K8SPod.Metadata.Annotations, objectMeta.Annotations)
-			mergeMapInto(target.K8SPod.Metadata.Labels, objectMeta.Labels)
+		if taskTemplate.GetK8SPod().GetMetadata() != nil {
+			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 			"invalid TaskSpecification, unable to determine Pod configuration")
@@ -393,7 +477,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	if dataLoadingConfig != nil {
 		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+			primaryContainer, taskTemplate.GetInterface(), dataLoadingConfig); err != nil {
 			return nil, nil, err
 		}
 
@@ -428,6 +512,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 	}
 
+	// Shared memory volume
+	if extendedResources.GetSharedMemory() != nil {
+		err = ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory())
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	// Override container image if necessary
 	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
@@ -445,6 +537,71 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
+func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podTemplate.GetMetadata().GetAnnotations() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+	}
+	if podTemplate.GetMetadata().GetLabels() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetLabels(), objectMeta.Labels)
+	}
+
+	var podSpecOverride *v1.PodSpec
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	if err != nil {
+		return nil, objectMeta, err
+	}
+
+	return podSpecOverride, objectMeta, nil
+}
+
+func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
+	podTolerations := podSpec.Tolerations
+
+	var newTolerations []v1.Toleration
+	for i := range podTolerations {
+		if toleration.MatchToleration(&podTolerations[i]) {
+			return podSpec
+		}
+		newTolerations = append(newTolerations, podTolerations[i])
+	}
+	newTolerations = append(newTolerations, *toleration)
+	podSpec.Tolerations = newTolerations
+	return podSpec
+}
+
+func AddTolerationsForExtendedResources(podSpec *v1.PodSpec) *v1.PodSpec {
+	if podSpec == nil {
+		podSpec = &v1.PodSpec{}
+	}
+
+	resources := sets.NewString()
+	for _, container := range podSpec.Containers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, container := range podSpec.InitContainers {
+		for _, extendedResource := range config.GetK8sPluginConfig().AddTolerationsForExtendedResources {
+			if _, ok := container.Resources.Requests[v1.ResourceName(extendedResource)]; ok {
+				resources.Insert(extendedResource)
+			}
+		}
+	}
+
+	for _, resource := range resources.List() {
+		addTolerationInPodSpec(podSpec, &v1.Toleration{
+			Key:      resource,
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		})
+	}
+
+	return podSpec
+}
+
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
 // involves parsing the raw PodSpec definition and applying all Flyte configuration options.
 func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, string, error) {
@@ -459,6 +616,8 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	if err != nil {
 		return nil, nil, "", err
 	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
 
 	return podSpec, objectMeta, primaryContainerName, nil
 }
@@ -483,11 +642,11 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	}
 
 	var podTemplate *v1.PodTemplate
-	if taskTemplate.Metadata != nil && len(taskTemplate.Metadata.PodTemplateName) > 0 {
+	if taskTemplate.GetMetadata() != nil && len(taskTemplate.GetMetadata().GetPodTemplateName()) > 0 {
 		// retrieve PodTemplate by name from PodTemplateStore
-		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.Metadata.PodTemplateName)
+		podTemplate = podTemplateStore.LoadOrDefault(tCtx.TaskExecutionMetadata().GetNamespace(), taskTemplate.GetMetadata().GetPodTemplateName())
 		if podTemplate == nil {
-			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.Metadata.PodTemplateName)
+			return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "PodTemplate '%s' does not exist", taskTemplate.GetMetadata().GetPodTemplateName())
 		}
 	} else {
 		// check for default PodTemplate

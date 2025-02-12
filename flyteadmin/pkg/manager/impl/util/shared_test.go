@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -81,10 +82,10 @@ func TestGetTask(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, task)
-	assert.Equal(t, project, task.Id.Project)
-	assert.Equal(t, domain, task.Id.Domain)
-	assert.Equal(t, name, task.Id.Name)
-	assert.Equal(t, version, task.Id.Version)
+	assert.Equal(t, project, task.GetId().GetProject())
+	assert.Equal(t, domain, task.GetId().GetDomain())
+	assert.Equal(t, name, task.GetId().GetName())
+	assert.Equal(t, version, task.GetId().GetVersion())
 }
 
 func TestGetTask_DatabaseError(t *testing.T) {
@@ -326,10 +327,10 @@ func TestGetLaunchPlan(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, launchPlan)
-	assert.Equal(t, project, launchPlan.Id.Project)
-	assert.Equal(t, domain, launchPlan.Id.Domain)
-	assert.Equal(t, name, launchPlan.Id.Name)
-	assert.Equal(t, version, launchPlan.Id.Version)
+	assert.Equal(t, project, launchPlan.GetId().GetProject())
+	assert.Equal(t, domain, launchPlan.GetId().GetDomain())
+	assert.Equal(t, name, launchPlan.GetId().GetName())
+	assert.Equal(t, version, launchPlan.GetId().GetVersion())
 }
 
 func TestGetLaunchPlan_TransformerError(t *testing.T) {
@@ -443,11 +444,11 @@ func TestGetNamedEntity(t *testing.T) {
 		})
 	assert.Nil(t, err)
 	assert.NotNil(t, entity)
-	assert.Equal(t, project, entity.Id.Project)
-	assert.Equal(t, domain, entity.Id.Domain)
-	assert.Equal(t, name, entity.Id.Name)
-	assert.Equal(t, description, entity.Metadata.Description)
-	assert.Equal(t, resourceType, entity.ResourceType)
+	assert.Equal(t, project, entity.GetId().GetProject())
+	assert.Equal(t, domain, entity.GetId().GetDomain())
+	assert.Equal(t, name, entity.GetId().GetName())
+	assert.Equal(t, description, entity.GetMetadata().GetDescription())
+	assert.Equal(t, resourceType, entity.GetResourceType())
 }
 
 func TestGetActiveLaunchPlanVersionFilters(t *testing.T) {
@@ -485,8 +486,8 @@ func TestGetMatchableResource(t *testing.T) {
 	domain := "dummyDomain"
 	workflow := "dummyWorkflow"
 	t.Run("successful fetch", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -502,15 +503,15 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
-		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
+		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
 		assert.Nil(t, err)
 	})
 	t.Run("successful fetch workflow matchable", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -527,16 +528,16 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, workflow)
-		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
+		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
 		assert.Nil(t, err)
 	})
 
 	t.Run("not found", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -544,15 +545,15 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "resource not found")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.Nil(t, err)
 	})
 
 	t.Run("internal error", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -560,7 +561,7 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.NotNil(t, err)
@@ -614,7 +615,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 			})
 		assert.Nil(t, err)
 		assert.NotNil(t, entity)
-		assert.Equal(t, "hello world", entity.ShortDescription)
+		assert.Equal(t, "hello world", entity.GetShortDescription())
 	})
 
 	t.Run("Failed to get DescriptionEntity", func(t *testing.T) {

@@ -28,7 +28,7 @@ func TestExecutionCanBeActivated(t *testing.T) {
 				t, "UpdateExecution", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.ExecutionUpdateRequest) bool {
-						return r.State == admin.ExecutionState_EXECUTION_ACTIVE
+						return r.GetState() == admin.ExecutionState_EXECUTION_ACTIVE
 					}))
 		})
 }
@@ -47,7 +47,7 @@ func TestExecutionCanBeArchived(t *testing.T) {
 				t, "UpdateExecution", s.Ctx,
 				mock.MatchedBy(
 					func(r *admin.ExecutionUpdateRequest) bool {
-						return r.State == admin.ExecutionState_EXECUTION_ARCHIVED
+						return r.GetState() == admin.ExecutionState_EXECUTION_ARCHIVED
 					}))
 		})
 }
@@ -146,7 +146,7 @@ func TestExecutionUpdateFailsWhenExecutionDoesNotExist(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(nil, ext.NewNotFoundError("execution not found"))
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -165,7 +165,7 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -200,7 +200,7 @@ func testExecutionUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.Id.Name, execution.Id.Project, execution.Id.Domain).
+				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -230,7 +230,7 @@ func testExecutionUpdateWithMockSetup(
 		setup(&s, execution.UConfig, target)
 	}
 
-	args := []string{target.Id.Name}
+	args := []string{target.GetId().GetName()}
 	err := updateExecutionFunc(s.Ctx, args, s.CmdCtx)
 
 	if asserter != nil {

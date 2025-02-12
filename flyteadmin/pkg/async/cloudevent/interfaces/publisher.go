@@ -6,7 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-//go:generate mockery -name=Publisher -output=../mocks -case=underscore
+//go:generate mockery-v2 --name=Publisher --output=../mocks --case=underscore --with-expecter
 
 // Publisher Defines the interface for Publishing execution event to other services (AWS pub/sub, Kafka).
 type Publisher interface {

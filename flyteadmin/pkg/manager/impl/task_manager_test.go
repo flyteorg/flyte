@@ -99,6 +99,67 @@ func TestCreateTask(t *testing.T) {
 	assert.NotNil(t, response)
 }
 
+func TestCreateTask_DuplicateTaskRegistration(t *testing.T) {
+	mockRepository := getMockTaskRepository()
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
+		func(input interfaces.Identifier) (models.Task, error) {
+			return models.Task{
+				TaskKey: models.TaskKey{
+					Project: taskIdentifier.GetProject(),
+					Domain:  taskIdentifier.GetDomain(),
+					Name:    taskIdentifier.GetName(),
+					Version: taskIdentifier.GetVersion(),
+				},
+				Digest: []byte{
+					0xbf, 0x79, 0x61, 0x1c, 0xf5, 0xc1, 0xfb, 0x4c, 0xf8, 0xf4, 0xc4, 0x53, 0x5f, 0x8f, 0x73, 0xe2, 0x26, 0x5a,
+					0x18, 0x4a, 0xb7, 0x66, 0x98, 0x3c, 0xab, 0x2, 0x6c, 0x9, 0x9b, 0x90, 0xec, 0x8f},
+			}, nil
+		})
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetCreateCallback(func(input models.Task, descriptionEntity *models.DescriptionEntity) error {
+		return adminErrors.NewFlyteAdminErrorf(codes.AlreadyExists, "task already exists")
+	})
+	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
+		mockScope.NewTestScope())
+	request := testutils.GetValidTaskRequest()
+	_, err := taskManager.CreateTask(context.Background(), request)
+	assert.Error(t, err)
+	flyteErr, ok := err.(adminErrors.FlyteAdminError)
+	assert.True(t, ok, "Error should be of type FlyteAdminError")
+	assert.Equal(t, codes.AlreadyExists, flyteErr.Code(), "Error code should be AlreadyExists")
+	assert.Contains(t, flyteErr.Error(), "task with identical structure already exists")
+	differentTemplate := &core.TaskTemplate{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+		},
+		Type: "type",
+		Metadata: &core.TaskMetadata{
+			Runtime: &core.RuntimeMetadata{
+				Version: "runtime version 2",
+			},
+		},
+		Interface: &core.TypedInterface{},
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image: "image",
+				Command: []string{
+					"command",
+				},
+			},
+		},
+	}
+	request.Spec.Template = differentTemplate
+	_, err = taskManager.CreateTask(context.Background(), request)
+	assert.Error(t, err)
+	flyteErr, ok = err.(adminErrors.FlyteAdminError)
+	assert.True(t, ok, "Error should be of type FlyteAdminError")
+	assert.Equal(t, codes.InvalidArgument, flyteErr.Code(), "Error code should be InvalidArgument")
+	assert.Contains(t, flyteErr.Error(), "name task with different structure already exists.")
+}
+
 func TestCreateTask_ValidationError(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
@@ -172,11 +233,11 @@ func TestGetTask(t *testing.T) {
 		Id: &taskIdentifier,
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "project", task.Id.Project)
-	assert.Equal(t, "domain", task.Id.Domain)
-	assert.Equal(t, "name", task.Id.Name)
-	assert.Equal(t, "version", task.Id.Version)
-	assert.True(t, proto.Equal(testutils.GetTaskClosure(), task.Closure))
+	assert.Equal(t, "project", task.GetId().GetProject())
+	assert.Equal(t, "domain", task.GetId().GetDomain())
+	assert.Equal(t, "name", task.GetId().GetName())
+	assert.Equal(t, "version", task.GetId().GetVersion())
+	assert.True(t, proto.Equal(testutils.GetTaskClosure(), task.GetClosure()))
 }
 
 func TestGetTask_DatabaseError(t *testing.T) {
@@ -287,18 +348,18 @@ func TestListTasks(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, taskList)
-	assert.Len(t, taskList.Tasks, 2)
+	assert.Len(t, taskList.GetTasks(), 2)
 
-	for idx, task := range taskList.Tasks {
-		assert.Equal(t, projectValue, task.Id.Project)
-		assert.Equal(t, domainValue, task.Id.Domain)
-		assert.Equal(t, nameValue, task.Id.Name)
-		assert.Equal(t, fmt.Sprintf("version %v", idx), task.Id.Version)
+	for idx, task := range taskList.GetTasks() {
+		assert.Equal(t, projectValue, task.GetId().GetProject())
+		assert.Equal(t, domainValue, task.GetId().GetDomain())
+		assert.Equal(t, nameValue, task.GetId().GetName())
+		assert.Equal(t, fmt.Sprintf("version %v", idx), task.GetId().GetVersion())
 		assert.True(t, proto.Equal(&admin.TaskClosure{
 			CreatedAt: testutils.MockCreatedAtProto,
-		}, task.Closure))
+		}, task.GetClosure()))
 	}
-	assert.Equal(t, "2", taskList.Token)
+	assert.Equal(t, "2", taskList.GetToken())
 }
 
 func TestListTasks_MissingParameters(t *testing.T) {
@@ -401,6 +462,6 @@ func TestListUniqueTaskIdentifiers(t *testing.T) {
 	})
 
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(resp.Entities))
-	assert.Empty(t, resp.Token)
+	assert.Equal(t, 2, len(resp.GetEntities()))
+	assert.Empty(t, resp.GetToken())
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -24,8 +25,8 @@ var taskIdentifier = &core.Identifier{
 func TestTaskHappyCase(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetCreateCallback(
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().CreateTask(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return &admin.TaskCreateResponse{}, nil
@@ -45,11 +46,11 @@ func TestTaskHappyCase(t *testing.T) {
 func TestTaskError(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetCreateCallback(
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().CreateTask(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.Id)
+			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -73,11 +74,11 @@ func TestTaskError(t *testing.T) {
 func TestListUniqueTaskIds(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().ListUniqueTaskIdentifiers(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error) {
 
-		assert.Equal(t, "staging", request.Domain)
+		assert.Equal(t, "staging", request.GetDomain())
 		return nil, nil
 	})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

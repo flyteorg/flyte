@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -16,7 +17,6 @@ import (
 
 var (
 	testGcpSubscriber pubsubtest.TestSubscriber
-	mockGcpEmailer    mocks.MockEmailer
 )
 
 // This method should be invoked before every test to Subscriber.
@@ -30,18 +30,19 @@ func initializeGcpSubscriber() {
 
 func TestGcpProcessor_StartProcessing(t *testing.T) {
 	initializeGcpSubscriber()
+	mockGcpEmailer := mocks.Emailer{}
 	testGcpSubscriber.ProtoMessages = append(testGcpSubscriber.ProtoMessages, testSubscriberProtoMessages...)
 
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
 
 	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
-		assert.Equal(t, email.Body, testEmail.Body)
-		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
-		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
-		assert.Equal(t, email.SenderEmail, testEmail.SenderEmail)
+		assert.Equal(t, email.GetBody(), testEmail.GetBody())
+		assert.Equal(t, email.GetRecipientsEmail(), testEmail.GetRecipientsEmail())
+		assert.Equal(t, email.GetSubjectLine(), testEmail.GetSubjectLine())
+		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
-	mockGcpEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockGcpEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	assert.Nil(t, testGcpProcessor.(*GcpProcessor).run())
 
 	// Check fornumber of messages processed.
@@ -53,7 +54,7 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 
 func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
 	initializeGcpSubscriber()
-
+	mockGcpEmailer := mocks.Emailer{}
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
 
 	// Expect no errors are returned.
@@ -68,7 +69,7 @@ func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
 
 func TestGcpProcessor_StartProcessingError(t *testing.T) {
 	initializeGcpSubscriber()
-
+	mockGcpEmailer := mocks.Emailer{}
 	ret := errors.New("err() returned an error")
 	// The error set by GivenErrError is returned by Err().
 	// Err() is checked before Run() returning.
@@ -84,7 +85,8 @@ func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 	sendEmailErrorFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
-	mockGcpEmailer.SetSendEmailFunc(sendEmailErrorFunc)
+	mockGcpEmailer := mocks.Emailer{}
+	mockGcpEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailErrorFunc)
 	testGcpSubscriber.ProtoMessages = append(testGcpSubscriber.ProtoMessages, testSubscriberProtoMessages...)
 
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
@@ -101,12 +103,14 @@ func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 
 func TestGcpProcessor_StopProcessing(t *testing.T) {
 	initializeGcpSubscriber()
+	mockGcpEmailer := mocks.Emailer{}
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
 	assert.Nil(t, testGcpProcessor.StopProcessing())
 }
 
 func TestGcpProcessor_StopProcessingError(t *testing.T) {
 	initializeGcpSubscriber()
+	mockGcpEmailer := mocks.Emailer{}
 	stopError := errors.New("stop() returns an error")
 	testGcpSubscriber.GivenStopError = stopError
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())

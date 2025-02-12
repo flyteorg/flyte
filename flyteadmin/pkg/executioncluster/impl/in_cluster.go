@@ -26,8 +26,8 @@ func (i InCluster) GetTarget(ctx context.Context, spec *executioncluster.Executi
 	if spec != nil && !(spec.TargetID == "" || spec.TargetID == defaultInClusterTargetID) {
 		return nil, errors.New(fmt.Sprintf("remote target %s is not supported", spec.TargetID))
 	}
-	if spec != nil && spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.Value != "" {
-		return nil, errors.New(fmt.Sprintf("execution cluster label %s is not supported", spec.ExecutionClusterLabel.Value))
+	if spec != nil && spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.GetValue() != "" {
+		return nil, errors.New(fmt.Sprintf("execution cluster label %s is not supported", spec.ExecutionClusterLabel.GetValue()))
 	}
 	return &i.target, nil
 }

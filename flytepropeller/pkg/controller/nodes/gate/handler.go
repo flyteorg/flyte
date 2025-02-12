@@ -84,7 +84,7 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecut
 		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier,
-				SignalId:    approveCondition.SignalId,
+				SignalId:    approveCondition.GetSignalId(),
 			},
 			Type: &core.LiteralType{
 				Type: &core.LiteralType_Simple{
@@ -99,10 +99,10 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecut
 		}
 
 		// if signal has value then check for approval
-		if signal.Value != nil && signal.Value.Value != nil {
-			approved, ok := getBoolean(signal.Value)
+		if signal.GetValue() != nil && signal.Value.Value != nil {
+			approved, ok := getBoolean(signal.GetValue())
 			if !ok {
-				errMsg := fmt.Sprintf("received a non-boolean approve signal value [%v]", signal.Value)
+				errMsg := fmt.Sprintf("received a non-boolean approve signal value [%v]", signal.GetValue())
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_UNKNOWN,
 					errors.RuntimeExecutionError, errMsg, nil)), nil
 			}
@@ -143,9 +143,9 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecut
 		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier,
-				SignalId:    signalCondition.SignalId,
+				SignalId:    signalCondition.GetSignalId(),
 			},
-			Type: signalCondition.Type,
+			Type: signalCondition.GetType(),
 		}
 
 		signal, err := g.signalClient.GetOrCreateSignal(ctx, request)
@@ -154,10 +154,10 @@ func (g *gateNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecut
 		}
 
 		// if signal has value then write to output and transition to success
-		if signal.Value != nil && signal.Value.Value != nil {
+		if signal.GetValue() != nil && signal.Value.Value != nil {
 			outputs := &core.LiteralMap{
 				Literals: map[string]*core.Literal{
-					signalCondition.OutputVariableName: signal.Value,
+					signalCondition.GetOutputVariableName(): signal.GetValue(),
 				},
 			}
 
@@ -218,9 +218,9 @@ func New(eventConfig *config.EventConfig, signalClient service.SignalServiceClie
 }
 
 func getBoolean(literal *core.Literal) (bool, bool) {
-	if scalarValue, ok := literal.Value.(*core.Literal_Scalar); ok {
-		if primitiveValue, ok := scalarValue.Scalar.Value.(*core.Scalar_Primitive); ok {
-			if booleanValue, ok := primitiveValue.Primitive.Value.(*core.Primitive_Boolean); ok {
+	if scalarValue, ok := literal.GetValue().(*core.Literal_Scalar); ok {
+		if primitiveValue, ok := scalarValue.Scalar.GetValue().(*core.Scalar_Primitive); ok {
+			if booleanValue, ok := primitiveValue.Primitive.GetValue().(*core.Primitive_Boolean); ok {
 				return booleanValue.Boolean, true
 			}
 		}

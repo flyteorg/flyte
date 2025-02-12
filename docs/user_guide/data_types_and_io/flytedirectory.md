@@ -16,9 +16,9 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
-:lines: 1-10
+:lines: 1-9
 ```
 
 Building upon the previous example demonstrated in the {std:ref}`file <file>` section,
@@ -27,7 +27,7 @@ let's continue by considering the normalization of columns in a CSV file.
 The following task downloads a list of URLs pointing to CSV files
 and returns the folder path in a `FlyteDirectory` object.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
 :pyobject: download_files
 ```
@@ -57,7 +57,7 @@ demonstrates how Flyte tasks are simply entrypoints of execution, which can them
 other functions and routines that are written in pure Python.
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
 :pyobject: normalize_columns
 ```
@@ -65,7 +65,7 @@ other functions and routines that are written in pure Python.
 We then define a task that accepts the previously downloaded folder, along with some metadata about the
 column names of each file in the directory and the column names that we want to normalize.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
 :pyobject: normalize_all_files
 ```
@@ -74,14 +74,14 @@ Compose all of the above tasks into a workflow. This workflow accepts a list
 of URL strings pointing to a remote location containing a CSV file, a list of column names
 associated with each CSV file, and a list of columns that we want to normalize.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
 :pyobject: download_and_normalize_csv_files
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/folder.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
 :lines: 94-114
 ```
@@ -98,9 +98,9 @@ This feature is marked as experimental. We'd love feedback on the API!
 
 Here is a simple example, you can accept a `FlyteDirectory` as an input, walk through it and copy the files to another `FlyteDirectory` one by one.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/ddce0448141ea6d2cb148df52bf408874adb15ad/examples/data_types_and_io/data_types_and_io/file_streaming.py
+```{literalinclude} /examples/data_types_and_io/data_types_and_io/file_streaming.py
 :caption: data_types_and_io/file_streaming.py
-:lines: 23-33
+:lines: 24-34
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/

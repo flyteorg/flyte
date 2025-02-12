@@ -779,7 +779,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				evRecorder := &eventMocks.NodeEventRecorder{}
 				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -893,7 +893,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				evRecorder := &eventMocks.NodeEventRecorder{}
 				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -939,7 +939,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				} else {
 					assert.Nil(t, s.Err)
 				}
-				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts())
+				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts()) // #nosec G115
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}
@@ -1770,18 +1770,18 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	}, subWfID)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "start-node", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
+	assert.Equal(t, "start-node", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
 	assert.Equal(t, "dummy://dummyOutUrl/outputs.pb",
-		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
-	assert.Equal(t, ev.ProducerId, testClusterID)
+		ev.GetOutputResult().(*event.NodeExecutionEvent_OutputUri).OutputUri)
+	assert.Equal(t, ev.GetProducerId(), testClusterID)
 	assert.Equal(t, subWfID, ev.GetTargetEntity())
-	assert.Nil(t, ev.InputValue)
+	assert.Nil(t, ev.GetInputValue())
 }
 
 func TestNodeExecutionEventV0(t *testing.T) {
@@ -1817,14 +1817,14 @@ func TestNodeExecutionEventV0(t *testing.T) {
 		RawOutputPolicy: config.RawOutputPolicyReference,
 	}, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, "n1", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
-	assert.Empty(t, ev.TargetEntity)
+	assert.Equal(t, "n1", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
+	assert.Empty(t, ev.GetTargetEntity())
 	assert.Equal(t, "reference", ev.GetInputUri())
 }
 
@@ -1870,18 +1870,18 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	}, nil)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "np1-2-n1", eventOpt.Id.NodeId)
-	assert.Equal(t, execID, eventOpt.Id.ExecutionId)
-	assert.Equal(t, "id", eventOpt.SpecNodeId)
+	assert.Equal(t, "np1-2-n1", eventOpt.GetId().GetNodeId())
+	assert.Equal(t, execID, eventOpt.GetId().GetExecutionId())
+	assert.Equal(t, "id", eventOpt.GetSpecNodeId())
 	expectParentMetadata := event.ParentNodeExecutionMetadata{
 		NodeId: "np1",
 	}
-	assert.Equal(t, expectParentMetadata, *eventOpt.ParentNodeMetadata)
-	assert.Nil(t, eventOpt.ParentTaskMetadata)
-	assert.Equal(t, "name", eventOpt.NodeName)
-	assert.Equal(t, "2", eventOpt.RetryGroup)
+	assert.True(t, proto.Equal(&expectParentMetadata, eventOpt.GetParentNodeMetadata()))
+	assert.Nil(t, eventOpt.GetParentTaskMetadata())
+	assert.Equal(t, "name", eventOpt.GetNodeName())
+	assert.Equal(t, "2", eventOpt.GetRetryGroup())
 	assert.True(t, proto.Equal(eventOpt.GetInputData(), inputs))
-	assert.Empty(t, eventOpt.TargetEntity)
+	assert.Empty(t, eventOpt.GetTargetEntity())
 	assert.Equal(t, inputs, eventOpt.GetInputData())
 }
 
@@ -2326,8 +2326,8 @@ func TestRecover(t *testing.T) {
 			},
 			CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
 			DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-				Id:               dynamicWorkflow.Id,
-				CompiledWorkflow: dynamicWorkflow.CompiledWorkflow,
+				Id:               dynamicWorkflow.GetId(),
+				CompiledWorkflow: dynamicWorkflow.GetCompiledWorkflow(),
 			},
 		}, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata))
 	})

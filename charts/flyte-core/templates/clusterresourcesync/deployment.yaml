@@ -83,7 +83,7 @@ spec:
         {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           secret:
-            secretName: flyte-secret-auth
+            secretName: {{ .Values.secrets.adminOauthClientCredentials.secretName }}
         {{- end }}
         {{- end }}
       {{- with .Values.cluster_resource_manager.nodeSelector }}

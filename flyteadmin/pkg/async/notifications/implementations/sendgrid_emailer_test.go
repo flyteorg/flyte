@@ -1,27 +1,26 @@
 package implementations
 
 import (
+	"context"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus/testutil"
+	"github.com/sendgrid/rest"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-func TestAddresses(t *testing.T) {
-	addresses := []string{"alice@example.com", "bob@example.com"}
-	sgAddresses := getEmailAddresses(addresses)
-	assert.Equal(t, sgAddresses[0].Address, "alice@example.com")
-	assert.Equal(t, sgAddresses[1].Address, "bob@example.com")
-}
-
-func TestGetEmail(t *testing.T) {
-	emailNotification := &admin.EmailMessage{
+var (
+	emailNotification = &admin.EmailMessage{
 		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
 		SenderEmail: "no-reply@example.com",
 		RecipientsEmail: []string{
@@ -32,7 +31,16 @@ func TestGetEmail(t *testing.T) {
 			"<a href=\"https://example.com/executions/T/B/D\">" +
 			"https://example.com/executions/T/B/D</a>.",
 	}
+)
 
+func TestAddresses(t *testing.T) {
+	addresses := []string{"alice@example.com", "bob@example.com"}
+	sgAddresses := getEmailAddresses(addresses)
+	assert.Equal(t, sgAddresses[0].Address, "alice@example.com")
+	assert.Equal(t, sgAddresses[1].Address, "bob@example.com")
+}
+
+func TestGetEmail(t *testing.T) {
 	sgEmail := getSendgridEmail(emailNotification)
 	assert.Equal(t, `Notice: Execution "name" has succeeded in "domain".`, sgEmail.Personalizations[0].Subject)
 	assert.Equal(t, "john@example.com", sgEmail.Personalizations[0].To[1].Address)
@@ -97,4 +105,64 @@ func TestNoFile(t *testing.T) {
 
 	// shouldn't reach here
 	t.Errorf("did not panic")
+}
+
+func TestSendEmail(t *testing.T) {
+	ctx := context.TODO()
+	expectedErr := errors.New("expected")
+	t.Run("exhaust all retry attempts", func(t *testing.T) {
+		sendgridClient := &mocks.SendgridClient{}
+		expectedEmail := getSendgridEmail(emailNotification)
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(nil, expectedErr).Times(3)
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(&rest.Response{Body: "email body"}, nil).Once()
+		scope := promutils.NewScope("bademailer")
+		emailerMetrics := newEmailMetrics(scope)
+
+		emailer := SendgridEmailer{
+			client:        sendgridClient,
+			systemMetrics: emailerMetrics,
+			cfg: &runtimeInterfaces.NotificationsConfig{
+				ReconnectAttempts: 1,
+			},
+		}
+
+		err := emailer.SendEmail(ctx, emailNotification)
+		assert.EqualError(t, err, expectedErr.Error())
+
+		assert.NoError(t, testutil.CollectAndCompare(emailerMetrics.SendError, strings.NewReader(`
+		# HELP bademailer:send_error Number of errors when sending email via Emailer
+		# TYPE bademailer:send_error counter
+		bademailer:send_error 1
+		`)))
+	})
+	t.Run("exhaust all retry attempts", func(t *testing.T) {
+		ctx := context.TODO()
+		sendgridClient := &mocks.SendgridClient{}
+		expectedEmail := getSendgridEmail(emailNotification)
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(nil, expectedErr).Once()
+		sendgridClient.OnSendMatch(expectedEmail).
+			Return(&rest.Response{Body: "email body"}, nil).Once()
+		scope := promutils.NewScope("goodemailer")
+		emailerMetrics := newEmailMetrics(scope)
+
+		emailer := SendgridEmailer{
+			client:        sendgridClient,
+			systemMetrics: emailerMetrics,
+			cfg: &runtimeInterfaces.NotificationsConfig{
+				ReconnectAttempts: 1,
+			},
+		}
+
+		err := emailer.SendEmail(ctx, emailNotification)
+		assert.NoError(t, err)
+
+		assert.NoError(t, testutil.CollectAndCompare(emailerMetrics.SendError, strings.NewReader(`
+		# HELP goodemailer:send_error Number of errors when sending email via Emailer
+		# TYPE goodemailer:send_error counter
+		goodemailer:send_error 0
+		`)))
+	})
 }

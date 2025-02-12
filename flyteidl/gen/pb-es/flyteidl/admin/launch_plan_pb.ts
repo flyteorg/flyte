@@ -12,6 +12,7 @@ import { Annotations, AuthRole, Envs, Labels, NamedEntityIdentifier, Notificatio
 import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
 import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
+import { ClusterAssignment } from "./cluster_assignment_pb.js";
 import { Schedule } from "./schedule_pb.js";
 
 /**
@@ -420,6 +421,14 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    */
   executionEnvAssignments: ExecutionEnvAssignment[] = [];
 
+  /**
+   * ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.
+   * This can be overwritten at execution creation level.
+   *
+   * @generated from field: flyteidl.admin.ClusterAssignment cluster_assignment = 23;
+   */
+  clusterAssignment?: ClusterAssignment;
+
   constructor(data?: PartialMessage<LaunchPlanSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -445,6 +454,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 21, name: "envs", kind: "message", T: Envs },
     { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
+    { no: 23, name: "cluster_assignment", kind: "message", T: ClusterAssignment },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {

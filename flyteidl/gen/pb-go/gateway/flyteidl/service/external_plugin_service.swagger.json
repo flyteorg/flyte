@@ -341,6 +341,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 \u003c x \u003c 65536."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the port to expose on the pod's IP address."
         }
       },
       "description": "Defines port properties for a container."
@@ -390,6 +394,9 @@
         "gpu_accelerator": {
           "$ref": "#/definitions/coreGPUAccelerator",
           "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        },
+        "shared_memory": {
+          "$ref": "#/definitions/coreSharedMemory"
         }
       },
       "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
@@ -531,6 +538,10 @@
         "data_config": {
           "$ref": "#/definitions/coreDataLoadingConfig",
           "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+        },
+        "primary_container_name": {
+          "type": "string",
+          "description": "Defines the primary container name when pod template override is executed."
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
@@ -901,6 +912,10 @@
         "mount_requirement": {
           "$ref": "#/definitions/SecretMountType",
           "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        },
+        "env_var": {
+          "type": "string",
+          "title": "env_var is optional. Custom environment variable to set the value of the secret. If mount_requirement is ENV_VAR,\nthen the value is the secret itself. If mount_requirement is FILE, then the value is the path to the secret file.\n+optional"
         }
       },
       "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
@@ -930,6 +945,24 @@
         }
       },
       "description": "SecurityContext holds security attributes that apply to tasks."
+    },
+    "coreSharedMemory": {
+      "type": "object",
+      "properties": {
+        "mount_path": {
+          "type": "string",
+          "title": "Mount path to place in container"
+        },
+        "mount_name": {
+          "type": "string",
+          "title": "Name for volume"
+        },
+        "size_limit": {
+          "type": "string",
+          "title": "Size limit for shared memory. If not set, then the shared memory is equal\nto the allocated memory.\n+optional"
+        }
+      },
+      "description": "Metadata associated with configuring a shared memory volume for a task."
     },
     "coreSimpleType": {
       "type": "string",
@@ -1042,10 +1075,6 @@
           "type": "boolean",
           "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
         },
-        "generates_deck": {
-          "type": "boolean",
-          "description": "Indicates whether the task will generate a Deck URI when it finishes executing."
-        },
         "tags": {
           "type": "object",
           "additionalProperties": {
@@ -1063,6 +1092,14 @@
             "type": "string"
           },
           "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
+        },
+        "is_eager": {
+          "type": "boolean",
+          "description": "is_eager indicates whether the task is eager or not.\nThis would be used by CreateTask endpoint."
+        },
+        "generates_deck": {
+          "type": "boolean",
+          "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
         }
       },
       "title": "Task Metadata"

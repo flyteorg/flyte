@@ -15,7 +15,7 @@ generate: download_tooling #generate go code
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
-	GL_DEBUG=linters_output,env golangci-lint run $(LINT_FLAGS) --deadline=5m --exclude deprecated -v
+	GL_DEBUG=linters_output,env golangci-lint run $(LINT_FLAGS) --timeout=5m --exclude deprecated -v
 
 .PHONY: lint-fix
 lint-fix: LINT_FLAGS=--fix

@@ -162,7 +162,7 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 }
 
 func transformVarNameToStringVal(ctx context.Context, varName string, inputs *idlCore.LiteralMap) (string, error) {
-	inputVal, exists := inputs.Literals[varName]
+	inputVal, exists := inputs.GetLiterals()[varName]
 	if !exists {
 		return "", fmt.Errorf("requested input is not found [%s]", varName)
 	}
@@ -175,7 +175,7 @@ func transformVarNameToStringVal(ctx context.Context, varName string, inputs *id
 }
 
 func serializePrimitive(p *idlCore.Primitive) (string, error) {
-	switch o := p.Value.(type) {
+	switch o := p.GetValue().(type) {
 	case *idlCore.Primitive_Integer:
 		return fmt.Sprintf("%v", o.Integer), nil
 	case *idlCore.Primitive_Boolean:
@@ -189,22 +189,22 @@ func serializePrimitive(p *idlCore.Primitive) (string, error) {
 	case *idlCore.Primitive_StringValue:
 		return o.StringValue, nil
 	default:
-		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.Value))
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.GetValue()))
 	}
 }
 
 func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
-	switch o := l.Value.(type) {
+	switch o := l.GetValue().(type) {
 	case *idlCore.Scalar_Primitive:
 		return serializePrimitive(o.Primitive)
 	case *idlCore.Scalar_Blob:
-		return o.Blob.Uri, nil
+		return o.Blob.GetUri(), nil
 	case *idlCore.Scalar_Schema:
-		return o.Schema.Uri, nil
+		return o.Schema.GetUri(), nil
 	case *idlCore.Scalar_Binary:
-		binaryBytes := o.Binary.Value
+		binaryBytes := o.Binary.GetValue()
 		var currVal any
-		if o.Binary.Tag == coreutils.MESSAGEPACK {
+		if o.Binary.GetTag() == coreutils.MESSAGEPACK {
 			err := msgpack.Unmarshal(binaryBytes, &currVal)
 			if err != nil {
 				return "", fmt.Errorf("failed to unmarshal messagepack bytes with literal:[%v], err:[%v]", l, err)
@@ -212,18 +212,18 @@ func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
 			// TODO: Try to support Primitive_Datetime, Primitive_Duration, Flyte File, and Flyte Directory.
 			return fmt.Sprintf("%v", currVal), nil
 		}
-		return "", fmt.Errorf("unsupported binary tag [%v]", o.Binary.Tag)
+		return "", fmt.Errorf("unsupported binary tag [%v]", o.Binary.GetTag())
 
 	default:
-		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
+		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.GetValue()))
 	}
 }
 
 func serializeLiteral(ctx context.Context, l *idlCore.Literal) (string, error) {
-	switch o := l.Value.(type) {
+	switch o := l.GetValue().(type) {
 	case *idlCore.Literal_Collection:
-		res := make([]string, 0, len(o.Collection.Literals))
-		for _, sub := range o.Collection.Literals {
+		res := make([]string, 0, len(o.Collection.GetLiterals()))
+		for _, sub := range o.Collection.GetLiterals() {
 			s, err := serializeLiteral(ctx, sub)
 			if err != nil {
 				return "", err
@@ -237,6 +237,6 @@ func serializeLiteral(ctx context.Context, l *idlCore.Literal) (string, error) {
 		return serializeLiteralScalar(o.Scalar)
 	default:
 		logger.Debugf(ctx, "received unexpected primitive type")
-		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.Value))
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.GetValue()))
 	}
 }

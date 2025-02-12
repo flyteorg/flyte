@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -24,8 +25,8 @@ var workflowIdentifier = core.Identifier{
 func TestCreateWorkflowHappyCase(t *testing.T) {
 	ctx := context.Background()
 
-	mockWorkflowManager := mocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(
+	mockWorkflowManager := mocks.WorkflowInterface{}
+	mockWorkflowManager.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 			return &admin.WorkflowCreateResponse{}, nil
@@ -45,11 +46,11 @@ func TestCreateWorkflowHappyCase(t *testing.T) {
 func TestCreateWorkflowError(t *testing.T) {
 	ctx := context.Background()
 
-	mockWorkflowManager := mocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(
+	mockWorkflowManager := mocks.WorkflowInterface{}
+	mockWorkflowManager.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), request.Id)
+			return nil, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

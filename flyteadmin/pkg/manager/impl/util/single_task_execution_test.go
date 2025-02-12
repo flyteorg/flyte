@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -86,29 +87,29 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 
-	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
-		assert.Equal(t, request.ResourceType, core.ResourceType_WORKFLOW)
-		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
+	mockNamedEntityManager := managerMocks.NamedEntityInterface{}
+	mockNamedEntityManager.EXPECT().UpdateNamedEntity(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+		assert.Equal(t, request.GetResourceType(), core.ResourceType_WORKFLOW)
+		assert.True(t, proto.Equal(request.GetId(), &admin.NamedEntityIdentifier{
 			Project: "flytekit",
 			Domain:  "production",
 			Name:    ".flytegen.app.workflows.MyWorkflow.my_task",
-		}), fmt.Sprintf("%+v", request.Id))
-		assert.True(t, proto.Equal(request.Metadata, &admin.NamedEntityMetadata{
+		}), fmt.Sprintf("%+v", request.GetId()))
+		assert.True(t, proto.Equal(request.GetMetadata(), &admin.NamedEntityMetadata{
 			State: admin.NamedEntityState_SYSTEM_GENERATED,
 		}))
 		return &admin.NamedEntityUpdateResponse{}, nil
-	}
+	})
 
-	mockWorkflowManager := managerMocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
-		assert.True(t, proto.Equal(request.Id, &core.Identifier{
+	mockWorkflowManager := managerMocks.WorkflowInterface{}
+	mockWorkflowManager.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+		assert.True(t, proto.Equal(request.GetId(), &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "flytekit",
 			Domain:       "production",
 			Name:         ".flytegen.app.workflows.MyWorkflow.my_task",
 			Version:      "12345",
-		}), fmt.Sprintf("%+v", request.Id))
+		}), fmt.Sprintf("%+v", request.GetId()))
 		assert.Len(t, request.GetSpec().GetTemplate().GetNodes(), 1)
 		assert.Equal(t, request.GetSpec().GetTemplate().GetNodes()[0].GetMetadata().GetRetries().GetRetries(), uint32(2))
 
@@ -218,19 +219,19 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	}
 	workflowID := uint(12)
 
-	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
-		assert.Equal(t, request.ResourceType, core.ResourceType_LAUNCH_PLAN)
-		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
+	mockNamedEntityManager := managerMocks.NamedEntityInterface{}
+	mockNamedEntityManager.EXPECT().UpdateNamedEntity(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+		assert.Equal(t, request.GetResourceType(), core.ResourceType_LAUNCH_PLAN)
+		assert.True(t, proto.Equal(request.GetId(), &admin.NamedEntityIdentifier{
 			Project: "flytekit",
 			Domain:  "production",
 			Name:    ".flytegen.app.workflows.MyWorkflow.my_task",
-		}), fmt.Sprintf("%+v", request.Id))
-		assert.True(t, proto.Equal(request.Metadata, &admin.NamedEntityMetadata{
+		}), fmt.Sprintf("%+v", request.GetId()))
+		assert.True(t, proto.Equal(request.GetMetadata(), &admin.NamedEntityMetadata{
 			State: admin.NamedEntityState_SYSTEM_GENERATED,
 		}))
 		return &admin.NamedEntityUpdateResponse{}, nil
-	}
+	})
 
 	taskIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
@@ -256,7 +257,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 		Domain:       "production",
 		Name:         ".flytegen.app.workflows.MyWorkflow.my_task",
 		Version:      "12345",
-	}, launchPlan.Id))
-	assert.True(t, proto.Equal(launchPlan.Closure.ExpectedOutputs, workflowInterface.Outputs))
-	assert.True(t, proto.Equal(launchPlan.Spec.AuthRole, spec.AuthRole))
+	}, launchPlan.GetId()))
+	assert.True(t, proto.Equal(launchPlan.GetClosure().GetExpectedOutputs(), workflowInterface.GetOutputs()))
+	assert.True(t, proto.Equal(launchPlan.GetSpec().GetAuthRole(), spec.GetAuthRole()))
 }

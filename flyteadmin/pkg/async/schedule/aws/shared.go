@@ -12,7 +12,7 @@ import (
 func hashIdentifier(identifier *core.Identifier) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(scheduleNameInputsFormat,
-		identifier.Project, identifier.Domain, identifier.Name)))
+		identifier.GetProject(), identifier.GetDomain(), identifier.GetName())))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(context.Background(),

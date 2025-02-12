@@ -88,14 +88,14 @@ func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskE
 	if trns.Info().Phase() == pluginCore.PhaseSuccess {
 		tk, err := tCtx.TaskReader().Read(ctx)
 		assert.NoError(f.t, err)
-		outputVars := tk.GetInterface().Outputs.Variables
+		outputVars := tk.GetInterface().GetOutputs().GetVariables()
 		o := &core.LiteralMap{
 			Literals: make(map[string]*core.Literal, len(outputVars)),
 		}
 		for k, v := range outputVars {
-			l, err := coreutils.MakeDefaultLiteralForType(v.Type)
+			l, err := coreutils.MakeDefaultLiteralForType(v.GetType())
 			if f.enableAsserts && !assert.NoError(f.t, err) {
-				assert.FailNow(f.t, "Failed to create default output for node [%v] Type [%v]", tCtx.TaskExecutionMetadata().GetTaskExecutionID(), v.Type)
+				assert.FailNow(f.t, "Failed to create default output for node [%v] Type [%v]", tCtx.TaskExecutionMetadata().GetTaskExecutionID(), v.GetType())
 			}
 			o.Literals[k] = l
 		}
@@ -488,21 +488,21 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 		if ok {
 			assert.True(t, ok)
-			switch e.Phase {
+			switch e.GetPhase() {
 			case core.WorkflowExecution_RUNNING:
-				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.WithinDuration(t, e.GetOccurredAt().AsTime(), time.Now(), time.Millisecond*5)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedRunning = true
 			case core.WorkflowExecution_FAILING:
-				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.WithinDuration(t, e.GetOccurredAt().AsTime(), time.Now(), time.Millisecond*5)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedFailing = true
 			case core.WorkflowExecution_FAILED:
-				assert.WithinDuration(t, e.OccurredAt.AsTime(), time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.WithinDuration(t, e.GetOccurredAt().AsTime(), time.Now(), time.Millisecond*5)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedFailed = true
 			default:
-				return fmt.Errorf("MockWorkflowRecorder should not have entered into any other states [%v]", e.Phase)
+				return fmt.Errorf("MockWorkflowRecorder should not have entered into any other states [%v]", e.GetPhase())
 			}
 		}
 		return nil
@@ -591,30 +591,30 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
 		if ok {
-			switch e.Phase {
+			switch e.GetPhase() {
 			case core.WorkflowExecution_RUNNING:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
+				occuredAt, err := ptypes.Timestamp(e.GetOccurredAt())
 				assert.NoError(t, err)
 
 				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedRunning = true
 			case core.WorkflowExecution_SUCCEEDING:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
+				occuredAt, err := ptypes.Timestamp(e.GetOccurredAt())
 				assert.NoError(t, err)
 
 				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedFailing = true
 			case core.WorkflowExecution_SUCCEEDED:
-				occuredAt, err := ptypes.Timestamp(e.OccurredAt)
+				occuredAt, err := ptypes.Timestamp(e.GetOccurredAt())
 				assert.NoError(t, err)
 
 				assert.WithinDuration(t, occuredAt, time.Now(), time.Millisecond*5)
-				assert.Equal(t, testClusterID, e.ProducerId)
+				assert.Equal(t, testClusterID, e.GetProducerId())
 				recordedSuccess = true
 			default:
-				return fmt.Errorf("MockWorkflowRecorder should not have entered into any other states, received [%v]", e.Phase.String())
+				return fmt.Errorf("MockWorkflowRecorder should not have entered into any other states, received [%v]", e.GetPhase().String())
 			}
 		}
 		return nil
@@ -819,7 +819,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		nodeExec := &nodemocks.Node{}
 		wfRecorder := &eventMocks.WorkflowEventRecorder{}
 		wfRecorder.On("RecordWorkflowEvent", mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
-			assert.Equal(t, testClusterID, ev.ProducerId)
+			assert.Equal(t, testClusterID, ev.GetProducerId())
 			evs = append(evs, ev)
 			return true
 		}), mock.Anything).Return(nil)
@@ -861,7 +861,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		nodeExec := &nodemocks.Node{}
 		wfRecorder := &eventMocks.WorkflowEventRecorder{}
 		wfRecorder.OnRecordWorkflowEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
-			assert.Equal(t, testClusterID, ev.ProducerId)
+			assert.Equal(t, testClusterID, ev.GetProducerId())
 			evs = append(evs, ev)
 			return true
 		}), mock.Anything).Return(nil)
@@ -902,7 +902,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		nodeExec := &nodemocks.Node{}
 		wfRecorder := &eventMocks.WorkflowEventRecorder{}
 		wfRecorder.OnRecordWorkflowEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
-			assert.Equal(t, testClusterID, ev.ProducerId)
+			assert.Equal(t, testClusterID, ev.GetProducerId())
 			evs = append(evs, ev)
 			return true
 		}), mock.Anything).Return(nil)

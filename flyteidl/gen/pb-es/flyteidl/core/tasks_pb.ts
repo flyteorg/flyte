@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, Struct } from "@bufbuild/protobuf";
+import { BoolValue, Duration, Message, proto3, Struct } from "@bufbuild/protobuf";
 import { KeyValuePair, RetryStrategy } from "./literals_pb.js";
 import { Identifier } from "./identifier_pb.js";
 import { TypedInterface } from "./interface_pb.js";
@@ -228,6 +228,65 @@ export class GPUAccelerator extends Message<GPUAccelerator> {
 }
 
 /**
+ * Metadata associated with configuring a shared memory volume for a task.
+ *
+ * @generated from message flyteidl.core.SharedMemory
+ */
+export class SharedMemory extends Message<SharedMemory> {
+  /**
+   * Mount path to place in container
+   *
+   * @generated from field: string mount_path = 1;
+   */
+  mountPath = "";
+
+  /**
+   * Name for volume
+   *
+   * @generated from field: string mount_name = 2;
+   */
+  mountName = "";
+
+  /**
+   * Size limit for shared memory. If not set, then the shared memory is equal
+   * to the allocated memory.
+   * +optional
+   *
+   * @generated from field: string size_limit = 3;
+   */
+  sizeLimit = "";
+
+  constructor(data?: PartialMessage<SharedMemory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.SharedMemory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "mount_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "mount_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "size_limit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SharedMemory {
+    return new SharedMemory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SharedMemory {
+    return new SharedMemory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SharedMemory {
+    return new SharedMemory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SharedMemory | PlainMessage<SharedMemory> | undefined, b: SharedMemory | PlainMessage<SharedMemory> | undefined): boolean {
+    return proto3.util.equals(SharedMemory, a, b);
+  }
+}
+
+/**
  * Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
  * allocate to a task.
  *
@@ -242,6 +301,11 @@ export class ExtendedResources extends Message<ExtendedResources> {
    */
   gpuAccelerator?: GPUAccelerator;
 
+  /**
+   * @generated from field: flyteidl.core.SharedMemory shared_memory = 2;
+   */
+  sharedMemory?: SharedMemory;
+
   constructor(data?: PartialMessage<ExtendedResources>) {
     super();
     proto3.util.initPartial(data, this);
@@ -251,6 +315,7 @@ export class ExtendedResources extends Message<ExtendedResources> {
   static readonly typeName = "flyteidl.core.ExtendedResources";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "gpu_accelerator", kind: "message", T: GPUAccelerator },
+    { no: 2, name: "shared_memory", kind: "message", T: SharedMemory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExtendedResources {
@@ -418,13 +483,6 @@ export class TaskMetadata extends Message<TaskMetadata> {
   cacheSerializable = false;
 
   /**
-   * Indicates whether the task will generate a Deck URI when it finishes executing.
-   *
-   * @generated from field: bool generates_deck = 10;
-   */
-  generatesDeck = false;
-
-  /**
    * Arbitrary tags that allow users and the platform to store small but arbitrary labels
    *
    * @generated from field: map<string, string> tags = 11;
@@ -447,6 +505,25 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   cacheIgnoreInputVars: string[] = [];
 
+  /**
+   * is_eager indicates whether the task is eager or not.
+   * This would be used by CreateTask endpoint.
+   *
+   * @generated from field: bool is_eager = 14;
+   */
+  isEager = false;
+
+  /**
+   * Indicates whether the task will generate a deck when it finishes executing.
+   * The BoolValue can have three states:
+   * - nil: The value is not set.
+   * - true: The task will generate a deck.
+   * - false: The task will not generate a deck.
+   *
+   * @generated from field: google.protobuf.BoolValue generates_deck = 15;
+   */
+  generatesDeck?: boolean;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -463,10 +540,11 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 7, name: "deprecated_error_message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "interruptible_value" },
     { no: 9, name: "cache_serializable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 10, name: "generates_deck", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 11, name: "tags", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 12, name: "pod_template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {
@@ -642,6 +720,13 @@ export class ContainerPort extends Message<ContainerPort> {
    */
   containerPort = 0;
 
+  /**
+   * Name of the port to expose on the pod's IP address.
+   *
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
   constructor(data?: PartialMessage<ContainerPort>) {
     super();
     proto3.util.initPartial(data, this);
@@ -651,6 +736,7 @@ export class ContainerPort extends Message<ContainerPort> {
   static readonly typeName = "flyteidl.core.ContainerPort";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "container_port", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerPort {
@@ -1092,6 +1178,13 @@ export class K8sPod extends Message<K8sPod> {
    */
   dataConfig?: DataLoadingConfig;
 
+  /**
+   * Defines the primary container name when pod template override is executed.
+   *
+   * @generated from field: string primary_container_name = 4;
+   */
+  primaryContainerName = "";
+
   constructor(data?: PartialMessage<K8sPod>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1103,6 +1196,7 @@ export class K8sPod extends Message<K8sPod> {
     { no: 1, name: "metadata", kind: "message", T: K8sObjectMetadata },
     { no: 2, name: "pod_spec", kind: "message", T: Struct },
     { no: 3, name: "data_config", kind: "message", T: DataLoadingConfig },
+    { no: 4, name: "primary_container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): K8sPod {

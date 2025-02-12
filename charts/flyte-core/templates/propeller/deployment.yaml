@@ -83,7 +83,11 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
+        {{- if and (.Values.flytepropeller.manager) (.Values.flytepropeller.manager_resources) }}
+        resources: {{- toYaml .Values.flytepropeller.manager_resources.resources | nindent 10 }}
+        {{- else }}
         resources: {{- toYaml .Values.flytepropeller.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
@@ -108,7 +112,7 @@ spec:
       {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
-          secretName: flyte-secret-auth
+          secretName: {{ .Values.secrets.adminOauthClientCredentials.secretName }}
       {{- end }}
       {{- with .Values.flytepropeller.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}

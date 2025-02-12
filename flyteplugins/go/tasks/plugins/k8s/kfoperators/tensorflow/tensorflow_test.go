@@ -156,6 +156,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 	overrides.OnGetResources().Return(resources)
 	overrides.OnGetExtendedResources().Return(extendedResources)
 	overrides.OnGetContainerImage().Return("")
+	overrides.OnGetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -628,11 +629,11 @@ func TestGetLogs(t *testing.T) {
 		workers, psReplicas, chiefReplicas, evaluatorReplicas)
 	assert.NoError(t, err)
 	assert.Equal(t, 5, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[1].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[2].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[3].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-evaluatorReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[4].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[1].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[2].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[3].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-evaluatorReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[4].GetUri())
 }
 
 func TestGetProperties(t *testing.T) {

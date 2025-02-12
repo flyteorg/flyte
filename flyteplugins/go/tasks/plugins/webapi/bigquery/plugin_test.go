@@ -105,9 +105,9 @@ func TestOutputWriter(t *testing.T) {
 		assert.NoError(t, err)
 
 		sd := literals.GetLiterals()["results"].GetScalar().GetStructuredDataset()
-		assert.Equal(t, sd.Uri, outputLocation)
-		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].Name, "col1")
-		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].LiteralType.GetSimple(), flyteIdlCore.SimpleType_INTEGER)
+		assert.Equal(t, sd.GetUri(), outputLocation)
+		assert.Equal(t, sd.GetMetadata().GetStructuredDatasetType().GetColumns()[0].GetName(), "col1")
+		assert.Equal(t, sd.GetMetadata().GetStructuredDatasetType().GetColumns()[0].GetLiteralType().GetSimple(), flyteIdlCore.SimpleType_INTEGER)
 
 		if ee != nil {
 			assert.NoError(t, ds.WriteProtobuf(ctx, outputWriter.GetErrorPath(), storage.Options{}, ee))
@@ -307,9 +307,9 @@ func TestHandleErrorResult(t *testing.T) {
 			phaseInfo := handleErrorResult(test.reason, "message", &taskInfo)
 
 			assert.Equal(t, test.phase, phaseInfo.Phase())
-			assert.Equal(t, test.reason, phaseInfo.Err().Code)
-			assert.Equal(t, test.errorKind, phaseInfo.Err().Kind)
-			assert.Equal(t, "message", phaseInfo.Err().Message)
+			assert.Equal(t, test.reason, phaseInfo.Err().GetCode())
+			assert.Equal(t, test.errorKind, phaseInfo.Err().GetKind())
+			assert.Equal(t, "message", phaseInfo.Err().GetMessage())
 		})
 	}
 }

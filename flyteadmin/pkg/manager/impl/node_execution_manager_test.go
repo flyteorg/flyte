@@ -71,7 +71,7 @@ var request = &admin.NodeExecutionEventRequest{
 		TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
 			TaskNodeMetadata: &event.TaskNodeMetadata{
 				DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-					Id:               dynamicWorkflowClosure.Primary.Template.Id,
+					Id:               dynamicWorkflowClosure.GetPrimary().GetTemplate().GetId(),
 					CompiledWorkflow: dynamicWorkflowClosure,
 				},
 			},
@@ -131,7 +131,7 @@ func TestCreateNodeEvent(t *testing.T) {
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 	expectedClosure := admin.NodeExecutionClosure{
-		Phase:     request.Event.Phase,
+		Phase:     request.GetEvent().GetPhase(),
 		StartedAt: occurredAtProto,
 		CreatedAt: occurredAtProto,
 		UpdatedAt: occurredAtProto,
@@ -450,8 +450,8 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 		}
 		nodeExecution, err := manager.transformNodeExecutionModel(ctx, models.NodeExecution{}, nodeExecID, transformers.DefaultExecutionTransformerOptions)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(nodeExecID, nodeExecution.Id))
-		assert.True(t, nodeExecution.Metadata.IsParentNode)
+		assert.True(t, proto.Equal(nodeExecID, nodeExecution.GetId()))
+		assert.True(t, nodeExecution.GetMetadata().GetIsParentNode())
 	})
 	t.Run("event version > 0", func(t *testing.T) {
 		manager := NodeExecutionManager{
@@ -480,8 +480,8 @@ func TestTransformNodeExecutionModel(t *testing.T) {
 			InternalData:          internalDataBytes,
 		}, nodeExecID, transformers.DefaultExecutionTransformerOptions)
 		assert.NoError(t, err)
-		assert.True(t, nodeExecution.Metadata.IsParentNode)
-		assert.True(t, nodeExecution.Metadata.IsDynamic)
+		assert.True(t, nodeExecution.GetMetadata().GetIsParentNode())
+		assert.True(t, nodeExecution.GetMetadata().GetIsDynamic())
 	})
 	t.Run("transform internal data err", func(t *testing.T) {
 		manager := NodeExecutionManager{
@@ -865,7 +865,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
@@ -878,8 +878,8 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestListNodeExecutionsWithParent(t *testing.T) {
@@ -895,7 +895,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	parentID := uint(12)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (execution models.NodeExecution, e error) {
-		assert.Equal(t, "parent_1", input.NodeExecutionIdentifier.NodeId)
+		assert.Equal(t, "parent_1", input.NodeExecutionIdentifier.GetNodeId())
 		return models.NodeExecution{
 			BaseModel: models.BaseModel{
 				ID: parentID,
@@ -966,7 +966,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		UniqueParentId: "parent_1",
 	})
 	assert.Nil(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
@@ -979,8 +979,8 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
@@ -1089,7 +1089,7 @@ func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
 		Filters: "eq(execution.phase, SUCCEEDED)",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
@@ -1102,8 +1102,8 @@ func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestListNodeExecutions_InvalidParams(t *testing.T) {
@@ -1316,7 +1316,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		},
 	})
 	assert.Nil(t, err)
-	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.Len(t, nodeExecutions.GetNodeExecutions(), 1)
 	expectedMetadata := admin.NodeExecutionMetaData{
 		SpecNodeId:   "spec-n1",
 		IsParentNode: true,
@@ -1333,8 +1333,8 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  &expectedClosure,
 		Metadata: &expectedMetadata,
-	}, nodeExecutions.NodeExecutions[0]))
-	assert.Equal(t, "3", nodeExecutions.Token)
+	}, nodeExecutions.GetNodeExecutions()[0]))
+	assert.Equal(t, "3", nodeExecutions.GetToken())
 }
 
 func TestGetNodeExecutionData(t *testing.T) {
@@ -1439,7 +1439,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 		DynamicWorkflow: &admin.DynamicWorkflowNodeMetadata{
-			Id:               dynamicWorkflowClosure.Primary.Template.Id,
+			Id:               dynamicWorkflowClosure.GetPrimary().GetTemplate().GetId(),
 			CompiledWorkflow: dynamicWorkflowClosure,
 		},
 		FlyteUrls: &admin.FlyteURLs{
@@ -1465,7 +1465,7 @@ func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
 			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
 		})
 	mockStorageClient := commonMocks.GetMockStorageClient()
-	expectedClosure := testutils.GetWorkflowClosure().CompiledWorkflow
+	expectedClosure := testutils.GetWorkflowClosure().GetCompiledWorkflow()
 	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		assert.Equal(t, remoteClosureIdentifier, reference.String())
 		bytes, err := proto.Marshal(expectedClosure)

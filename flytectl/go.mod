@@ -36,7 +36,7 @@ require (
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0
 	github.com/zalando/go-keyring v0.1.1
 	golang.org/x/oauth2 v0.18.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.21.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.34.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -82,7 +82,7 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
-	github.com/flyteorg/stow v0.3.10 // indirect
+	github.com/flyteorg/stow v0.3.11 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
@@ -141,6 +141,7 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
 	github.com/shamaton/msgpack/v2 v2.2.2 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
@@ -148,6 +149,12 @@ require (
 	github.com/spf13/viper v1.11.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
+	github.com/tidwall/gjson v1.17.1 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/wI2L/jsondiff v0.6.0 // indirect
+	gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
@@ -161,12 +168,12 @@ require (
 	go.opentelemetry.io/otel/sdk v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/term v0.22.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/api v0.155.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

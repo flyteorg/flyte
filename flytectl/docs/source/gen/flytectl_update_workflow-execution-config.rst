@@ -12,12 +12,19 @@ Synopsis
 
 Updates the workflow execution config for the given project and domain combination or additionally with workflow name.
 
-Updating the workflow execution config is only available from a generated file. See the get section for generating this file.
+Updating the workflow execution config is only available from a generated file.
+See the get section for generating this file.
 This will completely overwrite any existing custom project and domain and workflow combination execution config.
 It is preferable to do get and generate a config file if there is an existing execution config already set and then update it to have new values.
 Refer to get workflow-execution-config section on how to generate this file.
-It takes input for workflow execution config from the config file wec.yaml,
-Example: content of wec.yaml:
+
+It takes input for workflow execution config from the config file wec.yaml
+
+**New Configuration Example: Adding** ``raw_output_data_config``
+
+You can now update the `raw_output_data_config` using the `flytectl update workflow-execution-config` command.  
+
+Example content of `wec.yaml`:
 
 .. code-block:: yaml
 
@@ -27,6 +34,8 @@ Example: content of wec.yaml:
     security_context:
       run_as:
         k8s_service_account: demo
+    raw_output_data_config:
+        output_location_prefix: s3://example-data
 
 ::
 
@@ -34,6 +43,7 @@ Example: content of wec.yaml:
 
 Update workflow execution config for project, domain, and workflow combination. This will take precedence over any other
 execution config defined at project domain level.
+
 For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, development domain, it is:
 
 .. code-block:: yaml
@@ -45,6 +55,8 @@ For workflow 'core.control_flow.merge_sort.merge_sort' in flytesnacks project, d
     security_context:
       run_as:
         k8s_service_account: mergesortsa
+    raw_output_data_config:
+        output_location_prefix: s3://example-data
 
 ::
 
@@ -91,10 +103,12 @@ Options inherited from parent commands
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")
+      --admin.maxMessageSizeBytes int                The max size in bytes for incoming gRPC messages
       --admin.maxRetries int                         Max number of gRPC retries (default 4)
       --admin.perRetryTimeout string                 gRPC per retry timeout (default "15s")
       --admin.pkceConfig.refreshTime string          grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.pkceConfig.timeout string              Amount of time the browser session would be active for authentication from client app. (default "2m0s")
+      --admin.proxyCommand strings                   Command for external proxy-authorization token generation
       --admin.scopes strings                         List of scopes to request
       --admin.tokenRefreshWindow string              Max duration between token refresh attempt and token expiry. (default "0s")
       --admin.tokenUrl string                        OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
@@ -115,10 +129,17 @@ Options inherited from parent commands
       --files.outputLocationPrefix string            Custom output location prefix for offloaded types (files/schemas).
       --files.sourceUploadPath string                Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                         Version of the entity to be registered with flyte which are un-versioned after serialization.
+  -i, --interactive                                  Set this flag to use an interactive CLI
       --logger.formatter.type string                 Sets logging format type. (default "json")
       --logger.level int                             Sets the minimum logging level. (default 3)
       --logger.mute                                  Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                           Includes source code location in logs.
+      --otel.file.filename string                    Filename to store exported telemetry traces (default "/tmp/trace.txt")
+      --otel.jaeger.endpoint string                  Endpoint for the jaeger telemetry trace ingestor (default "http://localhost:14268/api/traces")
+      --otel.otlpgrpc.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4317")
+      --otel.otlphttp.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4318/v1/traces")
+      --otel.sampler.parentSampler string            Sets the parent sampler to use for the tracer (default "always")
+      --otel.type string                             Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]. (default "noop")
   -o, --output string                                Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
   -p, --project string                               Specifies the Flyte project.
       --storage.cache.max_size_mbs int               Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used

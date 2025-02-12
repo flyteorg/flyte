@@ -10,8 +10,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -31,7 +33,7 @@ import (
 
 var active = int32(admin.LaunchPlanState_ACTIVE)
 var inactive = int32(admin.LaunchPlanState_INACTIVE)
-var mockScheduler = mocks.NewMockEventScheduler()
+var mockScheduler = &mocks.EventScheduler{}
 var launchPlanIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_LAUNCH_PLAN,
 	Project:      project,
@@ -59,7 +61,7 @@ func getMockConfigForLpTest() runtimeInterfaces.Configuration {
 
 func setDefaultWorkflowCallbackForLpTest(repository interfaces.Repository) {
 	workflowSpec := testutils.GetSampleWorkflowSpecForTest()
-	typedInterface, _ := proto.Marshal(workflowSpec.Template.Interface)
+	typedInterface, _ := proto.Marshal(workflowSpec.GetTemplate().GetInterface())
 	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		return models.Workflow{
 			WorkflowKey: models.WorkflowKey{
@@ -107,10 +109,10 @@ func TestLaunchPlanManager_GetLaunchPlan(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
@@ -143,10 +145,10 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
@@ -169,10 +171,10 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 			LaunchPlans: []models.LaunchPlan{
 				{
 					LaunchPlanKey: models.LaunchPlanKey{
-						Project: lpRequest.Id.Project,
-						Domain:  lpRequest.Id.Domain,
-						Name:    lpRequest.Id.Name,
-						Version: lpRequest.Id.Version,
+						Project: lpRequest.GetId().GetProject(),
+						Domain:  lpRequest.GetId().GetDomain(),
+						Name:    lpRequest.GetId().GetName(),
+						Version: lpRequest.GetId().GetVersion(),
 					},
 					Spec:       specBytes,
 					Closure:    closureBytes,
@@ -185,9 +187,9 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(launchPlanListFunc)
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), &admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
-			Project: lpRequest.Id.Project,
-			Domain:  lpRequest.Id.Domain,
-			Name:    lpRequest.Id.Name,
+			Project: lpRequest.GetId().GetProject(),
+			Domain:  lpRequest.GetId().GetDomain(),
+			Name:    lpRequest.GetId().GetName(),
 		},
 	})
 	assert.NoError(t, err)
@@ -205,9 +207,9 @@ func TestLaunchPlanManager_GetActiveLaunchPlan_NoneActive(t *testing.T) {
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(launchPlanListFunc)
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), &admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
-			Project: lpRequest.Id.Project,
-			Domain:  lpRequest.Id.Domain,
-			Name:    lpRequest.Id.Name,
+			Project: lpRequest.GetId().GetProject(),
+			Domain:  lpRequest.GetId().GetDomain(),
+			Name:    lpRequest.GetId().GetName(),
 		},
 	})
 	assert.EqualError(t, err, "No active launch plan could be found: project:domain:name")
@@ -298,11 +300,11 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 	setDefaultWorkflowCallbackForLpTest(repository)
 	lpCreateFunc := func(input models.LaunchPlan) error {
 		launchPlan, _ := transformers.FromLaunchPlanModel(input)
-		assert.Equal(t, project, launchPlan.Id.Project)
-		assert.Equal(t, domain, launchPlan.Id.Domain)
-		assert.Equal(t, name, launchPlan.Id.Name)
-		assert.Equal(t, version, launchPlan.Id.Version)
-		assert.True(t, proto.Equal(testutils.GetLaunchPlanRequest().Spec, launchPlan.Spec))
+		assert.Equal(t, project, launchPlan.GetId().GetProject())
+		assert.Equal(t, domain, launchPlan.GetId().GetDomain())
+		assert.Equal(t, name, launchPlan.GetId().GetName())
+		assert.Equal(t, version, launchPlan.GetId().GetVersion())
+		assert.True(t, proto.Equal(testutils.GetLaunchPlanRequest().GetSpec(), launchPlan.GetSpec()))
 		expectedInputs := &core.ParameterMap{
 			Parameters: map[string]*core.Parameter{
 				"foo": {
@@ -315,9 +317,9 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 				},
 			},
 		}
-		assert.True(t, proto.Equal(expectedInputs, launchPlan.Closure.ExpectedInputs))
-		assert.True(t, proto.Equal(testutils.GetSampleWorkflowSpecForTest().Template.Interface.Outputs,
-			launchPlan.Closure.ExpectedOutputs))
+		assert.True(t, proto.Equal(expectedInputs, launchPlan.GetClosure().GetExpectedInputs()))
+		assert.True(t, proto.Equal(testutils.GetSampleWorkflowSpecForTest().GetTemplate().GetInterface().GetOutputs(),
+			launchPlan.GetClosure().GetExpectedOutputs()))
 		return nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
@@ -350,15 +352,15 @@ func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 	lpCreateFunc := func(input models.LaunchPlan) error {
 		launchPlan, _ := transformers.FromLaunchPlanModel(input)
-		assert.Equal(t, project, launchPlan.Id.Project)
-		assert.Equal(t, domain, launchPlan.Id.Domain)
-		assert.Equal(t, name, launchPlan.Id.Name)
-		assert.Equal(t, version, launchPlan.Id.Version)
-		expectedLaunchPlanSpec := testutils.GetLaunchPlanRequest().Spec
+		assert.Equal(t, project, launchPlan.GetId().GetProject())
+		assert.Equal(t, domain, launchPlan.GetId().GetDomain())
+		assert.Equal(t, name, launchPlan.GetId().GetName())
+		assert.Equal(t, version, launchPlan.GetId().GetVersion())
+		expectedLaunchPlanSpec := testutils.GetLaunchPlanRequest().GetSpec()
 		expectedLaunchPlanSpec.FixedInputs = nil
 		expectedLaunchPlanSpec.DefaultInputs.Parameters = map[string]*core.Parameter{}
-		assert.EqualValues(t, expectedLaunchPlanSpec.String(), launchPlan.Spec.String())
-		assert.Empty(t, launchPlan.Closure.ExpectedInputs)
+		assert.EqualValues(t, expectedLaunchPlanSpec.String(), launchPlan.GetSpec().String())
+		assert.Empty(t, launchPlan.GetClosure().GetExpectedInputs())
 		return nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
@@ -393,7 +395,7 @@ func makeLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFu
 
 func TestEnableSchedule(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	scheduleExpression := &admin.Schedule{
 		ScheduleExpression: &admin.Schedule_Rate{
 			Rate: &admin.FixedRate{
@@ -402,7 +404,7 @@ func TestEnableSchedule(t *testing.T) {
 			},
 		},
 	}
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			assert.True(t, proto.Equal(scheduleExpression, input.ScheduleExpression))
@@ -411,6 +413,19 @@ func TestEnableSchedule(t *testing.T) {
 				*input.Payload)
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
@@ -427,11 +442,24 @@ func TestEnableSchedule_Error(t *testing.T) {
 	expectedErr := errors.New("expected error")
 
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			return expectedErr
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
@@ -445,8 +473,8 @@ func TestEnableSchedule_Error(t *testing.T) {
 
 func TestDisableSchedule(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			return nil
@@ -460,8 +488,8 @@ func TestDisableSchedule_Error(t *testing.T) {
 	expectedErr := errors.New("expected error")
 
 	repository := getMockRepositoryForLpTest()
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			return expectedErr
 		})
@@ -496,22 +524,35 @@ func TestUpdateSchedules(t *testing.T) {
 		},
 	}
 	newLaunchPlanSpecBytes, _ := proto.Marshal(&newLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			assert.True(t, proto.Equal(&newScheduleExpression, input.ScheduleExpression))
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(
@@ -551,9 +592,9 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 		},
 	}
 	newLaunchPlanSpecBytes, _ := proto.Marshal(&newLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			assert.True(t, proto.Equal(&core.Identifier{
 				Project: project,
@@ -565,6 +606,19 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -580,11 +634,25 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 	assert.True(t, addCalled)
 
 	addCalled = false
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.ExpectedCalls = nil
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	oldLaunchPlanSpec := admin.LaunchPlanSpec{
 		EntityMetadata: &admin.LaunchPlanMetadata{},
 	}
@@ -619,9 +687,9 @@ func TestUpdateSchedules_NothingToEnableButRedo(t *testing.T) {
 		},
 	}
 	oldLaunchPlanSpecBytes, _ := proto.Marshal(&oldLaunchPlanSpec)
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			areEqual := proto.Equal(&core.Identifier{
 				Project: project,
@@ -669,20 +737,32 @@ func TestUpdateSchedules_NothingToDoButRedo(t *testing.T) {
 	}
 	launchPlanSpecBytes, _ := proto.Marshal(&launchPlanSpec)
 
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
-
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -730,20 +810,32 @@ func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {
 	launchPlanSpec := admin.LaunchPlanSpec{}
 	launchPlanSpecBytes, _ := proto.Marshal(&launchPlanSpec)
 
-	mockScheduler := mocks.NewMockEventScheduler()
+	mockScheduler := &mocks.EventScheduler{}
 	var removeCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
 	var addCalled bool
-	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+	mockScheduler.EXPECT().AddSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			addCalled = true
 			return nil
 		})
-
+	mockScheduler.EXPECT().CreateScheduleInput(mock.Anything, mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+		func(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
+			identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+			payload, _ := aws.SerializeScheduleWorkflowPayload(
+				schedule.GetKickoffTimeInputArg(),
+				&admin.NamedEntityIdentifier{
+					Project: identifier.GetProject(),
+					Domain:  identifier.GetDomain(),
+					Name:    identifier.GetName(),
+				})
+			return scheduleInterfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
+		},
+	)
 	repository := getMockRepositoryForLpTest()
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
@@ -816,8 +908,8 @@ func TestDisableLaunchPlan(t *testing.T) {
 	}
 
 	var removeScheduleFuncCalled bool
-	mockScheduler := mocks.NewMockEventScheduler()
-	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
+	mockScheduler := &mocks.EventScheduler{}
+	mockScheduler.EXPECT().RemoveSchedule(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(launchPlanNamedIdentifier, input.Identifier))
 			removeScheduleFuncCalled = true
@@ -1058,10 +1150,10 @@ func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	createdAt := time.Now()
@@ -1146,14 +1238,14 @@ func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(lpList.LaunchPlans))
-	for idx, lp := range lpList.LaunchPlans {
-		assert.Equal(t, project, lp.Id.Project)
-		assert.Equal(t, domain, lp.Id.Domain)
-		assert.Equal(t, name, lp.Id.Name)
-		assert.Equal(t, fmt.Sprintf("%v", idx+1), lp.Id.Version)
-		assert.True(t, proto.Equal(createdAtProto, lp.Closure.CreatedAt))
-		assert.True(t, proto.Equal(updatedAtProto, lp.Closure.UpdatedAt))
+	assert.Equal(t, 2, len(lpList.GetLaunchPlans()))
+	for idx, lp := range lpList.GetLaunchPlans() {
+		assert.Equal(t, project, lp.GetId().GetProject())
+		assert.Equal(t, domain, lp.GetId().GetDomain())
+		assert.Equal(t, name, lp.GetId().GetName())
+		assert.Equal(t, fmt.Sprintf("%v", idx+1), lp.GetId().GetVersion())
+		assert.True(t, proto.Equal(createdAtProto, lp.GetClosure().GetCreatedAt()))
+		assert.True(t, proto.Equal(updatedAtProto, lp.GetClosure().GetUpdatedAt()))
 	}
 }
 
@@ -1165,10 +1257,10 @@ func TestLaunchPlanManager_ListLaunchPlanIds(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (
@@ -1232,11 +1324,11 @@ func TestLaunchPlanManager_ListLaunchPlanIds(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(lpList.Entities))
-	for _, id := range lpList.Entities {
-		assert.Equal(t, project, id.Project)
-		assert.Equal(t, domain, id.Domain)
-		assert.Equal(t, name, id.Name)
+	assert.Equal(t, 2, len(lpList.GetEntities()))
+	for _, id := range lpList.GetEntities() {
+		assert.Equal(t, project, id.GetProject())
+		assert.Equal(t, domain, id.GetDomain())
+		assert.Equal(t, name, id.GetName())
 	}
 }
 
@@ -1248,10 +1340,10 @@ func TestLaunchPlanManager_ListActiveLaunchPlans(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (
@@ -1319,11 +1411,11 @@ func TestLaunchPlanManager_ListActiveLaunchPlans(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(lpList.LaunchPlans))
-	for _, id := range lpList.LaunchPlans {
-		assert.Equal(t, project, id.Id.Project)
-		assert.Equal(t, domain, id.Id.Domain)
-		assert.Equal(t, name, id.Id.Name)
+	assert.Equal(t, 2, len(lpList.GetLaunchPlans()))
+	for _, id := range lpList.GetLaunchPlans() {
+		assert.Equal(t, project, id.GetId().GetProject())
+		assert.Equal(t, domain, id.GetId().GetDomain())
+		assert.Equal(t, name, id.GetId().GetName())
 	}
 }
 

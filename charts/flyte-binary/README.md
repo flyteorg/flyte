@@ -22,7 +22,7 @@ Chart for basic single Flyte executable deployment
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
 | configuration.agentService.defaultAgent.defaultTimeout | string | `"10s"` |  |
-| configuration.agentService.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` |  |
+| configuration.agentService.defaultAgent.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
 | configuration.agentService.defaultAgent.insecure | bool | `true` |  |
 | configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
 | configuration.annotations | object | `{}` |  |
@@ -41,7 +41,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.13.2"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.14.1"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -63,6 +63,8 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.kubernetes.templateUri | string | `""` |  |
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
+| configuration.propeller.createCRDs | bool | `true` |  |
+| configuration.propeller.literalOffloadingConfigEnabled | bool | `true` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |
@@ -89,6 +91,7 @@ Chart for basic single Flyte executable deployment
 | deployment.extraVolumes | list | `[]` |  |
 | deployment.genAdminAuthSecret.args | list | `[]` |  |
 | deployment.genAdminAuthSecret.command | list | `[]` |  |
+| deployment.genAdminAuthSecret.securityContext | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary"` |  |
 | deployment.image.tag | string | `"latest"` |  |
@@ -103,6 +106,7 @@ Chart for basic single Flyte executable deployment
 | deployment.podSecurityContext.runAsGroup | int | `65534` |  |
 | deployment.podSecurityContext.runAsUser | int | `65534` |  |
 | deployment.readinessProbe | object | `{}` |  |
+| deployment.securityContext | object | `{}` |  |
 | deployment.sidecars | list | `[]` |  |
 | deployment.startupProbe | object | `{}` |  |
 | deployment.waitForDB.args | list | `[]` |  |
@@ -110,6 +114,7 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
+| deployment.waitForDB.securityContext | object | `{}` |  |
 | enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service","echo"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
 | enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service","echo"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
 | enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
