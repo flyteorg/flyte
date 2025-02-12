@@ -671,7 +671,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge podSpec with podTemplate
-	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	mergedPodSpec, err := MergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -685,10 +685,10 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	return mergedPodSpec, mergedObjectMeta, nil
 }
 
-// mergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
+// MergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
 // set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
 // container-level configuration from the basePodSpec.
-func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
+func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
 	if basePodSpec == nil || podSpec == nil {
 		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
 	}
