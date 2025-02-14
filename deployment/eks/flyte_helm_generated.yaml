@@ -493,7 +493,7 @@ data:
         retry-period: 2s
       limit-namespace: all
       literal-offloading-config:
-        enabled: true
+        enabled: false
       max-workflow-retries: 50
       metadata-prefix: metadata/propeller
       metrics-prefix: flyte
@@ -1410,7 +1410,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d506150c845dea702ff708615390d9ed7dfac19b77a88429ed888b08fc6c9db"
+        configChecksum: "35c3fa49fd80595831f3bb53ca75f8d1741def43e84d79a2f74d80ef17c12c1"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1494,7 +1494,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.14.1
       annotations:
-        configChecksum: "d506150c845dea702ff708615390d9ed7dfac19b77a88429ed888b08fc6c9db"
+        configChecksum: "35c3fa49fd80595831f3bb53ca75f8d1741def43e84d79a2f74d80ef17c12c1"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
