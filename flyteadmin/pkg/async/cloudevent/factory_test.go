@@ -42,7 +42,7 @@ func TestGetCloudEventPublisher(t *testing.T) {
 
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	t.Run("local publisher", func(t *testing.T) {
 		cfg.Type = common.Local
@@ -64,7 +64,7 @@ func TestInvalidAwsConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
@@ -79,7 +79,7 @@ func TestInvalidGcpConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
@@ -95,7 +95,7 @@ func TestInvalidKafkaConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	cfg.KafkaConfig = runtimeInterfaces.KafkaConfig{Version: "2.1.0"}
