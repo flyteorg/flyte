@@ -30,6 +30,9 @@ const Interrupted = "Interrupted"
 const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
+// unsignedSIGKILL = 256 - 9
+const unsignedSIGKILL = 247
+
 const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
@@ -926,7 +929,7 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 // DeterminePrimaryContainerPhase as the name suggests, given all the containers, will return a pluginsCore.PhaseInfo object
 // corresponding to the phase of the primaryContainer which is identified using the provided name.
 // This is useful in case of sidecars or pod jobs, where Flyte will monitor successful exit of a single container.
-func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
+func DeterminePrimaryContainerPhase(ctx context.Context, primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
 	for _, s := range statuses {
 		if s.Name == primaryContainerName {
 			if s.State.Waiting != nil || s.State.Running != nil {
@@ -934,16 +937,33 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 			}
 
 			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 || strings.Contains(s.State.Terminated.Reason, OOMKilled) {
-					message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
-						s.Name,
-						s.State.Terminated.ExitCode,
-						s.State.Terminated.Reason,
-						s.State.Terminated.Message)
-					return pluginsCore.PhaseInfoRetryableFailure(
+				message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+					s.Name,
+					s.State.Terminated.ExitCode,
+					s.State.Terminated.Reason,
+					s.State.Terminated.Message)
+
+				var phaseInfo pluginsCore.PhaseInfo
+				switch {
+				case strings.Contains(s.State.Terminated.Reason, OOMKilled):
+					// OOMKilled typically results in a SIGKILL signal, but we classify it as a user error
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(
 						s.State.Terminated.Reason, message, info)
+				case isTerminatedWithSigKill(s.State):
+					// If the primary container exited with SIGKILL, we treat it as a system-level error
+					// (such as node termination or preemption).
+					// Note: this best-effort approach accepts some false positives.
+					phaseInfo = pluginsCore.PhaseInfoSystemRetryableFailure(
+						s.State.Terminated.Reason, message, info)
+				case s.State.Terminated.ExitCode != 0:
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(
+						s.State.Terminated.Reason, message, info)
+				default:
+					return pluginsCore.PhaseInfoSuccess(info)
 				}
-				return pluginsCore.PhaseInfoSuccess(info)
+
+				logger.Infof(ctx, "Primary container terminated with issue. Message: '%s'", message)
+				return phaseInfo
 			}
 		}
 	}
@@ -955,7 +975,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 
 // DemystifyFailure resolves the various Kubernetes pod failure modes to determine
 // the most appropriate course of action
-func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore.TaskInfo, primaryContainerName string) (pluginsCore.PhaseInfo, error) {
 	code := "UnknownError"
 	message := "Pod failed. No message received from kubernetes."
 	if len(status.Reason) > 0 {
@@ -1015,10 +1035,16 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 		if containerState.Terminated != nil {
 			if strings.Contains(containerState.Terminated.Reason, OOMKilled) {
 				code = OOMKilled
-			} else if containerState.Terminated.ExitCode == SIGKILL {
+			} else if isTerminatedWithSigKill(containerState) {
 				// in some setups, node termination sends SIGKILL to all the containers running on that node. Capturing and
 				// tagging that correctly.
 				code = Interrupted
+				// If the primary container exited with SIGKILL, we treat it as a system-level error
+				// (such as node termination or preemption).
+				// Note: this best-effort approach accepts some false positives.
+				if c.Name == primaryContainerName {
+					isSystemError = true
+				}
 			}
 
 			if containerState.Terminated.ExitCode == 0 {
@@ -1034,9 +1060,11 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	}
 
 	if isSystemError {
+		logger.Infof(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
 		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
 	}
 
+	logger.Infof(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 
@@ -1128,4 +1156,8 @@ func BuildPodLogContext(pod *v1.Pod) *core.PodLogContext {
 		Containers:           makeContainerContexts(pod.Status.ContainerStatuses),
 		InitContainers:       makeContainerContexts(pod.Status.InitContainerStatuses),
 	}
+}
+
+func isTerminatedWithSigKill(state v1.ContainerState) bool {
+	return state.Terminated != nil && (state.Terminated.ExitCode == SIGKILL || state.Terminated.ExitCode == unsignedSIGKILL)
 }

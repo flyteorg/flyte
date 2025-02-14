@@ -437,7 +437,7 @@ func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExe
 			break
 		}
 
-		phaseInfo, err = podplugin.DemystifyPodStatus(pod, *taskInfo)
+		phaseInfo, err = podplugin.DemystifyPodStatus(ctx, pod, *taskInfo)
 		if err != nil {
 			return core.PhaseInfoUndefined, err
 		}

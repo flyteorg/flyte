@@ -185,7 +185,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		}
 	}
 
-	phaseInfo, err := DemystifyPodStatus(pod, info)
+	phaseInfo, err := DemystifyPodStatus(ctx, pod, info)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -197,18 +197,19 @@ func (plugin) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
 }
 
-func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	pluginState := k8s.PluginState{}
 	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
 	phaseInfo := pluginsCore.PhaseInfoUndefined
 	var err error
+	primaryContainerName, primaryContainerExists := pod.GetAnnotations()[flytek8s.PrimaryContainerKey]
 
 	hasLogs := len(info.Logs) > 0 || len(info.LogContext.GetPods()) > 0
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
 		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
 	case v1.PodFailed:
-		phaseInfo, err = flytek8s.DemystifyFailure(pod.Status, info)
+		phaseInfo, err = flytek8s.DemystifyFailure(ctx, pod.Status, info, primaryContainerName)
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
@@ -216,8 +217,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
-		primaryContainerName, exists := pod.GetAnnotations()[flytek8s.PrimaryContainerKey]
-		if !exists {
+		if !primaryContainerExists {
 			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
 			// succeeded rather than waiting for the Pod to be marked completed.
 			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
@@ -240,7 +240,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 			}
 		} else {
 			// if the primary container annotation exists, we use the status of the specified container
-			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
+			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(ctx, primaryContainerName, pod.Status.ContainerStatuses, &info)
 			if phaseInfo.Phase() == pluginsCore.PhasePermanentFailure && phaseInfo.Err() != nil &&
 				phaseInfo.Err().GetCode() == flytek8s.PrimaryContainerNotFound {
 				// if the primary container status is not found ensure that the primary container exists.
