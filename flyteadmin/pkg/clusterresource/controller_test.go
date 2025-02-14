@@ -121,7 +121,7 @@ func TestPopulateDefaultTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(&admin.ClusterResourceAttributes{
+	adminDataProvider.EXPECT().GetClusterResourceAttributes(mock.Anything, mock.Anything, mock.Anything).Return(&admin.ClusterResourceAttributes{
 		Attributes: map[string]string{
 			"var1": "val1",
 			"var2": "val2",
@@ -148,7 +148,7 @@ func TestGetCustomTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(
+	adminDataProvider.EXPECT().GetClusterResourceAttributes(mock.Anything, mock.Anything, mock.Anything).Return(
 		nil, errors.NewFlyteAdminError(codes.NotFound, "foo"))
 	testController := controller{
 		adminDataProvider: &adminDataProvider,
@@ -332,7 +332,7 @@ imagePullSecrets:
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			adminDataProvider := mocks.FlyteAdminDataProvider{}
-			adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, mock.Anything, mock.Anything).Return(&admin.ClusterResourceAttributes{}, nil)
+			adminDataProvider.EXPECT().GetClusterResourceAttributes(mock.Anything, mock.Anything, mock.Anything).Return(&admin.ClusterResourceAttributes{}, nil)
 			mockPromScope := mockScope.NewTestScope()
 
 			c := NewClusterResourceController(&adminDataProvider, &execClusterMocks.ListTargetsInterface{}, mockPromScope)
