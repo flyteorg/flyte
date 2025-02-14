@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -97,7 +98,7 @@ var workflowExecutionIdentifier = core.WorkflowExecutionIdentifier{
 	Name:    "name",
 }
 
-var mockNodeExecutionRemoteURL = dataMocks.NewMockRemoteURL()
+var mockNodeExecutionRemoteURL = &dataMocks.RemoteURLInterface{}
 
 func addGetExecutionCallback(t *testing.T, repository interfaces.Repository) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
@@ -1377,8 +1378,8 @@ func TestGetNodeExecutionData(t *testing.T) {
 			}, nil
 		})
 
-	mockNodeExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockNodeExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
+	mockNodeExecutionRemoteURL := &dataMocks.RemoteURLInterface{}
+	mockNodeExecutionRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == "input uri" {
 			return &admin.UrlBlob{
 				Url:   "inputs",
@@ -1392,7 +1393,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 		}
 
 		return &admin.UrlBlob{}, errors.New("unexpected input")
-	}
+	})
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
