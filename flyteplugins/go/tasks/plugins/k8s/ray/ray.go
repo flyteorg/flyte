@@ -549,6 +549,14 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 		podSpec.RuntimeClassName = customPodSpec.RuntimeClassName
 	}
 
+	if len(customPodSpec.Tolerations) > 0 {
+		podSpec.Tolerations = customPodSpec.Tolerations
+	}
+
+	if customPodSpec.Affinity != nil {
+		podSpec.Affinity = customPodSpec.Affinity
+	}
+
 	return podSpec, nil
 }
 
