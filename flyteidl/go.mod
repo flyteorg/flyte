@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/flyteidl
 
-go 1.22
+go 1.23
 
 require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
