@@ -2321,9 +2321,9 @@ func TestMergePodSpecsPrimaryContainerName(t *testing.T) {
 	assert.Equal(t, 2, len(primaryContainer.VolumeMounts))
 	assert.Equal(t, 2, len(primaryContainer.Env))
 
-    // WARN: the other container in podSpec is also included
-    assert.Equal(t, 2, len(mergedPodSpec.Containers))
-    assert.Equal(t, mergedPodSpec.Containers[1].Name, podSpec.Containers[1].Name)
+	// WARN: the other container in podSpec is also included
+	assert.Equal(t, 2, len(mergedPodSpec.Containers))
+	assert.Equal(t, mergedPodSpec.Containers[1].Name, podSpec.Containers[1].Name)
 
 	// validate primary init container
 	primaryInitContainer := mergedPodSpec.InitContainers[0]
