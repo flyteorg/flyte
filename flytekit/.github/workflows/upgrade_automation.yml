@@ -1,0 +1,12 @@
+name: Boilerplate Upgrade Automation
+on:
+  workflow_dispatch:
+
+jobs:
+  trigger-upgrade:
+    name: Boilerplate Upgrade Automation
+    uses: flyteorg/flytetools/.github/workflows/flyte_automation.yml@master
+    with:
+      component: boilerplate
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
