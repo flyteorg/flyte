@@ -2866,6 +2866,68 @@ func TestGetExecution(t *testing.T) {
 	assert.True(t, proto.Equal(&closure, execution.GetClosure()))
 }
 
+func TestGetExecutionOverwriteCache(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		assert.Equal(t, "project", input.Project)
+		assert.Equal(t, "domain", input.Domain)
+		assert.Equal(t, "name", input.Name)
+		return models.Execution{
+			BaseModel: models.BaseModel{
+				CreatedAt: testutils.MockCreatedAtValue,
+			},
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			Spec:         getExpectedSpecBytes(),
+			Phase:        phase,
+			Closure:      closureBytes,
+			LaunchPlanID: uint(1),
+			WorkflowID:   uint(2),
+			StartedAt:    &startedAt,
+		}, nil
+	}
+
+	lpSpec := testutils.GetSampleLpSpecForTest()
+	lpSpec.OverwriteCache = true
+	lpSpecBytes, _ := proto.Marshal(&lpSpec)
+	lpClosure := admin.LaunchPlanClosure{
+		ExpectedInputs: lpSpec.DefaultInputs,
+	}
+	lpClosureBytes, _ := proto.Marshal(&lpClosure)
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		lpModel := models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			BaseModel: models.BaseModel{
+				ID: uint(100),
+			},
+			Spec: lpSpecBytes,
+			Closure: lpClosureBytes,
+		}
+		return lpModel, nil
+	}
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	execution, err := execManager.GetExecution(context.Background(), admin.WorkflowExecutionGetRequest{
+		Id: &executionIdentifier,
+	})
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(&executionIdentifier, execution.Id))
+	assert.Equal(t, execution.Spec.OverwriteCache, true)
+}
+
 func TestGetExecution_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
