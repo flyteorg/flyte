@@ -50,11 +50,11 @@ type Context struct {
 	httpClient        *http.Client
 }
 
-func (c Context) OAuth2Provider() interfaces.OAuth2Provider {
+func (c *Context) OAuth2Provider() interfaces.OAuth2Provider {
 	return c.oauth2Provider
 }
 
-func (c Context) OAuth2ClientConfig(requestURL *url.URL) *oauth2.Config {
+func (c *Context) OAuth2ClientConfig(requestURL *url.URL) *oauth2.Config {
 	if requestURL == nil || strings.HasPrefix(c.oauth2Client.RedirectURL, requestURL.ResolveReference(rootRelativeURL).String()) {
 		return c.oauth2Client
 	}
@@ -68,64 +68,86 @@ func (c Context) OAuth2ClientConfig(requestURL *url.URL) *oauth2.Config {
 	}
 }
 
-func (c Context) OidcProvider() *oidc.Provider {
+func (c *Context) OidcProvider() *oidc.Provider {
+	if c.oidcProvider == nil {
+		logger.Warn(context.Background(), "OIDC provider was not initialized. Attempting to re-initialize OIDC provider...")
+		err := c.InitOIDC()
+		if err != nil {
+			logger.Warn(context.Background(), err)
+		}
+	}
 	return c.oidcProvider
 }
 
-func (c Context) CookieManager() interfaces.CookieHandler {
+func (c *Context) InitOIDC() error {
+	var err error
+	// Construct an oidc Provider, which needs its own http Client.
+	oidcCtx := oidc.ClientContext(context.Background(), c.httpClient)
+	baseURL := c.options.UserAuth.OpenID.BaseURL.String()
+
+	c.oidcProvider, err = oidc.NewProvider(oidcCtx, baseURL)
+	if err != nil {
+		return errors.Wrapf(ErrauthCtx, err, "Error creating oidc provider w/ issuer [%v]", baseURL)
+	}
+
+	c.oauth2Client.Endpoint = c.oidcProvider.Endpoint()
+	return nil
+}
+
+func (c *Context) CookieManager() interfaces.CookieHandler {
 	return c.cookieManager
 }
 
-func (c Context) Options() *config.Config {
+func (c *Context) Options() *config.Config {
 	return c.options
 }
 
-func (c Context) GetUserInfoURL() *url.URL {
+func (c *Context) GetUserInfoURL() *url.URL {
 	return c.userInfoURL
 }
 
-func (c Context) GetHTTPClient() *http.Client {
+func (c *Context) GetHTTPClient() *http.Client {
 	return c.httpClient
 }
 
-func (c Context) GetOAuth2MetadataURL() *url.URL {
+func (c *Context) GetOAuth2MetadataURL() *url.URL {
 	return c.oauth2MetadataURL
 }
 
-func (c Context) GetOIdCMetadataURL() *url.URL {
+func (c *Context) GetOIdCMetadataURL() *url.URL {
 	return c.oidcMetadataURL
 }
 
-func (c Context) AuthMetadataService() service.AuthMetadataServiceServer {
+func (c *Context) AuthMetadataService() service.AuthMetadataServiceServer {
 	return c.authServiceImpl
 }
 
-func (c Context) IdentityService() service.IdentityServiceServer {
+func (c *Context) IdentityService() service.IdentityServiceServer {
 	return c.identityServiceIml
 }
 
-func (c Context) OAuth2ResourceServer() interfaces.OAuth2ResourceServer {
+func (c *Context) OAuth2ResourceServer() interfaces.OAuth2ResourceServer {
 	return c.oauth2ResourceServer
 }
 func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2Provider interfaces.OAuth2Provider,
 	oauth2ResourceServer interfaces.OAuth2ResourceServer, authMetadataService service.AuthMetadataServiceServer,
-	identityService service.IdentityServiceServer, options *config.Config) (Context, error) {
+	identityService service.IdentityServiceServer, options *config.Config) (*Context, error) {
 
 	// Construct the cookie manager object.
 	hashKeyBase64, err := sm.Get(ctx, options.UserAuth.CookieHashKeySecretName)
 	if err != nil {
-		return Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
+		return &Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
 	}
 
 	blockKeyBase64, err := sm.Get(ctx, options.UserAuth.CookieBlockKeySecretName)
 	if err != nil {
-		return Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
+		return &Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
 	}
 
 	cookieManager, err := NewCookieManager(ctx, hashKeyBase64, blockKeyBase64, options.UserAuth.CookieSetting)
 	if err != nil {
 		logger.Errorf(ctx, "Error creating cookie manager %s", err)
-		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating cookie manager")
+		return &Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating cookie manager")
 	}
 
 	// Construct an http client for interacting with the IDP if necessary.
@@ -138,18 +160,10 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 		httpClient.Transport = &http.Transport{Proxy: http.ProxyURL(&options.UserAuth.HTTPProxyURL.URL)}
 	}
 
-	// Construct an oidc Provider, which needs its own http Client.
-	oidcCtx := oidc.ClientContext(ctx, httpClient)
-	baseURL := options.UserAuth.OpenID.BaseURL.String()
-	provider, err := oidc.NewProvider(oidcCtx, baseURL)
-	if err != nil {
-		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating oidc provider w/ issuer [%v]", baseURL)
-	}
-
 	// Construct the golang OAuth2 library's own internal configuration object from this package's config
-	oauth2Config, err := GetOAuth2ClientConfig(ctx, options.UserAuth.OpenID, provider.Endpoint(), sm)
+	oauth2Config, err := GetOAuth2ClientConfig(ctx, options.UserAuth.OpenID, sm)
 	if err != nil {
-		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating OAuth2 library configuration")
+		return &Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating OAuth2 library configuration")
 	}
 
 	logger.Infof(ctx, "Base IDP URL is %s", options.UserAuth.OpenID.BaseURL)
@@ -157,7 +171,7 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 	oauth2MetadataURL, err := url.Parse(OAuth2MetadataEndpoint)
 	if err != nil {
 		logger.Errorf(ctx, "Error parsing oauth2 metadata URL %s", err)
-		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error parsing metadata URL")
+		return &Context{}, errors.Wrapf(ErrauthCtx, err, "Error parsing metadata URL")
 	}
 
 	logger.Infof(ctx, "Metadata endpoint is %s", oauth2MetadataURL)
@@ -165,7 +179,7 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 	oidcMetadataURL, err := url.Parse(OIdCMetadataEndpoint)
 	if err != nil {
 		logger.Errorf(ctx, "Error parsing oidc metadata URL %s", err)
-		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error parsing metadata URL")
+		return &Context{}, errors.Wrapf(ErrauthCtx, err, "Error parsing metadata URL")
 	}
 
 	logger.Infof(ctx, "Metadata endpoint is %s", oidcMetadataURL)
@@ -175,7 +189,6 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 		oidcMetadataURL:      oidcMetadataURL,
 		oauth2MetadataURL:    oauth2MetadataURL,
 		oauth2Client:         &oauth2Config,
-		oidcProvider:         provider,
 		httpClient:           httpClient,
 		cookieManager:        cookieManager,
 		oauth2Provider:       oauth2Provider,
@@ -185,11 +198,20 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 	authCtx.authServiceImpl = authMetadataService
 	authCtx.identityServiceIml = identityService
 
-	return authCtx, nil
+	err = authCtx.InitOIDC()
+	if err != nil {
+		if authCtx.options.UserAuth.OpenID.OnlyStartIfOIDCIsAvailable {
+			return &Context{}, errors.Wrapf(ErrauthCtx, err, "Error initializing OIDC")
+		} else {
+			logger.Warn(ctx, err)
+		}
+	}
+
+	return &authCtx, nil
 }
 
 // This creates a oauth2 library config object, with values from the Flyte Admin config
-func GetOAuth2ClientConfig(ctx context.Context, options config.OpenIDOptions, providerEndpoints oauth2.Endpoint, sm core.SecretManager) (cfg oauth2.Config, err error) {
+func GetOAuth2ClientConfig(ctx context.Context, options config.OpenIDOptions, sm core.SecretManager) (cfg oauth2.Config, err error) {
 	var secret string
 	if len(options.DeprecatedClientSecretFile) > 0 {
 		secretBytes, err := ioutil.ReadFile(options.DeprecatedClientSecretFile)
@@ -212,6 +234,5 @@ func GetOAuth2ClientConfig(ctx context.Context, options config.OpenIDOptions, pr
 		ClientID:     options.ClientID,
 		ClientSecret: secret,
 		Scopes:       options.Scopes,
-		Endpoint:     providerEndpoints,
 	}, nil
 }
