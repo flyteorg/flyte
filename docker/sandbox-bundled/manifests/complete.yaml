@@ -420,8 +420,6 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
-      literal-offloading-config:
-        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -464,7 +462,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.0"
       k8s-array:
         logs:
           config:
@@ -1203,7 +1201,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 6c8ab25f10e8bdc025e51493a47ff9c9f42a46026ea70284ad804e05f5883a9a
+        checksum/configuration: 1fee6458b49bdd3e57e43195827fe48bcec36154b537f20796666aab8e647a0f
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary

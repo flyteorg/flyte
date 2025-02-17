@@ -431,8 +431,6 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
-      literal-offloading-config:
-        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -475,7 +473,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.0"
       k8s-array:
         logs:
           config:
@@ -1773,7 +1771,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.14.2
+        image: cr.flyte.org/flyteorg/flyteagent:1.15.0
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:
