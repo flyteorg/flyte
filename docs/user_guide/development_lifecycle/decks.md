@@ -194,3 +194,33 @@ if your deck renderers can enhance data visibility.
 Feel encouraged to open a pull request and play a part in enhancing the Flyte deck renderer ecosystem!
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
+
+### Streaming Decks
+
+Now you can visualize your deck directly if you call `Deck.publish()` in your code.
+
+```python
+@task(enable_deck=True)
+def t_deck():
+    Deck.publish()
+```
+
+You can click the refresh button and see the update until the deck succeeds.
+
+```{eval-rst}
+.. raw:: html
+
+   <video width="800" height="450" controls>
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4">
+   </video>
+```
+
+When the task fails, you can also see the deck in the flyte console.
+
+```{eval-rst}
+.. raw:: html
+
+   <video width="800" height="450" controls>
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/user_guide/development_lifecycle/decks/deck_failed.mp4">
+   </video>
+```
