@@ -208,7 +208,7 @@ After completing the form, submit it, copy the content, and save it to ``/etc/sl
 3. Start daemons
 ^^^^^^^^^^^^^^^^
 
-Finally, enable ``slurmctld`` and ``slurmd`` to start at boot and restart them.
+Then, enable ``slurmctld`` and ``slurmd`` to start at boot and restart them.
 
 .. code-block:: shell
 
@@ -221,6 +221,37 @@ Finally, enable ``slurmctld`` and ``slurmd`` to start at boot and restart them.
   sudo systemctl restart slurmd
 
 You can verify the status of the daemons using ``systemctl status <daemon>`` or check the logs in ``/var/log/slurm/slurmctld.log`` and ``/var/log/slurm/slurmd.log`` to ensure the Slurm cluster is running correctly.
+
+4. Try some Slurm commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally, run the following commands to ensure that a Slurm job can be submitted successfully:
+
+* ``sinfo``: View information about Slurm nodes and partitions
+
+.. code-block:: shell
+
+  root@rockwei:/etc/slurm# sinfo
+  PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+  debug*       up   infinite      1   idle localhost
+
+.. note::
+
+  Here's a small tip to enable job submission when the state is set to ``drain``. Simply change the state back to ``idle`` as shown below:
+
+  .. code-block:: shell
+
+    scontrol update nodename=<your-nodename> state=idle
+
+* ``srun``: Run a parallel job on cluster managed by Slurm
+
+.. code-block:: shell
+
+  root@rockwei:/etc/slurm# srun -N 1 hostname
+  rockwei
+
+If both commands execute successfully and return the expected results, you can proceed with testing the Slurm agent.
+
 
 Test your Slurm agent locally
 -----------------------------
