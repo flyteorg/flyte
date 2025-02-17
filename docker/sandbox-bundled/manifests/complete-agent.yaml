@@ -831,7 +831,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Y3JKZHUzeVcyaklvODV0bw==
+  haSharedSecret: eENhUk1rdG0wV3Vpa0NOcQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1262,7 +1262,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: a2fc35fdb12285fdb09d5db7d2d8ac6b6d438d7e0e90101939ffddab8c1d33a5
+        checksum/configuration: e41f2cbe2b01f18ce3a3f23b49425eaf8188bdca4d5ecd1ba28c13c918a84d5b
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1428,7 +1428,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0279a47e485cbe1e40ff0cf8ae15ca9c5f5b182c6dc9f04c925654af4f3b11f4
+        checksum/secret: b127ad6bf3b526f3d6c1111451e7c1bd20db273e5f0246366cc3aab4f1187276
       labels:
         app: docker-registry
         release: flyte-sandbox
