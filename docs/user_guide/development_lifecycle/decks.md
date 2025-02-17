@@ -195,11 +195,13 @@ Feel encouraged to open a pull request and play a part in enhancing the Flyte de
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
 
-### Streaming Decks
+## Streaming Decks
 
 Now you can visualize your deck directly if you call `Deck.publish()` in your code.
 
 ```python
+from flytekit.deck import Deck
+
 @task(enable_deck=True)
 def t_deck():
     Deck.publish()
@@ -211,7 +213,7 @@ You can click the refresh button and see the update until the deck succeeds.
 .. raw:: html
 
    <video width="800" height="450" controls>
-       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4">
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4">
    </video>
 ```
 
@@ -221,6 +223,6 @@ When the task fails, you can also see the deck in the flyte console.
 .. raw:: html
 
    <video width="800" height="450" controls>
-       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/user_guide/development_lifecycle/decks/deck_failed.mp4">
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_fail.mp4">
    </video>
 ```
