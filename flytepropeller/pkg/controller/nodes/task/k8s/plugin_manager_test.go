@@ -28,8 +28,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsk8sMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s/eventwatcheriface"
+	eventWatcherMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s/eventwatcheriface/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -129,7 +131,7 @@ func (p *pluginWithAbortOverride) OnAbort(ctx context.Context, tCtx pluginsCore.
 
 func ExampleNewPluginManager() {
 	sCtx := &pluginsCoreMock.SetupContext{}
-	fakeKubeClient := mocks.NewFakeKubeClient()
+	fakeKubeClient := executorMocks.NewFakeKubeClient()
 	mockClientset := k8sfake.NewSimpleClientset()
 	sCtx.On("KubeClient").Return(fakeKubeClient)
 	sCtx.On("OwnerKind").Return("test")
@@ -242,7 +244,7 @@ func dummySetupContext(fakeClient client.Client) pluginsCore.SetupContext {
 
 	kubeClient := &pluginsCoreMock.KubeClient{}
 	kubeClient.On("GetClient").Return(fakeClient)
-	kubeClient.On("GetCache").Return(&mocks.FakeInformers{})
+	kubeClient.On("GetCache").Return(&executorMocks.FakeInformers{})
 	setupContext.On("KubeClient").Return(kubeClient)
 
 	setupContext.On("OwnerKind").Return("x")
@@ -782,6 +784,8 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 		},
 	}
 
+	firstCreatedAt := time.Now()
+	lastCreatedAt := firstCreatedAt.Add(time.Second)
 	pluginStateQueued := PluginState{
 		Phase: PluginPhaseStarted,
 		K8sPluginState: k8s.PluginState{
@@ -814,6 +818,15 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 			Reason:       "",
 		},
 	}
+	pluginStateRunningVersion1 := PluginState{
+		Phase: PluginPhaseStarted,
+		K8sPluginState: k8s.PluginState{
+			Phase:        pluginsCore.PhaseRunning,
+			PhaseVersion: 1,
+			Reason:       "",
+		},
+		LastEventUpdate: lastCreatedAt,
+	}
 
 	phaseInfoQueued := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginStateQueued.K8sPluginState.PhaseVersion, pluginStateQueued.K8sPluginState.Reason, nil)
 	phaseInfoQueuedVersion1 := pluginsCore.PhaseInfoQueuedWithTaskInfo(
@@ -831,34 +844,62 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 	phaseInfoRunning := pluginsCore.PhaseInfoRunning(0, nil)
 
 	tests := []struct {
-		name                string
-		startPluginState    PluginState
-		reportedPhaseInfo   pluginsCore.PhaseInfo
-		expectedPluginState PluginState
+		name                  string
+		startPluginState      PluginState
+		reportedPhaseInfo     pluginsCore.PhaseInfo
+		expectedPluginState   PluginState
+		setupEventWatcherMock func() *eventWatcherMocks.EventWatcher
 	}{
 		{
 			"NoChange",
 			pluginStateQueued,
 			phaseInfoQueued,
 			pluginStateQueued,
+			nil,
 		},
 		{
 			"K8sPhaseChange",
 			pluginStateQueued,
 			phaseInfoRunning,
 			pluginStateRunning,
+			nil,
 		},
 		{
 			"PhaseVersionChange",
 			pluginStateQueued,
 			phaseInfoQueuedVersion1,
 			pluginStateQueuedVersion1,
+			nil,
 		},
 		{
 			"ReasonChange",
 			pluginStateQueued,
 			phaseInfoQueuedReasonBar,
 			pluginStateQueuedReasonBar,
+			nil,
+		},
+		{
+			"SamePhaseButVersionChangeDueToK8sEvents",
+			pluginStateRunning,
+			phaseInfoRunning,
+			pluginStateRunningVersion1,
+			func() *eventWatcherMocks.EventWatcher {
+				eventWatcherMock := eventWatcherMocks.NewEventWatcher(t)
+				eventWatcherMock.EXPECT().
+					List(k8stypes.NamespacedName{Namespace: res.GetNamespace(), Name: res.GetName()}, time.Time{}).
+					Return([]*eventwatcheriface.EventInfo{
+						{
+							Note:      "queued",
+							CreatedAt: firstCreatedAt,
+						},
+						{
+							Note:      "started",
+							CreatedAt: lastCreatedAt,
+						},
+					}).
+					Once()
+				return eventWatcherMock
+			},
 		},
 	}
 
@@ -905,6 +946,12 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 			mockResourceHandler.On("BuildIdentityResource", mock.Anything, tCtx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
 			mockResourceHandler.On("GetTaskPhase", mock.Anything, mock.Anything, mock.Anything).Return(tt.reportedPhaseInfo, nil)
 
+			k8sConfig := config.GetK8sPluginConfig()
+			var eventWatcherMock *eventWatcherMocks.EventWatcher
+			if tt.setupEventWatcherMock != nil {
+				k8sConfig.SendObjectEvents = true
+				defer func() { k8sConfig.SendObjectEvents = false }()
+			}
 			// create new PluginManager
 			pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
 				ID:              "x",
@@ -912,6 +959,12 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 				Plugin:          mockResourceHandler,
 			}, NewResourceMonitorIndex(), mockClientset)
 			assert.NoError(t, err)
+
+			if tt.setupEventWatcherMock != nil {
+				eventWatcherMock = tt.setupEventWatcherMock()
+				defer eventWatcherMock.AssertExpectations(t)
+				pluginManager.eventWatcher = eventWatcherMock
+			}
 
 			// handle plugin
 			_, err = pluginManager.Handle(ctx, tCtx)
@@ -936,7 +989,7 @@ func TestPluginManager_CustomKubeClient(t *testing.T) {
 	mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
 	fakeClient := fake.NewClientBuilder().Build()
 	newFakeClient := &pluginsCoreMock.KubeClient{}
-	newFakeClient.On("GetCache").Return(&mocks.FakeInformers{})
+	newFakeClient.On("GetCache").Return(&executorMocks.FakeInformers{})
 	mockClientset := k8sfake.NewSimpleClientset()
 	pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 		ID:              "x",
@@ -1040,7 +1093,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 func TestResourceManagerConstruction(t *testing.T) {
 	ctx := context.Background()
-	fakeKubeClient := mocks.NewFakeKubeClient()
+	fakeKubeClient := executorMocks.NewFakeKubeClient()
 
 	scope := promutils.NewScope("test:plugin_manager")
 	index := NewResourceMonitorIndex()
@@ -1055,7 +1108,7 @@ func TestFinalize(t *testing.T) {
 	t.Run("DeleteResourceOnFinalize=True", func(t *testing.T) {
 		ctx := context.Background()
 		sCtx := &pluginsCoreMock.SetupContext{}
-		fakeKubeClient := mocks.NewFakeKubeClient()
+		fakeKubeClient := executorMocks.NewFakeKubeClient()
 		sCtx.OnKubeClient().Return(fakeKubeClient)
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: true}))
@@ -1093,7 +1146,7 @@ func TestFinalize(t *testing.T) {
 	t.Run("DeleteResourceOnFinalize=False", func(t *testing.T) {
 		ctx := context.Background()
 		sCtx := &pluginsCoreMock.SetupContext{}
-		fakeKubeClient := mocks.NewFakeKubeClient()
+		fakeKubeClient := executorMocks.NewFakeKubeClient()
 		sCtx.OnKubeClient().Return(fakeKubeClient)
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: false}))

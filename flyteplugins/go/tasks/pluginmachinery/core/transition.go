@@ -36,6 +36,10 @@ func (t Transition) Info() PhaseInfo {
 	return t.info
 }
 
+func (t *Transition) SetInfo(info PhaseInfo) {
+	t.info = info
+}
+
 func (t Transition) String() string {
 	return fmt.Sprintf("%s,%s", t.ttype, t.info)
 }

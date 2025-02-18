@@ -10,18 +10,20 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/cache"
+
+	eventwatcher "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s/eventwatcheriface"
 )
 
 func TestEventWatcher_OnAdd(t *testing.T) {
 	now := time.Now()
-	ew := eventWatcher{}
+	ew := EventWatcher{}
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns1", Name: "name1"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{
 			{Namespace: "eventns1", Name: "eventname1"}: {CreatedAt: now.Add(-time.Minute)},
 		},
 	})
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns2", Name: "name2"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{},
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{},
 	})
 
 	t.Run("existing event", func(t *testing.T) {
@@ -87,14 +89,14 @@ func TestEventWatcher_OnAdd(t *testing.T) {
 
 func TestEventWatcher_OnDelete(t *testing.T) {
 	now := time.Now()
-	ew := eventWatcher{}
+	ew := EventWatcher{}
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns1", Name: "name1"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{
 			{Namespace: "eventns1", Name: "eventname1"}: {CreatedAt: now.Add(-time.Minute)},
 		},
 	})
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns2", Name: "name2"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{},
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{},
 	})
 
 	t.Run("existing event", func(t *testing.T) {
@@ -167,15 +169,15 @@ func TestEventWatcher_OnDelete(t *testing.T) {
 
 func TestEventWatcher_List(t *testing.T) {
 	now := time.Now()
-	ew := eventWatcher{}
+	ew := EventWatcher{}
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns1", Name: "name1"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{
 			{Namespace: "eventns1", Name: "eventname1"}: {CreatedAt: now},
 			{Namespace: "eventns2", Name: "eventname2"}: {CreatedAt: now.Add(-time.Hour)},
 		},
 	})
 	ew.objectCache.Store(types.NamespacedName{Namespace: "ns2", Name: "name2"}, &objectEvents{
-		eventInfos: map[types.NamespacedName]*EventInfo{},
+		eventInfos: map[types.NamespacedName]*eventwatcher.EventInfo{},
 	})
 
 	t.Run("all events", func(t *testing.T) {

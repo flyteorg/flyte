@@ -37,6 +37,7 @@ import (
 	compiler "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
 	nodeTaskConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s/eventwatcheriface"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
@@ -103,7 +104,7 @@ type PluginManager struct {
 	// Per namespace-resource
 	backOffController         *backoff.Controller
 	resourceLevelMonitor      *ResourceLevelMonitor
-	eventWatcher              EventWatcher
+	eventWatcher              eventwatcheriface.EventWatcher
 	updateBaseBackoffDuration int
 	updateBackoffRetries      int
 }
@@ -304,6 +305,10 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		return pluginsCore.UnknownTransition, err
 	}
 
+	if p.Phase() == k8sPluginState.Phase && p.Version() < k8sPluginState.PhaseVersion {
+		p = p.WithVersion(k8sPluginState.PhaseVersion)
+	}
+
 	if p.Phase() == pluginsCore.PhaseSuccess {
 		var opReader io.OutputReader
 		if pCtx.ow == nil {
@@ -374,7 +379,6 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// Add events since last update
-	version := phaseInfo.Version()
 	lastEventUpdate := pluginState.LastEventUpdate
 	if e.eventWatcher != nil && o != nil {
 		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
@@ -388,7 +392,13 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 				lastEventUpdate = event.CreatedAt
 			}
 			// Bump the version to ensure newly added events are picked up
-			version++
+			if phaseInfo.Phase() == pluginState.K8sPluginState.Phase &&
+				phaseInfo.Version() <= pluginState.K8sPluginState.PhaseVersion {
+				// If there are new events, but the phase version is the same,
+				// we should bump the version to ensure the new events are picked up.
+				phaseInfo = phaseInfo.WithVersion(pluginState.K8sPluginState.PhaseVersion + 1)
+				transition.SetInfo(phaseInfo)
+			}
 		}
 	}
 
@@ -397,7 +407,7 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 		Phase: pluginPhase,
 		K8sPluginState: k8s.PluginState{
 			Phase:        phaseInfo.Phase(),
-			PhaseVersion: version,
+			PhaseVersion: phaseInfo.Version(),
 			Reason:       phaseInfo.Reason(),
 		},
 		LastEventUpdate: lastEventUpdate,
@@ -680,7 +690,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	k8sConfig := config.GetK8sPluginConfig()
-	var eventWatcher EventWatcher
+	var eventWatcher eventwatcheriface.EventWatcher
 	if k8sConfig.SendObjectEvents {
 		eventWatcher, err = NewEventWatcher(ctx, gvk, kubeClientset)
 		if err != nil {

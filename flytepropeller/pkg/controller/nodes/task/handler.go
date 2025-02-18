@@ -717,6 +717,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
+		logger.Debugf(ctx, "recording task event [%v] phase [%s] version [%d]", evInfo.GetParentNodeExecutionId().GetExecutionId().GetName(), evInfo.GetPhase(), evInfo.GetPhaseVersion())
 		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
 			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
 			// Check for idempotency
@@ -746,6 +747,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		return handler.UnknownTransition, err
 	}
 	if evInfo != nil {
+		logger.Debugf(ctx, "recording final task event [%v] phase [%s] version [%d]", evInfo.GetParentNodeExecutionId().GetExecutionId().GetName(), evInfo.GetPhase(), evInfo.GetPhaseVersion())
 		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
 			// Check for idempotency
 			// Check for terminate state error
