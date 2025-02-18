@@ -152,7 +152,7 @@ jobs:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/go-build
