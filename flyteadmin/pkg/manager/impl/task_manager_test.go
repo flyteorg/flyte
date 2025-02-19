@@ -52,14 +52,7 @@ func init() {
 }
 
 func getMockTaskCompiler() workflowengine.Compiler {
-	mockCompiler := workflowMocks.NewMockCompiler()
-	mockCompiler.(*workflowMocks.MockCompiler).AddCompileTaskCallback(
-		func(task *core.TaskTemplate) (*core.CompiledTask, error) {
-			return &core.CompiledTask{
-				Template: task,
-			}, nil
-		})
-	return mockCompiler
+	return &workflowMocks.Compiler{}
 }
 
 func getMockTaskRepository() interfaces.Repository {
@@ -172,12 +165,9 @@ func TestCreateTask_ValidationError(t *testing.T) {
 }
 
 func TestCreateTask_CompilerError(t *testing.T) {
-	mockCompiler := workflowMocks.NewMockCompiler()
+	mockCompiler := &workflowMocks.Compiler{}
 	expectedErr := errors.New("expected error")
-	mockCompiler.(*workflowMocks.MockCompiler).AddCompileTaskCallback(
-		func(task *core.TaskTemplate) (*core.CompiledTask, error) {
-			return nil, expectedErr
-		})
+
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), mockCompiler,
 		mockScope.NewTestScope())

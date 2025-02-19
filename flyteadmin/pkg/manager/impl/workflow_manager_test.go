@@ -25,7 +25,6 @@ import (
 	workflowengineMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -89,22 +88,8 @@ func getMockRepository(workflowOnGet bool) interfaces.Repository {
 }
 
 func getMockWorkflowCompiler() workflowengineInterfaces.Compiler {
-	mockCompiler := workflowengineMocks.NewMockCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddGetRequirementCallback(
-		func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (
-			reqs compiler.WorkflowExecutionRequirements, err error) {
-			return compiler.WorkflowExecutionRequirements{}, nil
-		})
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddCompileWorkflowCallback(func(
-		primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask,
-		launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
-		return &core.CompiledWorkflowClosure{
-			Primary: &core.CompiledWorkflow{
-				Template: primaryWf,
-			},
-		}, nil
-	})
-	return mockCompiler
+	return &workflowengineMocks.Compiler{}
+
 }
 
 func getMockStorage() *storage.DataStore {
@@ -214,11 +199,6 @@ func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
 func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 	expectedErr := errors.New("expected error")
 	mockCompiler := getMockWorkflowCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddGetRequirementCallback(
-		func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (
-			reqs compiler.WorkflowExecutionRequirements, err error) {
-			return compiler.WorkflowExecutionRequirements{}, expectedErr
-		})
 
 	workflowManager := NewWorkflowManager(
 		getMockRepository(!returnWorkflowOnGet),
@@ -234,11 +214,6 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 	expectedErr := errors.New("expected error")
 	mockCompiler := getMockWorkflowCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddCompileWorkflowCallback(func(
-		primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask,
-		launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
-		return &core.CompiledWorkflowClosure{}, expectedErr
-	})
 
 	workflowManager := NewWorkflowManager(
 		getMockRepository(!returnWorkflowOnGet),
