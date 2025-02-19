@@ -279,6 +279,54 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 	}
 }
 
+func TestBuildPodTemplate(t *testing.T) {
+	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
+	resources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "container-imag", serviceAccount)
+	basePodSpec, objectMeta, _, err := flytek8s.ToK8sPodSpec(context.Background(), taskContext)
+	assert.Nil(t, err)
+
+	toleration := []corev1.Toleration{
+		{
+			Key:      "gpu-node-label",
+			Value:    "nvidia-tesla-t4",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+
+	customPodSpec :=
+		&core.K8SPod{
+			PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+				Tolerations: toleration,
+			}),
+			Metadata: &core.K8SObjectMetadata{
+				Labels:      map[string]string{"new-label-1": "val1"},
+				Annotations: map[string]string{"new-annotation-1": "val1"},
+			},
+		}
+
+	headGroupSpec := plugins.HeadGroupSpec{K8SPod: customPodSpec}
+	podSpec, err := buildHeadPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &headGroupSpec)
+	assert.Nil(t, err)
+	assert.Equal(t, podSpec.Spec.Tolerations, toleration)
+	expectedLabels := map[string]string{"label-1": "val1", "new-label-1": "val1"}
+	expectedAnnotations := map[string]string{"annotation-1": "val1", "new-annotation-1": "val1"}
+	assert.Equal(t, expectedLabels, podSpec.Labels)
+	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+
+	workerGroupSpec := plugins.WorkerGroupSpec{K8SPod: customPodSpec}
+	podSpec, err = buildWorkerPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &workerGroupSpec)
+	assert.Nil(t, err)
+	assert.Equal(t, toleration, podSpec.Spec.Tolerations)
+	assert.Equal(t, expectedLabels, podSpec.Labels)
+	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+}
+
 func TestBuildResourceRayExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:                 "gpu-node-label",
