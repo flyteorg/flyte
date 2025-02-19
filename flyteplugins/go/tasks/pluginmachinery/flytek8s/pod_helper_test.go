@@ -2090,13 +2090,13 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
 
-	podSpec1, _ := mergePodSpecs(nil, nil, "foo", "foo-init")
+	podSpec1, _ := MergePodSpecs(nil, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec1)
 
-	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo", "foo-init")
+	podSpec2, _ := MergePodSpecs(&v1.PodSpec{}, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec2)
 
-	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo", "foo-init")
+	podSpec3, _ := MergePodSpecs(nil, &v1.PodSpec{}, "foo", "foo-init")
 	assert.Nil(t, podSpec3)
 
 	podSpec := v1.PodSpec{
@@ -2184,7 +2184,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary", "primary-init")
+	mergedPodSpec, err := MergePodSpecs(&podTemplateSpec, &podSpec, "primary", "primary-init")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
