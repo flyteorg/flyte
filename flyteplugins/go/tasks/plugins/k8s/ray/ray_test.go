@@ -482,13 +482,6 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 		},
 	}
 
-	headPodSpecCustomTolerations := &corev1.PodSpec{
-		Tolerations: headTolerations,
-	}
-	workerPodSpecCustomTolerations := &corev1.PodSpec{
-		Tolerations: workerTolerations,
-	}
-
 	headAffinity := &corev1.Affinity{
 		NodeAffinity: &corev1.NodeAffinity{
 			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
@@ -581,11 +574,21 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			headK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
 					RuntimeClassName: &nvidiaRuntimeClassName,
+					Containers: []corev1.Container{
+						{
+							Name: "ray-head",
+						},
+					},
 				}),
 			},
 			workerK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
 					RuntimeClassName: &nvidiaRuntimeClassName,
+					Containers: []corev1.Container{
+						{
+							Name: "ray-worker",
+						},
+					},
 				}),
 			},
 			headPodAssertions: rayPodAssertions{
@@ -602,10 +605,24 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 		{
 			name: "custom tolerations",
 			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, headPodSpecCustomTolerations),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name: "ray-head",
+						},
+					},
+					Tolerations: headTolerations,
+				}),
 			},
 			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, workerPodSpecCustomTolerations),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name: "ray-worker",
+						},
+					},
+					Tolerations: workerTolerations,
+				}),
 			},
 			headPodAssertions: rayPodAssertions{
 				affinity:    &corev1.Affinity{},
