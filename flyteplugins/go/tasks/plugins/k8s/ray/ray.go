@@ -535,26 +535,9 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.GetPodSpec(), err.Error())
 	}
 
-	for _, container := range customPodSpec.Containers {
-		if container.Name != primaryContainer.Name { // Only support the primary container for now
-			continue
-		}
-
-		if len(container.Resources.Requests) > 0 || len(container.Resources.Limits) > 0 {
-			primaryContainer.Resources = container.Resources
-		}
-	}
-
-	if customPodSpec.RuntimeClassName != nil {
-		podSpec.RuntimeClassName = customPodSpec.RuntimeClassName
-	}
-
-	if len(customPodSpec.Tolerations) > 0 {
-		podSpec.Tolerations = customPodSpec.Tolerations
-	}
-
-	if customPodSpec.Affinity != nil {
-		podSpec.Affinity = customPodSpec.Affinity
+	podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainer.Name, "")
+	if err != nil {
+		return nil, err
 	}
 
 	return podSpec, nil
