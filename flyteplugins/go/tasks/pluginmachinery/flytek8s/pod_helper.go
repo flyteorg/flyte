@@ -951,8 +951,11 @@ func DeterminePrimaryContainerPhase(ctx context.Context, primaryContainerName st
 						s.State.Terminated.Reason, message, info)
 				case isTerminatedWithSigKill(s.State):
 					// If the primary container exited with SIGKILL, we treat it as a system-level error
-					// (such as node termination or preemption).
-					// Note: this best-effort approach accepts some false positives.
+					// (such as node termination or preemption). This best-effort approach accepts some false positives.
+					// In the case that node preemption terminates the kubelet *before* the kubelet is able to persist
+					// the pod's state to the Kubernetes API server, we rely on Kubernetes to eventually resolve
+					// the state. This will enable Propeller to eventually query the API server and determine that
+					// the pod no longer exists, which will then be counted as a system error.
 					phaseInfo = pluginsCore.PhaseInfoSystemRetryableFailure(
 						s.State.Terminated.Reason, message, info)
 				case s.State.Terminated.ExitCode != 0:
@@ -962,7 +965,7 @@ func DeterminePrimaryContainerPhase(ctx context.Context, primaryContainerName st
 					return pluginsCore.PhaseInfoSuccess(info)
 				}
 
-				logger.Infof(ctx, "Primary container terminated with issue. Message: '%s'", message)
+				logger.Warnf(ctx, "Primary container terminated with issue. Message: '%s'", message)
 				return phaseInfo
 			}
 		}
@@ -1040,8 +1043,11 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 				// tagging that correctly.
 				code = Interrupted
 				// If the primary container exited with SIGKILL, we treat it as a system-level error
-				// (such as node termination or preemption).
-				// Note: this best-effort approach accepts some false positives.
+				// (such as node termination or preemption). This best-effort approach accepts some false positives.
+				// In the case that node preemption terminates the kubelet *before* the kubelet is able to persist
+				// the pod's state to the Kubernetes API server, we rely on Kubernetes to eventually resolve
+				// the state. This will enable Propeller to eventually query the API server and determine that
+				// the pod no longer exists, which will then be counted as a system error.
 				if c.Name == primaryContainerName {
 					isSystemError = true
 				}
@@ -1060,11 +1066,11 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	}
 
 	if isSystemError {
-		logger.Infof(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
+		logger.Warnf(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
 		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
 	}
 
-	logger.Infof(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)
+	logger.Warnf(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 
