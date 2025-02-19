@@ -1694,8 +1694,8 @@ func TestDemystifyFailure(t *testing.T) {
 		}, pluginsCore.TaskInfo{}, "primary-container")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
@@ -1833,9 +1833,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed - SIGKILL", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1851,9 +1851,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed - SIGKILL unsigned", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1869,9 +1869,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container succeeded", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1908,9 +1908,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed with OOMKilled - SIGKILL", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
@@ -1926,9 +1926,9 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
-		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 }
 
