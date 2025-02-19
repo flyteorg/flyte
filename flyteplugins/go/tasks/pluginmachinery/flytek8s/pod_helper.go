@@ -708,7 +708,7 @@ func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	for i := 0; i < len(basePodSpec.InitContainers); i++ {
 		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
 			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
-		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerName {
 			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
 		}
 	}
@@ -791,6 +791,10 @@ func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 
 			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 		}
+	}
+
+	if mergedInitContainers == nil {
+		mergedInitContainers = basePodSpec.InitContainers
 	}
 
 	mergedPodSpec.InitContainers = mergedInitContainers

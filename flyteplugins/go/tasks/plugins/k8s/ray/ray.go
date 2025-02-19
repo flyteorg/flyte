@@ -382,8 +382,8 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		ObjectMeta: *objectMeta,
 	}
 	cfg := config.GetK8sPluginConfig()
-	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.K8SPod.GetMetadata().GetLabels()))
-	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.K8SPod.GetMetadata().GetAnnotations()))
+	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 	return podTemplateSpec, nil
 }
 
@@ -512,8 +512,8 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 		Spec:       *basePodSpec,
 		ObjectMeta: *objectMetadata,
 	}
-	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.K8SPod.GetMetadata().GetLabels()))
-	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.K8SPod.GetMetadata().GetAnnotations()))
+	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 	return podTemplateSpec, nil
 }
 
