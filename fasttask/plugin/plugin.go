@@ -473,9 +473,9 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 	fastTaskEnvironment *pb.FastTaskEnvironment, initialState *State, taskID string) (*State, core.PhaseInfo, error) {
 	queueID := fastTaskEnvironment.GetQueueId()
 	workerID := initialState.WorkerID
-	taskInfo, err := p.getTaskInfo(ctx, tCtx, initialState.SubmittedAt, time.Now(), executionEnv, queueID, initialState.WorkerID)
-	if err != nil {
-		return nil, core.PhaseInfoUndefined, err
+	taskInfo, getTaskInfoErr := p.getTaskInfo(ctx, tCtx, initialState.SubmittedAt, time.Now(), executionEnv, queueID, initialState.WorkerID)
+	if getTaskInfoErr != nil && !errors.Is(getTaskInfoErr, podContainerNotFoundError) {
+		return nil, core.PhaseInfoUndefined, getTaskInfoErr
 	}
 
 	// check the task status
@@ -512,6 +512,13 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
 		}
 	}
+
+	if (phaseInfo.Phase() == core.PhaseSuccess || phaseInfo.Phase() == core.PhaseRetryableFailure) && errors.Is(getTaskInfoErr, podContainerNotFoundError) {
+		// if we have reached a terminal state we should retry under system failure until we can find
+		// the container to correctly populate the logs
+		return nil, core.PhaseInfoUndefined, getTaskInfoErr
+	}
+
 	return &pluginState, phaseInfo, nil
 }
 
@@ -592,7 +599,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		},
 	}
 
-	if len(pod.Status.ContainerStatuses) <= containerIndex || pod.Status.ContainerStatuses[containerIndex].ContainerID == "" {
+	if len(pod.Status.ContainerStatuses) <= containerIndex {
 		// no container id yet
 		return &taskInfo, podContainerNotFoundError
 	}

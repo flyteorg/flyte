@@ -655,9 +655,25 @@ func TestHandleRunning(t *testing.T) {
 		expectedLogs           bool
 	}{
 		{
-			name:             "PodNotFound",
+			name:             "PodNotFoundRunning",
 			lastUpdated:      time.Now().Add(-5 * time.Second),
 			taskStatusPhase:  core.PhaseRunning,
+			taskStatusReason: "",
+			checkStatusError: nil,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": nil,
+			},
+			expectedPhase:          core.PhaseRunning,
+			expectedPhaseVersion:   1,
+			expectedReason:         "",
+			expectedError:          nil,
+			expectedLastUpdatedInc: true,
+			expectedLogs:           false,
+		},
+		{
+			name:             "PodNotFoundSuccess",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseSuccess,
 			taskStatusReason: "",
 			checkStatusError: nil,
 			executionEnvStatus: map[string]*v1.Pod{
