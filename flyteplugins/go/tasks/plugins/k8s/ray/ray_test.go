@@ -279,6 +279,54 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 	}
 }
 
+func TestBuildPodTemplate(t *testing.T) {
+	taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
+	resources := &corev1.ResourceRequirements{
+		Limits: corev1.ResourceList{
+			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	}
+	taskContext := dummyRayTaskContext(taskTemplate, resources, nil, "container-imag", serviceAccount)
+	basePodSpec, objectMeta, _, err := flytek8s.ToK8sPodSpec(context.Background(), taskContext)
+	assert.Nil(t, err)
+
+	toleration := []corev1.Toleration{
+		{
+			Key:      "gpu-node-label",
+			Value:    "nvidia-tesla-t4",
+			Operator: corev1.TolerationOpEqual,
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+
+	customPodSpec :=
+		&core.K8SPod{
+			PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+				Tolerations: toleration,
+			}),
+			Metadata: &core.K8SObjectMetadata{
+				Labels:      map[string]string{"new-label-1": "val1"},
+				Annotations: map[string]string{"new-annotation-1": "val1"},
+			},
+		}
+
+	headGroupSpec := plugins.HeadGroupSpec{K8SPod: customPodSpec}
+	podSpec, err := buildHeadPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &headGroupSpec)
+	assert.Nil(t, err)
+	assert.Equal(t, podSpec.Spec.Tolerations, toleration)
+	expectedLabels := map[string]string{"label-1": "val1", "new-label-1": "val1"}
+	expectedAnnotations := map[string]string{"annotation-1": "val1", "new-annotation-1": "val1"}
+	assert.Equal(t, expectedLabels, podSpec.Labels)
+	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+
+	workerGroupSpec := plugins.WorkerGroupSpec{K8SPod: customPodSpec}
+	podSpec, err = buildWorkerPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &workerGroupSpec)
+	assert.Nil(t, err)
+	assert.Equal(t, toleration, podSpec.Spec.Tolerations)
+	assert.Equal(t, expectedLabels, podSpec.Labels)
+	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+}
+
 func TestBuildResourceRayExtendedResources(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		GpuDeviceNodeLabel:                 "gpu-node-label",
@@ -432,6 +480,13 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 	}
 }
 
+type rayPodAssertions struct {
+	resources        *corev1.ResourceRequirements
+	runtimeClassName *string
+	tolerations      []corev1.Toleration
+	affinity         *corev1.Affinity
+}
+
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
 
@@ -457,76 +512,180 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 
 	nvidiaRuntimeClassName := "nvidia-cdi"
 
-	headPodSpecCustomResources := &corev1.PodSpec{
-		Containers: []corev1.Container{
-			{
-				Name:      "ray-head",
-				Resources: *expectedHeadResources,
-			},
+	headTolerations := []corev1.Toleration{
+		{
+			Key:      "head",
+			Operator: corev1.TolerationOpEqual,
+			Value:    "true",
+			Effect:   corev1.TaintEffectNoSchedule,
 		},
 	}
-	workerPodSpecCustomResources := &corev1.PodSpec{
-		Containers: []corev1.Container{
-			{
-				Name:      "ray-worker",
-				Resources: *expectedWorkerResources,
+
+	workerTolerations := []corev1.Toleration{
+		{
+			Key:      "worker",
+			Operator: corev1.TolerationOpEqual,
+			Value:    "true",
+			Effect:   corev1.TaintEffectNoSchedule,
+		},
+	}
+
+	headPodSpecCustomTolerations := &corev1.PodSpec{
+		Tolerations: headTolerations,
+	}
+	workerPodSpecCustomTolerations := &corev1.PodSpec{
+		Tolerations: workerTolerations,
+	}
+
+	headAffinity := &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "node-type",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"head-node"},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
 
-	headPodSpecCustomRuntimeClass := &corev1.PodSpec{
-		RuntimeClassName: &nvidiaRuntimeClassName,
-	}
-	workerPodSpecCustomRuntimeClass := &corev1.PodSpec{
-		RuntimeClassName: &nvidiaRuntimeClassName,
+	workerAffinity := &corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+				NodeSelectorTerms: []corev1.NodeSelectorTerm{
+					{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "node-type",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"worker-node"},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	params := []struct {
-		name                              string
-		taskResources                     *corev1.ResourceRequirements
-		headK8SPod                        *core.K8SPod
-		workerK8SPod                      *core.K8SPod
-		expectedSubmitterResources        *corev1.ResourceRequirements
-		expectedHeadResources             *corev1.ResourceRequirements
-		expectedWorkerResources           *corev1.ResourceRequirements
-		expectedSubmitterRuntimeClassName *string
-		expectedHeadRuntimeClassName      *string
-		expectedWorkerRuntimeClassName    *string
+		name                string
+		headK8SPod          *core.K8SPod
+		workerK8SPod        *core.K8SPod
+		headPodAssertions   rayPodAssertions
+		workerPodAssertions rayPodAssertions
 	}{
 		{
-			name:                       "task resources",
-			taskResources:              resourceRequirements,
-			expectedSubmitterResources: resourceRequirements,
-			expectedHeadResources:      resourceRequirements,
-			expectedWorkerResources:    resourceRequirements,
+			name:         "no customizations",
+			headK8SPod:   &core.K8SPod{},
+			workerK8SPod: &core.K8SPod{},
+			headPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: resourceRequirements,
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: resourceRequirements,
+			},
 		},
 		{
-			name:          "custom worker and head resources",
-			taskResources: resourceRequirements,
+			name: "custom worker and head resources",
 			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, headPodSpecCustomResources),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:      "ray-head",
+							Resources: *expectedHeadResources,
+						},
+					},
+				}),
 			},
 			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, workerPodSpecCustomResources),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:      "ray-worker",
+							Resources: *expectedWorkerResources,
+						},
+					},
+				}),
 			},
-			expectedSubmitterResources: resourceRequirements,
-			expectedHeadResources:      expectedHeadResources,
-			expectedWorkerResources:    expectedWorkerResources,
+			headPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: expectedHeadResources,
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: expectedWorkerResources,
+			},
 		},
 		{
-			name:                       "custom runtime class name",
-			taskResources:              resourceRequirements,
-			expectedSubmitterResources: resourceRequirements,
-			expectedHeadResources:      resourceRequirements,
-			expectedWorkerResources:    resourceRequirements,
+			name: "custom runtime class name",
 			headK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, headPodSpecCustomRuntimeClass),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					RuntimeClassName: &nvidiaRuntimeClassName,
+				}),
 			},
 			workerK8SPod: &core.K8SPod{
-				PodSpec: transformStructToStructPB(t, workerPodSpecCustomRuntimeClass),
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					RuntimeClassName: &nvidiaRuntimeClassName,
+				}),
 			},
-			expectedHeadRuntimeClassName:   &nvidiaRuntimeClassName,
-			expectedWorkerRuntimeClassName: &nvidiaRuntimeClassName,
+			headPodAssertions: rayPodAssertions{
+				affinity:         &corev1.Affinity{},
+				resources:        resourceRequirements,
+				runtimeClassName: &nvidiaRuntimeClassName,
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:         &corev1.Affinity{},
+				resources:        resourceRequirements,
+				runtimeClassName: &nvidiaRuntimeClassName,
+			},
+		},
+		{
+			name: "custom tolerations",
+			headK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, headPodSpecCustomTolerations),
+			},
+			workerK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, workerPodSpecCustomTolerations),
+			},
+			headPodAssertions: rayPodAssertions{
+				affinity:    &corev1.Affinity{},
+				resources:   resourceRequirements,
+				tolerations: headTolerations,
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:    &corev1.Affinity{},
+				resources:   resourceRequirements,
+				tolerations: workerTolerations,
+			},
+		},
+		{
+			name: "custom affinity",
+			headK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Affinity: headAffinity,
+				}),
+			},
+			workerK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					Affinity: workerAffinity,
+				}),
+			},
+			headPodAssertions: rayPodAssertions{
+				affinity:  headAffinity,
+				resources: resourceRequirements,
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:  workerAffinity,
+				resources: resourceRequirements,
+			},
 		},
 	}
 
@@ -545,7 +704,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			}
 
 			taskTemplate := dummyRayTaskTemplate("ray-id", rayJobInput)
-			taskContext := dummyRayTaskContext(taskTemplate, p.taskResources, nil, "", serviceAccount)
+			taskContext := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -553,29 +712,33 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			rayJob, ok := r.(*rayv1.RayJob)
 			assert.True(t, ok)
 
-			submitterPodResources := rayJob.Spec.SubmitterPodTemplate.Spec.Containers[0].Resources
-			assert.EqualValues(t,
-				p.expectedSubmitterResources,
-				&submitterPodResources,
-			)
-
 			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
 			headPodResources := headPodSpec.Containers[0].Resources
-			assert.EqualValues(t,
-				p.expectedHeadResources,
-				&headPodResources,
-			)
+			if p.headPodAssertions.resources != nil {
+				assert.EqualValues(t,
+					*p.headPodAssertions.resources,
+					headPodResources,
+				)
+			}
 
-			assert.EqualValues(t, p.expectedHeadRuntimeClassName, headPodSpec.RuntimeClassName)
+			assert.EqualValues(t, p.headPodAssertions.runtimeClassName, headPodSpec.RuntimeClassName)
+			assert.EqualValues(t, p.headPodAssertions.tolerations, headPodSpec.Tolerations)
+			assert.EqualValues(t, p.headPodAssertions.affinity, headPodSpec.Affinity)
 
 			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
 				workerPodSpec := workerGroupSpec.Template.Spec
 				workerPodResources := workerPodSpec.Containers[0].Resources
-				assert.EqualValues(t,
-					p.expectedWorkerResources,
-					&workerPodResources,
-				)
-				assert.EqualValues(t, p.expectedWorkerRuntimeClassName, workerPodSpec.RuntimeClassName)
+
+				if p.workerPodAssertions.resources != nil {
+					assert.EqualValues(t,
+						*p.workerPodAssertions.resources,
+						workerPodResources,
+					)
+				}
+
+				assert.EqualValues(t, p.workerPodAssertions.runtimeClassName, workerPodSpec.RuntimeClassName)
+				assert.EqualValues(t, p.workerPodAssertions.tolerations, workerPodSpec.Tolerations)
+				assert.EqualValues(t, p.workerPodAssertions.affinity, workerPodSpec.Affinity)
 			}
 		})
 	}

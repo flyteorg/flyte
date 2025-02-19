@@ -2014,12 +2014,12 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 
 	t.Run("BasePodTemplateExists", func(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
-			Name:                   primaryContainerTemplateName,
+			Name:                   "foo",
 			TerminationMessagePath: "/dev/primary-termination-log",
 		}
 
 		primaryInitContainerTemplate := v1.Container{
-			Name:                   primaryInitContainerTemplateName,
+			Name:                   "foo-init",
 			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
