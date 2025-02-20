@@ -1065,6 +1065,13 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 		}
 	}
 
+	// If the code remains 'UnknownError', it indicates that the kubelet did not have a chance
+	// to record a more specific failure before the node was terminated or preempted.
+	// In such cases, we classify the error as system-level and accept false positives
+	if code == "UnknownError" {
+		isSystemError = true
+	}
+
 	if isSystemError {
 		logger.Warnf(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
 		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
