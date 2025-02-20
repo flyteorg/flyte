@@ -6,6 +6,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+//go:generate mockery-v2 --name=LaunchPlanInterface --output=../mocks --case=underscore --with-expecter
+
 // Interface for managing Flyte Launch Plans
 type LaunchPlanInterface interface {
 	// Interface to create Launch Plans based on the request.

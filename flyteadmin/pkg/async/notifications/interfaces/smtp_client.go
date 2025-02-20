@@ -6,6 +6,8 @@ import (
 	"net/smtp"
 )
 
+//go:generate mockery-v2 --name=SMTPClient --output=../mocks --case=underscore --with-expecter
+
 // This interface is introduced to allow for mocking of the smtp.Client object.
 
 //go:generate mockery -name=SMTPClient -output=../mocks -case=underscore

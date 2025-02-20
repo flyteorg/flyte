@@ -52,11 +52,23 @@ class GPUAccelerator(_message.Message):
     partition_size: str
     def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ...) -> None: ...
 
+class SharedMemory(_message.Message):
+    __slots__ = ["mount_path", "mount_name", "size_limit"]
+    MOUNT_PATH_FIELD_NUMBER: _ClassVar[int]
+    MOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
+    SIZE_LIMIT_FIELD_NUMBER: _ClassVar[int]
+    mount_path: str
+    mount_name: str
+    size_limit: str
+    def __init__(self, mount_path: _Optional[str] = ..., mount_name: _Optional[str] = ..., size_limit: _Optional[str] = ...) -> None: ...
+
 class ExtendedResources(_message.Message):
-    __slots__ = ["gpu_accelerator"]
+    __slots__ = ["gpu_accelerator", "shared_memory"]
     GPU_ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
+    SHARED_MEMORY_FIELD_NUMBER: _ClassVar[int]
     gpu_accelerator: GPUAccelerator
-    def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ...) -> None: ...
+    shared_memory: SharedMemory
+    def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ..., shared_memory: _Optional[_Union[SharedMemory, _Mapping]] = ...) -> None: ...
 
 class RuntimeMetadata(_message.Message):
     __slots__ = ["type", "version", "flavor"]
@@ -235,14 +247,16 @@ class DataLoadingConfig(_message.Message):
     def __init__(self, enabled: bool = ..., input_path: _Optional[str] = ..., output_path: _Optional[str] = ..., format: _Optional[_Union[DataLoadingConfig.LiteralMapFormat, str]] = ..., io_strategy: _Optional[_Union[IOStrategy, _Mapping]] = ...) -> None: ...
 
 class K8sPod(_message.Message):
-    __slots__ = ["metadata", "pod_spec", "data_config"]
+    __slots__ = ["metadata", "pod_spec", "data_config", "primary_container_name"]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     POD_SPEC_FIELD_NUMBER: _ClassVar[int]
     DATA_CONFIG_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
     metadata: K8sObjectMetadata
     pod_spec: _struct_pb2.Struct
     data_config: DataLoadingConfig
-    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., data_config: _Optional[_Union[DataLoadingConfig, _Mapping]] = ...) -> None: ...
+    primary_container_name: str
+    def __init__(self, metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., data_config: _Optional[_Union[DataLoadingConfig, _Mapping]] = ..., primary_container_name: _Optional[str] = ...) -> None: ...
 
 class K8sObjectMetadata(_message.Message):
     __slots__ = ["labels", "annotations"]

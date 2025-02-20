@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -43,8 +44,8 @@ func TestTaskExecution(t *testing.T) {
 	const requestID = "request id"
 
 	t.Run("TestCreateTaskEvent", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetCreateTaskEventCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().CreateTaskExecutionEvent(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionEventRequest) (
 				*admin.TaskExecutionEventResponse, error) {
 				assert.Equal(t, requestID, request.GetRequestId())
@@ -73,7 +74,7 @@ func TestTaskExecution(t *testing.T) {
 
 	//	TEMP: uncomment when we turn on task execution events end to end
 	// t.Run("TestCreateTaskEventErr", func(t *testing.T) {
-	// 	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
+	// 	mockTaskExecutionManager := mocks.TaskExecutionInterface{}
 	// 	mockTaskExecutionManager.SetCreateTaskEventCallback(
 	// 		func(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	// 			*admin.TaskExecutionEventResponse, error) {
@@ -97,7 +98,7 @@ func TestTaskExecution(t *testing.T) {
 	// })
 	//
 	// t.Run("TestCreateTaskEventMissingTimestamp", func(t *testing.T) {
-	// 	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
+	// 	mockTaskExecutionManager := mocks.TaskExecutionInterface{}
 	// 	mockTaskExecutionManager.SetCreateTaskEventCallback(
 	// 		func(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	// 			*admin.TaskExecutionEventResponse, error) {
@@ -116,7 +117,7 @@ func TestTaskExecution(t *testing.T) {
 	// })
 	//
 	// t.Run("TestCreateTaskEventMissingNodeExecutionId", func(t *testing.T) {
-	// 	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
+	// 	mockTaskExecutionManager := mocks.TaskExecutionInterface{}
 	// 	mockTaskExecutionManager.SetCreateTaskEventCallback(
 	// 		func(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	// 			*admin.TaskExecutionEventResponse, error) {
@@ -139,8 +140,8 @@ func TestTaskExecution(t *testing.T) {
 	// })
 
 	t.Run("TestGetTaskExecution", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetGetTaskExecutionCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().GetTaskExecution(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				assert.Equal(t, taskID, request.GetId().GetTaskId())
@@ -163,8 +164,8 @@ func TestTaskExecution(t *testing.T) {
 	})
 
 	t.Run("TestGetTaskExecutionErr", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetGetTaskExecutionCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().GetTaskExecution(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				return nil, errors.New("expected error")
@@ -185,8 +186,8 @@ func TestTaskExecution(t *testing.T) {
 	})
 
 	t.Run("TestGetTaskExecutionMissingId", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetGetTaskExecutionCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().GetTaskExecution(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				t.Fatal("Parameters should be checked before this call")
@@ -206,8 +207,8 @@ func TestTaskExecution(t *testing.T) {
 	})
 
 	t.Run("TestGetTaskExecutionMissingNodeExecutionId", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetGetTaskExecutionCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().GetTaskExecution(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionGetRequest) (
 				*admin.TaskExecution, error) {
 				t.Fatal("Parameters should be checked before this call")
@@ -228,8 +229,8 @@ func TestTaskExecution(t *testing.T) {
 
 	// List endpoint tests
 	t.Run("TestListTaskExecutions", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetListTaskExecutionsCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
 				assert.Equal(t, "1", request.GetToken())
@@ -264,8 +265,8 @@ func TestTaskExecution(t *testing.T) {
 	})
 
 	t.Run("TestListTaskExecutions_NoLimit", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetListTaskExecutionsCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
 				return &admin.TaskExecutionList{}, nil
@@ -289,8 +290,8 @@ func TestTaskExecution(t *testing.T) {
 	})
 
 	t.Run("TestListTaskExecutions_NoFilters", func(t *testing.T) {
-		mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-		mockTaskExecutionManager.SetListTaskExecutionsCallback(
+		mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+		mockTaskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(
 			func(ctx context.Context, request *admin.TaskExecutionListRequest) (
 				*admin.TaskExecutionList, error) {
 				return &admin.TaskExecutionList{}, nil
@@ -308,8 +309,8 @@ func TestTaskExecution(t *testing.T) {
 }
 
 func TestGetTaskExecutionData(t *testing.T) {
-	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-	mockTaskExecutionManager.SetGetTaskExecutionDataCallback(
+	mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+	mockTaskExecutionManager.EXPECT().GetTaskExecutionData(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.TaskExecutionGetDataRequest) (
 			*admin.TaskExecutionGetDataResponse, error) {
 			return &admin.TaskExecutionGetDataResponse{

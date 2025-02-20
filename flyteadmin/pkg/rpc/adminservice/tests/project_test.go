@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -14,8 +15,8 @@ import (
 func TestRegisterProject(t *testing.T) {
 	ctx := context.Background()
 
-	mockProjectManager := mocks.MockProjectManager{}
-	mockProjectManager.SetCreateProject(
+	mockProjectManager := mocks.ProjectInterface{}
+	mockProjectManager.EXPECT().CreateProject(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
 			request *admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error) {
 			return &admin.ProjectRegisterResponse{}, nil
@@ -35,7 +36,7 @@ func TestRegisterProject(t *testing.T) {
 }
 
 func TestListProjects(t *testing.T) {
-	mockProjectManager := mocks.MockProjectManager{}
+	mockProjectManager := mocks.ProjectInterface{}
 	projects := &admin.Projects{
 		Projects: []*admin.Project{
 			{
@@ -50,7 +51,7 @@ func TestListProjects(t *testing.T) {
 			},
 		},
 	}
-	mockProjectManager.SetListCallback(func(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
+	mockProjectManager.EXPECT().ListProjects(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
 		assert.NotNil(t, request)
 		return projects, nil
 	})
@@ -60,9 +61,9 @@ func TestListProjects(t *testing.T) {
 }
 
 func TestGetProject(t *testing.T) {
-	mockProjectManager := mocks.MockProjectManager{}
+	mockProjectManager := mocks.ProjectInterface{}
 	project := &admin.Project{Id: "project id", Name: "project"}
-	mockProjectManager.SetGetCallBack(func(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
+	mockProjectManager.EXPECT().GetProject(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
 		assert.NotNil(t, request)
 		return project, nil
 	})

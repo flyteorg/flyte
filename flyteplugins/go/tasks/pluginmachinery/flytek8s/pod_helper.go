@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -129,7 +130,67 @@ func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *c
 		new.GpuAccelerator = overrides.GetGpuAccelerator()
 	}
 
+	if overrides.GetSharedMemory() != nil {
+		new.SharedMemory = overrides.GetSharedMemory()
+	}
+
 	return new
+}
+
+func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedMemory *core.SharedMemory) error {
+	sharedMountName := SharedMemory.GetMountName()
+	sharedMountPath := SharedMemory.GetMountPath()
+	if sharedMountName == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount name is not set")
+	}
+	if sharedMountPath == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount path is not set")
+	}
+
+	var primaryContainer *v1.Container
+	for index, container := range podSpec.Containers {
+		if container.Name == primaryContainerName {
+			primaryContainer = &podSpec.Containers[index]
+		}
+	}
+	if primaryContainer == nil {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to find primary container")
+	}
+
+	for _, volume := range podSpec.Volumes {
+		if volume.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in pod spec", sharedMountName)
+		}
+	}
+
+	for _, volume_mount := range primaryContainer.VolumeMounts {
+		if volume_mount.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in container", sharedMountName)
+		}
+		if volume_mount.MountPath == sharedMountPath {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "%s is already mounted in container", sharedMountPath)
+		}
+	}
+
+	var quantity resource.Quantity
+	var err error
+	if SharedMemory.GetSizeLimit() != "" {
+		quantity, err = resource.ParseQuantity(SharedMemory.GetSizeLimit())
+		if err != nil {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to parse size limit: %v", err.Error())
+		}
+	}
+
+	podSpec.Volumes = append(
+		podSpec.Volumes,
+		v1.Volume{
+			Name:         sharedMountName,
+			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity}},
+		},
+	)
+	primaryContainer.VolumeMounts = append(primaryContainer.VolumeMounts, v1.VolumeMount{Name: sharedMountName, MountPath: sharedMountPath})
+
+	return nil
 }
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
@@ -286,6 +347,17 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 				*c,
 			},
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
 		if target.K8SPod.GetPodSpec() == nil {
@@ -311,6 +383,17 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
 			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
 		}
+
+		// handle pod template override
+		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
+			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
+			if err != nil {
+				return nil, nil, "", err
+			}
+			primaryContainerName = podTemplate.GetPrimaryContainerName()
+		}
+
 	default:
 		return nil, nil, "", pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
 			"invalid TaskSpecification, unable to determine Pod configuration")
@@ -429,6 +512,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 	}
 
+	// Shared memory volume
+	if extendedResources.GetSharedMemory() != nil {
+		err = ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory())
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	// Override container image if necessary
 	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
@@ -444,6 +535,23 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 			return
 		}
 	}
+}
+
+func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
+	if podTemplate.GetMetadata().GetAnnotations() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetAnnotations(), objectMeta.Annotations)
+	}
+	if podTemplate.GetMetadata().GetLabels() != nil {
+		mergeMapInto(podTemplate.GetMetadata().GetLabels(), objectMeta.Labels)
+	}
+
+	var podSpecOverride *v1.PodSpec
+	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+	if err != nil {
+		return nil, objectMeta, err
+	}
+
+	return podSpecOverride, objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
@@ -563,7 +671,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	}
 
 	// merge podSpec with podTemplate
-	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	mergedPodSpec, err := MergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -577,10 +685,10 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	return mergedPodSpec, mergedObjectMeta, nil
 }
 
-// mergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
+// MergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
 // set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
 // container-level configuration from the basePodSpec.
-func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
+func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
 	if basePodSpec == nil || podSpec == nil {
 		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
 	}
@@ -590,7 +698,7 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	for i := 0; i < len(basePodSpec.Containers); i++ {
 		if basePodSpec.Containers[i].Name == defaultContainerTemplateName {
 			defaultContainerTemplate = &basePodSpec.Containers[i]
-		} else if basePodSpec.Containers[i].Name == primaryContainerTemplateName {
+		} else if basePodSpec.Containers[i].Name == primaryContainerName {
 			primaryContainerTemplate = &basePodSpec.Containers[i]
 		}
 	}
@@ -600,7 +708,7 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	for i := 0; i < len(basePodSpec.InitContainers); i++ {
 		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
 			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
-		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerName {
 			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
 		}
 	}
@@ -645,6 +753,10 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 		}
 	}
 
+	if mergedContainers == nil {
+		mergedContainers = basePodSpec.Containers
+	}
+
 	mergedPodSpec.Containers = mergedContainers
 
 	// merge PodTemplate init containers
@@ -679,6 +791,10 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 
 			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 		}
+	}
+
+	if mergedInitContainers == nil {
+		mergedInitContainers = basePodSpec.InitContainers
 	}
 
 	mergedPodSpec.InitContainers = mergedInitContainers

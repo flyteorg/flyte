@@ -54,7 +54,7 @@ var testSubscriberProtoMessages = []proto.Message{
 var (
 	testSubscriber pubsubtest.TestSubscriber
 	mockSub        pubsub.Subscriber = &testSubscriber
-	mockEmail      mocks.MockEmailer
+	mockEmail      mocks.Emailer
 	testProcessor  = NewProcessor(mockSub, &mockEmail, promutils.NewTestScope())
 )
 

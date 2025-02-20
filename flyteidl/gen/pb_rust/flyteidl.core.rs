@@ -1301,6 +1301,22 @@ pub mod gpu_accelerator {
         PartitionSize(::prost::alloc::string::String),
     }
 }
+/// Metadata associated with configuring a shared memory volume for a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SharedMemory {
+    /// Mount path to place in container
+    #[prost(string, tag="1")]
+    pub mount_path: ::prost::alloc::string::String,
+    /// Name for volume
+    #[prost(string, tag="2")]
+    pub mount_name: ::prost::alloc::string::String,
+    /// Size limit for shared memory. If not set, then the shared memory is equal
+    /// to the allocated memory.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub size_limit: ::prost::alloc::string::String,
+}
 /// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
 /// allocate to a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1310,6 +1326,8 @@ pub struct ExtendedResources {
     /// for multi-instance GPUs, the partition size to use.
     #[prost(message, optional, tag="1")]
     pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
+    #[prost(message, optional, tag="2")]
+    pub shared_memory: ::core::option::Option<SharedMemory>,
 }
 /// Runtime information. This is loosely defined to allow for extensibility.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1753,6 +1771,9 @@ pub struct K8sPod {
     /// Only K8s
     #[prost(message, optional, tag="3")]
     pub data_config: ::core::option::Option<DataLoadingConfig>,
+    /// Defines the primary container name when pod template override is executed.
+    #[prost(string, tag="4")]
+    pub primary_container_name: ::prost::alloc::string::String,
 }
 /// Metadata for building a kubernetes object when a task is executed.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2793,6 +2814,10 @@ pub struct TaskNodeOverrides {
     /// Override for the image used by task pods.
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
+    /// Override for the pod template used by task pods
+    /// +optional
+    #[prost(message, optional, tag="4")]
+    pub pod_template: ::core::option::Option<K8sPod>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -7,12 +7,13 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-var mockSandboxEmailer mocks.MockEmailer
+var mockSandboxEmailer mocks.Emailer
 
 func TestSandboxProcessor_StartProcessingSuccess(t *testing.T) {
 	msgChan := make(chan []byte, 1)
@@ -27,7 +28,7 @@ func TestSandboxProcessor_StartProcessingSuccess(t *testing.T) {
 		return nil
 	}
 
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	assert.Nil(t, testSandboxProcessor.(*SandboxProcessor).run())
 }
 
@@ -46,7 +47,7 @@ func TestSandboxProcessor_StartProcessingError(t *testing.T) {
 	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 	go testSandboxProcessor.StartProcessing()
@@ -65,6 +66,7 @@ func TestSandboxProcessor_StartProcessingMessageError(t *testing.T) {
 }
 
 func TestSandboxProcessor_StartProcessingEmailError(t *testing.T) {
+	mockSandboxEmailer := mocks.Emailer{}
 	msgChan := make(chan []byte, 1)
 	msgChan <- msg
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
@@ -74,7 +76,7 @@ func TestSandboxProcessor_StartProcessingEmailError(t *testing.T) {
 		return emailError
 	}
 
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	assert.NotNil(t, testSandboxProcessor.(*SandboxProcessor).run())
 }
 
