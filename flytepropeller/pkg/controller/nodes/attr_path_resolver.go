@@ -256,7 +256,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 			// recursively convert the interface to literal
 			literal, err := convertInterfaceToLiteral(nodeID, v)
 			if err != nil {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "Failed to resolve interface to literal scalar")
+				return nil, err
 			}
 			literals = append(literals, literal)
 		}

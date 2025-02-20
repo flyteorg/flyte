@@ -567,11 +567,6 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 		},
 	}
 
-	fmt.Println(toLiteralCollectionWithMsgpackBytes([]any{0, 1, 2, -1, -2}))
-	fmt.Println(flyteFile)
-	fmt.Println(flyteDirectory)
-	fmt.Println(literalNestedDC)
-
 	args := []struct {
 		literal  *core.Literal
 		path     []*core.PromiseAttribute
