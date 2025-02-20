@@ -173,9 +173,8 @@ func TestCreateTask_ValidationError(t *testing.T) {
 func TestCreateTask_CompilerError(t *testing.T) {
 	mockCompiler := &workflowMocks.Compiler{}
 	expectedErr := errors.New("expected error")
-	mockCompiler.On("CompileTask", mock.AnythingOfType("*core.TaskTemplate")).Return(func(taskTemplate *core.TaskTemplate) (*core.CompiledTask, error) {
-		return nil, expectedErr
-	})
+	mockCompiler.On("CompileTask", mock.MatchedBy(func(*core.TaskTemplate) bool { return true })).Return(nil, expectedErr)
+
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), mockCompiler,
 		mockScope.NewTestScope())

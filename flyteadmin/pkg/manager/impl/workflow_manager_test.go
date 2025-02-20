@@ -232,9 +232,7 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 	expectedErr := errors.New("expected error")
 	mockCompiler := workflowengineMocks.Compiler{}
-	mockCompiler.On("GetRequirements", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate")).Return(func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (compiler.WorkflowExecutionRequirements, error) {
-		return compiler.WorkflowExecutionRequirements{}, nil
-	})
+	mockCompiler.On("GetRequirements", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate")).Return(compiler.WorkflowExecutionRequirements{}, nil)
 
 	mockCompiler.On("CompileWorkflow", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.CompiledTask"), mock.AnythingOfType("[]common.InterfaceProvider")).Return(func(primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask, launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
 		return &core.CompiledWorkflowClosure{}, expectedErr
