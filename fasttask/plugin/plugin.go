@@ -373,10 +373,21 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 		return nil, core.PhaseInfoUndefined, err
 	}
 
+	// compile environment variables
+	envVars := make(map[string]string)
+	for k, v := range tCtx.TaskExecutionMetadata().GetEnvironmentVariables() {
+		envVars[k] = v
+	}
+	for _, envVar := range flytek8s.GetContextEnvVars(ctx) {
+		envVars[envVar.Name] = envVar.Value
+	}
+	for _, envVar := range flytek8s.GetExecutionEnvVars(tCtx.TaskExecutionMetadata().GetTaskExecutionID(), "") {
+		envVars[envVar.Name] = envVar.Value
+	}
+
 	// offer the work to the queue
 	queueID := fastTaskEnvironment.GetQueueId()
 	ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-	envVars := tCtx.TaskExecutionMetadata().GetEnvironmentVariables()
 	workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
