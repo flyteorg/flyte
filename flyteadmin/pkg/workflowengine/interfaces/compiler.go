@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 )
 
-//go:generate mockery-v2 --name=Compiler --output=../mocks --case=underscore --with-expecter
+//go:generate mockery-v2 --name=Compiler --output=../mocks --case=underscore
 
 // Workflow compiler interface.
 type Compiler interface {
