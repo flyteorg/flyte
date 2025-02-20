@@ -185,62 +185,18 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	}
 
 	// Check if the current value is a primitive type, and if it is convert that to a literal scalar
-	if _, ok := currVal.(string); ok {
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_StringValue{
-								StringValue: currVal.(string),
-							},
-						},
-					},
-				},
-			},
-		}, nil
-	} else if _, ok := currVal.(int); ok {
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Integer{
-								Integer: int64(currVal.(int)),
-							},
-						},
-					},
-				},
-			},
-		}, nil
-	} else if _, ok := currVal.(float64); ok {
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_FloatValue{
-								FloatValue: currVal.(float64),
-							},
-						},
-					},
-				},
-			},
-		}, nil
-	} else if _, ok := currVal.(bool); ok {
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Boolean{
-								Boolean: currVal.(bool),
-							},
-						},
-					},
-				},
-			},
-		}, nil
+
+	if isPrimitiveType(currVal) {
+		primitiveLiteral, err := convertInterfaceToLiteralScalar(nodeID, currVal)
+		if err != nil {
+			return nil, err
+		}
+		if primitiveLiteral != nil {
+			// wrap this in a core.literal
+			return &core.Literal{
+				Value: primitiveLiteral,
+			}, nil
+		}
 	}
 
 	// Marshal the current value to MessagePack bytes
@@ -250,6 +206,15 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	}
 	// Construct and return the binary-encoded literal
 	return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
+}
+
+// isPrimitiveType checks if the value is a primitive type
+func isPrimitiveType(value any) bool {
+	switch value.(type) {
+	case string, uint8, uint16, uint32, uint64, uint, int8, int16, int32, int64, int, float32, float64, bool:
+		return true
+	}
+	return false
 }
 
 func constructResolvedBinary(resolvedBinaryBytes []byte, serializationFormat string) *core.Literal {
@@ -291,7 +256,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 			// recursively convert the interface to literal
 			literal, err := convertInterfaceToLiteral(nodeID, v)
 			if err != nil {
-				return nil, err
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "Failed to resolve interface to literal scalar")
 			}
 			literals = append(literals, literal)
 		}
@@ -301,7 +266,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 			},
 		}
 	case interface{}:
-		scalar, err := convertInterfaceToLiteralScalar(nodeID, obj)
+		scalar, err := convertInterfaceToLiteralScalarWithNodeID(nodeID, obj)
 		if err != nil {
 			return nil, err
 		}
@@ -318,6 +283,24 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 	switch obj := obj.(type) {
 	case string:
 		value.Value = &core.Primitive_StringValue{StringValue: obj}
+	case uint8:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case uint16:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case uint32:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case uint64:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)} // #nosec G115
+	case uint:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)} // #nosec G115
+	case int8:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case int16:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case int32:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case int64:
+		value.Value = &core.Primitive_Integer{Integer: obj}
 	case int:
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
 	case float64:
@@ -325,7 +308,7 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 	case bool:
 		value.Value = &core.Primitive_Boolean{Boolean: obj}
 	default:
-		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "Failed to resolve interface to literal scalar")
+		return nil, errors.Errorf(errors.InvalidPrimitiveType, nodeID, "Failed to resolve interface to literal scalar")
 	}
 
 	return &core.Literal_Scalar{
@@ -335,4 +318,12 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 			},
 		},
 	}, nil
+}
+
+func convertInterfaceToLiteralScalarWithNodeID(nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
+	literal, err := convertInterfaceToLiteralScalar(nodeID, obj)
+	if err != nil {
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "Failed to resolve interface to literal scalar")
+	}
+	return literal, nil
 }
