@@ -85,13 +85,13 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetAnnotations(), objectMeta.Annotations)
 	mergeMapInto(taskCtx.TaskExecutionMetadata().GetLabels(), objectMeta.Labels)
 
-	workerSpec, err := createWorkerSpec(daskJob.GetWorkers(), podSpec, primaryContainerName)
+	workerSpec, err := createWorkerSpec(daskJob.GetWorkers(), podSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
 
 	clusterName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	schedulerSpec, err := createSchedulerSpec(daskJob.GetScheduler(), clusterName, nonInterruptiblePodSpec, primaryContainerName)
+	schedulerSpec, err := createSchedulerSpec(daskJob.GetScheduler(), clusterName, nonInterruptiblePodSpec, primaryContainerName, taskCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,8 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return job, nil
 }
 
-func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.WorkerSpec, error) {
+func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string,
+	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.WorkerSpec, error) {
 	workerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(workerPodSpec, primaryContainerName)
 	if err != nil {
@@ -133,6 +134,8 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 		if err != nil {
 			return nil, err
 		}
+
+		*resources = flytek8s.ApplyK8sResourceOverrides(teMetadata, resources)
 	}
 	if resources == nil {
 		resources = &v1.ResourceRequirements{}
@@ -174,7 +177,8 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 	}, nil
 }
 
-func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.SchedulerSpec, error) {
+func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string,
+	teMetadata pluginsCore.TaskExecutionMetadata) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
 	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)
 	if err != nil {
@@ -195,6 +199,8 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 		if err != nil {
 			return nil, err
 		}
+
+		*resources = flytek8s.ApplyK8sResourceOverrides(teMetadata, resources)
 	}
 	primaryContainer.Resources = *resources
 
