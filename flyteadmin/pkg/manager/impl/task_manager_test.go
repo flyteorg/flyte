@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -52,7 +53,12 @@ func init() {
 }
 
 func getMockTaskCompiler() workflowengine.Compiler {
-	return &workflowMocks.Compiler{}
+	compiler := &workflowMocks.Compiler{}
+	compiler.On("CompileTask", mock.AnythingOfType("*core.TaskTemplate")).Return(func(taskTemplate *core.TaskTemplate) (*core.CompiledTask, error) {
+		return &core.CompiledTask{Template: taskTemplate}, nil
+	})
+
+	return compiler
 }
 
 func getMockTaskRepository() interfaces.Repository {
@@ -167,7 +173,9 @@ func TestCreateTask_ValidationError(t *testing.T) {
 func TestCreateTask_CompilerError(t *testing.T) {
 	mockCompiler := &workflowMocks.Compiler{}
 	expectedErr := errors.New("expected error")
-
+	mockCompiler.On("CompileTask", mock.AnythingOfType("*core.TaskTemplate")).Return(func(taskTemplate *core.TaskTemplate) (*core.CompiledTask, error) {
+		return nil, expectedErr
+	})
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), mockCompiler,
 		mockScope.NewTestScope())
