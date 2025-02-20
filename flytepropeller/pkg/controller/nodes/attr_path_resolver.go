@@ -185,14 +185,12 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	}
 
 	// Check if the current value is a primitive type, and if it is convert that to a literal scalar
-
 	if isPrimitiveType(currVal) {
 		primitiveLiteral, err := convertInterfaceToLiteralScalar(nodeID, currVal)
 		if err != nil {
 			return nil, err
 		}
 		if primitiveLiteral != nil {
-			// wrap this in a core.literal
 			return &core.Literal{
 				Value: primitiveLiteral,
 			}, nil
