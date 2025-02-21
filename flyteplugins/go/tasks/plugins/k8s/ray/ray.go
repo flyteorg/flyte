@@ -535,7 +535,7 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.GetPodSpec(), err.Error())
 	}
 
-	podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainer.Name, "")
+	podSpec, err = flytek8s.MergePodSpecs(nil, podSpec, customPodSpec, primaryContainer.Name, "")
 	if err != nil {
 		return nil, err
 	}
