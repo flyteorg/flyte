@@ -9,6 +9,7 @@ import (
 
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -1719,21 +1720,166 @@ func TestResolveAttrPathInBinary(t *testing.T) {
 				}
 			}
 
-			// // special-case int64 and uint for comparison because msgpack unmarshals int64 as int64 and uint8 as uint8
-			// if expectedValueInt, ok := expectedValue.(int64); ok {
-			// 	if actualValueInt, ok := actualValue.(uint8); ok {
-			// 		// Compare the int64 and uint8 values
-			// 		if expectedValueInt != int64(actualValueInt) {
-			// 			t.Fatalf("Test case %d: Expected %v, but got %v", i, expectedValueInt, actualValueInt)
-			// 		}
-			// 	}
-			// 	// Deeply compare the expected and actual values, ignoring map ordering
-			// } else if !reflect.DeepEqual(expectedValue, actualValue) {
-			// 	t.Fatalf("Test case %d: %+v %+v Expected %+v, but got %+v", i, reflect.TypeOf(expectedValue), reflect.TypeOf(actualValue), expectedValue, actualValue)
-			// }
 			if !reflect.DeepEqual(expectedValue, actualValue) {
 				t.Fatalf("Test case %d: %+v %+v Expected %+v, but got %+v", i, reflect.TypeOf(expectedValue), reflect.TypeOf(actualValue), expectedValue, actualValue)
 			}
+		}
+	}
+}
+
+func TestConvertInterfaceToLiteralScalarBigUint64(t *testing.T) {
+	// Test the conversion of uint64 to a literal scalar
+	args := []struct {
+		value        interface{}
+		expectedType *core.Scalar_Primitive
+		hasError     bool
+	}{
+		{
+			value:        uint64(math.MaxInt64 + 1),
+			expectedType: nil,
+			hasError:     true,
+		},
+		{
+			value:        uint(math.MaxInt + 1),
+			expectedType: nil,
+			hasError:     true,
+		},
+		{
+			value: "abc",
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_StringValue{StringValue: "abc"},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: uint8(255),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: 255},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: uint16(65535),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: 65535},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: uint32(4294967295),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: 4294967295},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: int8(-128),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: -128},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: int16(-32768),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: -32768},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: int32(-2147483648),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: -2147483648},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: int64(-9223372036854775808),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Integer{Integer: -9223372036854775808},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: float32(1.0),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_FloatValue{FloatValue: 1.0},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: -math.MaxFloat32,
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_FloatValue{FloatValue: -math.MaxFloat32},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: math.MaxFloat32 + 1,
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_FloatValue{FloatValue: math.MaxFloat32 + 1},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: float64(3.141592653589793),
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_FloatValue{FloatValue: 3.141592653589793},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: math.MaxFloat64,
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_FloatValue{FloatValue: math.MaxFloat64},
+				},
+			},
+			hasError: false,
+		},
+		{
+			value: true,
+			expectedType: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{
+					Value: &core.Primitive_Boolean{Boolean: true},
+				},
+			},
+			hasError: false,
+		},
+	}
+
+	for _, arg := range args {
+		converted, err := convertInterfaceToLiteralScalar("", arg.value)
+		if arg.hasError {
+			assert.Error(t, err)
+			assert.ErrorContains(t, err, errors.InvalidPrimitiveType)
+		} else {
+			assert.NoError(t, err)
+			assert.True(t, proto.Equal(arg.expectedType.Primitive, converted.Scalar.GetPrimitive()))
 		}
 	}
 }

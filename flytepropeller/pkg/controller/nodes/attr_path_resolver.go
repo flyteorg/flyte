@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"context"
+	"math"
 
 	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -288,8 +289,14 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 	case uint32:
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
 	case uint64:
+		if obj > math.MaxInt64 {
+			return nil, errors.Errorf(errors.InvalidPrimitiveType, nodeID, "uint64 value is too large to be converted to int64")
+		}
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)} // #nosec G115
 	case uint:
+		if obj > math.MaxInt64 {
+			return nil, errors.Errorf(errors.InvalidPrimitiveType, nodeID, "uint value is too large to be converted to int64")
+		}
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)} // #nosec G115
 	case int8:
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
@@ -301,6 +308,8 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 		value.Value = &core.Primitive_Integer{Integer: obj}
 	case int:
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case float32:
+		value.Value = &core.Primitive_FloatValue{FloatValue: float64(obj)}
 	case float64:
 		value.Value = &core.Primitive_FloatValue{FloatValue: obj}
 	case bool:
