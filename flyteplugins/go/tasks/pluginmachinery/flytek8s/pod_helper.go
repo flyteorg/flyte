@@ -670,8 +670,8 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 		return podSpec, objectMeta, nil
 	}
 
-	// merge podSpec with podTemplate
-	mergedPodSpec, err := MergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	// merge podTemplate onto podSpec
+	mergedPodSpec, err := MergePodSpecs(podSpec, &podTemplate.Template.Spec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -688,47 +688,51 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 // MergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
 // set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
 // container-level configuration from the basePodSpec.
-func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
-	if basePodSpec == nil || podSpec == nil {
-		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
+func MergePodSpecs(basePodSpec *v1.PodSpec, otherPodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
+	if basePodSpec == nil || otherPodSpec == nil {
+		return nil, errors.New("neither the basePodSpec or the otherPodSpec can be nil")
 	}
 
-	// extract defaultContainerTemplate and primaryContainerTemplate
+	// extract primaryContainerTemplate. The base should always contain the primary container.
 	var defaultContainerTemplate, primaryContainerTemplate *v1.Container
-	for i := 0; i < len(basePodSpec.Containers); i++ {
-		if basePodSpec.Containers[i].Name == defaultContainerTemplateName {
-			defaultContainerTemplate = &basePodSpec.Containers[i]
-		} else if basePodSpec.Containers[i].Name == primaryContainerName {
-			primaryContainerTemplate = &basePodSpec.Containers[i]
+
+	// extract default container template
+	for i := 0; i < len(otherPodSpec.Containers); i++ {
+		if otherPodSpec.Containers[i].Name == defaultContainerTemplateName {
+			defaultContainerTemplate = &otherPodSpec.Containers[i]
+		} else if primaryContainerName != primaryContainerTemplateName && otherPodSpec.Containers[i].Name == primaryContainerTemplateName {
+			primaryContainerTemplate = &otherPodSpec.Containers[i]
 		}
 	}
 
-	// extract defaultInitContainerTemplate and primaryInitContainerTemplate
+	// extract primaryInitContainerTemplate. The base should always contain the primary container.
 	var defaultInitContainerTemplate, primaryInitContainerTemplate *v1.Container
-	for i := 0; i < len(basePodSpec.InitContainers); i++ {
-		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
-			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
-		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerName {
-			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
+
+	// extract defaultInitContainerTemplate
+	for i := 0; i < len(otherPodSpec.InitContainers); i++ {
+		if otherPodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+			defaultInitContainerTemplate = &otherPodSpec.InitContainers[i]
+		} else if primaryInitContainerName != primaryInitContainerTemplateName && otherPodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+			primaryInitContainerTemplate = &otherPodSpec.InitContainers[i]
 		}
 	}
 
-	// merge PodTemplate PodSpec with podSpec
-	var mergedPodSpec *v1.PodSpec = basePodSpec.DeepCopy()
-	if err := mergo.Merge(mergedPodSpec, podSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+	// merge PodTemplate PodSpec with otherPodSpec
+	var mergedPodSpec = basePodSpec.DeepCopy()
+	if err := mergo.Merge(mergedPodSpec, otherPodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, err
 	}
 
 	// merge PodTemplate containers
 	var mergedContainers []v1.Container
-	for _, container := range podSpec.Containers {
+	for _, container := range basePodSpec.Containers {
 		// if applicable start with defaultContainerTemplate
 		var mergedContainer *v1.Container
 		if defaultContainerTemplate != nil {
 			mergedContainer = defaultContainerTemplate.DeepCopy()
 		}
 
-		// if applicable merge with primaryContainerTemplate
+		// If this is a primary container handle the template
 		if container.Name == primaryContainerName && primaryContainerTemplate != nil {
 			if mergedContainer == nil {
 				mergedContainer = primaryContainerTemplate.DeepCopy()
@@ -740,35 +744,41 @@ func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			}
 		}
 
-		// if applicable merge with existing container
+		// if there is no default container this is the base. Otherwise merge it on top of the default
 		if mergedContainer == nil {
-			mergedContainers = append(mergedContainers, container)
-		} else {
+			mergedContainer = container.DeepCopy()
+		} else if container.Name != primaryContainerTemplateName {
 			err := mergo.Merge(mergedContainer, container, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
 			}
-
-			mergedContainers = append(mergedContainers, *mergedContainer)
 		}
-	}
 
-	if mergedContainers == nil {
-		mergedContainers = basePodSpec.Containers
+		for _, otherContainer := range otherPodSpec.Containers {
+			if mergedContainer.Name == otherContainer.Name {
+				err := mergo.Merge(mergedContainer, otherContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		mergedContainers = append(mergedContainers, *mergedContainer)
+
 	}
 
 	mergedPodSpec.Containers = mergedContainers
 
 	// merge PodTemplate init containers
 	var mergedInitContainers []v1.Container
-	for _, initContainer := range podSpec.InitContainers {
+	for _, initContainer := range basePodSpec.InitContainers {
 		// if applicable start with defaultContainerTemplate
 		var mergedInitContainer *v1.Container
 		if defaultInitContainerTemplate != nil {
 			mergedInitContainer = defaultInitContainerTemplate.DeepCopy()
 		}
 
-		// if applicable merge with primaryInitContainerTemplate
+		// If this is a primary init container handle the template
 		if initContainer.Name == primaryInitContainerName && primaryInitContainerTemplate != nil {
 			if mergedInitContainer == nil {
 				mergedInitContainer = primaryInitContainerTemplate.DeepCopy()
@@ -780,21 +790,26 @@ func MergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			}
 		}
 
-		// if applicable merge with existing init initContainer
+		// if there is no default container this is the base. Otherwise merge it on top of the default
 		if mergedInitContainer == nil {
-			mergedInitContainers = append(mergedInitContainers, initContainer)
+			mergedInitContainer = initContainer.DeepCopy()
 		} else {
 			err := mergo.Merge(mergedInitContainer, initContainer, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
 			}
-
-			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 		}
-	}
 
-	if mergedInitContainers == nil {
-		mergedInitContainers = basePodSpec.InitContainers
+		for _, otherInitContainer := range otherPodSpec.InitContainers {
+			if mergedInitContainer.Name == otherInitContainer.Name {
+				err := mergo.Merge(mergedInitContainer, otherInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 	}
 
 	mergedPodSpec.InitContainers = mergedInitContainers
