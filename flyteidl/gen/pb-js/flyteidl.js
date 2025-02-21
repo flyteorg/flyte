@@ -14820,6 +14820,7 @@
                  * @property {number} MEMORY=3 MEMORY value
                  * @property {number} STORAGE=4 STORAGE value
                  * @property {number} EPHEMERAL_STORAGE=5 EPHEMERAL_STORAGE value
+                 * @property {number} OOM_RESERVED_MEMORY=7 OOM_RESERVED_MEMORY value
                  */
                 Resources.ResourceName = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -14829,6 +14830,7 @@
                     values[valuesById[3] = "MEMORY"] = 3;
                     values[valuesById[4] = "STORAGE"] = 4;
                     values[valuesById[5] = "EPHEMERAL_STORAGE"] = 5;
+                    values[valuesById[7] = "OOM_RESERVED_MEMORY"] = 7;
                     return values;
                 })();
     
@@ -14840,7 +14842,6 @@
                      * @interface IResourceEntry
                      * @property {flyteidl.core.Resources.ResourceName|null} [name] ResourceEntry name
                      * @property {string|null} [value] ResourceEntry value
-                     * @property {string|null} [addValueOnOom] ResourceEntry addValueOnOom
                      */
     
                     /**
@@ -14875,14 +14876,6 @@
                     ResourceEntry.prototype.value = "";
     
                     /**
-                     * ResourceEntry addValueOnOom.
-                     * @member {string} addValueOnOom
-                     * @memberof flyteidl.core.Resources.ResourceEntry
-                     * @instance
-                     */
-                    ResourceEntry.prototype.addValueOnOom = "";
-    
-                    /**
                      * Creates a new ResourceEntry instance using the specified properties.
                      * @function create
                      * @memberof flyteidl.core.Resources.ResourceEntry
@@ -14910,8 +14903,6 @@
                             writer.uint32(/* id 1, wireType 0 =*/8).int32(message.name);
                         if (message.value != null && message.hasOwnProperty("value"))
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.value);
-                        if (message.addValueOnOom != null && message.hasOwnProperty("addValueOnOom"))
-                            writer.uint32(/* id 3, wireType 2 =*/26).string(message.addValueOnOom);
                         return writer;
                     };
     
@@ -14938,9 +14929,6 @@
                                 break;
                             case 2:
                                 message.value = reader.string();
-                                break;
-                            case 3:
-                                message.addValueOnOom = reader.string();
                                 break;
                             default:
                                 reader.skipType(tag & 7);
@@ -14971,14 +14959,12 @@
                             case 3:
                             case 4:
                             case 5:
+                            case 7:
                                 break;
                             }
                         if (message.value != null && message.hasOwnProperty("value"))
                             if (!$util.isString(message.value))
                                 return "value: string expected";
-                        if (message.addValueOnOom != null && message.hasOwnProperty("addValueOnOom"))
-                            if (!$util.isString(message.addValueOnOom))
-                                return "addValueOnOom: string expected";
                         return null;
                     };
     

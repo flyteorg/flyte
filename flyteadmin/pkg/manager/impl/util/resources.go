@@ -41,6 +41,9 @@ func getTaskResourcesAsSet(ctx context.Context, identifier *core.Identifier,
 				fmt.Sprintf("%v.ephemeral storage", resourceName), entry.GetValue())
 		case core.Resources_GPU:
 			result.GPU = parseQuantityNoError(ctx, identifier.String(), "gpu", entry.GetValue())
+		case core.Resources_OOM_RESERVED_MEMORY:
+			result.OOMReservedMemory = parseQuantityNoError(ctx, identifier.String(),
+				fmt.Sprintf("%v.oom reserved memory", resourceName), entry.GetValue())
 		}
 	}
 

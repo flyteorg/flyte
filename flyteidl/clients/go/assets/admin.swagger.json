@@ -4383,10 +4383,6 @@
         "value": {
           "type": "string",
           "title": "Value must be a valid k8s quantity. See\nhttps://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80"
-        },
-        "add_value_on_oom": {
-          "type": "string",
-          "description": "The appended value to the memory value when the task is OOMKilled."
         }
       },
       "description": "Encapsulates a resource name and value."
@@ -4399,10 +4395,11 @@
         "GPU",
         "MEMORY",
         "STORAGE",
-        "EPHEMERAL_STORAGE"
+        "EPHEMERAL_STORAGE",
+        "OOM_RESERVED_MEMORY"
       ],
       "default": "UNKNOWN",
-      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
+      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.\n - OOM_RESERVED_MEMORY: For OOM handling, we can request additional memory to be reserved for the task."
     },
     "RuntimeMetadataRuntimeType": {
       "type": "string",

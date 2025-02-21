@@ -23,21 +23,21 @@ class Resources(_message.Message):
         MEMORY: _ClassVar[Resources.ResourceName]
         STORAGE: _ClassVar[Resources.ResourceName]
         EPHEMERAL_STORAGE: _ClassVar[Resources.ResourceName]
+        OOM_RESERVED_MEMORY: _ClassVar[Resources.ResourceName]
     UNKNOWN: Resources.ResourceName
     CPU: Resources.ResourceName
     GPU: Resources.ResourceName
     MEMORY: Resources.ResourceName
     STORAGE: Resources.ResourceName
     EPHEMERAL_STORAGE: Resources.ResourceName
+    OOM_RESERVED_MEMORY: Resources.ResourceName
     class ResourceEntry(_message.Message):
-        __slots__ = ["name", "value", "add_value_on_oom"]
+        __slots__ = ["name", "value"]
         NAME_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
-        ADD_VALUE_ON_OOM_FIELD_NUMBER: _ClassVar[int]
         name: Resources.ResourceName
         value: str
-        add_value_on_oom: str
-        def __init__(self, name: _Optional[_Union[Resources.ResourceName, str]] = ..., value: _Optional[str] = ..., add_value_on_oom: _Optional[str] = ...) -> None: ...
+        def __init__(self, name: _Optional[_Union[Resources.ResourceName, str]] = ..., value: _Optional[str] = ...) -> None: ...
     REQUESTS_FIELD_NUMBER: _ClassVar[int]
     LIMITS_FIELD_NUMBER: _ClassVar[int]
     requests: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]

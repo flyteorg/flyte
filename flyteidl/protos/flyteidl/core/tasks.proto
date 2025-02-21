@@ -24,6 +24,8 @@ message Resources {
         STORAGE = 4;
         // For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
         EPHEMERAL_STORAGE = 5;
+        // For OOM handling, we can request additional memory to be reserved for the task.
+        OOM_RESERVED_MEMORY = 7;
     }
 
     // Encapsulates a resource name and value.
@@ -34,9 +36,6 @@ message Resources {
         // Value must be a valid k8s quantity. See
         // https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80
         string value = 2;
-
-        // The appended value to the memory value when the task is OOMKilled.
-        string add_value_on_oom = 3;
     }
 
     // The desired set of resources requested. ResourceNames must be unique within the list.

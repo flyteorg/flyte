@@ -33,20 +33,10 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry, OOMCount uint3
 				k8sResources[v1.ResourceCPU] = v
 			}
 		case core.Resources_MEMORY:
-			if OOMCount > 0 {
-				addVal := r.GetAddValueOnOom()
-				addV, err := resource.ParseQuantity(addVal)
-				if err != nil {
-					return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
-				}
-				if !addV.IsZero() {
-					for i := uint32(0); i < OOMCount; i++ {
-						v.Add(addV)
-					}
-				}
-			}
 			if !v.IsZero() {
-				k8sResources[v1.ResourceMemory] = v
+				memQuantity := k8sResources[v1.ResourceMemory]
+				memQuantity.Add(v)
+				k8sResources[v1.ResourceMemory] = memQuantity
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {
@@ -55,6 +45,14 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry, OOMCount uint3
 		case core.Resources_EPHEMERAL_STORAGE:
 			if !v.IsZero() {
 				k8sResources[v1.ResourceEphemeralStorage] = v
+			}
+		case core.Resources_OOM_RESERVED_MEMORY:
+			if !v.IsZero() {
+				memQuantity := k8sResources[v1.ResourceMemory]
+				for i := uint32(0); i < OOMCount; i++ {
+					memQuantity.Add(v)
+				}
+				k8sResources[v1.ResourceMemory] = memQuantity
 			}
 		}
 	}

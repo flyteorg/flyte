@@ -98,6 +98,13 @@ export enum Resources_ResourceName {
    * @generated from enum value: EPHEMERAL_STORAGE = 5;
    */
   EPHEMERAL_STORAGE = 5,
+
+  /**
+   * For OOM handling, we can request additional memory to be reserved for the task.
+   *
+   * @generated from enum value: OOM_RESERVED_MEMORY = 7;
+   */
+  OOM_RESERVED_MEMORY = 7,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Resources_ResourceName)
 proto3.util.setEnumType(Resources_ResourceName, "flyteidl.core.Resources.ResourceName", [
@@ -107,6 +114,7 @@ proto3.util.setEnumType(Resources_ResourceName, "flyteidl.core.Resources.Resourc
   { no: 3, name: "MEMORY" },
   { no: 4, name: "STORAGE" },
   { no: 5, name: "EPHEMERAL_STORAGE" },
+  { no: 7, name: "OOM_RESERVED_MEMORY" },
 ]);
 
 /**
@@ -130,13 +138,6 @@ export class Resources_ResourceEntry extends Message<Resources_ResourceEntry> {
    */
   value = "";
 
-  /**
-   * The appended value to the memory value when the task is OOMKilled.
-   *
-   * @generated from field: string add_value_on_oom = 3;
-   */
-  addValueOnOom = "";
-
   constructor(data?: PartialMessage<Resources_ResourceEntry>) {
     super();
     proto3.util.initPartial(data, this);
@@ -147,7 +148,6 @@ export class Resources_ResourceEntry extends Message<Resources_ResourceEntry> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "enum", T: proto3.getEnumType(Resources_ResourceName) },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "add_value_on_oom", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resources_ResourceEntry {
