@@ -59,6 +59,7 @@ const (
 	principal             = "principal"
 	rawOutput             = "raw_output"
 	executionClusterLabel = "execution_cluster_label"
+	launchPlanParallelism = int32(42)
 )
 
 var spec = testutils.GetExecutionRequest().GetSpec()
@@ -179,6 +180,8 @@ func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 
 func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 	lpSpec := testutils.GetSampleLpSpecForTest()
+
+	lpSpec.MaxParallelism = launchPlanParallelism
 	lpSpec.Labels = &admin.Labels{
 		Values: map[string]string{
 			"label1": "1",
@@ -319,6 +322,7 @@ func TestCreateExecution(t *testing.T) {
 			assert.True(t, proto.Equal(spec.GetClusterAssignment(), &clusterAssignment))
 			assert.Equal(t, "launch_plan", input.LaunchEntity)
 			assert.Equal(t, spec.GetMetadata().GetSystemMetadata().GetNamespace(), "project-domain")
+			assert.Equal(t, launchPlanParallelism, spec.GetMaxParallelism())
 			return nil
 		})
 	setDefaultLpCallbackForExecTest(repository)
