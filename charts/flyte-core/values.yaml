@@ -291,9 +291,22 @@ flyteagent:
           endpoint: "k8s://flyteagent.flyte:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
+          # -- Timeouts for each operation, if not specified, the default timeout will be used.
+          timeouts:
+            CreateTask: 10s
+            GetTask: 10s
+            DeleteTask: 10s
+            ExecuteTaskSync: 10s
+          defaultTimeout: 10s
         # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
         # need to be configured.
         supportedTaskTypes: []
+        agents:
+          custom_agent:
+            endpoint: "k8s://flyte_custom_agent.flyte:8000"
+            insecure: true
+        agentForTaskTypes:
+          - noop_task: custom_agent
   # -- Labels for flyteagent pods
   podLabels: {}
 
