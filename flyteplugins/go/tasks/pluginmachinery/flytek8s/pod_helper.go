@@ -686,8 +686,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	return mergedPodSpec, mergedObjectMeta, nil
 }
 
-// MergeBasePodSpecOntoTemplate merges different types of pod specs. This process uses the first as an optional pod template spec, the
-// second as the required main pod spec, and the third as an optional overlay/override. The pod template spec has some
+// MergeBasePodSpecOntoTemplate merges a base pod spec onto a template pod spec. The template pod spec has some
 // magic values that allow users to specify templates that target all containers and primary containers. Aside from
 // magic values this method will merge containers that have matching names.
 func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
@@ -835,6 +834,8 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 	return mergedPodSpec, nil
 }
 
+// MergeOverlayPodSpecOntoBase merges a customized pod spec onto a base pod spec. At a container level it will
+// merge containers that have matching names.
 func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.PodSpec) (*v1.PodSpec, error) {
 	if basePodSpec == nil || overlayPodSpec == nil {
 		return nil, errors.New("basePodSpec and overlayPodSpec must not be nil")
