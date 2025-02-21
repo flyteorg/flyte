@@ -1077,7 +1077,7 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	// Set the max parallelism based on the execution config (calculated based on multiple levels of settings)
-	requestSpec.MaxParallelism = executionConfig.MaxParallelism
+	requestSpec.MaxParallelism = executionConfig.GetMaxParallelism()
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
