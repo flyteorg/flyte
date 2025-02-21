@@ -282,6 +282,38 @@ func (_m *TaskExecutionMetadata) GetNamespace() string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetOOMFailures struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetOOMFailures) Return(_a0 uint32) *TaskExecutionMetadata_GetOOMFailures {
+	return &TaskExecutionMetadata_GetOOMFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetOOMFailures() *TaskExecutionMetadata_GetOOMFailures {
+	c_call := _m.On("GetOOMFailures")
+	return &TaskExecutionMetadata_GetOOMFailures{Call: c_call}
+}
+
+func (_m *TaskExecutionMetadata) OnGetOOMFailuresMatch(matchers ...interface{}) *TaskExecutionMetadata_GetOOMFailures {
+	c_call := _m.On("GetOOMFailures", matchers...)
+	return &TaskExecutionMetadata_GetOOMFailures{Call: c_call}
+}
+
+// GetOOMFailures provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetOOMFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetOverrides struct {
 	*mock.Call
 }

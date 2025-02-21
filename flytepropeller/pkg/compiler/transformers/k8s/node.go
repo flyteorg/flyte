@@ -68,7 +68,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 	}
 
-	res, err := flytek8s.ToK8sResourceRequirements(resources)
+	res, err := flytek8s.ToK8sResourceRequirements(resources, 0)
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, false

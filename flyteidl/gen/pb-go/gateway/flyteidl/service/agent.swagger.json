@@ -508,6 +508,10 @@
         "value": {
           "type": "string",
           "title": "Value must be a valid k8s quantity. See\nhttps://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80"
+        },
+        "add_value_on_oom": {
+          "type": "string",
+          "description": "The appended value to the memory value when the task is OOMKilled."
         }
       },
       "description": "Encapsulates a resource name and value."

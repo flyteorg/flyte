@@ -19,7 +19,7 @@ func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 
 // TODO we should modify the container resources to contain a map of enum values?
 // Also we should probably create tolerations / taints, but we could do that as a post process
-func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceList, error) {
+func ToK8sResourceList(resources []*core.Resources_ResourceEntry, OOMCount uint32) (v1.ResourceList, error) {
 	k8sResources := make(v1.ResourceList, len(resources))
 	for _, r := range resources {
 		rVal := r.GetValue()
@@ -33,6 +33,18 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 				k8sResources[v1.ResourceCPU] = v
 			}
 		case core.Resources_MEMORY:
+			if OOMCount > 0 {
+				addVal := r.GetAddValueOnOom()
+				addV, err := resource.ParseQuantity(addVal)
+				if err != nil {
+					return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+				}
+				if !addV.IsZero() {
+					for i := uint32(0); i < OOMCount; i++ {
+						v.Add(addV)
+					}
+				}
+			}
 			if !v.IsZero() {
 				k8sResources[v1.ResourceMemory] = v
 			}
@@ -49,16 +61,17 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 	return k8sResources, nil
 }
 
-func ToK8sResourceRequirements(resources *core.Resources) (*v1.ResourceRequirements, error) {
+func ToK8sResourceRequirements(resources *core.Resources, OOMCount uint32) (*v1.ResourceRequirements, error) {
+	// TODO: HERE!!!!!!!!!
 	res := &v1.ResourceRequirements{}
 	if resources == nil {
 		return res, nil
 	}
-	req, err := ToK8sResourceList(resources.GetRequests())
+	req, err := ToK8sResourceList(resources.GetRequests(), OOMCount)
 	if err != nil {
 		return res, err
 	}
-	lim, err := ToK8sResourceList(resources.GetLimits())
+	lim, err := ToK8sResourceList(resources.GetLimits(), OOMCount)
 	if err != nil {
 		return res, err
 	}

@@ -30,12 +30,14 @@ class Resources(_message.Message):
     STORAGE: Resources.ResourceName
     EPHEMERAL_STORAGE: Resources.ResourceName
     class ResourceEntry(_message.Message):
-        __slots__ = ["name", "value"]
+        __slots__ = ["name", "value", "add_value_on_oom"]
         NAME_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
+        ADD_VALUE_ON_OOM_FIELD_NUMBER: _ClassVar[int]
         name: Resources.ResourceName
         value: str
-        def __init__(self, name: _Optional[_Union[Resources.ResourceName, str]] = ..., value: _Optional[str] = ...) -> None: ...
+        add_value_on_oom: str
+        def __init__(self, name: _Optional[_Union[Resources.ResourceName, str]] = ..., value: _Optional[str] = ..., add_value_on_oom: _Optional[str] = ...) -> None: ...
     REQUESTS_FIELD_NUMBER: _ClassVar[int]
     LIMITS_FIELD_NUMBER: _ClassVar[int]
     requests: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]

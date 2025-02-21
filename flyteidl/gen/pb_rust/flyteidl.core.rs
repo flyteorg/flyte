@@ -1231,6 +1231,9 @@ pub mod resources {
         /// <https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80>
         #[prost(string, tag="2")]
         pub value: ::prost::alloc::string::String,
+        /// The appended value to the memory value when the task is OOMKilled.
+        #[prost(string, tag="3")]
+        pub add_value_on_oom: ::prost::alloc::string::String,
     }
     /// Known resource names.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

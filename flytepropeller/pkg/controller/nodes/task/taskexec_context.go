@@ -68,6 +68,7 @@ type taskExecutionMetadata struct {
 	taskExecID           taskExecutionID
 	o                    pluginCore.TaskOverrides
 	maxAttempts          uint32
+	OOMFailures          uint32
 	platformResources    *v1.ResourceRequirements
 	environmentVariables map[string]string
 }
@@ -82,6 +83,10 @@ func (t taskExecutionMetadata) GetOverrides() pluginCore.TaskOverrides {
 
 func (t taskExecutionMetadata) GetMaxAttempts() uint32 {
 	return t.maxAttempts
+}
+
+func (t taskExecutionMetadata) GetOOMFailures() uint32 {
+	return t.OOMFailures
 }
 
 func (t taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
@@ -290,6 +295,8 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		return nil, err
 	}
 
+	OOMFailures := nCtx.NodeStatus().GetOOMFailures()
+
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
@@ -301,6 +308,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 			},
 			o:                    nCtx.Node(),
 			maxAttempts:          maxAttempts,
+			OOMFailures:          OOMFailures,
 			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
 			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},

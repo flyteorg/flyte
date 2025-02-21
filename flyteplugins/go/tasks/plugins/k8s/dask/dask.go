@@ -129,7 +129,7 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 	resources := &primaryContainer.Resources
 	clusterResources := cluster.GetResources()
 	if len(clusterResources.GetRequests()) >= 1 || len(clusterResources.GetLimits()) >= 1 {
-		resources, err = flytek8s.ToK8sResourceRequirements(cluster.GetResources())
+		resources, err = flytek8s.ToK8sResourceRequirements(cluster.GetResources(), 0)
 		if err != nil {
 			return nil, err
 		}
@@ -191,7 +191,7 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 	resources := &primaryContainer.Resources
 	schedulerResources := scheduler.GetResources()
 	if len(schedulerResources.GetRequests()) >= 1 || len(schedulerResources.GetLimits()) >= 1 {
-		resources, err = flytek8s.ToK8sResourceRequirements(scheduler.GetResources())
+		resources, err = flytek8s.ToK8sResourceRequirements(scheduler.GetResources(), 0)
 		if err != nil {
 			return nil, err
 		}
