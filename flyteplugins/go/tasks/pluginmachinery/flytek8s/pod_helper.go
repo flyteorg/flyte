@@ -672,7 +672,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 
 	// merge podTemplate onto podSpec
 	templateSpec := &podTemplate.Template.Spec
-	mergedPodSpec, err := MergePodSpecs(templateSpec, podSpec, nil, primaryContainerName, primaryInitContainerName)
+	mergedPodSpec, err := MergeBasePodSpecOntoTemplate(templateSpec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -686,62 +686,45 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	return mergedPodSpec, mergedObjectMeta, nil
 }
 
-// MergePodSpecs merges different types of pod specs. This process uses the first as an optional pod template spec, the
+// MergeBasePodSpecOntoTemplate merges different types of pod specs. This process uses the first as an optional pod template spec, the
 // second as the required main pod spec, and the third as an optional overlay/override. The pod template spec has some
 // magic values that allow users to specify templates that target all containers and primary containers. Aside from
 // magic values this method will merge containers that have matching names.
-func MergePodSpecs(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, overlayPodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
-	if basePodSpec == nil {
-		return nil, errors.New("basePodSpec must not be nil")
-	}
-
-	if templatePodSpec == nil && overlayPodSpec == nil {
-		return nil, errors.New("templatePodSpec or overlayPodSpec must not be nil")
+func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
+	if templatePodSpec == nil || basePodSpec == nil {
+		return nil, errors.New("templatePodSpec and basePodSpec must not be nil")
 	}
 
 	// extract primaryContainerTemplate. The base should always contain the primary container.
 	var defaultContainerTemplate, primaryContainerTemplate *v1.Container
+
+	// extract default container template
+	for i := 0; i < len(templatePodSpec.Containers); i++ {
+		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
+			defaultContainerTemplate = &templatePodSpec.Containers[i]
+		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
+			primaryContainerTemplate = &templatePodSpec.Containers[i]
+		}
+	}
+
 	// extract primaryInitContainerTemplate. The base should always contain the primary container.
 	var defaultInitContainerTemplate, primaryInitContainerTemplate *v1.Container
 
-	if templatePodSpec != nil {
-		// extract default container template
-		for i := 0; i < len(templatePodSpec.Containers); i++ {
-			if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
-				defaultContainerTemplate = &templatePodSpec.Containers[i]
-			} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
-				primaryContainerTemplate = &templatePodSpec.Containers[i]
-			}
-		}
-
-		// extract defaultInitContainerTemplate
-		for i := 0; i < len(templatePodSpec.InitContainers); i++ {
-			if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
-				defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-			} else if primaryInitContainerName != primaryInitContainerTemplateName && templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
-				primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
-			}
+	// extract defaultInitContainerTemplate
+	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
+		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
+		} else if primaryInitContainerName != primaryInitContainerTemplateName && templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}
 
 	var mergedPodSpec *v1.PodSpec
 
 	// Merge base into template
-	if templatePodSpec != nil {
-		mergedPodSpec = templatePodSpec.DeepCopy()
-		if err := mergo.Merge(mergedPodSpec, basePodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
-			return nil, err
-		}
-	}
-
-	// Merge overlay into mergedPodSpec
-	if overlayPodSpec != nil {
-		if mergedPodSpec == nil {
-			mergedPodSpec = basePodSpec.DeepCopy()
-		}
-		if err := mergo.Merge(mergedPodSpec, overlayPodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
-			return nil, err
-		}
+	mergedPodSpec = templatePodSpec.DeepCopy()
+	if err := mergo.Merge(mergedPodSpec, basePodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+		return nil, err
 	}
 
 	// merge PodTemplate containers
@@ -766,19 +749,17 @@ func MergePodSpecs(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, overlay
 		}
 
 		// Check for any name matching template containers
-		if templatePodSpec != nil {
-			for _, templateContainer := range templatePodSpec.Containers {
-				if templateContainer.Name != container.Name {
-					continue
-				}
+		for _, templateContainer := range templatePodSpec.Containers {
+			if templateContainer.Name != container.Name {
+				continue
+			}
 
-				if mergedContainer == nil {
-					mergedContainer = &templateContainer
-				} else {
-					err := mergo.Merge(mergedContainer, templateContainer, mergo.WithOverride, mergo.WithAppendSlice)
-					if err != nil {
-						return nil, err
-					}
+			if mergedContainer == nil {
+				mergedContainer = &templateContainer
+			} else {
+				err := mergo.Merge(mergedContainer, templateContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
@@ -790,17 +771,6 @@ func MergePodSpecs(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, overlay
 			err := mergo.Merge(mergedContainer, container, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
-			}
-		}
-
-		if overlayPodSpec != nil {
-			for _, overlayContainer := range overlayPodSpec.Containers {
-				if mergedContainer.Name == overlayContainer.Name {
-					err := mergo.Merge(mergedContainer, overlayContainer, mergo.WithOverride, mergo.WithAppendSlice)
-					if err != nil {
-						return nil, err
-					}
-				}
 			}
 		}
 
@@ -832,19 +802,17 @@ func MergePodSpecs(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, overlay
 		}
 
 		// Check for any name matching template containers
-		if templatePodSpec != nil {
-			for _, templateInitContainer := range templatePodSpec.InitContainers {
-				if templateInitContainer.Name != initContainer.Name {
-					continue
-				}
+		for _, templateInitContainer := range templatePodSpec.InitContainers {
+			if templateInitContainer.Name != initContainer.Name {
+				continue
+			}
 
-				if mergedInitContainer == nil {
-					mergedInitContainer = &templateInitContainer
-				} else {
-					err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
-					if err != nil {
-						return nil, err
-					}
+			if mergedInitContainer == nil {
+				mergedInitContainer = &templateInitContainer
+			} else {
+				err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
@@ -859,17 +827,57 @@ func MergePodSpecs(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, overlay
 			}
 		}
 
-		if overlayPodSpec != nil {
-			for _, overlayInitContainer := range overlayPodSpec.InitContainers {
-				if mergedInitContainer.Name == overlayInitContainer.Name {
-					err := mergo.Merge(mergedInitContainer, overlayInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
-					if err != nil {
-						return nil, err
-					}
+		mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
+	}
+
+	mergedPodSpec.InitContainers = mergedInitContainers
+
+	return mergedPodSpec, nil
+}
+
+func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.PodSpec) (*v1.PodSpec, error) {
+	if basePodSpec == nil || overlayPodSpec == nil {
+		return nil, errors.New("basePodSpec and overlayPodSpec must not be nil")
+	}
+
+	mergedPodSpec := basePodSpec.DeepCopy()
+	if err := mergo.Merge(mergedPodSpec, overlayPodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+		return nil, err
+	}
+
+	// merge PodTemplate containers
+	var mergedContainers []v1.Container
+	for _, container := range basePodSpec.Containers {
+
+		mergedContainer := container.DeepCopy()
+
+		for _, overlayContainer := range overlayPodSpec.Containers {
+			if mergedContainer.Name == overlayContainer.Name {
+				err := mergo.Merge(mergedContainer, overlayContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
+		mergedContainers = append(mergedContainers, *mergedContainer)
+	}
 
+	mergedPodSpec.Containers = mergedContainers
+
+	// merge PodTemplate init containers
+	var mergedInitContainers []v1.Container
+	for _, initContainer := range basePodSpec.InitContainers {
+
+		mergedInitContainer := initContainer.DeepCopy()
+
+		for _, overlayInitContainer := range overlayPodSpec.InitContainers {
+			if mergedInitContainer.Name == overlayInitContainer.Name {
+				err := mergo.Merge(mergedInitContainer, overlayInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 	}
 
