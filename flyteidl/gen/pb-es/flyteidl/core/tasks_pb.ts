@@ -98,6 +98,13 @@ export enum Resources_ResourceName {
    * @generated from enum value: EPHEMERAL_STORAGE = 5;
    */
   EPHEMERAL_STORAGE = 5,
+
+  /**
+   * For OOM handling, we can request additional memory to be reserved for the task.
+   *
+   * @generated from enum value: OOM_RESERVED_MEMORY = 7;
+   */
+  OOM_RESERVED_MEMORY = 7,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Resources_ResourceName)
 proto3.util.setEnumType(Resources_ResourceName, "flyteidl.core.Resources.ResourceName", [
@@ -107,6 +114,7 @@ proto3.util.setEnumType(Resources_ResourceName, "flyteidl.core.Resources.Resourc
   { no: 3, name: "MEMORY" },
   { no: 4, name: "STORAGE" },
   { no: 5, name: "EPHEMERAL_STORAGE" },
+  { no: 7, name: "OOM_RESERVED_MEMORY" },
 ]);
 
 /**

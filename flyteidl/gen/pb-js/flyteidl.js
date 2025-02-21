@@ -14820,6 +14820,7 @@
                  * @property {number} MEMORY=3 MEMORY value
                  * @property {number} STORAGE=4 STORAGE value
                  * @property {number} EPHEMERAL_STORAGE=5 EPHEMERAL_STORAGE value
+                 * @property {number} OOM_RESERVED_MEMORY=7 OOM_RESERVED_MEMORY value
                  */
                 Resources.ResourceName = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -14829,6 +14830,7 @@
                     values[valuesById[3] = "MEMORY"] = 3;
                     values[valuesById[4] = "STORAGE"] = 4;
                     values[valuesById[5] = "EPHEMERAL_STORAGE"] = 5;
+                    values[valuesById[7] = "OOM_RESERVED_MEMORY"] = 7;
                     return values;
                 })();
     
@@ -14957,6 +14959,7 @@
                             case 3:
                             case 4:
                             case 5:
+                            case 7:
                                 break;
                             }
                         if (message.value != null && message.hasOwnProperty("value"))
