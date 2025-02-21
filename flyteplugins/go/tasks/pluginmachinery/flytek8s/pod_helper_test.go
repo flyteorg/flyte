@@ -2014,12 +2014,12 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 
 	t.Run("BasePodTemplateExists", func(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
-			Name:                   "foo",
+			Name:                   primaryContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-termination-log",
 		}
 
 		primaryInitContainerTemplate := v1.Container{
-			Name:                   "foo-init",
+			Name:                   primaryInitContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
@@ -2090,19 +2090,16 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
 
-	podSpec1, _ := MergePodSpecs(nil, nil, "foo", "foo-init")
+	podSpec1, _ := MergeBasePodSpecOntoTemplate(nil, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec1)
 
-	podSpec2, _ := MergePodSpecs(&v1.PodSpec{}, nil, "foo", "foo-init")
+	podSpec2, _ := MergeBasePodSpecOntoTemplate(nil, &v1.PodSpec{}, "foo", "foo-init")
 	assert.Nil(t, podSpec2)
-
-	podSpec3, _ := MergePodSpecs(nil, &v1.PodSpec{}, "foo", "foo-init")
-	assert.Nil(t, podSpec3)
 
 	podSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			v1.Container{
-				Name: "primary",
+				Name: "container",
 				VolumeMounts: []v1.VolumeMount{
 					{
 						Name:      "nccl",
@@ -2116,7 +2113,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 		InitContainers: []v1.Container{
 			v1.Container{
-				Name: "primary-init",
+				Name: "container-init",
 				VolumeMounts: []v1.VolumeMount{
 					{
 						Name:      "nccl",
@@ -2176,7 +2173,6 @@ func TestMergePodSpecs(t *testing.T) {
 		NodeSelector: map[string]string{
 			"foo": "bar",
 		},
-		SchedulerName: "defaultScheduler",
 		Tolerations: []v1.Toleration{
 			v1.Toleration{
 				Key: "foo",
@@ -2184,7 +2180,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := MergePodSpecs(&podTemplateSpec, &podSpec, "primary", "primary-init")
+	mergedPodSpec, err := MergeBasePodSpecOntoTemplate(&podTemplateSpec, &podSpec, podSpec.Containers[0].Name, podSpec.InitContainers[0].Name)
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -2198,7 +2194,7 @@ func TestMergePodSpecs(t *testing.T) {
 	// validate an appended array
 	assert.Equal(t, len(podTemplateSpec.Tolerations)+len(podSpec.Tolerations), len(mergedPodSpec.Tolerations))
 
-	// validate primary container
+	// validate first container
 	primaryContainer := mergedPodSpec.Containers[0]
 	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
