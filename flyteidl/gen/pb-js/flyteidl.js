@@ -24804,6 +24804,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {string|null} [outputPrefix] GetTaskRequest outputPrefix
                  */
     
                 /**
@@ -24846,6 +24847,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest outputPrefix.
+                 * @member {string} outputPrefix
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.outputPrefix = "";
+    
+                /**
                  * Creates a new GetTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -24875,6 +24884,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.outputPrefix);
                     return writer;
                 };
     
@@ -24904,6 +24915,9 @@
                             break;
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.outputPrefix = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24935,6 +24949,9 @@
                         if (error)
                             return "taskCategory." + error;
                     }
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        if (!$util.isString(message.outputPrefix))
+                            return "outputPrefix: string expected";
                     return null;
                 };
     

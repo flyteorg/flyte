@@ -129,14 +129,16 @@ class ExecuteTaskSyncResponse(_message.Message):
     def __init__(self, header: _Optional[_Union[ExecuteTaskSyncResponseHeader, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
-    __slots__ = ["task_type", "resource_meta", "task_category"]
+    __slots__ = ["task_type", "resource_meta", "task_category", "output_prefix"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     task_type: str
     resource_meta: bytes
     task_category: TaskCategory
-    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
+    output_prefix: str
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ..., output_prefix: _Optional[str] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
     __slots__ = ["resource"]
