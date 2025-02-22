@@ -209,7 +209,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 					"Unable to unmarshal driver pod spec [%v], Err: [%v]", driverPod.GetPodSpec(), err.Error())
 			}
 
-			podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
 			if err != nil {
 				return nil, err
 			}
@@ -262,7 +262,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 					"Unable to unmarshal executor pod spec [%v], Err: [%v]", executorPod.GetPodSpec(), err.Error())
 			}
 
-			podSpec, err = flytek8s.MergePodSpecs(podSpec, customPodSpec, primaryContainerName, "")
+			podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
 			if err != nil {
 				return nil, err
 			}
