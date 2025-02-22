@@ -8,6 +8,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -89,21 +91,19 @@ func getMockRepository(workflowOnGet bool) interfaces.Repository {
 }
 
 func getMockWorkflowCompiler() workflowengineInterfaces.Compiler {
-	mockCompiler := workflowengineMocks.NewMockCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddGetRequirementCallback(
-		func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (
-			reqs compiler.WorkflowExecutionRequirements, err error) {
-			return compiler.WorkflowExecutionRequirements{}, nil
-		})
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddCompileWorkflowCallback(func(
-		primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask,
-		launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
+	mockCompiler := &workflowengineMocks.Compiler{}
+	mockCompiler.On("GetRequirements", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate")).Return(func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (compiler.WorkflowExecutionRequirements, error) {
+		return compiler.WorkflowExecutionRequirements{}, nil
+	})
+
+	mockCompiler.On("CompileWorkflow", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.CompiledTask"), mock.AnythingOfType("[]common.InterfaceProvider")).Return(func(primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask, launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
 		return &core.CompiledWorkflowClosure{
 			Primary: &core.CompiledWorkflow{
 				Template: primaryWf,
 			},
 		}, nil
 	})
+
 	return mockCompiler
 }
 
@@ -213,12 +213,10 @@ func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
 
 func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 	expectedErr := errors.New("expected error")
-	mockCompiler := getMockWorkflowCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddGetRequirementCallback(
-		func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (
-			reqs compiler.WorkflowExecutionRequirements, err error) {
-			return compiler.WorkflowExecutionRequirements{}, expectedErr
-		})
+	mockCompiler := &workflowengineMocks.Compiler{}
+	mockCompiler.On("GetRequirements", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate")).Return(func(fg *core.WorkflowTemplate, subWfs []*core.WorkflowTemplate) (compiler.WorkflowExecutionRequirements, error) {
+		return compiler.WorkflowExecutionRequirements{}, expectedErr
+	})
 
 	workflowManager := NewWorkflowManager(
 		getMockRepository(!returnWorkflowOnGet),
@@ -233,16 +231,16 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 
 func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 	expectedErr := errors.New("expected error")
-	mockCompiler := getMockWorkflowCompiler()
-	mockCompiler.(*workflowengineMocks.MockCompiler).AddCompileWorkflowCallback(func(
-		primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask,
-		launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
+	mockCompiler := workflowengineMocks.Compiler{}
+	mockCompiler.On("GetRequirements", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate")).Return(compiler.WorkflowExecutionRequirements{}, nil)
+
+	mockCompiler.On("CompileWorkflow", mock.AnythingOfType("*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.WorkflowTemplate"), mock.AnythingOfType("[]*core.CompiledTask"), mock.AnythingOfType("[]common.InterfaceProvider")).Return(func(primaryWf *core.WorkflowTemplate, subworkflows []*core.WorkflowTemplate, tasks []*core.CompiledTask, launchPlans []engine.InterfaceProvider) (*core.CompiledWorkflowClosure, error) {
 		return &core.CompiledWorkflowClosure{}, expectedErr
 	})
 
 	workflowManager := NewWorkflowManager(
 		getMockRepository(!returnWorkflowOnGet),
-		getMockWorkflowConfigProvider(), mockCompiler, getMockStorage(), storagePrefix, mockScope.NewTestScope())
+		getMockWorkflowConfigProvider(), &mockCompiler, getMockStorage(), storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
 	assert.Nil(t, response)
