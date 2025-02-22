@@ -120,15 +120,24 @@ func NewExternalTokenSourceProvider(command []string) (TokenSourceProvider, erro
 }
 
 func (e ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	output, err := externalprocess.Execute(e.command)
+	return &externalCommandTokenSource{
+		command: e.command,
+	}, nil
+}
+
+type externalCommandTokenSource struct {
+	command []string
+}
+
+func (s *externalCommandTokenSource) Token() (*oauth2.Token, error) {
+	output, err := externalprocess.Execute(s.command)
 	if err != nil {
 		return nil, err
 	}
-
-	return oauth2.StaticTokenSource(&oauth2.Token{
+	return &oauth2.Token{
 		AccessToken: strings.Trim(string(output), "\t \n"),
 		TokenType:   "bearer",
-	}), nil
+	}, nil
 }
 
 type PKCETokenSourceProvider struct {
