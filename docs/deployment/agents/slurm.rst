@@ -381,3 +381,146 @@ If you are running the Slurm agent on an AWS EC2 instance, you will need to:
   You can verify your S3 access by running ``aws s3 ls`` in the terminal.
   
   This command will list all accessible S3 buckets if your credentials are configured correctly.
+
+Specify agent configuration
+---------------------------
+
+.. tabs::
+
+  .. group-tab:: Flyte binary
+
+    .. tabs::
+
+      .. group-tab:: Demo cluster
+
+        Enable the Slurm agent on the demo cluster by updating the ConfigMap:
+
+        .. code-block:: bash
+
+          kubectl edit configmap flyte-sandbox-config -n flyte
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,8,12
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                slurm_fn: agent-service
+                slurm: agent-service
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - agent-service
+
+      .. group-tab:: Helm chart
+
+        Edit the relevant YAML file to specify the plugin.
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,11,12
+
+          tasks:
+            task-plugins:
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - agent-service
+              default-for-task-types:
+                - container: container
+                - container_array: k8s-array
+                - slurm_fn: agent-service
+                - slurm: agent-service
+
+  .. group-tab:: Flyte core
+
+    Create a file named ``values-override.yaml`` and add the following config to it:
+
+    .. code-block:: yaml
+      :emphasize-lines: 8,13,14
+
+        enabled_plugins:
+          tasks:
+            task-plugins:
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - agent-service
+              default-for-task-types:
+                container: container
+                sidecar: sidecar
+                container_array: k8s-array
+                slurm_fn: agent-service
+                slurm: agent-service
+
+Add the Slurm Private Key
+-------------------------
+
+You have to set the Slurm Private Key to the Flyte configuration.
+
+1. Install the flyteagent pod using helm
+  
+.. code-block::
+  
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm install flyteagent flyteorg/flyteagent --namespace flyte
+
+2. Set Your Slurm Private Key as a Secret (Base64 Encoded):
+
+.. code-block:: bash
+
+  SECRET_VALUE=$(base64 < your_slurm_private_key_path) && \
+  kubectl patch secret flyteagent -n flyte --patch "{\"data\":{\"flyte_slurm_private_key\":\"$SECRET_VALUE\"}}"
+
+3. Restart development:
+
+.. code-block:: bash
+
+  kubectl rollout restart deployment flyteagent -n flyte
+
+Upgrade the deployment
+----------------------
+
+.. tabs::
+
+  .. group-tab:: Flyte binary
+
+    .. tabs::
+
+      .. group-tab:: Demo cluster
+
+        .. code-block::
+
+          kubectl rollout restart deployment flyte-sandbox -n flyte
+
+      .. group-tab:: Helm chart
+
+        .. code-block::
+
+          helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+        Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+        ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+        and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
+
+  .. group-tab:: Flyte core
+
+    .. code-block::
+
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
+
+Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
+
+.. code-block::
+
+  kubectl get pods -n flyte
+
+For Slurm agent on the Flyte cluster, see `Databricks agent <https://docs.flyte.org/en/latest/flytesnacks/examples/slurm_agent/index.html>`_.
