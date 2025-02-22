@@ -2378,6 +2378,161 @@ func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 	}
 }
 
+func TestMergeOverlayPodSpecOntoBase(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		basePodSpec    *v1.PodSpec
+		overlayPodSpec *v1.PodSpec
+		expectedResult *v1.PodSpec
+		expectedError  error
+	}{
+		{
+			name:           "nil overlay",
+			basePodSpec:    &v1.PodSpec{},
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base",
+			basePodSpec:    nil,
+			overlayPodSpec: &v1.PodSpec{},
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base and overlay",
+			basePodSpec:    nil,
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name: "base and overlay no overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+		},
+		{
+			name: "base and overlay with no matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "overlay-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "overlay-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, mergeErr := MergeOverlayPodSpecOntoBase(tt.basePodSpec, tt.overlayPodSpec)
+			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, mergeErr)
+		})
+	}
+}
+
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 	tests := []struct {
 		name              string

@@ -836,7 +836,7 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 // merge containers that have matching names.
 func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.PodSpec) (*v1.PodSpec, error) {
 	if basePodSpec == nil || overlayPodSpec == nil {
-		return nil, errors.New("basePodSpec and overlayPodSpec must not be nil")
+		return nil, errors.New("neither the basePodSpec or the overlayPodSpec can be nil")
 	}
 
 	mergedPodSpec := basePodSpec.DeepCopy()
