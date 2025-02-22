@@ -400,7 +400,7 @@ Specify agent configuration
           kubectl edit configmap flyte-sandbox-config -n flyte
 
         .. code-block:: yaml
-          :emphasize-lines: 7,8,12
+          :emphasize-lines: 7,8,13
 
           tasks:
             task-plugins:
