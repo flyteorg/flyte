@@ -269,7 +269,11 @@ The Slurm agent on the highest level has three core methods to interact with a S
 
 In its simplest form, the Slurm agent supports running a batch script using ``sbatch`` on a Slurm cluster, as shown below:
 
-.. image:: https://github.com/JiangJiaWei1103/flytekit/blob/slurm-agent-dev/plugins/flytekit-slurm/assets/basic_arch.png?raw=true
+.. image:: https://github.com/flyteorg/static-resources/blob/main/flytekit/plugins/slurm/basic_arch.png?raw=true
+
+For Python function tasks, the Slurm agent supports running a batch script using ``sbatch`` on a Slurm cluster with ``pyflyte-fast-execute`` as entrypoint, as shown below:
+
+.. image:: https://github.com/flyteorg/static-resources/blob/main/flytekit/plugins/slurm/slurm_function_task.png?raw=true
 
 Set up a local test environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,15 +293,7 @@ This setup consists of three main components: a client (localhost), a remote Slu
 
 .. code-block:: shell
 
-  # Install flytekit
-  git clone https://github.com/flyteorg/flytekit.git
-  cd flytekit
-  gh pr checkout 3005
-  make setup && pip install -e .
-
-  # Install the Slurm agent
-  cd plugins/flytekit-slurm/
-  pip install -e .
+  pip install flytekitplugins-slurm
 
 2. Install the Slurm agent on the Slurm cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -306,15 +302,7 @@ To run user-defined task functions on the Slurm cluster, you need to install the
 
 .. code-block:: shell
 
-  # Install flytekit
-  git clone https://github.com/flyteorg/flytekit.git
-  cd flytekit
-  gh pr checkout 3005
-  make setup && pip install -e .
-
-  # Install the Slurm agent
-  cd plugins/flytekit-slurm/
-  pip install -e .
+  pip install flytekitplugins-slurm
 
 3. Set up SSH configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -382,3 +370,14 @@ For advanced use cases where user-defined task functions are executed on the Slu
       aws_secret_access_key = <aws-secret-access-key>
 
 Once configured, both machines will have access to the Amazon S3 bucket.
+
+If you are running the Slurm agent on an AWS EC2 instance, you will need to:
+
+1. Add an IAM role to the EC2 instance under the "Security" settings
+2. Configure the IAM role with appropriate read and write permissions to access Flyte's blob store
+
+.. note::
+
+  You can verify your S3 access by running ``aws s3 ls`` in the terminal.
+  
+  This command will list all accessible S3 buckets if your credentials are configured correctly.
