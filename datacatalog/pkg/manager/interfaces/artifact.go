@@ -6,7 +6,7 @@ import (
 	idl_datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
-//go:generate mockery -all -output=../mocks -case=underscore
+//go:generate mockery-v2 --name=ArtifactManager --output=../mocks --case=underscore --with-expecter
 
 type ArtifactManager interface {
 	CreateArtifact(ctx context.Context, request *idl_datacatalog.CreateArtifactRequest) (*idl_datacatalog.CreateArtifactResponse, error)
