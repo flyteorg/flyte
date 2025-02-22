@@ -718,10 +718,8 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 		}
 	}
 
-	var mergedPodSpec *v1.PodSpec
-
 	// Merge base into template
-	mergedPodSpec = templatePodSpec.DeepCopy()
+	mergedPodSpec := templatePodSpec.DeepCopy()
 	if err := mergo.Merge(mergedPodSpec, basePodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, err
 	}

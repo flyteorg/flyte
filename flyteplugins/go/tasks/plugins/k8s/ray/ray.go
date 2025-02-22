@@ -370,7 +370,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	// Inject a sidecar for capturing and exposing Ray job logs
 	injectLogsSidecar(primaryContainer, basePodSpec)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
+	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -500,7 +500,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	}
 	primaryContainer.Ports = append(primaryContainer.Ports, ports...)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
+	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -518,7 +518,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 }
 
 // Merges a ray head/worker node custom pod specs onto task's generated pod spec
-func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, error) {
+func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, error) {
 	if k8sPod == nil {
 		return podSpec, nil
 	}
