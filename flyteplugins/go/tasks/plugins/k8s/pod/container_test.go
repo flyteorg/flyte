@@ -446,7 +446,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
-		assert.Equal(t, "UnknownError", ec)
+		assert.Equal(t, "Interrupted", ec)
 	})
 
 	t.Run("failConditionUnschedulable", func(t *testing.T) {
