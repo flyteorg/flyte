@@ -664,5 +664,14 @@ service AdminService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Retrieve metrics from an existing workflow execution."
     };
-  };
+  }
+
+  rpc DeleteExecutionPhase (flyteidl.admin.ExecutionPhaseDeleteRequest) returns (flyteidl.admin.ExecutionPhaseDeleteResponse) {
+		option (google.api.http) = {
+		  get: "/api/v1/delete_execution_phase/{execution_phase}"
+		};
+		option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+		  description: "Delete a execution phase"
+		};
+	};
 }

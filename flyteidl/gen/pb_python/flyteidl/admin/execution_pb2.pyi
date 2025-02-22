@@ -297,3 +297,15 @@ class WorkflowExecutionGetMetricsResponse(_message.Message):
     SPAN_FIELD_NUMBER: _ClassVar[int]
     span: _metrics_pb2.Span
     def __init__(self, span: _Optional[_Union[_metrics_pb2.Span, _Mapping]] = ...) -> None: ...
+
+class ExecutionPhaseDeleteRequest(_message.Message):
+    __slots__ = ["execution_phase"]
+    EXECUTION_PHASE_FIELD_NUMBER: _ClassVar[int]
+    execution_phase: str
+    def __init__(self, execution_phase: _Optional[str] = ...) -> None: ...
+
+class ExecutionPhaseDeleteResponse(_message.Message):
+    __slots__ = ["message"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...

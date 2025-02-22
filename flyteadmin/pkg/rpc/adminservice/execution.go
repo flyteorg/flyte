@@ -152,3 +152,17 @@ func (m *AdminService) TerminateExecution(
 	m.Metrics.executionEndpointMetrics.terminate.Success()
 	return response, nil
 }
+
+func (m *AdminService) DeleteExecutionPhase(
+	ctx context.Context, request *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	var response *admin.ExecutionPhaseDeleteResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.terminate.Time(func() {
+		response, err = m.ExecutionManager.DeleteExecutionPhase(ctx, request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.terminate)
+	}
+	m.Metrics.executionEndpointMetrics.terminate.Success()
+	return response, nil
+}

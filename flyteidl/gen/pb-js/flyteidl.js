@@ -36674,6 +36674,226 @@
                 return WorkflowExecutionGetMetricsResponse;
             })();
     
+            admin.ExecutionPhaseDeleteRequest = (function() {
+    
+                /**
+                 * Properties of an ExecutionPhaseDeleteRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionPhaseDeleteRequest
+                 * @property {string|null} [executionPhase] ExecutionPhaseDeleteRequest executionPhase
+                 */
+    
+                /**
+                 * Constructs a new ExecutionPhaseDeleteRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionPhaseDeleteRequest.
+                 * @implements IExecutionPhaseDeleteRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteRequest=} [properties] Properties to set
+                 */
+                function ExecutionPhaseDeleteRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionPhaseDeleteRequest executionPhase.
+                 * @member {string} executionPhase
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @instance
+                 */
+                ExecutionPhaseDeleteRequest.prototype.executionPhase = "";
+    
+                /**
+                 * Creates a new ExecutionPhaseDeleteRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @static
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionPhaseDeleteRequest} ExecutionPhaseDeleteRequest instance
+                 */
+                ExecutionPhaseDeleteRequest.create = function create(properties) {
+                    return new ExecutionPhaseDeleteRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionPhaseDeleteRequest message. Does not implicitly {@link flyteidl.admin.ExecutionPhaseDeleteRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @static
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteRequest} message ExecutionPhaseDeleteRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionPhaseDeleteRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.executionPhase != null && message.hasOwnProperty("executionPhase"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.executionPhase);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionPhaseDeleteRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionPhaseDeleteRequest} ExecutionPhaseDeleteRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionPhaseDeleteRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionPhaseDeleteRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.executionPhase = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionPhaseDeleteRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionPhaseDeleteRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.executionPhase != null && message.hasOwnProperty("executionPhase"))
+                        if (!$util.isString(message.executionPhase))
+                            return "executionPhase: string expected";
+                    return null;
+                };
+    
+                return ExecutionPhaseDeleteRequest;
+            })();
+    
+            admin.ExecutionPhaseDeleteResponse = (function() {
+    
+                /**
+                 * Properties of an ExecutionPhaseDeleteResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionPhaseDeleteResponse
+                 * @property {string|null} [message] ExecutionPhaseDeleteResponse message
+                 */
+    
+                /**
+                 * Constructs a new ExecutionPhaseDeleteResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionPhaseDeleteResponse.
+                 * @implements IExecutionPhaseDeleteResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteResponse=} [properties] Properties to set
+                 */
+                function ExecutionPhaseDeleteResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionPhaseDeleteResponse message.
+                 * @member {string} message
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteResponse
+                 * @instance
+                 */
+                ExecutionPhaseDeleteResponse.prototype.message = "";
+    
+                /**
+                 * Creates a new ExecutionPhaseDeleteResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteResponse
+                 * @static
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionPhaseDeleteResponse} ExecutionPhaseDeleteResponse instance
+                 */
+                ExecutionPhaseDeleteResponse.create = function create(properties) {
+                    return new ExecutionPhaseDeleteResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionPhaseDeleteResponse message. Does not implicitly {@link flyteidl.admin.ExecutionPhaseDeleteResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteResponse
+                 * @static
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteResponse} message ExecutionPhaseDeleteResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionPhaseDeleteResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.message);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionPhaseDeleteResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionPhaseDeleteResponse} ExecutionPhaseDeleteResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionPhaseDeleteResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionPhaseDeleteResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.message = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionPhaseDeleteResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionPhaseDeleteResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
+                    return null;
+                };
+    
+                return ExecutionPhaseDeleteResponse;
+            })();
+    
             /**
              * MatchableResource enum.
              * @name flyteidl.admin.MatchableResource
@@ -54272,6 +54492,39 @@
                  * @instance
                  * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest} request WorkflowExecutionGetMetricsRequest message or plain object
                  * @returns {Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#deleteExecutionPhase}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef DeleteExecutionPhaseCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ExecutionPhaseDeleteResponse} [response] ExecutionPhaseDeleteResponse
+                 */
+    
+                /**
+                 * Calls DeleteExecutionPhase.
+                 * @function deleteExecutionPhase
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteRequest} request ExecutionPhaseDeleteRequest message or plain object
+                 * @param {flyteidl.service.AdminService.DeleteExecutionPhaseCallback} callback Node-style callback called with the error, if any, and ExecutionPhaseDeleteResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.deleteExecutionPhase = function deleteExecutionPhase(request, callback) {
+                    return this.rpcCall(deleteExecutionPhase, $root.flyteidl.admin.ExecutionPhaseDeleteRequest, $root.flyteidl.admin.ExecutionPhaseDeleteResponse, request, callback);
+                }, "name", { value: "DeleteExecutionPhase" });
+    
+                /**
+                 * Calls DeleteExecutionPhase.
+                 * @function deleteExecutionPhase
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IExecutionPhaseDeleteRequest} request ExecutionPhaseDeleteRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ExecutionPhaseDeleteResponse>} Promise
                  * @variation 2
                  */
     

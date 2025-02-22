@@ -170,3 +170,11 @@ func NewExecutionRepo(
 		metrics:          metrics,
 	}
 }
+
+func (r *ExecutionRepo) Delete(ctx context.Context, executionPhase string) error {
+	result := r.db.Delete(&models.Execution{}, "phase = ?", executionPhase)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

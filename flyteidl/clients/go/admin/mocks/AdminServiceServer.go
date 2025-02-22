@@ -302,6 +302,47 @@ func (_m *AdminServiceServer) CreateWorkflowEvent(_a0 context.Context, _a1 *admi
 	return r0, r1
 }
 
+type AdminServiceServer_DeleteExecutionPhase struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_DeleteExecutionPhase) Return(_a0 *admin.ExecutionPhaseDeleteResponse, _a1 error) *AdminServiceServer_DeleteExecutionPhase {
+	return &AdminServiceServer_DeleteExecutionPhase{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnDeleteExecutionPhase(_a0 context.Context, _a1 *admin.ExecutionPhaseDeleteRequest) *AdminServiceServer_DeleteExecutionPhase {
+	c_call := _m.On("DeleteExecutionPhase", _a0, _a1)
+	return &AdminServiceServer_DeleteExecutionPhase{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnDeleteExecutionPhaseMatch(matchers ...interface{}) *AdminServiceServer_DeleteExecutionPhase {
+	c_call := _m.On("DeleteExecutionPhase", matchers...)
+	return &AdminServiceServer_DeleteExecutionPhase{Call: c_call}
+}
+
+// DeleteExecutionPhase provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) DeleteExecutionPhase(_a0 context.Context, _a1 *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ExecutionPhaseDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionPhaseDeleteRequest) *admin.ExecutionPhaseDeleteResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionPhaseDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionPhaseDeleteRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_DeleteProjectAttributes struct {
 	*mock.Call
 }

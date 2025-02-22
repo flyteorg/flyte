@@ -1956,3 +1956,16 @@ func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error
 	}
 	return filters, nil
 }
+
+func (m *ExecutionManager) DeleteExecutionPhase(ctx context.Context, req *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	executionPhase := req.GetExecutionPhase()
+
+	err := m.db.ExecutionRepo().Delete(ctx, executionPhase)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.ExecutionPhaseDeleteResponse{
+		Message: fmt.Sprintf("Execution %s deleted successfully", executionPhase),
+	}, nil
+}

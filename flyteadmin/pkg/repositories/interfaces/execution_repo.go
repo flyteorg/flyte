@@ -18,6 +18,7 @@ type ExecutionRepoInterface interface {
 	List(ctx context.Context, input ListResourceInput) (ExecutionCollectionOutput, error)
 	// Returns count of executions matching query parameters.
 	Count(ctx context.Context, input CountResourceInput) (int64, error)
+	Delete(ctx context.Context, executionPhase string) error
 }
 
 // Response format for a query on workflows.

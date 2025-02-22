@@ -430,3 +430,12 @@ message WorkflowExecutionGetMetricsResponse {
     // hierarchical structure using Flyte entity references.
     core.Span span = 1;
 }
+
+message ExecutionPhaseDeleteRequest {
+    string execution_phase = 1;
+}
+  
+message ExecutionPhaseDeleteResponse {
+    string message = 1;
+}
+  
