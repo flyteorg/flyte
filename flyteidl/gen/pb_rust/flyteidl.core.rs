@@ -1243,6 +1243,8 @@ pub mod resources {
         Storage = 4,
         /// For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.
         EphemeralStorage = 5,
+        /// For OOM handling, we can request additional memory to be reserved for the task.
+        OomReservedMemory = 7,
     }
     impl ResourceName {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -1257,6 +1259,7 @@ pub mod resources {
                 ResourceName::Memory => "MEMORY",
                 ResourceName::Storage => "STORAGE",
                 ResourceName::EphemeralStorage => "EPHEMERAL_STORAGE",
+                ResourceName::OomReservedMemory => "OOM_RESERVED_MEMORY",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1268,6 +1271,7 @@ pub mod resources {
                 "MEMORY" => Some(Self::Memory),
                 "STORAGE" => Some(Self::Storage),
                 "EPHEMERAL_STORAGE" => Some(Self::EphemeralStorage),
+                "OOM_RESERVED_MEMORY" => Some(Self::OomReservedMemory),
                 _ => None,
             }
         }

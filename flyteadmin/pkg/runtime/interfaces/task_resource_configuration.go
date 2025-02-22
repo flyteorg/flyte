@@ -3,10 +3,11 @@ package interfaces
 import "k8s.io/apimachinery/pkg/api/resource"
 
 type TaskResourceSet struct {
-	CPU              resource.Quantity `json:"cpu"`
-	GPU              resource.Quantity `json:"gpu"`
-	Memory           resource.Quantity `json:"memory"`
-	EphemeralStorage resource.Quantity `json:"ephemeralStorage"`
+	CPU               resource.Quantity `json:"cpu"`
+	GPU               resource.Quantity `json:"gpu"`
+	Memory            resource.Quantity `json:"memory"`
+	EphemeralStorage  resource.Quantity `json:"ephemeralStorage"`
+	OOMReservedMemory resource.Quantity `json:"oomReservedMemory"`
 }
 
 // Provides default values for task resource limits and defaults.
