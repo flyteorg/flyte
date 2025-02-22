@@ -691,7 +691,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 // magic values this method will merge containers that have matching names.
 func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
 	if templatePodSpec == nil || basePodSpec == nil {
-		return nil, errors.New("templatePodSpec and basePodSpec must not be nil")
+		return nil, errors.New("neither the templatePodSpec or the basePodSpec can be nil")
 	}
 
 	// extract primaryContainerTemplate. The base should always contain the primary container.
@@ -713,7 +713,7 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
 		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
 			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
-		} else if primaryInitContainerName != primaryInitContainerTemplateName && templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
 			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}
@@ -764,7 +764,7 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 		// Merge in the base container
 		if mergedContainer == nil {
 			mergedContainer = container.DeepCopy()
-		} else if container.Name != primaryContainerTemplateName {
+		} else {
 			err := mergo.Merge(mergedContainer, container, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
