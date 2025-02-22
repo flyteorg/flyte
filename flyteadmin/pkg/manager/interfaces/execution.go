@@ -30,4 +30,5 @@ type ExecutionInterface interface {
 	ListExecutions(ctx context.Context, request *admin.ResourceListRequest) (*admin.ExecutionList, error)
 	TerminateExecution(
 		ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error)
+	DeleteExecutionPhase(ctx context.Context, request *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error)
 }
