@@ -80,7 +80,7 @@ func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdmi
 	return nil
 }
 
-func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter, isolationFilter common.IsolationFilter) (*gorm.DB, error) {
 	for _, filter := range inlineFilters {
 		gormQueryExpr, err := filter.GetGormQueryExpr()
 		if err != nil {
@@ -90,6 +90,9 @@ func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters [
 	}
 	for _, mapFilter := range mapFilters {
 		tx = tx.Where(mapFilter.GetFilter())
+	}
+	if isolationFilter != nil {
+		tx = tx.Where(tx.Scopes(isolationFilter.GetScopes()...))
 	}
 	return tx, nil
 }
