@@ -161,8 +161,8 @@ func Test_newAuthInterceptor(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 		mockTokenCache := &mocks.TokenCache{}
 
-		mockTokenCache.OnGetTokenMatch().Return(tokenData, nil)
-		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
+		mockTokenCache.EXPECT().GetToken().Return(tokenData, nil)
+		mockTokenCache.EXPECT().SaveToken(mock.Anything).Return(nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -202,12 +202,12 @@ func Test_newAuthInterceptor(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
-		c.OnTryLockMatch().Return(true)
-		c.OnSaveTokenMatch(mock.Anything).Return(nil)
+		c.EXPECT().GetToken().Return(nil, nil)
+		c.EXPECT().TryLock().Return(true)
+		c.EXPECT().SaveToken(mock.Anything).Return(nil)
 		c.On("CondBroadcast").Return()
 		c.On("Unlock").Return()
-		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
+		c.EXPECT().PurgeIfEquals(mock.Anything).Return(true, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -249,7 +249,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
+		c.EXPECT().GetToken().Return(nil, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -293,10 +293,10 @@ func Test_newAuthInterceptor(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
-		c.OnTryLockMatch().Return(true)
-		c.OnSaveTokenMatch(mock.Anything).Return(nil)
-		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
+		c.EXPECT().GetToken().Return(nil, nil)
+		c.EXPECT().TryLock().Return(true)
+		c.EXPECT().SaveToken(mock.Anything).Return(nil)
+		c.EXPECT().PurgeIfEquals(mock.Anything).Return(true, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -318,8 +318,8 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 		grpcPort := rand.IntnRange(10000, 60000)
 		fakeToken := &oauth2.Token{}
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(fakeToken, nil)
-		c.OnSaveTokenMatch(mock.Anything).Return(nil)
+		c.EXPECT().GetToken().Return(fakeToken, nil)
+		c.EXPECT().SaveToken(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get public client config"))
@@ -357,8 +357,8 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 		grpcPort := rand.IntnRange(10000, 60000)
 		c := &mocks.TokenCache{}
 		fakeToken := &oauth2.Token{}
-		c.OnGetTokenMatch().Return(fakeToken, nil)
-		c.OnSaveTokenMatch(mock.Anything).Return(nil)
+		c.EXPECT().GetToken().Return(fakeToken, nil)
+		c.EXPECT().SaveToken(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		failedPublicClientConfigLookup := errors.New("expected err")
