@@ -11,22 +11,10 @@ on:
       - master
       - 'release-v**'
 env:
-  GO_VERSION: "1.22"
   PRIORITIES: "P0"
 jobs:
-  unpack-envvars:
-    runs-on: ubuntu-latest
-    outputs:
-      go-version: ${{ steps.step.outputs.go-version }}
-    steps:
-      - id: step
-        run: |
-          echo "go-version=${{ env.GO_VERSION }}" >> $GITHUB_OUTPUT
-
   lint:
     name: Lint
-    needs:
-      - unpack-envvars
     strategy:
       fail-fast: false
       matrix:
@@ -42,11 +30,8 @@ jobs:
     uses: ./.github/workflows/lint.yml
     with:
       component: ${{ matrix.component }}
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
   unit-tests:
     name: Unit Tests
-    needs:
-      - unpack-envvars
     strategy:
       fail-fast: false
       matrix:
@@ -61,7 +46,6 @@ jobs:
     uses: ./.github/workflows/unit-tests.yml
     with:
       component: ${{ matrix.component }}
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -77,7 +61,6 @@ jobs:
     name: Integration Test
     needs:
       - flyteadmin-int-tests-image-build
-      - unpack-envvars
     strategy:
       fail-fast: false
       matrix:
@@ -87,12 +70,9 @@ jobs:
     with:
       component: ${{ matrix.component }}
       cache_key: ${{ needs.flyteadmin-int-tests-image-build.outputs.cache_key }}
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
   generate:
     name: Check Go Generate
-    needs:
-      - unpack-envvars
     strategy:
       fail-fast: false
       matrix:
@@ -105,7 +85,6 @@ jobs:
     uses: ./.github/workflows/go_generate.yml
     with:
       component: ${{ matrix.component }}
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
@@ -121,8 +100,6 @@ jobs:
   dry_run_goreleaser:
     name: Dry Run Goreleaser
     runs-on: ubuntu-latest
-    needs:
-      - unpack-envvars
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -130,7 +107,7 @@ jobs:
           fetch-depth: "0"
       - uses: actions/setup-go@v4
         with:
-          go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+          go-version-file: go.mod
       - name: Run GoReleaser dry run
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -146,13 +123,11 @@ jobs:
     defaults:
       run:
         working-directory: flytectl
-    needs:
-      - unpack-envvars
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cache/go-build
@@ -161,7 +136,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+          go-version-file: go.mod
       - name: Build Flytectl binary
         run: make compile
       - name: Create a sandbox cluster

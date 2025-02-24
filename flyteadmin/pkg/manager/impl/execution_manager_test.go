@@ -79,7 +79,7 @@ var executionIdentifier = core.WorkflowExecutionIdentifier{
 	Name:    "name",
 }
 var mockPublisher notificationMocks.Publisher
-var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
+var mockExecutionRemoteURL = &dataMocks.RemoteURLInterface{}
 var requestedAt = time.Now()
 var testCluster = "C1"
 var outputURI = "output uri"
@@ -3624,8 +3624,8 @@ func TestGetExecutionData(t *testing.T) {
 			InputsURI:    shared.Inputs,
 		}, nil
 	}
-	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
+	mockExecutionRemoteURL := &dataMocks.RemoteURLInterface{}
+	mockExecutionRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(
 		ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == outputURI {
 			return &admin.UrlBlob{
@@ -3640,7 +3640,7 @@ func TestGetExecutionData(t *testing.T) {
 		}
 
 		return &admin.UrlBlob{}, errors.New("unexpected input")
-	}
+	})
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -3842,8 +3842,8 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 			StartedAt:    &startedAt,
 		}, nil
 	}
-	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
+	mockExecutionRemoteURL := &dataMocks.RemoteURLInterface{}
+	mockExecutionRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(
 		ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == outputURI {
 			return &admin.UrlBlob{
@@ -3858,7 +3858,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 		}
 
 		return &admin.UrlBlob{}, errors.New("unexpected input")
-	}
+	})
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	storageClient := getMockStorageForExecTest(context.Background())
