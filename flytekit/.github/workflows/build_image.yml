@@ -1,0 +1,86 @@
+name: Publish Python Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-push-docker-images-manual:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Flytekit Image Names
+        id: flytekit-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flytekit
+          tags: |
+            py${{ matrix.python-version }}-${{ github.sha }}
+      - name: Build & Push Flytekit Python${{ matrix.python-version }} Docker Image to Github Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: true
+          tags: ${{ steps.flytekit-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ github.sha }}
+            DOCKER_IMAGE=ghcr.io/${{ github.repository_owner }}/flytekit:py${{ matrix.python-version }}-${{ github.sha }}
+            PYTHON_VERSION=${{ matrix.python-version }}
+          file: Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push-flyteagent-images-manual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Flyte Agent Image Names
+        id: flyteagent-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyteagent
+          tags: |
+            ${{ github.sha }}
+      - name: Push External Plugin Service Image to GitHub Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: "."
+          platforms: linux/arm64, linux/amd64
+          push: true
+          tags: ${{ steps.flyteagent-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ github.sha }}
+          file: ./Dockerfile.agent
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
