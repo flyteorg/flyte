@@ -663,6 +663,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
+	// If either launch plan spec OverwriteCacheor or request spec OverwriteCache is true, we will set OverwriteCache as true in request spec
+	requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
+
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
@@ -1075,6 +1078,9 @@ func (m *ExecutionManager) launchExecution(
 	} else if requestSpec.GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
+
+	// If either launch plan spec OverwriteCacheor or request spec OverwriteCache is true, then we will set OverwriteCache as true in request spec
+	requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
@@ -1560,6 +1566,22 @@ func (m *ExecutionManager) GetExecution(
 		return nil, transformerErr
 	}
 
+	executionSpec := execution.Spec
+	// If either launch plan spec OverwriteCacheor or execution spec OverwriteCache is true, we will set OverwriteCache as true in execution spec
+	// GetLaunchPlanModel func for task resource type will throw error due to identifier format difference and missing entity so we exclude task type here, also no need to overwrite OverwriteCache for task type
+	if executionSpec.LaunchPlan != nil && executionSpec.LaunchPlan.ResourceType != core.ResourceType_TASK {
+		launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *executionSpec.LaunchPlan)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to get launch plan model for execution %+v with err %v", execution, err)
+			return nil, err
+		}
+		launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
+			return nil, err
+		}
+		executionSpec.OverwriteCache = executionSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
+	}
 	return execution, nil
 }
 
