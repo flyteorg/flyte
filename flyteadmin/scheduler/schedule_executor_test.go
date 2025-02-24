@@ -57,7 +57,7 @@ func setupScheduleExecutor(t *testing.T, s string) ScheduledExecutor {
 		},
 		Snapshot: f.Bytes(),
 	}
-	snapshotRepo.OnReadMatch(mock.Anything).Return(snapshotModel, nil)
+	snapshotRepo.EXPECT().ReadMatch(mock.Anything).Return(snapshotModel, nil)
 	snapshotRepo.OnWriteMatch(mock.Anything, mock.Anything).Return(nil)
 	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).
 		Return(&admin.ExecutionCreateResponse{}, nil)

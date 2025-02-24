@@ -27,8 +27,8 @@ func Test_tokenEndpoint(t *testing.T) {
 		rw := httptest.NewRecorder()
 		oauth2Provider, _ := newMockProvider(t)
 		mockAuthCtx := &mocks.AuthenticationContext{}
-		mockAuthCtx.OnOAuth2Provider().Return(oauth2Provider)
-		mockAuthCtx.OnOptions().Return(&config.Config{})
+		mockAuthCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
+		mockAuthCtx.EXPECT().Options().Return(&config.Config{})
 
 		tokenEndpoint(mockAuthCtx, rw, req)
 		assert.NotEmpty(t, rw.Body.String())
@@ -62,8 +62,8 @@ func Test_tokenEndpoint(t *testing.T) {
 		req.PostForm = payload
 		req.Header.Set("authorization", basicAuth("flytectl", "foobar"))
 		mockAuthCtx := &mocks.AuthenticationContext{}
-		mockAuthCtx.OnOAuth2Provider().Return(oauth2Provider)
-		mockAuthCtx.OnOptions().Return(&config.Config{})
+		mockAuthCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
+		mockAuthCtx.EXPECT().Options().Return(&config.Config{})
 
 		rw := httptest.NewRecorder()
 		tokenEndpoint(mockAuthCtx, rw, req)
