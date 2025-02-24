@@ -51,7 +51,7 @@ var (
 	arch = platformutil.Arch(runtime.GOARCH)
 )
 
-//go:generate mockery -name=GHRepoService -case=underscore
+//go:generate mockery-v2 --name=GHRepoService --case=underscore --with-expecter
 
 type GHRepoService interface {
 	GetLatestRelease(ctx context.Context, owner, repo string) (*github.RepositoryRelease, *github.Response, error)

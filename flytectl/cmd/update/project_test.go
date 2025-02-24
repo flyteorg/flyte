@@ -145,7 +145,7 @@ func TestProjectUpdateFailsWhenProjectDoesNotExist(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.GetId()).
+				EXPECT().GetProjectByID(s.Ctx, project.GetId()).
 				Return(nil, ext.NewNotFoundError("project not found"))
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).
@@ -164,7 +164,7 @@ func TestProjectUpdateFailsWhenAdminClientFails(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.GetId()).
+				EXPECT().GetProjectByID(s.Ctx, project.GetId()).
 				Return(project, nil)
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).
@@ -223,7 +223,7 @@ func testProjectUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, project *admin.Project) {
 			s.FetcherExt.
-				OnGetProjectByID(s.Ctx, project.GetId()).
+				EXPECT().GetProjectByID(s.Ctx, project.GetId()).
 				Return(project, nil)
 			s.MockAdminClient.
 				OnUpdateProjectMatch(s.Ctx, mock.Anything).

@@ -56,7 +56,7 @@ func TestListProjectFunc(t *testing.T) {
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 
 	assert.Nil(t, err)
@@ -71,7 +71,7 @@ func TestGetProjectFunc(t *testing.T) {
 
 	project.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "ListProjects", s.Ctx, filters.Filters{})
@@ -85,7 +85,7 @@ func TestGetProjectFuncError(t *testing.T) {
 		FieldSelector: "hello=",
 	}
 	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(nil, fmt.Errorf("Please add a valid field selector"))
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{
 		FieldSelector: "hello=",
 	}).Return(nil, fmt.Errorf("Please add a valid field selector"))
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)

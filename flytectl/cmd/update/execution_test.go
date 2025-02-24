@@ -146,7 +146,7 @@ func TestExecutionUpdateFailsWhenExecutionDoesNotExist(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
+				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(nil, ext.NewNotFoundError("execution not found"))
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -165,7 +165,7 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
+				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
@@ -200,7 +200,7 @@ func testExecutionUpdate(
 		t,
 		/* mockSetup */ func(s *testutils.TestStruct, execution *admin.Execution) {
 			s.FetcherExt.
-				OnFetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
+				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
 				OnUpdateExecutionMatch(s.Ctx, mock.Anything).

@@ -34,23 +34,23 @@ func TestTearDownFunc(t *testing.T) {
 	t.Run("SuccessKeepVolume", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		k8s.ContextMgr = mockK8sContextMgr
-		mockK8sContextMgr.OnRemoveContextMatch(mock.Anything).Return(nil)
+		mockK8sContextMgr.EXPECT().RemoveContext(mock.Anything).Return(nil)
 		err := sandbox.Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 		assert.Nil(t, err)
 	})
 	t.Run("SuccessRemoveVolume", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
-		mockDocker.OnVolumeRemove(ctx, docker.FlyteSandboxVolumeName, true).Return(nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().VolumeRemove(ctx, docker.FlyteSandboxVolumeName, true).Return(nil)
 		mockK8sContextMgr := &k8sMocks.ContextOps{}
 		k8s.ContextMgr = mockK8sContextMgr
-		mockK8sContextMgr.OnRemoveContextMatch(mock.Anything).Return(nil)
+		mockK8sContextMgr.EXPECT().RemoveContext(mock.Anything).Return(nil)
 		err := sandbox.Teardown(
 			ctx,
 			mockDocker,
@@ -58,19 +58,19 @@ func TestTearDownFunc(t *testing.T) {
 		)
 		assert.Nil(t, err)
 	})
-	t.Run("ErrorOnContainerRemove", func(t *testing.T) {
+	t.Run("ErrorEXPECT().ContainerRemove", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(fmt.Errorf("err"))
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(fmt.Errorf("err"))
 		err := sandbox.Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 		assert.NotNil(t, err)
 	})
 
-	t.Run("ErrorOnContainerList", func(t *testing.T) {
+	t.Run("ErrorEXPECT().ContainerList", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(nil, fmt.Errorf("err"))
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(nil, fmt.Errorf("err"))
 		err := sandbox.Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 		assert.NotNil(t, err)
 	})
@@ -84,8 +84,8 @@ func TestTearDownClusterFunc(t *testing.T) {
 
 	ctx := s.Ctx
 	mockDocker := &mocks.Docker{}
-	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-	mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+	mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+	mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 	docker.Client = mockDocker
 	err := teardownDemoCluster(ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)

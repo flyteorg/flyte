@@ -2,7 +2,7 @@ package visualize
 
 import graphviz "github.com/awalterschulze/gographviz"
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery-v2 --all --case=underscore --with-expecter
 
 type Graphvizer interface {
 	AddEdge(src, dst string, directed bool, attrs map[string]string) error
