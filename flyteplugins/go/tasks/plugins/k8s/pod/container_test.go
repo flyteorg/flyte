@@ -108,6 +108,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 		Name:      "test-owner-name",
 	})
 	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskMetadata.OnGetOOMFailures().Return(0)
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
 	tID.On("GetID").Return(core.TaskExecutionIdentifier{

@@ -35,8 +35,12 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry, OOMCount uint3
 		case core.Resources_MEMORY:
 			if !v.IsZero() {
 				memQuantity := k8sResources[v1.ResourceMemory]
-				memQuantity.Add(v)
-				k8sResources[v1.ResourceMemory] = memQuantity
+				if !memQuantity.IsZero() {
+					memQuantity.Add(v)
+					k8sResources[v1.ResourceMemory] = memQuantity
+				} else {
+					k8sResources[v1.ResourceMemory] = v
+				}
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {

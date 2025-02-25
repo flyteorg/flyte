@@ -173,6 +173,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
 	tMeta.OnGetConsoleURL().Return("")
+	tMeta.OnGetOOMFailures().Return(0)
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}

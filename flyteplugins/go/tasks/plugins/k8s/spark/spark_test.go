@@ -475,6 +475,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool, 
 	taskExecutionMetadata.On("GetOverrides").Return(overrides)
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
+	taskExecutionMetadata.OnGetOOMFailures().Return(0)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}

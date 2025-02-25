@@ -493,6 +493,38 @@ func (_m *MutableNodeStatus) IncrementAttempts() uint32 {
 	return r0
 }
 
+type MutableNodeStatus_IncrementOOMFailures struct {
+	*mock.Call
+}
+
+func (_m MutableNodeStatus_IncrementOOMFailures) Return(_a0 uint32) *MutableNodeStatus_IncrementOOMFailures {
+	return &MutableNodeStatus_IncrementOOMFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableNodeStatus) OnIncrementOOMFailures() *MutableNodeStatus_IncrementOOMFailures {
+	c_call := _m.On("IncrementOOMFailures")
+	return &MutableNodeStatus_IncrementOOMFailures{Call: c_call}
+}
+
+func (_m *MutableNodeStatus) OnIncrementOOMFailuresMatch(matchers ...interface{}) *MutableNodeStatus_IncrementOOMFailures {
+	c_call := _m.On("IncrementOOMFailures", matchers...)
+	return &MutableNodeStatus_IncrementOOMFailures{Call: c_call}
+}
+
+// IncrementOOMFailures provides a mock function with given fields:
+func (_m *MutableNodeStatus) IncrementOOMFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type MutableNodeStatus_IncrementSystemFailures struct {
 	*mock.Call
 }

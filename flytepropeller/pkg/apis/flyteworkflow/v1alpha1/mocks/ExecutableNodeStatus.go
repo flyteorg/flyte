@@ -423,6 +423,38 @@ func (_m *ExecutableNodeStatus) GetNodeExecutionStatus(ctx context.Context, id s
 	return r0
 }
 
+type ExecutableNodeStatus_GetOOMFailures struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetOOMFailures) Return(_a0 uint32) *ExecutableNodeStatus_GetOOMFailures {
+	return &ExecutableNodeStatus_GetOOMFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOOMFailures() *ExecutableNodeStatus_GetOOMFailures {
+	c_call := _m.On("GetOOMFailures")
+	return &ExecutableNodeStatus_GetOOMFailures{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOOMFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOOMFailures {
+	c_call := _m.On("GetOOMFailures", matchers...)
+	return &ExecutableNodeStatus_GetOOMFailures{Call: c_call}
+}
+
+// GetOOMFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetOOMFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ExecutableNodeStatus_GetOrCreateArrayNodeStatus struct {
 	*mock.Call
 }
@@ -1049,6 +1081,38 @@ func (_m *ExecutableNodeStatus) OnIncrementAttemptsMatch(matchers ...interface{}
 
 // IncrementAttempts provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) IncrementAttempts() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_IncrementOOMFailures struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_IncrementOOMFailures) Return(_a0 uint32) *ExecutableNodeStatus_IncrementOOMFailures {
+	return &ExecutableNodeStatus_IncrementOOMFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnIncrementOOMFailures() *ExecutableNodeStatus_IncrementOOMFailures {
+	c_call := _m.On("IncrementOOMFailures")
+	return &ExecutableNodeStatus_IncrementOOMFailures{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnIncrementOOMFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_IncrementOOMFailures {
+	c_call := _m.On("IncrementOOMFailures", matchers...)
+	return &ExecutableNodeStatus_IncrementOOMFailures{Call: c_call}
+}
+
+// IncrementOOMFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) IncrementOOMFailures() uint32 {
 	ret := _m.Called()
 
 	var r0 uint32

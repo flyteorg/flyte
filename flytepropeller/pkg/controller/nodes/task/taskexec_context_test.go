@@ -74,6 +74,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	ns := &flyteMocks.ExecutableNodeStatus{}
 	ns.OnGetDataDir().Return("data-dir")
 	ns.OnGetOutputDir().Return("output-dir")
+	ns.OnGetOOMFailures().Return(0)
 
 	n := &flyteMocks.ExecutableNode{}
 	n.OnGetResources().Return(resources)

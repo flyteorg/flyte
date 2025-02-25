@@ -487,6 +487,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.OnGetDataDir().Return("data-dir")
 		ns.OnGetOutputDir().Return("data-dir")
+		ns.OnGetOOMFailures().Return(0)
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -807,6 +808,7 @@ func Test_task_Abort(t *testing.T) {
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
 		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.OnGetOOMFailures().Return(0)
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -971,6 +973,7 @@ func Test_task_Abort_v1(t *testing.T) {
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
 		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.OnGetOOMFailures().Return(0)
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -1153,6 +1156,7 @@ func Test_task_Finalize(t *testing.T) {
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
 		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.OnGetOOMFailures().Return(0)
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}

@@ -61,6 +61,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.OnGetOOMFailures().Return(0)
 	return taskExecutionMetadata
 }
 

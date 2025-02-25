@@ -231,16 +231,6 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		Value: memory.Limit.String(),
 	})
 
-	// TODO: adjust the value based on the platform memory.
-	finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
-		Name:  core.Resources_OOM_RESERVED_MEMORY,
-		Value: taskResourceRequirements.Defaults.OOMReservedMemory.String(),
-	})
-	finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
-		Name:  core.Resources_OOM_RESERVED_MEMORY,
-		Value: taskResourceRequirements.Limits.OOMReservedMemory.String(),
-	})
-
 	// Only assign ephemeral storage when it is either requested or limited in the task definition, or a platform
 	// default exists.
 	if !taskResourceRequirements.Defaults.EphemeralStorage.IsZero() ||
@@ -273,6 +263,16 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 			Value: gpu.Limit.String(),
 		})
 	}
+
+	// TODO: adjust the value based on the platform memory.
+	finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
+		Name:  core.Resources_OOM_RESERVED_MEMORY,
+		Value: taskResourceRequirements.Defaults.OOMReservedMemory.String(),
+	})
+	finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
+		Name:  core.Resources_OOM_RESERVED_MEMORY,
+		Value: taskResourceRequirements.Limits.OOMReservedMemory.String(),
+	})
 
 	task.Template.GetContainer().Resources = &core.Resources{
 		Requests: finalizedResourceRequests,
