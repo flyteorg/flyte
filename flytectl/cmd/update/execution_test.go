@@ -149,7 +149,7 @@ func TestExecutionUpdateFailsWhenExecutionDoesNotExist(t *testing.T) {
 				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(nil, ext.NewNotFoundError("execution not found"))
 			s.MockAdminClient.
-				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateExecution(s.Ctx, mock.Anything).
 				Return(&admin.ExecutionUpdateResponse{}, nil)
 		},
 		/* setup */ nil,
@@ -168,7 +168,7 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
-				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateExecution(s.Ctx, mock.Anything).
 				Return(nil, fmt.Errorf("network error"))
 		},
 		/* setup */ func(s *testutils.TestStruct, config *execution.UpdateConfig, execution *admin.Execution) {
@@ -203,7 +203,7 @@ func testExecutionUpdate(
 				EXPECT().FetchExecution(s.Ctx, execution.GetId().GetName(), execution.GetId().GetProject(), execution.GetId().GetDomain()).
 				Return(execution, nil)
 			s.MockAdminClient.
-				OnUpdateExecutionMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateExecution(s.Ctx, mock.Anything).
 				Return(&admin.ExecutionUpdateResponse{}, nil)
 		},
 		setup,

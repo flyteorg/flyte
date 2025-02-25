@@ -211,9 +211,9 @@ func TestGetTaskFuncWithError(t *testing.T) {
 		s := testutils.Setup(t)
 
 		getLaunchPlanSetup()
-		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
-		s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
-		s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
+		s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
+		s.MockAdminClient.EXPECT().ListTaskIds(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
 		s.FetcherExt.EXPECT().FetchAllVerOfTask(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
 		err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -226,9 +226,9 @@ func TestGetTaskFuncWithError(t *testing.T) {
 		getLaunchPlanSetup()
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		argsTask = []string{}
-		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListTaskRequest).Return(nil, fmt.Errorf("error fetching all version"))
-		s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
-		s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
+		s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListTaskRequest).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
+		s.MockAdminClient.EXPECT().ListTaskIds(s.Ctx, namedIDRequestTask).Return(nil, fmt.Errorf("error listing task ids"))
 		s.FetcherExt.EXPECT().FetchAllVerOfTask(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
 		err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -241,8 +241,8 @@ func TestGetTaskFunc(t *testing.T) {
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
 	s.FetcherExt.EXPECT().FetchAllVerOfTask(mock.Anything, mock.Anything, mock.Anything,
 		mock.Anything, mock.Anything).Return(taskListResponse.GetTasks(), nil)
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -327,8 +327,8 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
 	s.FetcherExt.EXPECT().FetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.GetTasks(), nil)
 	config.GetConfig().Output = "table"
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -352,9 +352,9 @@ func TestGetTaskFuncLatest(t *testing.T) {
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
-	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTaskIds(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
 	s.FetcherExt.EXPECT().FetchTaskLatestVersion(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(task2, nil)
 	taskConfig.DefaultConfig.Latest = true
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -402,9 +402,9 @@ func TestGetTaskWithVersion(t *testing.T) {
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
-	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTaskIds(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
 	s.FetcherExt.EXPECT().FetchTaskVersion(s.Ctx, "task1", "v2", "dummyProject", "dummyDomain").Return(task2, nil)
 	taskConfig.DefaultConfig.Version = "v2"
 	objectGetRequestTask.Id.ResourceType = core.ResourceType_TASK
@@ -453,8 +453,8 @@ func TestGetTasks(t *testing.T) {
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
 	s.FetcherExt.EXPECT().FetchAllVerOfTask(s.Ctx, "task1", "dummyProject", "dummyDomain", filters.Filters{}).Return(taskListResponse.GetTasks(), nil)
 
 	err := getTaskFunc(s.Ctx, argsTask, s.CmdCtx)
@@ -469,7 +469,7 @@ func TestGetTasksFilters(t *testing.T) {
 	taskConfig.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "task.name=task1,task.version=v1",
 	}
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListFilterRequestTask).Return(taskListFilterResponse, nil)
 	filteredTasks := []*admin.Task{}
 	for _, task := range taskListResponse.GetTasks() {
 		if task.GetId().GetName() == "task1" && task.GetId().GetVersion() == "v1" {
@@ -490,9 +490,9 @@ func TestGetTaskWithExecFile(t *testing.T) {
 	s := testutils.Setup(t)
 
 	getTaskSetup()
-	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
-	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
-	s.MockAdminClient.OnListTaskIdsMatch(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
+	s.MockAdminClient.EXPECT().ListTasks(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
+	s.MockAdminClient.EXPECT().GetTask(s.Ctx, objectGetRequestTask).Return(task2, nil)
+	s.MockAdminClient.EXPECT().ListTaskIds(s.Ctx, namedIDRequestTask).Return(namedIdentifierListTask, nil)
 	s.FetcherExt.EXPECT().FetchTaskVersion(s.Ctx, "task1", "v2", "dummyProject", "dummyDomain").Return(task2, nil)
 	taskConfig.DefaultConfig.Version = "v2"
 	taskConfig.DefaultConfig.ExecFile = testDataFolder + "task_exec_file"

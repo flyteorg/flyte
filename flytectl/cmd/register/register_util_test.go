@@ -234,7 +234,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
 		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
@@ -245,7 +245,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		variableMap := map[string]*core.Variable{
 			"var1": {
 				Type: &core.LiteralType{
@@ -324,7 +324,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.AlreadyExists, "AlreadyExists"))
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
@@ -338,7 +338,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.InvalidArgument, "Invalid"))
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result

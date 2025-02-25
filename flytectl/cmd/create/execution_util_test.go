@@ -49,7 +49,7 @@ func TestCreateExecutionForRelaunch(t *testing.T) {
 	s := testutils.Setup(t)
 
 	createExecutionUtilSetup()
-	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
+	s.MockAdminClient.EXPECT().RelaunchExecution(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
 	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.Nil(t, err)
 }
@@ -58,7 +58,7 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 	s := testutils.Setup(t)
 
 	createExecutionUtilSetup()
-	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
+	s.MockAdminClient.EXPECT().RelaunchExecution(s.Ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
 	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 
 	assert.NotNil(t, err)
@@ -69,7 +69,7 @@ func TestCreateExecutionForRecovery(t *testing.T) {
 	s := testutils.Setup(t)
 
 	createExecutionUtilSetup()
-	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(executionCreateResponse, nil)
+	s.MockAdminClient.EXPECT().RecoverExecution(s.Ctx, recoverRequest).Return(executionCreateResponse, nil)
 	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.Nil(t, err)
 }
@@ -78,7 +78,7 @@ func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 	s := testutils.Setup(t)
 
 	createExecutionUtilSetup()
-	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
+	s.MockAdminClient.EXPECT().RecoverExecution(s.Ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
 	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("unknown execution"))
@@ -170,7 +170,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		executionConfig.KubeServiceAcct = "default"
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.EXPECT().FetchLPVersion(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
-		s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, mock.Anything).Return(launchPlan, nil)
+		s.MockAdminClient.EXPECT().GetLaunchPlan(s.Ctx, mock.Anything).Return(launchPlan, nil)
 		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
@@ -305,7 +305,7 @@ func TestCreateExecutionForRelaunchOverwritingCache(t *testing.T) {
 	createExecutionUtilSetup()
 	executionConfig.OverwriteCache = true
 	relaunchRequest.OverwriteCache = true // ensure request has overwriteCache param set
-	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
+	s.MockAdminClient.EXPECT().RelaunchExecution(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
 	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
 	assert.Nil(t, err)
 }

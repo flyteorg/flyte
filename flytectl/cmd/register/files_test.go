@@ -28,10 +28,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.Archive = true
 		args := []string{"testdata/valid-parent-folder-register.tar"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		err := registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
 	})
@@ -51,10 +51,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = mockStorage
 
 		args := []string{"testdata/flytesnacks-core.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		mockDataProxy := s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient)
 		mockDataProxy.OnCreateUploadLocationMatch(s.Ctx, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 
@@ -77,10 +77,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = mockStorage
 
 		args := []string{"testdata/failure-node.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		mockDataProxy := s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient)
 		mockDataProxy.OnCreateUploadLocationMatch(s.Ctx, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 
@@ -101,10 +101,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Nil(t, err)
 		Client = store
 		args := []string{"testdata/flytesnacks-core.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(mock.Anything, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 		err = Register(s.Ctx, args, config.GetConfig(), s.CmdCtx)
 		assert.Nil(t, err)
@@ -123,10 +123,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = store
 		assert.Nil(t, err)
 		args := []string{"testdata/invalid-fast.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
@@ -146,9 +146,9 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = store
 		assert.Nil(t, err)
 		args := []string{"testdata/flytesnacks-core.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(1)
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(mock.Anything, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -171,9 +171,9 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = store
 		assert.Nil(t, err)
 		args := []string{"testdata/flytesnacks-core.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(39)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(21)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(24)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(39)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(21)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed")).Call.Times(24)
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(mock.Anything, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -195,10 +195,10 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = store
 		assert.Nil(t, err)
 		args := []string{"testdata/flytesnacks-core.tgz"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().UpdateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(mock.Anything, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -219,9 +219,9 @@ func TestRegisterFromFiles(t *testing.T) {
 		Client = store
 		assert.Nil(t, err)
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateWorkflow(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(mock.Anything, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
