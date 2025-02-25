@@ -238,8 +238,8 @@ func TestCheckOffloadingCompat(t *testing.T) {
 	node := &mocks.ExecutableNode{}
 	node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 	nCtx.EXPECT().ExecutionContext().Return(executionContext)
-	executionContext.OnGetTask("task1").Return(executableTask, nil)
-	executableTask.OnCoreTask().Return(&idlCore.TaskTemplate{
+	executionContext.EXPECT().GetTask("task1").Return(executableTask, nil)
+	executableTask.EXPECT().CoreTask().Return(&idlCore.TaskTemplate{
 		Metadata: &idlCore.TaskMetadata{
 			Runtime: &idlCore.RuntimeMetadata{
 				Type:    idlCore.RuntimeMetadata_FLYTE_SDK,

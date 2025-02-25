@@ -481,11 +481,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
+		tr.EXPECT().GetTaskType().Return(ttype)
 		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetDataDir().Return("data-dir")
 		ns.EXPECT().GetOutputDir().Return("data-dir")
 
 		res := &v1.ResourceRequirements{}
@@ -516,15 +516,15 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.EXPECT().EventsRecorder().Return(recorder)
 		nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
 
-		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
+		nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		executionContext.EXPECT().GetParentInfo().Return(nil)
 		if allowIncrementParallelism {
-			executionContext.OnIncrementParallelism().Return(1)
+			executionContext.EXPECT().IncrementParallelism().Return(1)
 		}
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
@@ -532,13 +532,13 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		cod := codex.GobStateCodec{}
 		assert.NoError(t, cod.Encode(pluginResp, st))
 		nr := &nodeMocks.NodeStateReader{}
-		nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
+		nr.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{
 			PluginState:        st.Bytes(),
 			PluginPhase:        pluginPhase,
 			PluginPhaseVersion: pluginVer,
 		})
-		nCtx.OnNodeStateReader().Return(nr)
-		nCtx.OnNodeStateWriter().Return(s)
+		nCtx.EXPECT().NodeStateReader().Return(nr)
+		nCtx.EXPECT().NodeStateWriter().Return(s)
 		return nCtx
 	}
 
@@ -802,10 +802,10 @@ func Test_task_Abort(t *testing.T) {
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return("x")
+		tr.EXPECT().GetTaskType().Return("x")
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
 		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
@@ -840,8 +840,8 @@ func Test_task_Abort(t *testing.T) {
 		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
-		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
+		nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})
 		a := 45
@@ -851,17 +851,17 @@ func Test_task_Abort(t *testing.T) {
 		cod := codex.GobStateCodec{}
 		assert.NoError(t, cod.Encode(test{A: a}, st))
 		nr := &nodeMocks.NodeStateReader{}
-		nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
+		nr.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{
 			PluginState: st.Bytes(),
 		})
-		nCtx.OnNodeStateReader().Return(nr)
+		nCtx.EXPECT().NodeStateReader().Return(nr)
 		return nCtx
 	}
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 
 	incompatibleClusterEventsRecorder := nodeMocks.EventRecorder{}
-	incompatibleClusterEventsRecorder.OnRecordTaskEventMatch(mock.Anything, mock.Anything, mock.Anything).Return(
+	incompatibleClusterEventsRecorder.EXPECT().RecordTaskEvent(mock.Anything, mock.Anything, mock.Anything).Return(
 		&eventsErr.EventError{
 			Code: eventsErr.EventIncompatibleCusterError,
 		})
@@ -966,10 +966,10 @@ func Test_task_Abort_v1(t *testing.T) {
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return("x")
+		tr.EXPECT().GetTaskType().Return("x")
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
 		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
@@ -1004,8 +1004,8 @@ func Test_task_Abort_v1(t *testing.T) {
 		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
-		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
+		nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})
 		a := 45
@@ -1015,17 +1015,17 @@ func Test_task_Abort_v1(t *testing.T) {
 		cod := codex.GobStateCodec{}
 		assert.NoError(t, cod.Encode(test{A: a}, st))
 		nr := &nodeMocks.NodeStateReader{}
-		nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
+		nr.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{
 			PluginState: st.Bytes(),
 		})
-		nCtx.OnNodeStateReader().Return(nr)
+		nCtx.EXPECT().NodeStateReader().Return(nr)
 		return nCtx
 	}
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 
 	incompatibleClusterEventsRecorder := nodeMocks.EventRecorder{}
-	incompatibleClusterEventsRecorder.OnRecordTaskEventMatch(mock.Anything, mock.Anything, mock.Anything).Return(
+	incompatibleClusterEventsRecorder.EXPECT().RecordTaskEvent(mock.Anything, mock.Anything, mock.Anything).Return(
 		&eventsErr.EventError{
 			Code: eventsErr.EventIncompatibleCusterError,
 		})
@@ -1147,11 +1147,11 @@ func Test_task_Finalize(t *testing.T) {
 		}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return("x")
+		tr.EXPECT().GetTaskType().Return("x")
 		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
 		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
@@ -1187,8 +1187,8 @@ func Test_task_Finalize(t *testing.T) {
 		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
-		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+		nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
+		nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})
 		a := 45
@@ -1302,8 +1302,8 @@ func Test_task_Handle_ValidateOutputErr(t *testing.T) {
 
 	expectedErr := errors.Wrapf(ioutils.ErrRemoteFileExceedsMaxSize, "test file size exceeded")
 	r := &ioMocks.OutputReader{}
-	r.OnIsError(ctx).Return(false, nil)
-	r.OnExists(ctx).Return(true, expectedErr)
+	r.EXPECT().IsError(ctx).Return(false, nil)
+	r.EXPECT().Exists(ctx).Return(true, expectedErr)
 
 	h := Handler{}
 	result, err := h.ValidateOutput(ctx, nodeID, nil, r, nil, execConfig, tr)

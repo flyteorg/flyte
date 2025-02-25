@@ -44,28 +44,28 @@ func Test_validateBranchInterface(t *testing.T) {
 	}
 
 	n2 := &mocks.NodeBuilder{}
-	n2.OnGetId().Return("n2")
-	n2.OnGetCoreNode().Return(coreN2)
-	n2.OnGetTaskNode().Return(taskNode)
+	n2.EXPECT().GetId().Return("n2")
+	n2.EXPECT().GetCoreNode().Return(coreN2)
+	n2.EXPECT().GetTaskNode().Return(taskNode)
 	n2.On("SetInterface", mock.Anything)
-	n2.OnGetInputs().Return([]*core.Binding{})
+	n2.EXPECT().GetInputs().Return([]*core.Binding{})
 	n2.On("SetID", mock.Anything).Return()
-	n2.OnGetInterface().Return(nil)
+	n2.EXPECT().GetInterface().Return(nil)
 
 	task := &mocks.Task{}
-	task.OnGetInterface().Return(&core.TypedInterface{})
+	task.EXPECT().GetInterface().Return(&core.TypedInterface{})
 
 	wf := &mocks.WorkflowBuilder{}
 	wf.On("GetTask", mock.Anything).Return(task, true)
 
 	errs := compilerErrors.NewCompileErrors()
-	wf.OnGetOrCreateNodeBuilder(coreN2).Return(n2)
+	wf.EXPECT().GetOrCreateNodeBuilder(coreN2).Return(n2)
 
 	t.Run("single branch", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetInterface().Return(nil)
+		n.EXPECT().GetInterface().Return(nil)
 		n.On("SetID", mock.Anything).Return()
-		n.OnGetId().Return("n1")
+		n.EXPECT().GetId().Return("n1")
 		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{
 				Case: &core.IfBlock{
@@ -82,7 +82,7 @@ func Test_validateBranchInterface(t *testing.T) {
 			},
 		})
 
-		n.OnGetInputs().Return([]*core.Binding{})
+		n.EXPECT().GetInputs().Return([]*core.Binding{})
 
 		_, ok := validateBranchInterface(wf, n, errs)
 		assert.True(t, ok)
@@ -93,9 +93,9 @@ func Test_validateBranchInterface(t *testing.T) {
 
 	t.Run("two conditions", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("n1")
-		n.OnGetInterface().Return(nil)
-		n.OnGetInputs().Return([]*core.Binding{})
+		n.EXPECT().GetId().Return("n1")
+		n.EXPECT().GetInterface().Return(nil)
+		n.EXPECT().GetInputs().Return([]*core.Binding{})
 		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{
 				Case: &core.IfBlock{

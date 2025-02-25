@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -769,7 +770,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			},
 		}
 		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -790,7 +791,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			},
 		}
 		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -880,9 +881,9 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
 			// populate mock CompiledWorkflowClosure that satisfies just enough to compile
-			wfClosure := args.Get(2)
+			wfClosure := msg
 			assert.NotNil(t, wfClosure)
 			casted := wfClosure.(*admin.WorkflowClosure)
 			casted.CompiledWorkflow = &core.CompiledWorkflowClosure{

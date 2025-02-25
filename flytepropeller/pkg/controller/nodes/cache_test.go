@@ -70,7 +70,7 @@ func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTempla
 			Name: parentUniqueID,
 		},
 	)
-	mockNodeExecutionMetadata.OnGetNodeExecutionIDMatch().Return(
+	mockNodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(
 		&core.NodeExecutionIdentifier{
 			NodeId: nodeID,
 		},
@@ -344,7 +344,7 @@ func TestReleaseCatalogReservation(t *testing.T) {
 			cacheableHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnReleaseReservationMatch(mock.Anything, mock.Anything, mock.Anything).Return(test.releaseError)
+			catalogClient.EXPECT().ReleaseReservation(mock.Anything, mock.Anything, mock.Anything).Return(test.releaseError)
 
 			nodeExecutor := &nodeExecutor{
 				catalog: catalogClient,

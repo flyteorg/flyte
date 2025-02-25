@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -output=mocks -case=underscore
+//go:generate mockery-v2 --all --output=mocks --case=underscore --with-expecter
 
 // Recorder for Task events
 type TaskEventRecorder interface {

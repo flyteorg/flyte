@@ -30,7 +30,7 @@ func TestGetSubWorkflow(t *testing.T) {
 		ectx := &execMocks.ExecutionContext{}
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.EXPECT().Node().Return(node)
@@ -59,8 +59,8 @@ func TestGetSubWorkflow(t *testing.T) {
 		failureNode.EXPECT().GetWorkflowNode().Return(wfFailureNode)
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		swf.OnGetOnFailureNode().Return(failureNode)
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		swf.EXPECT().GetOnFailureNode().Return(failureNode)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.EXPECT().Node().Return(node)
@@ -82,7 +82,7 @@ func TestGetSubWorkflow(t *testing.T) {
 
 		ectx := &execMocks.ExecutionContext{}
 
-		ectx.OnFindSubWorkflow("x").Return(nil)
+		ectx.EXPECT().FindSubWorkflow("x").Return(nil)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.EXPECT().Node().Return(node)
@@ -107,7 +107,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -120,7 +120,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.EXPECT().GetID().Return("swf")
-		nodeExec.OnAbortHandlerMatch(mock.Anything, ectx, swf, mock.Anything, n, "reason").Return(nil)
+		nodeExec.EXPECT().AbortHandler(mock.Anything, ectx, swf, mock.Anything, n, "reason").Return(nil)
 		assert.Panics(t, func() {
 			_ = s.HandleAbort(ctx, nCtx, "reason")
 		})
@@ -135,10 +135,10 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		node.EXPECT().GetWorkflowNode().Return(wfNode)
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
+		swf.EXPECT().StartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 		ectx.EXPECT().GetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
@@ -155,7 +155,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.EXPECT().GetID().Return("swf")
 		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
-		nodeExec.OnAbortHandlerMatch(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(fmt.Errorf("err"))
+		nodeExec.EXPECT().AbortHandler(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(fmt.Errorf("err"))
 		assert.Error(t, s.HandleAbort(ctx, nCtx, "reason"))
 	})
 
@@ -169,10 +169,10 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		node.EXPECT().GetWorkflowNode().Return(wfNode)
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
+		swf.EXPECT().StartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 		ectx.EXPECT().GetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
@@ -189,7 +189,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.EXPECT().GetID().Return("swf")
 		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
-		nodeExec.OnAbortHandlerMatch(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(nil)
+		nodeExec.EXPECT().AbortHandler(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(nil)
 		assert.NoError(t, s.HandleAbort(ctx, nCtx, "reason"))
 	})
 }

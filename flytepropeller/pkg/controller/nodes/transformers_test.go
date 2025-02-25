@@ -42,7 +42,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		parentInfo.EXPECT().IsInDynamicChain().Return(true)
 		node := mocks.ExecutableNode{}
 		node.EXPECT().GetID().Return("n")
-		node.EXPECT().EXPECT().GetName().Return("nodey")
+		node.EXPECT().GetName().Return("nodey")
 		node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 
 		nev, err := ToNodeExecutionEvent(&core.NodeExecutionIdentifier{
@@ -74,7 +74,7 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		parentInfo.EXPECT().IsInDynamicChain().Return(false)
 		node := mocks.ExecutableNode{}
 		node.EXPECT().GetID().Return("n")
-		node.EXPECT().EXPECT().GetName().Return("nodey")
+		node.EXPECT().GetName().Return("nodey")
 		node.EXPECT().GetKind().Return(v1alpha1.NodeKindWorkflow)
 		executableWorkflowNode := mocks.ExecutableWorkflowNode{}
 		subworkflowRef := "ref"

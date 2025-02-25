@@ -105,23 +105,23 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	nCtx.EXPECT().NodeStatus().Return(s)
 
 	nr := &mocks3.NodeStateReader{}
-	nr.OnGetWorkflowNodeState().Return(handler.WorkflowNodeState{
+	nr.EXPECT().GetWorkflowNodeState().Return(handler.WorkflowNodeState{
 		Phase: phase,
 	})
-	nCtx.OnNodeStateReader().Return(nr)
-	nCtx.OnNodeStateWriter().Return(state)
+	nCtx.EXPECT().NodeStateReader().Return(nr)
+	nCtx.EXPECT().NodeStateWriter().Return(state)
 
 	ex := &execMocks.ExecutionContext{}
 	ex.EXPECT().GetEventVersion().Return(version)
 	ex.EXPECT().GetParentInfo().Return(nil)
 	ex.EXPECT().GetName().Return("name")
 	ex.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	ex.OnIncrementParallelism().Return(1)
+	ex.EXPECT().IncrementParallelism().Return(1)
 	ex.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
 	ex.EXPECT().GetAnnotations().Return(nil)
 	ex.EXPECT().GetLabels().Return(nil)
-	ex.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-	ex.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+	ex.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+	ex.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 
 	nCtx.EXPECT().ExecutionContext().Return(ex)
 
@@ -153,7 +153,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		Name:      "name",
 	}
 	mockWfNode := &mocks2.ExecutableWorkflowNode{}
-	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
+	mockWfNode.EXPECT().GetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
 	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
@@ -165,13 +165,13 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
 	wfStatus := &mocks2.MutableWorkflowNodeStatus{}
-	mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
+	mockNodeStatus.EXPECT().GetOrCreateWorkflowStatus().Return(wfStatus)
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("happy v0", func(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnLaunchMatch(
+		mockLPExec.EXPECT().Launch(
 			ctx,
 			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
 				return o.ParentNodeExecution.GetNodeId() == mockNode.GetID() &&
@@ -197,7 +197,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnLaunchMatch(
+		mockLPExec.EXPECT().Launch(
 			ctx,
 			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
 				return o.ParentNodeExecution.GetNodeId() == mockNode.GetID() &&
@@ -234,7 +234,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 	}
 	mockWfNode := &mocks2.ExecutableWorkflowNode{}
-	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
+	mockWfNode.EXPECT().GetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
 	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
@@ -245,7 +245,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
-	mockNodeStatusEXPECT().GetDataDir().Return(dataDir)
+	mockNodeStatus.EXPECT().GetDataDir().Return(dataDir)
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("stillRunning V0", func(t *testing.T) {
@@ -253,7 +253,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnGetStatusMatch(
+		mockLPExec.EXPECT().GetStatus(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.GetProject(), o.GetProject()) && assert.Equal(t, wfExecID.GetDomain(), o.GetDomain())
@@ -274,7 +274,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnGetStatusMatch(
+		mockLPExec.EXPECT().GetStatus(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.GetProject(), o.GetProject()) && assert.Equal(t, wfExecID.GetDomain(), o.GetDomain())
@@ -306,7 +306,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 	}
 	mockWfNode := &mocks2.ExecutableWorkflowNode{}
-	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
+	mockWfNode.EXPECT().GetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
 	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
@@ -317,7 +317,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
-	mockNodeStatusEXPECT().GetDataDir().Return(dataDir)
+	mockNodeStatus.EXPECT().GetDataDir().Return(dataDir)
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("abort v0", func(t *testing.T) {
@@ -326,7 +326,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnKillMatch(
+		mockLPExec.EXPECT().Kill(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.GetProject(), o.GetProject()) && assert.Equal(t, wfExecID.GetDomain(), o.GetDomain())
@@ -335,7 +335,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		).Return(nil)
 
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		eCtx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		eCtx.EXPECT().GetName().Return("test")
 		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
@@ -348,7 +348,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnKillMatch(
+		mockLPExec.EXPECT().Kill(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.GetProject(), o.GetProject()) && assert.Equal(t, wfExecID.GetDomain(), o.GetDomain())
@@ -357,7 +357,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		).Return(nil)
 
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		eCtx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		eCtx.EXPECT().GetName().Return("test")
 		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
@@ -368,7 +368,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
 		expectedErr := fmt.Errorf("fail")
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnKillMatch(
+		mockLPExec.EXPECT().Kill(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.GetProject(), o.GetProject()) && assert.Equal(t, wfExecID.GetDomain(), o.GetDomain())
@@ -378,7 +378,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		eCtx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		eCtx.EXPECT().GetName().Return("test")
 		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 

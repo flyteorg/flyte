@@ -453,7 +453,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(test.handlerReturn())
-				h.OnFinalizeRequired().Return(false)
+				h.EXPECT().FinalizeRequired().Return(false)
 
 				hf.EXPECT().GetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
@@ -628,33 +628,33 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN0Status.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 			tk := &mocks.ExecutableTask{}
-			tk.OnCoreTask().Return(&core.TaskTemplate{})
+			tk.EXPECT().CoreTask().Return(&core.TaskTemplate{})
 			mockWfStatus := &mocks.ExecutableWorkflowStatus{}
 			mockWf := &mocks.ExecutableWorkflow{}
-			mockWf.OnStartNode().Return(mockNodeN0)
+			mockWf.EXPECT().StartNode().Return(mockNodeN0)
 			mockWf.EXPECT().GetNode(nodeN2).Return(mockNode, true)
 			mockWf.EXPECT().GetNode(nodeN0).Return(mockNodeN0, true)
-			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN0).Return(mockN0Status)
-			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN2).Return(mockN2Status)
-			mockWf.OnGetConnections().Return(connections)
+			mockWf.EXPECT().GetNodeExecutionStatus(mock.Anything, nodeN0).Return(mockN0Status)
+			mockWf.EXPECT().GetNodeExecutionStatus(mock.Anything, nodeN2).Return(mockN2Status)
+			mockWf.EXPECT().GetConnections().Return(connections)
 			mockWf.EXPECT().GetID().Return("w1")
 			mockWf.EXPECT().ToNode(nodeN2).Return([]string{nodeN0}, nil)
-			mockWf.OnFromNode(nodeN0).Return([]string{nodeN2}, nil)
-			mockWf.OnFromNode(nodeN2).Return([]string{}, fmt.Errorf("did not expect"))
-			mockWf.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-			mockWf.OnGetExecutionStatus().Return(mockWfStatus)
-			mockWf.OnGetTask(taskID0).Return(tk, nil)
-			mockWf.OnGetTask(taskID).Return(tk, nil)
+			mockWf.EXPECT().FromNode(nodeN0).Return([]string{nodeN2}, nil)
+			mockWf.EXPECT().FromNode(nodeN2).Return([]string{}, fmt.Errorf("did not expect"))
+			mockWf.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
+			mockWf.EXPECT().GetExecutionStatus().Return(mockWfStatus)
+			mockWf.EXPECT().GetTask(taskID0).Return(tk, nil)
+			mockWf.EXPECT().GetTask(taskID).Return(tk, nil)
 			mockWf.EXPECT().GetLabels().Return(make(map[string]string))
 			mockWf.EXPECT().IsInterruptible().Return(false)
 			mockWf.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
-			mockWf.OnGetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
-			mockWf.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
+			mockWf.EXPECT().GetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
+			mockWf.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 			})
 			mockWf.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			mockWfStatusEXPECT().GetDataDir().Return(storage.DataReference("x"))
-			mockWfStatus.OnConstructNodeDataDirMatch(mock.Anything, mock.Anything, mock.Anything).Return("x", nil)
+			mockWfStatus.EXPECT().GetDataDir().Return(storage.DataReference("x"))
+			mockWfStatus.EXPECT().ConstructNodeDataDir(mock.Anything, mock.Anything).Return("x", nil)
 			return mockWf, mockN2Status
 		}
 
@@ -681,11 +681,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 				h := &nodemocks.NodeHandler{}
-				h.OnHandleMatch(
+				h.EXPECT().Handle(
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
-				h.OnFinalizeRequired().Return(false)
+				h.EXPECT().FinalizeRequired().Return(false)
 				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.enableCRDebugMetadata)
@@ -777,7 +777,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 				called := false
 				evRecorder := &eventMocks.NodeEventRecorder{}
-				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
+				evRecorder.EXPECT().RecordNodeEvent(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
 					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
@@ -796,11 +796,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				h.On("FinalizeRequired").Return(true)
 
 				if test.finalizeReturnErr {
-					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+					h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 				} else {
-					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
+					h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 				}
-				h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
@@ -891,7 +891,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 				called := false
 				evRecorder := &eventMocks.NodeEventRecorder{}
-				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
+				evRecorder.EXPECT().RecordNodeEvent(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
 					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
@@ -909,10 +909,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				).Return(test.handlerReturn())
 				h.On("FinalizeRequired").Return(true)
 				if test.currentNodePhase == v1alpha1.NodePhaseRetryableFailure {
-					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+					h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 					h.On("Finalize", mock.Anything, mock.Anything).Return(nil)
 				} else {
-					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+					h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 					h.On("Finalize", mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 				}
 				hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
@@ -1272,14 +1272,14 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				hf := &nodemocks.HandlerFactory{}
 				exec.nodeHandlerFactory = hf
 				h := &nodemocks.NodeHandler{}
-				h.OnHandleMatch(
+				h.EXPECT().Handle(
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
-				h.OnFinalizeRequired().Return(true)
-				h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+				h.EXPECT().FinalizeRequired().Return(true)
+				h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 
-				hf.OnGetHandlerMatch(v1alpha1.NodeKindTask).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				now := v1.Time{Time: time.Now()}
 				parentBranchNodeID := "branchNode"
@@ -1289,30 +1289,30 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				parentBranchNodeStatus := &mocks.ExecutableNodeStatus{}
 				parentBranchNodeStatus.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
 				parentBranchNodeStatus.EXPECT().IsDirty().Return(false)
-				parentBranchNodeStatus.OnGetStartedAt().Return(&now)
-				parentBranchNodeStatus.OnGetLastUpdatedAt().Return(nil)
+				parentBranchNodeStatus.EXPECT().GetStartedAt().Return(&now)
+				parentBranchNodeStatus.EXPECT().GetLastUpdatedAt().Return(nil)
 				bns := &mocks.MutableBranchNodeStatus{}
 				parentBranchNodeStatus.EXPECT().GetBranchStatus().Return(bns)
 				bns.EXPECT().GetPhase().Return(test.parentNodePhase)
 				parentBranchNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				tk := &mocks.ExecutableTask{}
-				tk.OnCoreTask().Return(&core.TaskTemplate{})
+				tk.EXPECT().CoreTask().Return(&core.TaskTemplate{})
 
 				tid := "tid"
 				eCtx := &mocks4.ExecutionContext{}
-				eCtx.OnGetTask(tid).Return(tk, nil)
+				eCtx.EXPECT().GetTask(tid).Return(tk, nil)
 
 				eCtx.EXPECT().IsInterruptible().Return(true)
-				eCtx.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
+				eCtx.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
 				eCtx.EXPECT().GetLabels().Return(nil)
 				eCtx.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 				eCtx.EXPECT().GetParentInfo().Return(nil)
-				eCtx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
+				eCtx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 					RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 				})
-				eCtx.OnIncrementParallelism().Return(0)
-				eCtx.OnCurrentParallelism().Return(0)
+				eCtx.EXPECT().IncrementParallelism().Return(0)
+				eCtx.EXPECT().CurrentParallelism().Return(0)
 				eCtx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 				eCtx.EXPECT().GetConsoleURL().Return("")
 
@@ -1329,11 +1329,11 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				branchTakeNodeStatus := &mocks.ExecutableNodeStatus{}
 				branchTakeNodeStatus.EXPECT().GetPhase().Return(test.currentNodePhase)
 				branchTakeNodeStatus.EXPECT().IsDirty().Return(false)
-				branchTakeNodeStatus.OnGetSystemFailures().Return(1)
-				branchTakeNodeStatusEXPECT().GetDataDir().Return("data")
+				branchTakeNodeStatus.EXPECT().GetSystemFailures().Return(1)
+				branchTakeNodeStatus.EXPECT().GetDataDir().Return("data")
 				branchTakeNodeStatus.EXPECT().GetParentNodeID().Return(&parentBranchNodeID)
 				branchTakeNodeStatus.EXPECT().GetParentTaskID().Return(nil)
-				branchTakeNodeStatus.OnGetStartedAt().Return(&now)
+				branchTakeNodeStatus.EXPECT().GetStartedAt().Return(&now)
 				branchTakeNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				if test.phaseUpdateExpected {
@@ -1500,7 +1500,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	ns.On("GetQueuedAt").Return(queuedAtTime)
 	ns.On("GetLastAttemptStartedAt").Return(queuedAtTime)
 	ns.EXPECT().GetAttempts().Return(0)
-	ns.OnGetSystemFailures().Return(0)
+	ns.EXPECT().GetSystemFailures().Return(0)
 	ns.On("ClearLastAttemptStartedAt").Return()
 
 	for _, tt := range tests {
@@ -1550,7 +1550,7 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 	// mocking status
 	ns := &mocks.ExecutableNodeStatus{}
 	ns.EXPECT().GetAttempts().Return(0)
-	ns.OnGetSystemFailures().Return(0)
+	ns.EXPECT().GetSystemFailures().Return(0)
 	ns.On("GetQueuedAt").Return(&v1.Time{Time: time.Now()})
 	ns.On("GetLastAttemptStartedAt").Return(&v1.Time{Time: time.Now()})
 
@@ -1589,10 +1589,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort error calls finalize", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(nil)
 
@@ -1603,10 +1603,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort error calls finalize with error", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(errors.New("finalize error"))
 
@@ -1617,10 +1617,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort calls finalize when no errors", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(nil)
 
@@ -1641,7 +1641,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
 		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.AbortHandler(ctx, nil, nil, nl, n, "aborting"))
 	})
 	t.Run("incompatible-cluster-err", func(t *testing.T) {
@@ -1656,16 +1656,16 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
 		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
-		nsEXPECT().GetDataDir().Return(storage.DataReference("s3:/foo"))
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("s3:/foo"))
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		nl.EXPECT().GetNode(id).Return(n, true)
 		incompatibleClusterErr := fakeEventRecorder{nodeErr: &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")}}
 
 		hf := &nodemocks.HandlerFactory{}
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, "aborting").Return(nil)
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-		hf.OnGetHandlerMatch(v1alpha1.NodeKindStart).Return(h, nil)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, "aborting").Return(nil)
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindStart).Return(h, nil)
 
 		nodeExecutor := &nodeExecutor{
 			nodeRecorder: incompatibleClusterErr,
@@ -1677,18 +1677,18 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		}
 
 		dag := mocks4.DAGStructure{}
-		dag.OnFromNode(id).Return(make([]string, 0), nil)
+		dag.EXPECT().FromNode(id).Return(make([]string, 0), nil)
 
 		execContext := mocks4.ExecutionContext{}
 		execContext.EXPECT().IsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
-		execContext.OnGetRawOutputDataConfig().Return(r)
-		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
+		execContext.EXPECT().GetRawOutputDataConfig().Return(r)
+		execContext.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
 		execContext.EXPECT().GetLabels().Return(nil)
 		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
 		et := &mocks.ExecutableTask{}
-		et.OnCoreTask().Return(&core.TaskTemplate{
+		et.EXPECT().CoreTask().Return(&core.TaskTemplate{
 			Id: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "p",
@@ -1697,7 +1697,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 				Version:      "v",
 			},
 		})
-		execContext.OnGetTask("id").Return(et, nil)
+		execContext.EXPECT().GetTask("id").Return(et, nil)
 		parentInfo := &mocks4.ImmutableParentInfo{}
 		parentInfo.EXPECT().GetUniqueID().Return("someunique1")
 		parentInfo.EXPECT().CurrentAttempt().Return(uint32(1))
@@ -1719,7 +1719,7 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
 		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
 }
@@ -1760,9 +1760,9 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
 	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 	ns.EXPECT().GetParentTaskID().Return(tID)
-	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
+	ns.EXPECT().GetOutputDir().Return("dummy://dummyOutUrl")
 	ns.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
@@ -1811,7 +1811,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
 	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 	ns.EXPECT().GetParentTaskID().Return(tID)
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
@@ -1862,7 +1862,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
 	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 	ns.EXPECT().GetParentTaskID().Return(tID)
 
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
@@ -1977,11 +1977,11 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		exec.nodeHandlerFactory = hf
 		h := &nodemocks.NodeHandler{}
-		h.OnHandleMatch(
+		h.EXPECT().Handle(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-		h.OnFinalizeRequired().Return(false)
+		h.EXPECT().FinalizeRequired().Return(false)
 
 		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
@@ -2021,11 +2021,11 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		exec.nodeHandlerFactory = hf
 		h := &nodemocks.NodeHandler{}
-		h.OnHandleMatch(
+		h.EXPECT().Handle(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-		h.OnFinalizeRequired().Return(false)
+		h.EXPECT().FinalizeRequired().Return(false)
 
 		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
@@ -2130,7 +2130,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2187,15 +2187,14 @@ func TestRecover(t *testing.T) {
 		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		reader := &nodemocks.NodeStateReader{}
-		reader.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
-		nCtx.OnNodeStateReader().Return(reader)
+		reader.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(reader)
 
 		writer := &nodemocks.NodeStateWriter{}
-		writer.OnPutDynamicNodeStateMatch(mock.Anything).Run(func(args mock.Arguments) {
-			state := args.Get(0).(handler.DynamicNodeState)
+		writer.EXPECT().PutDynamicNodeState(mock.Anything).Run(func(state handler.DynamicNodeState) {
 			assert.Equal(t, v1alpha1.DynamicNodePhaseParentFinalized, state.Phase)
 		}).Return(nil)
-		nCtx.OnNodeStateWriter().Return(writer)
+		nCtx.EXPECT().NodeStateWriter().Return(writer)
 
 		// initialize node executor
 		recoveryClient := &recoveryMocks.Client{}
@@ -2296,7 +2295,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2361,7 +2360,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2408,14 +2407,13 @@ func TestRecover(t *testing.T) {
 		}
 
 		reader := &nodemocks.NodeStateReader{}
-		reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
-		nCtx.OnNodeStateReader().Return(reader)
+		reader.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(reader)
 		writer := &nodemocks.NodeStateWriter{}
-		writer.OnPutTaskNodeStateMatch(mock.Anything).Run(func(args mock.Arguments) {
-			state := args.Get(0).(handler.TaskNodeState)
+		writer.EXPECT().PutTaskNodeState(mock.Anything).Run(func(state handler.TaskNodeState) {
 			assert.Equal(t, state.PreviousNodeExecutionCheckpointURI.String(), "prev path")
 		}).Return(nil)
-		nCtx.OnNodeStateWriter().Return(writer)
+		nCtx.EXPECT().NodeStateWriter().Return(writer)
 
 		phaseInfo, err := executor.attemptRecovery(context.TODO(), nCtx)
 		assert.NoError(t, err)
@@ -2443,7 +2441,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
@@ -2489,7 +2487,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2524,7 +2522,7 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 		m.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			MaxParallelism: maxParallelism,
 		})
-		m.OnCurrentParallelism().Return(currentParallelism)
+		m.EXPECT().CurrentParallelism().Return(currentParallelism)
 		return m
 	}
 
@@ -2537,7 +2535,7 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 			if lpRef {
 				lp = &v1alpha1.LaunchPlanRefID{}
 			}
-			wn.OnGetLaunchPlanRefID().Return(lp)
+			wn.EXPECT().GetLaunchPlanRefID().Return(lp)
 			en.EXPECT().GetWorkflowNode().Return(wn)
 		}
 		return en
@@ -2783,18 +2781,18 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 				Return(&datacatalog.Reservation{OwnerId: test.cacheReservationOwnerID}, nil)
 
 			mockHandler := &nodemocks.CacheableNodeHandler{}
-			mockHandler.OnIsCacheableMatch(
+			mockHandler.EXPECT().IsCacheable(
 				mock.Anything,
 				mock.MatchedBy(func(nCtx interfaces.NodeExecutionContext) bool { return nCtx.NodeID() == currentNodeID }),
 			).Return(test.cacheable, test.cacheSerializable, nil)
-			mockHandler.OnIsCacheableMatch(
+			mockHandler.EXPECT().IsCacheable(
 				mock.Anything,
 				mock.MatchedBy(func(nCtx interfaces.NodeExecutionContext) bool { return nCtx.NodeID() == downstreamNodeID }),
 			).Return(false, false, nil)
 			mockHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).
 				Return(pluginscatalog.Key{Identifier: core.Identifier{Name: currentNodeID}}, nil)
-			mockHandler.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil)
-			mockHandler.OnFinalizeRequiredMatch(mock.Anything).Return(false)
+			mockHandler.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil)
+			mockHandler.EXPECT().FinalizeRequired().Return(false)
 
 			nodeExecutor := setupNodeExecutor(t, catalogClient, dataStore, mockHandler, testScope.NewSubScope("node_executor"))
 
@@ -2848,7 +2846,7 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 
 			nodeStatus := &mocks.ExecutableNodeStatus{}
 			nodeStatus.EXPECT().GetAttempts().Return(test.attempts)
-			nodeStatus.OnGetSystemFailures().Return(test.systemFailures)
+			nodeStatus.EXPECT().GetSystemFailures().Return(test.systemFailures)
 
 			err := &core.ExecutionError{
 				Kind: test.errorKind,

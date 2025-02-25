@@ -268,7 +268,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	resourcePoolInfo := []*event.ResourcePoolInfo{
 		{
 			Namespace:       "ns",

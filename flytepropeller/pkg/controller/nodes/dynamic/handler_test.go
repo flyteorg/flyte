@@ -118,11 +118,11 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
+		tr.EXPECT().GetTaskType().Return(ttype)
 		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
 		ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
@@ -141,8 +141,8 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		r := &nodeMocks.NodeStateReader{}
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
-		nCtx.OnNodeStateReader().Return(r)
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(r)
 		return nCtx
 	}
 
@@ -177,7 +177,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nCtx := createNodeContext("test")
 			s := &dynamicNodeStateHolder{}
-			nCtx.OnNodeStateWriter().Return(s)
+			nCtx.EXPECT().NodeStateWriter().Return(s)
 			if tt.args.isDynamic {
 				f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 				assert.NoError(t, err)
@@ -188,9 +188,9 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {
-				h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
+				h.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
 			} else {
-				h.OnHandleMatch(mock.Anything, mock.Anything).Return(tt.args.trns, nil)
+				h.EXPECT().Handle(mock.Anything, mock.Anything).Return(tt.args.trns, nil)
 			}
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
@@ -285,7 +285,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{
 			Phase: v1alpha1.DynamicNodePhaseParentFinalizing,
 		})
-		nCtx.OnNodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateReader().Return(r)
 
 		return nCtx
 	}
@@ -295,7 +295,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		s := &dynamicNodeStateHolder{
 			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
 		}
-		nCtx.OnNodeStateWriter().Return(s)
+		nCtx.EXPECT().NodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
@@ -303,7 +303,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		n := &nodeMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		got, err := d.Handle(context.TODO(), nCtx)
 		assert.NoError(t, err)
@@ -315,7 +315,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		s := &dynamicNodeStateHolder{
 			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
 		}
-		nCtx.OnNodeStateWriter().Return(s)
+		nCtx.EXPECT().NodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
@@ -323,7 +323,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		n := &nodeMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		_, err = d.Handle(context.TODO(), nCtx)
 		assert.Error(t, err)
@@ -450,7 +450,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
+		tr.EXPECT().GetTaskType().Return(ttype)
 		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
@@ -471,7 +471,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetDataDir().Return("end-node")
 		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
@@ -494,7 +494,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetDataDir().Return("data-dir")
 		ns.EXPECT().GetOutputDir().Return("output-dir")
 		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.EXPECT().NodeStatus().Return(ns)
@@ -502,13 +502,13 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
 		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
-		w.OnGetExecutionStatus().Return(ws)
+		w.EXPECT().GetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{
 			Phase: v1alpha1.DynamicNodePhaseExecuting,
 		})
-		nCtx.OnNodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateReader().Return(r)
 		return nCtx
 	}
 
@@ -552,7 +552,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			finalOutput := storage.DataReference("/subnode")
 			nCtx := createNodeContext("test", finalOutput)
 			s := &dynamicNodeStateHolder{}
-			nCtx.OnNodeStateWriter().Return(s)
+			nCtx.EXPECT().NodeStateWriter().Return(s)
 			f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 			assert.NoError(t, err)
 			if tt.args.dj != nil {
@@ -561,15 +561,15 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
+				h.EXPECT().ValidateOutput(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
 			} else {
-				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+				h.EXPECT().ValidateOutput(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
 			}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
+				n.EXPECT().RecursiveNodeHandler(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
 			} else {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
+				n.EXPECT().RecursiveNodeHandler(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
 			}
 			if tt.args.generateOutputs {
 				endF := v1alpha1.GetOutputsFile("end-node")
@@ -647,7 +647,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
+		tr.EXPECT().GetTaskType().Return(ttype)
 		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
@@ -668,7 +668,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetDataDir().Return("end-node")
 		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
@@ -691,7 +691,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetDataDir().Return("data-dir")
 		ns.EXPECT().GetOutputDir().Return("output-dir")
 		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.EXPECT().NodeStatus().Return(ns)
@@ -699,13 +699,13 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
 		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
-		w.OnGetExecutionStatus().Return(ws)
+		w.EXPECT().GetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{
 			Phase: v1alpha1.DynamicNodePhaseExecuting,
 		})
-		nCtx.OnNodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateReader().Return(r)
 		return nCtx
 	}
 
@@ -742,7 +742,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			finalOutput := storage.DataReference("/subnode")
 			nCtx := createNodeContext("test", finalOutput)
 			s := &dynamicNodeStateHolder{}
-			nCtx.OnNodeStateWriter().Return(s)
+			nCtx.EXPECT().NodeStateWriter().Return(s)
 			f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 			assert.NoError(t, err)
 			if tt.args.dj != nil {
@@ -751,15 +751,15 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
+				h.EXPECT().ValidateOutput(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
 			} else {
-				h.OnValidateOutputMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+				h.EXPECT().ValidateOutput(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
 			}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
+				n.EXPECT().RecursiveNodeHandler(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(interfaces.NodeStatusUndefined, fmt.Errorf("error"))
 			} else {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
+				n.EXPECT().RecursiveNodeHandler(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
 			}
 			if tt.args.generateOutputs {
 				endF := v1alpha1.GetOutputsFile("end-node")
@@ -832,13 +832,13 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		}
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		sr := &nodeMocks.NodeStateReader{}
-		sr.OnGetDynamicNodeState().Return(s)
-		nCtx.OnNodeStateReader().Return(sr)
+		sr.EXPECT().GetDynamicNodeState().Return(s)
+		nCtx.EXPECT().NodeStateReader().Return(sr)
 		nCtx.EXPECT().CurrentAttempt().Return(0)
 
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalize(ctx, nCtx).Return(nil)
+		h.EXPECT().Finalize(ctx, nCtx).Return(nil)
 		n := &nodeMocks.Node{}
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
@@ -893,7 +893,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		}
 		tr := &nodeMocks.TaskReader{}
 		tr.EXPECT().GetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
+		tr.EXPECT().GetTaskType().Return(ttype)
 		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
@@ -918,7 +918,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		nCtx.EXPECT().ExecutionContext().Return(&execContext)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetDataDir().Return("end-node")
 		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
@@ -941,7 +941,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetDataDir().Return("data-dir")
 		ns.EXPECT().GetOutputDir().Return("output-dir")
 		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.EXPECT().NodeStatus().Return(ns)
@@ -949,13 +949,13 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
 		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
-		w.OnGetExecutionStatus().Return(ws)
+		w.EXPECT().GetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{
 			Phase: v1alpha1.DynamicNodePhaseExecuting,
 		})
-		nCtx.OnNodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateReader().Return(r)
 		return nCtx
 	}
 	t.Run("dynamicnodephase-executing", func(t *testing.T) {
@@ -968,9 +968,9 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalize(ctx, nCtx).Return(nil)
+		h.EXPECT().Finalize(ctx, nCtx).Return(nil)
 		n := &nodeMocks.Node{}
-		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.NoError(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
@@ -989,9 +989,9 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalize(ctx, nCtx).Return(fmt.Errorf("err"))
+		h.EXPECT().Finalize(ctx, nCtx).Return(fmt.Errorf("err"))
 		n := &nodeMocks.Node{}
-		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
@@ -1010,9 +1010,9 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
-		h.OnFinalize(ctx, nCtx).Return(nil)
+		h.EXPECT().Finalize(ctx, nCtx).Return(nil)
 		n := &nodeMocks.Node{}
-		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))

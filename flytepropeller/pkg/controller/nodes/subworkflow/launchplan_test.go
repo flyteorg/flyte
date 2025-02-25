@@ -254,7 +254,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 
 		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		ectx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 		ectx.EXPECT().GetEventVersion().Return(1)
 		ectx.EXPECT().GetParentInfo().Return(nil)
 		ectx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
@@ -262,9 +262,9 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				WorkflowExecutionIdentifier: recoveredExecID,
 			},
 		})
-		ectx.OnIncrementParallelism().Return(1)
+		ectx.EXPECT().IncrementParallelism().Return(1)
 		ectx.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
-		ectx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+		ectx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
 		ectx.EXPECT().GetLabels().Return(nil)
 		ectx.EXPECT().GetAnnotations().Return(nil)
 

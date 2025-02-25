@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery -name Workflow -case=underscore
+//go:generate mockery-v2 --name Workflow --case=underscore --with-expecter
 
 type Workflow interface {
 	Initialize(ctx context.Context) error

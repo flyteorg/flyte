@@ -164,7 +164,7 @@ func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
 
 	subWfNode := &mocks.ExecutableWorkflowNode{}
 	subWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
-	subWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
+	subWfNode.EXPECT().GetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
 
 	n := &mocks.ExecutableNode{}
 	n.EXPECT().GetWorkflowNode().Return(subWfNode)

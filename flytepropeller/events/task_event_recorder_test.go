@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/runtime/protoiface"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -50,7 +51,7 @@ func getRawOutputTaskEv() *event.TaskExecutionEvent {
 func TestRecordTaskEvent_Success_ReferenceOutputs(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceTaskEv()))
 		return true
 	})).Return(nil)
@@ -70,15 +71,15 @@ func TestRecordTaskEvent_Success_ReferenceOutputs(t *testing.T) {
 func TestRecordTaskEvent_Success_InlineOutputs(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getRawOutputTaskEv()))
 		return true
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything).Return(nil).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+		arg := msg.(*core.LiteralMap)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{
@@ -97,7 +98,7 @@ func TestRecordTaskEvent_Success_InlineOutputs(t *testing.T) {
 func TestRecordTaskEvent_Failure_FetchInlineOutputs(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
 		assert.True(t, proto.Equal(event, getReferenceTaskEv()))
 		return true
 	})).Return(nil)
@@ -121,17 +122,17 @@ func TestRecordTaskEvent_Failure_FetchInlineOutputs(t *testing.T) {
 func TestRecordTaskEvent_Failure_FallbackReference_Retry(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
 		return event.GetOutputData() != nil
 	})).Return(status.Error(codes.ResourceExhausted, "message too large"))
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
 		return event.GetOutputData() == nil && proto.Equal(event, getReferenceTaskEv())
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything).Return(nil).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+		arg := msg.(*core.LiteralMap)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{
@@ -150,12 +151,12 @@ func TestRecordTaskEvent_Failure_FallbackReference_Retry(t *testing.T) {
 func TestRecordTaskEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
-	eventRecorder.OnRecordTaskEventMatch(ctx, mock.Anything).Return(errors.New("foo"))
+	eventRecorder.EXPECT().RecordTaskEvent(ctx, mock.Anything).Return(errors.New("foo"))
 	pbStore := &storageMocks.ComposedProtobufStore{}
 	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything).Return(nil).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+		arg := msg.(*core.LiteralMap)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{

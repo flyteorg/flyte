@@ -72,7 +72,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	tr.EXPECT().GetTaskID().Return(taskID)
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	nsEXPECT().GetDataDir().Return("data-dir")
+	ns.EXPECT().GetDataDir().Return("data-dir")
 	ns.EXPECT().GetOutputDir().Return("output-dir")
 
 	n := &flyteMocks.ExecutableNode{}
@@ -111,12 +111,12 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	codex := codex.GobStateCodec{}
 	assert.NoError(t, codex.Encode(dummyPluginState{A: dummyPluginStateA}, st))
 	nr := &nodeMocks.NodeStateReader{}
-	nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
+	nr.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{
 		PluginState: st.Bytes(),
 	})
-	nCtx.OnNodeStateReader().Return(nr)
-	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
-	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.EXPECT().NodeStateReader().Return(nr)
+	nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
+	nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 	return nCtx
 }
 
@@ -409,8 +409,8 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
 	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
-	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
 		&storage.Config{
 			Type: storage.TypeMemory,
@@ -441,8 +441,8 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
 	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
-	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
 		&storage.Config{
 			Type: storage.TypeMemory,
@@ -453,8 +453,8 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 	nCtx.EXPECT().DataStore().Return(ds)
 	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 	reader := &nodeMocks.NodeStateReader{}
-	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
-	nCtx.OnNodeStateReader().Return(reader)
+	reader.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{})
+	nCtx.EXPECT().NodeStateReader().Return(reader)
 
 	t.Run("attempt-0-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
@@ -473,8 +473,8 @@ func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
 	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
-	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	nCtx.EXPECT().OutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx.EXPECT().RawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
 		&storage.Config{
 			Type: storage.TypeMemory,
@@ -485,10 +485,10 @@ func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
 	nCtx.EXPECT().DataStore().Return(ds)
 	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 	reader := &nodeMocks.NodeStateReader{}
-	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{
+	reader.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{
 		PreviousNodeExecutionCheckpointURI: storage.DataReference("s3://sandbox/x/prevname-n1-0/_flytecheckpoints"),
 	})
-	nCtx.OnNodeStateReader().Return(reader)
+	nCtx.EXPECT().NodeStateReader().Return(reader)
 
 	t.Run("recovery-attempt-0-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
