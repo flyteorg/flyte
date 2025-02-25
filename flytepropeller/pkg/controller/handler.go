@@ -39,6 +39,7 @@ type propellerMetrics struct {
 	WorkflowClosureReadTime  labeled.StopWatch
 	StreakLength             labeled.Counter
 	RoundTime                labeled.StopWatch
+	ExecutionInfo            *prometheus.GaugeVec
 }
 
 func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
@@ -55,6 +56,7 @@ func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 		WorkflowClosureReadTime:  labeled.NewStopWatch("closure_read", "Total time taken to read and parse the offloaded WorkflowClosure", time.Millisecond, roundScope, labeled.EmitUnlabeledMetric),
 		StreakLength:             labeled.NewCounter("streak_length", "Number of consecutive rounds used in fast follow mode", roundScope, labeled.EmitUnlabeledMetric),
 		RoundTime:                labeled.NewStopWatch("round_time", "Total time taken by one round traversing, copying and storing a workflow", time.Millisecond, roundScope, labeled.EmitUnlabeledMetric),
+		ExecutionInfo:            roundScope.MustNewGaugeVec("execution_info", "Workflow execution info(project, domain, execution_id and workflow name)", "project", "domain", "execution_id", "workflow_name"),
 	}
 }
 
@@ -97,7 +99,11 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	t.Stop()
 	ctx = contextutils.WithWorkflowID(ctx, mutableW.GetID())
 	if execID := mutableW.GetExecutionID(); execID.WorkflowExecutionIdentifier != nil {
-		ctx = contextutils.WithProjectDomain(ctx, mutableW.GetExecutionID().Project, mutableW.GetExecutionID().Domain)
+		workflowName := mutableW.WorkflowSpec.GetIdentifier().GetName()
+		if !mutableW.GetExecutionStatus().IsTerminated() {
+			p.metrics.ExecutionInfo.WithLabelValues(execID.Project, execID.Domain, execID.Name, workflowName).Set(1.0)
+		}
+		ctx = contextutils.WithProjectDomain(ctx, execID.Project, execID.Domain)
 	}
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
@@ -323,6 +329,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			// We add a completed label so that we can avoid polling for this workflow
 			SetCompletedLabel(mutatedWf, time.Now())
 			ResetFinalizers(mutatedWf)
+			p.deleteExecutionInfoMetric(mutatedWf)
 		}
 	}
 
@@ -387,6 +394,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 				ResetFinalizers(mutableW)
 				SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
 				SetCompletedLabel(mutableW, time.Now())
+				p.deleteExecutionInfoMetric(mutableW)
 				msg := fmt.Sprintf("Workflow size has breached threshold. Finalized with status: %v", mutatedWf.GetExecutionStatus().GetPhase())
 				mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, &core.ExecutionError{
 					Kind:    core.ExecutionError_SYSTEM,
@@ -419,6 +427,15 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 		return nil, nil
 	}
 	return newWf, nil
+}
+
+func (p *Propeller) deleteExecutionInfoMetric(w *v1alpha1.FlyteWorkflow) {
+	execID := w.GetExecutionID()
+	p.metrics.ExecutionInfo.DeletePartialMatch(prometheus.Labels{
+		"project":      execID.Project,
+		"domain":       execID.Domain,
+		"execution_id": execID.Name,
+	})
 }
 
 // NewPropellerHandler creates a new Propeller and initializes metrics

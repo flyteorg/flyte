@@ -52,6 +52,19 @@ func TestPropeller_Handle(t *testing.T) {
 
 	p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
 
+	execID := v1alpha1.ExecutionID{
+		WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+			Project: "foo",
+			Domain:  "bar",
+			Name:    "abc123",
+		},
+	}
+	wfID := &v1alpha1.Identifier{
+		Identifier: &core.Identifier{
+			Name: "hello_world",
+		},
+	}
+
 	const namespace = "test"
 	const name = "123"
 	t.Run("notPresent", func(t *testing.T) {
@@ -94,12 +107,14 @@ func TestPropeller_Handle(t *testing.T) {
 
 	t.Run("terminated", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 			Status: v1alpha1.WorkflowStatus{
 				Phase: v1alpha1.WorkflowPhaseFailed,
@@ -164,12 +179,14 @@ func TestPropeller_Handle(t *testing.T) {
 
 	t.Run("abort", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 			Status: v1alpha1.WorkflowStatus{
 				FailedAttempts: 1,
@@ -327,13 +344,15 @@ func TestPropeller_Handle(t *testing.T) {
 
 	t.Run("retriesExhaustedFinalize", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
 				Finalizers: []string{"f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 			Status: v1alpha1.WorkflowStatus{
 				Phase:          v1alpha1.WorkflowPhaseRunning,
@@ -359,6 +378,7 @@ func TestPropeller_Handle(t *testing.T) {
 	t.Run("deletedShouldBeFinalized", func(t *testing.T) {
 		n := v1.Now()
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,
 				Namespace:         namespace,
@@ -366,7 +386,8 @@ func TestPropeller_Handle(t *testing.T) {
 				DeletionTimestamp: &n,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 			Status: v1alpha1.WorkflowStatus{
 				Phase: v1alpha1.WorkflowPhaseSucceeding,
@@ -417,13 +438,15 @@ func TestPropeller_Handle(t *testing.T) {
 
 	t.Run("removefinalizerOnTerminateSuccess", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
 				Finalizers: []string{"f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
@@ -441,13 +464,15 @@ func TestPropeller_Handle(t *testing.T) {
 
 	t.Run("removefinalizerOnTerminateFailure", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
 				Finalizers: []string{"f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
@@ -539,6 +564,19 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 
 	p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
 
+	execID := v1alpha1.ExecutionID{
+		WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+			Project: "foo",
+			Domain:  "bar",
+			Name:    "abc123",
+		},
+	}
+	wfID := &v1alpha1.Identifier{
+		Identifier: &core.Identifier{
+			Name: "hello_world",
+		},
+	}
+
 	t.Run("error", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -569,12 +607,14 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 
 	t.Run("abort", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 			Status: v1alpha1.WorkflowStatus{
 				FailedAttempts: 1,
@@ -696,12 +736,14 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 
 	t.Run("happy-success", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 		}))
 		called := 0
@@ -748,6 +790,18 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 	ctx := context.TODO()
 	cfg := &config.Config{
 		MaxWorkflowRetries: 0,
+	}
+	execID := v1alpha1.ExecutionID{
+		WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+			Project: "foo",
+			Domain:  "bar",
+			Name:    "abc123",
+		},
+	}
+	wfID := &v1alpha1.Identifier{
+		Identifier: &core.Identifier{
+			Name: "hello_world",
+		},
 	}
 
 	const namespace = "test"
@@ -828,12 +882,14 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 		exec := &mockExecutor{}
 		p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
 		wf := &v1alpha1.FlyteWorkflow{
+			ExecutionID: execID,
 			ObjectMeta: v1.ObjectMeta{
 				Name:      name,
 				Namespace: namespace,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
-				ID: "w1",
+				ID:         "w1",
+				Identifier: wfID,
 			},
 		}
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
