@@ -28,8 +28,8 @@ func init() {
 
 func newMockExecutor(ctx context.Context, t testing.TB) (Executor, array.AdvanceIteration) {
 	kubeClient := &mocks.KubeClient{}
-	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+	kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 	e, err := NewExecutor(kubeClient, &Config{
 		MaxErrorStringLength: 200,
 		OutputAssembler: workqueue.Config{

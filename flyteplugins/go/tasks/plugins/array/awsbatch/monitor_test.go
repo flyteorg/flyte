@@ -34,19 +34,19 @@ func TestCheckSubTasksState(t *testing.T) {
 	ctx := context.Background()
 	tCtx := &mocks.TaskExecutionContext{}
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("generated-name")
+	tID.EXPECT().GetGeneratedName().Return("generated-name")
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetOwnerID().Return(types.NamespacedName{
+	tMeta.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "domain",
 		Name:      "name",
 	})
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 	inMemDatastore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnGetOutputPrefixPath().Return("")
-	outputWriter.OnGetRawOutputPrefix().Return("")
+	outputWriter.EXPECT().GetOutputPrefixPath().Return("")
+	outputWriter.EXPECT().GetRawOutputPrefix().Return("")
 
 	taskReader := &mocks.TaskReader{}
 	task := &flyteIdl.TaskTemplate{
@@ -61,10 +61,10 @@ func TestCheckSubTasksState(t *testing.T) {
 	}
 	taskReader.On("Read", mock.Anything).Return(task, nil)
 
-	tCtx.OnOutputWriter().Return(outputWriter)
-	tCtx.OnTaskReader().Return(taskReader)
-	tCtx.OnDataStore().Return(inMemDatastore)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().OutputWriter().Return(outputWriter)
+	tCtx.EXPECT().TaskReader().Return(taskReader)
+	tCtx.EXPECT().DataStore().Return(inMemDatastore)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 	t.Run("Not in cache", func(t *testing.T) {
 		mBatchClient := batchMocks.NewMockAwsBatchClient()
