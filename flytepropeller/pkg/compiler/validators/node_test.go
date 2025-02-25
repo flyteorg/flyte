@@ -14,7 +14,7 @@ import (
 func TestValidateBranchNode(t *testing.T) {
 	t.Run("No Case No Default", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetBranchNode().Return(&core.BranchNode{
+		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{},
 		})
 		n.OnGetId().Return("node1")
@@ -56,8 +56,8 @@ func TestValidateNode(t *testing.T) {
 			Inputs:  &core.VariableMap{},
 		})
 		n.OnGetOutputAliases().Return(nil)
-		n.OnGetBranchNode().Return(nil)
-		n.OnGetWorkflowNode().Return(nil)
+		n.EXPECT().GetBranchNode().Return(nil)
+		n.EXPECT().GetWorkflowNode().Return(nil)
 		n.OnGetTaskNode().Return(nil)
 
 		coreN := &core.Node{}

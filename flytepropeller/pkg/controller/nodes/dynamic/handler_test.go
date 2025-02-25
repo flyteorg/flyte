@@ -77,20 +77,20 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 
 		res := &v12.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
-		n.OnGetResources().Return(res)
-		n.OnGetID().Return("n1")
+		n.EXPECT().GetResources().Return(res)
+		n.EXPECT().GetID().Return("n1")
 
 		nm := &nodeMocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      n.GetID(),
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -117,28 +117,28 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			},
 		}
 		tr := &nodeMocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskID().Return(taskID)
 		tr.OnGetTaskType().Return(ttype)
-		tr.OnReadMatch(mock.Anything).Return(tk, nil)
+		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-		ns.OnGetOutputDir().Return(storage.DataReference("data-dir"))
+		nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeStatus().Return(ns)
-		nCtx.OnNodeID().Return("n1")
-		nCtx.OnEnqueueOwnerFunc().Return(nil)
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeStatus().Return(ns)
+		nCtx.EXPECT().NodeID().Return("n1")
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
+		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		r := &nodeMocks.NodeStateReader{}
 		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
@@ -279,7 +279,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		nCtx.On("NodeStatus").Return(ns)
 		nCtx.On("NodeID").Return("n1")
 		nCtx.On("EnqueueOwner").Return(nil)
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		r := &nodeMocks.NodeStateReader{}
 		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{
@@ -413,16 +413,16 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 		}
 
 		nm := &nodeMocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      nodeID,
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -449,59 +449,59 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			},
 		}
 		tr := &nodeMocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskID().Return(taskID)
 		tr.OnGetTaskType().Return(ttype)
-		tr.OnRead(ctx).Return(tk, nil)
+		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
-		n.OnGetTaskID().Return(&tID)
+		n.EXPECT().GetTaskID().Return(&tID)
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeID().Return(nodeID)
-		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeID().Return(nodeID)
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(func() error { return nil })
+		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatus.OnGetDataDir().Return("end-node")
-		endNodeStatus.OnGetOutputDir().Return("end-node")
+		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
 		subNs.On("SetOutputDir", mock.Anything).Return()
 		subNs.On("SetParentNodeID", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
-		subNs.OnGetOutputDir().Return(finalOutput)
+		subNs.EXPECT().GetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
-		subNs.OnGetAttempts().Return(0)
+		subNs.EXPECT().GetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_2").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_3").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "Node_2").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "Node_3").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return("data-dir")
-		ns.OnGetOutputDir().Return("output-dir")
-		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
-		nCtx.OnNodeStatus().Return(ns)
+		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
+		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
-		ws.OnGetNodeExecutionStatus(ctx, nodeID).Return(ns)
+		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
 		w.OnGetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}
@@ -576,13 +576,13 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), endF, storage.Options{}, &core.LiteralMap{}))
 			}
 			execContext := executorMocks.ExecutionContext{}
-			execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+			execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 			immutableParentInfo := executorMocks.ImmutableParentInfo{}
-			immutableParentInfo.OnGetUniqueID().Return("c1")
-			immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-			execContext.OnGetParentInfo().Return(&immutableParentInfo)
-			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			nCtx.OnExecutionContext().Return(&execContext)
+			immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+			immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+			execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			nCtx.EXPECT().ExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
@@ -610,16 +610,16 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		}
 
 		nm := &nodeMocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      nodeID,
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -646,59 +646,59 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			},
 		}
 		tr := &nodeMocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskID().Return(taskID)
 		tr.OnGetTaskType().Return(ttype)
-		tr.OnRead(ctx).Return(tk, nil)
+		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
-		n.OnGetTaskID().Return(&tID)
+		n.EXPECT().GetTaskID().Return(&tID)
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeID().Return(nodeID)
-		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeID().Return(nodeID)
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(func() error { return nil })
+		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatus.OnGetDataDir().Return("end-node")
-		endNodeStatus.OnGetOutputDir().Return("end-node")
+		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
 		subNs.On("SetOutputDir", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
-		subNs.OnGetOutputDir().Return(finalOutput)
+		subNs.EXPECT().GetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
 		subNs.On("SetParentNodeID", mock.Anything).Return()
-		subNs.OnGetAttempts().Return(0)
+		subNs.EXPECT().GetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return("data-dir")
-		ns.OnGetOutputDir().Return("output-dir")
-		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
-		nCtx.OnNodeStatus().Return(ns)
+		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
+		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
-		ws.OnGetNodeExecutionStatus(ctx, nodeID).Return(ns)
+		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
 		w.OnGetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}
@@ -766,10 +766,10 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), endF, storage.Options{}, &core.LiteralMap{}))
 			}
 			execContext := executorMocks.ExecutionContext{}
-			execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-			execContext.OnGetParentInfo().Return(nil)
-			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			nCtx.OnExecutionContext().Return(&execContext)
+			execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+			execContext.EXPECT().GetParentInfo().Return(nil)
+			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			nCtx.EXPECT().ExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
@@ -834,7 +834,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		sr := &nodeMocks.NodeStateReader{}
 		sr.OnGetDynamicNodeState().Return(s)
 		nCtx.OnNodeStateReader().Return(sr)
-		nCtx.OnCurrentAttempt().Return(0)
+		nCtx.EXPECT().CurrentAttempt().Return(0)
 
 		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
@@ -856,16 +856,16 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		}
 
 		nm := &nodeMocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      nodeID,
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -892,63 +892,63 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 			},
 		}
 		tr := &nodeMocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskID().Return(taskID)
 		tr.OnGetTaskType().Return(ttype)
-		tr.OnRead(ctx).Return(tk, nil)
+		tr.EXPECT().Read(ctx).Return(tk, nil)
 
 		n := &flyteMocks.ExecutableNode{}
-		n.OnGetTaskID().Return(&tID)
+		n.EXPECT().GetTaskID().Return(&tID)
 
 		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeID().Return(nodeID)
-		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeID().Return(nodeID)
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(func() error { return nil })
+		nCtx.EXPECT().DataStore().Return(dataStore)
 		execContext := executorMocks.ExecutionContext{}
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-		execContext.OnGetParentInfo().Return(nil)
-		nCtx.OnExecutionContext().Return(&execContext)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetParentInfo().Return(nil)
+		nCtx.EXPECT().ExecutionContext().Return(&execContext)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
-		endNodeStatus.OnGetDataDir().Return("end-node")
-		endNodeStatus.OnGetOutputDir().Return("end-node")
+		endNodeStatusEXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
 		subNs.On("SetOutputDir", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
-		subNs.OnGetOutputDir().Return(finalOutput)
+		subNs.EXPECT().GetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
 		subNs.On("SetParentNodeID", mock.Anything).Return()
-		subNs.OnGetAttempts().Return(0)
+		subNs.EXPECT().GetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return("data-dir")
-		ns.OnGetOutputDir().Return("output-dir")
-		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
-		nCtx.OnNodeStatus().Return(ns)
+		nsEXPECT().GetDataDir().Return("data-dir")
+		ns.EXPECT().GetOutputDir().Return("output-dir")
+		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
-		ws.OnGetNodeExecutionStatus(ctx, nodeID).Return(ns)
+		ws.EXPECT().GetNodeExecutionStatus(ctx, nodeID).Return(ns)
 		w.OnGetExecutionStatus().Return(ws)
 
 		r := &nodeMocks.NodeStateReader{}

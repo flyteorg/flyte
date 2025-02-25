@@ -77,32 +77,32 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	state := &workflowNodeStateHolder{s: wfNodeState}
 
 	nm := &mocks3.NodeExecutionMetadata{}
-	nm.OnGetAnnotations().Return(map[string]string{})
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+	nm.EXPECT().GetAnnotations().Return(map[string]string{})
+	nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 		ExecutionId: wfExecID,
 		NodeId:      n.GetID(),
 	})
-	nm.OnGetK8sServiceAccount().Return("service-account")
-	nm.OnGetLabels().Return(map[string]string{})
-	nm.OnGetNamespace().Return("namespace")
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.OnGetOwnerReference().Return(v1.OwnerReference{
+	nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+	nm.EXPECT().GetLabels().Return(map[string]string{})
+	nm.EXPECT().GetNamespace().Return("namespace")
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "sample",
 		Name: "name",
 	})
 
 	ir := &mocks4.InputReader{}
 	inputs := &core.LiteralMap{}
-	ir.OnGetMatch(mock.Anything).Return(inputs, nil)
+	ir.EXPECT().Get(mock.Anything).Return(inputs, nil)
 
 	nCtx := &mocks3.NodeExecutionContext{}
-	nCtx.OnNode().Return(n)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnInputReader().Return(ir)
-	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnNodeID().Return(n.GetID())
-	nCtx.OnEnqueueOwnerFunc().Return(nil)
-	nCtx.OnNodeStatus().Return(s)
+	nCtx.EXPECT().Node().Return(n)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().InputReader().Return(ir)
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+	nCtx.EXPECT().NodeID().Return(n.GetID())
+	nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
+	nCtx.EXPECT().NodeStatus().Return(s)
 
 	nr := &mocks3.NodeStateReader{}
 	nr.OnGetWorkflowNodeState().Return(handler.WorkflowNodeState{
@@ -112,18 +112,18 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	nCtx.OnNodeStateWriter().Return(state)
 
 	ex := &execMocks.ExecutionContext{}
-	ex.OnGetEventVersion().Return(version)
-	ex.OnGetParentInfo().Return(nil)
-	ex.OnGetName().Return("name")
-	ex.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	ex.EXPECT().GetEventVersion().Return(version)
+	ex.EXPECT().GetParentInfo().Return(nil)
+	ex.EXPECT().GetName().Return("name")
+	ex.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 	ex.OnIncrementParallelism().Return(1)
-	ex.OnGetSecurityContext().Return(core.SecurityContext{})
-	ex.OnGetAnnotations().Return(nil)
-	ex.OnGetLabels().Return(nil)
+	ex.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+	ex.EXPECT().GetAnnotations().Return(nil)
+	ex.EXPECT().GetLabels().Return(nil)
 	ex.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
 	ex.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
 
-	nCtx.OnExecutionContext().Return(ex)
+	nCtx.EXPECT().ExecutionContext().Return(ex)
 
 	return nCtx
 }
@@ -156,14 +156,14 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
-	mockWfNode.OnGetSubWorkflowRef().Return(nil)
+	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.OnGetID().Return("n1")
-	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.EXPECT().GetID().Return("n1")
+	mockNode.EXPECT().GetWorkflowNode().Return(mockWfNode)
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
-	mockNodeStatus.OnGetAttempts().Return(attempts)
+	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
 	wfStatus := &mocks2.MutableWorkflowNodeStatus{}
 	mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
 	recoveryClient := &mocks5.Client{}
@@ -237,15 +237,15 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
-	mockWfNode.OnGetSubWorkflowRef().Return(nil)
+	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.OnGetID().Return("n1")
-	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.EXPECT().GetID().Return("n1")
+	mockNode.EXPECT().GetWorkflowNode().Return(mockWfNode)
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
-	mockNodeStatus.OnGetAttempts().Return(attempts)
-	mockNodeStatus.OnGetDataDir().Return(dataDir)
+	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
+	mockNodeStatusEXPECT().GetDataDir().Return(dataDir)
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("stillRunning V0", func(t *testing.T) {
@@ -309,15 +309,15 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
 	})
-	mockWfNode.OnGetSubWorkflowRef().Return(nil)
+	mockWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.OnGetID().Return("n1")
-	mockNode.OnGetWorkflowNode().Return(mockWfNode)
+	mockNode.EXPECT().GetID().Return("n1")
+	mockNode.EXPECT().GetWorkflowNode().Return(mockWfNode)
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
-	mockNodeStatus.OnGetAttempts().Return(attempts)
-	mockNodeStatus.OnGetDataDir().Return(dataDir)
+	mockNodeStatus.EXPECT().GetAttempts().Return(attempts)
+	mockNodeStatusEXPECT().GetDataDir().Return(dataDir)
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("abort v0", func(t *testing.T) {
@@ -336,8 +336,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		eCtx.OnGetName().Return("test")
-		nCtx.OnExecutionContext().Return(eCtx)
+		eCtx.EXPECT().GetName().Return("test")
+		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
 		assert.NoError(t, err)
 	})
@@ -358,8 +358,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		eCtx.OnGetName().Return("test")
-		nCtx.OnExecutionContext().Return(eCtx)
+		eCtx.EXPECT().GetName().Return("test")
+		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
 		assert.NoError(t, err)
 	})
@@ -379,8 +379,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		eCtx.OnGetName().Return("test")
-		nCtx.OnExecutionContext().Return(eCtx)
+		eCtx.EXPECT().GetName().Return("test")
+		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 
 		err := h.Abort(ctx, nCtx, "test")
 		assert.Error(t, err)

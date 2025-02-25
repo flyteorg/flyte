@@ -85,7 +85,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnCurrentAttempt().Return(uint32(0))
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(0))
 
 	// ContextualNodeLookup
 	nodeLookup := &execmocks.NodeLookup{}
@@ -93,12 +93,12 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	nCtx.OnContextualNodeLookup().Return(nodeLookup)
 
 	// DataStore
-	nCtx.OnDataStore().Return(dataStore)
+	nCtx.EXPECT().DataStore().Return(dataStore)
 
 	// ExecutionContext
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		MaxParallelism: maxParallelism,
 	})
 	executionContext.OnGetExecutionID().Return(
@@ -109,10 +109,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 				Name:    "name",
 			},
 		})
-	executionContext.OnGetLabels().Return(nil)
+	executionContext.EXPECT().GetLabels().Return(nil)
 	executionContext.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-	executionContext.OnIsInterruptible().Return(false)
-	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.EXPECT().IsInterruptible().Return(false)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
 	outputVariableMap := make(map[string]*idlcore.Variable)
 	for _, outputVariable := range outputVariables {
 		outputVariableMap[outputVariable] = &idlcore.Variable{}
@@ -135,26 +135,26 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	executionContext.OnIncrementTaskExecutionCount().Return(1)
 	executionContext.OnCurrentNodeExecutionCount().Return(1)
 	executionContext.OnCurrentTaskExecutionCount().Return(1)
-	nCtx.OnExecutionContext().Return(executionContext)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 	// EventsRecorder
-	nCtx.OnEventsRecorder().Return(eventRecorder)
+	nCtx.EXPECT().EventsRecorder().Return(eventRecorder)
 
 	// InputReader
 	inputFilePaths := &pluginiomocks.InputFilePaths{}
-	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
-	nCtx.OnInputReader().Return(
+	inputFilePaths.EXPECT().GetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	nCtx.EXPECT().InputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,
 			inputLiteralMap,
 		))
 
 	// Node
-	nCtx.OnNode().Return(arrayNodeSpec)
+	nCtx.EXPECT().Node().Return(arrayNodeSpec)
 
 	// NodeExecutionMetadata
 	nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnGetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
+	nodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
 		NodeId: "foo",
 		ExecutionId: &idlcore.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -162,14 +162,14 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 			Name:    "name",
 		},
 	})
-	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	nodeExecutionMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "wf-namespace",
 		Name:      "wf-name",
 	})
-	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nodeExecutionMetadata)
 
 	// NodeID
-	nCtx.OnNodeID().Return("foo")
+	nCtx.EXPECT().NodeID().Return("foo")
 
 	// NodeStateReader
 	nodeStateReader := &mocks.NodeStateReader{}
@@ -190,7 +190,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	metav1NowMinus := metav1.Time{
 		Time: nowMinus,
 	}
-	nCtx.OnNodeStatus().Return(&v1alpha1.NodeStatus{
+	nCtx.EXPECT().NodeStatus().Return(&v1alpha1.NodeStatus{
 		DataDir:              storage.DataReference("s3://bucket/data"),
 		OutputDir:            storage.DataReference("s3://bucket/output"),
 		LastAttemptStartedAt: &metav1NowMinus,

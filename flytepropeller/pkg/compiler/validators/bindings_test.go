@@ -274,7 +274,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -340,7 +340,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -418,7 +418,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -488,7 +488,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -1073,7 +1073,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -1156,7 +1156,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -1264,7 +1264,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{

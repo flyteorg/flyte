@@ -66,7 +66,7 @@ func TestRecordNodeEvent_Success_InlineOutputs(t *testing.T) {
 		return true
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
 	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		arg := args.Get(2).(*core.LiteralMap)
@@ -94,7 +94,7 @@ func TestRecordNodeEvent_Failure_FetchInlineOutputs(t *testing.T) {
 		return true
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
 	}), mock.Anything).Return(errors.New("foo"))
 	mockStore := &storage.DataStore{
@@ -120,7 +120,7 @@ func TestRecordNodeEvent_Failure_FallbackReference_Retry(t *testing.T) {
 		return event.GetOutputData() == nil && proto.Equal(event, getReferenceNodeEv())
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
 	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		arg := args.Get(2).(*core.LiteralMap)
@@ -144,7 +144,7 @@ func TestRecordNodeEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
 	eventRecorder := mocks.EventRecorder{}
 	eventRecorder.OnRecordNodeEventMatch(ctx, mock.Anything).Return(errors.New("foo"))
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
 	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		arg := args.Get(2).(*core.LiteralMap)

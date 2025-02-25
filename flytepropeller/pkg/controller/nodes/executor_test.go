@@ -347,7 +347,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 				hf := &nodemocks.HandlerFactory{}
 				exec.nodeHandlerFactory = hf
 				h := &nodemocks.NodeHandler{}
-				hf.OnGetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
 				mockWf, mockNode, mockNodeStatus := createSingleNodeWf(test.parentNodePhase, 0)
 				execContext := executors.NewExecutionContext(mockWf, nil, nil, nil, executors.InitializeControlFlow())
@@ -455,7 +455,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 				).Return(test.handlerReturn())
 				h.OnFinalizeRequired().Return(false)
 
-				hf.OnGetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
 				mockWf, execContext, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
 				startNode := mockWf.StartNode()
@@ -569,91 +569,91 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			// Setup
 			mockN2Status := &mocks.ExecutableNodeStatus{}
 			// No parent node
-			mockN2Status.OnGetParentNodeID().Return(nil)
-			mockN2Status.OnGetParentTaskID().Return(nil)
-			mockN2Status.OnGetPhase().Return(n2Phase)
+			mockN2Status.EXPECT().GetParentNodeID().Return(nil)
+			mockN2Status.EXPECT().GetParentTaskID().Return(nil)
+			mockN2Status.EXPECT().GetPhase().Return(n2Phase)
 			mockN2Status.On("SetDataDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.OnGetDataDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetDataDir().Return(storage.DataReference("blah"))
 			mockN2Status.On("SetOutputDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.OnGetOutputDir().Return(storage.DataReference("blah"))
-			mockN2Status.OnGetWorkflowNodeStatus().Return(nil)
+			mockN2Status.EXPECT().GetOutputDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetWorkflowNodeStatus().Return(nil)
 
-			mockN2Status.OnGetStoppedAt().Return(nil)
+			mockN2Status.EXPECT().GetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
 			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), expectedClearStateOnAnyTermination, ee)
-			mockN2Status.OnIsDirty().Return(false)
-			mockN2Status.OnGetTaskNodeStatus().Return(nil)
+			mockN2Status.EXPECT().IsDirty().Return(false)
+			mockN2Status.EXPECT().GetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
-			mockN2Status.OnGetAttempts().Return(uint32(0))
+			mockN2Status.EXPECT().GetAttempts().Return(uint32(0))
 			if expectedN2Phase == v1alpha1.NodePhaseFailed {
-				mockN2Status.OnGetExecutionError().Return(&core.ExecutionError{
+				mockN2Status.EXPECT().GetExecutionError().Return(&core.ExecutionError{
 					Message: "Expected Failure",
 				})
 			}
-			mockN2Status.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+			mockN2Status.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 			mockNode := &mocks.ExecutableNode{}
-			mockNode.OnGetID().Return(nodeN2)
-			mockNode.OnGetBranchNode().Return(nil)
-			mockNode.OnGetKind().Return(v1alpha1.NodeKindTask)
-			mockNode.OnIsStartNode().Return(false)
-			mockNode.OnIsEndNode().Return(false)
-			mockNode.OnGetTaskID().Return(&taskID)
-			mockNode.OnGetInputBindings().Return([]*v1alpha1.Binding{})
-			mockNode.OnIsInterruptible().Return(nil)
-			mockNode.OnGetName().Return("name")
-			mockNode.OnGetWorkflowNode().Return(nil)
+			mockNode.EXPECT().GetID().Return(nodeN2)
+			mockNode.EXPECT().GetBranchNode().Return(nil)
+			mockNode.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+			mockNode.EXPECT().IsStartNode().Return(false)
+			mockNode.EXPECT().IsEndNode().Return(false)
+			mockNode.EXPECT().GetTaskID().Return(&taskID)
+			mockNode.EXPECT().GetInputBindings().Return([]*v1alpha1.Binding{})
+			mockNode.EXPECT().IsInterruptible().Return(nil)
+			mockNode.EXPECT().GetName().Return("name")
+			mockNode.EXPECT().GetWorkflowNode().Return(nil)
 
 			mockNodeN0 := &mocks.ExecutableNode{}
-			mockNodeN0.OnGetID().Return(nodeN0)
-			mockNodeN0.OnGetBranchNode().Return(nil)
-			mockNodeN0.OnGetKind().Return(v1alpha1.NodeKindTask)
-			mockNodeN0.OnIsStartNode().Return(false)
-			mockNodeN0.OnIsEndNode().Return(false)
-			mockNodeN0.OnGetTaskID().Return(&taskID0)
-			mockNodeN0.OnIsInterruptible().Return(nil)
-			mockNodeN0.OnGetName().Return("name")
-			mockNodeN0.OnGetWorkflowNode().Return(nil)
+			mockNodeN0.EXPECT().GetID().Return(nodeN0)
+			mockNodeN0.EXPECT().GetBranchNode().Return(nil)
+			mockNodeN0.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+			mockNodeN0.EXPECT().IsStartNode().Return(false)
+			mockNodeN0.EXPECT().IsEndNode().Return(false)
+			mockNodeN0.EXPECT().GetTaskID().Return(&taskID0)
+			mockNodeN0.EXPECT().IsInterruptible().Return(nil)
+			mockNodeN0.EXPECT().GetName().Return("name")
+			mockNodeN0.EXPECT().GetWorkflowNode().Return(nil)
 
 			mockN0Status := &mocks.ExecutableNodeStatus{}
-			mockN0Status.OnGetPhase().Return(n0Phase)
-			mockN0Status.OnGetAttempts().Return(uint32(0))
-			mockN0Status.OnGetExecutionError().Return(nil)
+			mockN0Status.EXPECT().GetPhase().Return(n0Phase)
+			mockN0Status.EXPECT().GetAttempts().Return(uint32(0))
+			mockN0Status.EXPECT().GetExecutionError().Return(nil)
 
-			mockN0Status.OnIsDirty().Return(false)
-			mockN0Status.OnGetParentTaskID().Return(nil)
+			mockN0Status.EXPECT().IsDirty().Return(false)
+			mockN0Status.EXPECT().GetParentTaskID().Return(nil)
 			n := v1.Now()
-			mockN0Status.OnGetStoppedAt().Return(&n)
+			mockN0Status.EXPECT().GetStoppedAt().Return(&n)
 
-			mockN0Status.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+			mockN0Status.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 			tk := &mocks.ExecutableTask{}
 			tk.OnCoreTask().Return(&core.TaskTemplate{})
 			mockWfStatus := &mocks.ExecutableWorkflowStatus{}
 			mockWf := &mocks.ExecutableWorkflow{}
 			mockWf.OnStartNode().Return(mockNodeN0)
-			mockWf.OnGetNode(nodeN2).Return(mockNode, true)
-			mockWf.OnGetNode(nodeN0).Return(mockNodeN0, true)
+			mockWf.EXPECT().GetNode(nodeN2).Return(mockNode, true)
+			mockWf.EXPECT().GetNode(nodeN0).Return(mockNodeN0, true)
 			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN0).Return(mockN0Status)
 			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN2).Return(mockN2Status)
 			mockWf.OnGetConnections().Return(connections)
-			mockWf.OnGetID().Return("w1")
-			mockWf.OnToNode(nodeN2).Return([]string{nodeN0}, nil)
+			mockWf.EXPECT().GetID().Return("w1")
+			mockWf.EXPECT().ToNode(nodeN2).Return([]string{nodeN0}, nil)
 			mockWf.OnFromNode(nodeN0).Return([]string{nodeN2}, nil)
 			mockWf.OnFromNode(nodeN2).Return([]string{}, fmt.Errorf("did not expect"))
 			mockWf.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
 			mockWf.OnGetExecutionStatus().Return(mockWfStatus)
 			mockWf.OnGetTask(taskID0).Return(tk, nil)
 			mockWf.OnGetTask(taskID).Return(tk, nil)
-			mockWf.OnGetLabels().Return(make(map[string]string))
-			mockWf.OnIsInterruptible().Return(false)
-			mockWf.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+			mockWf.EXPECT().GetLabels().Return(make(map[string]string))
+			mockWf.EXPECT().IsInterruptible().Return(false)
+			mockWf.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 			mockWf.OnGetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
 			mockWf.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 			})
-			mockWf.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			mockWfStatus.OnGetDataDir().Return(storage.DataReference("x"))
+			mockWf.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			mockWfStatusEXPECT().GetDataDir().Return(storage.DataReference("x"))
 			mockWfStatus.OnConstructNodeDataDirMatch(mock.Anything, mock.Anything, mock.Anything).Return("x", nil)
 			return mockWf, mockN2Status
 		}
@@ -686,7 +686,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
 				h.OnFinalizeRequired().Return(false)
-				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.enableCRDebugMetadata)
 				startNode := mockWf.StartNode()
@@ -801,7 +801,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
 				}
 				h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
 				execErr := mockNodeStatus.GetExecutionError()
@@ -1284,17 +1284,17 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				now := v1.Time{Time: time.Now()}
 				parentBranchNodeID := "branchNode"
 				parentBranchNode := &mocks.ExecutableNode{}
-				parentBranchNode.OnGetID().Return(parentBranchNodeID)
-				parentBranchNode.OnGetBranchNode().Return(&mocks.ExecutableBranchNode{})
+				parentBranchNode.EXPECT().GetID().Return(parentBranchNodeID)
+				parentBranchNode.EXPECT().GetBranchNode().Return(&mocks.ExecutableBranchNode{})
 				parentBranchNodeStatus := &mocks.ExecutableNodeStatus{}
-				parentBranchNodeStatus.OnGetPhase().Return(v1alpha1.NodePhaseRunning)
-				parentBranchNodeStatus.OnIsDirty().Return(false)
+				parentBranchNodeStatus.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
+				parentBranchNodeStatus.EXPECT().IsDirty().Return(false)
 				parentBranchNodeStatus.OnGetStartedAt().Return(&now)
 				parentBranchNodeStatus.OnGetLastUpdatedAt().Return(nil)
 				bns := &mocks.MutableBranchNodeStatus{}
-				parentBranchNodeStatus.OnGetBranchStatus().Return(bns)
-				bns.OnGetPhase().Return(test.parentNodePhase)
-				parentBranchNodeStatus.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+				parentBranchNodeStatus.EXPECT().GetBranchStatus().Return(bns)
+				bns.EXPECT().GetPhase().Return(test.parentNodePhase)
+				parentBranchNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				tk := &mocks.ExecutableTask{}
 				tk.OnCoreTask().Return(&core.TaskTemplate{})
@@ -1303,38 +1303,38 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				eCtx := &mocks4.ExecutionContext{}
 				eCtx.OnGetTask(tid).Return(tk, nil)
 
-				eCtx.OnIsInterruptible().Return(true)
+				eCtx.EXPECT().IsInterruptible().Return(true)
 				eCtx.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
-				eCtx.OnGetLabels().Return(nil)
-				eCtx.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-				eCtx.OnGetParentInfo().Return(nil)
+				eCtx.EXPECT().GetLabels().Return(nil)
+				eCtx.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+				eCtx.EXPECT().GetParentInfo().Return(nil)
 				eCtx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 					RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 				})
 				eCtx.OnIncrementParallelism().Return(0)
 				eCtx.OnCurrentParallelism().Return(0)
-				eCtx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-				eCtx.OnGetConsoleURL().Return("")
+				eCtx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+				eCtx.EXPECT().GetConsoleURL().Return("")
 
 				branchTakenNodeID := "branchTakenNode"
 				branchTakenNode := &mocks.ExecutableNode{}
-				branchTakenNode.OnGetID().Return(branchTakenNodeID)
-				branchTakenNode.OnGetKind().Return(v1alpha1.NodeKindTask)
-				branchTakenNode.OnGetTaskID().Return(&tid)
-				branchTakenNode.OnIsInterruptible().Return(nil)
-				branchTakenNode.OnIsStartNode().Return(false)
-				branchTakenNode.OnIsEndNode().Return(false)
-				branchTakenNode.OnGetInputBindings().Return(nil)
-				branchTakenNode.OnGetWorkflowNode().Return(nil)
+				branchTakenNode.EXPECT().GetID().Return(branchTakenNodeID)
+				branchTakenNode.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+				branchTakenNode.EXPECT().GetTaskID().Return(&tid)
+				branchTakenNode.EXPECT().IsInterruptible().Return(nil)
+				branchTakenNode.EXPECT().IsStartNode().Return(false)
+				branchTakenNode.EXPECT().IsEndNode().Return(false)
+				branchTakenNode.EXPECT().GetInputBindings().Return(nil)
+				branchTakenNode.EXPECT().GetWorkflowNode().Return(nil)
 				branchTakeNodeStatus := &mocks.ExecutableNodeStatus{}
-				branchTakeNodeStatus.OnGetPhase().Return(test.currentNodePhase)
-				branchTakeNodeStatus.OnIsDirty().Return(false)
+				branchTakeNodeStatus.EXPECT().GetPhase().Return(test.currentNodePhase)
+				branchTakeNodeStatus.EXPECT().IsDirty().Return(false)
 				branchTakeNodeStatus.OnGetSystemFailures().Return(1)
-				branchTakeNodeStatus.OnGetDataDir().Return("data")
-				branchTakeNodeStatus.OnGetParentNodeID().Return(&parentBranchNodeID)
-				branchTakeNodeStatus.OnGetParentTaskID().Return(nil)
+				branchTakeNodeStatusEXPECT().GetDataDir().Return("data")
+				branchTakeNodeStatus.EXPECT().GetParentNodeID().Return(&parentBranchNodeID)
+				branchTakeNodeStatus.EXPECT().GetParentTaskID().Return(nil)
 				branchTakeNodeStatus.OnGetStartedAt().Return(&now)
-				branchTakeNodeStatus.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+				branchTakeNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				if test.phaseUpdateExpected {
 					var ee *core.ExecutionError
@@ -1499,7 +1499,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	queuedAtTime := &v1.Time{Time: queuedAt}
 	ns.On("GetQueuedAt").Return(queuedAtTime)
 	ns.On("GetLastAttemptStartedAt").Return(queuedAtTime)
-	ns.OnGetAttempts().Return(0)
+	ns.EXPECT().GetAttempts().Return(0)
 	ns.OnGetSystemFailures().Return(0)
 	ns.On("ClearLastAttemptStartedAt").Return()
 
@@ -1526,7 +1526,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			mockNode.On("GetInputBindings").Return([]*v1alpha1.Binding{})
 			mockNode.On("GetActiveDeadline").Return(&tt.activeDeadline)
 			mockNode.On("GetExecutionDeadline").Return(&tt.executionDeadline)
-			mockNode.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
+			mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
 
 			nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
 			phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
@@ -1549,7 +1549,7 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 
 	// mocking status
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetAttempts().Return(0)
+	ns.EXPECT().GetAttempts().Return(0)
 	ns.OnGetSystemFailures().Return(0)
 	ns.On("GetQueuedAt").Return(&v1.Time{Time: time.Now()})
 	ns.On("GetLastAttemptStartedAt").Return(&v1.Time{Time: time.Now()})
@@ -1573,7 +1573,7 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 	mockNode.On("GetActiveDeadline").Return(nil)
 	mockNode.On("GetExecutionDeadline").Return(nil)
 	retries := 2
-	mockNode.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
+	mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
 
 	nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
 	phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
@@ -1637,28 +1637,28 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 	t.Run("not-yet-started", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
+		n.EXPECT().GetID().Return(id)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.AbortHandler(ctx, nil, nil, nl, n, "aborting"))
 	})
 	t.Run("incompatible-cluster-err", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
-		n.OnGetKind().Return(v1alpha1.NodeKindStart)
-		n.OnGetTaskID().Return(&id)
-		n.OnGetWorkflowNode().Return(nil)
+		n.EXPECT().GetID().Return(id)
+		n.EXPECT().GetKind().Return(v1alpha1.NodeKindStart)
+		n.EXPECT().GetTaskID().Return(&id)
+		n.EXPECT().GetWorkflowNode().Return(nil)
 		interruptible := false
-		n.OnIsInterruptible().Return(&interruptible)
+		n.EXPECT().IsInterruptible().Return(&interruptible)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseRunning)
-		ns.OnGetDataDir().Return(storage.DataReference("s3:/foo"))
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
+		nsEXPECT().GetDataDir().Return(storage.DataReference("s3:/foo"))
 		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-		nl.OnGetNode(id).Return(n, true)
+		nl.EXPECT().GetNode(id).Return(n, true)
 		incompatibleClusterErr := fakeEventRecorder{nodeErr: &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")}}
 
 		hf := &nodemocks.HandlerFactory{}
@@ -1680,12 +1680,12 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		dag.OnFromNode(id).Return(make([]string, 0), nil)
 
 		execContext := mocks4.ExecutionContext{}
-		execContext.OnIsInterruptible().Return(false)
+		execContext.EXPECT().IsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
 		execContext.OnGetRawOutputDataConfig().Return(r)
 		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-		execContext.OnGetLabels().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetLabels().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
 		et := &mocks.ExecutableTask{}
 		et.OnCoreTask().Return(&core.TaskTemplate{
@@ -1699,10 +1699,10 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		})
 		execContext.OnGetTask("id").Return(et, nil)
 		parentInfo := &mocks4.ImmutableParentInfo{}
-		parentInfo.OnGetUniqueID().Return("someunique1")
-		parentInfo.OnCurrentAttempt().Return(uint32(1))
-		parentInfo.OnIsInDynamicChain().Return(false)
-		execContext.OnGetParentInfo().Return(parentInfo)
+		parentInfo.EXPECT().GetUniqueID().Return("someunique1")
+		parentInfo.EXPECT().CurrentAttempt().Return(uint32(1))
+		parentInfo.EXPECT().IsInDynamicChain().Return(false)
+		execContext.EXPECT().GetParentInfo().Return(parentInfo)
 
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
@@ -1715,10 +1715,10 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 	t.Run("not-yet-started", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
+		n.EXPECT().GetID().Return(id)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
@@ -1746,24 +1746,24 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
 	inputReader := &mocks3.InputReader{}
-	inputReader.OnGetInputPath().Return("reference")
+	inputReader.EXPECT().GetInputPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false)
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindStart)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindStart)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
+	ns.EXPECT().GetParentTaskID().Return(tID)
 	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
-	ns.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+	ns.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
@@ -1799,20 +1799,20 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false).Twice()
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false).Twice()
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindTask)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
+	ns.EXPECT().GetParentTaskID().Return(tID)
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
 	}, nil)
@@ -1848,22 +1848,22 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", inputs)
 	//inputReader := &mocks3.InputReader{}
-	//inputReader.OnGetInputPath().Return("reference")
+	//inputReader.EXPECT().GetInputPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false)
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindTask)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
+	ns.EXPECT().GetParentTaskID().Return(tID)
 
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyInline,
@@ -1983,7 +1983,7 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
 		h.OnFinalizeRequired().Return(false)
 
-		hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
 		assert.NoError(t, err)
@@ -2027,7 +2027,7 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
 		h.OnFinalizeRequired().Return(false)
 
-		hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
 		assert.NoError(t, err)
@@ -2084,30 +2084,30 @@ func TestRecover(t *testing.T) {
 	}
 
 	execContext := &mocks4.ExecutionContext{}
-	execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
 			WorkflowExecutionIdentifier: recoveryID,
 		},
 	})
-	execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+	execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
 	nm := &nodemocks.NodeExecutionMetadata{}
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+	nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 		ExecutionId: wfExecID,
 		NodeId:      nodeID,
 	})
 
 	ir := &mocks3.InputReader{}
-	ir.OnGetInputPath().Return(inputsPath)
+	ir.EXPECT().GetInputPath().Return(inputsPath)
 
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetOutputDir().Return(storage.DataReference("out"))
+	ns.EXPECT().GetOutputDir().Return(storage.DataReference("out"))
 
 	nCtx := &nodemocks.NodeExecutionContext{}
-	nCtx.OnExecutionContext().Return(execContext)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnInputReader().Return(ir)
-	nCtx.OnNodeStatus().Return(ns)
+	nCtx.EXPECT().ExecutionContext().Return(execContext)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().InputReader().Return(ir)
+	nCtx.EXPECT().NodeStatus().Return(ns)
 
 	t.Run("recover task node successfully", func(t *testing.T) {
 		recoveryClient := &recoveryMocks.Client{}
@@ -2141,7 +2141,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2161,10 +2161,10 @@ func TestRecover(t *testing.T) {
 
 		// initialize node execution context
 		nCtx := &nodemocks.NodeExecutionContext{}
-		nCtx.OnExecutionContext().Return(execContext)
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnNodeStatus().Return(ns)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		mockPBStore.On("CopyRaw", mock.Anything, storage.DataReference(srcDynamicJobSpecURI), storage.DataReference(dstDynamicJobSpecURI), mock.Anything).Return(nil)
@@ -2184,7 +2184,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &mockReferenceConstructor,
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		reader := &nodemocks.NodeStateReader{}
 		reader.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
@@ -2307,7 +2307,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2371,7 +2371,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2457,7 +2457,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
 			store:          storageClient,
@@ -2501,7 +2501,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2521,7 +2521,7 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 	// Creates an execution context for the test
 	createExecContext := func(maxParallelism, currentParallelism uint32) executors.ExecutionContext {
 		m := &mocks4.ExecutionContext{}
-		m.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		m.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			MaxParallelism: maxParallelism,
 		})
 		m.OnCurrentParallelism().Return(currentParallelism)
@@ -2530,7 +2530,7 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 
 	createNode := func(kind v1alpha1.NodeKind, lpRef bool) v1alpha1.ExecutableNode {
 		en := &mocks.ExecutableNode{}
-		en.OnGetKind().Return(kind)
+		en.EXPECT().GetKind().Return(kind)
 		if kind == v1alpha1.NodeKindWorkflow {
 			wn := &mocks.ExecutableWorkflowNode{}
 			var lp *v1alpha1.LaunchPlanRefID
@@ -2538,7 +2538,7 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 				lp = &v1alpha1.LaunchPlanRefID{}
 			}
 			wn.OnGetLaunchPlanRefID().Return(lp)
-			en.OnGetWorkflowNode().Return(wn)
+			en.EXPECT().GetWorkflowNode().Return(wn)
 		}
 		return en
 	}
@@ -2671,7 +2671,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 
 		// initialize node executor
 		mockHandlerFactory := &nodemocks.HandlerFactory{}
-		mockHandlerFactory.OnGetHandler(v1alpha1.NodeKindTask).Return(mockHandler, nil)
+		mockHandlerFactory.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(mockHandler, nil)
 		nodeExecutor, err := NewExecutor(ctx, nodeConfig, dataStore, enqueueWorkflow, mockEventSink,
 			adminClient, adminClient, rawOutputPrefix, fakeKubeClient, catalogClient,
 			recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, mockHandlerFactory, testScope)
@@ -2777,9 +2777,9 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 
 			// initialize nodeExecutor
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnGetMatch(mock.Anything, mock.Anything).
+			catalogClient.EXPECT().Get(mock.Anything, mock.Anything).
 				Return(pluginscatalog.NewCatalogEntry(nil, pluginscatalog.NewStatus(test.cacheStatus, nil)), nil)
-			catalogClient.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			catalogClient.EXPECT().GetOrExtendReservation(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 				Return(&datacatalog.Reservation{OwnerId: test.cacheReservationOwnerID}, nil)
 
 			mockHandler := &nodemocks.CacheableNodeHandler{}
@@ -2791,7 +2791,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 				mock.Anything,
 				mock.MatchedBy(func(nCtx interfaces.NodeExecutionContext) bool { return nCtx.NodeID() == downstreamNodeID }),
 			).Return(false, false, nil)
-			mockHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).
+			mockHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).
 				Return(pluginscatalog.Key{Identifier: core.Identifier{Name: currentNodeID}}, nil)
 			mockHandler.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil)
 			mockHandler.OnFinalizeRequiredMatch(mock.Anything).Return(false)
@@ -2843,11 +2843,11 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 			config.GetConfig().NodeConfig.DefaultMaxAttempts = test.maxAttempts
 
 			node := &mocks.ExecutableNode{}
-			node.OnGetRetryStrategy().Return(nil)
+			node.EXPECT().GetRetryStrategy().Return(nil)
 			nCtx := &nodeExecContext{node: node}
 
 			nodeStatus := &mocks.ExecutableNodeStatus{}
-			nodeStatus.OnGetAttempts().Return(test.attempts)
+			nodeStatus.EXPECT().GetAttempts().Return(test.attempts)
 			nodeStatus.OnGetSystemFailures().Return(test.systemFailures)
 
 			err := &core.ExecutionError{

@@ -95,26 +95,26 @@ func createNodeExecutionContext(gateNode *v1alpha1.GateNodeSpec) *nodeMocks.Node
 	nm := &nodeMocks.NodeExecutionMetadata{}
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-	ns.OnGetOutputDir().Return(storage.DataReference("data-dir"))
+	nsEXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+	ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
 
 	t := v1.NewTime(time.Now())
 	ns.OnGetLastAttemptStartedAt().Return(&t)
 
 	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 
 	eCtx := &executormocks.ExecutionContext{}
 	eCtx.OnGetExecutionID().Return(wfExecID)
 
 	nCtx := &nodeMocks.NodeExecutionContext{}
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnNode().Return(n)
-	nCtx.OnNodeStatus().Return(ns)
-	nCtx.OnDataStore().Return(dataStore)
-	nCtx.OnExecutionContext().Return(eCtx)
-	nCtx.OnInputReader().Return(inputReader)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().Node().Return(n)
+	nCtx.EXPECT().NodeStatus().Return(ns)
+	nCtx.EXPECT().DataStore().Return(dataStore)
+	nCtx.EXPECT().ExecutionContext().Return(eCtx)
+	nCtx.EXPECT().InputReader().Return(inputReader)
 
 	r := &nodeMocks.NodeStateReader{}
 	r.OnGetGateNodeState().Return(handler.GateNodeState{})

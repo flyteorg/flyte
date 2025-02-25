@@ -15,7 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery-v2 --all --case=underscore --with-expecter
 
 type TaskReader interface {
 	Read(ctx context.Context) (*core.TaskTemplate, error)

@@ -66,7 +66,7 @@ func Test_validateBranchInterface(t *testing.T) {
 		n.OnGetInterface().Return(nil)
 		n.On("SetID", mock.Anything).Return()
 		n.OnGetId().Return("n1")
-		n.OnGetBranchNode().Return(&core.BranchNode{
+		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{
 				Case: &core.IfBlock{
 					Condition: &core.BooleanExpression{
@@ -96,7 +96,7 @@ func Test_validateBranchInterface(t *testing.T) {
 		n.OnGetId().Return("n1")
 		n.OnGetInterface().Return(nil)
 		n.OnGetInputs().Return([]*core.Binding{})
-		n.OnGetBranchNode().Return(&core.BranchNode{
+		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{
 				Case: &core.IfBlock{
 					Condition: &core.BooleanExpression{

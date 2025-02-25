@@ -15,13 +15,13 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 		existingAnnotations := map[string]string{
 			"existingKey": "existingValue",
 		}
-		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+		existingMetadata.EXPECT().GetAnnotations().Return(existingAnnotations)
 
 		existingLabels := map[string]string{
 			"existingLabel": "existingLabelValue",
 		}
-		existingMetadata.OnGetLabels().Return(existingLabels)
-		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
+		existingMetadata.EXPECT().GetLabels().Return(existingLabels)
+		existingMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
 		assert.NoError(t, err)
@@ -35,13 +35,13 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 		existingAnnotations := map[string]string{
 			"existingKey": "existingValue",
 		}
-		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+		existingMetadata.EXPECT().GetAnnotations().Return(existingAnnotations)
 
 		existingLabels := map[string]string{
 			"existingLabel": "existingLabelValue",
 		}
-		existingMetadata.OnGetLabels().Return(existingLabels)
-		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
+		existingMetadata.EXPECT().GetLabels().Return(existingLabels)
+		existingMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{
 			SecurityContext: &core.SecurityContext{
@@ -71,14 +71,14 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 
 		existingMetadata := &mocks.TaskExecutionMetadata{}
 		existingAnnotations := map[string]string{}
-		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+		existingMetadata.EXPECT().GetAnnotations().Return(existingAnnotations)
 
-		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "test-exec-identity"}})
+		existingMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "test-exec-identity"}})
 
 		existingLabels := map[string]string{
 			"existingLabel": "existingLabelValue",
 		}
-		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.EXPECT().GetLabels().Return(existingLabels)
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
 		assert.NoError(t, err)
@@ -90,14 +90,14 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 
 		existingMetadata := &mocks.TaskExecutionMetadata{}
 		existingAnnotations := map[string]string{}
-		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+		existingMetadata.EXPECT().GetAnnotations().Return(existingAnnotations)
 
-		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "name@company.com"}})
+		existingMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "name@company.com"}})
 
 		existingLabels := map[string]string{
 			"existingLabel": "existingLabelValue",
 		}
-		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.EXPECT().GetLabels().Return(existingLabels)
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
 		assert.NoError(t, err)
@@ -109,7 +109,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 
 func Test_newTaskExecutionContext(t *testing.T) {
 	existing := &mocks.TaskExecutionContext{}
-	existing.OnTaskExecutionMetadata().Panic("Unexpected")
+	existing.EXPECT().TaskExecutionMetadata().Panic("Unexpected")
 
 	newMetadata := &mocks.TaskExecutionMetadata{}
 	actualCtx := newTaskExecutionContext(existing, newMetadata)

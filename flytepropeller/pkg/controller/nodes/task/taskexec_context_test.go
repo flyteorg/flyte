@@ -54,49 +54,49 @@ var (
 
 func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParentInfo, eventVersion v1alpha1.EventVersion) interfaces.NodeExecutionContext {
 	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.OnGetAnnotations().Return(map[string]string{})
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+	nm.EXPECT().GetAnnotations().Return(map[string]string{})
+	nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 		NodeId:      nodeID,
 		ExecutionId: wfExecID,
 	})
-	nm.OnGetK8sServiceAccount().Return("service-account")
-	nm.OnGetLabels().Return(map[string]string{})
-	nm.OnGetNamespace().Return("namespace")
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.OnGetOwnerReference().Return(v1.OwnerReference{
+	nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+	nm.EXPECT().GetLabels().Return(map[string]string{})
+	nm.EXPECT().GetNamespace().Return("namespace")
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "sample",
 		Name: "name",
 	})
 
 	tr := &nodeMocks.TaskReader{}
-	tr.OnGetTaskID().Return(taskID)
+	tr.EXPECT().GetTaskID().Return(taskID)
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return("data-dir")
-	ns.OnGetOutputDir().Return("output-dir")
+	nsEXPECT().GetDataDir().Return("data-dir")
+	ns.EXPECT().GetOutputDir().Return("output-dir")
 
 	n := &flyteMocks.ExecutableNode{}
-	n.OnGetResources().Return(resources)
+	n.EXPECT().GetResources().Return(resources)
 	ma := 5
-	n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
+	n.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
 
 	ir := &ioMocks.InputReader{}
 	nCtx := &nodeMocks.NodeExecutionContext{}
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnNode().Return(n)
-	nCtx.OnInputReader().Return(ir)
-	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnTaskReader().Return(tr)
-	nCtx.OnNodeStatus().Return(ns)
-	nCtx.OnNodeID().Return(nodeID)
-	nCtx.OnEventsRecorder().Return(nil)
-	nCtx.OnEnqueueOwnerFunc().Return(nil)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().Node().Return(n)
+	nCtx.EXPECT().InputReader().Return(ir)
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+	nCtx.EXPECT().TaskReader().Return(tr)
+	nCtx.EXPECT().NodeStatus().Return(ns)
+	nCtx.EXPECT().NodeID().Return(nodeID)
+	nCtx.EXPECT().EventsRecorder().Return(nil)
+	nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
 
 	executionContext := &mocks2.ExecutionContext{}
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	executionContext.OnGetParentInfo().Return(parentInfo)
-	executionContext.OnGetEventVersion().Return(eventVersion)
-	nCtx.OnExecutionContext().Return(executionContext)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	executionContext.EXPECT().GetParentInfo().Return(parentInfo)
+	executionContext.EXPECT().GetEventVersion().Return(eventVersion)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(
 		&storage.Config{
@@ -105,7 +105,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 		promutils.NewTestScope(),
 	)
 	assert.NoError(t, err)
-	nCtx.OnDataStore().Return(ds)
+	nCtx.EXPECT().DataStore().Return(ds)
 
 	st := bytes.NewBuffer([]byte{})
 	codex := codex.GobStateCodec{}
@@ -123,7 +123,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 func dummyPlugin() pluginCore.Plugin {
 	p := &pluginCoreMocks.Plugin{}
 	p.On("GetID").Return("plugin1")
-	p.OnGetProperties().Return(pluginCore.PluginProperties{})
+	p.EXPECT().GetProperties().Return(pluginCore.PluginProperties{})
 	return p
 }
 
@@ -189,9 +189,9 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	// assert.Equal(t, got.InputReader(), ir)
 
 	anotherPlugin := &pluginCoreMocks.Plugin{}
-	anotherPlugin.OnGetID().Return("plugin2")
+	anotherPlugin.EXPECT().GetID().Return("plugin2")
 	maxLength := 8
-	anotherPlugin.OnGetProperties().Return(pluginCore.PluginProperties{
+	anotherPlugin.EXPECT().GetProperties().Return(pluginCore.PluginProperties{
 		GeneratedNameMaxLength: &maxLength,
 	})
 	anotherTaskExecCtx, err := tk.newTaskExecutionContext(context.TODO(), nCtx, anotherPlugin)
@@ -211,8 +211,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 
 func TestHandler_newTaskExecutionContext_taskExecutionID_WithParentInfo(t *testing.T) {
 	parentInfo := &mocks2.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("n0")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().GetUniqueID().Return("n0")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
 
 	nCtx := dummyNodeExecutionContext(t, parentInfo, v1alpha1.EventVersion1)
 	p := dummyPlugin()
@@ -408,7 +408,7 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
@@ -418,8 +418,8 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 		promutils.NewTestScope(),
 	)
 	assert.NoError(t, err)
-	nCtx.OnDataStore().Return(ds)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().DataStore().Return(ds)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 
 	pre, uid, err := ComputeRawOutputPrefix(context.TODO(), 100, nCtx, "n1", 0)
 	assert.NoError(t, err)
@@ -440,7 +440,7 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 func TestComputePreviousCheckpointPath(t *testing.T) {
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
@@ -450,8 +450,8 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 		promutils.NewTestScope(),
 	)
 	assert.NoError(t, err)
-	nCtx.OnDataStore().Return(ds)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().DataStore().Return(ds)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 	reader := &nodeMocks.NodeStateReader{}
 	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
 	nCtx.OnNodeStateReader().Return(reader)
@@ -472,7 +472,7 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	ds, err := storage.NewDataStore(
@@ -482,8 +482,8 @@ func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
 		promutils.NewTestScope(),
 	)
 	assert.NoError(t, err)
-	nCtx.OnDataStore().Return(ds)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().DataStore().Return(ds)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 	reader := &nodeMocks.NodeStateReader{}
 	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{
 		PreviousNodeExecutionCheckpointURI: storage.DataReference("s3://sandbox/x/prevname-n1-0/_flytecheckpoints"),

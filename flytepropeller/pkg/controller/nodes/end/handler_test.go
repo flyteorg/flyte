@@ -89,9 +89,9 @@ func TestEndHandler_Handle(t *testing.T) {
 
 	t.Run("InputReadFailure", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("err"))
+		ir.EXPECT().Get(mock.Anything).Return(nil, fmt.Errorf("err"))
 		nCtx := &mocks.NodeExecutionContext{}
-		nCtx.OnInputReader().Return(ir)
+		nCtx.EXPECT().InputReader().Return(ir)
 		_, err := e.Handle(ctx, nCtx)
 		assert.Error(t, err)
 	})

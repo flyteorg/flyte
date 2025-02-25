@@ -236,8 +236,8 @@ func TestCheckOffloadingCompat(t *testing.T) {
 	executionContext := &executorMocks.ExecutionContext{}
 	executableTask := &mocks.ExecutableTask{}
 	node := &mocks.ExecutableNode{}
-	node.OnGetKind().Return(v1alpha1.NodeKindTask)
-	nCtx.OnExecutionContext().Return(executionContext)
+	node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 	executionContext.OnGetTask("task1").Return(executableTask, nil)
 	executableTask.OnCoreTask().Return(&idlCore.TaskTemplate{
 		Metadata: &idlCore.TaskMetadata{
@@ -248,7 +248,7 @@ func TestCheckOffloadingCompat(t *testing.T) {
 		},
 	})
 	taskID := "task1"
-	node.OnGetTaskID().Return(&taskID)
+	node.EXPECT().GetTaskID().Return(&taskID)
 	t.Run("supported version success", func(t *testing.T) {
 		inputLiterals := map[string]*idlCore.Literal{
 			"foo": {
