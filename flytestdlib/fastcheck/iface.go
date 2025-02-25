@@ -14,7 +14,7 @@ import (
 // resolution
 // The Data-structure is thread-safe and can be accessed by multiple threads concurrently.
 
-//go:generate mockery -name Filter -case=underscore
+//go:generate mockery-v2 --name Filter --case=underscore --with-expecter
 
 type Filter interface {
 	// Contains returns a True if the id was previously seen or false otherwise
