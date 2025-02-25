@@ -127,7 +127,7 @@ func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, url strin
 	}
 
 	retryableOauthMetadataError := flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
-	err = retry.OnError(backoff,
+	err = retry.EXPECT().Error(backoff,
 		func(err error) bool { // Determine if error is retryable
 			return err == retryableOauthMetadataError
 		}, func() error { // Send HTTP request

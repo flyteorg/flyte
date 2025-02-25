@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -19,9 +20,9 @@ import (
 
 func getMockStore() *storage.DataStore {
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(_ mock.Arguments) {
-
-	})
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(
+		func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+		})
 
 	mockStore := &storage.DataStore{
 		ComposedProtobufStore: pbStore,
