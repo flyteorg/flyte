@@ -306,7 +306,10 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		Connection:   &metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
-	return fmt.Errorf("failed to delete task from agent with %v", err)
+	if err != nil {
+		return fmt.Errorf("failed to delete task from agent with %v", err)
+	}
+	return nil
 }
 
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
