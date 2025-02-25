@@ -22,12 +22,10 @@ how to generate an HTML report from some Python object.
 
 When using flyte and flytekit >= 1.15.0, you can view the deck streaming.
 
-```{eval-rst}
-.. raw:: html
-   <video width="800" height="450" controls>
-       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4">
-   </video>
-```
+<video width="800" height="450" controls>
+    <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
 
 ## Enabling Flyte decks
 
