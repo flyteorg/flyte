@@ -4598,6 +4598,9 @@ export namespace flyteidl {
 
             /** ArrayNode dataMode */
             dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
+
+            /** ArrayNode boundInputs */
+            boundInputs?: (string[]|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4629,6 +4632,9 @@ export namespace flyteidl {
 
             /** ArrayNode dataMode. */
             public dataMode: flyteidl.core.ArrayNode.DataMode;
+
+            /** ArrayNode boundInputs. */
+            public boundInputs: string[];
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
