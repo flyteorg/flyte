@@ -64,8 +64,8 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		cfg := GetConfig(ctx)
 		tokenCache := &tokenCacheMocks.TokenCache{}
 		metadataClient := &adminMocks.AuthMetadataServiceClient{}
-		metadataClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
-		metadataClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
+		metadataClient.EXPECT().GetOAuth2Metadata(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
+		metadataClient.EXPECT().GetPublicClientConfig(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
 		cfg.AuthType = AuthTypeClientSecret
 		cfg.Audience = test.audienceCfg
 		cfg.Scopes = test.scopesCfg

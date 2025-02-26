@@ -50,8 +50,8 @@ func TestFetchFromCache(t *testing.T) {
 		RedirectUri:              "http://localhost:8089/redirect",
 	}
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
-	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
+	mockAuthClient.EXPECT().GetOAuth2Metadata(mock.Anything, mock.Anything).Return(metadata, nil)
+	mockAuthClient.EXPECT().GetPublicClientConfig(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("no token in cache", func(t *testing.T) {
 		tokenCacheProvider := cache.NewTokenCacheInMemoryProvider()

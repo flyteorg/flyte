@@ -27,8 +27,8 @@ func TestGenerateClientConfig(t *testing.T) {
 		CodeChallengeMethodsSupported: []string{"dummyCodeChallenege"},
 		DeviceAuthorizationEndpoint:   "dummyDeviceEndpoint",
 	}
-	mockAuthClient.OnGetPublicClientConfigMatch(ctx, mock.Anything).Return(flyteClientResp, nil)
-	mockAuthClient.OnGetOAuth2MetadataMatch(ctx, mock.Anything).Return(oauthMetaDataResp, nil)
+	mockAuthClient.EXPECT().GetPublicClientConfig(ctx, mock.Anything).Return(flyteClientResp, nil)
+	mockAuthClient.EXPECT().GetOAuth2Metadata(ctx, mock.Anything).Return(oauthMetaDataResp, nil)
 	oauthConfig, err := BuildConfigFromMetadataService(ctx, mockAuthClient)
 	assert.Nil(t, err)
 	assert.NotNil(t, oauthConfig)
