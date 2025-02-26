@@ -180,7 +180,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	nodeStateWriter := &mocks.NodeStateWriter{}
 	nodeStateWriter.EXPECT().PutArrayNodeState(mock.Anything).Run(
 		func(s handler.ArrayNodeState) {
-			arrayNodeState = &s
+			*arrayNodeState = s
 		},
 	).Return(nil)
 	nCtx.EXPECT().NodeStateWriter().Return(nodeStateWriter)
