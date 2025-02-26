@@ -11008,6 +11008,7 @@
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
                  * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
+                 * @property {Array.<string>|null} [boundInputs] ArrayNode boundInputs
                  */
     
                 /**
@@ -11019,6 +11020,7 @@
                  * @param {flyteidl.core.IArrayNode=} [properties] Properties to set
                  */
                 function ArrayNode(properties) {
+                    this.boundInputs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -11080,6 +11082,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.dataMode = 0;
+    
+                /**
+                 * ArrayNode boundInputs.
+                 * @member {Array.<string>} boundInputs
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.boundInputs = $util.emptyArray;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11144,6 +11154,9 @@
                         $root.google.protobuf.BoolValue.encode(message.isOriginalSubNodeInterface, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     if (message.dataMode != null && message.hasOwnProperty("dataMode"))
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.dataMode);
+                    if (message.boundInputs != null && message.boundInputs.length)
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            writer.uint32(/* id 8, wireType 2 =*/66).string(message.boundInputs[i]);
                     return writer;
                 };
     
@@ -11185,6 +11198,11 @@
                             break;
                         case 7:
                             message.dataMode = reader.int32();
+                            break;
+                        case 8:
+                            if (!(message.boundInputs && message.boundInputs.length))
+                                message.boundInputs = [];
+                            message.boundInputs.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11249,6 +11267,13 @@
                         case 1:
                             break;
                         }
+                    if (message.boundInputs != null && message.hasOwnProperty("boundInputs")) {
+                        if (!Array.isArray(message.boundInputs))
+                            return "boundInputs: array expected";
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            if (!$util.isString(message.boundInputs[i]))
+                                return "boundInputs: string[] expected";
+                    }
                     return null;
                 };
     
