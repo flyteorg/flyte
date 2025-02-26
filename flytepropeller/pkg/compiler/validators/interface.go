@@ -2,6 +2,7 @@ package validators
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
@@ -172,12 +173,18 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 					},
 				}
 				for key, variable := range underlyingIface.Inputs.Variables {
-					iface.Inputs.Variables[key] = &core.Variable{
-						Type: &core.LiteralType{
-							Type: &core.LiteralType_CollectionType{
-								CollectionType: variable.Type,
+					if slices.Contains(arrayNode.GetBoundInputs(), key) {
+						iface.Inputs.Variables[key] = &core.Variable{
+							Type: variable.Type,
+						}
+					} else {
+						iface.Inputs.Variables[key] = &core.Variable{
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_CollectionType{
+									CollectionType: variable.Type,
+								},
 							},
-						},
+						}
 					}
 				}
 				for key, variable := range underlyingIface.Outputs.Variables {

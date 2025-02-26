@@ -9,6 +9,7 @@ type ArrayNodeSpec struct {
 	MinSuccessRatio *float32
 	ExecutionMode   core.ArrayNode_ExecutionMode
 	DataMode        core.ArrayNode_DataMode
+	BoundInputs     []string
 }
 
 func (a *ArrayNodeSpec) GetSubNodeSpec() *NodeSpec {
@@ -33,4 +34,8 @@ func (a *ArrayNodeSpec) GetExecutionMode() core.ArrayNode_ExecutionMode {
 
 func (a *ArrayNodeSpec) GetDataMode() core.ArrayNode_DataMode {
 	return a.DataMode
+}
+
+func (a *ArrayNodeSpec) GetBoundInputs() []string {
+	return a.BoundInputs
 }

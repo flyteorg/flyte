@@ -4,6 +4,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+//go:generate mockery -all -case=underscore
+
 type NodeID = string
 type TaskID = Identifier
 type WorkflowID = Identifier

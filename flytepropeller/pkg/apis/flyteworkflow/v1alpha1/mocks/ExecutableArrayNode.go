@@ -14,6 +14,40 @@ type ExecutableArrayNode struct {
 	mock.Mock
 }
 
+type ExecutableArrayNode_GetBoundInputs struct {
+	*mock.Call
+}
+
+func (_m ExecutableArrayNode_GetBoundInputs) Return(_a0 []string) *ExecutableArrayNode_GetBoundInputs {
+	return &ExecutableArrayNode_GetBoundInputs{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableArrayNode) OnGetBoundInputs() *ExecutableArrayNode_GetBoundInputs {
+	c_call := _m.On("GetBoundInputs")
+	return &ExecutableArrayNode_GetBoundInputs{Call: c_call}
+}
+
+func (_m *ExecutableArrayNode) OnGetBoundInputsMatch(matchers ...interface{}) *ExecutableArrayNode_GetBoundInputs {
+	c_call := _m.On("GetBoundInputs", matchers...)
+	return &ExecutableArrayNode_GetBoundInputs{Call: c_call}
+}
+
+// GetBoundInputs provides a mock function with given fields:
+func (_m *ExecutableArrayNode) GetBoundInputs() []string {
+	ret := _m.Called()
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableArrayNode_GetDataMode struct {
 	*mock.Call
 }

@@ -52,6 +52,25 @@ var (
 			},
 		},
 	}
+	collectionLiteralTwo = &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{
+					literalTwo,
+				},
+			},
+		},
+	}
+	collectionOfCollectionLiteral = &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{
+					collectionLiteral,
+					collectionLiteralTwo,
+				},
+			},
+		},
+	}
 )
 
 func TestConstructLiteralMap(t *testing.T) {
@@ -66,11 +85,19 @@ func TestConstructLiteralMap(t *testing.T) {
 	err = dataStore.WriteProtobuf(ctx, dataReference, storage.Options{}, collectionLiteral)
 	assert.Nil(t, err)
 
+	mockArrayNode := mocks.ExecutableArrayNode{}
+	mockArrayNode.OnGetBoundInputs().Return([]string{})
+
 	individualInputFilesArrayNode := mocks.ExecutableArrayNode{}
 	individualInputFilesArrayNode.OnGetDataMode().Return(core.ArrayNode_INDIVIDUAL_INPUT_FILES)
+	individualInputFilesArrayNode.OnGetBoundInputs().Return([]string{})
 
 	singleInputFileArrayNode := mocks.ExecutableArrayNode{}
 	singleInputFileArrayNode.OnGetDataMode().Return(core.ArrayNode_SINGLE_INPUT_FILE)
+	singleInputFileArrayNode.OnGetBoundInputs().Return([]string{})
+
+	boundInputsArrayNode := mocks.ExecutableArrayNode{}
+	boundInputsArrayNode.OnGetBoundInputs().Return([]string{"bar"})
 
 	literalOneHash, err := pbhash.ComputeHash(ctx, literalOne)
 	assert.NoError(t, err)
@@ -127,7 +154,7 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
-			&mocks.ExecutableArrayNode{},
+			&mockArrayNode,
 		},
 		{
 			"MultiList",
@@ -169,7 +196,7 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
-			&mocks.ExecutableArrayNode{},
+			&mockArrayNode,
 		},
 		{
 			"Partial",
@@ -202,7 +229,7 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
-			&mocks.ExecutableArrayNode{},
+			&mockArrayNode,
 		},
 		{
 			"Offloaded Literal Collection - Individual Input Files",
@@ -268,14 +295,56 @@ func TestConstructLiteralMap(t *testing.T) {
 			},
 			&singleInputFileArrayNode,
 		},
+		{
+			"Bound inputs - scalar",
+			&core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionLiteralTwo,
+					"bar": literalTwo,
+				},
+			},
+			[]*core.LiteralMap{
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": literalTwo,
+						"bar": literalTwo,
+					},
+				},
+			},
+			&boundInputsArrayNode,
+		},
+		{
+			"Bound inputs - collection",
+			&core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionOfCollectionLiteral,
+					"bar": collectionLiteralTwo,
+				},
+			},
+			[]*core.LiteralMap{
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": collectionLiteral,
+						"bar": collectionLiteralTwo,
+					},
+				},
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": collectionLiteralTwo,
+						"bar": collectionLiteralTwo,
+					},
+				},
+			},
+			&boundInputsArrayNode,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			for i := 0; i < len(test.expectedLiteralMaps); i++ {
-				outputLiteralMap, err := constructLiteralMap(ctx, dataStore, test.arrayNode, test.inputLiteralMaps, i)
+				inputLiteralMap, err := constructLiteralMap(ctx, dataStore, test.arrayNode, test.inputLiteralMaps, i)
 				assert.NoError(t, err)
-				assert.True(t, proto.Equal(test.expectedLiteralMaps[i], outputLiteralMap))
+				assert.True(t, proto.Equal(test.expectedLiteralMaps[i], inputLiteralMap))
 			}
 		})
 	}

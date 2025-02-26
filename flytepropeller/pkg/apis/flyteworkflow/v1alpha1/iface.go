@@ -261,6 +261,7 @@ type ExecutableArrayNode interface {
 	GetMinSuccessRatio() *float32
 	GetExecutionMode() core.ArrayNode_ExecutionMode
 	GetDataMode() core.ArrayNode_DataMode
+	GetBoundInputs() []string
 }
 
 type ExecutableWorkflowNodeStatus interface {

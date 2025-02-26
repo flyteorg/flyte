@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"slices"
 
 	"github.com/golang/protobuf/proto"
 
@@ -37,7 +38,9 @@ func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) 
 func constructLiteralMap(ctx context.Context, dataStore *storage.DataStore, arrayNode v1alpha1.ExecutableArrayNode, inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
 	for name, literal := range inputs.Literals {
-		if literalCollection := literal.GetCollection(); literalCollection != nil {
+		if slices.Contains(arrayNode.GetBoundInputs(), name) {
+			literals[name] = literal
+		} else if literalCollection := literal.GetCollection(); literalCollection != nil {
 			if index >= len(literalCollection.Literals) {
 				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
 			}
