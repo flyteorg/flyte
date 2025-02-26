@@ -4395,10 +4395,11 @@
         "GPU",
         "MEMORY",
         "STORAGE",
-        "EPHEMERAL_STORAGE"
+        "EPHEMERAL_STORAGE",
+        "OOM_RESERVED_MEMORY"
       ],
       "default": "UNKNOWN",
-      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
+      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs.\n - OOM_RESERVED_MEMORY: For OOM handling, we can request additional memory to be reserved for the task."
     },
     "RuntimeMetadataRuntimeType": {
       "type": "string",

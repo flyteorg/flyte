@@ -23,12 +23,14 @@ class Resources(_message.Message):
         MEMORY: _ClassVar[Resources.ResourceName]
         STORAGE: _ClassVar[Resources.ResourceName]
         EPHEMERAL_STORAGE: _ClassVar[Resources.ResourceName]
+        OOM_RESERVED_MEMORY: _ClassVar[Resources.ResourceName]
     UNKNOWN: Resources.ResourceName
     CPU: Resources.ResourceName
     GPU: Resources.ResourceName
     MEMORY: Resources.ResourceName
     STORAGE: Resources.ResourceName
     EPHEMERAL_STORAGE: Resources.ResourceName
+    OOM_RESERVED_MEMORY: Resources.ResourceName
     class ResourceEntry(_message.Message):
         __slots__ = ["name", "value"]
         NAME_FIELD_NUMBER: _ClassVar[int]

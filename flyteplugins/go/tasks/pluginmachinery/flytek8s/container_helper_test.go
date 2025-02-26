@@ -405,6 +405,7 @@ func TestToK8sContainer(t *testing.T) {
 	})
 	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
 	mockTaskExecMetadata.OnGetConsoleURL().Return("")
+	mockTaskExecMetadata.OnGetOOMFailures().Return(0)
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)

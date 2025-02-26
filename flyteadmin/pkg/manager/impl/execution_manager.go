@@ -264,6 +264,16 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		})
 	}
 
+	// TODO: adjust the value based on the platform memory.
+	finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
+		Name:  core.Resources_OOM_RESERVED_MEMORY,
+		Value: taskResourceRequirements.Defaults.OOMReservedMemory.String(),
+	})
+	finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
+		Name:  core.Resources_OOM_RESERVED_MEMORY,
+		Value: taskResourceRequirements.Limits.OOMReservedMemory.String(),
+	})
+
 	task.Template.GetContainer().Resources = &core.Resources{
 		Requests: finalizedResourceRequests,
 		Limits:   finalizedResourceLimits,

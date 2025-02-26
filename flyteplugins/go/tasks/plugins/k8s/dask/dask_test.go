@@ -201,6 +201,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
 	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.OnGetOOMFailures().Return(0)
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
 	overrides.OnGetExtendedResources().Return(extendedResources)
@@ -469,7 +470,7 @@ func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 		Name:  core.Resources_MEMORY,
 		Value: "15G",
 	})
-	expectedResources, _ := flytek8s.ToK8sResourceRequirements(expectedPbResources)
+	expectedResources, _ := flytek8s.ToK8sResourceRequirements(expectedPbResources, 0)
 
 	flyteWorkflowResources := v1.ResourceRequirements{
 		Requests: v1.ResourceList{

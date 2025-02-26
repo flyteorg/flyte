@@ -47,6 +47,7 @@ type TaskExecutionMetadata interface {
 	GetOverrides() TaskOverrides
 	GetLabels() map[string]string
 	GetMaxAttempts() uint32
+	GetOOMFailures() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
 	GetSecurityContext() core.SecurityContext // TODO (whynopointer)

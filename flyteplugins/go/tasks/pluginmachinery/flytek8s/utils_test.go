@@ -34,7 +34,7 @@ func TestToK8sResourceList(t *testing.T) {
 			{Name: core.Resources_GPU, Value: "1"},
 			{Name: core.Resources_MEMORY, Value: "1024Mi"},
 			{Name: core.Resources_EPHEMERAL_STORAGE, Value: "1024Mi"},
-		})
+		}, 0)
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, r)
@@ -45,14 +45,14 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
 	}
 	{
-		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{})
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{}, 0)
 		assert.NoError(t, err)
 		assert.Empty(t, r)
 	}
 	{
 		_, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
 			{Name: core.Resources_CPU, Value: "250x"},
-		})
+		}, 0)
 		assert.Error(t, err)
 	}
 
@@ -61,7 +61,7 @@ func TestToK8sResourceList(t *testing.T) {
 func TestToK8sResourceRequirements(t *testing.T) {
 
 	{
-		r, err := ToK8sResourceRequirements(nil)
+		r, err := ToK8sResourceRequirements(nil, 0)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Empty(t, r.Limits)
@@ -71,7 +71,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 		r, err := ToK8sResourceRequirements(&core.Resources{
 			Requests: nil,
 			Limits:   nil,
-		})
+		}, 0)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Empty(t, r.Limits)
@@ -85,7 +85,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "1024m"},
 			},
-		})
+		}, 0)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Equal(t, resource.MustParse("250m"), r.Requests[v1.ResourceCPU])
@@ -99,7 +99,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "1024m"},
 			},
-		})
+		}, 0)
 		assert.Error(t, err)
 	}
 	{
@@ -110,7 +110,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "blah"},
 			},
-		})
+		}, 0)
 		assert.Error(t, err)
 	}
 }

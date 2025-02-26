@@ -337,6 +337,10 @@ func TestCreateExecution(t *testing.T) {
 				Name:  core.Resources_MEMORY,
 				Value: "200Gi",
 			},
+			{
+				Name:  core.Resources_OOM_RESERVED_MEMORY,
+				Value: "0",
+			},
 		},
 		Limits: []*core.Resources_ResourceEntry{
 			{
@@ -346,6 +350,10 @@ func TestCreateExecution(t *testing.T) {
 			{
 				Name:  core.Resources_MEMORY,
 				Value: "500Gi",
+			},
+			{
+				Name:  core.Resources_OOM_RESERVED_MEMORY,
+				Value: "0",
 			},
 		},
 	}
@@ -4117,16 +4125,18 @@ func TestSetDefaults(t *testing.T) {
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	execManager.(*ExecutionManager).setCompiledTaskDefaults(context.Background(), task, workflowengineInterfaces.TaskResources{
 		Defaults: runtimeInterfaces.TaskResourceSet{
-			CPU:              resource.MustParse("200m"),
-			GPU:              resource.MustParse("4"),
-			Memory:           resource.MustParse("200Gi"),
-			EphemeralStorage: resource.MustParse("500Mi"),
+			CPU:               resource.MustParse("200m"),
+			GPU:               resource.MustParse("4"),
+			Memory:            resource.MustParse("200Gi"),
+			EphemeralStorage:  resource.MustParse("500Mi"),
+			OOMReservedMemory: resource.MustParse("100Mi"),
 		},
 		Limits: runtimeInterfaces.TaskResourceSet{
-			CPU:              resource.MustParse("300m"),
-			GPU:              resource.MustParse("8"),
-			Memory:           resource.MustParse("500Gi"),
-			EphemeralStorage: resource.MustParse("501Mi"),
+			CPU:               resource.MustParse("300m"),
+			GPU:               resource.MustParse("8"),
+			Memory:            resource.MustParse("500Gi"),
+			EphemeralStorage:  resource.MustParse("501Mi"),
+			OOMReservedMemory: resource.MustParse("300Mi"),
 		},
 	})
 	assert.True(t, proto.Equal(
@@ -4149,6 +4159,10 @@ func TestSetDefaults(t *testing.T) {
 						Name:  core.Resources_GPU,
 						Value: "4",
 					},
+					{
+						Name:  core.Resources_OOM_RESERVED_MEMORY,
+						Value: "0",
+					},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{
@@ -4166,6 +4180,10 @@ func TestSetDefaults(t *testing.T) {
 					{
 						Name:  core.Resources_GPU,
 						Value: "4",
+					},
+					{
+						Name:  core.Resources_OOM_RESERVED_MEMORY,
+						Value: "0",
 					},
 				},
 			},
@@ -4229,6 +4247,10 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 						Name:  core.Resources_GPU,
 						Value: "4",
 					},
+					{
+						Name:  core.Resources_OOM_RESERVED_MEMORY,
+						Value: "0",
+					},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{
@@ -4243,6 +4265,10 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 						Name:  core.Resources_GPU,
 						Value: "4",
 					},
+					{
+						Name:  core.Resources_OOM_RESERVED_MEMORY,
+						Value: "0",
+					},
 				},
 			},
 		},
@@ -4251,10 +4277,11 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 
 func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 	taskConfigLimits := runtimeInterfaces.TaskResourceSet{
-		CPU:              resource.MustParse("300m"),
-		GPU:              resource.MustParse("1"),
-		Memory:           resource.MustParse("500Gi"),
-		EphemeralStorage: resource.MustParse("501Mi"),
+		CPU:               resource.MustParse("300m"),
+		GPU:               resource.MustParse("1"),
+		Memory:            resource.MustParse("500Gi"),
+		EphemeralStorage:  resource.MustParse("501Mi"),
+		OOMReservedMemory: resource.MustParse("300Mi"),
 	}
 
 	task := &core.CompiledTask{
@@ -4280,8 +4307,9 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 		execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 		execManager.(*ExecutionManager).setCompiledTaskDefaults(context.Background(), task, workflowengineInterfaces.TaskResources{
 			Defaults: runtimeInterfaces.TaskResourceSet{
-				CPU:    resource.MustParse("200m"),
-				Memory: resource.MustParse("200Gi"),
+				CPU:               resource.MustParse("200m"),
+				Memory:            resource.MustParse("200Gi"),
+				OOMReservedMemory: resource.MustParse("0"),
 			},
 			Limits: taskConfigLimits,
 		})
@@ -4297,6 +4325,10 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 							Name:  core.Resources_MEMORY,
 							Value: "200Gi",
 						},
+						{
+							Name:  core.Resources_OOM_RESERVED_MEMORY,
+							Value: "0",
+						},
 					},
 					Limits: []*core.Resources_ResourceEntry{
 						{
@@ -4306,6 +4338,10 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 						{
 							Name:  core.Resources_MEMORY,
 							Value: "200Gi",
+						},
+						{
+							Name:  core.Resources_OOM_RESERVED_MEMORY,
+							Value: "0",
 						},
 					},
 				},
@@ -4341,6 +4377,10 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 							Name:  core.Resources_EPHEMERAL_STORAGE,
 							Value: "1",
 						},
+						{
+							Name:  core.Resources_OOM_RESERVED_MEMORY,
+							Value: "0",
+						},
 					},
 					Limits: []*core.Resources_ResourceEntry{
 						{
@@ -4354,6 +4394,10 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 						{
 							Name:  core.Resources_EPHEMERAL_STORAGE,
 							Value: "1",
+						},
+						{
+							Name:  core.Resources_OOM_RESERVED_MEMORY,
+							Value: "0",
 						},
 					},
 				},
