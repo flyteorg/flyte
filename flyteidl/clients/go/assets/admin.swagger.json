@@ -6585,6 +6585,13 @@
         "data_mode": {
           "$ref": "#/definitions/ArrayNodeDataMode",
           "title": "data_mode determines how input data is passed to the sub-nodes"
+        },
+        "bound_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "+optional. Specifies input bindings that are not mapped over for the node."
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."

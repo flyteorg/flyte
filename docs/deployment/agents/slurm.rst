@@ -205,6 +205,27 @@ After completing the form, submit it, copy the content, and save it to ``/etc/sl
 
   For a sample configuration file, please refer to this `slurm.conf <https://github.com/JiangJiaWei1103/Slurm-101/blob/main/slurm.conf>`_.
 
+.. note::
+
+  If you are using GPUs in your Slurm cluster, you need additional configuration files.
+  Here is an example configuration for a Ubuntu machine with a Tesla T4 GPU:
+
+  In ``/etc/slurm/slurm.conf``, add:
+
+  .. code-block:: ini
+
+      GresTypes=gpu
+      NodeName=localhost Gres=gpu:1 CPUs=<cpus> RealMemory=<available-mem> Sockets=<sockets> CoresPerSocket=<cores-per-socket> ThreadsPerCore=<threads-per-core> State=UNKNOWN
+      PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
+
+  In ``/etc/slurm/gres.conf``, add:
+  
+  .. code-block:: ini
+
+      AutoDetect=nvml
+      NodeName=localhost Name=gpu Type=tesla File=/dev/nvidia0
+
+
 3. Start daemons
 ^^^^^^^^^^^^^^^^
 
