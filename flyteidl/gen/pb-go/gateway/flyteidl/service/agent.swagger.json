@@ -316,6 +316,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "output_prefix",
+            "description": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
