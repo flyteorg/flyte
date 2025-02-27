@@ -575,4 +575,60 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_rbac.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("rbac.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_rbac.bypassMethodPatterns", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(DefaultConfig.Rbac.BypassMethodPatterns, ",")
+
+			cmdFlags.Set("rbac.bypassMethodPatterns", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.bypassMethodPatterns"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.Rbac.BypassMethodPatterns)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_rbac.tokenScopeRoleResolver.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("rbac.tokenScopeRoleResolver.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.tokenScopeRoleResolver.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.TokenScopeRoleResolver.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_rbac.tokenClaimRoleResolver.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("rbac.tokenClaimRoleResolver.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.tokenClaimRoleResolver.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.TokenClaimRoleResolver.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

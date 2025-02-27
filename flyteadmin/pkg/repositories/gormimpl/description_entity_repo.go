@@ -5,12 +5,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	descriptionEntityResourceColumns = common.ResourceColumns{Project: Project, Domain: Domain}
 )
 
 // DescriptionEntityRepo Implementation of DescriptionEntityRepoInterface.
@@ -30,7 +36,8 @@ func (r *DescriptionEntityRepo) Get(ctx context.Context, input interfaces.GetDes
 
 	tx := r.db.WithContext(ctx).Table(descriptionEntityTableName)
 	// Apply filters
-	tx, err = applyFilters(tx, filters, nil)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, descriptionEntityResourceColumns)
+	tx, err = applyFilters(tx, filters, nil, isolationFilter)
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
@@ -56,7 +63,8 @@ func (r *DescriptionEntityRepo) List(
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, descriptionEntityResourceColumns)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.DescriptionEntityCollectionOutput{}, err
 	}
