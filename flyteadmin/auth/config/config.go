@@ -174,7 +174,7 @@ type Config struct {
 	// AppAuth settings used to authenticate and control/limit access scopes for apps.
 	AppAuth OAuth2Options `json:"appAuth" pflag:",Defines Auth options for apps. UserAuth must be enabled for AppAuth to work."`
 
-	Rbac Rbac `json:"rbacConfig" pflag:",Defines RBAC options for Flyte Admin."`
+	Rbac Rbac `json:"rbac" pflag:",Defines RBAC options for Flyte Admin."`
 }
 
 type AuthorizationServer struct {
