@@ -6,11 +6,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	taskColumnNames = common.ResourceColumns{Project: Project, Domain: Domain}
 )
 
 // Implementation of TaskRepoInterface.
@@ -21,6 +28,9 @@ type TaskRepo struct {
 }
 
 func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity == nil {
@@ -49,6 +59,7 @@ func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEnt
 func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
 	var task models.Task
 	timer := r.metrics.GetDuration.Start()
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskColumnNames)
 	tx := r.db.WithContext(ctx).Where(&models.Task{
 		TaskKey: models.TaskKey{
 			Project: input.Project,
@@ -56,7 +67,11 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).Take(&task)
+	})
+	if isolationFilter != nil {
+		tx = tx.Where(tx.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&task)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
@@ -75,6 +90,7 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 
 func (r *TaskRepo) List(
 	ctx context.Context, input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error) {
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskColumnNames)
 	// First validate input.
 	if err := ValidateListInput(input); err != nil {
 		return interfaces.TaskCollectionOutput{}, err
@@ -82,7 +98,7 @@ func (r *TaskRepo) List(
 	var tasks []models.Task
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.TaskCollectionOutput{}, err
 	}
@@ -110,10 +126,12 @@ func (r *TaskRepo) ListTaskIdentifiers(ctx context.Context, input interfaces.Lis
 		return interfaces.TaskCollectionOutput{}, err
 	}
 
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskColumnNames)
+
 	tx := r.db.WithContext(ctx).Model(models.Task{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.TaskCollectionOutput{}, err
 	}

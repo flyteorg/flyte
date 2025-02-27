@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -126,6 +128,13 @@ var (
 				},
 			},
 		},
+		Rbac: Rbac{
+			Enabled: false,
+			BypassMethodPatterns: []string{
+				"/grpc.health.v1.Health/.*",                // health checking for k8s
+				"/flyteidl.service.AuthMetadataService/.*", // auth metadata used by other Flyte services
+			},
+		},
 	}
 
 	cfgSection = config.MustRegisterSection("auth", DefaultConfig)
@@ -164,6 +173,8 @@ type Config struct {
 
 	// AppAuth settings used to authenticate and control/limit access scopes for apps.
 	AppAuth OAuth2Options `json:"appAuth" pflag:",Defines Auth options for apps. UserAuth must be enabled for AppAuth to work."`
+
+	Rbac Rbac `json:"rbacConfig" pflag:",Defines RBAC options for Flyte Admin."`
 }
 
 type AuthorizationServer struct {
@@ -234,6 +245,67 @@ type UserAuthConfig struct {
 	CookieBlockKeySecretName string         `json:"cookieBlockKeySecretName" pflag:",OPTIONAL: Secret name to use for cookie block key."`
 	CookieSetting            CookieSettings `json:"cookieSetting" pflag:", settings used by cookies created for user auth"`
 	IDPQueryParameter        string         `json:"idpQueryParameter" pflag:", idp query parameter used for selecting a particular IDP for doing user authentication. Eg: for Okta passing idp=<IDP-ID> forces the authentication to happen with IDP-ID"`
+}
+
+type Rbac struct {
+	Enabled                bool                   `json:"enabled" pflag:",Enables RBAC."`
+	BypassMethodPatterns   []string               `json:"bypassMethodPatterns" pflag:",List of regex patterns to match against method names to bypass RBAC."`
+	TokenScopeRoleResolver TokenScopeRoleResolver `json:"tokenScopeRoleResolver" pflag:",Config to use for resolving roles from token scopes."`
+	TokenClaimRoleResolver TokenClaimRoleResolver `json:"tokenClaimRoleResolver" pflag:",Config to use for resolving roles from token claims."`
+	Policies               []AuthorizationPolicy  `json:"policies" pflag:",Authorization policies to use for RBAC."`
+}
+
+// An AuthorizationPolicy represents authorization allow rules.
+type AuthorizationPolicy struct {
+	Role  string `json:"role" pflag:",Role to match against."`
+	Rules []Rule `json:"rules" pflag:",Allow rules for matching requests."`
+}
+
+func (ap AuthorizationPolicy) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ap)
+}
+
+func (ap AuthorizationPolicy) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &ap)
+	if err != nil {
+		return fmt.Errorf("unmarshalling AuthorizationPolicy: %w", err)
+	}
+	return nil
+}
+
+// A Rule is a struct that represents an API request to match on.
+type Rule struct {
+	MethodPattern string `json:"methodPattern" pflag:",Regex pattern for the gRPC method of the request."`
+	Project       string `json:"project" pflag:",Project level resource scope, empty is wildcard."`
+	Domain        string `json:"domain" pflag:",Domain level resource scope, empty is wildcard."`
+	Name          string `json:"name" pflag:",Scope of the rule."`
+}
+
+// A TokenClaimRoleResolver is a struct that represents how token claims can map to RBAC roles.
+type TokenClaimRoleResolver struct {
+	Enabled     bool         `json:"enabled" pflag:",Enables token claim based role resolution."`
+	TokenClaims []TokenClaim `json:"tokenClaims" pflag:",List of claims to use for role resolution."`
+}
+
+type TokenScopeRoleResolver struct {
+	Enabled bool `json:"enabled" pflag:",Enables token scope based role resolution."`
+}
+
+// A TokenClaim is a struct that describes which claims to look for in tokens in order to use the values as RBAC roles.
+type TokenClaim struct {
+	Name string `json:"name" pflag:",Scope of the claim to look for in the token."`
+}
+
+func (tc TokenClaim) MarshalJSON() ([]byte, error) {
+	return json.Marshal(tc)
+}
+
+func (tc TokenClaim) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &tc)
+	if err != nil {
+		return fmt.Errorf("unmarshalling TokenClaim: %w", err)
+	}
+	return nil
 }
 
 //go:generate enumer --type=SameSite --trimprefix=SameSite -json
