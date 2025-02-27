@@ -310,6 +310,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.FromString,
                 )
+        self.DeleteExecutionPhase = channel.unary_unary(
+                '/flyteidl.service.AdminService/DeleteExecutionPhase',
+                request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteResponse.FromString,
+                )
 
 
 class AdminServiceServicer(object):
@@ -713,6 +718,12 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteExecutionPhase(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AdminServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -995,6 +1006,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetExecutionMetrics,
                     request_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.SerializeToString,
+            ),
+            'DeleteExecutionPhase': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteExecutionPhase,
+                    request_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -1957,5 +1973,22 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetExecutionMetrics',
             flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.SerializeToString,
             flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteExecutionPhase(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/DeleteExecutionPhase',
+            flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteRequest.SerializeToString,
+            flyteidl_dot_admin_dot_execution__pb2.ExecutionPhaseDeleteResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
