@@ -403,7 +403,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
 		Client = store
-		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).EXPECT().CreateUploadLocation(s.Ctx, &service.CreateUploadLocationRequest{
 			Project:    "flytesnacks",
 			Domain:     "development",
 			Filename:   "flytesnacks-core.tgz",
@@ -422,7 +422,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
 		Client = store
-		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).EXPECT().CreateUploadLocation(s.Ctx, &service.CreateUploadLocationRequest{
 			Project:    "flytesnacks",
 			Domain:     "development",
 			Filename:   "flytesnacks-core.tgz",

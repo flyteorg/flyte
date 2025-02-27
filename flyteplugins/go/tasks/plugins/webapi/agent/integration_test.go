@@ -305,7 +305,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
 
 	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
-	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+	stream.EXPECT().Recv().Return(&admin.ExecuteTaskSyncResponse{
 		Res: &admin.ExecuteTaskSyncResponse_Header{
 			Header: &admin.ExecuteTaskSyncResponseHeader{
 				Resource: resource,
@@ -313,11 +313,11 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 		},
 	}, nil).Once()
 
-	stream.OnRecv().Return(nil, io.EOF).Once()
-	stream.OnSendMatch(mock.Anything).Return(nil)
-	stream.OnCloseSendMatch(mock.Anything).Return(nil)
+	stream.EXPECT().Recv().Return(nil, io.EOF).Once()
+	stream.EXPECT().Send(mock.Anything).Return(nil)
+	stream.EXPECT().CloseSend().Return(nil)
 
-	syncAgentClient.OnExecuteTaskSyncMatch(mock.Anything).Return(stream, nil)
+	syncAgentClient.EXPECT().ExecuteTaskSync(mock.Anything).Return(stream, nil)
 
 	cfg := defaultConfig
 	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
