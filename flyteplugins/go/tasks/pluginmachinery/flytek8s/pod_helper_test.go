@@ -1622,16 +1622,18 @@ func TestDemystifySuccess(t *testing.T) {
 }
 
 func TestDemystifyFailure(t *testing.T) {
+	ctx := context.TODO()
+
 	t.Run("unknown-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{}, pluginsCore.TaskInfo{})
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "UnknownError", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("known-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{})
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "hello", phaseInfo.Err().GetCode())
@@ -1639,7 +1641,7 @@ func TestDemystifyFailure(t *testing.T) {
 	})
 
 	t.Run("OOMKilled", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					State: v1.ContainerState{
@@ -1650,15 +1652,15 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
 		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
-	t.Run("SIGKILL", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+	t.Run("SIGKILL non-primary container", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					LastTerminationState: v1.ContainerState{
@@ -1667,18 +1669,39 @@ func TestDemystifyFailure(t *testing.T) {
 							ExitCode: SIGKILL,
 						},
 					},
+					Name: "non-primary-container",
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "primary-container")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
 		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
+	t.Run("SIGKILL primary container", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "some reason",
+							ExitCode: SIGKILL,
+						},
+					},
+					Name: "primary-container",
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "primary-container")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+	})
+
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
 		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			Message: "Pod Node is in progress of shutting down, not admitting any new pods",
 			Reason:  "Shutdown",
 			ContainerStatuses: []v1.ContainerStatus{
@@ -1691,7 +1714,7 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
@@ -1701,7 +1724,7 @@ func TestDemystifyFailure(t *testing.T) {
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
 		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			Message: "Foobar",
 			Reason:  "Terminated",
 			ContainerStatuses: []v1.ContainerStatus{
@@ -1714,7 +1737,7 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
@@ -1760,6 +1783,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 }
 
 func TestDeterminePrimaryContainerPhase(t *testing.T) {
+	ctx := context.TODO()
 	primaryContainerName := "primary"
 	secondaryContainer := v1.ContainerStatus{
 		Name: "secondary",
@@ -1771,7 +1795,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 	}
 	var info = &pluginsCore.TaskInfo{}
 	t.Run("primary container waiting", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1784,7 +1808,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 	})
 	t.Run("primary container running", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1797,7 +1821,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 	})
 	t.Run("primary container failed", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1811,10 +1835,47 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
+	t.Run("primary container failed - SIGKILL", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 137,
+						Reason:   "foo",
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
+	t.Run("primary container failed - SIGKILL unsigned", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 247,
+						Reason:   "foo",
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
 	t.Run("primary container succeeded", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1827,7 +1888,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 	t.Run("missing primary container", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer,
 		}, info)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
@@ -1835,7 +1896,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed with OOMKilled", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1848,8 +1909,27 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
 		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
+	t.Run("primary container failed with OOMKilled - SIGKILL", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 137,
+						Reason:   OOMKilled,
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 }
 
