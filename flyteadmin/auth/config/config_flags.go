@@ -88,7 +88,5 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.bypassMethodPatterns"), DefaultConfig.Rbac.BypassMethodPatterns, "List of regex patterns to match against method names to bypass RBAC.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbac.tokenScopeRoleResolver.enabled"), DefaultConfig.Rbac.TokenScopeRoleResolver.Enabled, "Enables token scope based role resolution.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbac.tokenClaimRoleResolver.enabled"), DefaultConfig.Rbac.TokenClaimRoleResolver.Enabled, "Enables token claim based role resolution.")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.tokenClaimRoleResolver.tokenClaims"), DefaultConfig.Rbac.TokenClaimRoleResolver.TokenClaims, "List of claims to use for role resolution.")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.policies"), DefaultConfig.Rbac.Policies, "Authorization policies to use for RBAC.")
 	return cmdFlags
 }

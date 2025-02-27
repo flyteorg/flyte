@@ -631,32 +631,4 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbac.tokenClaimRoleResolver.tokenClaims", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := DefaultConfig.Rbac.TokenClaimRoleResolver.TokenClaims
-
-			cmdFlags.Set("rbac.tokenClaimRoleResolver.tokenClaims", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.tokenClaimRoleResolver.tokenClaims"); err == nil {
-				testDecodeRaw_Config(t, vStringSlice, &actual.Rbac.TokenClaimRoleResolver.TokenClaims)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_rbac.policies", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := DefaultConfig.Rbac.Policies
-
-			cmdFlags.Set("rbac.policies", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.policies"); err == nil {
-				testDecodeRaw_Config(t, vStringSlice, &actual.Rbac.Policies)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 }
