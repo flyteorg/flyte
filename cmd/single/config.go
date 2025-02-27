@@ -5,6 +5,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
+//go:generate pflags Config --default-var=DefaultConfig
+
 var (
 	DefaultConfig = &Config{}
 	configSection = config.MustRegisterSection("flyte", DefaultConfig)
