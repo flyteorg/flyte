@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/utils/clock"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/core"
@@ -31,6 +32,7 @@ type ScheduledExecutor struct {
 	scope                  promutils.Scope
 	adminServiceClient     service.AdminServiceClient
 	workflowExecutorConfig *runtimeInterfaces.FlyteWorkflowExecutorConfig
+	clock                  clock.Clock // pluggable clock for unit testing
 }
 
 func (w *ScheduledExecutor) Run(ctx context.Context) error {
@@ -78,7 +80,7 @@ func (w *ScheduledExecutor) Run(ctx context.Context) error {
 	go wait.UntilWithContext(updaterCtx, gcronUpdater.UpdateGoCronSchedules, scheduleUpdaterDuration)
 
 	// Catch up simultaneously on all the schedules in the scheduler
-	currTime := time.Now()
+	currTime := w.clock.Now()
 	af := futures.NewAsyncFuture(ctx, func(ctx context.Context) (interface{}, error) {
 		return gcronScheduler.CatchupAll(ctx, currTime), nil
 	})
@@ -112,5 +114,20 @@ func NewScheduledExecutor(db repositoryInterfaces.SchedulerRepoInterface,
 		adminServiceClient:     adminServiceClient,
 		workflowExecutorConfig: workflowExecutorConfig.GetFlyteWorkflowExecutorConfig(),
 		snapshoter:             snapshoter.New(scope, db),
+		clock:                  clock.RealClock{},
+	}
+}
+
+func newScheduledExecutorWithClock(db repositoryInterfaces.SchedulerRepoInterface,
+	workflowExecutorConfig runtimeInterfaces.WorkflowExecutorConfig,
+	scope promutils.Scope, adminServiceClient service.AdminServiceClient,
+	clock clock.Clock) ScheduledExecutor {
+	return ScheduledExecutor{
+		db:                     db,
+		scope:                  scope,
+		adminServiceClient:     adminServiceClient,
+		workflowExecutorConfig: workflowExecutorConfig.GetFlyteWorkflowExecutorConfig(),
+		snapshoter:             snapshoter.New(scope, db),
+		clock:                  clock,
 	}
 }

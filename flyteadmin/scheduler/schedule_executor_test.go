@@ -12,6 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"k8s.io/utils/clock"
+	testingclock "k8s.io/utils/clock/testing"
 
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -28,7 +30,7 @@ import (
 var schedules []models.SchedulableEntity
 var db repositoryInterfaces.Repository
 
-func setupScheduleExecutor(t *testing.T, s string) ScheduledExecutor {
+func setupScheduleExecutor(t *testing.T, s string, clock clock.Clock) ScheduledExecutor {
 	db = mocks.NewMockRepository()
 	var scope = promutils.NewScope(s)
 	scheduleExecutorConfig := runtimeInterfaces.WorkflowExecutorConfig{
@@ -61,13 +63,16 @@ func setupScheduleExecutor(t *testing.T, s string) ScheduledExecutor {
 	snapshotRepo.OnWriteMatch(mock.Anything, mock.Anything).Return(nil)
 	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).
 		Return(&admin.ExecutionCreateResponse{}, nil)
-	return NewScheduledExecutor(db, scheduleExecutorConfig,
-		scope, mockAdminClient)
+	return newScheduledExecutorWithClock(db, scheduleExecutorConfig,
+		scope, mockAdminClient, clock)
 }
 
 func TestSuccessfulSchedulerExec(t *testing.T) {
+
+	fakeClock := testingclock.NewFakeClock(time.Now())
+
 	t.Run("add cron schedule", func(t *testing.T) {
-		scheduleExecutor := setupScheduleExecutor(t, "cron")
+		scheduleExecutor := setupScheduleExecutor(t, "cron", fakeClock)
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
 		activeV2 := true
 		createAt := time.Now()
@@ -93,7 +98,7 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			err := scheduleExecutor.Run(context.Background())
 			assert.Nil(t, err)
 		}()
-		time.Sleep(10 * time.Second)
+		fakeClock.Step(10 * time.Second)
 		scheduleEntitiesRepo = db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
 		activeV2 = false
 		schedules = nil
@@ -114,11 +119,11 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			Active:              &activeV2,
 		})
 		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
-		time.Sleep(30 * time.Second)
+		fakeClock.Step(30 * time.Second)
 	})
 
 	t.Run("add fixed rate schedule", func(t *testing.T) {
-		scheduleExecutor := setupScheduleExecutor(t, "fixed")
+		scheduleExecutor := setupScheduleExecutor(t, "fixed", fakeClock)
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
 		activeV2 := true
 		createAt := time.Now()
@@ -145,7 +150,7 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			err := scheduleExecutor.Run(context.Background())
 			assert.Nil(t, err)
 		}()
-		time.Sleep(10 * time.Second)
+		fakeClock.Step(10 * time.Second)
 		scheduleEntitiesRepo = db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
 		activeV2 = false
 		schedules = nil
@@ -167,11 +172,11 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			Active:              &activeV2,
 		})
 		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
-		time.Sleep(30 * time.Second)
+		fakeClock.Step(30 * time.Second)
 	})
 
 	t.Run("unable to read schedules", func(t *testing.T) {
-		scheduleExecutor := setupScheduleExecutor(t, "unable_read_schedules")
+		scheduleExecutor := setupScheduleExecutor(t, "unable_read_schedules", fakeClock)
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
 		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(nil, fmt.Errorf("unable to read schedules"))
 
