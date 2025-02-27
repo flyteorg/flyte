@@ -7,12 +7,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	executionColumnNames = common.ResourceColumns{Project: "executions.execution_project", Domain: "executions.execution_domain"}
 )
 
 // Implementation of ExecutionInterface.
@@ -23,6 +29,9 @@ type ExecutionRepo struct {
 }
 
 func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if len(executionTagModel) > 0 {
@@ -45,13 +54,21 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution, exec
 func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 	var execution models.Execution
 	timer := r.metrics.GetDuration.Start()
+
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, executionColumnNames)
+
 	tx := r.db.WithContext(ctx).Where(&models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
 		},
-	}).Take(&execution)
+	})
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&execution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -67,6 +84,9 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 }
 
 func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
+	if err := util.FilterResourceMutation(ctx, execution.Project, execution.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&models.Execution{}).Where(getIDFilter(execution.ID)).Updates(execution)
 	timer.Stop()
@@ -83,6 +103,9 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	if err = ValidateListInput(input); err != nil {
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
+
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, executionColumnNames)
+
 	var executions []models.Execution
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 	// And add join condition as required by user-specified filters (which can potentially include join table attrs).
@@ -105,7 +128,7 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
@@ -127,6 +150,8 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 
 func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
 	var err error
+
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, executionColumnNames)
 	tx := r.db.WithContext(ctx).Model(&models.Execution{})
 
 	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
@@ -144,7 +169,7 @@ func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourc
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return 0, err
 	}

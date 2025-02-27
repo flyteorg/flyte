@@ -6,12 +6,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	taskExecutionColumnNames = common.ResourceColumns{Project: "task_executions.project", Domain: "task_executions.domain"}
 )
 
 // Implementation of TaskExecutionInterface.
@@ -22,6 +28,9 @@ type TaskExecutionRepo struct {
 }
 
 func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecution) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
@@ -32,6 +41,7 @@ func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecuti
 }
 
 func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskExecutionColumnNames)
 	var taskExecution models.TaskExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.TaskExecution{
@@ -52,7 +62,12 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 			},
 			RetryAttempt: &input.TaskExecutionID.RetryAttempt,
 		},
-	}).Preload("ChildNodeExecution").Take(&taskExecution)
+	}).Preload("ChildNodeExecution")
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&taskExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -80,6 +95,9 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 }
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
+	if err := util.FilterResourceMutation(ctx, execution.Project, execution.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{}).Where(getIDFilter(execution.ID)).
 		Updates(&execution)
@@ -115,7 +133,8 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskExecutionColumnNames)
+	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.TaskExecutionCollectionOutput{}, err
 	}
@@ -157,7 +176,8 @@ func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, taskExecutionColumnNames)
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return 0, err
 	}

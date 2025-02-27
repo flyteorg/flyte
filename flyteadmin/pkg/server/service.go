@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors"
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -106,8 +107,8 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
 	if cfg.Security.UseAuth {
 		logger.Infof(ctx, "Creating gRPC server with authentication")
-		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+
+		interceptorsToLoad := []grpc.UnaryServerInterceptor{
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
 			grpcprometheus.UnaryServerInterceptor,
@@ -115,8 +116,21 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
 			auth.AuthenticationLoggingInterceptor,
-			middlewareInterceptors,
-		)
+		}
+
+		if authCtx.Options().Rbac.Enabled {
+			logger.Infof(ctx, "Creating gRPC server with RBAC")
+			authorizationInterceptor, err := interceptors.GetAuthorizationInterceptor(authCtx)
+			if err != nil {
+				return nil, fmt.Errorf("getting authorization interceptor: %w", err)
+			}
+			interceptorsToLoad = append(interceptorsToLoad, authorizationInterceptor)
+		}
+
+		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
+		interceptorsToLoad = append(interceptorsToLoad, middlewareInterceptors)
+
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(interceptorsToLoad...)
 	} else {
 		logger.Infof(ctx, "Creating gRPC server without authentication")
 		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
