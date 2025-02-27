@@ -575,13 +575,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.enabled", func(t *testing.T) {
+	t.Run("Test_rbac.enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("rbacConfig.enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("rbacConfig.enabled"); err == nil {
+			cmdFlags.Set("rbac.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.Enabled)
 
 			} else {
@@ -589,13 +589,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.bypassMethodPatterns", func(t *testing.T) {
+	t.Run("Test_rbac.bypassMethodPatterns", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_Config(DefaultConfig.Rbac.BypassMethodPatterns, ",")
 
-			cmdFlags.Set("rbacConfig.bypassMethodPatterns", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("rbacConfig.bypassMethodPatterns"); err == nil {
+			cmdFlags.Set("rbac.bypassMethodPatterns", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.bypassMethodPatterns"); err == nil {
 				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.Rbac.BypassMethodPatterns)
 
 			} else {
@@ -603,13 +603,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.tokenScopeRoleResolver.enabled", func(t *testing.T) {
+	t.Run("Test_rbac.tokenScopeRoleResolver.enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("rbacConfig.tokenScopeRoleResolver.enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("rbacConfig.tokenScopeRoleResolver.enabled"); err == nil {
+			cmdFlags.Set("rbac.tokenScopeRoleResolver.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.tokenScopeRoleResolver.enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.TokenScopeRoleResolver.Enabled)
 
 			} else {
@@ -617,13 +617,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.tokenClaimRoleResolver.enabled", func(t *testing.T) {
+	t.Run("Test_rbac.tokenClaimRoleResolver.enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("rbacConfig.tokenClaimRoleResolver.enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("rbacConfig.tokenClaimRoleResolver.enabled"); err == nil {
+			cmdFlags.Set("rbac.tokenClaimRoleResolver.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("rbac.tokenClaimRoleResolver.enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Rbac.TokenClaimRoleResolver.Enabled)
 
 			} else {
@@ -631,13 +631,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.tokenClaimRoleResolver.tokenClaims", func(t *testing.T) {
+	t.Run("Test_rbac.tokenClaimRoleResolver.tokenClaims", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.Rbac.TokenClaimRoleResolver.TokenClaims
 
-			cmdFlags.Set("rbacConfig.tokenClaimRoleResolver.tokenClaims", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("rbacConfig.tokenClaimRoleResolver.tokenClaims"); err == nil {
+			cmdFlags.Set("rbac.tokenClaimRoleResolver.tokenClaims", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.tokenClaimRoleResolver.tokenClaims"); err == nil {
 				testDecodeRaw_Config(t, vStringSlice, &actual.Rbac.TokenClaimRoleResolver.TokenClaims)
 
 			} else {
@@ -645,13 +645,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_rbacConfig.policies", func(t *testing.T) {
+	t.Run("Test_rbac.policies", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.Rbac.Policies
 
-			cmdFlags.Set("rbacConfig.policies", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("rbacConfig.policies"); err == nil {
+			cmdFlags.Set("rbac.policies", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("rbac.policies"); err == nil {
 				testDecodeRaw_Config(t, vStringSlice, &actual.Rbac.Policies)
 
 			} else {

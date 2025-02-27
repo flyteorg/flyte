@@ -766,6 +766,31 @@ configmap:
             - profile
             - openid
           clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+      # -- RBAC / Authorization configuration
+      rbac:
+        enabled: false
+        bypassMethodPatterns:
+          - "/grpc.health.v1.Health/.*"
+          - "/flyteidl.service.AuthMetadataService/.*"
+        tokenScopeRoleResolver:
+          enabled: true
+        policies:
+          - role: "admin"
+            rules:
+              - name: "Admin allow all"
+                methodPattern: ".*"
+          - role: "flytesnacks-engineer"
+            rules:
+              - name: "Flytesnacks engineer dev write access"
+                methodPattern: ".*"
+                project: flytesnacks
+                domain: development
+              - name: "Flytesnacks engineer prod read access"
+                methodPattern: "List.*|Get.*"
+                project: flytesnacks
+                domain: production
+
+
 
   # -- Datacatalog server config
   datacatalogServer:

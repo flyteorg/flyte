@@ -84,11 +84,11 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "appAuth.thirdPartyConfig.flyteClient.redirectUri"), DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.RedirectURI, "This is the callback uri registered with the app which handles authorization for a Flyte deployment")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "appAuth.thirdPartyConfig.flyteClient.scopes"), DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.Scopes, "Recommended scopes for the client to request.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "appAuth.thirdPartyConfig.flyteClient.audience"), DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.Audience, "Audience to use when initiating OAuth2 authorization requests.")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbacConfig.enabled"), DefaultConfig.Rbac.Enabled, "Enables RBAC.")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbacConfig.bypassMethodPatterns"), DefaultConfig.Rbac.BypassMethodPatterns, "List of regex patterns to match against method names to bypass RBAC.")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbacConfig.tokenScopeRoleResolver.enabled"), DefaultConfig.Rbac.TokenScopeRoleResolver.Enabled, "Enables token scope based role resolution.")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbacConfig.tokenClaimRoleResolver.enabled"), DefaultConfig.Rbac.TokenClaimRoleResolver.Enabled, "Enables token claim based role resolution.")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbacConfig.tokenClaimRoleResolver.tokenClaims"), DefaultConfig.Rbac.TokenClaimRoleResolver.TokenClaims, "List of claims to use for role resolution.")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbacConfig.policies"), DefaultConfig.Rbac.Policies, "Authorization policies to use for RBAC.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbac.enabled"), DefaultConfig.Rbac.Enabled, "Enables RBAC.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.bypassMethodPatterns"), DefaultConfig.Rbac.BypassMethodPatterns, "List of regex patterns to match against method names to bypass RBAC.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbac.tokenScopeRoleResolver.enabled"), DefaultConfig.Rbac.TokenScopeRoleResolver.Enabled, "Enables token scope based role resolution.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "rbac.tokenClaimRoleResolver.enabled"), DefaultConfig.Rbac.TokenClaimRoleResolver.Enabled, "Enables token claim based role resolution.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.tokenClaimRoleResolver.tokenClaims"), DefaultConfig.Rbac.TokenClaimRoleResolver.TokenClaims, "List of claims to use for role resolution.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rbac.policies"), DefaultConfig.Rbac.Policies, "Authorization policies to use for RBAC.")
 	return cmdFlags
 }
