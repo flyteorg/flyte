@@ -790,8 +790,6 @@ configmap:
                 project: flytesnacks
                 domain: production
 
-
-
   # -- Datacatalog server config
   datacatalogServer:
     datacatalog:
