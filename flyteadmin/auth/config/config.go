@@ -252,7 +252,7 @@ type Rbac struct {
 	BypassMethodPatterns   []string               `json:"bypassMethodPatterns" pflag:",List of regex patterns to match against method names to bypass RBAC."`
 	TokenScopeRoleResolver TokenScopeRoleResolver `json:"tokenScopeRoleResolver" pflag:",Config to use for resolving roles from token scopes."`
 	TokenClaimRoleResolver TokenClaimRoleResolver `json:"tokenClaimRoleResolver" pflag:",Config to use for resolving roles from token claims."`
-	Policies               []AuthorizationPolicy  `json:"policies" pflag:",Authorization policies to use for RBAC."`
+	Policies               []AuthorizationPolicy  `json:"policies" pflag:"-,Authorization policies to use for RBAC."`
 }
 
 // An AuthorizationPolicy represents authorization allow rules.
@@ -284,7 +284,7 @@ type Rule struct {
 // A TokenClaimRoleResolver is a struct that represents how token claims can map to RBAC roles.
 type TokenClaimRoleResolver struct {
 	Enabled     bool         `json:"enabled" pflag:",Enables token claim based role resolution."`
-	TokenClaims []TokenClaim `json:"tokenClaims" pflag:",List of claims to use for role resolution."`
+	TokenClaims []TokenClaim `json:"tokenClaims" pflag:"-,List of claims to use for role resolution."`
 }
 
 type TokenScopeRoleResolver struct {
