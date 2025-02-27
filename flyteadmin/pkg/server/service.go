@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors"
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -30,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/authzserver"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/dataproxy"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
