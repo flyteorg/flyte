@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -ex
-DELTA_CHECK=true
+
 echo "Running go generate"
 go generate ./...
 go mod tidy
