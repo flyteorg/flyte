@@ -577,8 +577,9 @@ func TestGetLogs(t *testing.T) {
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil, k8s.PluginState{})
-	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0, 0)
+	taskTemplate := dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots))
+	taskCtx := dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", jobNamespace, jobName), jobLogs[0].GetUri())

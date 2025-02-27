@@ -204,7 +204,7 @@ func ParseElasticConfig(elasticConfig ElasticConfig) *kubeflowv1.ElasticPolicy {
 // Analyses the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	app, ok := resource.(*kubeflowv1.PyTorchJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
@@ -218,7 +218,12 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 
 	workersCount := common.GetReplicaCount(app.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
 
-	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, hasMaster, *workersCount, 0, 0, 0)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, taskTemplate, hasMaster, *workersCount, 0, 0, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
