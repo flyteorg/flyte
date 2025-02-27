@@ -40,8 +40,8 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncQuboleQuery(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		mockCache := &cacheMocks.AutoRefresh{}
 		mockQubole := &quboleMocks.QuboleClient{}
 		mockSecretManager := &mocks.SecretManager{}
-		mockSecretManager.OnGetMatch(mock.Anything, mock.Anything).Return("fake key", nil)
+		mockSecretManager.EXPECT().Get(mock.Anything, mock.Anything).Return("fake key", nil)
 
 		testScope := promutils.NewTestScope()
 
@@ -73,13 +73,13 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 			ExecutionState: state,
 			Identifier:     "some-id",
 		}
-		mockQubole.OnGetCommandStatusMatch(mock.Anything, mock.MatchedBy(func(commandId string) bool {
+		mockQubole.EXPECT().GetCommandStatus(mock.Anything, mock.MatchedBy(func(commandId string) bool {
 			return commandId == state.CommandID
 		}), mock.Anything).Return(client.QuboleStatusDone, nil)
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncQuboleQuery(ctx, []cache.ItemWrapper{iw})
 		newExecutionState := newCacheItem[0].Item.(ExecutionStateCacheItem)

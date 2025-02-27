@@ -50,7 +50,7 @@ func TestScheduleJob(t *testing.T) {
 	rateLimiter := rate.NewLimiter(1, 10)
 	executor := new(mocks.Executor)
 	snapshot := &snapshoter.SnapshotV1{}
-	executor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	executor.EXPECT().Execute(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	g := scheduler.NewGoCronScheduler(context.Background(), []models.SchedulableEntity{}, schedulerScope, snapshot, rateLimiter, executor, false)
 	c.Start()
 

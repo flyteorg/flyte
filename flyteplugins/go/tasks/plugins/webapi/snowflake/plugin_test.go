@@ -29,7 +29,7 @@ func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test"))
 
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),

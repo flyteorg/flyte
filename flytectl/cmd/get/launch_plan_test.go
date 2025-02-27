@@ -220,8 +220,8 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		launchplan.DefaultConfig.Latest = true
 		launchplan.DefaultConfig.Filter = filters.Filters{}
-		mockFetcher.OnFetchLPLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
+		mockFetcher.EXPECT().FetchLPLatestVersion(mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
 		_, err := FetchLPForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
@@ -232,7 +232,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		launchplan.DefaultConfig.Version = "v1"
 		launchplan.DefaultConfig.Filter = filters.Filters{}
-		mockFetcher.OnFetchLPVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+		mockFetcher.EXPECT().FetchLPVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("error fetching version"))
 		_, err := FetchLPForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
@@ -244,7 +244,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 		launchplan.DefaultConfig.Filter = filters.Filters{}
 		launchplan.DefaultConfig.Filter = filters.Filters{}
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
-		mockFetcher.OnFetchAllVerOfLPMatch(mock.Anything, mock.Anything, mock.Anything,
+		mockFetcher.EXPECT().FetchAllVerOfLP(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
 		_, err := FetchLPForName(s.Ctx, mockFetcher, "lpName", projectValue, domainValue)
 		assert.NotNil(t, err)
@@ -253,10 +253,10 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	t.Run("failure fetching ", func(t *testing.T) {
 		s := testutils.Setup(t)
 		getLaunchPlanSetup()
-		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(nil, fmt.Errorf("error fetching all version"))
-		s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceGetRequest).Return(nil, fmt.Errorf("error fetching all version"))
-		s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(nil, fmt.Errorf("error fetching launch plan"))
-		s.MockAdminClient.OnListLaunchPlanIdsMatch(s.Ctx, namedIDRequest).Return(nil, fmt.Errorf("error listing launch plan ids"))
+		s.FetcherExt.EXPECT().FetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.EXPECT().ListLaunchPlans(s.Ctx, resourceGetRequest).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.EXPECT().GetLaunchPlan(s.Ctx, objectGetRequest).Return(nil, fmt.Errorf("error fetching launch plan"))
+		s.MockAdminClient.EXPECT().ListLaunchPlanIds(s.Ctx, namedIDRequest).Return(nil, fmt.Errorf("error listing launch plan ids"))
 		err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
@@ -265,8 +265,8 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 		s := testutils.Setup(t)
 		getLaunchPlanSetup()
 		argsLp = []string{}
-		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(nil, fmt.Errorf("error fetching all version"))
-		s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceListRequest).Return(nil, fmt.Errorf("error fetching all version"))
+		s.FetcherExt.EXPECT().FetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(nil, fmt.Errorf("error fetching all version"))
+		s.MockAdminClient.EXPECT().ListLaunchPlans(s.Ctx, resourceListRequest).Return(nil, fmt.Errorf("error fetching all version"))
 		err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
@@ -275,7 +275,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 func TestGetLaunchPlanFunc(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
-	s.FetcherExt.OnFetchAllVerOfLPMatch(mock.Anything, mock.Anything, "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
+	s.FetcherExt.EXPECT().FetchAllVerOfLP(mock.Anything, mock.Anything, "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchAllVerOfLP", s.Ctx, "launchplan1", "dummyProject", "dummyDomain", launchplan.DefaultConfig.Filter)
@@ -286,7 +286,7 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
 	launchplan.DefaultConfig.Latest = true
-	s.FetcherExt.OnFetchLPLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan2, nil)
+	s.FetcherExt.EXPECT().FetchLPLatestVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan2, nil)
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchLPLatestVersion", s.Ctx, "launchplan1", projectValue, domainValue)
@@ -297,7 +297,7 @@ func TestGetLaunchPlanWithVersion(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
 	launchplan.DefaultConfig.Version = "v2"
-	s.FetcherExt.OnFetchLPVersion(s.Ctx, "launchplan1", "v2", "dummyProject", "dummyDomain").Return(launchPlan2, nil)
+	s.FetcherExt.EXPECT().FetchLPVersion(s.Ctx, "launchplan1", "v2", "dummyProject", "dummyDomain").Return(launchPlan2, nil)
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchLPVersion", s.Ctx, "launchplan1", "v2", "dummyProject", "dummyDomain")
@@ -308,7 +308,7 @@ func TestGetLaunchPlans(t *testing.T) {
 	t.Run("no workflow filter", func(t *testing.T) {
 		s := testutils.Setup(t)
 		getLaunchPlanSetup()
-		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
+		s.FetcherExt.EXPECT().FetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 		argsLp = []string{}
 		err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 		assert.Nil(t, err)
@@ -317,7 +317,7 @@ func TestGetLaunchPlans(t *testing.T) {
 	t.Run("workflow filter", func(t *testing.T) {
 		s := testutils.Setup(t)
 		getLaunchPlanSetup()
-		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{
+		s.FetcherExt.EXPECT().FetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{
 			FieldSelector: "workflow.name=workflow2",
 		}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 		argsLp = []string{}
@@ -341,10 +341,10 @@ func TestGetLaunchPlans(t *testing.T) {
 func TestGetLaunchPlansWithExecFile(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
-	s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceListRequest).Return(launchPlanListResponse, nil)
-	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(launchPlan2, nil)
-	s.MockAdminClient.OnListLaunchPlanIdsMatch(s.Ctx, namedIDRequest).Return(namedIdentifierList, nil)
-	s.FetcherExt.OnFetchLPVersion(s.Ctx, "launchplan1", "v2", "dummyProject", "dummyDomain").Return(launchPlan2, nil)
+	s.MockAdminClient.EXPECT().ListLaunchPlans(s.Ctx, resourceListRequest).Return(launchPlanListResponse, nil)
+	s.MockAdminClient.EXPECT().GetLaunchPlan(s.Ctx, objectGetRequest).Return(launchPlan2, nil)
+	s.MockAdminClient.EXPECT().ListLaunchPlanIds(s.Ctx, namedIDRequest).Return(namedIdentifierList, nil)
+	s.FetcherExt.EXPECT().FetchLPVersion(s.Ctx, "launchplan1", "v2", "dummyProject", "dummyDomain").Return(launchPlan2, nil)
 	launchplan.DefaultConfig.Version = "v2"
 	launchplan.DefaultConfig.ExecFile = testDataFolder + "exec_file"
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
@@ -376,10 +376,10 @@ workflow: launchplan1
 func TestGetLaunchPlanTableFunc(t *testing.T) {
 	s := testutils.Setup(t)
 	getLaunchPlanSetup()
-	s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceGetRequest).Return(launchPlanListResponse, nil)
-	s.MockAdminClient.OnGetLaunchPlanMatch(s.Ctx, objectGetRequest).Return(launchPlan2, nil)
-	s.MockAdminClient.OnListLaunchPlanIdsMatch(s.Ctx, namedIDRequest).Return(namedIdentifierList, nil)
-	s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
+	s.MockAdminClient.EXPECT().ListLaunchPlans(s.Ctx, resourceGetRequest).Return(launchPlanListResponse, nil)
+	s.MockAdminClient.EXPECT().GetLaunchPlan(s.Ctx, objectGetRequest).Return(launchPlan2, nil)
+	s.MockAdminClient.EXPECT().ListLaunchPlanIds(s.Ctx, namedIDRequest).Return(namedIdentifierList, nil)
+	s.FetcherExt.EXPECT().FetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.GetLaunchPlans(), nil)
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)

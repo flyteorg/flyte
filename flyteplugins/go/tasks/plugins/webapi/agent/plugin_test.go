@@ -26,7 +26,7 @@ const defaultAgentEndpoint = "localhost:8000"
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test"))
 
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1

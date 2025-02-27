@@ -301,7 +301,7 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -318,11 +318,11 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 		},
 		RetryAttempt: 0,
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

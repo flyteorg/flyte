@@ -57,9 +57,9 @@ func setupScheduleExecutor(t *testing.T, s string) ScheduledExecutor {
 		},
 		Snapshot: f.Bytes(),
 	}
-	snapshotRepo.OnReadMatch(mock.Anything).Return(snapshotModel, nil)
-	snapshotRepo.OnWriteMatch(mock.Anything, mock.Anything).Return(nil)
-	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).
+	snapshotRepo.EXPECT().Read(mock.Anything).Return(snapshotModel, nil)
+	snapshotRepo.EXPECT().Write(mock.Anything, mock.Anything).Return(nil)
+	mockAdminClient.EXPECT().CreateExecution(context.Background(), mock.Anything).
 		Return(&admin.ExecutionCreateResponse{}, nil)
 	return NewScheduledExecutor(db, scheduleExecutorConfig,
 		scope, mockAdminClient)
@@ -88,7 +88,7 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			Active:              &activeV2,
 		})
 
-		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
+		scheduleEntitiesRepo.EXPECT().GetAll(mock.Anything).Return(schedules, nil)
 		go func() {
 			err := scheduleExecutor.Run(context.Background())
 			assert.Nil(t, err)
@@ -113,7 +113,7 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			KickoffTimeInputArg: "kickoff_time",
 			Active:              &activeV2,
 		})
-		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
+		scheduleEntitiesRepo.EXPECT().GetAll(mock.Anything).Return(schedules, nil)
 		time.Sleep(30 * time.Second)
 	})
 
@@ -139,7 +139,7 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			KickoffTimeInputArg: "kickoff_time",
 			Active:              &activeV2,
 		})
-		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
+		scheduleEntitiesRepo.EXPECT().GetAll(mock.Anything).Return(schedules, nil)
 
 		go func() {
 			err := scheduleExecutor.Run(context.Background())
@@ -166,14 +166,14 @@ func TestSuccessfulSchedulerExec(t *testing.T) {
 			KickoffTimeInputArg: "kickoff_time",
 			Active:              &activeV2,
 		})
-		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(schedules, nil)
+		scheduleEntitiesRepo.EXPECT().GetAll(mock.Anything).Return(schedules, nil)
 		time.Sleep(30 * time.Second)
 	})
 
 	t.Run("unable to read schedules", func(t *testing.T) {
 		scheduleExecutor := setupScheduleExecutor(t, "unable_read_schedules")
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnGetAllMatch(mock.Anything).Return(nil, fmt.Errorf("unable to read schedules"))
+		scheduleEntitiesRepo.EXPECT().GetAll(mock.Anything).Return(nil, fmt.Errorf("unable to read schedules"))
 
 		go func() {
 			err := scheduleExecutor.Run(context.Background())

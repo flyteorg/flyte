@@ -26,12 +26,12 @@ func TestAuthEndpoint(t *testing.T) {
 
 		authCtx := &mocks.AuthenticationContext{}
 		oauth2Provider := &mocks.OAuth2Provider{}
-		oauth2Provider.OnNewAuthorizeRequest(req.Context(), req).Return(fosite.NewAuthorizeRequest(), nil)
-		authCtx.OnOAuth2Provider().Return(oauth2Provider)
+		oauth2Provider.EXPECT().NewAuthorizeRequest(req.Context(), req).Return(fosite.NewAuthorizeRequest(), nil)
+		authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
 
 		cookieManager := &mocks.CookieHandler{}
-		cookieManager.OnSetAuthCodeCookie(req.Context(), w, originalURL).Return(nil)
-		authCtx.OnCookieManager().Return(cookieManager)
+		cookieManager.EXPECT().SetAuthCodeCookie(req.Context(), w, originalURL).Return(nil)
+		authCtx.EXPECT().CookieManager().Return(cookieManager)
 
 		authEndpoint(authCtx, w, req)
 		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
@@ -45,16 +45,16 @@ func TestAuthEndpoint(t *testing.T) {
 		authCtx := &mocks.AuthenticationContext{}
 		oauth2Provider := &mocks.OAuth2Provider{}
 		requester := fosite.NewAuthorizeRequest()
-		oauth2Provider.OnNewAuthorizeRequest(req.Context(), req).Return(requester, nil)
+		oauth2Provider.EXPECT().NewAuthorizeRequest(req.Context(), req).Return(requester, nil)
 		oauth2Provider.On("WriteAuthorizeError", w, requester, mock.Anything).Run(func(args mock.Arguments) {
 			rw := args.Get(0).(http.ResponseWriter)
 			rw.WriteHeader(http.StatusForbidden)
 		})
-		authCtx.OnOAuth2Provider().Return(oauth2Provider)
+		authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
 
 		cookieManager := &mocks.CookieHandler{}
-		cookieManager.OnSetAuthCodeCookie(req.Context(), w, originalURL).Return(fmt.Errorf("failure injection"))
-		authCtx.OnCookieManager().Return(cookieManager)
+		cookieManager.EXPECT().SetAuthCodeCookie(req.Context(), w, originalURL).Return(fmt.Errorf("failure injection"))
+		authCtx.EXPECT().CookieManager().Return(cookieManager)
 
 		authEndpoint(authCtx, w, req)
 		assert.Equal(t, http.StatusForbidden, w.Code)
@@ -70,21 +70,21 @@ func TestAuthEndpoint(t *testing.T) {
 //
 //	oauth2Provider := &mocks.OAuth2Provider{}
 //	requester := fosite.NewAuthorizeRequest()
-//	oauth2Provider.OnNewAuthorizeRequest(req.Context(), req).Return(requester, nil)
+//	oauth2Provider.EXPECT().NewAuthorizeRequest(req.Context(), req).Return(requester, nil)
 //	oauth2Provider.On("WriteAuthorizeError", w, requester, mock.Anything).Run(func(args mock.Arguments) {
 //		rw := args.Get(0).(http.ResponseWriter)
 //		rw.WriteHeader(http.StatusForbidden)
 //	})
 //
-//	authCtx.OnOAuth2Provider().Return(oauth2Provider)
+//	authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
 //
 //	cookieManager := &mocks.CookieHandler{}
-//	cookieManager.OnSetAuthCodeCookie(req.Context(), w, originalURL).Return(nil)
+//	cookieManager.EXPECT().SetAuthCodeCookie(req.Context(), w, originalURL).Return(nil)
 //	cookieManager.OnRetrieveTokenValues(req.Context(), req).Return(sampleIDToken, "", "", nil)
 //	cookieManager.OnRetrieveUserInfo(req.Context(), req).Return(&service.UserInfoResponse{Subject: "abc"}, nil)
-//	authCtx.OnCookieManager().Return(cookieManager)
+//	authCtx.EXPECT().CookieManager().Return(cookieManager)
 //
-//	authCtx.OnOptions().Return(&config.Config{
+//	authCtx.EXPECT().Options().Return(&config.Config{
 //		UserAuth: config.UserAuthConfig{
 //			OpenID: config.OpenIDOptions{
 //				//ClientID: "http://localhost",

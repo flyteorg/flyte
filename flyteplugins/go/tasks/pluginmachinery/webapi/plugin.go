@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery-v2 --all --case=underscore --with-expecter
 
 // A Lazy loading function, that will load the plugin. Plugins should be initialized in this method. It is guaranteed
 // that the plugin loader will be called before any Handle/Abort/Finalize functions are invoked

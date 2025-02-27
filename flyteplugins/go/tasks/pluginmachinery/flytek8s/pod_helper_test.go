@@ -59,9 +59,9 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	to.On("GetPodTemplate").Return(podTemplate)
 	taskExecutionMetadata.On("GetOverrides").Return(to)
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskExecutionMetadata
 }
 
@@ -79,27 +79,27 @@ func dummyTaskTemplate() *core.TaskTemplate {
 
 func dummyInputReader() io.InputReader {
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	return inputReader
 }
 
 func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirements, rm *core.ExtendedResources, containerImage string, podTemplate *core.K8SPod) pluginsCore.TaskExecutionContext {
 	ow := &pluginsIOMock.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("")
-	ow.OnGetRawOutputPrefix().Return("")
-	ow.OnGetCheckpointPrefix().Return("/checkpoint")
-	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	ow.EXPECT().GetOutputPrefixPath().Return("")
+	ow.EXPECT().GetRawOutputPrefix().Return("")
+	ow.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	ow.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage, podTemplate))
-	tCtx.OnInputReader().Return(dummyInputReader())
-	tCtx.OnOutputWriter().Return(ow)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage, podTemplate))
+	tCtx.EXPECT().InputReader().Return(dummyInputReader())
+	tCtx.EXPECT().OutputWriter().Return(ow)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
-	tCtx.OnTaskReader().Return(taskReader)
+	tCtx.EXPECT().TaskReader().Return(taskReader)
 	return tCtx
 }
 
@@ -1953,8 +1953,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -1979,8 +1979,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -2006,8 +2006,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -2034,8 +2034,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -2084,8 +2084,8 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
@@ -2146,8 +2146,8 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)

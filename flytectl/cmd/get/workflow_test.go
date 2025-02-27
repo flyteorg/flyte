@@ -98,7 +98,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Latest = true
-		mockFetcher.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
+		mockFetcher.EXPECT().FetchWorkflowLatestVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
 		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
@@ -109,8 +109,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Version = "v1"
-		mockFetcher.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching version"))
+		mockFetcher.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything).Return(nil, fmt.Errorf("error fetching version"))
 		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
 	})
@@ -120,7 +120,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
-		mockFetcher.OnFetchAllVerOfWorkflowMatch(mock.Anything, mock.Anything, mock.Anything,
+		mockFetcher.EXPECT().FetchAllVerOfWorkflow(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all version"))
 		_, _, err := FetchWorkflowForName(s.Ctx, mockFetcher, "workflowName", projectValue, domainValue)
 		assert.NotNil(t, err)
@@ -132,8 +132,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 		getWorkflowSetup()
 		workflow.DefaultConfig.Latest = true
 		args := []string{"workflowName"}
-		s.FetcherExt.OnFetchWorkflowLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
+		s.FetcherExt.EXPECT().FetchWorkflowLatestVersion(mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything).Return(nil, fmt.Errorf("error fetching latest version"))
 		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
 	})
@@ -143,7 +143,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 		getWorkflowSetup()
 		var args []string
-		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchAllWorkflows(mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return([]*admin.NamedEntity{}, nil)
 		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -154,7 +154,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 		getWorkflowSetup()
 		var args []string
-		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchAllWorkflows(mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("error fetching all workflows"))
 		err := getWorkflowFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -168,7 +168,7 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue).Return(workflow1, nil)
+	s.FetcherExt.EXPECT().FetchWorkflowLatestVersion(s.Ctx, "workflow1", projectValue, domainValue).Return(workflow1, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
 	s.TearDownAndVerify(t, `
@@ -187,7 +187,7 @@ func TestListWorkflowFuncWithTable(t *testing.T) {
 	getWorkflowSetup()
 	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	s.FetcherExt.OnFetchAllVerOfWorkflowMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflows, nil)
+	s.FetcherExt.EXPECT().FetchAllVerOfWorkflow(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflows, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
 	s.TearDownAndVerify(t, `

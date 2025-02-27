@@ -162,7 +162,7 @@ func getLegacyExecutionRequest() *admin.ExecutionCreateRequest {
 
 func getMockNamespaceMappingConfig() runtimeInterfaces.NamespaceMappingConfiguration {
 	mockNs := runtimeMocks.NamespaceMappingConfiguration{}
-	mockNs.OnGetNamespaceTemplate().Return("{{ project }}-{{ domain }}")
+	mockNs.EXPECT().GetNamespaceTemplate().Return("{{ project }}-{{ domain }}")
 	return &mockNs
 }
 
@@ -296,7 +296,7 @@ func getMockRepositoryForExecTest() interfaces.Repository {
 var defaultTestExecutor = workflowengineMocks.WorkflowExecutor{}
 
 func init() {
-	defaultTestExecutor.OnID().Return("testDefault")
+	defaultTestExecutor.EXPECT().ID().Return("testDefault")
 }
 
 func TestCreateExecution(t *testing.T) {
@@ -349,7 +349,7 @@ func TestCreateExecution(t *testing.T) {
 			},
 		},
 	}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
 		tasks := data.WorkflowClosure.GetTasks()
 		for _, task := range tasks {
 			assert.Equal(t, len(resources.GetRequests()), len(task.GetTemplate().GetContainer().GetResources().GetRequests()))
@@ -363,12 +363,12 @@ func TestCreateExecution(t *testing.T) {
 	})).Return(workflowengineInterfaces.ExecutionResponse{
 		Cluster: testCluster,
 	}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
+	qosProvider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
 			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
 		},
@@ -380,7 +380,7 @@ func TestCreateExecution(t *testing.T) {
 		},
 	})
 
-	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+	qosProvider.EXPECT().GetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
 		"domain": core.QualityOfService_HIGH,
 	})
 
@@ -481,10 +481,10 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 	)
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{
 		Cluster: testCluster,
 	}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
@@ -516,12 +516,12 @@ func TestCreateExecution_NoAssignedName(t *testing.T) {
 			return nil
 		})
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
 		return len(data.ExecutionID.GetName()) > 0
 	})).Return(workflowengineInterfaces.ExecutionResponse{
 		Cluster: testCluster,
 	}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
@@ -562,7 +562,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		runtimeMocks.NewMockRegistrationValidationProvider())
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
 		assert.NotEmpty(t, data.WorkflowClosure.GetTasks())
 		for _, task := range data.WorkflowClosure.GetTasks() {
 			assert.Len(t, task.GetTemplate().GetContainer().GetConfig(), 1)
@@ -573,7 +573,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 	})).Return(workflowengineInterfaces.ExecutionResponse{
 		Cluster: testCluster,
 	}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, configProvider, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -640,12 +640,12 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	setDefaultLpCallbackForExecTest(repository)
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABC")
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, expectedErr)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, expectedErr)
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
+	qosProvider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
 			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
 		},
@@ -657,7 +657,7 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 		},
 	})
 
-	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+	qosProvider.EXPECT().GetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
 		"domain": core.QualityOfService_HIGH,
 	})
 
@@ -685,8 +685,8 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 
 func TestCreateExecutionDatabaseFailure(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	repository := getMockRepositoryForExecTest()
@@ -761,8 +761,8 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -804,8 +804,8 @@ func TestCreateExecutionDefaultNotifications(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -843,8 +843,8 @@ func TestCreateExecutionDisableNotifications(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -913,8 +913,8 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -932,7 +932,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(executionData workflowengineInterfaces.ExecutionData) bool {
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.MatchedBy(func(executionData workflowengineInterfaces.ExecutionData) bool {
 		assert.EqualValues(t, map[string]string{
 			"dynamiclabel1": "dynamic1",
 			"dynamiclabel2": "dynamic2",
@@ -943,7 +943,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 		}, executionData.ExecutionParameters.Annotations)
 		return true
 	})).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1061,8 +1061,8 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 
 			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
-			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-			mockExecutor.OnID().Return("testMockExecutor")
+			mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+			mockExecutor.EXPECT().ID().Return("testMockExecutor")
 			r := plugins.NewRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1141,8 +1141,8 @@ func TestCreateExecutionOverwriteCache(t *testing.T) {
 
 			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
-			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-			mockExecutor.OnID().Return("testMockExecutor")
+			mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+			mockExecutor.EXPECT().ID().Return("testMockExecutor")
 			r := plugins.NewRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1225,8 +1225,8 @@ func TestCreateExecutionWithEnvs(t *testing.T) {
 
 			repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
-			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-			mockExecutor.OnID().Return("testMockExecutor")
+			mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+			mockExecutor.EXPECT().ID().Return("testMockExecutor")
 			r := plugins.NewRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1255,13 +1255,13 @@ func TestCreateExecution_CustomNamespaceMappingConfig(t *testing.T) {
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
 	mockNs := runtimeMocks.NamespaceMappingConfiguration{}
-	mockNs.OnGetNamespaceTemplate().Return("{{ project }}")
+	mockNs.EXPECT().GetNamespaceTemplate().Return("{{ project }}")
 	mockExecutionsConfigProvider := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(),
 		runtimeMocks.NewMockQueueConfigurationProvider(
@@ -1440,8 +1440,8 @@ func TestRelaunchExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1539,8 +1539,8 @@ func TestRelaunchExecution_CreateFailure(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1579,8 +1579,8 @@ func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1630,8 +1630,8 @@ func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1753,8 +1753,8 @@ func TestRelaunchExecutionEnvsOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1805,8 +1805,8 @@ func TestRecoverExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -1864,8 +1864,8 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2046,8 +2046,8 @@ func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2109,8 +2109,8 @@ func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -2170,8 +2170,8 @@ func TestRecoverExecutionEnvsOverride(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -3473,7 +3473,7 @@ func TestTerminateExecution(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnAbortMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.AbortData) bool {
+	mockExecutor.EXPECT().Abort(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.AbortData) bool {
 		assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -3481,7 +3481,7 @@ func TestTerminateExecution(t *testing.T) {
 		}, data.ExecutionID))
 		return true
 	})).Return(nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -3506,8 +3506,8 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 	var expectedError = errors.New("expected error")
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().Abort(mock.Anything, mock.Anything).Return(expectedError)
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
@@ -3547,8 +3547,8 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Abort(mock.Anything, mock.Anything).Return(nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -3569,8 +3569,8 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 	var expectedError = errors.New("expected error")
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().Abort(mock.Anything, mock.Anything).Return(expectedError)
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 
@@ -3900,7 +3900,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 	setDefaultLpCallbackForExecTest(repository)
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(execData workflowengineInterfaces.ExecutionData) bool {
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.MatchedBy(func(execData workflowengineInterfaces.ExecutionData) bool {
 		assert.EqualValues(t, map[string]string{
 			"label1": "1",
 			"label2": "2",
@@ -3913,7 +3913,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 	})).Return(workflowengineInterfaces.ExecutionResponse{
 		Cluster: testCluster,
 	}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
+	mockExecutor.EXPECT().ID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -3934,8 +3934,8 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 	storageClient := getMockStorageForExecTest(context.Background())
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -4518,8 +4518,8 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	namedEntityManager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("testMockExecutor")
+	mockExecutor.EXPECT().Execute(mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
+	mockExecutor.EXPECT().ID().Return("testMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, workflowManager, namedEntityManager, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
@@ -5577,7 +5577,7 @@ func TestGetClusterAssignment(t *testing.T) {
 	t.Run("value from config", func(t *testing.T) {
 		customCP := "my_cp"
 		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
-		clusterPoolAsstProvider.OnGetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
+		clusterPoolAsstProvider.EXPECT().GetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
 			workflowIdentifier.GetDomain(): runtimeInterfaces.ClusterPoolAssignment{
 				Pool: customCP,
 			},
@@ -5635,7 +5635,7 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 	t.Run("empty value in DB, takes value from request", func(t *testing.T) {
 		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
-		clusterPoolAsstProvider.OnGetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
+		clusterPoolAsstProvider.EXPECT().GetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
 			workflowIdentifier.GetDomain(): runtimeInterfaces.ClusterPoolAssignment{
 				Pool: "",
 			},

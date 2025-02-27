@@ -19,7 +19,7 @@ import (
 // The intention of these interfaces is to decouple the algorithm and usage from the actual CRD definition.
 // this would help in ease of changes underneath without affecting the code.
 
-//go:generate mockery -all
+//go:generate mockery-v2 --all --with-expecter
 
 type CustomState map[string]interface{}
 type WorkflowID = string

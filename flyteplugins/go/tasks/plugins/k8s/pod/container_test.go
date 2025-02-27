@@ -107,7 +107,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
-	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
 	tID.On("GetID").Return(core.TaskExecutionIdentifier{
@@ -127,40 +127,40 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	to.On("GetExtendedResources").Return(extendedResources)
 	to.On("GetPodTemplate").Return(nil)
 
-	to.OnGetContainerImage().Return(containerImage)
+	to.EXPECT().GetContainerImage().Return(containerImage)
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskMetadata.OnGetConsoleURL().Return("")
+	taskMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskMetadata
 }
 
 func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata pluginsCore.TaskExecutionMetadata) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
-	inputReader.OnGetInputPath().Return("test-data-reference")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	taskCtx.OnOutputWriter().Return(outputReader)
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
-	taskCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	taskCtx.OnPluginStateReader().Return(pluginStateReader)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	taskCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
 }

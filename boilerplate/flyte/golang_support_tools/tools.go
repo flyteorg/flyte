@@ -4,7 +4,6 @@
 package tools
 
 import (
-	_ "github.com/EngHabu/mockery/cmd/mockery"
 	_ "github.com/vektra/mockery/v2/cmd"
 	_ "github.com/alvaroloes/enumer"
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"

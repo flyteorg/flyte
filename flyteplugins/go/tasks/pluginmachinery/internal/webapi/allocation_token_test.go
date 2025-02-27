@@ -25,7 +25,7 @@ func init() {
 
 func newPluginWithProperties(properties webapi.PluginConfig) *mocks.AsyncPlugin {
 	m := &mocks.AsyncPlugin{}
-	m.OnGetConfig().Return(properties)
+	m.EXPECT().GetConfig().Return(properties)
 	return m
 }
 
@@ -37,18 +37,18 @@ func Test_allocateToken(t *testing.T) {
 	clck := testing2.NewFakeClock(tNow)
 
 	tID := &mocks2.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("abc")
+	tID.EXPECT().GetGeneratedName().Return("abc")
 
 	tMeta := &mocks2.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	rm := &mocks2.ResourceManager{}
-	rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
-	rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
+	rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
+	rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
 
 	tCtx := &mocks2.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnResourceManager().Return(rm)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().ResourceManager().Return(rm)
 
 	state := &State{}
 
@@ -72,7 +72,7 @@ func Test_allocateToken(t *testing.T) {
 	})
 
 	t.Run("Allocation Successful", func(t *testing.T) {
-		p.OnResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
+		p.EXPECT().ResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
@@ -86,20 +86,20 @@ func Test_allocateToken(t *testing.T) {
 
 	t.Run("Allocation Failed", func(t *testing.T) {
 		tID := &mocks2.TaskExecutionID{}
-		tID.OnGetGeneratedName().Return("abc2")
+		tID.EXPECT().GetGeneratedName().Return("abc2")
 
 		tMeta := &mocks2.TaskExecutionMetadata{}
-		tMeta.OnGetTaskExecutionID().Return(tID)
+		tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 		rm := &mocks2.ResourceManager{}
-		rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
-		rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
+		rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
+		rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
 
 		tCtx := &mocks2.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(tMeta)
-		tCtx.OnResourceManager().Return(rm)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+		tCtx.EXPECT().ResourceManager().Return(rm)
 
-		p.OnResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
+		p.EXPECT().ResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
 		a := newTokenAllocator(clck)
 		gotNewState, _, err := a.allocateToken(ctx, p, tCtx, state, metrics)
 		assert.NoError(t, err)
@@ -120,26 +120,26 @@ func Test_releaseToken(t *testing.T) {
 	clck := testing2.NewFakeClock(tNow)
 
 	tID := &mocks2.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("abc")
+	tID.EXPECT().GetGeneratedName().Return("abc")
 
 	tMeta := &mocks2.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	rm := &mocks2.ResourceManager{}
-	rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
-	rm.OnAllocateResourceMatch(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
-	rm.OnReleaseResource(ctx, core.ResourceNamespace("ns"), "abc").Return(nil)
+	rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc", mock.Anything).Return(core.AllocationStatusGranted, nil)
+	rm.EXPECT().AllocateResource(ctx, core.ResourceNamespace("ns"), "abc2", mock.Anything).Return(core.AllocationStatusExhausted, nil)
+	rm.EXPECT().ReleaseResource(ctx, core.ResourceNamespace("ns"), "abc").Return(nil)
 
 	tCtx := &mocks2.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnResourceManager().Return(rm)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().ResourceManager().Return(rm)
 
 	p := newPluginWithProperties(webapi.PluginConfig{
 		ResourceQuotas: map[core.ResourceNamespace]int{
 			"ns": 1,
 		},
 	})
-	p.OnResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
+	p.EXPECT().ResourceRequirements(ctx, tCtx).Return("ns", core.ResourceConstraintsSpec{}, nil)
 
 	a := newTokenAllocator(clck)
 	assert.NoError(t, a.releaseToken(ctx, p, tCtx, metrics))

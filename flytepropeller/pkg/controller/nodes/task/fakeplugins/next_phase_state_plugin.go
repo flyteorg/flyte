@@ -52,7 +52,7 @@ func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskEx
 			r.On("ReadError", mock.Anything).Return(*s.TaskErr, nil)
 		}
 
-		r.OnDeckExistsMatch(mock.Anything).Return(s.DeckExists, nil)
+		r.EXPECT().DeckExists(mock.Anything).Return(s.DeckExists, nil)
 		r.On("IsError", mock.Anything).Return(isErr, nil)
 		r.On("IsFile", mock.Anything).Return(true)
 		r.On("Exists", mock.Anything).Return(s.OutputExists, nil)
