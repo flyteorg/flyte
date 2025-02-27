@@ -482,12 +482,22 @@ data:
             cloudwatch-enabled: false
             stackdriver-enabled: false
       agent-service:
+        agentForTaskTypes:
+        - noop_task: custom_agent
+        agents:
+          custom_agent:
+            endpoint: k8s://flyte_custom_agent.flyte:8000
+            insecure: true
         defaultAgent:
           defaultTimeout: 10s
           endpoint: k8s://flyteagent.flyte:8000
           insecure: true
           timeouts:
+            CreateTask: 10s
+            DeleteTask: 10s
+            ExecuteTaskSync: 10s
             GetTask: 10s
+        supportedTaskTypes: []
   002-database.yaml: |
     database:
       postgres:
@@ -821,7 +831,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: NmdFQmhIcGQ3QUY4anJ4OQ==
+  haSharedSecret: ZmFXUEpMSXBvam1RQ1dBbQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1252,7 +1262,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 17020fb9c16e349ea5d5d5d0c641e0c7f41ddee4c834b93bffd8f58006fb88be
+        checksum/configuration: e41f2cbe2b01f18ce3a3f23b49425eaf8188bdca4d5ecd1ba28c13c918a84d5b
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1418,7 +1428,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e70b19a9c6f4e7c05fff1fb0b2adc885112a99eab0fc2a893762513e45e1a230
+        checksum/secret: 319fe49bb415a6be154ae6343804d89c771ea558293eb25425657b0e7e52a53c
       labels:
         app: docker-registry
         release: flyte-sandbox
