@@ -41,7 +41,7 @@ func TestGetAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 		_, err := GetAuthorizationInterceptor(authCtx)
 		require.ErrorContains(t, err, "authorization policy rule example has invalid resource scope")
 	})
@@ -77,7 +77,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -100,7 +100,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -123,7 +123,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -145,7 +145,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -210,7 +210,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -245,7 +245,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -292,7 +292,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -329,7 +329,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
@@ -376,7 +376,7 @@ func TestAuthorizationInterceptor(t *testing.T) {
 			},
 		}
 		authCtx := &mocks.AuthenticationContext{}
-		authCtx.OnOptions().Return(cfg)
+		authCtx.EXPECT().Options().Return(cfg)
 
 		interceptor, err := GetAuthorizationInterceptor(authCtx)
 		require.NoError(t, err)
