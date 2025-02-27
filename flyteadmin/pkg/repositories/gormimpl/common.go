@@ -92,7 +92,8 @@ func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters [
 		tx = tx.Where(mapFilter.GetFilter())
 	}
 	if isolationFilter != nil {
-		tx = tx.Where(tx.Scopes(isolationFilter.GetScopes()...))
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
 	}
 	return tx, nil
 }
@@ -114,7 +115,8 @@ func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFil
 		tx = tx.Where(mapFilter.GetFilter())
 	}
 	if isolationFilter != nil {
-		tx = tx.Where(tx.Scopes(isolationFilter.GetScopes()...))
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
 	}
 	return tx, nil
 }
