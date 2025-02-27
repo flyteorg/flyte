@@ -948,7 +948,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 							Phase: transitionPhase,
 						}
 
-						err := executionContext.(interfaces.NodeExecutionContext).EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
+						err := executionContext.EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
 						assert.NoError(t, err)
 					},
 				).Return(transition, nil)
