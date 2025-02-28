@@ -93,8 +93,8 @@ func (_m ArrayEventRecorder_finalize) Return(_a0 error) *ArrayEventRecorder_fina
 	return &ArrayEventRecorder_finalize{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ArrayEventRecorder) Onfinalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) *ArrayEventRecorder_finalize {
-	c_call := _m.On("finalize", ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig)
+func (_m *ArrayEventRecorder) Onfinalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *core.ExecutionError) *ArrayEventRecorder_finalize {
+	c_call := _m.On("finalize", ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError)
 	return &ArrayEventRecorder_finalize{Call: c_call}
 }
 
@@ -103,13 +103,13 @@ func (_m *ArrayEventRecorder) OnfinalizeMatch(matchers ...interface{}) *ArrayEve
 	return &ArrayEventRecorder_finalize{Call: c_call}
 }
 
-// finalize provides a mock function with given fields: ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig
-func (_m *ArrayEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
-	ret := _m.Called(ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig)
+// finalize provides a mock function with given fields: ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError
+func (_m *ArrayEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase core.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *core.ExecutionError) error {
+	ret := _m.Called(ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext, core.TaskExecution_Phase, uint32, *config.EventConfig) error); ok {
-		r0 = rf(ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig)
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext, core.TaskExecution_Phase, uint32, *config.EventConfig, *core.ExecutionError) error); ok {
+		r0 = rf(ctx, nCtx, taskPhase, taskPhaseVersion, eventConfig, arrayNodeExecutionError)
 	} else {
 		r0 = ret.Error(0)
 	}

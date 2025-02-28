@@ -48,10 +48,12 @@ func (t *taskExecutionID) GetUniqueNodeID() string {
 	return t.nodeID
 }
 
+//go:generate mockery -all -case=underscore
+
 type ArrayEventRecorder interface {
 	interfaces.EventRecorder
 	process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error
-	finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error
+	finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error
 	finalizeRequired(ctx context.Context) bool
 }
 
@@ -218,7 +220,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 }
 
 func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
+	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error {
 
 	// build task Identifier
 	var taskID *idlcore.Identifier
@@ -304,6 +306,11 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_OutputUri{
 			OutputUri: v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir()).String(),
 		}
+	} else if taskPhase == idlcore.TaskExecution_FAILED {
+		// attach first evaluated error(s) if taskPhase is FAILED
+		taskExecutionEvent.OutputResult = &events.TaskExecutionEvent_Error{
+			Error: arrayNodeExecutionError,
+		}
 	}
 
 	// record TaskExecutionEvent
@@ -323,7 +330,7 @@ func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.No
 }
 
 func (*passThroughEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
+	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig, arrayNodeExecutionError *idlcore.ExecutionError) error {
 	return nil
 }
 
