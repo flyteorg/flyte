@@ -8,7 +8,7 @@ import (
 
 // This interface is introduced to allow for mocking of the smtp.Client object.
 
-//go:generate mockery-v2 --name=SMTPClient --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=SMTPClient --output=../mocks --case=underscore --with-expecter
 type SMTPClient interface {
 	Hello(localName string) error
 	Extension(ext string) (bool, string)

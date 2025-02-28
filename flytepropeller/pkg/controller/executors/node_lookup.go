@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery-v2 --name NodeLookup --case=underscore --with-expecter
+//go:generate mockery --name NodeLookup --case=underscore --with-expecter
 
 // NodeLookup provides a structure that enables looking up all nodes within the current execution hierarchy/context.
 // NOTE: execution hierarchy may change the nodes available, this is because when a SubWorkflow is being executed, only
