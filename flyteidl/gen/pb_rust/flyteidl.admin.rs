@@ -1849,8 +1849,10 @@ pub struct WorkflowExecutionGetMetricsResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionPhaseDeleteRequest {
-    #[prost(string, tag="1")]
-    pub execution_phase: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(enumeration="super::core::workflow_execution::Phase", tag="2")]
+    pub phase: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

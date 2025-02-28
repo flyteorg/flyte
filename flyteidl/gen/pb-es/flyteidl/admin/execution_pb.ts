@@ -1604,9 +1604,14 @@ export class WorkflowExecutionGetMetricsResponse extends Message<WorkflowExecuti
  */
 export class ExecutionPhaseDeleteRequest extends Message<ExecutionPhaseDeleteRequest> {
   /**
-   * @generated from field: string execution_phase = 1;
+   * @generated from field: flyteidl.core.WorkflowExecutionIdentifier id = 1;
    */
-  executionPhase = "";
+  id?: WorkflowExecutionIdentifier;
+
+  /**
+   * @generated from field: flyteidl.core.WorkflowExecution.Phase phase = 2;
+   */
+  phase = WorkflowExecution_Phase.UNDEFINED;
 
   constructor(data?: PartialMessage<ExecutionPhaseDeleteRequest>) {
     super();
@@ -1616,7 +1621,8 @@ export class ExecutionPhaseDeleteRequest extends Message<ExecutionPhaseDeleteReq
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.ExecutionPhaseDeleteRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "execution_phase", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "id", kind: "message", T: WorkflowExecutionIdentifier },
+    { no: 2, name: "phase", kind: "enum", T: proto3.getEnumType(WorkflowExecution_Phase) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionPhaseDeleteRequest {

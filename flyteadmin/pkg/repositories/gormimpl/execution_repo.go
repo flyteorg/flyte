@@ -171,10 +171,16 @@ func NewExecutionRepo(
 	}
 }
 
-func (r *ExecutionRepo) Delete(ctx context.Context, executionPhase string) error {
-	result := r.db.Delete(&models.Execution{}, "phase = ?", executionPhase)
+func (r *ExecutionRepo) Delete(ctx context.Context, input interfaces.ExecutionPhaseDeleteInput) error {
+	result := r.db.Delete(&models.Execution{},
+		"execution_project = ? AND execution_domain = ? AND phase = ?",
+		input.WorkflowExecutionID.Project,
+		input.WorkflowExecutionID.Domain,
+		input.ExecutionPhase.String())
+
 	if result.Error != nil {
 		return result.Error
 	}
+
 	return nil
 }

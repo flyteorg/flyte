@@ -432,7 +432,8 @@ message WorkflowExecutionGetMetricsResponse {
 }
 
 message ExecutionPhaseDeleteRequest {
-    string execution_phase = 1;
+    core.WorkflowExecutionIdentifier id = 1;
+    core.WorkflowExecution.Phase phase = 2;
 }
   
 message ExecutionPhaseDeleteResponse {

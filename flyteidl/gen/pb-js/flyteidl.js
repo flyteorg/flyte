@@ -36680,7 +36680,8 @@
                  * Properties of an ExecutionPhaseDeleteRequest.
                  * @memberof flyteidl.admin
                  * @interface IExecutionPhaseDeleteRequest
-                 * @property {string|null} [executionPhase] ExecutionPhaseDeleteRequest executionPhase
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] ExecutionPhaseDeleteRequest id
+                 * @property {flyteidl.core.WorkflowExecution.Phase|null} [phase] ExecutionPhaseDeleteRequest phase
                  */
     
                 /**
@@ -36699,12 +36700,20 @@
                 }
     
                 /**
-                 * ExecutionPhaseDeleteRequest executionPhase.
-                 * @member {string} executionPhase
+                 * ExecutionPhaseDeleteRequest id.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} id
                  * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
                  * @instance
                  */
-                ExecutionPhaseDeleteRequest.prototype.executionPhase = "";
+                ExecutionPhaseDeleteRequest.prototype.id = null;
+    
+                /**
+                 * ExecutionPhaseDeleteRequest phase.
+                 * @member {flyteidl.core.WorkflowExecution.Phase} phase
+                 * @memberof flyteidl.admin.ExecutionPhaseDeleteRequest
+                 * @instance
+                 */
+                ExecutionPhaseDeleteRequest.prototype.phase = 0;
     
                 /**
                  * Creates a new ExecutionPhaseDeleteRequest instance using the specified properties.
@@ -36730,8 +36739,10 @@
                 ExecutionPhaseDeleteRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.executionPhase != null && message.hasOwnProperty("executionPhase"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.executionPhase);
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.phase);
                     return writer;
                 };
     
@@ -36754,7 +36765,10 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.executionPhase = reader.string();
+                            message.id = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.phase = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -36775,9 +36789,27 @@
                 ExecutionPhaseDeleteRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.executionPhase != null && message.hasOwnProperty("executionPhase"))
-                        if (!$util.isString(message.executionPhase))
-                            return "executionPhase: string expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                            break;
+                        }
                     return null;
                 };
     

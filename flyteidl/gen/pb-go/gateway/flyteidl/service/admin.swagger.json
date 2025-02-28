@@ -537,7 +537,7 @@
         ]
       }
     },
-    "/api/v1/delete_execution_phase/{execution_phase}": {
+    "/api/v1/delete_execution_phase/{id.project}/{id.domain}/{phase}": {
       "get": {
         "description": "Delete a execution phase",
         "operationId": "AdminService_DeleteExecutionPhase",
@@ -557,9 +557,49 @@
         },
         "parameters": [
           {
-            "name": "execution_phase",
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "phase",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDING",
+              "SUCCEEDED",
+              "FAILING",
+              "FAILED",
+              "ABORTED",
+              "TIMED_OUT",
+              "ABORTING"
+            ]
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],

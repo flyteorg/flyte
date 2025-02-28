@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // Parameters for getting an individual resource.
@@ -43,4 +44,9 @@ type CountResourceInput struct {
 	// A set of the entities (besides the primary table being queried) that should be joined with when performing
 	// the count query. This enables filtering on non-primary entity attributes.
 	JoinTableEntities map[common.Entity]bool
+}
+
+type ExecutionPhaseDeleteInput struct {
+	WorkflowExecutionID core.WorkflowExecutionIdentifier
+	ExecutionPhase      core.WorkflowExecution_Phase
 }

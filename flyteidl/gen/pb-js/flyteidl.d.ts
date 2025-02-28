@@ -15084,8 +15084,11 @@ export namespace flyteidl {
         /** Properties of an ExecutionPhaseDeleteRequest. */
         interface IExecutionPhaseDeleteRequest {
 
-            /** ExecutionPhaseDeleteRequest executionPhase */
-            executionPhase?: (string|null);
+            /** ExecutionPhaseDeleteRequest id */
+            id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionPhaseDeleteRequest phase */
+            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
         }
 
         /** Represents an ExecutionPhaseDeleteRequest. */
@@ -15097,8 +15100,11 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IExecutionPhaseDeleteRequest);
 
-            /** ExecutionPhaseDeleteRequest executionPhase. */
-            public executionPhase: string;
+            /** ExecutionPhaseDeleteRequest id. */
+            public id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionPhaseDeleteRequest phase. */
+            public phase: flyteidl.core.WorkflowExecution.Phase;
 
             /**
              * Creates a new ExecutionPhaseDeleteRequest instance using the specified properties.

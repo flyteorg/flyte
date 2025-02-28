@@ -299,10 +299,12 @@ class WorkflowExecutionGetMetricsResponse(_message.Message):
     def __init__(self, span: _Optional[_Union[_metrics_pb2.Span, _Mapping]] = ...) -> None: ...
 
 class ExecutionPhaseDeleteRequest(_message.Message):
-    __slots__ = ["execution_phase"]
-    EXECUTION_PHASE_FIELD_NUMBER: _ClassVar[int]
-    execution_phase: str
-    def __init__(self, execution_phase: _Optional[str] = ...) -> None: ...
+    __slots__ = ["id", "phase"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    id: _identifier_pb2.WorkflowExecutionIdentifier
+    phase: _execution_pb2.WorkflowExecution.Phase
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ...) -> None: ...
 
 class ExecutionPhaseDeleteResponse(_message.Message):
     __slots__ = ["message"]
