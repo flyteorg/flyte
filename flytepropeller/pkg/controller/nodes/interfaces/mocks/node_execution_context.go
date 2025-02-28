@@ -88,6 +88,38 @@ func (_m *NodeExecutionContext) CurrentAttempt() uint32 {
 	return r0
 }
 
+type NodeExecutionContext_CurrentOOMFailures struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionContext_CurrentOOMFailures) Return(_a0 uint32) *NodeExecutionContext_CurrentOOMFailures {
+	return &NodeExecutionContext_CurrentOOMFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionContext) OnCurrentOOMFailures() *NodeExecutionContext_CurrentOOMFailures {
+	c_call := _m.On("CurrentOOMFailures")
+	return &NodeExecutionContext_CurrentOOMFailures{Call: c_call}
+}
+
+func (_m *NodeExecutionContext) OnCurrentOOMFailuresMatch(matchers ...interface{}) *NodeExecutionContext_CurrentOOMFailures {
+	c_call := _m.On("CurrentOOMFailures", matchers...)
+	return &NodeExecutionContext_CurrentOOMFailures{Call: c_call}
+}
+
+// CurrentOOMFailures provides a mock function with given fields:
+func (_m *NodeExecutionContext) CurrentOOMFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type NodeExecutionContext_DataStore struct {
 	*mock.Call
 }

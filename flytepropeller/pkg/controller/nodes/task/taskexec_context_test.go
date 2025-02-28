@@ -87,6 +87,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnNode().Return(n)
 	nCtx.OnInputReader().Return(ir)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
+	nCtx.OnCurrentOOMFailures().Return(uint32(0))
 	nCtx.OnTaskReader().Return(tr)
 	nCtx.OnNodeStatus().Return(ns)
 	nCtx.OnNodeID().Return(nodeID)

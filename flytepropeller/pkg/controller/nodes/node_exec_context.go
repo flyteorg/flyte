@@ -193,6 +193,10 @@ func (e nodeExecContext) CurrentAttempt() uint32 {
 	return e.nodeStatus.GetAttempts()
 }
 
+func (e nodeExecContext) CurrentOOMFailures() uint32 {
+	return e.nodeStatus.GetOOMFailures()
+}
+
 func (e nodeExecContext) NodeStatus() v1alpha1.ExecutableNodeStatus {
 	return e.nodeStatus
 }

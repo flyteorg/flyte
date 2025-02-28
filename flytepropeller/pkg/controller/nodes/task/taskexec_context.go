@@ -295,7 +295,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		return nil, err
 	}
 
-	OOMFailures := nCtx.NodeStatus().GetOOMFailures()
+	OOMFailures := nCtx.CurrentOOMFailures()
 
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
