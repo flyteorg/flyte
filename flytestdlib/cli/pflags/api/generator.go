@@ -239,8 +239,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ inte
 
 			addField(typ, f)
 		case *types.Alias:
-			// For type aliases/named types (e.g. `type Foo int`), they will show up as Named but their underlying type
-			// will be basic.
+			// For alias types, they will show up as Alias but their underlying type will be basic.
 			if b, isBasic := t.Underlying().(*types.Basic); isBasic {
 				f, err := buildBasicField(ctx, tag, b, defaultValueAccessor, fieldPath, variable, false, false, isPtr, bindDefaultVar, nil)
 				if err != nil {
@@ -294,10 +293,10 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ inte
 				testValue = `"1"`
 			}
 
-			logger.Infof(ctx, "[%v] is of a Named type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
+			logger.Infof(ctx, "[%v] is of an Alias type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
 
 			if jsonUnmarshaler {
-				logger.Infof(logger.WithIndent(ctx, indent), "Type is json unmarhslalable.")
+				logger.Infof(logger.WithIndent(ctx, indent), "Type is json unmarshallable.")
 
 				addField(typ, FieldInfo{
 					Name:               tag.Name,
@@ -341,8 +340,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ inte
 				}
 			}
 		case *types.Named:
-			// For type aliases/named types (e.g. `type Foo int`), they will show up as Named but their underlying type
-			// will be basic.
+			// For named types, they will show up as Named but their underlying type will be basic.
 			if _, isBasic := t.Underlying().(*types.Basic); isBasic {
 				logger.Debugf(ctx, "type [%v] is a named basic type. Using buildNamedBasicField to generate it.", t.Obj().Name())
 				f, err := buildNamedBasicField(ctx, workingDirPkg, tag, t, defaultValueAccessor, fieldPath, variable, isPtr, bindDefaultVar)
@@ -400,7 +398,7 @@ func discoverFieldsRecursive(ctx context.Context, workingDirPkg string, typ inte
 			logger.Infof(ctx, "[%v] is of a Named type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
 
 			if jsonUnmarshaler {
-				logger.Infof(logger.WithIndent(ctx, indent), "Type is json unmarhslalable.")
+				logger.Infof(logger.WithIndent(ctx, indent), "Type is json unmarshallable.")
 
 				addField(typ, FieldInfo{
 					Name:               tag.Name,
