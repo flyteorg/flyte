@@ -1,10 +1,1 @@
-# Default owner for all files, unless otherwise overridden below
-* @unionai/cloud-eng
-
-# Docs
-/docs/ @neverett @ppiegaze
-
-# EXO
-/fasttask/ @unionai/exo
-/flyteplugins/ @unionai/exo
-/flytepropeller/ @unionai/exo
+# By default files don't have owners
