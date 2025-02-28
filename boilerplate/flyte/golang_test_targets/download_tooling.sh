@@ -16,7 +16,7 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
-	"github.com/vektra/mockery/v2@v2.40.3"
+	"github.com/vektra/mockery/v2@v2.52.1"
 	"github.com/golangci/golangci-lint/cmd/golangci-lint"
 	"github.com/daixiang0/gci"
 	"github.com/alvaroloes/enumer"
@@ -41,7 +41,7 @@ for tool in "${tools[@]}"; do
 		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-fork
 	fi
 	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-v2
-	if [[ $tool == "github.com/vektra/mockery/v2@v2.40.3" ]]; then
+	if [[ $tool == "github.com/vektra/mockery/v2@v2.52.1" ]]; then
 		echo "Renaming mockery to mockery-v2"
 		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v2
 	fi
