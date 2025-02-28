@@ -791,3 +791,80 @@ func TestMergeIntoExecConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestShouldAddEagerSecret(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  *admin.TaskCreateRequest
+		expected bool
+	}{
+		{
+			name: "NilMetadata",
+			request: &admin.TaskCreateRequest{
+				Spec: &admin.TaskSpec{
+					Template: &core.TaskTemplate{
+						Metadata: nil,
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "IsEagerTrue",
+			request: &admin.TaskCreateRequest{
+				Spec: &admin.TaskSpec{
+					Template: &core.TaskTemplate{
+						Metadata: &core.TaskMetadata{
+							IsEager: true,
+						},
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "IsEagerFalse",
+			request: &admin.TaskCreateRequest{
+				Spec: &admin.TaskSpec{
+					Template: &core.TaskTemplate{
+						Metadata: &core.TaskMetadata{
+							IsEager: false,
+						},
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "EagerFailureHandlerTask",
+			request: &admin.TaskCreateRequest{
+				Spec: &admin.TaskSpec{
+					Template: &core.TaskTemplate{
+						Metadata: &core.TaskMetadata{},
+						Type:     "eager_failure_handler_task",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "NonEagerTask",
+			request: &admin.TaskCreateRequest{
+				Spec: &admin.TaskSpec{
+					Template: &core.TaskTemplate{
+						Metadata: &core.TaskMetadata{},
+						Type:     "non_eager_task",
+					},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ShouldAddEagerSecret(tt.request)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}

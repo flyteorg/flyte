@@ -22,6 +22,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+const (
+	EagerCleanupTaskType = "eager_failure_handler_task"
+)
+
 func GetExecutionName(request *admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
 		return request.Name
@@ -468,9 +472,9 @@ func GetSubNodesFromParentNodeExecution(ctx context.Context, db repoInterfaces.R
 	return subNodeIds, nil
 }
 
-func IsEagerTask(request *admin.TaskCreateRequest) bool {
+func ShouldAddEagerSecret(request *admin.TaskCreateRequest) bool {
 	if request.GetSpec() == nil || request.GetSpec().GetTemplate() == nil || request.GetSpec().GetTemplate().GetMetadata() == nil {
 		return false
 	}
-	return request.GetSpec().GetTemplate().GetMetadata().GetIsEager()
+	return request.GetSpec().GetTemplate().GetMetadata().GetIsEager() || (request.GetSpec().GetTemplate().GetType() == EagerCleanupTaskType)
 }
