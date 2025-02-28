@@ -84,8 +84,8 @@ func SetMetricKeys(appConfig *runtimeIfaces.ApplicationConfig) {
 
 // Creates a new gRPC Server with all the configuration
 func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
- storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
- scope promutils.Scope, sm core.SecretManager, opts ...grpc.ServerOption) (*grpc.Server, error) {
+ 	storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
+ 	scope promutils.Scope, sm core.SecretManager, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
@@ -203,8 +203,8 @@ func healthCheckFunc(w http.ResponseWriter, _ *http.Request) {
 }
 
 func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig, _ *authConfig.Config, authCtx interfaces.AuthenticationContext,
- additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
- grpcAddress string, grpcConnectionOpts ...grpc.DialOption) (*http.ServeMux, error) {
+ 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
+ 	grpcAddress string, grpcConnectionOpts ...grpc.DialOption) (*http.ServeMux, error) {
 
 	// Register the server that will serve HTTP/REST Traffic
 	mux := http.NewServeMux()
@@ -332,9 +332,9 @@ func generateRequestID() string {
 }
 
 func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
- authCfg *authConfig.Config, storageConfig *storage.Config,
- additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
- scope promutils.Scope) error {
+ 	authCfg *authConfig.Config, storageConfig *storage.Config,
+ 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
+ 	scope promutils.Scope) error {
 	logger.Infof(ctx, "Serving Flyte Admin Insecure")
 
 	// This will parse configuration and create the necessary objects for dealing with auth
@@ -466,9 +466,9 @@ func grpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Ha
 }
 
 func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig, authCfg *authConfig.Config,
- storageCfg *storage.Config,
- additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
- scope promutils.Scope) error {
+ 	storageCfg *storage.Config,
+ 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
+ 	scope promutils.Scope) error {
 	certPool, cert, err := GetSslCredentials(ctx, cfg.Security.Ssl.CertificateFile, cfg.Security.Ssl.KeyFile)
 	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 
