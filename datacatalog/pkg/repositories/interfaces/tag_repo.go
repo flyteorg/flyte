@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 )
 
-//go:generate mockery-v2 --name=TagRepo --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=TagRepo --output=../mocks --case=underscore --with-expecter
 
 type TagRepo interface {
 	Create(ctx context.Context, in models.Tag) error

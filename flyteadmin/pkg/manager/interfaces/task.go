@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery-v2 --name=TaskInterface --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=TaskInterface --output=../mocks --case=underscore --with-expecter
 
 // Interface for managing Flyte Tasks
 type TaskInterface interface {

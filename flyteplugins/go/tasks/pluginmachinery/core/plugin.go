@@ -8,7 +8,7 @@ import (
 	"k8s.io/utils/strings/slices"
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 // https://github.com/flyteorg/flytepropeller/blob/979fabe1d1b22b01645259a03b8096f227681d08/pkg/utils/encoder.go#L25-L26
 const minGeneratedNameLength = 8

@@ -14,7 +14,7 @@ import (
 
 type VarName = string
 
-//go:generate mockery-v2 --name=OutputResolver --case=underscore --with-expecter
+//go:generate mockery --name=OutputResolver --case=underscore --with-expecter
 
 type OutputResolver interface {
 	// Extracts a subset of node outputs to literals.
