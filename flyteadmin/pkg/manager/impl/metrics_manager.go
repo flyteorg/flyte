@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -427,7 +428,8 @@ func (m *MetricsManager) parseNodeExecution(ctx context.Context, nodeExecution *
 				err = fmt.Errorf("failed to identify workflow node type for node: %+v", target)
 			}
 		default:
-			err = fmt.Errorf("failed to identify node type for node: %+v", target)
+			logger.Warnf(ctx, "unsupported node type")
+			// We don't error out here so that users can still get metrics of other nodes
 		}
 
 		if err != nil {
