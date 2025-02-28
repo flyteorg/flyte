@@ -48,6 +48,7 @@ var (
 		},
 	}
 	workflowMaxParallelism = uint32(10)
+	testError              = &idlcore.ExecutionError{Message: "test error"}
 )
 
 func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler interfaces.NodeHandler, dataStore *storage.DataStore, scope promutils.Scope) (interfaces.NodeHandler, error) {
@@ -209,8 +210,10 @@ func TestAbort(t *testing.T) {
 		subNodePhases                  []v1alpha1.NodePhase
 		subNodeTaskPhases              []core.Phase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
-		arrayNodeState                 v1alpha1.ArrayNodePhase
+		arrayNodeStatePhase            v1alpha1.ArrayNodePhase
+		arrayNodeStateError            *idlcore.ExecutionError
 		expectedTaskExecutionPhase     idlcore.TaskExecution_Phase
+		expectTaskExecutionError       bool
 	}{
 		{
 			name: "Aborted after failed",
@@ -220,8 +223,10 @@ func TestAbort(t *testing.T) {
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
-			arrayNodeState:                 v1alpha1.ArrayNodePhaseFailing,
+			arrayNodeStatePhase:            v1alpha1.ArrayNodePhaseFailing,
+			arrayNodeStateError:            testError,
 			expectedTaskExecutionPhase:     idlcore.TaskExecution_FAILED,
+			expectTaskExecutionError:       true,
 		},
 		{
 			name: "Aborted while running",
@@ -231,7 +236,8 @@ func TestAbort(t *testing.T) {
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
-			arrayNodeState:                 v1alpha1.ArrayNodePhaseExecuting,
+			arrayNodeStatePhase:            v1alpha1.ArrayNodePhaseExecuting,
+			arrayNodeStateError:            testError,
 			expectedTaskExecutionPhase:     idlcore.TaskExecution_ABORTED,
 		},
 	}
@@ -266,7 +272,8 @@ func TestAbort(t *testing.T) {
 
 			// initialize ArrayNodeState
 			arrayNodeState := &handler.ArrayNodeState{
-				Phase: test.arrayNodeState,
+				Phase: test.arrayNodeStatePhase,
+				Error: test.arrayNodeStateError,
 			}
 			for _, item := range []struct {
 				arrayReference *bitarray.CompactArray
@@ -302,6 +309,12 @@ func TestAbort(t *testing.T) {
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 				assert.Equal(t, test.expectedTaskExecutionPhase, eventRecorder.taskExecutionEvents[0].GetPhase())
+
+				if test.expectTaskExecutionError {
+					assert.Equal(t, testError.GetMessage(), eventRecorder.taskExecutionEvents[0].GetError().GetMessage())
+				} else {
+					assert.Nil(t, eventRecorder.taskExecutionEvents[0].GetError())
+				}
 
 				externalResources := eventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
@@ -1295,6 +1308,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 				Phase:                v1alpha1.ArrayNodePhaseSucceeding,
 				SubNodePhases:        subNodePhases,
 				SubNodeRetryAttempts: retryAttempts,
+				Error:                testError,
 			}
 
 			// create NodeExecutionContext
@@ -1361,6 +1375,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 
 			assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 			assert.Equal(t, idlcore.TaskExecution_SUCCEEDED, eventRecorder.taskExecutionEvents[0].GetPhase())
+			assert.Nil(t, eventRecorder.taskExecutionEvents[0].GetError())
 		})
 	}
 }
@@ -1406,6 +1421,7 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 			// initialize ArrayNodeState
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseFailing,
+				Error: testError,
 			}
 
 			for _, item := range []struct {
@@ -1442,6 +1458,7 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 
 			assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 			assert.Equal(t, idlcore.TaskExecution_FAILED, eventRecorder.taskExecutionEvents[0].GetPhase())
+			assert.Equal(t, testError.GetMessage(), eventRecorder.taskExecutionEvents[0].GetError().GetMessage())
 		})
 	}
 }

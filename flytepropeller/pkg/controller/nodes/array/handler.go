@@ -123,7 +123,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	// update state for subNodes
-	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig); err != nil {
+	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig, arrayNodeState.Error); err != nil {
 		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
 		if !eventsErr.IsAlreadyExists(err) {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
@@ -452,7 +452,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// if there is a failing node set the error message if it has not been previous set
-		if failingCount > 0 && arrayNodeState.Error == nil {
+		if failingCount > 0 || failedCount > 0 && arrayNodeState.Error == nil {
+			// only set the error message as the collector summary can be the concatenation of multiple errors
+			// evaluated in the same evaluation
 			arrayNodeState.Error = &idlcore.ExecutionError{
 				Message: subNodeFailureCollector.Summary(events.MaxErrorMessageLength),
 			}
@@ -621,7 +623,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// ensure task_execution set to succeeded
-		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig); err != nil {
+		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig, arrayNodeState.Error); err != nil {
 			if !eventsErr.IsAlreadyExists(err) {
 				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 				return handler.UnknownTransition, err
@@ -663,7 +665,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		maxRetries := config.GetConfig().ArrayNode.MaxTaskPhaseVersionAttempts
 		retries := 0
 		for retries <= maxRetries {
-			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
+			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig, arrayNodeState.Error)
 
 			if err == nil {
 				break
