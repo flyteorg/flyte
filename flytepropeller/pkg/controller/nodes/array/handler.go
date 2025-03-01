@@ -48,7 +48,7 @@ var (
 	}
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 // arrayNodeHandler is a handle implementation for processing array nodes
 type arrayNodeHandler struct {

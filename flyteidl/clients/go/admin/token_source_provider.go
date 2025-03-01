@@ -25,7 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery-v2 --name TokenSource --with-expecter
+//go:generate mockery --name TokenSource --with-expecter
 type TokenSource interface {
 	Token() (*oauth2.Token, error)
 }

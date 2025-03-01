@@ -20,7 +20,7 @@ import (
 )
 
 // IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
-//go:generate mockery-v2 --dir ../../../gen/pb-go/flyteidl/service --name AdminServiceClient --output ../admin/mocks --with-expecter
+//go:generate mockery --dir ../../../gen/pb-go/flyteidl/service --name AdminServiceClient --output ../admin/mocks --with-expecter
 
 // Clientset contains the clients exposed to communicate with various admin services.
 type Clientset struct {
