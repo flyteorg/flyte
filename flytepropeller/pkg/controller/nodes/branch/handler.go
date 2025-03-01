@@ -161,7 +161,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 	if downstreamStatus.IsComplete() {
 		childOutputsPath := v1alpha1.GetOutputsFile(childOutputDir)
 		outputsPath := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
-		if err := nCtx.DataStore().CopyRaw(ctx, childOutputsPath, outputsPath, storage.Options{}); err != nil {
+		if err := nCtx.DataStore().CopyRaw(ctx, childOutputsPath, outputsPath, storage.Options{}); err != nil && !storage.IsNotFound(err) {
 			errMsg := fmt.Sprintf("Failed to copy child node outputs from [%v] to [%v]", childOutputsPath, outputsPath)
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.OutputsNotFoundError, errMsg, nil)), nil
 		}
