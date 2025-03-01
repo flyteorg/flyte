@@ -5767,7 +5767,7 @@ func local_request_AdminService_GetExecutionMetrics_0(ctx context.Context, marsh
 }
 
 var (
-	filter_AdminService_DeleteExecutionPhase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "project": 1, "domain": 2, "phase": 3}, Base: []int{1, 5, 5, 6, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 6, 2, 8, 3, 4, 5, 5}}
+	filter_AdminService_DeleteExecutionPhase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "project": 1, "domain": 2}, Base: []int{1, 4, 5, 6, 2, 0, 4, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 5, 2, 7, 3, 4}}
 )
 
 func request_AdminService_DeleteExecutionPhase_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -5776,7 +5776,6 @@ func request_AdminService_DeleteExecutionPhase_0(ctx context.Context, marshaler 
 
 	var (
 		val string
-		e   int32
 		ok  bool
 		err error
 		_   = err
@@ -5801,18 +5800,6 @@ func request_AdminService_DeleteExecutionPhase_0(ctx context.Context, marshaler 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
 	}
-
-	val, ok = pathParams["phase"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phase")
-	}
-
-	e, err = runtime.Enum(val, extCore.WorkflowExecution_Phase_value)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "phase", err)
-	}
-
-	protoReq.Phase = extCore.WorkflowExecution_Phase(e)
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -5832,7 +5819,6 @@ func local_request_AdminService_DeleteExecutionPhase_0(ctx context.Context, mars
 
 	var (
 		val string
-		e   int32
 		ok  bool
 		err error
 		_   = err
@@ -5857,18 +5843,6 @@ func local_request_AdminService_DeleteExecutionPhase_0(ctx context.Context, mars
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.domain", err)
 	}
-
-	val, ok = pathParams["phase"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "phase")
-	}
-
-	e, err = runtime.Enum(val, extCore.WorkflowExecution_Phase_value)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "phase", err)
-	}
-
-	protoReq.Phase = extCore.WorkflowExecution_Phase(e)
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -7388,7 +7362,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_DeleteExecutionPhase_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_DeleteExecutionPhase_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -7396,7 +7370,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/DeleteExecutionPhase", runtime.WithHTTPPathPattern("/api/v1/delete_execution_phase/{id.project}/{id.domain}/{phase}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/DeleteExecutionPhase", runtime.WithHTTPPathPattern("/api/v1/delete_execution_phase/{id.project}/{id.domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8774,13 +8748,13 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
-	mux.Handle("GET", pattern_AdminService_DeleteExecutionPhase_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AdminService_DeleteExecutionPhase_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/DeleteExecutionPhase", runtime.WithHTTPPathPattern("/api/v1/delete_execution_phase/{id.project}/{id.domain}/{phase}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/DeleteExecutionPhase", runtime.WithHTTPPathPattern("/api/v1/delete_execution_phase/{id.project}/{id.domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -8920,7 +8894,7 @@ var (
 
 	pattern_AdminService_GetExecutionMetrics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "metrics", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_DeleteExecutionPhase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "delete_execution_phase", "id.project", "id.domain", "phase"}, ""))
+	pattern_AdminService_DeleteExecutionPhase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "delete_execution_phase", "id.project", "id.domain"}, ""))
 )
 
 var (

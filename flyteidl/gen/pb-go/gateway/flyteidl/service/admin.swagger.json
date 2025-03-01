@@ -537,8 +537,8 @@
         ]
       }
     },
-    "/api/v1/delete_execution_phase/{id.project}/{id.domain}/{phase}": {
-      "get": {
+    "/api/v1/delete_execution_phase/{id.project}/{id.domain}": {
+      "delete": {
         "description": "Delete a execution phase",
         "operationId": "AdminService_DeleteExecutionPhase",
         "responses": {
@@ -571,24 +571,6 @@
             "type": "string"
           },
           {
-            "name": "phase",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "UNDEFINED",
-              "QUEUED",
-              "RUNNING",
-              "SUCCEEDING",
-              "SUCCEEDED",
-              "FAILING",
-              "FAILED",
-              "ABORTED",
-              "TIMED_OUT",
-              "ABORTING"
-            ]
-          },
-          {
             "name": "id.name",
             "description": "User or system provided value for the resource.",
             "in": "query",
@@ -601,6 +583,25 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "phase",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDING",
+              "SUCCEEDED",
+              "FAILING",
+              "FAILED",
+              "ABORTED",
+              "TIMED_OUT",
+              "ABORTING"
+            ],
+            "default": "UNDEFINED"
           }
         ],
         "tags": [

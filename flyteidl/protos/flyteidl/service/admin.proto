@@ -668,7 +668,7 @@ service AdminService {
 
   rpc DeleteExecutionPhase (flyteidl.admin.ExecutionPhaseDeleteRequest) returns (flyteidl.admin.ExecutionPhaseDeleteResponse) {
 		option (google.api.http) = {
-		  get: "/api/v1/delete_execution_phase/{id.project}/{id.domain}/{phase}"
+      delete: "/api/v1/delete_execution_phase/{id.project}/{id.domain}"
 		};
 		option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
 		  description: "Delete a execution phase"
