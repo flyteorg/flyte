@@ -64,20 +64,23 @@ func updateWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCt
 		return fmt.Errorf("attrFile is mandatory while calling update for workflow execution config")
 	}
 
-	workflowExecutionConfigFileConfig := workflowexecutionconfig.FileConfig{}
-	if err := sconfig.ReadConfigFromFile(&workflowExecutionConfigFileConfig, updateConfig.AttrFile); err != nil {
-		return err
-	}
+	// Process each attribute file
+	for _, attrFile := range updateConfig.AttrFile {
+		workflowExecutionConfigFileConfig := workflowexecutionconfig.FileConfig{}
+		if err := sconfig.ReadConfigFromFile(&workflowExecutionConfigFileConfig, attrFile); err != nil {
+			return fmt.Errorf("error reading config from file %s: %w", attrFile, err)
+		}
 
-	// Get project domain workflow name from the read file.
-	project := workflowExecutionConfigFileConfig.Project
-	domain := workflowExecutionConfigFileConfig.Domain
-	workflowName := workflowExecutionConfigFileConfig.Workflow
+		// Get project domain workflow name from the read file.
+		project := workflowExecutionConfigFileConfig.Project
+		domain := workflowExecutionConfigFileConfig.Domain
+		workflowName := workflowExecutionConfigFileConfig.Workflow
 
-	if err := DecorateAndUpdateMatchableAttr(ctx, cmdCtx, project, domain, workflowName,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, workflowExecutionConfigFileConfig,
-		updateConfig.DryRun, updateConfig.Force); err != nil {
-		return err
+		if err := DecorateAndUpdateMatchableAttr(ctx, cmdCtx, project, domain, workflowName,
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, workflowExecutionConfigFileConfig,
+			updateConfig.DryRun, updateConfig.Force); err != nil {
+			return fmt.Errorf("error updating config from file %s: %w", attrFile, err)
+		}
 	}
 	return nil
 }
