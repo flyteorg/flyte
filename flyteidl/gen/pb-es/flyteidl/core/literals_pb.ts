@@ -1071,11 +1071,124 @@ export class KeyValuePair extends Message<KeyValuePair> {
 }
 
 /**
+ * If specified, enables exponential backoff, upto max retries and max interval
+ *
+ * @generated from message flyteidl.core.ExponentialBackoff
+ */
+export class ExponentialBackoff extends Message<ExponentialBackoff> {
+  /**
+   * maximum number of increasing retries
+   *
+   * @generated from field: uint32 max_exponent = 1;
+   */
+  maxExponent = 0;
+
+  /**
+   * maximum interval between retries
+   *
+   * @generated from field: google.protobuf.Duration max = 2;
+   */
+  max?: Duration;
+
+  constructor(data?: PartialMessage<ExponentialBackoff>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.ExponentialBackoff";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "max_exponent", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "max", kind: "message", T: Duration },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExponentialBackoff {
+    return new ExponentialBackoff().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExponentialBackoff {
+    return new ExponentialBackoff().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExponentialBackoff {
+    return new ExponentialBackoff().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExponentialBackoff | PlainMessage<ExponentialBackoff> | undefined, b: ExponentialBackoff | PlainMessage<ExponentialBackoff> | undefined): boolean {
+    return proto3.util.equals(ExponentialBackoff, a, b);
+  }
+}
+
+/**
+ * Algorithm => new_memory = min(old_memory * factor, mem_limit)
+ *
+ * @generated from message flyteidl.core.RetryOnOOM
+ */
+export class RetryOnOOM extends Message<RetryOnOOM> {
+  /**
+   * Factor to use to increase the memory by - new_memory = prev_memory * factor
+   *
+   * @generated from field: float factor = 1;
+   */
+  factor = 0;
+
+  /**
+   * this should be a resource quantity and specifies the max memory limit that becomes the ceil
+   *
+   * @generated from field: string limit = 2;
+   */
+  limit = "";
+
+  /**
+   * Optional. Default exponent should be 1
+   *
+   * @generated from field: flyteidl.core.ExponentialBackoff backoff = 3;
+   */
+  backoff?: ExponentialBackoff;
+
+  constructor(data?: PartialMessage<RetryOnOOM>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.RetryOnOOM";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "factor", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 2, name: "limit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "backoff", kind: "message", T: ExponentialBackoff },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RetryOnOOM | PlainMessage<RetryOnOOM> | undefined, b: RetryOnOOM | PlainMessage<RetryOnOOM> | undefined): boolean {
+    return proto3.util.equals(RetryOnOOM, a, b);
+  }
+}
+
+/**
  * Retry strategy associated with an executable unit.
  *
  * @generated from message flyteidl.core.RetryStrategy
  */
 export class RetryStrategy extends Message<RetryStrategy> {
+  /**
+   * +optional. If specified, the system will update the memory limit on OOM.
+   *
+   * @generated from field: flyteidl.core.RetryOnOOM on_oom = 1;
+   */
+  onOom?: RetryOnOOM;
+
   /**
    * Number of retries. Retries will be consumed when the job fails with a recoverable error.
    * The number of retries must be less than or equals to 10.
@@ -1092,6 +1205,7 @@ export class RetryStrategy extends Message<RetryStrategy> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.RetryStrategy";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "on_oom", kind: "message", T: RetryOnOOM },
     { no: 5, name: "retries", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 

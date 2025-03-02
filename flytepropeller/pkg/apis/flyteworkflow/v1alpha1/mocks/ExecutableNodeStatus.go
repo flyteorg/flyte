@@ -765,6 +765,51 @@ func (_c *ExecutableNodeStatus_GetNodeExecutionStatus_Call) RunAndReturn(run fun
 	return _c
 }
 
+// GetOOMFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetOOMFailures() uint32 {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOOMFailures")
+	}
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+// ExecutableNodeStatus_GetOOMFailures_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOOMFailures'
+type ExecutableNodeStatus_GetOOMFailures_Call struct {
+	*mock.Call
+}
+
+// GetOOMFailures is a helper method to define mock.On call
+func (_e *ExecutableNodeStatus_Expecter) GetOOMFailures() *ExecutableNodeStatus_GetOOMFailures_Call {
+	return &ExecutableNodeStatus_GetOOMFailures_Call{Call: _e.mock.On("GetOOMFailures")}
+}
+
+func (_c *ExecutableNodeStatus_GetOOMFailures_Call) Run(run func()) *ExecutableNodeStatus_GetOOMFailures_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_GetOOMFailures_Call) Return(_a0 uint32) *ExecutableNodeStatus_GetOOMFailures_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_GetOOMFailures_Call) RunAndReturn(run func() uint32) *ExecutableNodeStatus_GetOOMFailures_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrCreateArrayNodeStatus provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) GetOrCreateArrayNodeStatus() v1alpha1.MutableArrayNodeStatus {
 	ret := _m.Called()
@@ -1646,6 +1691,51 @@ func (_c *ExecutableNodeStatus_IncrementAttempts_Call) Return(_a0 uint32) *Execu
 }
 
 func (_c *ExecutableNodeStatus_IncrementAttempts_Call) RunAndReturn(run func() uint32) *ExecutableNodeStatus_IncrementAttempts_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// IncrementOOMFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) IncrementOOMFailures() uint32 {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for IncrementOOMFailures")
+	}
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+// ExecutableNodeStatus_IncrementOOMFailures_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IncrementOOMFailures'
+type ExecutableNodeStatus_IncrementOOMFailures_Call struct {
+	*mock.Call
+}
+
+// IncrementOOMFailures is a helper method to define mock.On call
+func (_e *ExecutableNodeStatus_Expecter) IncrementOOMFailures() *ExecutableNodeStatus_IncrementOOMFailures_Call {
+	return &ExecutableNodeStatus_IncrementOOMFailures_Call{Call: _e.mock.On("IncrementOOMFailures")}
+}
+
+func (_c *ExecutableNodeStatus_IncrementOOMFailures_Call) Run(run func()) *ExecutableNodeStatus_IncrementOOMFailures_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_IncrementOOMFailures_Call) Return(_a0 uint32) *ExecutableNodeStatus_IncrementOOMFailures_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ExecutableNodeStatus_IncrementOOMFailures_Call) RunAndReturn(run func() uint32) *ExecutableNodeStatus_IncrementOOMFailures_Call {
 	_c.Call.Return(run)
 	return _c
 }

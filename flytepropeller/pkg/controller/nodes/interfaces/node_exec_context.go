@@ -58,6 +58,7 @@ type NodeExecutionContext interface {
 	NodeID() v1alpha1.NodeID
 	Node() v1alpha1.ExecutableNode
 	CurrentAttempt() uint32
+	CurrentOOMFailures() uint32
 	TaskReader() TaskReader
 
 	NodeStateReader() NodeStateReader

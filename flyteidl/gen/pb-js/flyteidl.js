@@ -9593,12 +9593,288 @@
                 return KeyValuePair;
             })();
     
+            core.ExponentialBackoff = (function() {
+    
+                /**
+                 * Properties of an ExponentialBackoff.
+                 * @memberof flyteidl.core
+                 * @interface IExponentialBackoff
+                 * @property {number|null} [maxExponent] ExponentialBackoff maxExponent
+                 * @property {google.protobuf.IDuration|null} [max] ExponentialBackoff max
+                 */
+    
+                /**
+                 * Constructs a new ExponentialBackoff.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an ExponentialBackoff.
+                 * @implements IExponentialBackoff
+                 * @constructor
+                 * @param {flyteidl.core.IExponentialBackoff=} [properties] Properties to set
+                 */
+                function ExponentialBackoff(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExponentialBackoff maxExponent.
+                 * @member {number} maxExponent
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @instance
+                 */
+                ExponentialBackoff.prototype.maxExponent = 0;
+    
+                /**
+                 * ExponentialBackoff max.
+                 * @member {google.protobuf.IDuration|null|undefined} max
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @instance
+                 */
+                ExponentialBackoff.prototype.max = null;
+    
+                /**
+                 * Creates a new ExponentialBackoff instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @static
+                 * @param {flyteidl.core.IExponentialBackoff=} [properties] Properties to set
+                 * @returns {flyteidl.core.ExponentialBackoff} ExponentialBackoff instance
+                 */
+                ExponentialBackoff.create = function create(properties) {
+                    return new ExponentialBackoff(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExponentialBackoff message. Does not implicitly {@link flyteidl.core.ExponentialBackoff.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @static
+                 * @param {flyteidl.core.IExponentialBackoff} message ExponentialBackoff message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExponentialBackoff.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.maxExponent != null && message.hasOwnProperty("maxExponent"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.maxExponent);
+                    if (message.max != null && message.hasOwnProperty("max"))
+                        $root.google.protobuf.Duration.encode(message.max, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExponentialBackoff message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.ExponentialBackoff} ExponentialBackoff
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExponentialBackoff.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ExponentialBackoff();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.maxExponent = reader.uint32();
+                            break;
+                        case 2:
+                            message.max = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExponentialBackoff message.
+                 * @function verify
+                 * @memberof flyteidl.core.ExponentialBackoff
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExponentialBackoff.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.maxExponent != null && message.hasOwnProperty("maxExponent"))
+                        if (!$util.isInteger(message.maxExponent))
+                            return "maxExponent: integer expected";
+                    if (message.max != null && message.hasOwnProperty("max")) {
+                        var error = $root.google.protobuf.Duration.verify(message.max);
+                        if (error)
+                            return "max." + error;
+                    }
+                    return null;
+                };
+    
+                return ExponentialBackoff;
+            })();
+    
+            core.RetryOnOOM = (function() {
+    
+                /**
+                 * Properties of a RetryOnOOM.
+                 * @memberof flyteidl.core
+                 * @interface IRetryOnOOM
+                 * @property {number|null} [factor] RetryOnOOM factor
+                 * @property {string|null} [limit] RetryOnOOM limit
+                 * @property {flyteidl.core.IExponentialBackoff|null} [backoff] RetryOnOOM backoff
+                 */
+    
+                /**
+                 * Constructs a new RetryOnOOM.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a RetryOnOOM.
+                 * @implements IRetryOnOOM
+                 * @constructor
+                 * @param {flyteidl.core.IRetryOnOOM=} [properties] Properties to set
+                 */
+                function RetryOnOOM(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * RetryOnOOM factor.
+                 * @member {number} factor
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @instance
+                 */
+                RetryOnOOM.prototype.factor = 0;
+    
+                /**
+                 * RetryOnOOM limit.
+                 * @member {string} limit
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @instance
+                 */
+                RetryOnOOM.prototype.limit = "";
+    
+                /**
+                 * RetryOnOOM backoff.
+                 * @member {flyteidl.core.IExponentialBackoff|null|undefined} backoff
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @instance
+                 */
+                RetryOnOOM.prototype.backoff = null;
+    
+                /**
+                 * Creates a new RetryOnOOM instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @static
+                 * @param {flyteidl.core.IRetryOnOOM=} [properties] Properties to set
+                 * @returns {flyteidl.core.RetryOnOOM} RetryOnOOM instance
+                 */
+                RetryOnOOM.create = function create(properties) {
+                    return new RetryOnOOM(properties);
+                };
+    
+                /**
+                 * Encodes the specified RetryOnOOM message. Does not implicitly {@link flyteidl.core.RetryOnOOM.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @static
+                 * @param {flyteidl.core.IRetryOnOOM} message RetryOnOOM message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                RetryOnOOM.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.factor != null && message.hasOwnProperty("factor"))
+                        writer.uint32(/* id 1, wireType 5 =*/13).float(message.factor);
+                    if (message.limit != null && message.hasOwnProperty("limit"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.limit);
+                    if (message.backoff != null && message.hasOwnProperty("backoff"))
+                        $root.flyteidl.core.ExponentialBackoff.encode(message.backoff, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a RetryOnOOM message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.RetryOnOOM} RetryOnOOM
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                RetryOnOOM.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.RetryOnOOM();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.factor = reader.float();
+                            break;
+                        case 2:
+                            message.limit = reader.string();
+                            break;
+                        case 3:
+                            message.backoff = $root.flyteidl.core.ExponentialBackoff.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a RetryOnOOM message.
+                 * @function verify
+                 * @memberof flyteidl.core.RetryOnOOM
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                RetryOnOOM.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.factor != null && message.hasOwnProperty("factor"))
+                        if (typeof message.factor !== "number")
+                            return "factor: number expected";
+                    if (message.limit != null && message.hasOwnProperty("limit"))
+                        if (!$util.isString(message.limit))
+                            return "limit: string expected";
+                    if (message.backoff != null && message.hasOwnProperty("backoff")) {
+                        var error = $root.flyteidl.core.ExponentialBackoff.verify(message.backoff);
+                        if (error)
+                            return "backoff." + error;
+                    }
+                    return null;
+                };
+    
+                return RetryOnOOM;
+            })();
+    
             core.RetryStrategy = (function() {
     
                 /**
                  * Properties of a RetryStrategy.
                  * @memberof flyteidl.core
                  * @interface IRetryStrategy
+                 * @property {flyteidl.core.IRetryOnOOM|null} [onOom] RetryStrategy onOom
                  * @property {number|null} [retries] RetryStrategy retries
                  */
     
@@ -9616,6 +9892,14 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
+    
+                /**
+                 * RetryStrategy onOom.
+                 * @member {flyteidl.core.IRetryOnOOM|null|undefined} onOom
+                 * @memberof flyteidl.core.RetryStrategy
+                 * @instance
+                 */
+                RetryStrategy.prototype.onOom = null;
     
                 /**
                  * RetryStrategy retries.
@@ -9649,6 +9933,8 @@
                 RetryStrategy.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
+                    if (message.onOom != null && message.hasOwnProperty("onOom"))
+                        $root.flyteidl.core.RetryOnOOM.encode(message.onOom, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.retries != null && message.hasOwnProperty("retries"))
                         writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.retries);
                     return writer;
@@ -9672,6 +9958,9 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
+                        case 1:
+                            message.onOom = $root.flyteidl.core.RetryOnOOM.decode(reader, reader.uint32());
+                            break;
                         case 5:
                             message.retries = reader.uint32();
                             break;
@@ -9694,6 +9983,11 @@
                 RetryStrategy.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (message.onOom != null && message.hasOwnProperty("onOom")) {
+                        var error = $root.flyteidl.core.RetryOnOOM.verify(message.onOom);
+                        if (error)
+                            return "onOom." + error;
+                    }
                     if (message.retries != null && message.hasOwnProperty("retries"))
                         if (!$util.isInteger(message.retries))
                             return "retries: integer expected";

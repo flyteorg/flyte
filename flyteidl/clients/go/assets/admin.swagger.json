@@ -7206,6 +7206,21 @@
       },
       "description": "Represents the error message from the execution."
     },
+    "coreExponentialBackoff": {
+      "type": "object",
+      "properties": {
+        "max_exponent": {
+          "type": "integer",
+          "format": "int64",
+          "title": "maximum number of increasing retries"
+        },
+        "max": {
+          "type": "string",
+          "title": "maximum interval between retries"
+        }
+      },
+      "title": "If specified, enables exponential backoff, upto max retries and max interval"
+    },
     "coreExtendedResources": {
       "type": "object",
       "properties": {
@@ -7942,9 +7957,32 @@
       },
       "description": "A customizable interface to convey resources requested for a container. This can be interpreted differently for different\ncontainer engines."
     },
+    "coreRetryOnOOM": {
+      "type": "object",
+      "properties": {
+        "factor": {
+          "type": "number",
+          "format": "float",
+          "title": "Factor to use to increase the memory by - new_memory = prev_memory * factor"
+        },
+        "limit": {
+          "type": "string",
+          "title": "this should be a resource quantity and specifies the max memory limit that becomes the ceil"
+        },
+        "backoff": {
+          "$ref": "#/definitions/coreExponentialBackoff",
+          "title": "Optional. Default exponent should be 1"
+        }
+      },
+      "title": "Algorithm =\u003e new_memory = min(old_memory * factor, mem_limit)"
+    },
     "coreRetryStrategy": {
       "type": "object",
       "properties": {
+        "on_oom": {
+          "$ref": "#/definitions/coreRetryOnOOM",
+          "description": "+optional. If specified, the system will update the memory limit on OOM."
+        },
         "retries": {
           "type": "integer",
           "format": "int64",
