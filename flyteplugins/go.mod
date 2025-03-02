@@ -17,7 +17,6 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/imdario/mergo v0.3.13
-	github.com/kubeflow/common v0.4.3
 	github.com/kubeflow/training-operator v1.8.0
 	github.com/magiconair/properties v1.8.6
 	github.com/mitchellh/mapstructure v1.5.0
