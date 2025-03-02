@@ -1967,14 +1967,15 @@ func (m *ExecutionManager) DeleteExecutionPhase(ctx context.Context, req *admin.
 		return nil, fmt.Errorf("workflow execution identifier cannot be nil")
 	}
 
-	if workflowExecutionID.Project == "" || workflowExecutionID.Domain == "" {
+	if workflowExecutionID.GetProject() == "" || workflowExecutionID.GetDomain() == "" {
 		return nil, fmt.Errorf("workflow execution identifier must have project, domain")
 	}
 
 	// Wrap executionPhase in ExecutionPhaseDeleteInput
 	input := repositoryInterfaces.ExecutionPhaseDeleteInput{
-		WorkflowExecutionID: *workflowExecutionID,
-		ExecutionPhase:      executionPhase,
+		Project:        workflowExecutionID.GetProject(),
+		Domain:         workflowExecutionID.GetDomain(),
+		ExecutionPhase: executionPhase,
 	}
 
 	err := m.db.ExecutionRepo().Delete(ctx, input)
@@ -1985,7 +1986,7 @@ func (m *ExecutionManager) DeleteExecutionPhase(ctx context.Context, req *admin.
 	return &admin.ExecutionPhaseDeleteResponse{
 		Message: fmt.Sprintf("Execution phase %s for workflow %s/%s deleted successfully",
 			executionPhase.String(),
-			workflowExecutionID.Project,
-			workflowExecutionID.Domain),
+			workflowExecutionID.GetProject(),
+			workflowExecutionID.GetDomain()),
 	}, nil
 }

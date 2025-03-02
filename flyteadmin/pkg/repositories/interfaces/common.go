@@ -47,6 +47,7 @@ type CountResourceInput struct {
 }
 
 type ExecutionPhaseDeleteInput struct {
-	WorkflowExecutionID core.WorkflowExecutionIdentifier
-	ExecutionPhase      core.WorkflowExecution_Phase
+	Project        string
+	Domain         string
+	ExecutionPhase core.WorkflowExecution_Phase
 }
