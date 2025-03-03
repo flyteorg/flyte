@@ -503,7 +503,7 @@ func (m *MetricsManager) parseNodeExecutions(ctx context.Context, nodeExecutions
 	return nil
 }
 
-// parseSubworkflowNodeExecutions partitions the SubworkflowNode execution into a collection of Categorical and
+// parseSubworkflowNodeExecution partitions the SubworkflowNode execution into a collection of Categorical and
 // Reference Spans which are appended to the provided spans argument.
 func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 	nodeExecution *admin.NodeExecution, identifier *core.Identifier, spans *[]*core.Span, depth int) error {
@@ -608,7 +608,7 @@ func parseTaskExecutions(taskExecutions []*admin.TaskExecution, spans *[]*core.S
 	}
 }
 
-// parseTaskNodeExecutions partitions the TaskNode execution into a collection of Categorical and Reference Spans which
+// parseTaskNodeExecution partitions the TaskNode execution into a collection of Categorical and Reference Spans which
 // are appended to the provided spans argument.
 func (m *MetricsManager) parseTaskNodeExecution(ctx context.Context, nodeExecution *admin.NodeExecution, spans *[]*core.Span, depth int) error {
 	// retrieve task executions
