@@ -110,6 +110,7 @@ message ExecuteTaskSyncResponse {
 
 // A message used to fetch a job resource from flyte agent server.
 message GetTaskRequest {
+  reserved 5;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
   // Metadata about the resource to be pass to the agent.
