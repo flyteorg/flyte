@@ -1,7 +1,10 @@
 package flytek8s
 
 import (
-	"github.com/pkg/errors"
+	"math"
+	"strconv"
+
+	"github.com/pkg/errors" // For decimal arithmetic
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -35,8 +38,23 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry, onOOMConfig pl
 		case core.Resources_MEMORY:
 			if !v.IsZero() {
 				if onOOMConfig != nil && onOOMConfig.GetExponent() > 0 && onOOMConfig.GetFactor() > 1.0 {
-					// TODO: Create this function
-					// v.Mul(math.Pow(float64(onOOMConfig.GetFactor()), float64(onOOMConfig.GetExponent())))
+					// Convert to multiplier into string and parse it to quantity
+					multiplier := math.Pow(float64(onOOMConfig.GetFactor()), float64(onOOMConfig.GetExponent()))
+					multiplier_str := strconv.FormatFloat(multiplier, 'f', -1, 64)
+					multiplier_quantity, err := resource.ParseQuantity(multiplier_str)
+					if err != nil {
+						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+					}
+
+					// Multiply the value by the multiplier
+					v.AsDec().Mul(v.AsDec(), multiplier_quantity.AsDec())
+
+					// Convert the value to a string and parse it to quantity
+					v, err := resource.ParseQuantity(v.AsDec().String())
+					if err != nil {
+						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+					}
+
 					limitVal, err := resource.ParseQuantity(onOOMConfig.GetLimit())
 					if err != nil {
 						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
