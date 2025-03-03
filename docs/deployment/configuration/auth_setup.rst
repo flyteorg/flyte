@@ -565,7 +565,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
                # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
                externalAuthServer:
                # Replace this with your deployment URL.  It will be used by flyteadmin to validate the token audience
-                 allowedAudience: [https://<your-flyte-deployment-URL>]
+                 allowedAudience: https://<your-flyte-deployment-URL>
                # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
                # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
                # For Okta, use the Issuer URI of the custom auth server:  
