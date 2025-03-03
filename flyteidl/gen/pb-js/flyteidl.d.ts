@@ -10066,6 +10066,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
         }
 
         /** Represents a GetTaskRequest. */
@@ -10085,6 +10088,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix. */
+            public outputPrefix: string;
 
             /**
              * Creates a new GetTaskRequest instance using the specified properties.
