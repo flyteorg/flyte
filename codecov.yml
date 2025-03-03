@@ -1,2 +1,3 @@
 ignore:
   - flyteidl/gen/**/*
+  - **/mocks/*
