@@ -7,7 +7,7 @@ require (
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.2.4
 	github.com/golang/protobuf v1.5.3
 	github.com/jackc/pgconn v1.14.3
 	github.com/mitchellh/mapstructure v1.5.0
