@@ -225,6 +225,20 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_security.insecureCookieHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("security.insecureCookieHeader", testValue)
+			if vBool, err := cmdFlags.GetBool("security.insecureCookieHeader"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.Security.InsecureCookieHeader)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_security.auditAccess", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
