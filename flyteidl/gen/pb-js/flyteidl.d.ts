@@ -10326,6 +10326,9 @@ export namespace flyteidl {
             /** GetTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
 
+            /** GetTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
+
             /** GetTaskRequest connection */
             connection?: (flyteidl.core.IConnection|null);
         }
@@ -10347,6 +10350,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix. */
+            public outputPrefix: string;
 
             /** GetTaskRequest connection. */
             public connection?: (flyteidl.core.IConnection|null);

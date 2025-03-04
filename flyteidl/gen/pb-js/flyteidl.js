@@ -25469,6 +25469,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {string|null} [outputPrefix] GetTaskRequest outputPrefix
                  * @property {flyteidl.core.IConnection|null} [connection] GetTaskRequest connection
                  */
     
@@ -25512,6 +25513,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest outputPrefix.
+                 * @member {string} outputPrefix
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.outputPrefix = "";
+    
+                /**
                  * GetTaskRequest connection.
                  * @member {flyteidl.core.IConnection|null|undefined} connection
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -25549,6 +25558,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.outputPrefix);
                     if (message.connection != null && message.hasOwnProperty("connection"))
                         $root.flyteidl.core.Connection.encode(message.connection, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
@@ -25580,6 +25591,9 @@
                             break;
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.outputPrefix = reader.string();
                             break;
                         case 5:
                             message.connection = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
@@ -25614,6 +25628,9 @@
                         if (error)
                             return "taskCategory." + error;
                     }
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        if (!$util.isString(message.outputPrefix))
+                            return "outputPrefix: string expected";
                     if (message.connection != null && message.hasOwnProperty("connection")) {
                         var error = $root.flyteidl.core.Connection.verify(message.connection);
                         if (error)

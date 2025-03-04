@@ -540,6 +540,13 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   taskCategory?: TaskCategory;
 
   /**
+   * Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+   *
+   * @generated from field: string output_prefix = 4;
+   */
+  outputPrefix = "";
+
+  /**
    * Connection (secret and config) required by the agent.
    * Agent will use the secret and config in the taskTemplate if it's None.
    * +optional
@@ -559,6 +566,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "task_category", kind: "message", T: TaskCategory },
+    { no: 4, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "connection", kind: "message", T: Connection },
   ]);
 

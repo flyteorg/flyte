@@ -155,6 +155,9 @@ pub struct GetTaskRequest {
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="3")]
     pub task_category: ::core::option::Option<TaskCategory>,
+    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+    #[prost(string, tag="4")]
+    pub output_prefix: ::prost::alloc::string::String,
     /// Connection (secret and config) required by the agent.
     /// Agent will use the secret and config in the taskTemplate if it's None.
     /// +optional

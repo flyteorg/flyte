@@ -268,6 +268,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		OutputPrefix: metadata.OutputPrefix,
 		Connection:   &metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)

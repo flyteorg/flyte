@@ -318,6 +318,13 @@
             "type": "string"
           },
           {
+            "name": "output_prefix",
+            "description": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "connection.task_type",
             "description": "The task type that the connection is used for.",
             "in": "query",
