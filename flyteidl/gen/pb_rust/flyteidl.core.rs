@@ -2001,6 +2001,7 @@ pub mod workflow_execution {
         Aborted = 7,
         TimedOut = 8,
         Aborting = 9,
+        Pending = 10,
     }
     impl Phase {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2019,6 +2020,7 @@ pub mod workflow_execution {
                 Phase::Aborted => "ABORTED",
                 Phase::TimedOut => "TIMED_OUT",
                 Phase::Aborting => "ABORTING",
+                Phase::Pending => "PENDING",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2034,6 +2036,7 @@ pub mod workflow_execution {
                 "ABORTED" => Some(Self::Aborted),
                 "TIMED_OUT" => Some(Self::TimedOut),
                 "ABORTING" => Some(Self::Aborting),
+                "PENDING" => Some(Self::Pending),
                 _ => None,
             }
         }

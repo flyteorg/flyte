@@ -13702,6 +13702,7 @@
                  * @property {number} ABORTED=7 ABORTED value
                  * @property {number} TIMED_OUT=8 TIMED_OUT value
                  * @property {number} ABORTING=9 ABORTING value
+                 * @property {number} PENDING=10 PENDING value
                  */
                 WorkflowExecution.Phase = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -13715,6 +13716,7 @@
                     values[valuesById[7] = "ABORTED"] = 7;
                     values[valuesById[8] = "TIMED_OUT"] = 8;
                     values[valuesById[9] = "ABORTING"] = 9;
+                    values[valuesById[10] = "PENDING"] = 10;
                     return values;
                 })();
     
@@ -20982,6 +20984,7 @@
                         case 7:
                         case 8:
                         case 9:
+                        case 10:
                             break;
                         }
                     if (message.occurredAt != null && message.hasOwnProperty("occurredAt")) {
@@ -30054,6 +30057,7 @@
                             case 7:
                             case 8:
                             case 9:
+                            case 10:
                                 break;
                             }
                     }
@@ -34504,6 +34508,7 @@
                         case 7:
                         case 8:
                         case 9:
+                        case 10:
                             break;
                         }
                     if (message.startedAt != null && message.hasOwnProperty("startedAt")) {
@@ -36223,6 +36228,7 @@
                  * @property {flyteidl.admin.ExecutionState|null} [state] ExecutionStateChangeDetails state
                  * @property {google.protobuf.ITimestamp|null} [occurredAt] ExecutionStateChangeDetails occurredAt
                  * @property {string|null} [principal] ExecutionStateChangeDetails principal
+                 * @property {string|null} [description] ExecutionStateChangeDetails description
                  */
     
                 /**
@@ -36265,6 +36271,14 @@
                 ExecutionStateChangeDetails.prototype.principal = "";
     
                 /**
+                 * ExecutionStateChangeDetails description.
+                 * @member {string} description
+                 * @memberof flyteidl.admin.ExecutionStateChangeDetails
+                 * @instance
+                 */
+                ExecutionStateChangeDetails.prototype.description = "";
+    
+                /**
                  * Creates a new ExecutionStateChangeDetails instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.ExecutionStateChangeDetails
@@ -36294,6 +36308,8 @@
                         $root.google.protobuf.Timestamp.encode(message.occurredAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.principal != null && message.hasOwnProperty("principal"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.principal);
+                    if (message.description != null && message.hasOwnProperty("description"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.description);
                     return writer;
                 };
     
@@ -36323,6 +36339,9 @@
                             break;
                         case 3:
                             message.principal = reader.string();
+                            break;
+                        case 4:
+                            message.description = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -36359,6 +36378,9 @@
                     if (message.principal != null && message.hasOwnProperty("principal"))
                         if (!$util.isString(message.principal))
                             return "principal: string expected";
+                    if (message.description != null && message.hasOwnProperty("description"))
+                        if (!$util.isString(message.description))
+                            return "description: string expected";
                     return null;
                 };
     
@@ -40956,6 +40978,7 @@
                  * @property {flyteidl.admin.IFixedRate|null} [rate] Schedule rate
                  * @property {flyteidl.admin.ICronSchedule|null} [cronSchedule] Schedule cronSchedule
                  * @property {string|null} [kickoffTimeInputArg] Schedule kickoffTimeInputArg
+                 * @property {flyteidl.admin.ISchedulerPolicy|null} [schedulerPolicy] Schedule schedulerPolicy
                  */
     
                 /**
@@ -41005,6 +41028,14 @@
                  */
                 Schedule.prototype.kickoffTimeInputArg = "";
     
+                /**
+                 * Schedule schedulerPolicy.
+                 * @member {flyteidl.admin.ISchedulerPolicy|null|undefined} schedulerPolicy
+                 * @memberof flyteidl.admin.Schedule
+                 * @instance
+                 */
+                Schedule.prototype.schedulerPolicy = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -41051,6 +41082,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.kickoffTimeInputArg);
                     if (message.cronSchedule != null && message.hasOwnProperty("cronSchedule"))
                         $root.flyteidl.admin.CronSchedule.encode(message.cronSchedule, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.schedulerPolicy != null && message.hasOwnProperty("schedulerPolicy"))
+                        $root.flyteidl.admin.SchedulerPolicy.encode(message.schedulerPolicy, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -41083,6 +41116,9 @@
                             break;
                         case 3:
                             message.kickoffTimeInputArg = reader.string();
+                            break;
+                        case 5:
+                            message.schedulerPolicy = $root.flyteidl.admin.SchedulerPolicy.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -41132,10 +41168,181 @@
                     if (message.kickoffTimeInputArg != null && message.hasOwnProperty("kickoffTimeInputArg"))
                         if (!$util.isString(message.kickoffTimeInputArg))
                             return "kickoffTimeInputArg: string expected";
+                    if (message.schedulerPolicy != null && message.hasOwnProperty("schedulerPolicy")) {
+                        var error = $root.flyteidl.admin.SchedulerPolicy.verify(message.schedulerPolicy);
+                        if (error)
+                            return "schedulerPolicy." + error;
+                    }
                     return null;
                 };
     
                 return Schedule;
+            })();
+    
+            admin.SchedulerPolicy = (function() {
+    
+                /**
+                 * Properties of a SchedulerPolicy.
+                 * @memberof flyteidl.admin
+                 * @interface ISchedulerPolicy
+                 * @property {number|null} [max] SchedulerPolicy max
+                 * @property {flyteidl.admin.ConcurrencyPolicy|null} [policy] SchedulerPolicy policy
+                 */
+    
+                /**
+                 * Constructs a new SchedulerPolicy.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a SchedulerPolicy.
+                 * @implements ISchedulerPolicy
+                 * @constructor
+                 * @param {flyteidl.admin.ISchedulerPolicy=} [properties] Properties to set
+                 */
+                function SchedulerPolicy(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * SchedulerPolicy max.
+                 * @member {number} max
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @instance
+                 */
+                SchedulerPolicy.prototype.max = 0;
+    
+                /**
+                 * SchedulerPolicy policy.
+                 * @member {flyteidl.admin.ConcurrencyPolicy} policy
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @instance
+                 */
+                SchedulerPolicy.prototype.policy = 0;
+    
+                /**
+                 * Creates a new SchedulerPolicy instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @static
+                 * @param {flyteidl.admin.ISchedulerPolicy=} [properties] Properties to set
+                 * @returns {flyteidl.admin.SchedulerPolicy} SchedulerPolicy instance
+                 */
+                SchedulerPolicy.create = function create(properties) {
+                    return new SchedulerPolicy(properties);
+                };
+    
+                /**
+                 * Encodes the specified SchedulerPolicy message. Does not implicitly {@link flyteidl.admin.SchedulerPolicy.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @static
+                 * @param {flyteidl.admin.ISchedulerPolicy} message SchedulerPolicy message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                SchedulerPolicy.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.max != null && message.hasOwnProperty("max"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.max);
+                    if (message.policy != null && message.hasOwnProperty("policy"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.policy);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a SchedulerPolicy message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.SchedulerPolicy} SchedulerPolicy
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                SchedulerPolicy.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SchedulerPolicy();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.max = reader.uint32();
+                            break;
+                        case 2:
+                            message.policy = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a SchedulerPolicy message.
+                 * @function verify
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                SchedulerPolicy.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.max != null && message.hasOwnProperty("max"))
+                        if (!$util.isInteger(message.max))
+                            return "max: integer expected";
+                    if (message.policy != null && message.hasOwnProperty("policy"))
+                        switch (message.policy) {
+                        default:
+                            return "policy: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                            break;
+                        }
+                    return null;
+                };
+    
+                return SchedulerPolicy;
+            })();
+    
+            /**
+             * ConcurrencyPolicy enum.
+             * @name flyteidl.admin.ConcurrencyPolicy
+             * @enum {string}
+             * @property {number} UNSPECIFIED=0 UNSPECIFIED value
+             * @property {number} WAIT=1 WAIT value
+             * @property {number} ABORT=2 ABORT value
+             * @property {number} REPLACE=3 REPLACE value
+             */
+            admin.ConcurrencyPolicy = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNSPECIFIED"] = 0;
+                values[valuesById[1] = "WAIT"] = 1;
+                values[valuesById[2] = "ABORT"] = 2;
+                values[valuesById[3] = "REPLACE"] = 3;
+                return values;
+            })();
+    
+            /**
+             * ConcurrencyLevel enum.
+             * @name flyteidl.admin.ConcurrencyLevel
+             * @enum {string}
+             * @property {number} LAUNCH_PLAN=0 LAUNCH_PLAN value
+             * @property {number} LAUNCH_PLAN_VERSION=1 LAUNCH_PLAN_VERSION value
+             */
+            admin.ConcurrencyLevel = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "LAUNCH_PLAN"] = 0;
+                values[valuesById[1] = "LAUNCH_PLAN_VERSION"] = 1;
+                return values;
             })();
     
             admin.NodeExecutionGetRequest = (function() {

@@ -4580,6 +4580,17 @@
         }
       }
     },
+    "adminConcurrencyPolicy": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "WAIT",
+        "ABORT",
+        "REPLACE"
+      ],
+      "default": "UNSPECIFIED",
+      "title": "- WAIT: wait for previous executions to terminate before starting a new one\n - ABORT: fail the CreateExecution request and do not permit the execution to start\n - REPLACE: terminate the oldest execution when the concurrency limit is reached and immediately begin proceeding with the new execution"
+    },
     "adminCronSchedule": {
       "type": "object",
       "properties": {
@@ -5095,6 +5106,10 @@
         "principal": {
           "type": "string",
           "title": "Identifies the entity (if any) responsible for causing the state change of the execution"
+        },
+        "description": {
+          "type": "string",
+          "title": "Includes the reason for the `PENDING` phase"
         }
       }
     },
@@ -5989,9 +6004,26 @@
         "kickoff_time_input_arg": {
           "type": "string",
           "description": "Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off."
+        },
+        "scheduler_policy": {
+          "$ref": "#/definitions/adminSchedulerPolicy"
         }
       },
       "description": "Defines complete set of information required to trigger an execution on a schedule."
+    },
+    "adminSchedulerPolicy": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "integer",
+          "format": "int64",
+          "title": "Defines how many executions with this launch plan can run in parallel"
+        },
+        "policy": {
+          "$ref": "#/definitions/adminConcurrencyPolicy",
+          "description": "Defines how to handle the execution when the max concurrency is reached."
+        }
+      }
     },
     "adminSlackNotification": {
       "type": "object",
@@ -8611,7 +8643,8 @@
         "FAILED",
         "ABORTED",
         "TIMED_OUT",
-        "ABORTING"
+        "ABORTING",
+        "PENDING"
       ],
       "default": "UNDEFINED"
     },

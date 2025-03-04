@@ -5647,7 +5647,8 @@ export namespace flyteidl {
                 FAILED = 6,
                 ABORTED = 7,
                 TIMED_OUT = 8,
-                ABORTING = 9
+                ABORTING = 9,
+                PENDING = 10
             }
         }
 
@@ -14878,6 +14879,9 @@ export namespace flyteidl {
 
             /** ExecutionStateChangeDetails principal */
             principal?: (string|null);
+
+            /** ExecutionStateChangeDetails description */
+            description?: (string|null);
         }
 
         /** Represents an ExecutionStateChangeDetails. */
@@ -14897,6 +14901,9 @@ export namespace flyteidl {
 
             /** ExecutionStateChangeDetails principal. */
             public principal: string;
+
+            /** ExecutionStateChangeDetails description. */
+            public description: string;
 
             /**
              * Creates a new ExecutionStateChangeDetails instance using the specified properties.
@@ -16862,6 +16869,9 @@ export namespace flyteidl {
 
             /** Schedule kickoffTimeInputArg */
             kickoffTimeInputArg?: (string|null);
+
+            /** Schedule schedulerPolicy */
+            schedulerPolicy?: (flyteidl.admin.ISchedulerPolicy|null);
         }
 
         /** Represents a Schedule. */
@@ -16884,6 +16894,9 @@ export namespace flyteidl {
 
             /** Schedule kickoffTimeInputArg. */
             public kickoffTimeInputArg: string;
+
+            /** Schedule schedulerPolicy. */
+            public schedulerPolicy?: (flyteidl.admin.ISchedulerPolicy|null);
 
             /** Schedule ScheduleExpression. */
             public ScheduleExpression?: ("cronExpression"|"rate"|"cronSchedule");
@@ -16919,6 +16932,78 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a SchedulerPolicy. */
+        interface ISchedulerPolicy {
+
+            /** SchedulerPolicy max */
+            max?: (number|null);
+
+            /** SchedulerPolicy policy */
+            policy?: (flyteidl.admin.ConcurrencyPolicy|null);
+        }
+
+        /** Represents a SchedulerPolicy. */
+        class SchedulerPolicy implements ISchedulerPolicy {
+
+            /**
+             * Constructs a new SchedulerPolicy.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISchedulerPolicy);
+
+            /** SchedulerPolicy max. */
+            public max: number;
+
+            /** SchedulerPolicy policy. */
+            public policy: flyteidl.admin.ConcurrencyPolicy;
+
+            /**
+             * Creates a new SchedulerPolicy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SchedulerPolicy instance
+             */
+            public static create(properties?: flyteidl.admin.ISchedulerPolicy): flyteidl.admin.SchedulerPolicy;
+
+            /**
+             * Encodes the specified SchedulerPolicy message. Does not implicitly {@link flyteidl.admin.SchedulerPolicy.verify|verify} messages.
+             * @param message SchedulerPolicy message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISchedulerPolicy, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SchedulerPolicy message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SchedulerPolicy
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SchedulerPolicy;
+
+            /**
+             * Verifies a SchedulerPolicy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** ConcurrencyPolicy enum. */
+        enum ConcurrencyPolicy {
+            UNSPECIFIED = 0,
+            WAIT = 1,
+            ABORT = 2,
+            REPLACE = 3
+        }
+
+        /** ConcurrencyLevel enum. */
+        enum ConcurrencyLevel {
+            LAUNCH_PLAN = 0,
+            LAUNCH_PLAN_VERSION = 1
         }
 
         /** Properties of a NodeExecutionGetRequest. */

@@ -40,4 +40,35 @@ message Schedule {
 
     // Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
     string kickoff_time_input_arg = 3;
+
+    SchedulerPolicy scheduler_policy = 5;
+}
+
+message SchedulerPolicy {
+    // Defines how many executions with this launch plan can run in parallel
+    uint32 max = 1;
+
+    // Defines how to handle the execution when the max concurrency is reached.
+    ConcurrencyPolicy policy = 2;
+}
+
+enum ConcurrencyPolicy {
+    UNSPECIFIED = 0;
+
+    // wait for previous executions to terminate before starting a new one
+    WAIT = 1;
+
+    // fail the CreateExecution request and do not permit the execution to start
+    ABORT = 2;
+
+    // terminate the oldest execution when the concurrency limit is reached and immediately begin proceeding with the new execution
+    REPLACE = 3;
+}
+
+enum ConcurrencyLevel {
+    // Applies concurrency limits across all launch plan versions.
+    LAUNCH_PLAN = 0;
+
+    // Applies concurrency at the versioned launch plan level
+    LAUNCH_PLAN_VERSION = 1;
 }

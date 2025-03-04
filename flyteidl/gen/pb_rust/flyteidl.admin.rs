@@ -1821,6 +1821,9 @@ pub struct ExecutionStateChangeDetails {
     /// Identifies the entity (if any) responsible for causing the state change of the execution
     #[prost(string, tag="3")]
     pub principal: ::prost::alloc::string::String,
+    /// Includes the reason for the `PENDING` phase
+    #[prost(string, tag="4")]
+    pub description: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
@@ -1905,6 +1908,8 @@ pub struct Schedule {
     /// Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
     #[prost(string, tag="3")]
     pub kickoff_time_input_arg: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="5")]
+    pub scheduler_policy: ::core::option::Option<SchedulerPolicy>,
     #[prost(oneof="schedule::ScheduleExpression", tags="1, 2, 4")]
     pub schedule_expression: ::core::option::Option<schedule::ScheduleExpression>,
 }
@@ -1922,6 +1927,16 @@ pub mod schedule {
         #[prost(message, tag="4")]
         CronSchedule(super::CronSchedule),
     }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct SchedulerPolicy {
+    /// Defines how many executions with this launch plan can run in parallel
+    #[prost(uint32, tag="1")]
+    pub max: u32,
+    /// Defines how to handle the execution when the max concurrency is reached.
+    #[prost(enumeration="ConcurrencyPolicy", tag="2")]
+    pub policy: i32,
 }
 /// Represents a frequency at which to run a schedule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -1949,6 +1964,69 @@ impl FixedRateUnit {
             "MINUTE" => Some(Self::Minute),
             "HOUR" => Some(Self::Hour),
             "DAY" => Some(Self::Day),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ConcurrencyPolicy {
+    Unspecified = 0,
+    /// wait for previous executions to terminate before starting a new one
+    Wait = 1,
+    /// fail the CreateExecution request and do not permit the execution to start
+    Abort = 2,
+    /// terminate the oldest execution when the concurrency limit is reached and immediately begin proceeding with the new execution
+    Replace = 3,
+}
+impl ConcurrencyPolicy {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            ConcurrencyPolicy::Unspecified => "UNSPECIFIED",
+            ConcurrencyPolicy::Wait => "WAIT",
+            ConcurrencyPolicy::Abort => "ABORT",
+            ConcurrencyPolicy::Replace => "REPLACE",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "UNSPECIFIED" => Some(Self::Unspecified),
+            "WAIT" => Some(Self::Wait),
+            "ABORT" => Some(Self::Abort),
+            "REPLACE" => Some(Self::Replace),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ConcurrencyLevel {
+    /// Applies concurrency limits across all launch plan versions.
+    LaunchPlan = 0,
+    /// Applies concurrency at the versioned launch plan level
+    LaunchPlanVersion = 1,
+}
+impl ConcurrencyLevel {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            ConcurrencyLevel::LaunchPlan => "LAUNCH_PLAN",
+            ConcurrencyLevel::LaunchPlanVersion => "LAUNCH_PLAN_VERSION",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "LAUNCH_PLAN" => Some(Self::LaunchPlan),
+            "LAUNCH_PLAN_VERSION" => Some(Self::LaunchPlanVersion),
             _ => None,
         }
     }
