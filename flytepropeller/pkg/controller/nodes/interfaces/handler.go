@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 // NodeExecutor defines the interface for handling a single Flyte Node of any Node type.
 type NodeExecutor interface {

@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
 	quboleMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -304,10 +305,10 @@ func TestMonitorQuery(t *testing.T) {
 	}
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreateMatch("my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name", mock.Anything).Return(ExecutionStateCacheItem{
+	mockCache.EXPECT().GetOrCreate("my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name", mock.Anything).Return(ExecutionStateCacheItem{
 		ExecutionState: ExecutionState{Phase: PhaseQuerySucceeded},
 		Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name",
-	}, nil).Run(func(_ mock.Arguments) {
+	}, nil).Run(func(id string, item cache.Item) {
 		getOrCreateCalled = true
 	})
 
@@ -327,17 +328,17 @@ func TestKickOffQuery(t *testing.T) {
 		Status: client.QuboleStatusWaiting,
 	}
 	mockQubole := &quboleMocks.QuboleClient{}
-	mockQubole.OnExecuteHiveCommandMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
-		mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockQubole.EXPECT().ExecuteHiveCommand(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+		mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string, commandMetadata client.CommandMetadata) {
 		quboleCalled = true
 	}).Return(quboleCommandDetails, nil)
 
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreate(mock.Anything,
+	mockCache.EXPECT().GetOrCreate(mock.Anything,
 		ExecutionStateCacheItem{
 			ExecutionState: ExecutionState{Phase: PhaseSubmitted, CommandID: "453298043"},
-			Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name"}).Run(func(_ mock.Arguments) {
+			Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name"}).Run(func(id string, item cache.Item) {
 		getOrCreateCalled = true
 	}).Return(ExecutionStateCacheItem{}, nil)
 
@@ -418,7 +419,7 @@ func Test_mapLabelToPrimaryLabel(t *testing.T) {
 func createMockTaskExecutionContextWithProjectDomain(project string, domain string) *mocks.TaskExecutionContext {
 	mockTaskExecutionContext := mocks.TaskExecutionContext{}
 	taskExecID := &pluginsCoreMocks.TaskExecutionID{}
-	taskExecID.OnGetID().Return(idlCore.TaskExecutionIdentifier{
+	taskExecID.EXPECT().GetID().Return(idlCore.TaskExecutionIdentifier{
 		NodeExecutionId: &idlCore.NodeExecutionIdentifier{ExecutionId: &idlCore.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -427,7 +428,7 @@ func createMockTaskExecutionContextWithProjectDomain(project string, domain stri
 	})
 
 	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-	taskMetadata.OnGetTaskExecutionID().Return(taskExecID)
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(taskExecID)
 	mockTaskExecutionContext.On("TaskExecutionMetadata").Return(taskMetadata)
 	return &mockTaskExecutionContext
 }

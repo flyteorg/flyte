@@ -95,52 +95,52 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 	}
 
 	nm := &mocks.NodeExecutionMetadata{}
-	nm.OnGetAnnotations().Return(map[string]string{})
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+	nm.EXPECT().GetAnnotations().Return(map[string]string{})
+	nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 		ExecutionId: wfExecID,
 		NodeId:      n.GetID(),
 	})
-	nm.OnGetK8sServiceAccount().Return("service-account")
-	nm.OnGetLabels().Return(map[string]string{})
-	nm.OnGetNamespace().Return("namespace")
-	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.OnGetOwnerReference().Return(v1.OwnerReference{
+	nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+	nm.EXPECT().GetLabels().Return(map[string]string{})
+	nm.EXPECT().GetNamespace().Return("namespace")
+	nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "sample",
 		Name: "name",
 	})
 
 	ns := &mocks2.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-	ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+	ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 
 	ir := &mocks3.InputReader{}
-	ir.OnGetMatch(mock.Anything).Return(inputs, nil)
+	ir.EXPECT().Get(mock.Anything).Return(inputs, nil)
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnNode().Return(n)
-	nCtx.OnInputReader().Return(ir)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().Node().Return(n)
+	nCtx.EXPECT().InputReader().Return(ir)
 	tmpDataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
-	nCtx.OnDataStore().Return(tmpDataStore)
-	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnNodeStatus().Return(ns)
+	nCtx.EXPECT().DataStore().Return(tmpDataStore)
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+	nCtx.EXPECT().NodeStatus().Return(ns)
 
-	nCtx.OnNodeID().Return("n1")
-	nCtx.OnEnqueueOwnerFunc().Return(nil)
+	nCtx.EXPECT().NodeID().Return("n1")
+	nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
 
 	nr := &mocks.NodeStateReader{}
-	nr.OnGetBranchNodeState().Return(handler.BranchNodeState{
+	nr.EXPECT().GetBranchNodeState().Return(handler.BranchNodeState{
 		FinalizedNodeID: childNodeID,
 		Phase:           phase,
 	})
-	nCtx.OnNodeStateReader().Return(nr)
-	nCtx.OnNodeStateWriter().Return(s)
-	nCtx.OnExecutionContext().Return(eCtx)
+	nCtx.EXPECT().NodeStateReader().Return(nr)
+	nCtx.EXPECT().NodeStateWriter().Return(s)
+	nCtx.EXPECT().ExecutionContext().Return(eCtx)
 	if nl == nil {
-		nCtx.OnContextualNodeLookup().Return(nil)
+		nCtx.EXPECT().ContextualNodeLookup().Return(nil)
 	} else {
-		nCtx.OnContextualNodeLookup().Return(nl)
+		nCtx.EXPECT().ContextualNodeLookup().Return(nl)
 	}
 	return nCtx, s
 }
@@ -153,12 +153,12 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 
 	res := &v12.ResourceRequirements{}
 	n := &mocks2.ExecutableNode{}
-	n.OnGetResources().Return(res)
-	n.OnGetID().Return(nodeID)
+	n.EXPECT().GetResources().Return(res)
+	n.EXPECT().GetID().Return(nodeID)
 
 	expectedError := &core.ExecutionError{}
 	bn := &mocks2.ExecutableNode{}
-	bn.OnGetID().Return(childNodeID)
+	bn.EXPECT().GetID().Return(childNodeID)
 
 	tests := []struct {
 		name            string
@@ -186,20 +186,20 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.OnGetParentInfo().Return(parentInfo{})
+			eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
 
 			mockNodeLookup := &execMocks.NodeLookup{}
 			if len(test.upstreamNodeID) > 0 {
-				mockNodeLookup.OnToNodeMatch(childNodeID).Return([]string{test.upstreamNodeID}, nil)
+				mockNodeLookup.EXPECT().ToNode(childNodeID).Return([]string{test.upstreamNodeID}, nil)
 			} else {
-				mockNodeLookup.OnToNodeMatch(childNodeID).Return(nil, nil)
+				mockNodeLookup.EXPECT().ToNode(childNodeID).Return(nil, nil)
 			}
 
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeNotYetEvaluated, &childNodeID, n, nil, mockNodeLookup, eCtx)
 			newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 			expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 			mockNodeExecutor := &mocks.Node{}
-			mockNodeExecutor.OnRecursiveNodeHandlerMatch(
+			mockNodeExecutor.EXPECT().RecursiveNodeHandler(
 				mock.Anything, // ctx
 				mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, expectedExecContext) }),
 				mock.MatchedBy(func(d executors.DAGStructure) bool {
@@ -223,10 +223,10 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			).Return(test.ns, test.err)
 
 			childNodeStatus := &mocks2.ExecutableNodeStatus{}
-			childNodeStatus.OnGetAttempts().Return(0)
+			childNodeStatus.EXPECT().GetAttempts().Return(0)
 			childNodeStatus.On("SetDataDir", storage.DataReference("/output-dir/child")).Once()
 			childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/child/0")).Once()
-			mockNodeLookup.OnGetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
+			mockNodeLookup.EXPECT().GetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
 			if test.childPhase == v1alpha1.NodePhaseSucceeded {
 				_ = nCtx.DataStore().WriteRaw(ctx, storage.DataReference("/output-dir/child/0/outputs.pb"), 0, storage.Options{}, bytes.NewReader([]byte{}))
 			}
@@ -306,11 +306,11 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 
 	t.Run("NoBranchNode", func(t *testing.T) {
 		mockNodeExecutor := &mocks.Node{}
-		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything,
+		mockNodeExecutor.EXPECT().AbortHandler(mock.Anything,
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetParentInfo().Return(nil)
+		eCtx.EXPECT().GetParentInfo().Return(nil)
 		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil, eCtx)
 		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
@@ -320,17 +320,17 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 	t.Run("BranchNodeSuccess", func(t *testing.T) {
 		mockNodeExecutor := &mocks.Node{}
 		mockNodeLookup := &execMocks.NodeLookup{}
-		mockNodeLookup.OnToNodeMatch(mock.Anything).Return(nil, nil)
+		mockNodeLookup.EXPECT().ToNode(mock.Anything).Return(nil, nil)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetParentInfo().Return(parentInfo{})
+		eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
 		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, mockNodeLookup, eCtx)
 		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
-		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything,
+		mockNodeExecutor.EXPECT().AbortHandler(mock.Anything,
 			mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, expectedExecContext) }),
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		mockNodeLookup.OnGetNode(*s.s.FinalizedNodeID).Return(n, true)
+		mockNodeLookup.EXPECT().GetNode(*s.s.FinalizedNodeID).Return(n, true)
 		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.NoError(t, err)
@@ -379,11 +379,11 @@ func TestBranchHandler_HandleNode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			res := &v12.ResourceRequirements{}
 			n := &mocks2.ExecutableNode{}
-			n.OnGetResources().Return(res)
-			n.OnGetBranchNode().Return(nil)
-			n.OnGetID().Return("n1")
+			n.EXPECT().GetResources().Return(res)
+			n.EXPECT().GetBranchNode().Return(nil)
+			n.EXPECT().GetID().Return("n1")
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.OnGetParentInfo().Return(nil)
+			eCtx.EXPECT().GetParentInfo().Return(nil)
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeSuccess, &childNodeID, n, inputs, nil, eCtx)
 
 			s, err := branch.Handle(ctx, nCtx)

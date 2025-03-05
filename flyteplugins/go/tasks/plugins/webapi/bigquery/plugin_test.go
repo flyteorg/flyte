@@ -88,8 +88,8 @@ func TestOutputWriter(t *testing.T) {
 
 	template := flyteIdlCore.TaskTemplate{}
 	tr := &coreMocks.TaskReader{}
-	tr.OnRead(ctx).Return(&template, nil)
-	statusContext.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(ctx).Return(&template, nil)
+	statusContext.EXPECT().TaskReader().Return(tr)
 
 	outputLocation := "bq://project:flyte.table"
 	err := writeOutput(ctx, statusContext, outputLocation)
@@ -99,8 +99,7 @@ func TestOutputWriter(t *testing.T) {
 	assert.NoError(t, err)
 
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		or := args.Get(1).(io.OutputReader)
+	outputWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(ctx context.Context, or io.OutputReader) {
 		literals, ee, err := or.Read(ctx)
 		assert.NoError(t, err)
 
@@ -120,8 +119,8 @@ func TestOutputWriter(t *testing.T) {
 
 	execID := rand.String(3)
 	basePrefix := storage.DataReference("fake://bucket/prefix/" + execID)
-	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
-	statusContext.OnOutputWriter().Return(outputWriter)
+	outputWriter.EXPECT().GetOutputPath().Return(basePrefix + "/outputs.pb")
+	statusContext.EXPECT().OutputWriter().Return(outputWriter)
 
 	template = flyteIdlCore.TaskTemplate{
 		Interface: &flyteIdlCore.TypedInterface{
@@ -149,8 +148,8 @@ func TestOutputWriter(t *testing.T) {
 			},
 		},
 	}
-	tr.OnRead(ctx).Return(&template, nil)
-	statusContext.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(ctx).Return(&template, nil)
+	statusContext.EXPECT().TaskReader().Return(tr)
 	err = writeOutput(ctx, statusContext, outputLocation)
 	assert.NoError(t, err)
 }

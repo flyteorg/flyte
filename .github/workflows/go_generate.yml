@@ -6,9 +6,6 @@ on:
       component:
         required: true
         type: string
-      go-version:
-        required: true
-        type: string
     secrets:
       FLYTE_BOT_PAT:
         required: true
@@ -29,6 +26,6 @@ jobs:
           github_token: ${{ secrets.FLYTE_BOT_PAT }}
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.component }}/go.mod
       - name: Go generate and diff
         run: DELTA_CHECK=true make generate

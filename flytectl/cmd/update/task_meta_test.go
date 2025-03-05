@@ -137,12 +137,12 @@ func TestTaskMetadataUpdateFailsWhenTaskDoesNotExist(t *testing.T) {
 		core.ResourceType_TASK,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
-				OnGetNamedEntityMatch(
-					s.Ctx,
-					mock.Anything).
+				EXPECT().GetNamedEntity(
+				s.Ctx,
+				mock.Anything).
 				Return(nil, ext.NewNotFoundError("named entity not found"))
 			s.MockAdminClient.
-				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateNamedEntity(s.Ctx, mock.Anything).
 				Return(&admin.NamedEntityUpdateResponse{}, nil)
 		},
 		/* setup */ nil,
@@ -159,12 +159,12 @@ func TestTaskMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 		core.ResourceType_TASK,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
-				OnGetNamedEntityMatch(
-					s.Ctx,
-					mock.Anything).
+				EXPECT().GetNamedEntity(
+				s.Ctx,
+				mock.Anything).
 				Return(namedEntity, nil)
 			s.MockAdminClient.
-				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateNamedEntity(s.Ctx, mock.Anything).
 				Return(nil, fmt.Errorf("network error"))
 		},
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {

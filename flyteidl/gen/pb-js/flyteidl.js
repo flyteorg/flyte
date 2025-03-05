@@ -11008,6 +11008,7 @@
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
                  * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
+                 * @property {Array.<string>|null} [boundInputs] ArrayNode boundInputs
                  */
     
                 /**
@@ -11019,6 +11020,7 @@
                  * @param {flyteidl.core.IArrayNode=} [properties] Properties to set
                  */
                 function ArrayNode(properties) {
+                    this.boundInputs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -11080,6 +11082,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.dataMode = 0;
+    
+                /**
+                 * ArrayNode boundInputs.
+                 * @member {Array.<string>} boundInputs
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.boundInputs = $util.emptyArray;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11144,6 +11154,9 @@
                         $root.google.protobuf.BoolValue.encode(message.isOriginalSubNodeInterface, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     if (message.dataMode != null && message.hasOwnProperty("dataMode"))
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.dataMode);
+                    if (message.boundInputs != null && message.boundInputs.length)
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            writer.uint32(/* id 8, wireType 2 =*/66).string(message.boundInputs[i]);
                     return writer;
                 };
     
@@ -11185,6 +11198,11 @@
                             break;
                         case 7:
                             message.dataMode = reader.int32();
+                            break;
+                        case 8:
+                            if (!(message.boundInputs && message.boundInputs.length))
+                                message.boundInputs = [];
+                            message.boundInputs.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11249,6 +11267,13 @@
                         case 1:
                             break;
                         }
+                    if (message.boundInputs != null && message.hasOwnProperty("boundInputs")) {
+                        if (!Array.isArray(message.boundInputs))
+                            return "boundInputs: array expected";
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            if (!$util.isString(message.boundInputs[i]))
+                                return "boundInputs: string[] expected";
+                    }
                     return null;
                 };
     
@@ -24804,6 +24829,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {string|null} [outputPrefix] GetTaskRequest outputPrefix
                  */
     
                 /**
@@ -24846,6 +24872,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest outputPrefix.
+                 * @member {string} outputPrefix
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.outputPrefix = "";
+    
+                /**
                  * Creates a new GetTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -24875,6 +24909,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.outputPrefix);
                     return writer;
                 };
     
@@ -24904,6 +24940,9 @@
                             break;
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.outputPrefix = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24935,6 +24974,9 @@
                         if (error)
                             return "taskCategory." + error;
                     }
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        if (!$util.isString(message.outputPrefix))
+                            return "outputPrefix: string expected";
                     return null;
                 };
     
@@ -29495,6 +29537,7 @@
                  * @memberof flyteidl.admin
                  * @interface IEmailNotification
                  * @property {Array.<string>|null} [recipientsEmail] EmailNotification recipientsEmail
+                 * @property {string|null} [template] EmailNotification template
                  */
     
                 /**
@@ -29520,6 +29563,14 @@
                  * @instance
                  */
                 EmailNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * EmailNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.EmailNotification
+                 * @instance
+                 */
+                EmailNotification.prototype.template = "";
     
                 /**
                  * Creates a new EmailNotification instance using the specified properties.
@@ -29548,6 +29599,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29573,6 +29626,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29600,6 +29656,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29613,6 +29672,7 @@
                  * @memberof flyteidl.admin
                  * @interface IPagerDutyNotification
                  * @property {Array.<string>|null} [recipientsEmail] PagerDutyNotification recipientsEmail
+                 * @property {string|null} [template] PagerDutyNotification template
                  */
     
                 /**
@@ -29638,6 +29698,14 @@
                  * @instance
                  */
                 PagerDutyNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * PagerDutyNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.PagerDutyNotification
+                 * @instance
+                 */
+                PagerDutyNotification.prototype.template = "";
     
                 /**
                  * Creates a new PagerDutyNotification instance using the specified properties.
@@ -29666,6 +29734,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29691,6 +29761,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29718,6 +29791,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29731,6 +29807,7 @@
                  * @memberof flyteidl.admin
                  * @interface ISlackNotification
                  * @property {Array.<string>|null} [recipientsEmail] SlackNotification recipientsEmail
+                 * @property {string|null} [template] SlackNotification template
                  */
     
                 /**
@@ -29756,6 +29833,14 @@
                  * @instance
                  */
                 SlackNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * SlackNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.SlackNotification
+                 * @instance
+                 */
+                SlackNotification.prototype.template = "";
     
                 /**
                  * Creates a new SlackNotification instance using the specified properties.
@@ -29784,6 +29869,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29809,6 +29896,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29836,6 +29926,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     

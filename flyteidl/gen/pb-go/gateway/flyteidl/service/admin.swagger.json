@@ -4778,6 +4778,10 @@
             "type": "string"
           },
           "title": "The list of email addresses recipients for this notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines an email notification specification."
@@ -5849,6 +5853,10 @@
             "type": "string"
           },
           "title": "Currently, PagerDuty notifications leverage email to trigger a notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines a pager duty notification specification."
@@ -6082,6 +6090,10 @@
             "type": "string"
           },
           "title": "Currently, Slack notifications leverage email to trigger a notification.\n+required"
+        },
+        "template": {
+          "type": "string",
+          "title": "The template to use for this notification.\n+optional"
         }
       },
       "description": "Defines a slack notification specification."
@@ -6665,6 +6677,13 @@
         "data_mode": {
           "$ref": "#/definitions/ArrayNodeDataMode",
           "title": "data_mode determines how input data is passed to the sub-nodes"
+        },
+        "bound_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "+optional. Specifies input bindings that are not mapped over for the node."
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."

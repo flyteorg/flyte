@@ -234,7 +234,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil, nil)
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
 		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
@@ -245,7 +245,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.EXPECT().CreateLaunchPlan(mock.Anything, mock.Anything).Return(nil, nil)
 		variableMap := map[string]*core.Variable{
 			"var1": {
 				Type: &core.LiteralType{
@@ -287,7 +287,7 @@ func TestRegisterFile(t *testing.T) {
 				},
 			},
 		}
-		s.FetcherExt.OnFetchWorkflowVersionMatch(s.Ctx, "core.scheduled_workflows.lp_schedules.date_formatter_wf", mock.Anything, "dummyProject", "dummyDomain").Return(wf, nil)
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(s.Ctx, "core.scheduled_workflows.lp_schedules.date_formatter_wf", mock.Anything, "dummyProject", "dummyDomain").Return(wf, nil)
 		args := []string{"testdata/152_my_cron_scheduled_lp_3.pb"}
 		var registerResults []Result
 		results, err := registerFile(s.Ctx, args[0], registerResults, s.CmdCtx, "", *rconfig.DefaultFilesConfig)
@@ -324,7 +324,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.AlreadyExists, "AlreadyExists"))
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
@@ -338,7 +338,7 @@ func TestRegisterFile(t *testing.T) {
 		s := testutils.Setup(t)
 
 		registerFilesSetup()
-		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+		s.MockAdminClient.EXPECT().CreateTask(mock.Anything, mock.Anything).Return(nil,
 			status.Error(codes.InvalidArgument, "Invalid"))
 		args := []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
@@ -403,7 +403,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
 		Client = store
-		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).EXPECT().CreateUploadLocation(s.Ctx, &service.CreateUploadLocationRequest{
 			Project:    "flytesnacks",
 			Domain:     "development",
 			Filename:   "flytesnacks-core.tgz",
@@ -422,7 +422,7 @@ func TestUploadFastRegisterArtifact(t *testing.T) {
 		}, testScope.NewSubScope("flytectl"))
 		assert.Nil(t, err)
 		Client = store
-		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).OnCreateUploadLocationMatch(s.Ctx, &service.CreateUploadLocationRequest{
+		s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient).EXPECT().CreateUploadLocation(s.Ctx, &service.CreateUploadLocationRequest{
 			Project:    "flytesnacks",
 			Domain:     "development",
 			Filename:   "flytesnacks-core.tgz",
@@ -456,7 +456,7 @@ func TestGetStorageClient(t *testing.T) {
 func TestGetAllFlytesnacksExample(t *testing.T) {
 	t.Run("Failed to get manifest with wrong name", func(t *testing.T) {
 		mockGh := &ghMocks.GHRepoService{}
-		mockGh.OnGetLatestReleaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, fmt.Errorf("failed"))
+		mockGh.EXPECT().GetLatestRelease(mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, fmt.Errorf("failed"))
 		_, _, err := getAllExample("no////ne", "", mockGh)
 		assert.NotNil(t, err)
 	})
@@ -464,7 +464,7 @@ func TestGetAllFlytesnacksExample(t *testing.T) {
 		mockGh := &ghMocks.GHRepoService{}
 		tag := "v0.15.0"
 		sandboxManifest := "flyte_sandbox_manifest.tgz"
-		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
+		mockGh.EXPECT().GetReleaseByTag(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&github.RepositoryRelease{
 			TagName: &tag,
 			Assets: []*github.ReleaseAsset{{
 				Name: &sandboxManifest,
@@ -477,7 +477,7 @@ func TestGetAllFlytesnacksExample(t *testing.T) {
 		mockGh := &ghMocks.GHRepoService{}
 		tag := "v0.15.0"
 		sandboxManifest := "flyte_sandbox_manifest.tgz"
-		mockGh.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, tag).Return(&github.RepositoryRelease{
+		mockGh.EXPECT().GetReleaseByTag(mock.Anything, mock.Anything, mock.Anything, tag).Return(&github.RepositoryRelease{
 			TagName: &tag,
 			Assets: []*github.ReleaseAsset{{
 				Name: &sandboxManifest,
@@ -756,7 +756,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 
 		registerFilesSetup()
 
-		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -782,7 +782,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 
 		registerFilesSetup()
 
-		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -845,7 +845,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -908,7 +908,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",
@@ -1002,7 +1002,7 @@ func TestValidateLaunchSpec(t *testing.T) {
 				},
 			},
 		}
-		s.FetcherExt.OnFetchWorkflowVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.FetcherExt.EXPECT().FetchWorkflowVersion(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		lpSpec := &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
 				Project: "projectValue",

@@ -167,6 +167,9 @@ message ArrayNode {
 
     // data_mode determines how input data is passed to the sub-nodes
     DataMode data_mode = 7;
+
+    //+optional. Specifies input bindings that are not mapped over for the node.
+    repeated string bound_inputs = 8;
 }
 
 // Defines extra information about the Node.

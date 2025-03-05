@@ -25,7 +25,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -37,7 +37,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 
 		deleteTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(fmt.Errorf("failed to delete project domain attributes"))
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -52,7 +52,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_task_attribute.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -66,7 +66,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -81,7 +81,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(fmt.Errorf("failed to delete workflow attribute"))
 		err := deleteTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -97,7 +97,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_workflow_task_attribute.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -112,7 +112,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = testDataNonExistentFile
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)

@@ -420,7 +420,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
 		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
 		assert.NoError(t, err)
-		mockClient.OnGetLaunchPlanMatch(
+		mockClient.EXPECT().GetLaunchPlan(
 			ctx,
 			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
 		).Return(&admin.LaunchPlan{Id: id}, nil)
@@ -433,7 +433,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
 		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
 		assert.NoError(t, err)
-		mockClient.OnGetLaunchPlanMatch(
+		mockClient.EXPECT().GetLaunchPlan(
 			ctx,
 			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
 		).Return(nil, status.Error(codes.NotFound, ""))
@@ -579,8 +579,8 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 
 			iwMock := &mocks2.ItemWrapper{}
 			i := tc.cacheItem
-			iwMock.OnGetItem().Return(i)
-			iwMock.OnGetID().Return("id")
+			iwMock.EXPECT().GetItem().Return(i)
+			iwMock.EXPECT().GetID().Return("id")
 
 			mockClient.On("GetExecution", mock.Anything, mock.Anything).Return(tc.getExecutionResp, tc.getExecutionError)
 			mockClient.On("GetExecutionData", mock.Anything, mock.Anything).Return(tc.getExecutionDataResp, tc.getExecutionDataError)

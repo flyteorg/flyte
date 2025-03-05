@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-//go:generate mockery-v2 --name=ProjectInterface --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=ProjectInterface --output=../mocks --case=underscore --with-expecter
 
 // Interface for managing projects (and domains).
 type ProjectInterface interface {

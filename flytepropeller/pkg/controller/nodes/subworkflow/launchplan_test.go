@@ -234,43 +234,43 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 
 		ir := &mocks4.InputReader{}
 		inputs := &core.LiteralMap{}
-		ir.OnGetMatch(mock.Anything).Return(inputs, nil)
-		nCtx.OnInputReader().Return(ir)
+		ir.EXPECT().Get(mock.Anything).Return(inputs, nil)
+		nCtx.EXPECT().InputReader().Return(ir)
 
 		nm := &mocks3.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      "n",
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
 
-		nCtx.OnNodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		ectx.OnGetEventVersion().Return(1)
-		ectx.OnGetParentInfo().Return(nil)
-		ectx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		ectx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		ectx.EXPECT().GetEventVersion().Return(1)
+		ectx.EXPECT().GetParentInfo().Return(nil)
+		ectx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
 				WorkflowExecutionIdentifier: recoveredExecID,
 			},
 		})
-		ectx.OnIncrementParallelism().Return(1)
-		ectx.OnGetSecurityContext().Return(core.SecurityContext{})
-		ectx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-		ectx.OnGetLabels().Return(nil)
-		ectx.OnGetAnnotations().Return(nil)
+		ectx.EXPECT().IncrementParallelism().Return(1)
+		ectx.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+		ectx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+		ectx.EXPECT().GetLabels().Return(nil)
+		ectx.EXPECT().GetAnnotations().Return(nil)
 
-		nCtx.OnExecutionContext().Return(ectx)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnNode().Return(mockNode)
+		nCtx.EXPECT().ExecutionContext().Return(ectx)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().Node().Return(mockNode)
 
 		s, err := h.StartLaunchPlan(ctx, nCtx)
 		assert.NoError(t, err)
@@ -389,7 +389,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, op, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
+		nCtx.EXPECT().DataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
@@ -431,7 +431,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, op, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
+		nCtx.EXPECT().DataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseSuccess)
@@ -596,7 +596,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
+		nCtx.EXPECT().DataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
@@ -630,7 +630,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, &core.LiteralMap{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
+		nCtx.EXPECT().DataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase().String(), handler.EPhaseUndefined.String())
@@ -680,8 +680,8 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 		}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetName().Return("name")
-		nCtx.OnExecutionContext().Return(eCtx)
+		eCtx.EXPECT().GetName().Return("name")
+		nCtx.EXPECT().ExecutionContext().Return(eCtx)
 		err := h.HandleAbort(ctx, nCtx, "some reason")
 		assert.NoError(t, err)
 	})

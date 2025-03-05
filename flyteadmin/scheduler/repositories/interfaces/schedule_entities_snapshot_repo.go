@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 )
 
-//go:generate mockery -name=ScheduleEntitiesSnapShotRepoInterface -output=../mocks -case=underscore
+//go:generate mockery --name=ScheduleEntitiesSnapShotRepoInterface --output=../mocks --case=underscore --with-expecter
 
 // ScheduleEntitiesSnapShotRepoInterface : An Interface for interacting with the snapshot of schedulable entities in the database
 type ScheduleEntitiesSnapShotRepoInterface interface {

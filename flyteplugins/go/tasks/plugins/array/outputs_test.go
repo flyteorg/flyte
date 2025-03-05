@@ -43,7 +43,7 @@ func TestOutputAssembler_Queue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &mocks.IndexedWorkQueue{}
-			q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+			q.EXPECT().Queue(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 
 			o := OutputAssembler{
 				IndexedWorkQueue: q,
@@ -70,9 +70,9 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 
 		// Setup the expected data to be written to outputWriter.
 		ow := &mocks2.OutputWriter{}
-		ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
-		ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
-		ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
+		ow.EXPECT().GetOutputPrefixPath().Return("/bucket/prefix")
+		ow.EXPECT().GetOutputPath().Return("/bucket/prefix/outputs.pb")
+		ow.EXPECT().GetRawOutputPrefix().Return("/bucket/sandbox/")
 
 		// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
 		phases := arrayCore.NewPhasesCompactArray(0)
@@ -124,9 +124,9 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 
 		// Setup the expected data to be written to outputWriter.
 		ow := &mocks2.OutputWriter{}
-		ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
-		ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
-		ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
+		ow.EXPECT().GetOutputPrefixPath().Return("/bucket/prefix")
+		ow.EXPECT().GetOutputPath().Return("/bucket/prefix/outputs.pb")
+		ow.EXPECT().GetRawOutputPrefix().Return("/bucket/sandbox/")
 
 		// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
 		phases := arrayCore.NewPhasesCompactArray(4)
@@ -222,29 +222,29 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		}
 
 		info := &mocks.WorkItemInfo{}
-		info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-		q.OnGet("found").Return(info, true, nil)
+		info.EXPECT().Status().Return(workqueue.WorkStatusSucceeded)
+		q.EXPECT().Get("found").Return(info, true, nil)
 
 		s := &arrayCore.State{}
 
 		tID := &mocks3.TaskExecutionID{}
-		tID.OnGetGeneratedName().Return("found")
+		tID.EXPECT().GetGeneratedName().Return("found")
 
 		tMeta := &mocks3.TaskExecutionMetadata{}
-		tMeta.OnGetTaskExecutionID().Return(tID)
+		tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 		ow := &mocks2.OutputWriter{}
-		ow.OnPutMatch(mock.Anything, mock.Anything).Return(nil)
-		ow.OnGetOutputPath().Return("/location/prefix/outputs.pb")
-		ow.OnGetErrorPath().Return("/location/prefix/error.pb")
+		ow.EXPECT().Put(mock.Anything, mock.Anything).Return(nil)
+		ow.EXPECT().GetOutputPath().Return("/location/prefix/outputs.pb")
+		ow.EXPECT().GetErrorPath().Return("/location/prefix/error.pb")
 
 		d, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		tCtx := &mocks3.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(tMeta)
-		tCtx.OnOutputWriter().Return(ow)
-		tCtx.OnDataStore().Return(d)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+		tCtx.EXPECT().OutputWriter().Return(ow)
+		tCtx.EXPECT().DataStore().Return(d)
 
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
@@ -269,21 +269,21 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		}
 
 		info := &mocks.WorkItemInfo{}
-		info.OnStatus().Return(workqueue.WorkStatusFailed)
-		info.OnError().Return(fmt.Errorf("expected error"))
+		info.EXPECT().Status().Return(workqueue.WorkStatusFailed)
+		info.EXPECT().Error().Return(fmt.Errorf("expected error"))
 
-		q.OnGet("found_failed").Return(info, true, nil)
+		q.EXPECT().Get("found_failed").Return(info, true, nil)
 
 		s := &arrayCore.State{}
 
 		tID := &mocks3.TaskExecutionID{}
-		tID.OnGetGeneratedName().Return("found_failed")
+		tID.EXPECT().GetGeneratedName().Return("found_failed")
 
 		tMeta := &mocks3.TaskExecutionMetadata{}
-		tMeta.OnGetTaskExecutionID().Return(tID)
+		tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 		tCtx := &mocks3.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(tMeta)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 		_, err := AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
@@ -308,9 +308,9 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		}
 
 		info := &mocks.WorkItemInfo{}
-		info.OnStatus().Return(workqueue.WorkStatusSucceeded)
-		q.OnGet("notfound").Return(nil, false, nil).Once()
-		q.OnGet("notfound").Return(info, true, nil).Once()
+		info.EXPECT().Status().Return(workqueue.WorkStatusSucceeded)
+		q.EXPECT().Get("notfound").Return(nil, false, nil).Once()
+		q.EXPECT().Get("notfound").Return(info, true, nil).Once()
 
 		detailedStatus := arrayCore.NewPhasesCompactArray(2)
 		detailedStatus.SetItem(0, bitarray.Item(pluginCore.PhaseSuccess))
@@ -327,13 +327,13 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		}
 
 		tID := &mocks3.TaskExecutionID{}
-		tID.OnGetGeneratedName().Return("notfound")
+		tID.EXPECT().GetGeneratedName().Return("notfound")
 
 		tMeta := &mocks3.TaskExecutionMetadata{}
-		tMeta.OnGetTaskExecutionID().Return(tID)
+		tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 		tReader := &mocks3.TaskReader{}
-		tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
+		tReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
@@ -351,9 +351,9 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		assert.NoError(t, ds.WriteProtobuf(ctx, "/prefix/outputs.pb", storage.Options{}, taskOutput.GetMap()))
 
 		ow := &mocks2.OutputWriter{}
-		ow.OnGetOutputPrefixPath().Return("/prefix/")
-		ow.OnGetOutputPath().Return("/prefix/outputs.pb")
-		ow.OnGetErrorPath().Return("/prefix/error.pb")
+		ow.EXPECT().GetOutputPrefixPath().Return("/prefix/")
+		ow.EXPECT().GetOutputPath().Return("/prefix/outputs.pb")
+		ow.EXPECT().GetErrorPath().Return("/prefix/error.pb")
 		ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, or io.OutputReader) error {
 			m, ee, err := or.Read(ctx)
 			assert.NoError(t, err)
@@ -364,10 +364,10 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		})
 
 		tCtx := &mocks3.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(tMeta)
-		tCtx.OnTaskReader().Return(tReader)
-		tCtx.OnOutputWriter().Return(ow)
-		tCtx.OnDataStore().Return(ds)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+		tCtx.EXPECT().TaskReader().Return(tReader)
+		tCtx.EXPECT().OutputWriter().Return(ow)
+		tCtx.EXPECT().DataStore().Return(ds)
 
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)
@@ -404,9 +404,9 @@ func Test_assembleErrorsWorker_Process(t *testing.T) {
 
 	// Setup the expected data to be written to outputWriter.
 	ow := &mocks2.OutputWriter{}
-	ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
-	ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
-	ow.OnGetErrorPath().Return("/bucket/prefix/error.pb")
+	ow.EXPECT().GetRawOutputPrefix().Return("/bucket/sandbox/")
+	ow.EXPECT().GetOutputPrefixPath().Return("/bucket/prefix")
+	ow.EXPECT().GetErrorPath().Return("/bucket/prefix/error.pb")
 	ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, reader io.OutputReader) error {
 		// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
 

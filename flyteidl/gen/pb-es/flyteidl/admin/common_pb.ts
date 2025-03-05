@@ -876,6 +876,14 @@ export class EmailNotification extends Message<EmailNotification> {
    */
   recipientsEmail: string[] = [];
 
+  /**
+   * The template to use for this notification.
+   * +optional
+   *
+   * @generated from field: string template = 2;
+   */
+  template = "";
+
   constructor(data?: PartialMessage<EmailNotification>) {
     super();
     proto3.util.initPartial(data, this);
@@ -885,6 +893,7 @@ export class EmailNotification extends Message<EmailNotification> {
   static readonly typeName = "flyteidl.admin.EmailNotification";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "recipients_email", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EmailNotification {
@@ -918,6 +927,14 @@ export class PagerDutyNotification extends Message<PagerDutyNotification> {
    */
   recipientsEmail: string[] = [];
 
+  /**
+   * The template to use for this notification.
+   * +optional
+   *
+   * @generated from field: string template = 2;
+   */
+  template = "";
+
   constructor(data?: PartialMessage<PagerDutyNotification>) {
     super();
     proto3.util.initPartial(data, this);
@@ -927,6 +944,7 @@ export class PagerDutyNotification extends Message<PagerDutyNotification> {
   static readonly typeName = "flyteidl.admin.PagerDutyNotification";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "recipients_email", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PagerDutyNotification {
@@ -960,6 +978,14 @@ export class SlackNotification extends Message<SlackNotification> {
    */
   recipientsEmail: string[] = [];
 
+  /**
+   * The template to use for this notification.
+   * +optional
+   *
+   * @generated from field: string template = 2;
+   */
+  template = "";
+
   constructor(data?: PartialMessage<SlackNotification>) {
     super();
     proto3.util.initPartial(data, this);
@@ -969,6 +995,7 @@ export class SlackNotification extends Message<SlackNotification> {
   static readonly typeName = "flyteidl.admin.SlackNotification";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "recipients_email", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SlackNotification {

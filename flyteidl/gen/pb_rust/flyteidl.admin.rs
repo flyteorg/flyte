@@ -145,6 +145,9 @@ pub struct GetTaskRequest {
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="3")]
     pub task_category: ::core::option::Option<TaskCategory>,
+    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+    #[prost(string, tag="4")]
+    pub output_prefix: ::prost::alloc::string::String,
 }
 /// Response to get an individual task resource.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -706,6 +709,10 @@ pub struct EmailNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a pager duty notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -715,6 +722,10 @@ pub struct PagerDutyNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a slack notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -724,6 +735,10 @@ pub struct SlackNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Represents a structure for notifications based on execution status.
 /// The notification content is configured within flyte admin but can be templatized.

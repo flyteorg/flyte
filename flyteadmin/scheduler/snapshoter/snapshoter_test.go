@@ -50,7 +50,7 @@ func TestSnapShoterRead(t *testing.T) {
 			},
 			Snapshot: f.Bytes(),
 		}
-		snapshotRepo.OnRead(context.Background()).Return(snapshotModel, nil)
+		snapshotRepo.EXPECT().Read(context.Background()).Return(snapshotModel, nil)
 
 		reader := &VersionedSnapshot{}
 		snapshotVal, err := snapshoter.Read(context.Background(), reader)
@@ -62,7 +62,7 @@ func TestSnapShoterRead(t *testing.T) {
 		snapshoter := setupSnapShoter("TestSnapShoterReadUnsuccessfulReadIgnoreError")
 		snapshotRepo := db.ScheduleEntitiesSnapshotRepo().(*schedMocks.ScheduleEntitiesSnapShotRepoInterface)
 
-		snapshotRepo.OnRead(context.Background()).Return(models.ScheduleEntitiesSnapshot{}, errors.GetSingletonMissingEntityError("schedule_entities_snapshots"))
+		snapshotRepo.EXPECT().Read(context.Background()).Return(models.ScheduleEntitiesSnapshot{}, errors.GetSingletonMissingEntityError("schedule_entities_snapshots"))
 
 		reader := &VersionedSnapshot{}
 		snapshotVal, err := snapshoter.Read(context.Background(), reader)
@@ -74,7 +74,7 @@ func TestSnapShoterRead(t *testing.T) {
 		snapshoter := setupSnapShoter("TestSnapShoterReadUnsuccessfulReadDontIgnoreError")
 		snapshotRepo := db.ScheduleEntitiesSnapshotRepo().(*schedMocks.ScheduleEntitiesSnapShotRepoInterface)
 
-		snapshotRepo.OnRead(context.Background()).Return(models.ScheduleEntitiesSnapshot{}, errors.GetInvalidInputError("invalid input"))
+		snapshotRepo.EXPECT().Read(context.Background()).Return(models.ScheduleEntitiesSnapshot{}, errors.GetInvalidInputError("invalid input"))
 
 		reader := &VersionedSnapshot{}
 		_, err := snapshoter.Read(context.Background(), reader)
@@ -104,7 +104,7 @@ func TestSnapShoterSave(t *testing.T) {
 		},
 		Snapshot: f.Bytes(),
 	}
-	snapshotRepo.OnWrite(context.Background(), snapshotModel).Return(nil)
+	snapshotRepo.EXPECT().Write(context.Background(), snapshotModel).Return(nil)
 
 	snapshoter.Save(context.Background(), writer, snapshot)
 }

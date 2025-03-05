@@ -33,7 +33,7 @@ func getAttributeMatchFetcherSetup() {
 
 func TestFetchWorkflowAttributes(t *testing.T) {
 	getAttributeMatchFetcherSetup()
-	adminClient.OnGetWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(wResp, nil)
+	adminClient.EXPECT().GetWorkflowAttributes(mock.Anything, mock.Anything).Return(wResp, nil)
 	_, err := adminFetcherExt.FetchWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 	assert.Nil(t, err)
 }
@@ -41,14 +41,14 @@ func TestFetchWorkflowAttributes(t *testing.T) {
 func TestFetchWorkflowAttributesError(t *testing.T) {
 	t.Run("failed api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
-		adminClient.OnGetWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		adminClient.EXPECT().GetWorkflowAttributes(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		_, err := adminFetcherExt.FetchWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 		assert.Equal(t, fmt.Errorf("failed"), err)
 	})
 	t.Run("empty data from api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
 		wResp := &admin.WorkflowAttributesGetResponse{}
-		adminClient.OnGetWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(wResp, nil)
+		adminClient.EXPECT().GetWorkflowAttributes(mock.Anything, mock.Anything).Return(wResp, nil)
 		_, err := adminFetcherExt.FetchWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
 		assert.True(t, IsNotFoundError(err))
@@ -58,7 +58,7 @@ func TestFetchWorkflowAttributesError(t *testing.T) {
 
 func TestFetchProjectDomainAttributes(t *testing.T) {
 	getAttributeMatchFetcherSetup()
-	adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
+	adminClient.EXPECT().GetProjectDomainAttributes(mock.Anything, mock.Anything).Return(pResp, nil)
 	_, err := adminFetcherExt.FetchProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 	assert.Nil(t, err)
 }
@@ -66,14 +66,14 @@ func TestFetchProjectDomainAttributes(t *testing.T) {
 func TestFetchProjectDomainAttributesError(t *testing.T) {
 	t.Run("failed api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
-		adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		adminClient.EXPECT().GetProjectDomainAttributes(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		_, err := adminFetcherExt.FetchProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 		assert.Equal(t, fmt.Errorf("failed"), err)
 	})
 	t.Run("empty data from api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
 		pResp := &admin.ProjectDomainAttributesGetResponse{}
-		adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
+		adminClient.EXPECT().GetProjectDomainAttributes(mock.Anything, mock.Anything).Return(pResp, nil)
 		_, err := adminFetcherExt.FetchProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
 		assert.True(t, IsNotFoundError(err))
@@ -84,14 +84,14 @@ func TestFetchProjectDomainAttributesError(t *testing.T) {
 func TestFetchProjectAttributesError(t *testing.T) {
 	t.Run("failed api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
-		adminClient.OnGetProjectAttributesMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+		adminClient.EXPECT().GetProjectAttributes(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		_, err := adminFetcherExt.FetchProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
 		assert.Equal(t, fmt.Errorf("failed"), err)
 	})
 	t.Run("empty data from api", func(t *testing.T) {
 		getAttributeMatchFetcherSetup()
 		pResp := &admin.ProjectAttributesGetResponse{}
-		adminClient.OnGetProjectAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
+		adminClient.EXPECT().GetProjectAttributes(mock.Anything, mock.Anything).Return(pResp, nil)
 		_, err := adminFetcherExt.FetchProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
 		assert.True(t, IsNotFoundError(err))

@@ -59,7 +59,7 @@ func TestListExecutionFunc(t *testing.T) {
 	executionList := &admin.ExecutionList{
 		Executions: executions,
 	}
-	s.FetcherExt.OnListExecutionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executionList, nil)
+	s.FetcherExt.EXPECT().ListExecution(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executionList, nil)
 	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "ListExecution", s.Ctx, projectValue, domainValue, execution.DefaultConfig.Filter)
@@ -93,7 +93,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 	}
 	s := testutils.Setup(t)
 
-	s.FetcherExt.OnListExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
+	s.FetcherExt.EXPECT().ListExecution(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
 	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("executions NotFound"))
@@ -129,7 +129,7 @@ func TestGetExecutionFunc(t *testing.T) {
 	args := []string{executionNameValue}
 	s := testutils.Setup(t)
 
-	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(executionResponse, nil)
+	s.FetcherExt.EXPECT().FetchExecution(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(executionResponse, nil)
 	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "FetchExecution", s.Ctx, executionNameValue, projectValue, domainValue)
@@ -143,8 +143,8 @@ func TestGetExecutionFuncForDetails(t *testing.T) {
 	mockFetcherExt := s.FetcherExt
 	execution.DefaultConfig.Details = true
 	args := []string{dummyExec}
-	mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
-	mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nil, fmt.Errorf("unable to fetch details"))
+	mockFetcherExt.EXPECT().FetchExecution(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+	mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nil, fmt.Errorf("unable to fetch details"))
 	err := getExecutionFunc(ctx, args, mockCmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf("unable to fetch details"), err)
@@ -206,12 +206,12 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 				Literals: outputs,
 			},
 		}
-		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+		mockFetcherExt.EXPECT().FetchExecution(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
 		}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionData(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
 
 		err := getExecutionFunc(ctx, args, mockCmdCtx)
 		assert.Nil(t, err)
@@ -232,12 +232,12 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 
 		nodeExecutions := []*admin.NodeExecution{nodeExec1}
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
-		mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+		mockFetcherExt.EXPECT().FetchExecution(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
 		}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("error in fetching data"))
+		mockFetcherExt.EXPECT().FetchNodeExecutionData(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("error in fetching data"))
 
 		err := getExecutionFunc(ctx, args, mockCmdCtx)
 		assert.NotNil(t, err)
@@ -317,12 +317,12 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 				},
 			}
 
-			mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
-			mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-			mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+			mockFetcherExt.EXPECT().FetchExecution(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+			mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+			mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
 				TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
 			}, nil)
-			mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+			mockFetcherExt.EXPECT().FetchNodeExecutionData(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
 			got := getExecutionFunc(ctx, args, mockCmdCtx)
 			assert.Equal(t, tt.want, got)
 		}
@@ -360,7 +360,7 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 	args := []string{executionNameValue}
 	s := testutils.Setup(t)
 
-	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("execution NotFound"))
+	s.FetcherExt.EXPECT().FetchExecution(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("execution NotFound"))
 	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("execution NotFound"))

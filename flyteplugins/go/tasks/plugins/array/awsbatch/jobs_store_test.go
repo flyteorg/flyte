@@ -204,11 +204,11 @@ func Test_syncBatches(t *testing.T) {
 		}}, 2)
 
 		i := &mocks3.ItemWrapper{}
-		i.OnGetItem().Return(&Job{
+		i.EXPECT().GetItem().Return(&Job{
 			ID:      "job",
 			SubJobs: createSubJobList(3),
 		})
-		i.OnGetID().Return("job")
+		i.EXPECT().GetID().Return("job")
 
 		var resp []cache.ItemSyncResponse
 		var err error
@@ -239,11 +239,11 @@ func Test_syncBatches(t *testing.T) {
 		}}, 10)
 
 		i := &mocks3.ItemWrapper{}
-		i.OnGetItem().Return(&Job{
+		i.EXPECT().GetItem().Return(&Job{
 			ID:      "job",
 			SubJobs: createSubJobList(3),
 		})
-		i.OnGetID().Return("job")
+		i.EXPECT().GetID().Return("job")
 
 		var resp []cache.ItemSyncResponse
 		var err error

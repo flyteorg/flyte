@@ -160,7 +160,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 
 	repo := repositoryMocks.NewMockRepository()
 	repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-		OnGetMatch(mock.Anything, mock.Anything).Return(
+		EXPECT().Get(mock.Anything, mock.Anything).Return(
 		models.Signal{
 			Type: typeBytes,
 		},
@@ -211,7 +211,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	t.Run("MissingSignal", func(t *testing.T) {
 		repo := repositoryMocks.NewMockRepository()
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-			OnGetMatch(mock.Anything, mock.Anything).Return(models.Signal{}, errors.New("foo"))
+			EXPECT().Get(mock.Anything, mock.Anything).Return(models.Signal{}, errors.New("foo"))
 
 		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
@@ -250,7 +250,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 
 		repo := repositoryMocks.NewMockRepository()
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-			OnGetMatch(mock.Anything, mock.Anything).Return(
+			EXPECT().Get(mock.Anything, mock.Anything).Return(
 			models.Signal{
 				Type: typeBytes,
 			},
@@ -298,7 +298,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		// Mock the repository to return a signal with this unsupported type
 		repo := repositoryMocks.NewMockRepository()
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-			OnGetMatch(mock.Anything, mock.Anything).Return(
+			EXPECT().Get(mock.Anything, mock.Anything).Return(
 			models.Signal{
 				Type: unsupportedLiteralTypeBytes, // Set the unsupported type
 			},

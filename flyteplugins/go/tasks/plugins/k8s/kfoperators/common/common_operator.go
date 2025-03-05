@@ -89,7 +89,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 }
 
 // GetLogs will return the logs for kubeflow job
-func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
+func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, taskTemplate *core.TaskTemplate, hasMaster bool,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
@@ -125,6 +125,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 				PodUnixStartTime:     startTime,
 				PodUnixFinishTime:    finishTime,
 				TaskExecutionID:      taskExecID,
+				TaskTemplate:         taskTemplate,
 			},
 		)
 		if masterErr != nil {
@@ -143,6 +144,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodUnixStartTime:     startTime,
 			PodUnixFinishTime:    finishTime,
 			TaskExecutionID:      taskExecID,
+			TaskTemplate:         taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -160,6 +162,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -172,6 +175,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-chiefReplica-%d", 0),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -184,6 +188,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-evaluatorReplica-%d", 0),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -328,6 +333,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
 		}
+		*resources = flytek8s.ApplyK8sResourceOverrides(taskCtx.TaskExecutionMetadata(), resources)
 		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
 	}
 	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
