@@ -17,35 +17,88 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-func GetAuthorizationInterceptor(authCtx interfaces.AuthenticationContext) (grpc.UnaryServerInterceptor, error) {
+// RbacInterceptor is a gRPC interceptor that enforces RBAC or role based access control.
+type RbacInterceptor struct {
+	compiledPoliciesByRole       map[string]compiledAuthorizationPolicy
+	compiledBypassMethodPatterns []*regexp.Regexp
+	cfg                          config.Rbac
+}
 
-	noopFunc := func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		return nil, nil
+// compiledRule is a rule with compiled/validated regexes
+type compiledRule struct {
+	methodPattern *regexp.Regexp
+	project       string
+	domain        string
+	name          string
+}
+
+func newCompiledRule(methodPattern *regexp.Regexp, project, domain, name string) compiledRule {
+	return compiledRule{
+		methodPattern: methodPattern,
+		project:       project,
+		domain:        domain,
+		name:          name,
 	}
+}
 
-	opts := authCtx.Options().Rbac
-	for _, policy := range opts.Policies {
-		// FIXME: Move this to somewhere else?
-		err := validatePolicy(policy)
+// compiledAuthorizationPolicy is a policy with compiled/validated regexes
+type compiledAuthorizationPolicy struct {
+	role  string
+	rules []compiledRule
+}
+
+func newAuthorizationPolicy(role string, rules []compiledRule) compiledAuthorizationPolicy {
+	return compiledAuthorizationPolicy{
+		role:  role,
+		rules: rules,
+	}
+}
+
+// NewRbacInterceptor initializes a new RbacInterceptor and does validation on the RBAC config
+func NewRbacInterceptor(authCtx interfaces.AuthenticationContext) (*RbacInterceptor, error) {
+	cfg := authCtx.Options().Rbac
+
+	compiledPoliciesByRole := map[string]compiledAuthorizationPolicy{}
+
+	// Validate policies
+	for _, policy := range cfg.Policies {
+		compiledPolicy, err := validatePolicy(policy)
 		if err != nil {
-			return noopFunc, fmt.Errorf("failed to validate authorization policy: %w", err)
+			return nil, fmt.Errorf("validating authorization policy: %w", err)
 		}
+
+		_, exists := compiledPoliciesByRole[compiledPolicy.role]
+		if exists {
+			return nil, fmt.Errorf("found authorization policies with conflicting role %s", compiledPolicy.role)
+		}
+
+		compiledPoliciesByRole[compiledPolicy.role] = compiledPolicy
 	}
 
 	bypassMethodPatterns := []*regexp.Regexp{}
 
-	for _, allowedMethod := range opts.BypassMethodPatterns {
+	for _, allowedMethod := range cfg.BypassMethodPatterns {
+		// compile regexes and cache them
 		compiled, err := regexp.Compile(allowedMethod)
 		if err != nil {
-			return noopFunc, fmt.Errorf("compiling bypass method pattern %s: %w", allowedMethod, err)
+			return nil, fmt.Errorf("compiling bypass method pattern %s: %w", allowedMethod, err)
 		}
 
 		bypassMethodPatterns = append(bypassMethodPatterns, compiled)
 	}
 
+	return &RbacInterceptor{
+		compiledBypassMethodPatterns: bypassMethodPatterns,
+		cfg:                          cfg,
+		compiledPoliciesByRole:       compiledPoliciesByRole,
+	}, nil
+}
+
+// UnaryInterceptor generates a grpc.UnaryServerInterceptor from RbacInterceptor
+func (i *RbacInterceptor) UnaryInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 
-		for _, allowedMethod := range bypassMethodPatterns {
+		for _, allowedMethod := range i.compiledBypassMethodPatterns {
 			if allowedMethod.MatchString(info.FullMethod) {
 				logger.Debugf(ctx, "[%s] Authorization bypassed for method", info.FullMethod)
 				return handler(ctx, req)
@@ -53,48 +106,45 @@ func GetAuthorizationInterceptor(authCtx interfaces.AuthenticationContext) (grpc
 		}
 
 		identityContext := auth.IdentityContextFromContext(ctx)
-		roles := resolveRoles(opts, identityContext)
+		possibleRoles := i.resolvePossibleRoles(identityContext)
 
-		if len(roles) == 0 {
-			logger.Debugf(ctx, "[%s]No roles resolved. Unauthorized.", info.FullMethod)
+		if len(possibleRoles) == 0 {
+			logger.Debugf(ctx, "[%s] No possible roles resolved. Unauthorized.", info.FullMethod)
 			return nil, status.Errorf(codes.PermissionDenied, "")
 		}
 
-		logger.Debugf(ctx, "[%s]Found roles: %s", info.FullMethod, roles)
+		logger.Debugf(ctx, "[%s] Found possible roles: %s", info.FullMethod, possibleRoles)
 
-		authorizedResourceScopes, err := calculateAuthorizedResourceScopes(ctx, roles, opts.Policies, info)
-		if err != nil {
-			logger.Errorf(ctx, "[%s]Failed to calculate authorized scopes for user %s: %+v", info.FullMethod, identityContext.UserID(), err)
-			return nil, status.Errorf(codes.Internal, "")
-		}
+		// Try to match the possible roles against policies
+		authorizedResourceScopes := i.calculateAuthorizedResourceScopes(ctx, possibleRoles, info)
 
 		if len(authorizedResourceScopes) == 0 {
-			logger.Debugf(ctx, "[%s]Found no matching authorization policy rules. Unauthorized.", info.FullMethod)
+			logger.Debugf(ctx, "[%s] Found no matching authorization policy rules. Unauthorized.", info.FullMethod)
 			return nil, status.Errorf(codes.PermissionDenied, "")
 		}
 
-		// Add authorized resource scopes to context
+		// Add authorized resource scopes to context so it can be used in the application later.
 		isolationContext := isolation.NewIsolationContext(authorizedResourceScopes)
+		ctx = isolationContext.WithContext(ctx)
 
-		isolationCtx := isolationContext.WithContext(ctx)
-		return handler(isolationCtx, req)
+		return handler(ctx, req)
 
-	}, nil
+	}
 }
 
-func resolveRoles(rbac config.Rbac, identityContext auth.IdentityContext) []string {
+func (i *RbacInterceptor) resolvePossibleRoles(identityContext auth.IdentityContext) []string {
 
 	roleSet := map[string]bool{}
 
-	if rbac.TokenScopeRoleResolver.Enabled {
+	if i.cfg.TokenScopeRoleResolver.Enabled {
 
 		for _, scopeRole := range identityContext.Scopes().List() {
 			roleSet[scopeRole] = true
 		}
 	}
 
-	if rbac.TokenClaimRoleResolver.Enabled {
-		claimRoles := resolveRolesViaClaims(identityContext.Claims(), rbac.TokenClaimRoleResolver.TokenClaims)
+	if i.cfg.TokenClaimRoleResolver.Enabled {
+		claimRoles := resolveRolesViaClaims(identityContext.Claims(), i.cfg.TokenClaimRoleResolver.TokenClaims)
 
 		for _, claimRole := range claimRoles {
 			roleSet[claimRole] = true
@@ -113,17 +163,19 @@ func resolveRolesViaClaims(claims map[string]interface{}, targetClaims []config.
 			continue
 		}
 
+		// Handle case of simple string value
 		claimString, ok := claimIntf.(string)
 		if ok {
 			roleSet[claimString] = true
 			continue
 		}
 
+		// Handle case of list of string values
 		claimListElements, ok := claimIntf.([]interface{})
 		if ok {
 			for _, claimListElement := range claimListElements {
-				claimStringElement, ok := claimListElement.(string)
-				if ok {
+				claimStringElement, isString := claimListElement.(string)
+				if isString {
 					roleSet[claimStringElement] = true
 				}
 			}
@@ -133,17 +185,12 @@ func resolveRolesViaClaims(claims map[string]interface{}, targetClaims []config.
 	return maps.Keys(roleSet)
 }
 
-func calculateAuthorizedResourceScopes(ctx context.Context, roles []string, policies []config.AuthorizationPolicy, info *grpc.UnaryServerInfo) ([]isolation.ResourceScope, error) {
+func (i *RbacInterceptor) calculateAuthorizedResourceScopes(ctx context.Context, roles []string, info *grpc.UnaryServerInfo) []isolation.ResourceScope {
 	authorizedScopes := []isolation.ResourceScope{}
 
-	policiesByRole := map[string]config.AuthorizationPolicy{}
-	for _, policy := range policies {
-		policiesByRole[policy.Role] = policy
-	}
-
-	matchingPolicies := map[string]config.AuthorizationPolicy{}
+	matchingPolicies := map[string]compiledAuthorizationPolicy{}
 	for _, role := range roles {
-		policy, ok := policiesByRole[role]
+		policy, ok := i.compiledPoliciesByRole[role]
 		if !ok {
 			continue
 		}
@@ -151,37 +198,32 @@ func calculateAuthorizedResourceScopes(ctx context.Context, roles []string, poli
 		matchingPolicies[role] = policy
 	}
 
-	logger.Debugf(ctx, "[%s]Found matching authorization policies: %s", info.FullMethod, matchingPolicies)
+	logger.Debugf(ctx, "[%s] Found matching authorization policies: %+v", info.FullMethod, matchingPolicies)
 
 	for role, policy := range matchingPolicies {
-		matchingRules, err := authorizationPolicyMatchesRequest(policy, info)
-		if err != nil {
-			return authorizedScopes, fmt.Errorf("failed to match request: %w", err)
-		}
+		matchingRules := discoverMatchingPolicyRulesForRequest(policy, info)
 
 		if len(matchingRules) > 0 {
-			logger.Debugf(ctx, "[%s]Found matching rules for role %s: %s", info.FullMethod, role, matchingRules)
+			logger.Debugf(ctx, "[%s] Found matching rules for role %s: %+v", info.FullMethod, role, matchingRules)
+			// TODO: We should probably try and deduplicate any resource scopes but this is fine for now.
 			for _, matchingRule := range matchingRules {
 				authorizedScopes = append(authorizedScopes, isolation.ResourceScope{
-					Project: matchingRule.Project,
-					Domain:  matchingRule.Domain,
+					Project: matchingRule.project,
+					Domain:  matchingRule.domain,
 				})
 			}
 		} else {
-			logger.Debugf(ctx, "[%s]Found no matching rules for role %s", info.FullMethod, role)
+			logger.Debugf(ctx, "[%s] Found no matching rules for role %s", info.FullMethod, role)
 		}
 	}
 
-	return authorizedScopes, nil
+	return authorizedScopes
 }
 
-func authorizationPolicyMatchesRequest(ap config.AuthorizationPolicy, info *grpc.UnaryServerInfo) ([]config.Rule, error) {
-	matchingRules := []config.Rule{}
-	for _, rule := range ap.Rules {
-		matches, err := ruleMatchesRequest(rule, info)
-		if err != nil {
-			return []config.Rule{}, fmt.Errorf("matching rule against request: %w", err)
-		}
+func discoverMatchingPolicyRulesForRequest(ap compiledAuthorizationPolicy, info *grpc.UnaryServerInfo) []compiledRule {
+	matchingRules := []compiledRule{}
+	for _, rule := range ap.rules {
+		matches := rule.methodPattern.MatchString(info.FullMethod)
 
 		if !matches {
 			continue
@@ -190,24 +232,24 @@ func authorizationPolicyMatchesRequest(ap config.AuthorizationPolicy, info *grpc
 		matchingRules = append(matchingRules, rule)
 	}
 
-	return matchingRules, nil
+	return matchingRules
 }
 
-func ruleMatchesRequest(rule config.Rule, info *grpc.UnaryServerInfo) (bool, error) {
-	pattern, err := regexp.Compile(rule.MethodPattern)
-	if err != nil {
-		return false, fmt.Errorf("compiling rule pattern %s: %w", rule.MethodPattern, err)
-	}
+func validatePolicy(ap config.AuthorizationPolicy) (compiledAuthorizationPolicy, error) {
+	compiledRules := []compiledRule{}
 
-	return pattern.MatchString(info.FullMethod), nil
-}
-
-func validatePolicy(ap config.AuthorizationPolicy) error {
 	for _, rule := range ap.Rules {
 		if rule.Project == "" && rule.Domain != "" {
-			return fmt.Errorf("authorization policy rule %s has invalid resource scope", rule.Name)
+			return compiledAuthorizationPolicy{}, fmt.Errorf("authorization policy rule %s has invalid resource scope", rule.Name)
 		}
+
+		methodPattern, err := regexp.Compile(rule.MethodPattern)
+		if err != nil {
+			return compiledAuthorizationPolicy{}, fmt.Errorf("compiling rule %s pattern %s: %w", rule.Name, rule.MethodPattern, err)
+		}
+
+		compiledRules = append(compiledRules, newCompiledRule(methodPattern, rule.Project, rule.Domain, rule.Name))
 	}
 
-	return nil
+	return newAuthorizationPolicy(ap.Role, compiledRules), nil
 }

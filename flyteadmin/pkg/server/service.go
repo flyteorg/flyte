@@ -120,11 +120,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 		if authCtx.Options().Rbac.Enabled {
 			logger.Infof(ctx, "Creating gRPC server with RBAC")
-			authorizationInterceptor, err := interceptors.GetAuthorizationInterceptor(authCtx)
+			rbacInterceptor, err := interceptors.NewRbacInterceptor(authCtx)
 			if err != nil {
-				return nil, fmt.Errorf("getting authorization interceptor: %w", err)
+				return nil, fmt.Errorf("creating rbac interceptor: %w", err)
 			}
-			interceptorsToLoad = append(interceptorsToLoad, authorizationInterceptor)
+			interceptorsToLoad = append(interceptorsToLoad, rbacInterceptor.UnaryInterceptor())
 		}
 
 		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
