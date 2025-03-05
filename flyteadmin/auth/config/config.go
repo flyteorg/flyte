@@ -1,8 +1,6 @@
 package config
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -261,18 +259,6 @@ type AuthorizationPolicy struct {
 	Rules []Rule `json:"rules" pflag:",Allow rules for matching requests."`
 }
 
-func (ap AuthorizationPolicy) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ap)
-}
-
-func (ap AuthorizationPolicy) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &ap)
-	if err != nil {
-		return fmt.Errorf("unmarshalling AuthorizationPolicy: %w", err)
-	}
-	return nil
-}
-
 // A Rule is a struct that represents an API request to match on.
 type Rule struct {
 	MethodPattern string `json:"methodPattern" pflag:",Regex pattern for the gRPC method of the request."`
@@ -294,18 +280,6 @@ type TokenScopeRoleResolver struct {
 // A TokenClaim is a struct that describes which claims to look for in tokens in order to use the values as RBAC roles.
 type TokenClaim struct {
 	Name string `json:"name" pflag:",Scope of the claim to look for in the token."`
-}
-
-func (tc TokenClaim) MarshalJSON() ([]byte, error) {
-	return json.Marshal(tc)
-}
-
-func (tc TokenClaim) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &tc)
-	if err != nil {
-		return fmt.Errorf("unmarshalling TokenClaim: %w", err)
-	}
-	return nil
 }
 
 //go:generate enumer --type=SameSite --trimprefix=SameSite -json
