@@ -335,7 +335,7 @@ func GetIsolationFilter(ctx context.Context, resourceDepth isolation.TargetResou
 
 	for _, resourceScope := range resourceScopes {
 		if resourceScope.Project == "" {
-			// User has wilcard access
+			// User has wildcard access
 			return nil
 		}
 
