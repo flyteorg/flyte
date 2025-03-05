@@ -64,14 +64,14 @@ type ConnectorService struct {
 	CorePlugin         Plugin
 }
 
-// ContainTaskType check if connection supports this task type.
+// ContainTaskType check if connector supports this task type.
 func (p *ConnectorService) ContainTaskType(taskType TaskType) bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return slices.Contains(p.supportedTaskTypes, taskType)
 }
 
-// SetSupportedTaskType set supportTaskType in the connection service.
+// SetSupportedTaskType set supportTaskType in the connector service.
 func (p *ConnectorService) SetSupportedTaskType(taskTypes []TaskType) {
 	p.mu.Lock()
 	defer p.mu.Unlock()

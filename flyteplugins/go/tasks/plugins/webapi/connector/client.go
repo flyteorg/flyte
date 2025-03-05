@@ -22,13 +22,13 @@ import (
 const defaultTaskTypeVersion = 0
 
 type Connector struct {
-	// IsSync indicates whether this connection is a sync connection. Sync connectors are expected to return their
+	// IsSync indicates whether this connector is a sync connector. Sync connectors are expected to return their
 	// results synchronously when called by propeller. Given that sync connectors can affect the performance
 	// of the system, it's important to enforce strict timeout policies.
-	// An Async connection, on the other hand, is required to be able to identify jobs by an
+	// An Async connector, on the other hand, is required to be able to identify jobs by an
 	// identifier and query for job statuses as jobs progress.
 	IsSync bool
-	// ConnectorDeployment is the connection deployment where this connection is running.
+	// ConnectorDeployment is the connector deployment where this connector is running.
 	ConnectorDeployment *Deployment
 }
 
@@ -114,17 +114,17 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
-				// we should not panic here, as we want to continue to support old connection settings
-				logger.Warningf(finalCtx, "list connection method not implemented for connection: [%v]", connectorDeployment.Endpoint)
+				// we should not panic here, as we want to continue to support old connector settings
+				logger.Warningf(finalCtx, "list connector method not implemented for connector: [%v]", connectorDeployment.Endpoint)
 				continue
 			}
 
 			if !ok {
-				logger.Errorf(finalCtx, "failed to list connection: [%v] with a non-gRPC error: [%v]", connectorDeployment.Endpoint, err)
+				logger.Errorf(finalCtx, "failed to list connector: [%v] with a non-gRPC error: [%v]", connectorDeployment.Endpoint, err)
 				continue
 			}
 
-			logger.Errorf(finalCtx, "failed to list connection: [%v] with error: [%v]", connectorDeployment.Endpoint, err)
+			logger.Errorf(finalCtx, "failed to list connector: [%v] with error: [%v]", connectorDeployment.Endpoint, err)
 			continue
 		}
 
@@ -150,7 +150,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
 
-	// If the connection doesn't implement the metadata service, we construct the registry based on the configuration
+	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
 			if _, ok := newConnectorRegistry[taskType]; !ok {
@@ -193,7 +193,7 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 		}
 		conn, err := getGrpcConnection(ctx, connectorDeployment)
 		if err != nil {
-			logger.Errorf(ctx, "failed to create connection to connection: [%v] with error: [%v]", connectorDeployment, err)
+			logger.Errorf(ctx, "failed to create connection to connector: [%v] with error: [%v]", connectorDeployment, err)
 			continue
 		}
 		clientSet.syncConnectorClients[connectorDeployment.Endpoint] = service.NewSyncConnectorServiceClient(conn)
