@@ -51,10 +51,10 @@ var (
 		PollInterval:       config.Duration{Duration: 10 * time.Second},
 	}
 
-	configSection = pluginsConfig.MustRegisterSubSection("connection-service", &defaultConfig)
+	configSection = pluginsConfig.MustRegisterSubSection("connector-service", &defaultConfig)
 )
 
-// Config is config for 'connection' plugin
+// Config is config for 'connector' plugin
 type Config struct {
 	// WebAPI defines config for the base WebAPI plugin
 	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
@@ -62,8 +62,8 @@ type Config struct {
 	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
 	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
-	// The default connection if there does not exist a more specific matching against task types
-	DefaultConnector Deployment `json:"defaultConnector" pflag:",The default connection."`
+	// The default connector if there does not exist a more specific matching against task types
+	DefaultConnector Deployment `json:"defaultConnector" pflag:",The default connector."`
 
 	// The connectors used to match against specific task types. {connectorDeploymentID: ConnectorDeployment}
 	ConnectorDeployments map[string]*Deployment `json:"connectors" pflag:",The connectors."`
@@ -74,12 +74,12 @@ type Config struct {
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
 	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 
-	// PollInterval is the interval at which the plugin should poll the connection for metadata updates
-	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the connection for metadata updates."`
+	// PollInterval is the interval at which the plugin should poll the connector for metadata updates
+	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the connector for metadata updates."`
 }
 
 type Deployment struct {
-	// Endpoint points to an connection gRPC endpoint
+	// Endpoint points to an connector gRPC endpoint
 	Endpoint string `json:"endpoint"`
 
 	// Insecure indicates whether the communication with the gRPC service is insecure

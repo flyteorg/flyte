@@ -135,7 +135,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	request := &connectorIDL.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create task from connectorIDL with %v", err)
+		return nil, nil, fmt.Errorf("failed to create task from connector with %v", err)
 	}
 
 	return ResourceMetaWrapper{
@@ -153,8 +153,8 @@ func (p *Plugin) ExecuteTaskSync(
 ) (webapi.ResourceMeta, webapi.Resource, error) {
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
-		logger.Errorf(ctx, "failed to execute task from connectorIDL with %v", err)
-		return nil, nil, fmt.Errorf("failed to execute task from connectorIDL with %v", err)
+		logger.Errorf(ctx, "failed to execute task from connector with %v", err)
+		return nil, nil, fmt.Errorf("failed to execute task from connector with %v", err)
 	}
 
 	headerProto := &connectorIDL.ExecuteTaskSyncRequest{
@@ -192,7 +192,7 @@ func (p *Plugin) ExecuteTaskSync(
 	if in.GetHeader() == nil {
 		return nil, nil, fmt.Errorf("expected header in the response, but got none")
 	}
-	// TODO: Read the streaming output from the connectorIDL, and merge it into the final output.
+	// TODO: Read the streaming output from the connector, and merge it into the final output.
 	// For now, Propeller assumes that the output is always in the header.
 	resource := in.GetHeader().GetResource()
 
@@ -225,7 +225,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get task from connectorIDL with %v", err)
+		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
 
 	return ResourceWrapper{
@@ -259,7 +259,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	if err != nil {
-		return fmt.Errorf("failed to delete task from connectorIDL with %v", err)
+		return fmt.Errorf("failed to delete task from connector with %v", err)
 	}
 	return nil
 }
@@ -337,7 +337,7 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 	if !ok {
 		conn, err := getGrpcConnection(ctx, connector)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get grpc connectorIDL with error: %v", err)
+			return nil, fmt.Errorf("failed to get grpc connector with error: %v", err)
 		}
 		client = service.NewAsyncConnectorServiceClient(conn)
 		p.cs.asyncConnectorClients[connector.Endpoint] = client
@@ -410,7 +410,7 @@ func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEn
 	supportedTaskTypes := maps.Keys(connectorRegistry)
 
 	return webapi.PluginEntry{
-		ID:                 "connectorIDL-service",
+		ID:                 "connector-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			plugin := &Plugin{

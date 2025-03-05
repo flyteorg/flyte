@@ -24,7 +24,7 @@ const (
 	// Template paths
 	devTemplatePath           = "/var/lib/rancher/k3s/server/manifests-staging/dev.yaml"
 	fullTemplatePath          = "/var/lib/rancher/k3s/server/manifests-staging/complete.yaml"
-	fullConnectorTemplatePath = "/var/lib/rancher/k3s/server/manifests-staging/complete-connection.yaml"
+	fullConnectorTemplatePath = "/var/lib/rancher/k3s/server/manifests-staging/complete-connector.yaml"
 	renderedManifestPath      = "/var/lib/rancher/k3s/server/manifests/flyte.yaml"
 )
 

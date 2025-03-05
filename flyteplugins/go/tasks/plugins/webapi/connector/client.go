@@ -32,7 +32,7 @@ type Connector struct {
 	ConnectorDeployment *Deployment
 }
 
-// ClientSet contains the clients exposed to communicate with various connection services.
+// ClientSet contains the clients exposed to communicate with various connector services.
 type ClientSet struct {
 	asyncConnectorClients    map[string]service.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient
 	syncConnectorClients     map[string]service.SyncConnectorServiceClient     // map[endpoint] => SyncConnectorServiceClient
