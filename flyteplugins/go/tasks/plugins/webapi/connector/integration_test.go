@@ -1,4 +1,4 @@
-package agent
+package connector
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/utils/strings/slices"
 
-	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	connectorMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -43,7 +43,7 @@ func TestEndToEnd(t *testing.T) {
 	cfg.WebAPI.ResourceQuotas = map[core.ResourceNamespace]int{}
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-	cfg.DefaultAgent.Endpoint = "localhost:8000"
+	cfg.DefaultConnector.Endpoint = "localhost:8000"
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 
@@ -74,7 +74,7 @@ func TestEndToEnd(t *testing.T) {
 	basePrefix := storage.DataReference("fake://bucket/prefix/")
 
 	t.Run("run an async task", func(t *testing.T) {
-		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAsyncAgentPlugin())
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAsyncConnectorPlugin())
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("async task"))
 		assert.NoError(t, err)
 
@@ -87,7 +87,7 @@ func TestEndToEnd(t *testing.T) {
 	})
 
 	t.Run("run a sync task", func(t *testing.T) {
-		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockSyncAgentPlugin())
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockSyncConnectorPlugin())
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("sync task"))
 		assert.NoError(t, err)
 
@@ -111,19 +111,19 @@ func TestEndToEnd(t *testing.T) {
 	})
 
 	t.Run("failed to create a job", func(t *testing.T) {
-		agentPlugin := newMockAsyncAgentPlugin()
-		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		connectorPlugin := newMockAsyncConnectorPlugin()
+		connectorPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				cs: &ClientSet{
-					asyncAgentClients:    map[string]service.AsyncAgentServiceClient{},
-					syncAgentClients:     map[string]service.SyncAgentServiceClient{},
-					agentMetadataClients: map[string]service.AgentMetadataServiceClient{},
+					asyncConnectorClients:    map[string]service.AsyncConnectorServiceClient{},
+					syncConnectorClients:     map[string]service.SyncConnectorServiceClient{},
+					connectorMetadataClients: map[string]service.ConnectorMetadataServiceClient{},
 				},
 			}, nil
 		}
-		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+		pluginEntry := pluginmachinery.CreateRemotePlugin(connectorPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test2"))
 		assert.NoError(t, err)
 
@@ -150,8 +150,8 @@ func TestEndToEnd(t *testing.T) {
 		tr.EXPECT().Read(context.Background()).Return(nil, fmt.Errorf("read fail"))
 		tCtx.EXPECT().TaskReader().Return(tr)
 
-		agentPlugin := newMockAsyncAgentPlugin()
-		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+		connectorPlugin := newMockAsyncConnectorPlugin()
+		pluginEntry := pluginmachinery.CreateRemotePlugin(connectorPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test3"))
 		assert.NoError(t, err)
 
@@ -171,8 +171,8 @@ func TestEndToEnd(t *testing.T) {
 		inputReader.EXPECT().Get(mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.EXPECT().InputReader().Return(inputReader)
 
-		agentPlugin := newMockAsyncAgentPlugin()
-		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+		connectorPlugin := newMockAsyncConnectorPlugin()
+		pluginEntry := pluginmachinery.CreateRemotePlugin(connectorPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test4"))
 		assert.NoError(t, err)
 
@@ -252,59 +252,59 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	return tCtx
 }
 
-func newMockAsyncAgentPlugin() webapi.PluginEntry {
-	asyncAgentClient := new(agentMocks.AsyncAgentServiceClient)
-	agentRegistry := Registry{
-		"spark": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
+func newMockAsyncConnectorPlugin() webapi.PluginEntry {
+	asyncConnectorClient := new(connectorMocks.AsyncConnectorServiceClient)
+	connectorRegistry := Registry{
+		"spark": {defaultTaskTypeVersion: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: false}},
 	}
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
 		return slices.Equal(request.GetTemplate().GetContainer().GetArgs(), expectedArgs)
 	})
-	asyncAgentClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
+	asyncConnectorClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
 		ResourceMeta: []byte{1, 2, 3, 4}}, nil)
 
 	mockGetRequestMatcher := mock.MatchedBy(func(request *admin.GetTaskRequest) bool {
 		return request.GetTaskCategory().GetName() == "spark"
 	})
-	asyncAgentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
+	asyncConnectorClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
 		&admin.GetTaskResponse{Resource: &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)
 
-	asyncAgentClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
+	asyncConnectorClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
 		&admin.DeleteTaskResponse{}, nil)
 
 	cfg := defaultConfig
-	cfg.DefaultAgent.Endpoint = "localhost:8000"
+	cfg.DefaultConnector.Endpoint = "localhost:8000"
 
 	return webapi.PluginEntry{
-		ID:                 "agent-service",
+		ID:                 "connection-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
-					asyncAgentClients: map[string]service.AsyncAgentServiceClient{
-						defaultAgentEndpoint: asyncAgentClient,
+					asyncConnectorClients: map[string]service.AsyncConnectorServiceClient{
+						defaultConnectorEndpoint: asyncConnectorClient,
 					},
 				},
-				registry: agentRegistry,
+				registry: connectorRegistry,
 			}, nil
 		},
 	}
 }
 
-func newMockSyncAgentPlugin() webapi.PluginEntry {
-	agentRegistry := Registry{
-		"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}},
+func newMockSyncConnectorPlugin() webapi.PluginEntry {
+	connectorRegistry := Registry{
+		"openai": {defaultTaskTypeVersion: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: true}},
 	}
 
-	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
+	syncConnectorClient := new(connectorMocks.SyncConnectorServiceClient)
 	output, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
 
-	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
+	stream := new(connectorMocks.SyncConnectorService_ExecuteTaskSyncClient)
 	stream.EXPECT().Recv().Return(&admin.ExecuteTaskSyncResponse{
 		Res: &admin.ExecuteTaskSyncResponse_Header{
 			Header: &admin.ExecuteTaskSyncResponseHeader{
@@ -317,24 +317,24 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 	stream.EXPECT().Send(mock.Anything).Return(nil)
 	stream.EXPECT().CloseSend().Return(nil)
 
-	syncAgentClient.EXPECT().ExecuteTaskSync(mock.Anything).Return(stream, nil)
+	syncConnectorClient.EXPECT().ExecuteTaskSync(mock.Anything).Return(stream, nil)
 
 	cfg := defaultConfig
-	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
+	cfg.DefaultConnector.Endpoint = defaultConnectorEndpoint
 
 	return webapi.PluginEntry{
-		ID:                 "agent-service",
+		ID:                 "connection-service",
 		SupportedTaskTypes: []core.TaskType{"openai"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
-					syncAgentClients: map[string]service.SyncAgentServiceClient{
-						defaultAgentEndpoint: syncAgentClient,
+					syncConnectorClients: map[string]service.SyncConnectorServiceClient{
+						defaultConnectorEndpoint: syncConnectorClient,
 					},
 				},
-				registry: agentRegistry,
+				registry: connectorRegistry,
 			}, nil
 		},
 	}

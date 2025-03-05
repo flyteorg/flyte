@@ -1,4 +1,4 @@
-package agent
+package connector
 
 import (
 	"time"
@@ -39,7 +39,7 @@ var (
 				Value: 50,
 			},
 		},
-		DefaultAgent: Deployment{
+		DefaultConnector: Deployment{
 			Endpoint:             "",
 			Insecure:             true,
 			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
@@ -51,10 +51,10 @@ var (
 		PollInterval:       config.Duration{Duration: 10 * time.Second},
 	}
 
-	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
+	configSection = pluginsConfig.MustRegisterSubSection("connection-service", &defaultConfig)
 )
 
-// Config is config for 'agent' plugin
+// Config is config for 'connection' plugin
 type Config struct {
 	// WebAPI defines config for the base WebAPI plugin
 	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
@@ -62,24 +62,24 @@ type Config struct {
 	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
 	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
-	// The default agent if there does not exist a more specific matching against task types
-	DefaultAgent Deployment `json:"defaultAgent" pflag:",The default agent."`
+	// The default connection if there does not exist a more specific matching against task types
+	DefaultConnector Deployment `json:"defaultConnector" pflag:",The default connection."`
 
-	// The agents used to match against specific task types. {agentDeploymentID: AgentDeployment}
-	AgentDeployments map[string]*Deployment `json:"agents" pflag:",The agents."`
+	// The connectors used to match against specific task types. {connectorDeploymentID: ConnectorDeployment}
+	ConnectorDeployments map[string]*Deployment `json:"connectors" pflag:",The connectors."`
 
-	// Maps task types to their agents. {TaskType: agentDeploymentID}
-	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
+	// Maps task types to their connectors. {TaskType: connectorDeploymentID}
+	ConnectorForTaskTypes map[string]string `json:"connectorForTaskTypes" pflag:"-,"`
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
 	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 
-	// PollInterval is the interval at which the plugin should poll the agent for metadata updates
-	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
+	// PollInterval is the interval at which the plugin should poll the connection for metadata updates
+	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the connection for metadata updates."`
 }
 
 type Deployment struct {
-	// Endpoint points to an agent gRPC endpoint
+	// Endpoint points to an connection gRPC endpoint
 	Endpoint string `json:"endpoint"`
 
 	// Insecure indicates whether the communication with the gRPC service is insecure

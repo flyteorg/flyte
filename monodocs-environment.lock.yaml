@@ -21768,7 +21768,7 @@ package:
     sha256: a0fd916633252d99efb6223b1050202841fa8d2d53dacca564b0ed77249d3228
   category: main
   optional: false
-- name: snowflake-connector-python
+- name: snowflake-connection-python
   version: 3.13.2
   manager: conda
   platform: linux-64
@@ -21802,7 +21802,7 @@ package:
     sha256: 40eb0dccfb517d9bd7758c95de6880559f6ffa65908b91d86093ace3b9c09861
   category: main
   optional: false
-- name: snowflake-connector-python
+- name: snowflake-connection-python
   version: 3.13.2
   manager: conda
   platform: osx-64
@@ -21835,7 +21835,7 @@ package:
     sha256: 587a364db788b65cf09c48b854863c907618422c7bb574634d7087d77bab0e9e
   category: main
   optional: false
-- name: snowflake-connector-python
+- name: snowflake-connection-python
   version: 3.13.2
   manager: conda
   platform: osx-arm64

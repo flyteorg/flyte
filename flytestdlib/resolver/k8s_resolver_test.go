@@ -60,7 +60,7 @@ func TestBuilder(t *testing.T) {
 	fc := &fakeConn{
 		cmp: make(chan struct{}),
 	}
-	k8sResolver, err := builder.Build(parseTarget("test://flyteagent.flyte.svc.cluster.local:8000"), fc, resolver.BuildOptions{})
+	k8sResolver, err := builder.Build(parseTarget("test://flyteconnector.flyte.svc.cluster.local:8000"), fc, resolver.BuildOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestBuilder(t *testing.T) {
 
 	_, err = k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "flyteagent",
+			Name:      "flyteconnector",
 			Namespace: "flyte",
 		},
 		Subsets: []v1.EndpointSubset{

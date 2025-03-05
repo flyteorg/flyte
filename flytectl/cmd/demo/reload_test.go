@@ -43,7 +43,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 		},
 	}, nil)
 
-	// This first set of mocks is for the check for the bootstrap agent. This is
+	// This first set of mocks is for the check for the bootstrap connector. This is
 	// Expected to fail in legacy sandboxes
 	var checkLegacySandboxExecExitCode int
 	if legacy {
@@ -57,7 +57,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 			Tty:          true,
 			WorkingDir:   "/",
 			AttachStdout: true,
-			Cmd:          []string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapAgent)},
+			Cmd:          []string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapConnector)},
 		},
 	).Return(types.IDResponse{ID: "0"}, nil)
 	mockDocker.EXPECT().ContainerExecAttach(ctx, "0", types.ExecStartCheck{}).Return(types.HijackedResponse{
@@ -65,7 +65,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 	}, nil)
 	mockDocker.EXPECT().ContainerExecInspect(ctx, "0").Return(types.ContainerExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
 
-	// Register additional mocks for the actual execution of the bootstrap agent
+	// Register additional mocks for the actual execution of the bootstrap connection
 	// in non-legacy sandboxes
 	if !legacy {
 		mockDocker.EXPECT().ContainerExecCreate(
@@ -76,7 +76,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 				Tty:          true,
 				WorkingDir:   "/",
 				AttachStdout: true,
-				Cmd:          []string{internalBootstrapAgent},
+				Cmd:          []string{internalBootstrapConnector},
 			},
 		).Return(types.IDResponse{ID: "1"}, nil)
 		mockDocker.EXPECT().ContainerExecAttach(ctx, "1", types.ExecStartCheck{}).Return(types.HijackedResponse{

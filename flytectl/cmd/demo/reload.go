@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	internalBootstrapAgent = "flyte-sandbox-bootstrap"
+	internalBootstrapConnector = "flyte-sandbox-bootstrap"
 )
 const (
 	reloadShort = "Power cycle the Flyte executable pod, effectively picking up an updated config."
@@ -35,7 +35,7 @@ func isLegacySandbox(ctx context.Context, cli docker.Docker, containerID string)
 		ctx,
 		cli,
 		containerID,
-		[]string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapAgent)},
+		[]string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapConnector)},
 	)
 	if err != nil {
 		return result, err
@@ -75,8 +75,8 @@ func reloadDemoCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 	}
 
 	// At this point we know that we are on a modern sandbox, and we can use the
-	// internal bootstrap agent to reload the cluster
-	exec, err := docker.ExecCommend(ctx, cli, c.ID, []string{internalBootstrapAgent})
+	// internal bootstrap connector to reload the cluster
+	exec, err := docker.ExecCommend(ctx, cli, c.ID, []string{internalBootstrapConnector})
 	if err != nil {
 		return err
 	}

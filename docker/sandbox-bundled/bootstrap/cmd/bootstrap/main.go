@@ -17,15 +17,15 @@ const (
 	clusterResourceTemplatesConfigMapName = "flyte-sandbox-extra-cluster-resource-templates"
 	deploymentName                        = "flyte-sandbox"
 	devModeEnvVar                         = "FLYTE_DEV"
-	disableAgentModeEnvVar                = "DISABLE_AGENT"
+	disableConnectorModeEnvVar            = "DISABLE_CONNECTOR"
 	dockerHost                            = "host.docker.internal"
 	namespace                             = "flyte"
 
 	// Template paths
-	devTemplatePath       = "/var/lib/rancher/k3s/server/manifests-staging/dev.yaml"
-	fullTemplatePath      = "/var/lib/rancher/k3s/server/manifests-staging/complete.yaml"
-	fullAgentTemplatePath = "/var/lib/rancher/k3s/server/manifests-staging/complete-agent.yaml"
-	renderedManifestPath  = "/var/lib/rancher/k3s/server/manifests/flyte.yaml"
+	devTemplatePath           = "/var/lib/rancher/k3s/server/manifests-staging/dev.yaml"
+	fullTemplatePath          = "/var/lib/rancher/k3s/server/manifests-staging/complete.yaml"
+	fullConnectorTemplatePath = "/var/lib/rancher/k3s/server/manifests-staging/complete-connection.yaml"
+	renderedManifestPath      = "/var/lib/rancher/k3s/server/manifests/flyte.yaml"
 )
 
 func main() {
@@ -37,8 +37,8 @@ func main() {
 	} else {
 		// If we are not running in dev mode, look for user-specified configuration
 		// to load into the sandbox deployment
-		tmplPath = fullAgentTemplatePath
-		if os.Getenv(disableAgentModeEnvVar) == "True" {
+		tmplPath = fullConnectorTemplatePath
+		if os.Getenv(disableConnectorModeEnvVar) == "True" {
 			tmplPath = fullTemplatePath
 		}
 

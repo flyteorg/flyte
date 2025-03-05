@@ -54,7 +54,7 @@ dependencies:
   - scikit-learn                # scikit-learn
   - dask[distributed]           # dask
   - mlflow>=2.10.0              # mlflow
-  - snowflake-connector-python  # snowflake
+  - snowflake-connection-python  # snowflake
   - vaex-core                   # vaex
   - openai                      # chatgpt
   - wandb                       # wandb

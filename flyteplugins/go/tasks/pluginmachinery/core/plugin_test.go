@@ -94,16 +94,16 @@ func TestLoadPlugin(t *testing.T) {
 
 }
 
-func TestAgentService(t *testing.T) {
-	agentService := core.AgentService{}
+func TestConnectorService(t *testing.T) {
+	connectorService := core.ConnectorService{}
 	taskTypes := []core.TaskType{"sensor", "chatgpt"}
 
 	for _, taskType := range taskTypes {
-		assert.Equal(t, false, agentService.ContainTaskType(taskType))
+		assert.Equal(t, false, connectorService.ContainTaskType(taskType))
 	}
 
-	agentService.SetSupportedTaskType(taskTypes)
+	connectorService.SetSupportedTaskType(taskTypes)
 	for _, taskType := range taskTypes {
-		assert.Equal(t, true, agentService.ContainTaskType(taskType))
+		assert.Equal(t, true, connectorService.ContainTaskType(taskType))
 	}
 }

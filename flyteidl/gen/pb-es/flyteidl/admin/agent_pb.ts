@@ -57,9 +57,8 @@ proto3.util.setEnumType(State, "flyteidl.admin.State", [
 /**
  * Represents a subset of runtime task execution metadata that are relevant to external plugins.
  *
- * ID of the task execution
- *
  * @generated from message flyteidl.admin.TaskExecutionMetadata
+ * @deprecated
  */
 export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
   /**
@@ -184,6 +183,7 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
  * Represents a request structure to create task.
  *
  * @generated from message flyteidl.admin.CreateTaskRequest
+ * @deprecated
  */
 export class CreateTaskRequest extends Message<CreateTaskRequest> {
   /**
@@ -251,6 +251,7 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
  * Represents a create response structure.
  *
  * @generated from message flyteidl.admin.CreateTaskResponse
+ * @deprecated
  */
 export class CreateTaskResponse extends Message<CreateTaskResponse> {
   /**
@@ -290,6 +291,7 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
 
 /**
  * @generated from message flyteidl.admin.CreateRequestHeader
+ * @deprecated
  */
 export class CreateRequestHeader extends Message<CreateRequestHeader> {
   /**
@@ -353,6 +355,7 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
 
 /**
  * @generated from message flyteidl.admin.ExecuteTaskSyncRequest
+ * @deprecated
  */
 export class ExecuteTaskSyncRequest extends Message<ExecuteTaskSyncRequest> {
   /**
@@ -403,6 +406,7 @@ export class ExecuteTaskSyncRequest extends Message<ExecuteTaskSyncRequest> {
 
 /**
  * @generated from message flyteidl.admin.ExecuteTaskSyncResponseHeader
+ * @deprecated
  */
 export class ExecuteTaskSyncResponseHeader extends Message<ExecuteTaskSyncResponseHeader> {
   /**
@@ -440,6 +444,7 @@ export class ExecuteTaskSyncResponseHeader extends Message<ExecuteTaskSyncRespon
 
 /**
  * @generated from message flyteidl.admin.ExecuteTaskSyncResponse
+ * @deprecated
  */
 export class ExecuteTaskSyncResponse extends Message<ExecuteTaskSyncResponse> {
   /**
@@ -495,6 +500,7 @@ export class ExecuteTaskSyncResponse extends Message<ExecuteTaskSyncResponse> {
  * A message used to fetch a job resource from flyte agent server.
  *
  * @generated from message flyteidl.admin.GetTaskRequest
+ * @deprecated
  */
 export class GetTaskRequest extends Message<GetTaskRequest> {
   /**
@@ -561,6 +567,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
  * Response to get an individual task resource.
  *
  * @generated from message flyteidl.admin.GetTaskResponse
+ * @deprecated
  */
 export class GetTaskResponse extends Message<GetTaskResponse> {
   /**
@@ -598,6 +605,7 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
 
 /**
  * @generated from message flyteidl.admin.Resource
+ * @deprecated
  */
 export class Resource extends Message<Resource> {
   /**
@@ -690,6 +698,7 @@ export class Resource extends Message<Resource> {
  * A message used to delete a task.
  *
  * @generated from message flyteidl.admin.DeleteTaskRequest
+ * @deprecated
  */
 export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   /**
@@ -748,6 +757,7 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
  * Response to delete a task.
  *
  * @generated from message flyteidl.admin.DeleteTaskResponse
+ * @deprecated
  */
 export class DeleteTaskResponse extends Message<DeleteTaskResponse> {
   constructor(data?: PartialMessage<DeleteTaskResponse>) {
@@ -781,6 +791,7 @@ export class DeleteTaskResponse extends Message<DeleteTaskResponse> {
  * A message containing the agent metadata.
  *
  * @generated from message flyteidl.admin.Agent
+ * @deprecated
  */
 export class Agent extends Message<Agent> {
   /**
@@ -849,6 +860,7 @@ export class Agent extends Message<Agent> {
 
 /**
  * @generated from message flyteidl.admin.TaskCategory
+ * @deprecated
  */
 export class TaskCategory extends Message<TaskCategory> {
   /**
@@ -898,6 +910,7 @@ export class TaskCategory extends Message<TaskCategory> {
  * A request to get an agent.
  *
  * @generated from message flyteidl.admin.GetAgentRequest
+ * @deprecated
  */
 export class GetAgentRequest extends Message<GetAgentRequest> {
   /**
@@ -939,6 +952,7 @@ export class GetAgentRequest extends Message<GetAgentRequest> {
  * A response containing an agent.
  *
  * @generated from message flyteidl.admin.GetAgentResponse
+ * @deprecated
  */
 export class GetAgentResponse extends Message<GetAgentResponse> {
   /**
@@ -978,6 +992,7 @@ export class GetAgentResponse extends Message<GetAgentResponse> {
  * A request to list all agents.
  *
  * @generated from message flyteidl.admin.ListAgentsRequest
+ * @deprecated
  */
 export class ListAgentsRequest extends Message<ListAgentsRequest> {
   constructor(data?: PartialMessage<ListAgentsRequest>) {
@@ -1011,6 +1026,7 @@ export class ListAgentsRequest extends Message<ListAgentsRequest> {
  * A response containing a list of agents.
  *
  * @generated from message flyteidl.admin.ListAgentsResponse
+ * @deprecated
  */
 export class ListAgentsResponse extends Message<ListAgentsResponse> {
   /**
@@ -1050,6 +1066,7 @@ export class ListAgentsResponse extends Message<ListAgentsResponse> {
  * A request to get the metrics from a task execution.
  *
  * @generated from message flyteidl.admin.GetTaskMetricsRequest
+ * @deprecated
  */
 export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
   /**
@@ -1141,6 +1158,7 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
  * A response containing a list of metrics for a task execution.
  *
  * @generated from message flyteidl.admin.GetTaskMetricsResponse
+ * @deprecated
  */
 export class GetTaskMetricsResponse extends Message<GetTaskMetricsResponse> {
   /**
@@ -1182,6 +1200,7 @@ export class GetTaskMetricsResponse extends Message<GetTaskMetricsResponse> {
  * A request to get the log from a task execution.
  *
  * @generated from message flyteidl.admin.GetTaskLogsRequest
+ * @deprecated
  */
 export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
   /**
@@ -1255,6 +1274,7 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
 
 /**
  * @generated from message flyteidl.admin.GetTaskLogsResponseHeader
+ * @deprecated
  */
 export class GetTaskLogsResponseHeader extends Message<GetTaskLogsResponseHeader> {
   /**
@@ -1295,6 +1315,7 @@ export class GetTaskLogsResponseHeader extends Message<GetTaskLogsResponseHeader
 
 /**
  * @generated from message flyteidl.admin.GetTaskLogsResponseBody
+ * @deprecated
  */
 export class GetTaskLogsResponseBody extends Message<GetTaskLogsResponseBody> {
   /**
@@ -1336,6 +1357,7 @@ export class GetTaskLogsResponseBody extends Message<GetTaskLogsResponseBody> {
  * A response containing the logs for a task execution.
  *
  * @generated from message flyteidl.admin.GetTaskLogsResponse
+ * @deprecated
  */
 export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
   /**
@@ -1389,6 +1411,7 @@ export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
  * engine.
  *
  * @generated from message flyteidl.admin.AgentError
+ * @deprecated
  */
 export class AgentError extends Message<AgentError> {
   /**
@@ -1446,6 +1469,7 @@ export class AgentError extends Message<AgentError> {
  * Defines a generic error type that dictates the behavior of the retry strategy.
  *
  * @generated from enum flyteidl.admin.AgentError.Kind
+ * @deprecated
  */
 export enum AgentError_Kind {
   /**

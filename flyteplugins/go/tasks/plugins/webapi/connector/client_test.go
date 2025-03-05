@@ -1,4 +1,4 @@
-package agent
+package connector
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 func TestInitializeClients(t *testing.T) {
 	cfg := defaultConfig
-	cfg.AgentDeployments = map[string]*Deployment{
+	cfg.ConnectorDeployments = map[string]*Deployment{
 		"x": {
 			Endpoint: "x",
 		},
@@ -20,9 +20,9 @@ func TestInitializeClients(t *testing.T) {
 	ctx := context.Background()
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	cs := getAgentClientSets(ctx)
-	_, ok := cs.syncAgentClients["y"]
+	cs := getConnectorClientSets(ctx)
+	_, ok := cs.syncConnectorClients["y"]
 	assert.True(t, ok)
-	_, ok = cs.asyncAgentClients["x"]
+	_, ok = cs.asyncConnectorClients["x"]
 	assert.True(t, ok)
 }

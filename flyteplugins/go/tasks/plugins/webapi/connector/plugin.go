@@ -1,4 +1,4 @@
-package agent
+package connector
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connectorIDL "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -25,9 +25,9 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-const ID = "agent-service"
+const ID = "connector-service"
 
-type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+type Registry map[string]map[int32]*Connector // map[taskTypeName][taskTypeVersion] => Connector
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -40,23 +40,23 @@ type Plugin struct {
 type ResourceWrapper struct {
 	Phase flyteIdl.TaskExecution_Phase
 	// Deprecated: Please Use Phase instead.
-	State      admin.State
-	Outputs    *flyteIdl.LiteralMap
-	Message    string
-	LogLinks   []*flyteIdl.TaskLog
-	CustomInfo *structpb.Struct
-	AgentError *admin.AgentError
+	State          connectorIDL.State
+	Outputs        *flyteIdl.LiteralMap
+	Message        string
+	LogLinks       []*flyteIdl.TaskLog
+	CustomInfo     *structpb.Struct
+	ConnectorError *connectorIDL.ConnectorError
 }
 
-// IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
+// IsTerminal is used to avoid making network calls to the connectorIDL service if the resource is already in a terminal state.
 func (r ResourceWrapper) IsTerminal() bool {
 	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
 
 type ResourceMetaWrapper struct {
-	OutputPrefix      string
-	AgentResourceMeta []byte
-	TaskCategory      admin.TaskCategory
+	OutputPrefix          string
+	ConnectorResourceMeta []byte
+	TaskCategory          connectorIDL.TaskCategory
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -108,57 +108,57 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
+	taskCategory := connectorIDL.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
+	connector, isSync := p.getFinalConnector(&taskCategory, p.cfg)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	if isSync {
-		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", agent)
+		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", connector)
 		defer cancel()
-		client, err := p.getSyncAgentClient(ctx, agent)
+		client, err := p.getSyncConnectorClient(ctx, connector)
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		header := &connectorIDL.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", connector)
 	defer cancel()
 
-	// Use async agent client
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	// Use async connectorIDL client
+	client, err := p.getAsyncConnectorClient(ctx, connector)
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &connectorIDL.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create task from agent with %v", err)
+		return nil, nil, fmt.Errorf("failed to create task from connectorIDL with %v", err)
 	}
 
 	return ResourceMetaWrapper{
-		OutputPrefix:      outputPrefix,
-		AgentResourceMeta: res.GetResourceMeta(),
-		TaskCategory:      taskCategory,
+		OutputPrefix:          outputPrefix,
+		ConnectorResourceMeta: res.GetResourceMeta(),
+		TaskCategory:          taskCategory,
 	}, nil, nil
 }
 
 func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
-	client service.SyncAgentServiceClient,
-	header *admin.CreateRequestHeader,
+	client service.SyncConnectorServiceClient,
+	header *connectorIDL.CreateRequestHeader,
 	inputs *flyteIdl.LiteralMap,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
-		logger.Errorf(ctx, "failed to execute task from agent with %v", err)
-		return nil, nil, fmt.Errorf("failed to execute task from agent with %v", err)
+		logger.Errorf(ctx, "failed to execute task from connectorIDL with %v", err)
+		return nil, nil, fmt.Errorf("failed to execute task from connectorIDL with %v", err)
 	}
 
-	headerProto := &admin.ExecuteTaskSyncRequest{
-		Part: &admin.ExecuteTaskSyncRequest_Header{
+	headerProto := &connectorIDL.ExecuteTaskSyncRequest{
+		Part: &connectorIDL.ExecuteTaskSyncRequest_Header{
 			Header: header,
 		},
 	}
@@ -167,8 +167,8 @@ func (p *Plugin) ExecuteTaskSync(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
 	}
-	inputsProto := &admin.ExecuteTaskSyncRequest{
-		Part: &admin.ExecuteTaskSyncRequest_Inputs{
+	inputsProto := &connectorIDL.ExecuteTaskSyncRequest{
+		Part: &connectorIDL.ExecuteTaskSyncRequest_Inputs{
 			Inputs: inputs,
 		},
 	}
@@ -192,40 +192,40 @@ func (p *Plugin) ExecuteTaskSync(
 	if in.GetHeader() == nil {
 		return nil, nil, fmt.Errorf("expected header in the response, but got none")
 	}
-	// TODO: Read the streaming output from the agent, and merge it into the final output.
+	// TODO: Read the streaming output from the connectorIDL, and merge it into the final output.
 	// For now, Propeller assumes that the output is always in the header.
 	resource := in.GetHeader().GetResource()
 
 	return nil, ResourceWrapper{
-		Phase:      resource.GetPhase(),
-		Outputs:    resource.GetOutputs(),
-		Message:    resource.GetMessage(),
-		LogLinks:   resource.GetLogLinks(),
-		CustomInfo: resource.GetCustomInfo(),
-		AgentError: resource.GetAgentError(),
+		Phase:          resource.GetPhase(),
+		Outputs:        resource.GetOutputs(),
+		Message:        resource.GetMessage(),
+		LogLinks:       resource.GetLogLinks(),
+		CustomInfo:     resource.GetCustomInfo(),
+		ConnectorError: resource.GetConnectorError(),
 	}, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	client, err := p.getAsyncConnectorClient(ctx, connector)
 	if err != nil {
 		return nil, err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "GetTask", connector)
 	defer cancel()
 
-	request := &admin.GetTaskRequest{
+	request := &connectorIDL.GetTaskRequest{
 		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
-		ResourceMeta: metadata.AgentResourceMeta,
+		ResourceMeta: metadata.ConnectorResourceMeta,
 		OutputPrefix: metadata.OutputPrefix,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get task from agent with %v", err)
+		return nil, fmt.Errorf("failed to get task from connectorIDL with %v", err)
 	}
 
 	return ResourceWrapper{
@@ -243,23 +243,23 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	client, err := p.getAsyncConnectorClient(ctx, connector)
 	if err != nil {
 		return err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", connector)
 	defer cancel()
 
-	request := &admin.DeleteTaskRequest{
+	request := &connectorIDL.DeleteTaskRequest{
 		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
-		ResourceMeta: metadata.AgentResourceMeta,
+		ResourceMeta: metadata.ConnectorResourceMeta,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	if err != nil {
-		return fmt.Errorf("failed to delete task from agent with %v", err)
+		return fmt.Errorf("failed to delete task from connectorIDL with %v", err)
 	}
 	return nil
 }
@@ -268,8 +268,8 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
 	errorCode := pluginErrors.TaskFailedWithError
-	if resource.AgentError != nil && resource.AgentError.GetCode() != "" {
-		errorCode = resource.AgentError.GetCode()
+	if resource.ConnectorError != nil && resource.ConnectorError.GetCode() != "" {
+		errorCode = resource.ConnectorError.GetCode()
 	}
 
 	switch resource.Phase {
@@ -300,15 +300,15 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 
 	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.State {
-	case admin.State_PENDING:
+	case connectorIDL.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
-	case admin.State_RUNNING:
+	case connectorIDL.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
-	case admin.State_PERMANENT_FAILURE:
+	case connectorIDL.State_PERMANENT_FAILURE:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case admin.State_RETRYABLE_FAILURE:
+	case connectorIDL.State_RETRYABLE_FAILURE:
 		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case admin.State_SUCCEEDED:
+	case connectorIDL.State_SUCCEEDED:
 		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
@@ -319,51 +319,51 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p *Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
-	client, ok := p.cs.syncAgentClients[agent.Endpoint]
+func (p *Plugin) getSyncConnectorClient(ctx context.Context, connector *Deployment) (service.SyncConnectorServiceClient, error) {
+	client, ok := p.cs.syncConnectorClients[connector.Endpoint]
 	if !ok {
-		conn, err := getGrpcConnection(ctx, agent)
+		conn, err := getGrpcConnection(ctx, connector)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+			return nil, fmt.Errorf("failed to get grpc connectorIDL with error: %v", err)
 		}
-		client = service.NewSyncAgentServiceClient(conn)
-		p.cs.syncAgentClients[agent.Endpoint] = client
+		client = service.NewSyncConnectorServiceClient(conn)
+		p.cs.syncConnectorClients[connector.Endpoint] = client
 	}
 	return client, nil
 }
 
-func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
-	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
+func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (service.AsyncConnectorServiceClient, error) {
+	client, ok := p.cs.asyncConnectorClients[connector.Endpoint]
 	if !ok {
-		conn, err := getGrpcConnection(ctx, agent)
+		conn, err := getGrpcConnection(ctx, connector)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+			return nil, fmt.Errorf("failed to get grpc connectorIDL with error: %v", err)
 		}
-		client = service.NewAsyncAgentServiceClient(conn)
-		p.cs.asyncAgentClients[agent.Endpoint] = client
+		client = service.NewAsyncConnectorServiceClient(conn)
+		p.cs.asyncConnectorClients[connector.Endpoint] = client
 	}
 	return client, nil
 }
 
-func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
+func (p *Plugin) watchConnectors(ctx context.Context, connectorService *core.ConnectorService) {
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
-		clientSet := getAgentClientSets(childCtx)
-		agentRegistry := getAgentRegistry(childCtx, clientSet)
-		p.setRegistry(agentRegistry)
-		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
+		clientSet := getConnectorClientSets(childCtx)
+		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
+		p.setRegistry(connectorRegistry)
+		connectorService.SetSupportedTaskType(maps.Keys(connectorRegistry))
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+func (p *Plugin) getFinalConnector(taskCategory *connectorIDL.TaskCategory, cfg *Config) (*Deployment, bool) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if agent, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
-		return agent.AgentDeployment, agent.IsSync
+	if connector, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
+		return connector.ConnectorDeployment, connector.IsSync
 	}
-	return &cfg.DefaultAgent, false
+	return &cfg.DefaultConnector, false
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -379,19 +379,19 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 
 	var opReader flyteIO.OutputReader
 	if outputs != nil {
-		logger.Debugf(ctx, "AgentDeployment returned an output.")
+		logger.Debugf(ctx, "ConnectorDeployment returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
-		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
+		logger.Debugf(ctx, "ConnectorDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
+func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) connectorIDL.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 
-	return admin.TaskExecutionMetadata{
+	return connectorIDL.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
 		Labels:               taskExecutionMetadata.GetLabels(),
@@ -402,31 +402,31 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
+func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
-	clientSet := getAgentClientSets(ctx)
-	agentRegistry := getAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := maps.Keys(agentRegistry)
+	clientSet := getConnectorClientSets(ctx)
+	connectorRegistry := getConnectorRegistry(ctx, clientSet)
+	supportedTaskTypes := maps.Keys(connectorRegistry)
 
 	return webapi.PluginEntry{
-		ID:                 "agent-service",
+		ID:                 "connectorIDL-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			plugin := &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         cfg,
 				cs:          clientSet,
-				registry:    agentRegistry,
+				registry:    connectorRegistry,
 			}
-			plugin.watchAgents(ctx, agentService)
+			plugin.watchConnectors(ctx, connectorService)
 			return plugin, nil
 		},
 	}
 }
 
-func RegisterAgentPlugin(agentService *core.AgentService) {
+func RegisterConnectorPlugin(connectorService *core.ConnectorService) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(agentService))
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))
 }
