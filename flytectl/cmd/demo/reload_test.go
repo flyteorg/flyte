@@ -65,7 +65,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 	}, nil)
 	mockDocker.EXPECT().ContainerExecInspect(ctx, "0").Return(types.ContainerExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
 
-	// Register additional mocks for the actual execution of the bootstrap connection
+	// Register additional mocks for the actual execution of the bootstrap connector
 	// in non-legacy sandboxes
 	if !legacy {
 		mockDocker.EXPECT().ContainerExecCreate(
