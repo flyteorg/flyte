@@ -6,7 +6,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.2.4
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
