@@ -6031,7 +6031,7 @@ func TestQueryTemplate(t *testing.T) {
 	})
 }
 
-func TestDeleteExecutionPhase1(t *testing.T) {
+func TestDeleteExecutionPhase(t *testing.T) {
 	t.Run("successful deletion", func(t *testing.T) {
 		repository := repositoryMocks.NewMockRepository()
 
