@@ -666,6 +666,25 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	// Training operator did not modify the job even though it is not suspended
+	pytorchJob := dummyPytorchJobResourceCreator(kubeflowv1.JobCreated)
+	pytorchJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	pytorchJob.Status.StartTime = nil
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, pytorchJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	pytorchJobSuspended := dummyPytorchJobResourceCreator(kubeflowv1.JobCreated)
+	pytorchJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	pytorchJobSuspended.Status.StartTime = nil
+	suspend := true
+	pytorchJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, pytorchJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
