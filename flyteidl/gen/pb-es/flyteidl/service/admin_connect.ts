@@ -8,7 +8,7 @@ import { MethodKind } from "@bufbuild/protobuf";
 import { NamedEntity, NamedEntityGetRequest, NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NamedEntityList, NamedEntityListRequest, NamedEntityUpdateRequest, NamedEntityUpdateResponse, ObjectGetRequest, ResourceListRequest } from "../admin/common_pb.js";
 import { Workflow, WorkflowCreateRequest, WorkflowCreateResponse, WorkflowList } from "../admin/workflow_pb.js";
 import { ActiveLaunchPlanListRequest, ActiveLaunchPlanRequest, LaunchPlan, LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanList, LaunchPlanUpdateRequest, LaunchPlanUpdateResponse } from "../admin/launch_plan_pb.js";
-import { Execution, ExecutionCreateRequest, ExecutionCreateResponse, ExecutionList, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionTerminateRequest, ExecutionTerminateResponse, ExecutionUpdateRequest, ExecutionUpdateResponse, WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse, WorkflowExecutionGetMetricsRequest, WorkflowExecutionGetMetricsResponse, WorkflowExecutionGetRequest } from "../admin/execution_pb.js";
+import { Execution, ExecutionCreateRequest, ExecutionCreateResponse, ExecutionList, ExecutionPhaseDeleteRequest, ExecutionPhaseDeleteResponse, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionTerminateRequest, ExecutionTerminateResponse, ExecutionUpdateRequest, ExecutionUpdateResponse, WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse, WorkflowExecutionGetMetricsRequest, WorkflowExecutionGetMetricsResponse, WorkflowExecutionGetRequest } from "../admin/execution_pb.js";
 import { DynamicNodeWorkflowResponse, GetDynamicNodeWorkflowRequest, NodeExecution, NodeExecutionForTaskListRequest, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionGetRequest, NodeExecutionList, NodeExecutionListRequest } from "../admin/node_execution_pb.js";
 import { GetDomainRequest, GetDomainsResponse, Project, ProjectGetRequest, ProjectListRequest, ProjectRegisterRequest, ProjectRegisterResponse, Projects, ProjectUpdateResponse } from "../admin/project_pb.js";
 import { NodeExecutionEventRequest, NodeExecutionEventResponse, TaskExecutionEventRequest, TaskExecutionEventResponse, WorkflowExecutionEventRequest, WorkflowExecutionEventResponse } from "../admin/event_pb.js";
@@ -645,6 +645,15 @@ export const AdminService = {
       name: "GetExecutionMetrics",
       I: WorkflowExecutionGetMetricsRequest,
       O: WorkflowExecutionGetMetricsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc flyteidl.service.AdminService.DeleteExecutionPhase
+     */
+    deleteExecutionPhase: {
+      name: "DeleteExecutionPhase",
+      I: ExecutionPhaseDeleteRequest,
+      O: ExecutionPhaseDeleteResponse,
       kind: MethodKind.Unary,
     },
   }

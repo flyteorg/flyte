@@ -1959,3 +1959,37 @@ func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error
 	}
 	return filters, nil
 }
+func (m *ExecutionManager) DeleteExecutionPhase(ctx context.Context, req *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	executionPhase := req.GetPhase()
+	if executionPhase == core.WorkflowExecution_UNDEFINED {
+		return nil, fmt.Errorf("execution phase cannot be undefined")
+	}
+
+	workflowExecutionID := req.GetId()
+	if workflowExecutionID == nil {
+		return nil, fmt.Errorf("workflow execution identifier cannot be nil")
+	}
+
+	if workflowExecutionID.GetProject() == "" || workflowExecutionID.GetDomain() == "" {
+		return nil, fmt.Errorf("workflow execution identifier must have project, domain")
+	}
+
+	// Wrap executionPhase in ExecutionPhaseDeleteInput
+	input := repositoryInterfaces.ExecutionPhaseDeleteInput{
+		Project:        workflowExecutionID.GetProject(),
+		Domain:         workflowExecutionID.GetDomain(),
+		ExecutionPhase: executionPhase,
+	}
+
+	err := m.db.ExecutionRepo().Delete(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.ExecutionPhaseDeleteResponse{
+		Message: fmt.Sprintf("Execution phase %s for workflow %s/%s deleted successfully",
+			executionPhase.String(),
+			workflowExecutionID.GetProject(),
+			workflowExecutionID.GetDomain()),
+	}, nil
+}
