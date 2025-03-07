@@ -13,7 +13,7 @@ func TestGetLatestFlytectlVersion(t *testing.T) {
 	t.Run("Get latest release", func(t *testing.T) {
 		mockGh := &mocks.GHRepoService{}
 		// return a list of github releases
-		mockGh.OnListReleasesMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+		mockGh.EXPECT().ListReleases(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 			[]*go_github.RepositoryRelease{
 				{TagName: go_github.String("flytectl/1.2.4")},
 				{TagName: go_github.String("flytectl/1.2.3")},
@@ -50,7 +50,7 @@ func TestGetFlytectlReleases(t *testing.T) {
 			{TagName: go_github.String("flytectl/1.2.3")},
 		}
 		// return a list of github releases
-		mockGh.OnListReleasesMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+		mockGh.EXPECT().ListReleases(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 			allReleases,
 			nil,
 			nil,

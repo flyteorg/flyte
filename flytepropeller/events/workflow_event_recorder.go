@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -output=mocks -case=underscore
+//go:generate mockery --all --output=mocks --case=underscore --with-expecter
 
 // Recorder for Workflow events
 type WorkflowEventRecorder interface {
@@ -69,7 +69,7 @@ func (r *workflowEventRecorder) RecordWorkflowEvent(ctx context.Context, ev *eve
 		logger.Infof(ctx, "Failed to record workflow event [%+v] with err: %v", ev, err)
 		// Only attempt to retry sending an event in the case we tried to send raw output data inline
 		if eventConfig.FallbackToOutputReference && rawOutputPolicy == config.RawOutputPolicyInline {
-			logger.Infof(ctx, "Falling back to sending workflow event outputs by reference for [%+v]", ev.ExecutionId)
+			logger.Infof(ctx, "Falling back to sending workflow event outputs by reference for [%+v]", ev.GetExecutionId())
 			return r.handleFailure(ctx, origEvent, err)
 		}
 		return err

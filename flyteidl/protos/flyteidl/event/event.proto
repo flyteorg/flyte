@@ -127,6 +127,9 @@ message NodeExecutionEvent {
     // if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
     // as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
     bool is_in_dynamic_chain = 24;
+
+    // Whether this node launched an eager task.
+    bool is_eager = 25;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched
@@ -284,6 +287,16 @@ message ExternalResourceInfo {
 
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
+
+    // Additional metadata to do with this event's node target based on the node type. We are
+    // explicitly not including the task_node_metadata here because it is not clear if it is needed.
+    // If we decide to include in the future, we should deprecate the cache_status field.
+    oneof target_metadata {
+        WorkflowNodeMetadata workflow_node_metadata = 7;
+    }
+
+    // Extensible field for custom, plugin-specific info
+    google.protobuf.Struct custom_info = 8;
 }
 
 

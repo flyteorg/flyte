@@ -433,6 +433,9 @@ data:
         disabled: false
         seedProjects:
         - flytesnacks
+        seedProjectsWithDetails:
+        - description: Default project setup.
+          name: flytesnacks
       dataCatalog:
         disabled: false
       propeller:
@@ -450,6 +453,7 @@ data:
         - sidecar
         - k8s-array
         - agent-service
+        - echo
     plugins:
       logs:
         kubernetes-enabled: true
@@ -458,7 +462,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc0"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.0"
       k8s-array:
         logs:
           config:
@@ -495,6 +499,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        - FLYTE_PLATFORM_URL: 'flyte-sandbox-grpc.flyte:8089'
+        - FLYTE_PLATFORM_INSECURE: true
     storage:
       signedURL:
         stowConfigOverride:
@@ -797,7 +803,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UFppYnRpOVNHMVdlZkp0TA==
+  haSharedSecret: TG9qSkFYNDBjc3JJakxZYw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1195,7 +1201,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 6bc1ee22a1eb899398b82b56862cfb1aa09ed96f467d4eae11f2738c284115c2
+        checksum/configuration: 1fee6458b49bdd3e57e43195827fe48bcec36154b537f20796666aab8e647a0f
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1361,7 +1367,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: bfe262b4ef6c387db539e0d2b93d9557907a4a4b5aef3cec954b1ce593d364d9
+        checksum/secret: a6fd0b4e81971aff50f056b2beddcb3b0eb480659bcea29f287a9773123ede6c
       labels:
         app: docker-registry
         release: flyte-sandbox

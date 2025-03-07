@@ -7,27 +7,28 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-var mockSandboxEmailer mocks.MockEmailer
+var mockSandboxEmailer mocks.Emailer
 
 func TestSandboxProcessor_StartProcessingSuccess(t *testing.T) {
 	msgChan := make(chan []byte, 1)
 	msgChan <- msg
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
-		assert.Equal(t, testEmail.Body, email.Body)
-		assert.Equal(t, testEmail.RecipientsEmail, email.RecipientsEmail)
-		assert.Equal(t, testEmail.SubjectLine, email.SubjectLine)
-		assert.Equal(t, testEmail.SenderEmail, email.SenderEmail)
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
+		assert.Equal(t, testEmail.GetBody(), email.GetBody())
+		assert.Equal(t, testEmail.GetRecipientsEmail(), email.GetRecipientsEmail())
+		assert.Equal(t, testEmail.GetSubjectLine(), email.GetSubjectLine())
+		assert.Equal(t, testEmail.GetSenderEmail(), email.GetSenderEmail())
 		return nil
 	}
 
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	assert.Nil(t, testSandboxProcessor.(*SandboxProcessor).run())
 }
 
@@ -43,10 +44,10 @@ func TestSandboxProcessor_StartProcessingError(t *testing.T) {
 	msgChan <- msg
 
 	emailError := errors.New("error running processor")
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 	go testSandboxProcessor.StartProcessing()
@@ -65,16 +66,17 @@ func TestSandboxProcessor_StartProcessingMessageError(t *testing.T) {
 }
 
 func TestSandboxProcessor_StartProcessingEmailError(t *testing.T) {
+	mockSandboxEmailer := mocks.Emailer{}
 	msgChan := make(chan []byte, 1)
 	msgChan <- msg
 	testSandboxProcessor := NewSandboxProcessor(msgChan, &mockSandboxEmailer)
 
 	emailError := errors.New("error sending email")
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
 
-	mockSandboxEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	mockSandboxEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	assert.NotNil(t, testSandboxProcessor.(*SandboxProcessor).run())
 }
 

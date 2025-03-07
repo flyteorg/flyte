@@ -13,7 +13,9 @@ import (
 )
 
 func TestWorkflowMetadataCanBeActivated(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -31,7 +33,9 @@ func TestWorkflowMetadataCanBeActivated(t *testing.T) {
 }
 
 func TestWorkflowMetadataCanBeArchived(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ACTIVE
 			config.Archive = true
@@ -49,7 +53,9 @@ func TestWorkflowMetadataCanBeArchived(t *testing.T) {
 }
 
 func TestWorkflowMetadataCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			config.Activate = true
 			config.Archive = true
@@ -61,7 +67,9 @@ func TestWorkflowMetadataCannotBeActivatedAndArchivedAtTheSameTime(t *testing.T)
 }
 
 func TestWorkflowMetadataUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ACTIVE
 			config.Activate = true
@@ -74,7 +82,9 @@ func TestWorkflowMetadataUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 }
 
 func TestWorkflowMetadataUpdateWithoutForceFlagFails(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -87,7 +97,9 @@ func TestWorkflowMetadataUpdateWithoutForceFlagFails(t *testing.T) {
 }
 
 func TestWorkflowMetadataUpdateDoesNothingWithDryRunFlag(t *testing.T) {
-	testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+	testNamedEntityUpdate(
+		t,
+		core.ResourceType_WORKFLOW,
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 			namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 			config.Activate = true
@@ -101,7 +113,9 @@ func TestWorkflowMetadataUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 func TestForceFlagIsIgnoredWithDryRunDuringWorkflowMetadataUpdate(t *testing.T) {
 	t.Run("without --force", func(t *testing.T) {
-		testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+		testNamedEntityUpdate(
+			t,
+			core.ResourceType_WORKFLOW,
 			/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 				namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 				config.Activate = true
@@ -116,7 +130,9 @@ func TestForceFlagIsIgnoredWithDryRunDuringWorkflowMetadataUpdate(t *testing.T) 
 	})
 
 	t.Run("with --force", func(t *testing.T) {
-		testNamedEntityUpdate(core.ResourceType_WORKFLOW,
+		testNamedEntityUpdate(
+			t,
+			core.ResourceType_WORKFLOW,
 			/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
 				namedEntity.Metadata.State = admin.NamedEntityState_NAMED_ENTITY_ARCHIVED
 				config.Activate = true
@@ -133,15 +149,16 @@ func TestForceFlagIsIgnoredWithDryRunDuringWorkflowMetadataUpdate(t *testing.T) 
 
 func TestWorkflowMetadataUpdateFailsWhenWorkflowDoesNotExist(t *testing.T) {
 	testNamedEntityUpdateWithMockSetup(
+		t,
 		core.ResourceType_WORKFLOW,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
-				OnGetNamedEntityMatch(
-					s.Ctx,
-					mock.Anything).
+				EXPECT().GetNamedEntity(
+				s.Ctx,
+				mock.Anything).
 				Return(nil, ext.NewNotFoundError("named entity not found"))
 			s.MockAdminClient.
-				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateNamedEntity(s.Ctx, mock.Anything).
 				Return(&admin.NamedEntityUpdateResponse{}, nil)
 		},
 		/* setup */ nil,
@@ -154,15 +171,16 @@ func TestWorkflowMetadataUpdateFailsWhenWorkflowDoesNotExist(t *testing.T) {
 
 func TestWorkflowMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 	testNamedEntityUpdateWithMockSetup(
+		t,
 		core.ResourceType_WORKFLOW,
 		/* mockSetup */ func(s *testutils.TestStruct, namedEntity *admin.NamedEntity) {
 			s.MockAdminClient.
-				OnGetNamedEntityMatch(
-					s.Ctx,
-					mock.Anything).
+				EXPECT().GetNamedEntity(
+				s.Ctx,
+				mock.Anything).
 				Return(namedEntity, nil)
 			s.MockAdminClient.
-				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).
+				EXPECT().UpdateNamedEntity(s.Ctx, mock.Anything).
 				Return(nil, fmt.Errorf("network error"))
 		},
 		/* setup */ func(s *testutils.TestStruct, config *NamedEntityConfig, namedEntity *admin.NamedEntity) {
@@ -178,7 +196,8 @@ func TestWorkflowMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func TestWorkflowMetadataUpdateRequiresWorkflowName(t *testing.T) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	config := &NamedEntityConfig{}
 
 	err := getUpdateWorkflowFunc(config)(s.Ctx, nil, s.CmdCtx)

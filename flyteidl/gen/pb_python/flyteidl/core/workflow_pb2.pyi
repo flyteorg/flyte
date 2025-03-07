@@ -91,27 +91,46 @@ class GateNode(_message.Message):
     def __init__(self, approve: _Optional[_Union[ApproveCondition, _Mapping]] = ..., signal: _Optional[_Union[SignalCondition, _Mapping]] = ..., sleep: _Optional[_Union[SleepCondition, _Mapping]] = ...) -> None: ...
 
 class ArrayNode(_message.Message):
-    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode"]
+    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_mode", "is_original_sub_node_interface", "data_mode", "bound_inputs"]
     class ExecutionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         MINIMAL_STATE: _ClassVar[ArrayNode.ExecutionMode]
         FULL_STATE: _ClassVar[ArrayNode.ExecutionMode]
     MINIMAL_STATE: ArrayNode.ExecutionMode
     FULL_STATE: ArrayNode.ExecutionMode
+    class DataMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        SINGLE_INPUT_FILE: _ClassVar[ArrayNode.DataMode]
+        INDIVIDUAL_INPUT_FILES: _ClassVar[ArrayNode.DataMode]
+    SINGLE_INPUT_FILE: ArrayNode.DataMode
+    INDIVIDUAL_INPUT_FILES: ArrayNode.DataMode
     NODE_FIELD_NUMBER: _ClassVar[int]
     PARALLELISM_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESS_RATIO_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_MODE_FIELD_NUMBER: _ClassVar[int]
+    IS_ORIGINAL_SUB_NODE_INTERFACE_FIELD_NUMBER: _ClassVar[int]
+    DATA_MODE_FIELD_NUMBER: _ClassVar[int]
+    BOUND_INPUTS_FIELD_NUMBER: _ClassVar[int]
     node: Node
     parallelism: int
     min_successes: int
     min_success_ratio: float
     execution_mode: ArrayNode.ExecutionMode
-    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ...) -> None: ...
+    is_original_sub_node_interface: _wrappers_pb2.BoolValue
+    data_mode: ArrayNode.DataMode
+    bound_inputs: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_mode: _Optional[_Union[ArrayNode.ExecutionMode, str]] = ..., is_original_sub_node_interface: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., data_mode: _Optional[_Union[ArrayNode.DataMode, str]] = ..., bound_inputs: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
-    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]
+    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable", "config"]
+    class ConfigEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAME_FIELD_NUMBER: _ClassVar[int]
     TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
@@ -119,6 +138,7 @@ class NodeMetadata(_message.Message):
     CACHEABLE_FIELD_NUMBER: _ClassVar[int]
     CACHE_VERSION_FIELD_NUMBER: _ClassVar[int]
     CACHE_SERIALIZABLE_FIELD_NUMBER: _ClassVar[int]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
     name: str
     timeout: _duration_pb2.Duration
     retries: _literals_pb2.RetryStrategy
@@ -126,7 +146,8 @@ class NodeMetadata(_message.Message):
     cacheable: bool
     cache_version: str
     cache_serializable: bool
-    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ...) -> None: ...
+    config: _containers.ScalarMap[str, str]
+    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class Alias(_message.Message):
     __slots__ = ["var", "alias"]
@@ -208,14 +229,16 @@ class WorkflowTemplate(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., metadata: _Optional[_Union[WorkflowMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., outputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., failure_node: _Optional[_Union[Node, _Mapping]] = ..., metadata_defaults: _Optional[_Union[WorkflowMetadataDefaults, _Mapping]] = ...) -> None: ...
 
 class TaskNodeOverrides(_message.Message):
-    __slots__ = ["resources", "extended_resources", "container_image"]
+    __slots__ = ["resources", "extended_resources", "container_image", "pod_template"]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
     EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     CONTAINER_IMAGE_FIELD_NUMBER: _ClassVar[int]
+    POD_TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     resources: _tasks_pb2.Resources
     extended_resources: _tasks_pb2.ExtendedResources
     container_image: str
-    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ...) -> None: ...
+    pod_template: _tasks_pb2.K8sPod
+    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ..., pod_template: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanTemplate(_message.Message):
     __slots__ = ["id", "interface", "fixed_inputs"]

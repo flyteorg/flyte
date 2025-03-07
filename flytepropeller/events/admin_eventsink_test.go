@@ -79,14 +79,14 @@ func CreateMockAdminEventSink(t *testing.T, rate int64, capacity int) (EventSink
 func TestAdminWorkflowEvent(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, adminClient, filter := CreateMockAdminEventSink(t, 100, 1000)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(false)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(false)
 
 	adminClient.On(
 		"CreateWorkflowEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.WorkflowExecutionEventRequest) bool {
-			return req.Event == wfEvent
+			return req.GetEvent() == wfEvent
 		},
 		)).Return(&admin.WorkflowExecutionEventResponse{}, nil)
 
@@ -97,14 +97,14 @@ func TestAdminWorkflowEvent(t *testing.T) {
 func TestAdminNodeEvent(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, adminClient, filter := CreateMockAdminEventSink(t, 100, 1000)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(false)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(false)
 
 	adminClient.On(
 		"CreateNodeEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.NodeExecutionEventRequest) bool {
-			return req.Event == nodeEvent
+			return req.GetEvent() == nodeEvent
 		}),
 	).Return(&admin.NodeExecutionEventResponse{}, nil)
 
@@ -115,14 +115,14 @@ func TestAdminNodeEvent(t *testing.T) {
 func TestAdminTaskEvent(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, adminClient, filter := CreateMockAdminEventSink(t, 100, 1000)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(false)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(false)
 
 	adminClient.On(
 		"CreateTaskEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.TaskExecutionEventRequest) bool {
-			return req.Event == taskEvent
+			return req.GetEvent() == taskEvent
 		}),
 	).Return(&admin.TaskExecutionEventResponse{}, nil)
 
@@ -133,8 +133,8 @@ func TestAdminTaskEvent(t *testing.T) {
 func TestAdminAlreadyExistsError(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, adminClient, filter := CreateMockAdminEventSink(t, 100, 1000)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(false)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(false)
 
 	alreadyExistErr := status.Error(codes.AlreadyExists, "Grpc AlreadyExists error")
 
@@ -152,14 +152,14 @@ func TestAdminAlreadyExistsError(t *testing.T) {
 func TestAdminRateLimitError(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, adminClient, filter := CreateMockAdminEventSink(t, 1, 1)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(false)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(false)
 
 	adminClient.On(
 		"CreateTaskEvent",
 		ctx,
 		mock.MatchedBy(func(req *admin.TaskExecutionEventRequest) bool {
-			return req.Event == taskEvent
+			return req.GetEvent() == taskEvent
 		}),
 	).Return(&admin.TaskExecutionEventResponse{}, nil)
 
@@ -180,17 +180,20 @@ func TestAdminRateLimitError(t *testing.T) {
 func TestAdminFilterContains(t *testing.T) {
 	ctx := context.Background()
 	adminEventSink, _, filter := CreateMockAdminEventSink(t, 1, 1)
-	filter.OnAddMatch(mock.Anything, mock.Anything).Return(true)
-	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Add(mock.Anything, mock.Anything).Return(true)
+	filter.EXPECT().Contains(mock.Anything, mock.Anything).Return(true)
 
 	wfErr := adminEventSink.Sink(ctx, wfEvent)
-	assert.NoError(t, wfErr)
+	assert.Error(t, wfErr)
+	assert.True(t, errors.IsAlreadyExists(wfErr))
 
 	nodeErr := adminEventSink.Sink(ctx, nodeEvent)
-	assert.NoError(t, nodeErr)
+	assert.Error(t, nodeErr)
+	assert.True(t, errors.IsAlreadyExists(nodeErr))
 
 	taskErr := adminEventSink.Sink(ctx, taskEvent)
-	assert.NoError(t, taskErr)
+	assert.Error(t, taskErr)
+	assert.True(t, errors.IsAlreadyExists(taskErr))
 }
 
 func TestIDFromMessage(t *testing.T) {

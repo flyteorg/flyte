@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -13,7 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-var taskIdentifier = core.Identifier{
+var taskIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
 	Name:         "Name",
 	Domain:       "Domain",
@@ -24,10 +25,10 @@ var taskIdentifier = core.Identifier{
 func TestTaskHappyCase(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetCreateCallback(
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().CreateTask(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return &admin.TaskCreateResponse{}, nil
 		},
 	)
@@ -36,7 +37,7 @@ func TestTaskHappyCase(t *testing.T) {
 	})
 
 	resp, err := mockServer.CreateTask(ctx, &admin.TaskCreateRequest{
-		Id: &taskIdentifier,
+		Id: taskIdentifier,
 	})
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
@@ -45,11 +46,11 @@ func TestTaskHappyCase(t *testing.T) {
 func TestTaskError(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetCreateCallback(
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().CreateTask(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
-			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.Id)
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.GetId())
 		},
 	)
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{
@@ -73,11 +74,11 @@ func TestTaskError(t *testing.T) {
 func TestListUniqueTaskIds(t *testing.T) {
 	ctx := context.Background()
 
-	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+	mockTaskManager := mocks.TaskInterface{}
+	mockTaskManager.EXPECT().ListUniqueTaskIdentifiers(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error) {
 
-		assert.Equal(t, "staging", request.Domain)
+		assert.Equal(t, "staging", request.GetDomain())
 		return nil, nil
 	})
 	mockServer := NewMockAdminServer(NewMockAdminServerInput{

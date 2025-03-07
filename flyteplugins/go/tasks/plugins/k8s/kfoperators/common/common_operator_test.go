@@ -8,6 +8,7 @@ import (
 
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -17,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 func TestMain(m *testing.M) {
@@ -170,36 +172,37 @@ func TestGetLogs(t *testing.T) {
 	workers := int32(1)
 	launcher := int32(1)
 
+	taskTemplate := dummyTaskTemplate()
 	taskCtx := dummyTaskContext()
 	mpiJobObjectMeta := meta_v1.ObjectMeta{
 		Name:      "test",
 		Namespace: "mpi-namespace",
 	}
-	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0, 0)
+	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].GetUri())
 
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
 		Name:      "test",
 		Namespace: "pytorch-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0, 0)
+	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[1].GetUri())
 
 	tensorflowJobObjectMeta := meta_v1.ObjectMeta{
 		Name:      "test",
 		Namespace: "tensorflow-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1, 0)
+	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, taskTemplate, false, workers, launcher, 1, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[1].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[2].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[1].GetUri())
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[2].GetUri())
 
 }
 
@@ -209,6 +212,7 @@ func TestGetLogsTemplateUri(t *testing.T) {
 		StackDriverTemplateURI: "https://console.cloud.google.com/logs/query;query=resource.labels.pod_name={{.podName}}&timestamp>{{.podRFC3339StartTime}}",
 	}))
 
+	taskTemplate := dummyTaskTemplate()
 	taskCtx := dummyTaskContext()
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
 		Name: "test",
@@ -218,11 +222,42 @@ func TestGetLogsTemplateUri(t *testing.T) {
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},
 	}
-	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
+	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, 1, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].GetUri())
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[1].GetUri())
+}
+
+func TestGetLogsDynamic(t *testing.T) {
+	dynamicLinks := map[string]tasklog.TemplateLogPlugin{
+		"test-dynamic-link": {
+			TemplateURIs: []string{"https://some-service.com/{{.taskConfig.dynamicParam}}"},
+		},
+	}
+
+	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
+		DynamicLogLinks: dynamicLinks,
+	}))
+
+	taskTemplate := dummyTaskTemplate()
+	taskTemplate.Config = map[string]string{
+		"link_type":    "test-dynamic-link",
+		"dynamicParam": "dynamic-value",
+	}
+	taskCtx := dummyTaskContext()
+	pytorchJobObjectMeta := meta_v1.ObjectMeta{
+		Name: "test",
+		Namespace: "pytorch-" +
+			"namespace",
+		CreationTimestamp: meta_v1.Time{
+			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
+		},
+	}
+	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, 1, 0, 0, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobLogs))
+	assert.Equal(t, "https://some-service.com/dynamic-value", jobLogs[0].GetUri())
 }
 
 func dummyPodSpec() v1.PodSpec {
@@ -297,11 +332,30 @@ func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 	assert.Equal(t, []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"}, podSpec.Containers[0].Args)
 }
 
+func dummyTaskTemplate() *core.TaskTemplate {
+	id := "dummy-id"
+
+	testImage := "dummy-image"
+
+	structObj := structpb.Struct{}
+
+	return &core.TaskTemplate{
+		Id:   &core.Identifier{Name: id},
+		Type: "container",
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image: testImage,
+			},
+		},
+		Custom: &structObj,
+	}
+}
+
 func dummyTaskContext() pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -318,11 +372,11 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 		},
 		RetryAttempt: 0,
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

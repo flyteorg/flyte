@@ -35,7 +35,7 @@ func newJobsStore(t testing.TB, batchClient Client) *JobStore {
 func newJobsStoreWithSize(t testing.TB, batchClient Client, size int) *JobStore {
 	store, err := NewJobStore(context.TODO(), batchClient, config.JobStoreConfig{
 		CacheSize:      size,
-		Parallelizm:    1,
+		Parallelism:    1,
 		BatchChunkSize: 2,
 		ResyncPeriod:   config2.Duration{Duration: 1000},
 	}, EventHandler{}, promutils.NewTestScope())
@@ -204,11 +204,11 @@ func Test_syncBatches(t *testing.T) {
 		}}, 2)
 
 		i := &mocks3.ItemWrapper{}
-		i.OnGetItem().Return(&Job{
+		i.EXPECT().GetItem().Return(&Job{
 			ID:      "job",
 			SubJobs: createSubJobList(3),
 		})
-		i.OnGetID().Return("job")
+		i.EXPECT().GetID().Return("job")
 
 		var resp []cache.ItemSyncResponse
 		var err error
@@ -239,11 +239,11 @@ func Test_syncBatches(t *testing.T) {
 		}}, 10)
 
 		i := &mocks3.ItemWrapper{}
-		i.OnGetItem().Return(&Job{
+		i.EXPECT().GetItem().Return(&Job{
 			ID:      "job",
 			SubJobs: createSubJobList(3),
 		})
-		i.OnGetID().Return("job")
+		i.EXPECT().GetID().Return("job")
 
 		var resp []cache.ItemSyncResponse
 		var err error

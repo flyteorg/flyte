@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
@@ -30,6 +30,27 @@ type PluginEntry struct {
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
 }
 
+type ErrorAggregationStrategy int
+
+const (
+	// Single error file from a single container
+	DefaultErrorAggregationStrategy ErrorAggregationStrategy = iota
+
+	// Earliest error from potentially multiple error files
+	EarliestErrorAggregationStrategy
+)
+
+func (e ErrorAggregationStrategy) String() string {
+	switch e {
+	case DefaultErrorAggregationStrategy:
+		return "Default"
+	case EarliestErrorAggregationStrategy:
+		return "Earliest"
+	default:
+		panic("Unknown enum value, cannot happen")
+	}
+}
+
 // System level properties that this Plugin supports
 type PluginProperties struct {
 	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.
@@ -45,6 +66,8 @@ type PluginProperties struct {
 	// override that behavior unless the resource that gets created for this plugin does not consume resources (cluster's
 	// cpu/memory... etc. or external resources) once the plugin's Plugin.GetTaskPhase() returns a terminal phase.
 	DisableDeleteResourceOnFinalize bool
+	// Specifies how errors are aggregated
+	ErrorAggregationStrategy ErrorAggregationStrategy
 }
 
 // Special context passed in to plugins when checking task phase
@@ -125,12 +148,12 @@ type UpdateResourceOperation struct {
 	Options []client.UpdateOption
 }
 
-// AbortBehavior that patches the default resource
+// AbortBehaviorPatchDefaultResource that patches the default resource
 func AbortBehaviorPatchDefaultResource(patchOperation PatchResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorPatch(patchOperation, deleteOnErr, nil)
 }
 
-// AbortBehavior that patches the specified resource
+// AbortBehaviorPatch that patches the specified resource
 func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -139,12 +162,12 @@ func AbortBehaviorPatch(patchOperation PatchResourceOperation, deleteOnErr bool,
 	}
 }
 
-// AbortBehavior that updates the default resource
+// AbortBehaviorUpdateDefaultResource that updates the default resource
 func AbortBehaviorUpdateDefaultResource(updateOperation UpdateResourceOperation, deleteOnErr bool) AbortBehavior {
 	return AbortBehaviorUpdate(updateOperation, deleteOnErr, nil)
 }
 
-// AbortBehavior that updates the specified resource
+// AbortBehaviorUpdate that updates the specified resource
 func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bool, resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:    resource,
@@ -153,12 +176,12 @@ func AbortBehaviorUpdate(updateOperation UpdateResourceOperation, deleteOnErr bo
 	}
 }
 
-// AbortBehavior that deletes the default resource
+// AbortBehaviorDeleteDefaultResource that deletes the default resource
 func AbortBehaviorDeleteDefaultResource() AbortBehavior {
 	return AbortBehaviorDelete(nil)
 }
 
-// AbortBehavior that deletes the specified resource
+// AbortBehaviorDelete that deletes the specified resource
 func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 	return AbortBehavior{
 		Resource:       resource,

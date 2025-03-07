@@ -29,7 +29,7 @@ var (
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test"))
 
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
@@ -56,7 +56,7 @@ func TestPlugin(t *testing.T) {
 
 func TestSendRequest(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test1"))
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test1"))
 	databricksJob := map[string]interface{}{"sparkConfig": map[string]interface{}{"sparkVersion": "7.3.x-scala2.12"}}
 	token := "token"
 
@@ -148,7 +148,7 @@ func TestCreateTaskInfo(t *testing.T) {
 		taskInfo := createTaskInfo("run-id", "job-id", testInstance)
 
 		assert.Equal(t, 1, len(taskInfo.Logs))
-		assert.Equal(t, taskInfo.Logs[0].Uri, "https://test-account.cloud.databricks.com/#job/job-id/run/run-id")
-		assert.Equal(t, taskInfo.Logs[0].Name, "Databricks Console")
+		assert.Equal(t, taskInfo.Logs[0].GetUri(), "https://test-account.cloud.databricks.com/#job/job-id/run/run-id")
+		assert.Equal(t, taskInfo.Logs[0].GetName(), "Databricks Console")
 	})
 }

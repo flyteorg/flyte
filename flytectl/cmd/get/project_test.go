@@ -51,13 +51,12 @@ func getProjectSetup() {
 }
 
 func TestListProjectFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	s.MockAdminClient.EXPECT().ListProjects(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 
 	assert.Nil(t, err)
@@ -65,30 +64,28 @@ func TestListProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	argsProject = []string{}
 
 	project.DefaultConfig.Filter = filters.Filters{}
-	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
+	s.MockAdminClient.EXPECT().ListProjects(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{}).Return(projectListResponse, nil)
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)
 	assert.Nil(t, err)
 	s.FetcherExt.AssertCalled(t, "ListProjects", s.Ctx, filters.Filters{})
 }
 
 func TestGetProjectFuncError(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "hello=",
 	}
-	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(nil, fmt.Errorf("Please add a valid field selector"))
-	s.FetcherExt.OnListProjects(s.Ctx, filters.Filters{
+	s.MockAdminClient.EXPECT().ListProjects(s.Ctx, resourceListRequestProject).Return(nil, fmt.Errorf("Please add a valid field selector"))
+	s.FetcherExt.EXPECT().ListProjects(s.Ctx, filters.Filters{
 		FieldSelector: "hello=",
 	}).Return(nil, fmt.Errorf("Please add a valid field selector"))
 	err := getProjectsFunc(s.Ctx, argsProject, s.CmdCtx)

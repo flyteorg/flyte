@@ -43,7 +43,7 @@ func TestExecutor_Handle(t *testing.T) {
 	jc := definition.NewCache(10)
 
 	q := &queueMocks.IndexedWorkQueue{}
-	q.OnQueueMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	q.EXPECT().Queue(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 
 	oa := array.OutputAssembler{
 		IndexedWorkQueue: q,
@@ -59,7 +59,7 @@ func TestExecutor_Handle(t *testing.T) {
 	ctx := context.Background()
 
 	tr := &pluginMocks.TaskReader{}
-	tr.OnRead(ctx).Return(&core.TaskTemplate{
+	tr.EXPECT().Read(ctx).Return(&core.TaskTemplate{
 		Target: &core.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
 		},
@@ -90,8 +90,8 @@ func TestExecutor_Handle(t *testing.T) {
 		})
 
 	tID := &pluginMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("notfound")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("notfound")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      "a",
@@ -111,13 +111,13 @@ func TestExecutor_Handle(t *testing.T) {
 	})
 
 	overrides := &pluginMocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfig().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
 
 	dataStore, err := storage.NewDataStore(&storage.Config{
 		Type: storage.TypeMemory,
@@ -125,15 +125,15 @@ func TestExecutor_Handle(t *testing.T) {
 	assert.NoError(t, err)
 
 	inputReader := &mocks2.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/inputs.pb")
+	inputReader.EXPECT().GetInputPrefixPath().Return("/inputs.pb")
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnPluginStateReader().Return(pluginStateReader)
-	tCtx.OnPluginStateWriter().Return(pluginStateWriter)
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnDataStore().Return(dataStore)
-	tCtx.OnInputReader().Return(inputReader)
+	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
+	tCtx.EXPECT().PluginStateWriter().Return(pluginStateWriter)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().DataStore().Return(dataStore)
+	tCtx.EXPECT().InputReader().Return(inputReader)
 
 	transition, err := e.Handle(ctx, tCtx)
 	assert.NoError(t, err)

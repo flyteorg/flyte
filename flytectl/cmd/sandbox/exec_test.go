@@ -27,7 +27,7 @@ func TestSandboxClusterExec(t *testing.T) {
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	reader := bufio.NewReader(strings.NewReader("test"))
 
-	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
+	mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{
@@ -36,9 +36,9 @@ func TestSandboxClusterExec(t *testing.T) {
 		},
 	}, nil)
 	docker.ExecConfig.Cmd = []string{"ls -al"}
-	mockDocker.OnContainerExecCreateMatch(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
-	mockDocker.OnContainerExecInspectMatch(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-	mockDocker.OnContainerExecAttachMatch(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
+	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
+	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
 		Reader: reader,
 	}, fmt.Errorf("Test"))
 	docker.Client = mockDocker
@@ -50,10 +50,10 @@ func TestSandboxClusterExec(t *testing.T) {
 func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	reader := bufio.NewReader(strings.NewReader("test"))
-	s := testutils.Setup()
+	s := testutils.Setup(t)
 	ctx := s.Ctx
 
-	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
+	mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{
@@ -62,9 +62,9 @@ func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 		},
 	}, nil)
 	docker.ExecConfig.Cmd = []string{}
-	mockDocker.OnContainerExecCreateMatch(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
-	mockDocker.OnContainerExecInspectMatch(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-	mockDocker.OnContainerExecAttachMatch(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, docker.ExecConfig).Return(types.IDResponse{}, nil)
+	mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
+	mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
 		Reader: reader,
 	}, fmt.Errorf("Test"))
 	docker.Client = mockDocker

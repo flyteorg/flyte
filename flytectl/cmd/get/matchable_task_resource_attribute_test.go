@@ -54,12 +54,11 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -68,13 +67,12 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		taskresourceattribute.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -83,13 +81,12 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		taskresourceattribute.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -99,12 +96,11 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -114,12 +110,11 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(workflowResp, nil)
 		err := getTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -129,12 +124,11 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskResourceAttributeSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)

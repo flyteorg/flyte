@@ -129,7 +129,7 @@ func TestAddTag(t *testing.T) {
 		_, err := tagManager.AddTag(context.Background(), &datacatalog.AddTagRequest{
 			Tag: &datacatalog.Tag{
 				ArtifactId: "noArtifact",
-				Dataset:    getTestDataset().Id,
+				Dataset:    getTestDataset().GetId(),
 			},
 		})
 
@@ -143,7 +143,7 @@ func TestAddTag(t *testing.T) {
 		_, err := tagManager.AddTag(context.Background(), &datacatalog.AddTagRequest{
 			Tag: &datacatalog.Tag{
 				Name:    "noArtifact",
-				Dataset: getTestDataset().Id,
+				Dataset: getTestDataset().GetId(),
 			},
 		})
 

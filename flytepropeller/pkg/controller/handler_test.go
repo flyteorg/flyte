@@ -9,7 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -63,7 +65,7 @@ func TestPropeller_Handle(t *testing.T) {
 		s := &mocks.FlyteWorkflow{}
 		exec := &mockExecutor{}
 		p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrStaleWorkflowError, "stale")).Once()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrStaleWorkflowError, "stale")).Once()
 		assert.NoError(t, p.Handle(ctx, namespace, name))
 	})
 
@@ -249,7 +251,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -268,7 +270,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("handlingPanics", func(t *testing.T) {
@@ -276,7 +278,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -294,7 +296,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 		assert.Equal(t, uint32(1), r.Status.FailedAttempts)
 	})
 
@@ -303,7 +305,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -322,7 +324,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("retriesExhaustedFinalize", func(t *testing.T) {
@@ -330,7 +332,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -351,7 +353,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 		assert.True(t, abortCalled)
 	})
@@ -362,7 +364,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,
 				Namespace:         namespace,
-				Finalizers:        []string{"f1"},
+				Finalizers:        []string{Finalizer, "f1"},
 				DeletionTimestamp: &n,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
@@ -381,7 +383,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseAborted, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 
@@ -420,7 +422,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -435,7 +437,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSuccess, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 
@@ -444,7 +446,7 @@ func TestPropeller_Handle(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -459,7 +461,7 @@ func TestPropeller_Handle(t *testing.T) {
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
-		assert.Equal(t, 0, len(r.Finalizers))
+		assert.NotContains(t, r.Finalizers, Finalizer)
 		assert.True(t, HasCompletedLabel(r))
 	})
 	t.Run("failOnExecutionNotFoundError", func(t *testing.T) {
@@ -638,7 +640,7 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 			ObjectMeta: v1.ObjectMeta{
 				Name:       name,
 				Namespace:  namespace,
-				Finalizers: []string{"f1"},
+				Finalizers: []string{Finalizer, "f1"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -662,7 +664,7 @@ func TestPropeller_Handle_TurboMode(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, 1, len(r.Finalizers))
+		assert.Equal(t, 2, len(r.Finalizers))
 	})
 
 	t.Run("happy-nochange", func(t *testing.T) {
@@ -767,8 +769,8 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 				ID: "w1",
 			},
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -788,8 +790,8 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 				ID: "w1",
 			},
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -813,7 +815,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseRunning, "done", nil)
 			return nil
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
 			return w.Status.Phase == v1alpha1.WorkflowPhaseFailing
@@ -840,10 +842,10 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", nil)
 			return nil
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
-			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !HasFinalizer(w) && HasCompletedLabel(w)
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !controllerutil.ContainsFinalizer(w, Finalizer) && HasCompletedLabel(w)
 		}), mock.Anything).Return(nil, nil).Once()
 		err := p.Handle(ctx, namespace, name)
 		assert.NoError(t, err)
@@ -879,9 +881,9 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
 			// populate mock CompiledWorkflowClosure that satisfies just enough to compile
-			wfClosure := args.Get(2)
+			wfClosure := msg
 			assert.NotNil(t, wfClosure)
 			casted := wfClosure.(*admin.WorkflowClosure)
 			casted.CompiledWorkflow = &core.CompiledWorkflowClosure{
@@ -912,7 +914,7 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
 		dataStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, protoStore)
 		p := NewPropellerHandler(ctx, cfg, dataStore, s, exec, scope)
 
@@ -924,7 +926,7 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
 			return fmt.Errorf("foo")
 		}

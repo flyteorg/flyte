@@ -6,6 +6,7 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 
 package flyteidl.core;
 
@@ -60,12 +61,25 @@ message GPUAccelerator {
     }
 }
 
+// Metadata associated with configuring a shared memory volume for a task.
+message SharedMemory {
+    // Mount path to place in container
+    string mount_path = 1;
+    // Name for volume
+    string mount_name = 2;
+    // Size limit for shared memory. If not set, then the shared memory is equal
+    // to the allocated memory.
+    // +optional
+    string size_limit = 3;
+}
+
 // Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
 // allocate to a task.
 message ExtendedResources {
     // GPU accelerator to select for task. Contains information about device type, and
     // for multi-instance GPUs, the partition size to use.
     GPUAccelerator gpu_accelerator = 1;
+    SharedMemory shared_memory = 2;
 }
 
 // Runtime information. This is loosely defined to allow for extensibility.
@@ -88,6 +102,10 @@ message RuntimeMetadata {
 
 // Task Metadata
 message TaskMetadata {
+    // Field number 10 is reserved because we are reusing the name generates_deck for field number 15,
+    // but with a different type.
+    reserved 10;
+
     // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
     bool discoverable = 1;
 
@@ -121,9 +139,6 @@ message TaskMetadata {
     // Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work
     bool cache_serializable = 9;
 
-    // Indicates whether the task will generate a Deck URI when it finishes executing.
-    bool generates_deck = 10;
-
     // Arbitrary tags that allow users and the platform to store small but arbitrary labels
     map<string, string> tags = 11;
 
@@ -134,6 +149,16 @@ message TaskMetadata {
 
     // cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
     repeated string cache_ignore_input_vars  = 13;
+    // is_eager indicates whether the task is eager or not.
+    // This would be used by CreateTask endpoint.
+    bool is_eager = 14;
+
+    // Indicates whether the task will generate a deck when it finishes executing.
+    // The BoolValue can have three states:
+    // - nil: The value is not set.
+    // - true: The task will generate a deck.
+    // - false: The task will not generate a deck.
+    google.protobuf.BoolValue generates_deck = 15;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -189,6 +214,8 @@ message ContainerPort {
     // Number of port to expose on the pod's IP address.
     // This must be a valid port number, 0 < x < 65536.
     uint32 container_port = 1;
+    // Name of the port to expose on the pod's IP address.
+    string name = 2;
 }
 
 message Container {
@@ -317,6 +344,10 @@ message K8sPod {
     // to understand the default paths.
     // Only K8s
     DataLoadingConfig data_config = 3;
+
+
+    // Defines the primary container name when pod template override is executed.
+    string primary_container_name = 4;
 }
 
 // Metadata for building a kubernetes object when a task is executed.

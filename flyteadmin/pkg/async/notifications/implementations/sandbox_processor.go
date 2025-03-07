@@ -27,12 +27,12 @@ func (p *SandboxProcessor) StartProcessing() {
 }
 
 func (p *SandboxProcessor) run() error {
-	var emailMessage admin.EmailMessage
+	emailMessage := &admin.EmailMessage{}
 
 	for {
 		select {
 		case msg := <-p.subChan:
-			err := proto.Unmarshal(msg, &emailMessage)
+			err := proto.Unmarshal(msg, emailMessage)
 			if err != nil {
 				logger.Errorf(context.Background(), "error with unmarshalling message [%v]", err)
 				return err

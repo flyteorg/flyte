@@ -54,10 +54,10 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1"}
-		mockRedisClient.OnSIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
-		mockRedisClient.OnSMembers("test-resource1").Return(allocatedTokens, nil)
-		mockRedisClient.OnSCard("test-resource1").Return(int64(len(allocatedTokens)), nil)
-		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
+		mockRedisClient.EXPECT().SIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
+		mockRedisClient.EXPECT().SMembers("test-resource1").Return(allocatedTokens, nil)
+		mockRedisClient.EXPECT().SCard("test-resource1").Return(int64(len(allocatedTokens)), nil)
+		mockRedisClient.EXPECT().SAdd(mock.Anything, mock.Anything).Return(0, nil)
 
 		mockComposedResourceConstraintList := createMockComposedResourceConstraintList()
 		ns1Got, err := r.AllocateResource(mockContext, "test-resource1", "ns1-token2", mockComposedResourceConstraintList)
@@ -79,10 +79,10 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1", "ns1-token2", "ns1-token3"}
-		mockRedisClient.OnSIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
-		mockRedisClient.OnSMembers("test-resource2").Return(allocatedTokens, nil)
-		mockRedisClient.OnSCard("test-resource2").Return(int64(len(allocatedTokens)), nil)
-		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
+		mockRedisClient.EXPECT().SIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
+		mockRedisClient.EXPECT().SMembers("test-resource2").Return(allocatedTokens, nil)
+		mockRedisClient.EXPECT().SCard("test-resource2").Return(int64(len(allocatedTokens)), nil)
+		mockRedisClient.EXPECT().SAdd(mock.Anything, mock.Anything).Return(0, nil)
 		got, err := r.AllocateResource(mockContext, "test-resource2", "ns1-token4", []FullyQualifiedResourceConstraint{})
 		assert.Nil(t, err)
 		assert.Equal(t, core.AllocationStatusGranted, got)
@@ -98,10 +98,10 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1", "ns1-token2", "ns1-token3", "ns1-token4"}
-		mockRedisClient.OnSIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
-		mockRedisClient.OnSMembers("test-resource2").Return(allocatedTokens, nil)
-		mockRedisClient.OnSCard("test-resource2").Return(int64(len(allocatedTokens)), nil)
-		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
+		mockRedisClient.EXPECT().SIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
+		mockRedisClient.EXPECT().SMembers("test-resource2").Return(allocatedTokens, nil)
+		mockRedisClient.EXPECT().SCard("test-resource2").Return(int64(len(allocatedTokens)), nil)
+		mockRedisClient.EXPECT().SAdd(mock.Anything, mock.Anything).Return(0, nil)
 		mockComposedResourceConstraintList := createMockComposedResourceConstraintList()
 		got, err := r.AllocateResource(mockContext, "test-resource2", "ns1-token5", mockComposedResourceConstraintList)
 		assert.Nil(t, err)
@@ -124,10 +124,10 @@ func TestRedisResourceManager_checkAgainstConstraints(t *testing.T) {
 			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1"}
-		mockRedisClient.OnSIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
-		mockRedisClient.OnSMembers("test-resource1").Return(allocatedTokens, nil)
-		mockRedisClient.OnSCard("test-resource1").Return(int64(len(allocatedTokens)), nil)
-		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
+		mockRedisClient.EXPECT().SIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
+		mockRedisClient.EXPECT().SMembers("test-resource1").Return(allocatedTokens, nil)
+		mockRedisClient.EXPECT().SCard("test-resource1").Return(int64(len(allocatedTokens)), nil)
+		mockRedisClient.EXPECT().SAdd(mock.Anything, mock.Anything).Return(0, nil)
 		mockComposedResourceConstraintList := createMockComposedResourceConstraintList()
 		ok, idx, err := r.checkAgainstConstraints(mockContext, mockRedisClient, "test-resource1", mockComposedResourceConstraintList)
 		assert.NoError(t, err)

@@ -57,23 +57,23 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
 	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnIsInterruptible().Return(true)
+	nodeExecutionMetadata.EXPECT().IsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-	mockExecContext.OnGetParentInfo().Return(nil)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+	mockExecContext.EXPECT().GetParentInfo().Return(nil)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"
-	tID.OnGetGeneratedName().Return(generatedName)
-	tID.OnGetID().Return(*id)
-	tID.OnGetUniqueNodeID().Return("unique-node-id")
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
+	tID.EXPECT().GetID().Return(*id)
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	resourcePoolInfo := []*event.ResourcePoolInfo{
 		{
 			Namespace:       "ns",
@@ -99,21 +99,21 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Nil(t, tev.Logs)
-	assert.Equal(t, core.TaskExecution_WAITING_FOR_RESOURCES, tev.Phase)
-	assert.Equal(t, uint32(0), tev.PhaseVersion)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, tkID, tev.TaskId)
-	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
+	assert.Nil(t, tev.GetLogs())
+	assert.Equal(t, core.TaskExecution_WAITING_FOR_RESOURCES, tev.GetPhase())
+	assert.Equal(t, uint32(0), tev.GetPhaseVersion())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, tkID, tev.GetTaskId())
+	assert.Equal(t, nodeID, tev.GetParentNodeExecutionId())
 	assert.Equal(t, inputPath, tev.GetInputUri())
-	assert.Nil(t, tev.OutputResult)
-	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
-	assert.Equal(t, containerTaskType, tev.TaskType)
-	assert.Equal(t, "reason", tev.Reason)
-	assert.Equal(t, containerPluginIdentifier, tev.Metadata.PluginIdentifier)
-	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
-	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
-	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Nil(t, tev.GetOutputResult())
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.GetMetadata().GetInstanceClass())
+	assert.Equal(t, containerTaskType, tev.GetTaskType())
+	assert.Equal(t, "reason", tev.GetReason())
+	assert.Equal(t, containerPluginIdentifier, tev.GetMetadata().GetPluginIdentifier())
+	assert.Equal(t, generatedName, tev.GetMetadata().GetGeneratedName())
+	assert.EqualValues(t, resourcePoolInfo, tev.GetMetadata().GetResourcePoolInfo())
+	assert.Equal(t, testClusterID, tev.GetProducerId())
 
 	l := []*core.TaskLog{
 		{Uri: "x", Name: "y", MessageFormat: core.TaskLog_JSON},
@@ -139,24 +139,24 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, core.TaskExecution_RUNNING, tev.Phase)
-	assert.Equal(t, uint32(1), tev.PhaseVersion)
-	assert.Equal(t, l, tev.Logs)
-	assert.Equal(t, c, tev.CustomInfo)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, tkID, tev.TaskId)
-	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
+	assert.Equal(t, core.TaskExecution_RUNNING, tev.GetPhase())
+	assert.Equal(t, uint32(1), tev.GetPhaseVersion())
+	assert.Equal(t, l, tev.GetLogs())
+	assert.Equal(t, c, tev.GetCustomInfo())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, tkID, tev.GetTaskId())
+	assert.Equal(t, nodeID, tev.GetParentNodeExecutionId())
 	assert.Equal(t, inputPath, tev.GetInputUri())
-	assert.Nil(t, tev.OutputResult)
-	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
-	assert.Equal(t, containerTaskType, tev.TaskType)
-	assert.Equal(t, containerPluginIdentifier, tev.Metadata.PluginIdentifier)
-	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
-	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
-	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Nil(t, tev.GetOutputResult())
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.GetMetadata().GetInstanceClass())
+	assert.Equal(t, containerTaskType, tev.GetTaskType())
+	assert.Equal(t, containerPluginIdentifier, tev.GetMetadata().GetPluginIdentifier())
+	assert.Equal(t, generatedName, tev.GetMetadata().GetGeneratedName())
+	assert.EqualValues(t, resourcePoolInfo, tev.GetMetadata().GetResourcePoolInfo())
+	assert.Equal(t, testClusterID, tev.GetProducerId())
 
 	defaultNodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	defaultNodeExecutionMetadata.OnIsInterruptible().Return(false)
+	defaultNodeExecutionMetadata.EXPECT().IsInterruptible().Return(false)
 	tev, err = ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 		TaskExecContext: tCtx,
 		InputReader:     in,
@@ -177,23 +177,23 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, core.TaskExecution_SUCCEEDED, tev.Phase)
-	assert.Equal(t, uint32(0), tev.PhaseVersion)
-	assert.Equal(t, l, tev.Logs)
-	assert.Equal(t, c, tev.CustomInfo)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, tkID, tev.TaskId)
-	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
-	assert.NotNil(t, tev.OutputResult)
+	assert.Equal(t, core.TaskExecution_SUCCEEDED, tev.GetPhase())
+	assert.Equal(t, uint32(0), tev.GetPhaseVersion())
+	assert.Equal(t, l, tev.GetLogs())
+	assert.Equal(t, c, tev.GetCustomInfo())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, tkID, tev.GetTaskId())
+	assert.Equal(t, nodeID, tev.GetParentNodeExecutionId())
+	assert.NotNil(t, tev.GetOutputResult())
 	assert.Equal(t, inputPath, tev.GetInputUri())
 	assert.Equal(t, outputPath, tev.GetOutputUri())
-	assert.Empty(t, event.TaskExecutionMetadata_DEFAULT, tev.Metadata.InstanceClass)
-	assert.Equal(t, containerTaskType, tev.TaskType)
-	assert.Equal(t, containerPluginIdentifier, tev.Metadata.PluginIdentifier)
-	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
-	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
-	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Empty(t, event.TaskExecutionMetadata_DEFAULT, tev.GetMetadata().GetInstanceClass())
+	assert.Equal(t, containerTaskType, tev.GetTaskType())
+	assert.Equal(t, containerPluginIdentifier, tev.GetMetadata().GetPluginIdentifier())
+	assert.Equal(t, generatedName, tev.GetMetadata().GetGeneratedName())
+	assert.EqualValues(t, resourcePoolInfo, tev.GetMetadata().GetResourcePoolInfo())
+	assert.Equal(t, testClusterID, tev.GetProducerId())
 
 	t.Run("inline event policy", func(t *testing.T) {
 		inputs := &core.LiteralMap{
@@ -249,26 +249,26 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
 	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnIsInterruptible().Return(true)
+	nodeExecutionMetadata.EXPECT().IsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 	mockParentInfo := &mocks2.ImmutableParentInfo{}
-	mockParentInfo.OnGetUniqueID().Return("np1")
-	mockParentInfo.OnCurrentAttempt().Return(uint32(2))
-	mockExecContext.OnGetParentInfo().Return(mockParentInfo)
+	mockParentInfo.EXPECT().GetUniqueID().Return("np1")
+	mockParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"
-	tID.OnGetGeneratedName().Return(generatedName)
-	tID.OnGetID().Return(*id)
-	tID.OnGetUniqueNodeID().Return("unique-node-id")
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
+	tID.EXPECT().GetID().Return(*id)
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	resourcePoolInfo := []*event.ResourcePoolInfo{
 		{
 			Namespace:       "ns",
@@ -297,21 +297,21 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	expectedNodeID := &core.NodeExecutionIdentifier{
 		NodeId: "fmxzd5ta",
 	}
-	assert.Nil(t, tev.Logs)
-	assert.Equal(t, core.TaskExecution_WAITING_FOR_RESOURCES, tev.Phase)
-	assert.Equal(t, uint32(0), tev.PhaseVersion)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, tkID, tev.TaskId)
-	assert.Equal(t, expectedNodeID, tev.ParentNodeExecutionId)
+	assert.Nil(t, tev.GetLogs())
+	assert.Equal(t, core.TaskExecution_WAITING_FOR_RESOURCES, tev.GetPhase())
+	assert.Equal(t, uint32(0), tev.GetPhaseVersion())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, tkID, tev.GetTaskId())
+	assert.Equal(t, expectedNodeID, tev.GetParentNodeExecutionId())
 	assert.Equal(t, inputPath, tev.GetInputUri())
-	assert.Nil(t, tev.OutputResult)
-	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
-	assert.Equal(t, containerTaskType, tev.TaskType)
-	assert.Equal(t, "reason", tev.Reason)
-	assert.Equal(t, containerPluginIdentifier, tev.Metadata.PluginIdentifier)
-	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
-	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
-	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Nil(t, tev.GetOutputResult())
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.GetMetadata().GetInstanceClass())
+	assert.Equal(t, containerTaskType, tev.GetTaskType())
+	assert.Equal(t, "reason", tev.GetReason())
+	assert.Equal(t, containerPluginIdentifier, tev.GetMetadata().GetPluginIdentifier())
+	assert.Equal(t, generatedName, tev.GetMetadata().GetGeneratedName())
+	assert.EqualValues(t, resourcePoolInfo, tev.GetMetadata().GetResourcePoolInfo())
+	assert.Equal(t, testClusterID, tev.GetProducerId())
 
 	l := []*core.TaskLog{
 		{Uri: "x", Name: "y", MessageFormat: core.TaskLog_JSON},
@@ -337,19 +337,19 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, core.TaskExecution_RUNNING, tev.Phase)
-	assert.Equal(t, uint32(1), tev.PhaseVersion)
-	assert.Equal(t, l, tev.Logs)
-	assert.Equal(t, c, tev.CustomInfo)
-	assert.Equal(t, np, tev.OccurredAt)
-	assert.Equal(t, tkID, tev.TaskId)
-	assert.Equal(t, expectedNodeID, tev.ParentNodeExecutionId)
+	assert.Equal(t, core.TaskExecution_RUNNING, tev.GetPhase())
+	assert.Equal(t, uint32(1), tev.GetPhaseVersion())
+	assert.Equal(t, l, tev.GetLogs())
+	assert.Equal(t, c, tev.GetCustomInfo())
+	assert.Equal(t, np, tev.GetOccurredAt())
+	assert.Equal(t, tkID, tev.GetTaskId())
+	assert.Equal(t, expectedNodeID, tev.GetParentNodeExecutionId())
 	assert.Equal(t, inputPath, tev.GetInputUri())
-	assert.Nil(t, tev.OutputResult)
-	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
-	assert.Equal(t, containerTaskType, tev.TaskType)
-	assert.Equal(t, containerPluginIdentifier, tev.Metadata.PluginIdentifier)
-	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
-	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
-	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Nil(t, tev.GetOutputResult())
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.GetMetadata().GetInstanceClass())
+	assert.Equal(t, containerTaskType, tev.GetTaskType())
+	assert.Equal(t, containerPluginIdentifier, tev.GetMetadata().GetPluginIdentifier())
+	assert.Equal(t, generatedName, tev.GetMetadata().GetGeneratedName())
+	assert.EqualValues(t, resourcePoolInfo, tev.GetMetadata().GetResourcePoolInfo())
+	assert.Equal(t, testClusterID, tev.GetProducerId())
 }

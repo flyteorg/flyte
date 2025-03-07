@@ -14,17 +14,17 @@ import (
 func TestSandboxStatus(t *testing.T) {
 	t.Run("Sandbox status with zero result", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
-		s := testutils.Setup()
-		mockDocker.OnContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		s := testutils.Setup(t)
+		mockDocker.EXPECT().ContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		docker.Client = mockDocker
 		err := sandboxClusterStatus(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
 	})
 	t.Run("Sandbox status with running sandbox", func(t *testing.T) {
-		s := testutils.Setup()
+		s := testutils.Setup(t)
 		ctx := s.Ctx
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
 				Names: []string{

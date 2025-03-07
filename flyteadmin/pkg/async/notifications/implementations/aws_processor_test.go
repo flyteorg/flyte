@@ -8,12 +8,13 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-var mockEmailer mocks.MockEmailer
+var mockEmailer mocks.Emailer
 
 // This method should be invoked before every test to Subscriber.
 func initializeProcessor() {
@@ -30,14 +31,14 @@ func TestProcessor_StartProcessing(t *testing.T) {
 	// Because the message stored in Amazon SQS is a JSON of the SNS output, store the test output in the JSON Messages.
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
-		assert.Equal(t, email.Body, testEmail.Body)
-		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
-		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
-		assert.Equal(t, email.SenderEmail, testEmail.SenderEmail)
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
+		assert.Equal(t, email.GetBody(), testEmail.GetBody())
+		assert.Equal(t, email.GetRecipientsEmail(), testEmail.GetRecipientsEmail())
+		assert.Equal(t, email.GetSubjectLine(), testEmail.GetSubjectLine())
+		assert.Equal(t, email.GetSenderEmail(), testEmail.GetSenderEmail())
 		return nil
 	}
-	mockEmailer.SetSendEmailFunc(sendEmailValidationFunc)
+	testProcessor.(*Processor).email.(*mocks.Emailer).EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailValidationFunc)
 	// TODO Add test for metric inc for number of messages processed.
 	// Assert 1 message processed and 1 total.
 	assert.Nil(t, testProcessor.(*Processor).run())
@@ -115,10 +116,10 @@ func TestProcessor_StartProcessingError(t *testing.T) {
 func TestProcessor_StartProcessingEmailError(t *testing.T) {
 	initializeProcessor()
 	emailError := errors.New("error sending email")
-	sendEmailErrorFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailErrorFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
-	mockEmailer.SetSendEmailFunc(sendEmailErrorFunc)
+	mockEmailer.EXPECT().SendEmail(mock.Anything, mock.Anything).RunAndReturn(sendEmailErrorFunc)
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
 	// Even if there is an error in sending an email StartProcessing will return no errors.

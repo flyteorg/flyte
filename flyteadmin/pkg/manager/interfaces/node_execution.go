@@ -6,14 +6,16 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+//go:generate mockery --name=NodeExecutionInterface --output=../mocks --case=underscore --with-expecter
+
 // Interface for managing Flyte Workflow NodeExecutions
 type NodeExecutionInterface interface {
-	CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
+	CreateNodeEvent(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 		*admin.NodeExecutionEventResponse, error)
-	GetNodeExecution(ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error)
-	ListNodeExecutions(ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error)
-	ListNodeExecutionsForTask(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error)
+	GetNodeExecution(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error)
+	ListNodeExecutions(ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error)
+	ListNodeExecutionsForTask(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error)
 	GetNodeExecutionData(
-		ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
-	GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error)
+		ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
+	GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error)
 }

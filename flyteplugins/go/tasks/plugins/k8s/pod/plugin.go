@@ -59,7 +59,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	}
 	primaryContainerName := ""
 
-	if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 0 {
 		// handles pod tasks when they are defined as Sidecar tasks and marshal the podspec using k8s proto.
 		sidecarJob := sidecarJob{}
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &sidecarJob)
@@ -79,7 +79,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		// update annotations and labels
 		objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, sidecarJob.Annotations)
 		objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, sidecarJob.Labels)
-	} else if taskTemplate.Type == SidecarTaskType && taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetType() == SidecarTaskType && taskTemplate.GetTaskTypeVersion() == 1 {
 		// handles pod tasks that marshal the pod spec to the task custom.
 		err := utils.UnmarshalStructToObj(taskTemplate.GetCustom(), &podSpec)
 		if err != nil {
@@ -100,9 +100,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		}
 
 		// update annotations and labels
-		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().Metadata != nil {
-			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().Metadata.Annotations)
-			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().Metadata.Labels)
+		if taskTemplate.GetK8SPod() != nil && taskTemplate.GetK8SPod().GetMetadata() != nil {
+			objectMeta.Annotations = utils.UnionMaps(objectMeta.Annotations, taskTemplate.GetK8SPod().GetMetadata().GetAnnotations())
+			objectMeta.Labels = utils.UnionMaps(objectMeta.Labels, taskTemplate.GetK8SPod().GetMetadata().GetLabels())
 		}
 	} else {
 		// handles both container / pod tasks that use the TaskTemplate Container and K8sPod fields
@@ -122,7 +122,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.Type == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.GetType() == SidecarTaskType || len(podSpec.Containers) == 1 {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -180,12 +180,26 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		info.Logs = taskLogs
 	}
 
+	phaseInfo, err := DemystifyPodStatus(ctx, pod, info)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
+	return phaseInfo, err
+}
+
+func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	pluginState := k8s.PluginState{}
+	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
 	phaseInfo := pluginsCore.PhaseInfoUndefined
+	var err error
+	primaryContainerName, primaryContainerExists := pod.GetAnnotations()[flytek8s.PrimaryContainerKey]
+
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
 		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
 	case v1.PodFailed:
-		phaseInfo, err = flytek8s.DemystifyFailure(pod.Status, info)
+		phaseInfo, err = flytek8s.DemystifyFailure(ctx, pod.Status, info, primaryContainerName)
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
@@ -193,8 +207,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
-		primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
-		if !exists {
+		if !primaryContainerExists {
 			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
 			// succeeded rather than waiting for the Pod to be marked completed.
 			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
@@ -217,7 +230,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 			}
 		} else {
 			// if the primary container annotation exists, we use the status of the specified container
-			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
+			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(ctx, primaryContainerName, pod.Status.ContainerStatuses, &info)
 			if phaseInfo.Phase() == pluginsCore.PhasePermanentFailure && phaseInfo.Err() != nil &&
 				phaseInfo.Err().GetCode() == flytek8s.PrimaryContainerNotFound {
 				// if the primary container status is not found ensure that the primary container exists.

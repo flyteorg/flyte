@@ -13,6 +13,7 @@ import (
 
 	tokenCacheMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
@@ -63,8 +64,8 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		cfg := GetConfig(ctx)
 		tokenCache := &tokenCacheMocks.TokenCache{}
 		metadataClient := &adminMocks.AuthMetadataServiceClient{}
-		metadataClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
-		metadataClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
+		metadataClient.EXPECT().GetOAuth2Metadata(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
+		metadataClient.EXPECT().GetPublicClientConfig(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
 		cfg.AuthType = AuthTypeClientSecret
 		cfg.Audience = test.audienceCfg
 		cfg.Scopes = test.scopesCfg
@@ -88,9 +89,9 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	minuteAgo := time.Now().Add(-time.Minute)
 	hourAhead := time.Now().Add(time.Hour)
 	twoHourAhead := time.Now().Add(2 * time.Hour)
-	invalidToken := oauth2.Token{AccessToken: "foo", Expiry: minuteAgo}
-	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
-	newToken := oauth2.Token{AccessToken: "foo", Expiry: twoHourAhead}
+	invalidToken := utils.GenTokenWithCustomExpiry(t, minuteAgo)
+	validToken := utils.GenTokenWithCustomExpiry(t, hourAhead)
+	newToken := utils.GenTokenWithCustomExpiry(t, twoHourAhead)
 
 	tests := []struct {
 		name          string
@@ -101,24 +102,24 @@ func TestCustomTokenSource_Token(t *testing.T) {
 		{
 			name:          "no cached token",
 			token:         nil,
-			newToken:      &newToken,
-			expectedToken: &newToken,
+			newToken:      newToken,
+			expectedToken: newToken,
 		},
 		{
 			name:          "cached token valid",
-			token:         &validToken,
+			token:         validToken,
 			newToken:      nil,
-			expectedToken: &validToken,
+			expectedToken: validToken,
 		},
 		{
 			name:          "cached token expired",
-			token:         &invalidToken,
-			newToken:      &newToken,
-			expectedToken: &newToken,
+			token:         invalidToken,
+			newToken:      newToken,
+			expectedToken: newToken,
 		},
 		{
 			name:          "failed new token",
-			token:         &invalidToken,
+			token:         invalidToken,
 			newToken:      nil,
 			expectedToken: nil,
 		},
@@ -127,9 +128,9 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			tokenCache := &tokenCacheMocks.TokenCache{}
-			tokenCache.OnGetToken().Return(test.token, nil).Maybe()
-			tokenCache.On("Lock").Return().Maybe()
-			tokenCache.On("Unlock").Return().Maybe()
+			tokenCache.EXPECT().GetToken().Return(test.token, nil).Maybe()
+			tokenCache.EXPECT().Lock().Return().Maybe()
+			tokenCache.EXPECT().Unlock().Return().Maybe()
 			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
 			assert.NoError(t, err)
 			source, err := provider.GetTokenSource(ctx)
@@ -138,16 +139,16 @@ func TestCustomTokenSource_Token(t *testing.T) {
 			assert.True(t, ok)
 
 			mockSource := &adminMocks.TokenSource{}
-			if test.token != &validToken {
+			if test.token != validToken {
 				if test.newToken != nil {
-					mockSource.OnToken().Return(test.newToken, nil)
+					mockSource.EXPECT().Token().Return(test.newToken, nil)
 				} else {
-					mockSource.OnToken().Return(nil, fmt.Errorf("refresh token failed"))
+					mockSource.EXPECT().Token().Return(nil, fmt.Errorf("refresh token failed"))
 				}
 			}
 			customSource.new = mockSource
 			if test.newToken != nil {
-				tokenCache.OnSaveToken(test.newToken).Return(nil).Once()
+				tokenCache.EXPECT().SaveToken(test.newToken).Return(nil).Once()
 			}
 			token, err := source.Token()
 			if test.expectedToken != nil {

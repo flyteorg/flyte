@@ -9,46 +9,28 @@ on:
   push:
     branches:
       - master
-env:
-  GO_VERSION: "1.22"
+      - 'release-v**'
 jobs:
-  unpack-envvars:
-    runs-on: ubuntu-latest
-    outputs:
-      go-version: ${{ steps.step.outputs.go-version }}
-    steps:
-      - id: step
-        run: |
-          echo "go-version=${{ env.GO_VERSION }}" >> $GITHUB_OUTPUT
   lint:
     name: Lint
-    needs:
-      - unpack-envvars
     strategy:
       fail-fast: false
     uses: ./.github/workflows/lint.yml
     with:
       component: flyteidl
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
   unit-tests:
     name: Unit Tests
-    needs:
-      - unpack-envvars
     uses: ./.github/workflows/unit-tests.yml
     with:
       component: flyteidl
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   generate:
     name: Check Go Generate
-    needs:
-      - unpack-envvars
     strategy:
       fail-fast: false
     uses: ./.github/workflows/go_generate.yml
     with:
       component: flyteidl
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}

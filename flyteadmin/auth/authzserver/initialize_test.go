@@ -25,7 +25,7 @@ func TestRegisterHandlers(t *testing.T) {
 		registerer.On("HandleFunc", "/oauth2/token", mock.Anything)
 		authCtx := &mocks.AuthenticationContext{}
 		oauth2Provider := &mocks.OAuth2Provider{}
-		authCtx.OnOAuth2Provider().Return(oauth2Provider)
+		authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
 		RegisterHandlers(registerer, authCtx)
 	})
 }

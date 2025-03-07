@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 // AdminFetcherExtInterface Interface for exposing the fetch capabilities from the admin and also allow this to be injectable into other
 // modules. eg : create execution which requires to fetch launchplan details to construct the execution spec.
@@ -34,7 +34,7 @@ type AdminFetcherExtInterface interface {
 	FetchAllVerOfLP(ctx context.Context, lpName, project, domain string, filter filters.Filters) ([]*admin.LaunchPlan, error)
 
 	// FetchLPLatestVersion fetches latest version of launch plan in a  project, domain
-	FetchLPLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.LaunchPlan, error)
+	FetchLPLatestVersion(ctx context.Context, name, project, domain string) (*admin.LaunchPlan, error)
 
 	// FetchLPVersion fetches particular version of launch plan in a  project, domain
 	FetchLPVersion(ctx context.Context, name, version, project, domain string) (*admin.LaunchPlan, error)
@@ -55,7 +55,7 @@ type AdminFetcherExtInterface interface {
 	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Workflow, error)
 
 	// FetchWorkflowLatestVersion fetches latest version of workflow in a  project, domain
-	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error)
+	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string) (*admin.Workflow, error)
 
 	// FetchWorkflowVersion fetches particular version of workflow in a  project, domain
 	FetchWorkflowVersion(ctx context.Context, name, version, project, domain string) (*admin.Workflow, error)

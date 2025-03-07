@@ -114,7 +114,7 @@ func setupWithSchedules(t *testing.T, subscope string, schedules []models.Schedu
 	rateLimiter := rate.NewLimiter(1, 10)
 	executor := new(mocks.Executor)
 	snapshot := &snapshoter.SnapshotV1{}
-	executor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	executor.EXPECT().Execute(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	g := NewGoCronScheduler(context.Background(), schedules, schedulerScope, snapshot, rateLimiter, executor, useUtcTz)
 	goCronScheduler, ok := g.(*GoCronScheduler)
 	goCronScheduler.UpdateSchedules(context.Background(), schedules)
@@ -186,7 +186,7 @@ func TestGetTimedFuncWithSchedule(t *testing.T) {
 		ctx := context.Background()
 		g := setup(t, "failure_case", false)
 		executor := new(mocks.Executor)
-		executor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("failure case"))
+		executor.EXPECT().Execute(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("failure case"))
 		g.executor = executor
 		timeFunc := g.GetTimedFuncWithSchedule()
 		assert.NotNil(t, timeFunc)

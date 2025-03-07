@@ -29,7 +29,7 @@ func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test"))
 
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
@@ -57,8 +57,8 @@ func TestCreateTaskInfo(t *testing.T) {
 		taskInfo := createTaskInfo("d5493e36", "test-account")
 
 		assert.Equal(t, 1, len(taskInfo.Logs))
-		assert.Equal(t, taskInfo.Logs[0].Uri, "https://test-account.snowflakecomputing.com/console#/monitoring/queries/detail?queryId=d5493e36")
-		assert.Equal(t, taskInfo.Logs[0].Name, "Snowflake Console")
+		assert.Equal(t, taskInfo.Logs[0].GetUri(), "https://test-account.snowflakecomputing.com/console#/monitoring/queries/detail?queryId=d5493e36")
+		assert.Equal(t, taskInfo.Logs[0].GetName(), "Snowflake Console")
 	})
 }
 

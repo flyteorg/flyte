@@ -114,8 +114,8 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 			Enabled: true,
 		},
 	}
-	listTargetsProvider.OnGetValidTargets().Return(validTargets)
-	listTargetsProvider.OnGetAllTargets().Return(targets)
+	listTargetsProvider.EXPECT().GetValidTargets().Return(validTargets)
+	listTargetsProvider.EXPECT().GetAllTargets().Return(targets)
 	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
 	assert.NoError(t, err)
 	return randomCluster
@@ -182,8 +182,8 @@ func getRandomClusterSelectorWithDefaultLabelForTest(t *testing.T, configFile st
 			Enabled: true,
 		},
 	}
-	listTargetsProvider.OnGetValidTargets().Return(validTargets)
-	listTargetsProvider.OnGetAllTargets().Return(targets)
+	listTargetsProvider.EXPECT().GetValidTargets().Return(validTargets)
+	listTargetsProvider.EXPECT().GetAllTargets().Return(targets)
 	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
 	assert.NoError(t, err)
 	return randomCluster

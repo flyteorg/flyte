@@ -1,6 +1,6 @@
 package interfaces
 
-//go:generate mockery -name ClusterPoolAssignmentConfiguration -output=mocks -case=underscore
+//go:generate mockery --name ClusterPoolAssignmentConfiguration --output=mocks --case=underscore --with-expecter
 
 type ClusterPoolAssignment struct {
 	Pool string `json:"pool"`

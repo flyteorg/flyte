@@ -21,8 +21,8 @@ func Benchmark_initDefaultRegexes(b *testing.B) {
 
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("generated-name")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("generated-name")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -39,7 +39,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		},
 		RetryAttempt: 1,
 	})
-	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.EXPECT().GetUniqueNodeID().Return("n0-0-n0")
 	return tID
 }
 
@@ -63,6 +63,7 @@ func Test_Input_templateVars(t *testing.T) {
 	}
 	podBase := Input{
 		HostName:             "my-host",
+		NodeName:             "my-node-name",
 		PodName:              "my-pod",
 		PodUID:               "my-pod-uid",
 		Namespace:            "my-namespace",
@@ -103,6 +104,7 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.ContainerName, "my-container"},
 				{defaultRegexes.ContainerID, "containerID"},
 				{defaultRegexes.Hostname, "my-host"},
+				{defaultRegexes.NodeName, "my-node-name"},
 				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
 				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
 				{defaultRegexes.PodUnixStartTime, "123"},
@@ -139,6 +141,7 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.ContainerName, ""},
 				{defaultRegexes.ContainerID, ""},
 				{defaultRegexes.Hostname, ""},
+				{defaultRegexes.NodeName, ""},
 				{defaultRegexes.NodeID, "n0-0-n0"},
 				{defaultRegexes.GeneratedName, "generated-name"},
 				{defaultRegexes.TaskRetryAttempt, "1"},
@@ -327,12 +330,13 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"ddog",
 			TemplateLogPlugin{
-				TemplateURIs:  []TemplateURI{"https://app.datadoghq.com/logs?event&from_ts={{ .podUnixStartTime }}&live=true&query=pod_name%3A{{ .podName }}&to_ts={{ .podUnixFinishTime }}"},
+				TemplateURIs:  []TemplateURI{"https://app.datadoghq.com/logs?event&from_ts={{ .podUnixStartTime }}&live=true&query=pod_name%3A{{ .podName }}&to_ts={{ .podUnixFinishTime }}&host={{ .nodeName }}"},
 				MessageFormat: core.TaskLog_JSON,
 			},
 			args{
 				input: Input{
 					HostName:             "my-host",
+					NodeName:             "ip-1-2-3-4",
 					PodName:              "my-pod",
 					Namespace:            "my-namespace",
 					ContainerName:        "my-container",
@@ -347,7 +351,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "https://app.datadoghq.com/logs?event&from_ts=123&live=true&query=pod_name%3Amy-pod&to_ts=12345",
+						Uri:           "https://app.datadoghq.com/logs?event&from_ts=123&live=true&query=pod_name%3Amy-pod&to_ts=12345&host=ip-1-2-3-4",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},
@@ -474,6 +478,37 @@ func TestTemplateLogPlugin(t *testing.T) {
 					{
 						Uri:           "vscode://flyteinteractive:1234/my-pod-name",
 						MessageFormat: core.TaskLog_JSON,
+					},
+				},
+			},
+		},
+		{
+			"flyteinteractive",
+			TemplateLogPlugin{
+				Name:                "vscode",
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat:       core.TaskLog_JSON,
+				HideOnceFinished:    true,
+				ShowWhilePending:    true,
+			},
+			args{
+				input: Input{
+					PodName: "my-pod-name",
+					TaskTemplate: &core.TaskTemplate{
+						Config: map[string]string{
+							"link_type": "vscode",
+							"port":      "1234",
+						},
+					},
+				},
+			},
+			Output{
+				TaskLogs: []*core.TaskLog{
+					{
+						Uri:              "vscode://flyteinteractive:1234/my-pod-name",
+						MessageFormat:    core.TaskLog_JSON,
+						ShowWhilePending: true,
+						HideOnceFinished: true,
 					},
 				},
 			},

@@ -12,7 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 type GlobalSecretProvider interface {
 	GetForSecret(ctx context.Context, secret *coreIdl.Secret) (string, error)
@@ -35,20 +35,20 @@ func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *co
 		return p, false, err
 	}
 
-	switch secret.MountRequirement {
+	switch secret.GetMountRequirement() {
 	case coreIdl.Secret_FILE:
 		return nil, false, fmt.Errorf("global secrets can only be injected as environment "+
-			"variables [%v/%v]", secret.Group, secret.Key)
+			"variables [%v/%v]", secret.GetGroup(), secret.GetKey())
 	case coreIdl.Secret_ANY:
 		fallthrough
 	case coreIdl.Secret_ENV_VAR:
-		if len(secret.Group) == 0 {
+		if len(secret.GetGroup()) == 0 {
 			return nil, false, fmt.Errorf("mounting a secret to env var requires selecting the "+
-				"secret and a single key within. Key [%v]", secret.Key)
+				"secret and a single key within. Key [%v]", secret.GetKey())
 		}
 
 		envVar := corev1.EnvVar{
-			Name:  strings.ToUpper(K8sDefaultEnvVarPrefix + secret.Group + EnvVarGroupKeySeparator + secret.Key),
+			Name:  strings.ToUpper(K8sDefaultEnvVarPrefix + secret.GetGroup() + EnvVarGroupKeySeparator + secret.GetKey()),
 			Value: v,
 		}
 
@@ -63,7 +63,7 @@ func (g GlobalSecrets) Inject(ctx context.Context, secret *coreIdl.Secret, p *co
 		p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
 		p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
 	default:
-		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
+		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.GetMountRequirement().String(), secret.GetKey())
 		logger.Error(ctx, err)
 		return p, false, err
 	}

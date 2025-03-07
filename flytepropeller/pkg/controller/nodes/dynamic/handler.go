@@ -22,7 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 const dynamicNodeID = "dynamic-node"
 
@@ -103,9 +103,9 @@ func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, 
 		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
 	taskNodeInfoMetadata := &event.TaskNodeMetadata{}
-	if dCtx.subWorkflowClosure != nil && dCtx.subWorkflowClosure.Primary != nil && dCtx.subWorkflowClosure.Primary.Template != nil {
+	if dCtx.subWorkflowClosure != nil && dCtx.subWorkflowClosure.GetPrimary() != nil && dCtx.subWorkflowClosure.GetPrimary().GetTemplate() != nil {
 		taskNodeInfoMetadata.DynamicWorkflow = &event.DynamicWorkflowNodeMetadata{
-			Id:                dCtx.subWorkflowClosure.Primary.Template.Id,
+			Id:                dCtx.subWorkflowClosure.GetPrimary().GetTemplate().GetId(),
 			CompiledWorkflow:  dCtx.subWorkflowClosure,
 			DynamicJobSpecUri: dCtx.dynamicJobSpecURI,
 		}

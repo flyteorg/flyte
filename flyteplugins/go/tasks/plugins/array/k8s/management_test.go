@@ -63,7 +63,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	})
 
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(&core2.TaskTemplate{
+	tr.EXPECT().Read(ctx).Return(&core2.TaskTemplate{
 		Custom: customStruct,
 		Target: &core2.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
@@ -71,9 +71,9 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	}, nil)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("notfound")
+	tID.EXPECT().GetGeneratedName().Return("notfound")
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
-	tID.OnGetID().Return(core2.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core2.TaskExecutionIdentifier{
 		TaskId: &core2.Identifier{
 			ResourceType: core2.ResourceType_TASK,
 			Project:      "a",
@@ -93,41 +93,42 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	})
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(&v1.ResourceRequirements{
+	overrides.EXPECT().GetResources().Return(&v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU: resource.MustParse("10"),
 		},
 	})
-	overrides.OnGetExtendedResources().Return(nil)
-	overrides.OnGetContainerImage().Return("")
+	overrides.EXPECT().GetExtendedResources().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
-	tMeta.OnIsInterruptible().Return(false)
-	tMeta.OnGetK8sServiceAccount().Return("s")
-	tMeta.OnGetSecurityContext().Return(core2.SecurityContext{})
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
+	tMeta.EXPECT().IsInterruptible().Return(false)
+	tMeta.EXPECT().GetK8sServiceAccount().Return("s")
+	tMeta.EXPECT().GetSecurityContext().Return(core2.SecurityContext{})
 
-	tMeta.OnGetMaxAttempts().Return(2)
-	tMeta.OnGetNamespace().Return("n")
-	tMeta.OnGetLabels().Return(nil)
-	tMeta.OnGetAnnotations().Return(nil)
-	tMeta.OnGetOwnerReference().Return(metav1.OwnerReference{})
-	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
-	tMeta.OnGetEnvironmentVariables().Return(nil)
-	tMeta.OnGetConsoleURL().Return("")
+	tMeta.EXPECT().GetMaxAttempts().Return(2)
+	tMeta.EXPECT().GetNamespace().Return("n")
+	tMeta.EXPECT().GetLabels().Return(nil)
+	tMeta.EXPECT().GetAnnotations().Return(nil)
+	tMeta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{})
+	tMeta.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	tMeta.EXPECT().GetInterruptibleFailureThreshold().Return(2)
+	tMeta.EXPECT().GetEnvironmentVariables().Return(nil)
+	tMeta.EXPECT().GetConsoleURL().Return("")
 
 	ow := &mocks2.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("/prefix/")
-	ow.OnGetRawOutputPrefix().Return("/raw_prefix/")
-	ow.OnGetCheckpointPrefix().Return("/checkpoint")
-	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	ow.EXPECT().GetOutputPrefixPath().Return("/prefix/")
+	ow.EXPECT().GetRawOutputPrefix().Return("/raw_prefix/")
+	ow.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	ow.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	ir := &mocks2.InputReader{}
-	ir.OnGetInputPrefixPath().Return("/prefix/")
-	ir.OnGetInputPath().Return("/prefix/inputs.pb")
-	ir.OnGetMatch(mock.Anything).Return(&core2.LiteralMap{}, nil)
+	ir.EXPECT().GetInputPrefixPath().Return("/prefix/")
+	ir.EXPECT().GetInputPath().Return("/prefix/inputs.pb")
+	ir.EXPECT().Get(mock.Anything).Return(&core2.LiteralMap{}, nil)
 
 	composedProtobufStore := &stdmocks.ComposedProtobufStore{}
 	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {
@@ -140,15 +141,15 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	}
 
 	pluginStateReader := &mocks.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnOutputWriter().Return(ow)
-	tCtx.OnInputReader().Return(ir)
-	tCtx.OnDataStore().Return(dataStore)
-	tCtx.OnPluginStateReader().Return(pluginStateReader)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().OutputWriter().Return(ow)
+	tCtx.EXPECT().InputReader().Return(ir)
+	tCtx.EXPECT().DataStore().Return(dataStore)
+	tCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 	return tCtx
 }
 
@@ -202,14 +203,14 @@ func TestCheckSubTasksState(t *testing.T) {
 	t.Run("Launch", func(t *testing.T) {
 		// initialize metadata
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-		kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+		kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+		kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+		resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
 		currentState := &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -217,8 +218,10 @@ func TestCheckSubTasksState(t *testing.T) {
 			OriginalArraySize:    int64(subtaskCount),
 			OriginalMinSuccesses: int64(subtaskCount),
 			ArrayStatus: arraystatus.ArrayStatus{
+				// #nosec G115
 				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 		}
 
@@ -239,14 +242,14 @@ func TestCheckSubTasksState(t *testing.T) {
 		t.Run(fmt.Sprintf("LaunchParallelism%d", i), func(t *testing.T) {
 			// initialize metadata
 			kubeClient := mocks.KubeClient{}
-			kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-			kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+			kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+			kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 
 			resourceManager := mocks.ResourceManager{}
-			resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+			resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
 
 			tCtx := getMockTaskExecutionContext(ctx, i)
-			tCtx.OnResourceManager().Return(&resourceManager)
+			tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
 			currentState := &arrayCore.State{
 				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -254,8 +257,10 @@ func TestCheckSubTasksState(t *testing.T) {
 				OriginalArraySize:    int64(subtaskCount),
 				OriginalMinSuccesses: int64(subtaskCount),
 				ArrayStatus: arraystatus.ArrayStatus{
+					// #nosec G115
 					Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
 				},
+				// #nosec G115
 				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 			}
 
@@ -281,14 +286,14 @@ func TestCheckSubTasksState(t *testing.T) {
 	t.Run("LaunchResourcesExhausted", func(t *testing.T) {
 		// initialize metadata
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-		kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+		kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+		kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
+		resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
 		currentState := &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -296,8 +301,10 @@ func TestCheckSubTasksState(t *testing.T) {
 			OriginalArraySize:    int64(subtaskCount),
 			OriginalMinSuccesses: int64(subtaskCount),
 			ArrayStatus: arraystatus.ArrayStatus{
+				// #nosec G115
 				Detailed: arrayCore.NewPhasesCompactArray(uint(subtaskCount)), // set all tasks to core.PhaseUndefined
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 		}
 
@@ -315,10 +322,10 @@ func TestCheckSubTasksState(t *testing.T) {
 
 		// execute again - with resources available and validate results
 		nresourceManager := mocks.ResourceManager{}
-		nresourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+		nresourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
 
 		ntCtx := getMockTaskExecutionContext(ctx, 0)
-		ntCtx.OnResourceManager().Return(&nresourceManager)
+		ntCtx.EXPECT().ResourceManager().Return(&nresourceManager)
 
 		lastState, _, err := LaunchAndCheckSubTasksState(ctx, ntCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", newState)
 		assert.Nil(t, err)
@@ -333,21 +340,21 @@ func TestCheckSubTasksState(t *testing.T) {
 	t.Run("LaunchRetryableFailures", func(t *testing.T) {
 		// initialize metadata
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(fakeKubeClient)
-		kubeClient.OnGetCache().Return(fakeKubeCache)
+		kubeClient.EXPECT().GetClient().Return(fakeKubeClient)
+		kubeClient.EXPECT().GetCache().Return(fakeKubeCache)
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+		resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
 			detailed.SetItem(i, bitarray.Item(core.PhaseRetryableFailure)) // set all tasks to core.PhaseRetryableFailure
 		}
 
-		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
+		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1)) // #nosec G115
 		assert.NoError(t, err)
 
 		currentState := &arrayCore.State{
@@ -358,6 +365,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
@@ -402,17 +410,18 @@ func TestCheckSubTasksState(t *testing.T) {
 		}
 
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(fakeKubeClient)
-		kubeClient.OnGetCache().Return(fakeKubeCache)
+		kubeClient.EXPECT().GetClient().Return(fakeKubeClient)
+		kubeClient.EXPECT().GetCache().Return(fakeKubeCache)
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
+		resourceManager.EXPECT().AllocateResource(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
+			// #nosec G115
 			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
 		}
 
@@ -424,6 +433,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 		}
 
@@ -445,31 +455,32 @@ func TestCheckSubTasksState(t *testing.T) {
 
 			logLinks := externalResource.Logs
 			assert.Equal(t, 2, len(logLinks))
-			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #0-%d", i), logLinks[0].Name)
-			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i), logLinks[0].Uri)
-			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #0-%d", i), logLinks[1].Name)
-			assert.Equal(t, fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.notfound-%d;streamFilter=typeLogStreamPrefix", i), logLinks[1].Uri)
+			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #0-%d", i), logLinks[0].GetName())
+			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i), logLinks[0].GetUri())
+			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #0-%d", i), logLinks[1].GetName())
+			assert.Equal(t, fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.notfound-%d;streamFilter=typeLogStreamPrefix", i), logLinks[1].GetUri())
 		}
 	})
 
 	t.Run("RunningRetryableFailures", func(t *testing.T) {
 		// initialize metadata
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(failureFakeKubeClient)
-		kubeClient.OnGetCache().Return(failureFakeKubeCache)
+		kubeClient.EXPECT().GetClient().Return(failureFakeKubeClient)
+		kubeClient.EXPECT().GetCache().Return(failureFakeKubeCache)
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		resourceManager.EXPECT().ReleaseResource(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
-		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 		for i := 0; i < subtaskCount; i++ {
+			// #nosec G115
 			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
 		}
 
-		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
+		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1)) // #nosec G115
 		assert.NoError(t, err)
 
 		currentState := &arrayCore.State{
@@ -480,6 +491,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
@@ -500,20 +512,22 @@ func TestCheckSubTasksState(t *testing.T) {
 	t.Run("RunningPermanentFailures", func(t *testing.T) {
 		// initialize metadata
 		kubeClient := mocks.KubeClient{}
-		kubeClient.OnGetClient().Return(failureFakeKubeClient)
-		kubeClient.OnGetCache().Return(failureFakeKubeCache)
+		kubeClient.EXPECT().GetClient().Return(failureFakeKubeClient)
+		kubeClient.EXPECT().GetCache().Return(failureFakeKubeCache)
 
 		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		resourceManager.EXPECT().ReleaseResource(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
+		tCtx.EXPECT().ResourceManager().Return(&resourceManager)
 
+		// #nosec G115
 		detailed := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
 		for i := 0; i < subtaskCount; i++ {
 			detailed.SetItem(i, bitarray.Item(core.PhaseRunning)) // set all tasks to core.PhaseRunning
 		}
 
+		// #nosec G115
 		retryAttemptsArray, err := bitarray.NewCompactArray(uint(subtaskCount), bitarray.Item(1))
 		assert.NoError(t, err)
 
@@ -529,6 +543,7 @@ func TestCheckSubTasksState(t *testing.T) {
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: detailed,
 			},
+			// #nosec G115
 			IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
 			RetryAttempts:  retryAttemptsArray,
 		}
@@ -558,10 +573,10 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 		},
 	}
 	kubeClient := mocks.KubeClient{}
-	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+	kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 
-	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount)) // #nosec G115
 	for i := 0; i < subtaskCount; i++ {
 		compactArray.SetItem(i, 5)
 	}
@@ -574,14 +589,15 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 		ArrayStatus: arraystatus.ArrayStatus{
 			Detailed: compactArray,
 		},
+		// #nosec G115
 		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
 	}
 
 	t.Run("SuccessfulTermination", func(t *testing.T) {
 		eventRecorder := mocks.EventsRecorder{}
-		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
+		eventRecorder.EXPECT().RecordRaw(mock.Anything, mock.Anything).Return(nil)
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnEventsRecorder().Return(&eventRecorder)
+		tCtx.EXPECT().EventsRecorder().Return(&eventRecorder)
 
 		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
 			return nil
@@ -595,9 +611,9 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 
 	t.Run("TerminationWithError", func(t *testing.T) {
 		eventRecorder := mocks.EventsRecorder{}
-		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
+		eventRecorder.EXPECT().RecordRaw(mock.Anything, mock.Anything).Return(nil)
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnEventsRecorder().Return(&eventRecorder)
+		tCtx.EXPECT().EventsRecorder().Return(&eventRecorder)
 
 		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
 			return fmt.Errorf("termination error")
@@ -621,8 +637,8 @@ func TestTerminateSubTasks(t *testing.T) {
 		},
 	}
 	kubeClient := mocks.KubeClient{}
-	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
-	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+	kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
 
 	tests := []struct {
 		name                string
@@ -652,9 +668,10 @@ func TestTerminateSubTasks(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			// #nosec G115
 			compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
 			for i, phaseIdx := range test.initialPhaseIndices {
-				compactArray.SetItem(i, bitarray.Item(phaseIdx))
+				compactArray.SetItem(i, bitarray.Item(phaseIdx)) // #nosec G115
 			}
 			currentState := &arrayCore.State{
 				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -665,6 +682,7 @@ func TestTerminateSubTasks(t *testing.T) {
 				ArrayStatus: arraystatus.ArrayStatus{
 					Detailed: compactArray,
 				},
+				// #nosec G115
 				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
 			}
 

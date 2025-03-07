@@ -28,16 +28,17 @@ import (
 type handlerFactory struct {
 	handlers map[v1alpha1.NodeKind]interfaces.NodeHandler
 
-	workflowLauncher launchplan.Executor
-	launchPlanReader launchplan.Reader
-	kubeClient       executors.Client
-	kubeClientset    kubernetes.Interface
-	catalogClient    catalog.Client
-	recoveryClient   recovery.Client
-	eventConfig      *config.EventConfig
-	clusterID        string
-	signalClient     service.SignalServiceClient
-	scope            promutils.Scope
+	workflowLauncher        launchplan.Executor
+	launchPlanReader        launchplan.Reader
+	kubeClient              executors.Client
+	kubeClientset           kubernetes.Interface
+	catalogClient           catalog.Client
+	recoveryClient          recovery.Client
+	eventConfig             *config.EventConfig
+	literalOffloadingConfig config.LiteralOffloadingConfig
+	clusterID               string
+	signalClient            service.SignalServiceClient
+	scope                   promutils.Scope
 }
 
 func (f *handlerFactory) GetHandler(kind v1alpha1.NodeKind) (interfaces.NodeHandler, error) {
@@ -54,7 +55,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 		return err
 	}
 
-	arrayHandler, err := array.New(executor, f.eventConfig, f.scope)
+	arrayHandler, err := array.New(executor, f.eventConfig, f.literalOffloadingConfig, f.scope)
 	if err != nil {
 		return err
 	}
@@ -79,18 +80,20 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 
 func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader,
 	kubeClient executors.Client, kubeClientset kubernetes.Interface, catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
+	literalOffloadingConfig config.LiteralOffloadingConfig,
 	clusterID string, signalClient service.SignalServiceClient, scope promutils.Scope) (interfaces.HandlerFactory, error) {
 
 	return &handlerFactory{
-		workflowLauncher: workflowLauncher,
-		launchPlanReader: launchPlanReader,
-		kubeClient:       kubeClient,
-		kubeClientset:    kubeClientset,
-		catalogClient:    catalogClient,
-		recoveryClient:   recoveryClient,
-		eventConfig:      eventConfig,
-		clusterID:        clusterID,
-		signalClient:     signalClient,
-		scope:            scope,
+		workflowLauncher:        workflowLauncher,
+		launchPlanReader:        launchPlanReader,
+		kubeClient:              kubeClient,
+		kubeClientset:           kubeClientset,
+		catalogClient:           catalogClient,
+		recoveryClient:          recoveryClient,
+		eventConfig:             eventConfig,
+		literalOffloadingConfig: literalOffloadingConfig,
+		clusterID:               clusterID,
+		signalClient:            signalClient,
+		scope:                   scope,
 	}, nil
 }

@@ -61,16 +61,16 @@ func compileFromPackage(packagePath string) error {
 		case *admin.TaskSpec:
 			tasks = append(tasks, v)
 		case *admin.WorkflowSpec:
-			workflows[v.Template.Id.Name] = v
+			workflows[v.GetTemplate().GetId().GetName()] = v
 		case *admin.LaunchPlan:
-			plans[v.Id.Name] = v
+			plans[v.GetId().GetName()] = v
 		}
 	}
 
 	// compile tasks
 	taskTemplates := []*core.TaskTemplate{}
 	for _, task := range tasks {
-		taskTemplates = append(taskTemplates, task.Template)
+		taskTemplates = append(taskTemplates, task.GetTemplate())
 	}
 
 	fmt.Println("\nCompiling tasks...")
@@ -107,13 +107,13 @@ func handleWorkflow(
 	compiledLaunchPlanProviders []common.InterfaceProvider,
 	plans map[string]*admin.LaunchPlan,
 	workflows map[string]*admin.WorkflowSpec) ([]common.InterfaceProvider, error) {
-	reqs, _ := compiler.GetRequirements(workflow.Template, workflow.SubWorkflows)
-	wfName := workflow.Template.Id.Name
+	reqs, _ := compiler.GetRequirements(workflow.GetTemplate(), workflow.GetSubWorkflows())
+	wfName := workflow.GetTemplate().GetId().GetName()
 
 	// Check if all the subworkflows referenced by launchplan are compiled
 	for i := range reqs.GetRequiredLaunchPlanIds() {
-		lpID := &reqs.GetRequiredLaunchPlanIds()[i]
-		lpWfName := plans[lpID.Name].Spec.WorkflowId.Name
+		lpID := reqs.GetRequiredLaunchPlanIds()[i]
+		lpWfName := plans[lpID.GetName()].GetSpec().GetWorkflowId().GetName()
 		missingWorkflow := workflows[lpWfName]
 		if compiledWorkflows[lpWfName] == nil {
 			// Recursively compile the missing workflow first
@@ -127,8 +127,8 @@ func handleWorkflow(
 
 	fmt.Println("\nCompiling workflow:", wfName)
 
-	wf, err := compiler.CompileWorkflow(workflow.Template,
-		workflow.SubWorkflows,
+	wf, err := compiler.CompileWorkflow(workflow.GetTemplate(),
+		workflow.GetSubWorkflows(),
 		compiledTasks,
 		compiledLaunchPlanProviders)
 
@@ -140,11 +140,11 @@ func handleWorkflow(
 
 	// Update the expected inputs and outputs for the launchplans which reference this workflow
 	for _, plan := range plans {
-		if plan.Spec.WorkflowId.Name == wfName {
-			plan.Closure.ExpectedOutputs = wf.Primary.Template.Interface.Outputs
+		if plan.GetSpec().GetWorkflowId().GetName() == wfName {
+			plan.Closure.ExpectedOutputs = wf.GetPrimary().GetTemplate().GetInterface().GetOutputs()
 			newMap := make(map[string]*core.Parameter)
 
-			for key, value := range wf.Primary.Template.Interface.Inputs.Variables {
+			for key, value := range wf.GetPrimary().GetTemplate().GetInterface().GetInputs().GetVariables() {
 				newMap[key] = &core.Parameter{
 					Var: value,
 				}
@@ -152,7 +152,7 @@ func handleWorkflow(
 			plan.Closure.ExpectedInputs = &core.ParameterMap{
 				Parameters: newMap,
 			}
-			compiledLaunchPlanProviders = append(compiledLaunchPlanProviders, compiler.NewLaunchPlanInterfaceProvider(*plan))
+			compiledLaunchPlanProviders = append(compiledLaunchPlanProviders, compiler.NewLaunchPlanInterfaceProvider(plan))
 		}
 	}
 

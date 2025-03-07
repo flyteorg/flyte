@@ -29,7 +29,7 @@ func setupExecutor(scope string) Executor {
 func TestExecutor(t *testing.T) {
 	executor := setupExecutor("testExecutor1")
 	active := true
-	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
+	mockAdminClient.EXPECT().CreateExecution(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
 	t.Run("kickoff_time_arg", func(t *testing.T) {
 		schedule := models.SchedulableEntity{
 			SchedulableEntityKey: models.SchedulableEntityKey{
@@ -75,7 +75,7 @@ func TestExecutorAlreadyExists(t *testing.T) {
 		KickoffTimeInputArg: "kickoff_time",
 		Active:              &active,
 	}
-	mockAdminClient.OnCreateExecutionMatch(mock.Anything, mock.Anything).Return(nil,
+	mockAdminClient.EXPECT().CreateExecution(mock.Anything, mock.Anything).Return(nil,
 		errors.NewFlyteAdminErrorf(codes.AlreadyExists, "Already exists"))
 	err := executor.Execute(context.Background(), time.Now(), schedule)
 	assert.Nil(t, err)
@@ -95,7 +95,7 @@ func TestExecutorInactiveSchedule(t *testing.T) {
 		KickoffTimeInputArg: "kickoff_time",
 		Active:              &active,
 	}
-	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
+	mockAdminClient.EXPECT().CreateExecution(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
 	err := executor.Execute(context.Background(), time.Now(), schedule)
 	assert.Nil(t, err)
 }

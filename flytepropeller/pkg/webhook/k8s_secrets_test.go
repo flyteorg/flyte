@@ -182,6 +182,95 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 		},
 	}
 
+	successPodEnvWithEnvName := corev1.Pod{
+		Spec: corev1.PodSpec{
+			InitContainers: []corev1.Container{},
+			Containers: []corev1.Container{
+				{
+					Name: "container1",
+					Env: []corev1.EnvVar{
+						{
+							Name: "_FSEC_GROUP_HELLO",
+							ValueFrom: &corev1.EnvVarSource{
+								SecretKeyRef: &corev1.SecretKeySelector{
+									Key: "HELLO",
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "grOUP",
+									},
+									Optional: &optional,
+								},
+							},
+						},
+						{
+							Name: "MY_CUSTOM_ENV",
+							ValueFrom: &corev1.EnvVarSource{
+								SecretKeyRef: &corev1.SecretKeySelector{
+									Key: "HELLO",
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "grOUP",
+									},
+									Optional: &optional,
+								},
+							},
+						},
+						{
+							Name:  "FLYTE_SECRETS_ENV_PREFIX",
+							Value: "_FSEC_",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	successPodFileWithName := corev1.Pod{
+		Spec: corev1.PodSpec{
+			Volumes: []corev1.Volume{
+				{
+					Name: "m4ze5vkql3",
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: "grOUP",
+							Items: []corev1.KeyToPath{
+								{
+									Key:  "HELLO",
+									Path: "hello",
+								},
+							},
+							Optional: &optional,
+						},
+					},
+				},
+			},
+			InitContainers: []corev1.Container{},
+			Containers: []corev1.Container{
+				{
+					Name: "container1",
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "m4ze5vkql3",
+							MountPath: "/etc/flyte/secrets/group",
+							ReadOnly:  true,
+						},
+					},
+					Env: []corev1.EnvVar{
+						{
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
+						},
+						{
+							Name: "FLYTE_SECRETS_FILE_PREFIX",
+						},
+						{
+							Name:  "MY_CUSTOM_ENV",
+							Value: "/etc/flyte/secrets/group/hello",
+						},
+					},
+				},
+			},
+		},
+	}
+
 	ctx := context.Background()
 	type args struct {
 		secret *coreIdl.Secret
@@ -197,9 +286,14 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 			want: &corev1.Pod{}, wantErr: true},
 		{name: "simple", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR}, p: inputPod.DeepCopy()},
 			want: &successPodEnv, wantErr: false},
+		{name: "simple with env_var", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_ENV_VAR, EnvVar: "MY_CUSTOM_ENV"}, p: inputPod.DeepCopy()},
+			want: &successPodEnvWithEnvName, wantErr: false},
 		{name: "require file single", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_FILE},
 			p: inputPod.DeepCopy()},
 			want: &successPodFile, wantErr: false},
+		{name: "require file single with env var", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "HELLO", MountRequirement: coreIdl.Secret_FILE, EnvVar: "MY_CUSTOM_ENV"},
+			p: inputPod.DeepCopy()},
+			want: &successPodFileWithName, wantErr: false},
 		{name: "require file multiple from same secret group", args: args{secret: &coreIdl.Secret{Group: "grOUP", Key: "world", MountRequirement: coreIdl.Secret_FILE},
 			p: successPodFile.DeepCopy()},
 			want: &successPodMultiFiles, wantErr: false},

@@ -337,4 +337,60 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_update-base-backoff-duration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("update-base-backoff-duration", testValue)
+			if vInt, err := cmdFlags.GetInt("update-base-backoff-duration"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vInt), &actual.UpdateBaseBackoffDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_update-backoff-retries", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("update-backoff-retries", testValue)
+			if vInt, err := cmdFlags.GetInt("update-backoff-retries"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vInt), &actual.UpdateBackoffRetries)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_add-tolerations-for-extended-resources", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_K8sPluginConfig(defaultK8sConfig.AddTolerationsForExtendedResources, ",")
+
+			cmdFlags.Set("add-tolerations-for-extended-resources", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("add-tolerations-for-extended-resources"); err == nil {
+				testDecodeRaw_K8sPluginConfig(t, join_K8sPluginConfig(vStringSlice, ","), &actual.AddTolerationsForExtendedResources)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_enable-distributed-error-aggregation", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("enable-distributed-error-aggregation", testValue)
+			if vBool, err := cmdFlags.GetBool("enable-distributed-error-aggregation"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vBool), &actual.EnableDistributedErrorAggregation)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

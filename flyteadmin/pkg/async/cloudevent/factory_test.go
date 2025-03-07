@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -19,9 +20,9 @@ import (
 
 func getMockStore() *storage.DataStore {
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(_ mock.Arguments) {
-
-	})
+	pbStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(
+		func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+		})
 
 	mockStore := &storage.DataStore{
 		ComposedProtobufStore: pbStore,
@@ -42,7 +43,7 @@ func TestGetCloudEventPublisher(t *testing.T) {
 
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	t.Run("local publisher", func(t *testing.T) {
 		cfg.Type = common.Local
@@ -64,7 +65,7 @@ func TestInvalidAwsConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
@@ -79,7 +80,7 @@ func TestInvalidGcpConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
@@ -95,7 +96,7 @@ func TestInvalidKafkaConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
+	url := &dataMocks.RemoteURLInterface{}
 
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	cfg.KafkaConfig = runtimeInterfaces.KafkaConfig{Version: "2.1.0"}

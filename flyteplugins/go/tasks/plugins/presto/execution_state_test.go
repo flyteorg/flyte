@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -84,7 +85,7 @@ func TestConstructTaskLog(t *testing.T) {
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
 	taskLog := ConstructTaskLog(ExecutionState{CommandID: "123", URI: u.String()})
-	assert.Equal(t, expected, taskLog.Uri)
+	assert.Equal(t, expected, taskLog.GetUri())
 }
 
 func TestConstructTaskInfo(t *testing.T) {
@@ -103,7 +104,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	}
 
 	taskInfo := ConstructTaskInfo(e)
-	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].Uri)
+	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].GetUri())
 	assert.Len(t, taskInfo.ExternalResources, 1)
 	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "123")
 }
@@ -276,10 +277,10 @@ func TestMonitorQuery(t *testing.T) {
 	}
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreateMatch(mock.AnythingOfType("string"), mock.Anything).Return(ExecutionStateCacheItem{
+	mockCache.EXPECT().GetOrCreate(mock.AnythingOfType("string"), mock.Anything).Return(ExecutionStateCacheItem{
 		ExecutionState: ExecutionState{CurrentPhase: PhaseQuerySucceeded},
 		Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name",
-	}, nil).Run(func(_ mock.Arguments) {
+	}, nil).Run(func(id string, item cache.Item) {
 		getOrCreateCalled = true
 	})
 
@@ -299,13 +300,12 @@ func TestKickOffQuery(t *testing.T) {
 		ID: "1234567",
 	}
 	mockPresto := &prestoMocks.PrestoClient{}
-	mockPresto.OnExecuteCommandMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
-		mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockPresto.EXPECT().ExecuteCommand(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, commandStr string, executeArgs client.PrestoExecuteArgs) {
 		prestoCalled = true
 	}).Return(prestoExecuteResponse, nil)
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreateMatch(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockCache.EXPECT().GetOrCreate(mock.Anything, mock.Anything).Run(func(id string, item cache.Item) {
 		getOrCreateCalled = true
 	}).Return(ExecutionStateCacheItem{}, nil)
 

@@ -47,12 +47,11 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -61,13 +60,12 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","value":"foo"}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -76,13 +74,12 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		executionclusterlabel.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -92,12 +89,11 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed to get project domain attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getExecutionClusterLabel(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -107,12 +103,11 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(workflowResp, nil)
 		err := getExecutionClusterLabel(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -122,12 +117,11 @@ func TestGetExecutionClusterLabel(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","value":"foo"}`)
 	})
 	t.Run("failed to get workflow attribute", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getExecutionClusterLabelSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getExecutionClusterLabel(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)

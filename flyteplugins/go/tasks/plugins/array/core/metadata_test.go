@@ -17,27 +17,27 @@ func TestInitializeExternalResources(t *testing.T) {
 	subTaskCount := 10
 	cachedCount := 4
 
-	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount))
+	indexesToCache := InvertBitSet(bitarray.NewBitSet(uint(subTaskCount)), uint(subTaskCount)) // #nosec G115
 	for i := 0; i < cachedCount; i++ {
-		indexesToCache.Clear(uint(i))
+		indexesToCache.Clear(uint(i)) // #nosec G115
 	}
 
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(&idlCore.TaskTemplate{
+	tr.EXPECT().Read(ctx).Return(&idlCore.TaskTemplate{
 		Metadata: &idlCore.TaskMetadata{
 			Discoverable: true,
 		},
 	}, nil)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("notfound")
+	tID.EXPECT().GetGeneratedName().Return("notfound")
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 	state := State{
 		OriginalArraySize:  int64(subTaskCount),
@@ -54,7 +54,7 @@ func TestInitializeExternalResources(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, subTaskCount, len(externalResources))
 	for i, externalResource := range externalResources {
-		assert.Equal(t, uint32(i), externalResource.Index)
+		assert.Equal(t, uint32(i), externalResource.Index) // #nosec G115
 		assert.Equal(t, 0, len(externalResource.Logs))
 		assert.Equal(t, uint32(0), externalResource.RetryAttempt)
 		if i < cachedCount {

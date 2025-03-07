@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	tokenCache "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -60,6 +61,11 @@ import (
 )
 
 const (
+	// Finalizer is the global and domain-qualified Flyte finalizer
+	Finalizer = "flyte.org/finalizer"
+	// OldFinalizer is the old non-domain-qualified finalizer, kept for backwards compatibility
+	// This should eventually be removed
+	OldFinalizer                      = "flyte-finalizer"
 	resourceLevelMonitorCycleDuration = 5 * time.Second
 	missing                           = "missing"
 	podDefaultNamespace               = "flyte"
@@ -302,14 +308,15 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 
 func getAdminClient(ctx context.Context) (client service.AdminServiceClient, signalClient service.SignalServiceClient, opt []grpc.DialOption, err error) {
 	cfg := admin.GetConfig(ctx)
-	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	tc := tokenCache.NewTokenCacheInMemoryProvider()
+	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).WithTokenCache(tc).Build(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}
 
 	credentialsFuture := admin.NewPerRPCCredentialsFuture()
 	opts := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, nil, credentialsFuture, nil)),
+		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)),
 		grpc.WithPerRPCCredentials(credentialsFuture),
 	}
 
@@ -334,23 +341,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
-	}
-
-	var launchPlanActor launchplan.FlyteAdmin
-	if cfg.EnableAdminLauncher {
-		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
-			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"), store)
-		if err != nil {
-			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
-
-		if err := launchPlanActor.Initialize(ctx); err != nil {
-			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
-			return nil, err
-		}
-	} else {
-		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
 	}
 
 	logger.Info(ctx, "Setting up event sink and recorder")
@@ -432,16 +422,33 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	controller.levelMonitor = NewResourceLevelMonitor(scope.NewSubScope("collector"), flyteworkflowInformer.Lister())
 
+	var launchPlanActor launchplan.FlyteAdmin
+	if cfg.EnableAdminLauncher {
+		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, launchplan.GetAdminConfig(),
+			scope.NewSubScope("admin_launcher"), store, controller.enqueueWorkflowForNodeUpdates)
+		if err != nil {
+			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+
+		if err := launchPlanActor.Initialize(ctx); err != nil {
+			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
+			return nil, err
+		}
+	} else {
+		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
+	}
+
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
-		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.LiteralOffloadingConfig, cfg.ClusterID, signalClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
-		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
+		catalogClient, recoveryClient, cfg.LiteralOffloadingConfig, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}

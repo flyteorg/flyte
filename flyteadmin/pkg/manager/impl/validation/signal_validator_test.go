@@ -20,7 +20,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	ctx := context.TODO()
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -39,7 +39,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingSignalIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Type: &core.LiteralType{
 				Type: &core.LiteralType_Simple{
 					Simple: core.SimpleType_BOOLEAN,
@@ -50,7 +50,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("InvalidSignalIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -68,7 +68,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				SignalId: "signal",
 			},
@@ -82,7 +82,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("InvalidExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Domain: "domain",
@@ -100,7 +100,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingType", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -118,7 +118,7 @@ func TestValidateSignalListrequest(t *testing.T) {
 	ctx := context.TODO()
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -130,14 +130,14 @@ func TestValidateSignalListrequest(t *testing.T) {
 	})
 
 	t.Run("MissingWorkflowExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			Limit: 20,
 		}
 		assert.EqualError(t, ValidateSignalListRequest(ctx, request), "missing execution_id")
 	})
 
 	t.Run("MissingLimit", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -160,7 +160,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 
 	repo := repositoryMocks.NewMockRepository()
 	repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-		OnGetMatch(mock.Anything, mock.Anything).Return(
+		EXPECT().Get(mock.Anything, mock.Anything).Return(
 		models.Signal{
 			Type: typeBytes,
 		},
@@ -168,7 +168,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	)
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -195,7 +195,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingValue", func(t *testing.T) {
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -211,9 +211,9 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	t.Run("MissingSignal", func(t *testing.T) {
 		repo := repositoryMocks.NewMockRepository()
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-			OnGetMatch(mock.Anything, mock.Anything).Return(models.Signal{}, errors.New("foo"))
+			EXPECT().Get(mock.Anything, mock.Anything).Return(models.Signal{}, errors.New("foo"))
 
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -250,14 +250,14 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 
 		repo := repositoryMocks.NewMockRepository()
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
-			OnGetMatch(mock.Anything, mock.Anything).Return(
+			EXPECT().Get(mock.Anything, mock.Anything).Return(
 			models.Signal{
 				Type: typeBytes,
 			},
 			nil,
 		)
 
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -282,5 +282,53 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		}
 		utils.AssertEqualWithSanitizedRegex(t,
 			"requested signal value [scalar:{ primitive:{ boolean:false } } ] is not castable to existing signal type [[8 1]]", ValidateSignalSetRequest(ctx, repo, request).Error())
+	})
+
+	t.Run("UnknownIDLType", func(t *testing.T) {
+		ctx := context.TODO()
+
+		// Define an unsupported literal type with a simple type of 1000
+		unsupportedLiteralType := &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: 1000, // Using 1000 as an unsupported type
+			},
+		}
+		unsupportedLiteralTypeBytes, _ := proto.Marshal(unsupportedLiteralType)
+
+		// Mock the repository to return a signal with this unsupported type
+		repo := repositoryMocks.NewMockRepository()
+		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
+			EXPECT().Get(mock.Anything, mock.Anything).Return(
+			models.Signal{
+				Type: unsupportedLiteralTypeBytes, // Set the unsupported type
+			},
+			nil,
+		)
+
+		// Set up the unsupported literal that will trigger the nil valueType condition
+		unsupportedLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{},
+			},
+		}
+
+		request := admin.SignalSetRequest{
+			Id: &core.SignalIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				SignalId: "signal",
+			},
+			Value: unsupportedLiteral, // This will lead to valueType being nil
+		}
+
+		// Invoke the function and check for the expected error
+		err := ValidateSignalSetRequest(ctx, repo, &request)
+		assert.NotNil(t, err)
+
+		// Expected error message
+		assert.Contains(t, err.Error(), failedToValidateLiteralType)
 	})
 }

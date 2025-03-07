@@ -66,19 +66,19 @@ func assertNonEmptyInterface(t testing.TB, iface *core.TypedInterface, ifaceOk b
 		t.Fatal(errs)
 	}
 
-	assert.NotNil(t, iface.Inputs)
-	assert.NotNil(t, iface.Inputs.Variables)
-	assert.NotNil(t, iface.Outputs)
-	assert.NotNil(t, iface.Outputs.Variables)
+	assert.NotNil(t, iface.GetInputs())
+	assert.NotNil(t, iface.GetInputs().GetVariables())
+	assert.NotNil(t, iface.GetOutputs())
+	assert.NotNil(t, iface.GetOutputs().GetVariables())
 }
 
 func TestValidateUnderlyingInterface(t *testing.T) {
 	t.Run("Invalid empty node", func(t *testing.T) {
 		wfBuilder := mocks.WorkflowBuilder{}
 		nodeBuilder := mocks.NodeBuilder{}
-		nodeBuilder.OnGetCoreNode().Return(&core.Node{})
-		nodeBuilder.OnGetId().Return("node_1")
-		nodeBuilder.OnGetInterface().Return(nil)
+		nodeBuilder.EXPECT().GetCoreNode().Return(&core.Node{})
+		nodeBuilder.EXPECT().GetId().Return("node_1")
+		nodeBuilder.EXPECT().GetInterface().Return(nil)
 		errs := errors.NewCompileErrors()
 		iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
 		assert.False(t, ifaceOk)
@@ -91,7 +91,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		task.On("GetInterface").Return(nil)
 
 		wfBuilder := mocks.WorkflowBuilder{}
-		wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+		wfBuilder.On("GetTask", mock.MatchedBy(func(id *core.Identifier) bool {
 			return id.String() == (&core.Identifier{
 				Name: "Task_1",
 			}).String()
@@ -111,7 +111,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				TaskNode: taskNode,
 			},
 		})
-		nodeBuilder.OnGetInterface().Return(nil)
+		nodeBuilder.EXPECT().GetInterface().Return(nil)
 
 		nodeBuilder.On("GetTaskNode").Return(taskNode)
 		nodeBuilder.On("GetId").Return("node_1")
@@ -150,7 +150,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		nodeBuilder.On("GetId").Return("node_1")
 		nodeBuilder.On("SetInterface", mock.Anything).Return()
 		nodeBuilder.On("GetInputs").Return([]*core.Binding{})
-		nodeBuilder.OnGetInterface().Return(nil)
+		nodeBuilder.EXPECT().GetInterface().Return(nil)
 
 		t.Run("Self", func(t *testing.T) {
 			errs := errors.NewCompileErrors()
@@ -228,7 +228,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				},
 			})
 
-			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&lp, true)
 
 			errs = errors.NewCompileErrors()
 			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
@@ -269,7 +269,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				},
 			})
 
-			wfBuilder.On("GetSubWorkflow", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&subWf, true)
+			wfBuilder.On("GetSubWorkflow", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&subWf, true)
 
 			workflowNode.Reference = &core.WorkflowNode_SubWorkflowRef{
 				SubWorkflowRef: &core.Identifier{Name: "Ref_1"},
@@ -299,8 +299,8 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 					GateNode: gateNode,
 				},
 			})
-			nodeBuilder.OnGetInterface().Return(nil)
-			nodeBuilder.OnGetInputs().Return(nil)
+			nodeBuilder.EXPECT().GetInterface().Return(nil)
+			nodeBuilder.EXPECT().GetInputs().Return(nil)
 
 			nodeBuilder.On("GetGateNode").Return(gateNode)
 			nodeBuilder.On("GetId").Return("node_1")
@@ -334,7 +334,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 					GateNode: gateNode,
 				},
 			})
-			nodeBuilder.OnGetInterface().Return(nil)
+			nodeBuilder.EXPECT().GetInterface().Return(nil)
 
 			nodeBuilder.On("GetGateNode").Return(gateNode)
 			nodeBuilder.On("GetId").Return("node_1")
@@ -362,7 +362,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 					GateNode: gateNode,
 				},
 			})
-			nodeBuilder.OnGetInterface().Return(nil)
+			nodeBuilder.EXPECT().GetInterface().Return(nil)
 
 			nodeBuilder.On("GetGateNode").Return(gateNode)
 			nodeBuilder.On("GetId").Return("node_1")
@@ -419,19 +419,19 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 
 		taskNodeBuilder := &mocks.NodeBuilder{}
 		taskNodeBuilder.On("GetCoreNode").Return(taskNode)
-		taskNodeBuilder.On("GetId").Return(taskNode.Id)
-		taskNodeBuilder.On("GetTaskNode").Return(taskNode.Target.(*core.Node_TaskNode).TaskNode)
+		taskNodeBuilder.On("GetId").Return(taskNode.GetId())
+		taskNodeBuilder.On("GetTaskNode").Return(taskNode.GetTarget().(*core.Node_TaskNode).TaskNode)
 		taskNodeBuilder.On("GetInterface").Return(nil)
 		taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
 
 		wfBuilder := mocks.WorkflowBuilder{}
-		wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+		wfBuilder.On("GetTask", mock.MatchedBy(func(id *core.Identifier) bool {
 			return id.String() == (&core.Identifier{
 				Name: "Task_1",
 			}).String()
 		})).Return(&task, true)
 		wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
-			return node.Id == "node_1"
+			return node.GetId() == "node_1"
 		})).Return(taskNodeBuilder)
 
 		// mock array node
@@ -445,9 +445,9 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		}
 
 		nodeBuilder := mocks.NodeBuilder{}
-		nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+		nodeBuilder.On("GetArrayNode").Return(arrayNode.GetTarget().(*core.Node_ArrayNode).ArrayNode)
 		nodeBuilder.On("GetCoreNode").Return(arrayNode)
-		nodeBuilder.On("GetId").Return(arrayNode.Id)
+		nodeBuilder.On("GetId").Return(arrayNode.GetId())
 		nodeBuilder.On("GetInterface").Return(nil)
 		nodeBuilder.On("SetInterface", mock.Anything).Return()
 
@@ -459,8 +459,8 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 	})
 }
 
-func matchIdentifier(id core.Identifier) interface{} {
-	return mock.MatchedBy(func(arg core.Identifier) bool {
+func matchIdentifier(id *core.Identifier) interface{} {
+	return mock.MatchedBy(func(arg *core.Identifier) bool {
 		return arg.String() == id.String()
 	})
 }

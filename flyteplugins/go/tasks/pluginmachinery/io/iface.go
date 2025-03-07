@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 // InputFilePaths contains the different ways available for downstream systems to retrieve inputs.
 // If using Files for IO with tasks, then the input will be written to this path. All the files are always created in a
@@ -27,13 +27,18 @@ type InputReader interface {
 	Get(ctx context.Context) (*core.LiteralMap, error)
 }
 
-// OutputReader provides an abstracted OutputReader interface. The plugins are responsible to provide
-// the implementations for the interface. Some helper implementations can be found in ioutils
-type OutputReader interface {
+// ErrorReader provides an abstracted error reading interface, which is part of OutputReader below.
+type ErrorReader interface {
 	// IsError returns true if an error was detected when reading the output and false if no error was detected
 	IsError(ctx context.Context) (bool, error)
 	// ReadError returns the error as type ExecutionError
 	ReadError(ctx context.Context) (ExecutionError, error)
+}
+
+// OutputReader provides an abstracted OutputReader interface. The plugins are responsible to provide
+// the implementations for the interface. Some helper implementations can be found in ioutils
+type OutputReader interface {
+	ErrorReader
 	// IsFile returns true if the outputs are using the OutputFilePaths specified files. If so it allows the system to
 	// optimize the reads of the files
 	IsFile(ctx context.Context) bool

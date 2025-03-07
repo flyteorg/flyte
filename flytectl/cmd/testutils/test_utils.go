@@ -41,8 +41,7 @@ type TestStruct struct {
 	Stderr          *os.File
 }
 
-// Make sure to call TearDown after using this function
-func Setup() (s TestStruct) {
+func Setup(t *testing.T) (s TestStruct) {
 	s.Ctx = context.Background()
 	s.Reader, s.Writer, s.Err = os.Pipe()
 	if s.Err != nil {
@@ -57,9 +56,9 @@ func Setup() (s TestStruct) {
 	s.FetcherExt = new(extMocks.AdminFetcherExtInterface)
 	s.UpdaterExt = new(extMocks.AdminUpdaterExtInterface)
 	s.DeleterExt = new(extMocks.AdminDeleterExtInterface)
-	s.FetcherExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.UpdaterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.DeleterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
+	s.FetcherExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
+	s.UpdaterExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
+	s.DeleterExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
 	s.MockAdminClient = s.MockClient.AdminClient().(*mocks.AdminServiceClient)
 	s.MockOutStream = s.Writer
 	s.CmdCtx = cmdCore.NewCommandContextWithExt(s.MockClient, s.FetcherExt, s.UpdaterExt, s.DeleterExt, s.MockOutStream)
@@ -67,12 +66,13 @@ func Setup() (s TestStruct) {
 	config.GetConfig().Domain = domainValue
 	config.GetConfig().Output = output
 
-	return s
-}
+	// We need to make sure that the original final descriptors are restored after the test
+	t.Cleanup(func() {
+		os.Stdout = s.StdOut
+		os.Stderr = s.Stderr
+	})
 
-func (s *TestStruct) TearDown() {
-	os.Stdout = s.StdOut
-	os.Stderr = s.Stderr
+	return s
 }
 
 // TearDownAndVerify TODO: Change this to verify log lines from context

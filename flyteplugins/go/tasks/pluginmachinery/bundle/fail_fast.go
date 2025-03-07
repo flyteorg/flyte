@@ -31,7 +31,7 @@ func (h failFastHandler) Handle(ctx context.Context, tCtx core.TaskExecutionCont
 	}
 	return core.DoTransition(core.PhaseInfoFailure("AlwaysFail",
 		fmt.Sprintf("Task [%s] type [%+v] not supported by platform for this project/domain/workflow",
-			taskTemplate.Type, tCtx.TaskExecutionMetadata().GetTaskExecutionID()), &core.TaskInfo{
+			taskTemplate.GetType(), tCtx.TaskExecutionMetadata().GetTaskExecutionID()), &core.TaskInfo{
 			OccurredAt: &occuredAt,
 		})), nil
 }

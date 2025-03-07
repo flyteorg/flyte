@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
@@ -38,7 +39,7 @@ func getQualityOfServiceWithDuration(duration time.Duration) *core.QualityOfServ
 func getMockConfig() runtimeInterfaces.Configuration {
 	mockConfig := mocks.NewMockConfigurationProvider(nil, nil, nil, nil, nil, nil)
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	provider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
+	provider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
 			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
 		},
@@ -50,7 +51,7 @@ func getMockConfig() runtimeInterfaces.Configuration {
 		},
 	})
 
-	provider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+	provider.EXPECT().GetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
 		"production":  core.QualityOfService_HIGH,
 		"development": core.QualityOfService_LOW,
 	})
@@ -60,12 +61,12 @@ func getMockConfig() runtimeInterfaces.Configuration {
 }
 
 func addGetResourceFunc(t *testing.T, resourceManager interfaces.ResourceInterface) {
-	resourceManager.(*managerMocks.MockResourceManager).GetResourceFunc = func(ctx context.Context,
+	resourceManager.(*managerMocks.ResourceInterface).EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 		request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 		assert.EqualValues(t, request, interfaces.ResourceRequest{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			Workflow:     workflowIdentifier.Name,
+			Project:      workflowIdentifier.GetProject(),
+			Domain:       workflowIdentifier.GetDomain(),
+			Workflow:     workflowIdentifier.GetName(),
 			ResourceType: admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
 		})
 		return &interfaces.ResourceResponse{
@@ -75,7 +76,7 @@ func addGetResourceFunc(t *testing.T, resourceManager interfaces.ResourceInterfa
 				},
 			},
 		}, nil
-	}
+	})
 }
 
 func getWorkflowWithQosSpec(qualityOfService *core.QualityOfService) *admin.Workflow {
@@ -96,7 +97,7 @@ func getWorkflowWithQosSpec(qualityOfService *core.QualityOfService) *admin.Work
 }
 
 func TestGetQualityOfService_ExecutionCreateRequest(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
 	addGetResourceFunc(t, &resourceManager)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
@@ -119,7 +120,7 @@ func TestGetQualityOfService_ExecutionCreateRequest(t *testing.T) {
 }
 
 func TestGetQualityOfService_LaunchPlan(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
 	addGetResourceFunc(t, &resourceManager)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
@@ -140,7 +141,7 @@ func TestGetQualityOfService_LaunchPlan(t *testing.T) {
 }
 
 func TestGetQualityOfService_Workflow(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
 	addGetResourceFunc(t, &resourceManager)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
@@ -159,7 +160,7 @@ func TestGetQualityOfService_Workflow(t *testing.T) {
 }
 
 func TestGetQualityOfService_MatchableResource(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
 	addGetResourceFunc(t, &resourceManager)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
@@ -178,7 +179,8 @@ func TestGetQualityOfService_MatchableResource(t *testing.T) {
 }
 
 func TestGetQualityOfService_ConfigValues(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
 	spec, err := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{
@@ -196,7 +198,8 @@ func TestGetQualityOfService_ConfigValues(t *testing.T) {
 }
 
 func TestGetQualityOfService_NoDefault(t *testing.T) {
-	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager := managerMocks.ResourceInterface{}
+	resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).Return(nil, nil)
 
 	allocator := NewQualityOfServiceAllocator(getMockConfig(), &resourceManager)
 	spec, err := allocator.GetQualityOfService(context.Background(), GetQualityOfServiceInput{

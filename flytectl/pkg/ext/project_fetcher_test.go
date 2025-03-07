@@ -39,7 +39,7 @@ func TestAdminFetcherExtClient_ListProjects(t *testing.T) {
 	projects := &admin.Projects{
 		Projects: []*admin.Project{project1, project2},
 	}
-	adminClient.OnListProjectsMatch(mock.Anything, mock.Anything).Return(projects, nil)
+	adminClient.EXPECT().ListProjects(mock.Anything, mock.Anything).Return(projects, nil)
 	_, err := adminFetcherExt.ListProjects(ctx, taskFilter)
 	assert.Nil(t, err)
 }

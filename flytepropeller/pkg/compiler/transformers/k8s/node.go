@@ -31,12 +31,13 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
 	var containerImage string
+	var podtemplate *core.K8SPod
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
 		for _, t := range tasks {
-			if t.Template.Id.String() == taskID {
-				task = t.Template
+			if t.GetTemplate().GetId().String() == taskID {
+				task = t.GetTemplate()
 				break
 			}
 		}
@@ -46,7 +47,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, !errs.HasErrors()
 		}
 
-		if overrides := n.GetTaskNode().Overrides; overrides != nil {
+		if overrides := n.GetTaskNode().GetOverrides(); overrides != nil {
 			if overrides.GetResources() != nil {
 				resources = overrides.GetResources()
 			}
@@ -59,6 +60,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 			if len(overrides.GetContainerImage()) > 0 {
 				containerImage = overrides.GetContainerImage()
+			}
+
+			if overrides.GetPodTemplate() != nil {
+				podtemplate = overrides.GetPodTemplate()
 			}
 		}
 	}
@@ -87,7 +92,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			interruptVal := n.GetMetadata().GetInterruptible()
 			interruptible = &interruptVal
 		}
-		name = n.GetMetadata().Name
+		name = n.GetMetadata().GetName()
 	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
@@ -102,6 +107,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		ActiveDeadline:    activeDeadline,
 		Interruptible:     interruptible,
 		ContainerImage:    containerImage,
+		PodTemplate:       podtemplate,
 	}
 
 	switch v := n.GetTarget().(type) {
@@ -114,7 +120,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, !errs.HasErrors()
 		}
 
-		switch n.GetWorkflowNode().Reference.(type) {
+		switch n.GetWorkflowNode().GetReference().(type) {
 		case *core.WorkflowNode_LaunchplanRef:
 			nodeSpec.Kind = v1alpha1.NodeKindWorkflow
 			nodeSpec.WorkflowNode = &v1alpha1.WorkflowNodeSpec{
@@ -146,7 +152,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	case *core.Node_GateNode:
 		nodeSpec.Kind = v1alpha1.NodeKindGate
 		gateNode := n.GetGateNode()
-		switch gateNode.Condition.(type) {
+		switch gateNode.GetCondition().(type) {
 		case *core.GateNode_Approve:
 			nodeSpec.GateNode = &v1alpha1.GateNodeSpec{
 				Kind: v1alpha1.ConditionKindApprove,
@@ -173,7 +179,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		arrayNode := n.GetArrayNode()
 
 		// build subNodeSpecs
-		subNodeSpecs, ok := buildNodeSpec(arrayNode.Node, tasks, errs)
+		subNodeSpecs, ok := buildNodeSpec(arrayNode.GetNode(), tasks, errs)
 		if !ok {
 			return nil, ok
 		}
@@ -191,7 +197,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			Parallelism: parallelism,
 		}
 
-		switch successCriteria := arrayNode.SuccessCriteria.(type) {
+		switch successCriteria := arrayNode.GetSuccessCriteria().(type) {
 		case *core.ArrayNode_MinSuccesses:
 			nodeSpec.ArrayNode.MinSuccesses = &successCriteria.MinSuccesses
 		case *core.ArrayNode_MinSuccessRatio:
@@ -209,13 +215,13 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 }
 
 func buildIfBlockSpec(block *core.IfBlock, tasks []*core.CompiledTask, errs errors.CompileErrors) (*v1alpha1.IfBlock, []*v1alpha1.NodeSpec) {
-	nodeSpecs, ok := buildNodeSpec(block.ThenNode, tasks, errs)
+	nodeSpecs, ok := buildNodeSpec(block.GetThenNode(), tasks, errs)
 	if !ok {
 		return nil, []*v1alpha1.NodeSpec{}
 	}
 	return &v1alpha1.IfBlock{
-		Condition: v1alpha1.BooleanExpression{BooleanExpression: block.Condition},
-		ThenNode:  refStr(block.ThenNode.Id),
+		Condition: v1alpha1.BooleanExpression{BooleanExpression: block.GetCondition()},
+		ThenNode:  refStr(block.GetThenNode().GetId()),
 	}, nodeSpecs
 }
 
@@ -226,26 +232,26 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 
 	var childNodes []*v1alpha1.NodeSpec
 
-	branchNode, nodeSpecs := buildIfBlockSpec(branch.IfElse.Case, tasks, errs.NewScope())
+	branchNode, nodeSpecs := buildIfBlockSpec(branch.GetIfElse().GetCase(), tasks, errs.NewScope())
 	res := &v1alpha1.BranchNodeSpec{
 		If: *branchNode,
 	}
 	childNodes = append(childNodes, nodeSpecs...)
 
-	switch branch.IfElse.GetDefault().(type) {
+	switch branch.GetIfElse().GetDefault().(type) {
 	case *core.IfElseBlock_ElseNode:
-		ns, ok := buildNodeSpec(branch.IfElse.GetElseNode(), tasks, errs)
+		ns, ok := buildNodeSpec(branch.GetIfElse().GetElseNode(), tasks, errs)
 		if !ok {
 			return nil, []*v1alpha1.NodeSpec{}
 		}
 		childNodes = append(childNodes, ns...)
-		res.Else = refStr(branch.IfElse.GetElseNode().Id)
+		res.Else = refStr(branch.GetIfElse().GetElseNode().GetId())
 	case *core.IfElseBlock_Error:
-		res.ElseFail = branch.IfElse.GetError()
+		res.ElseFail = branch.GetIfElse().GetError()
 	}
 
-	other := make([]*v1alpha1.IfBlock, 0, len(branch.IfElse.Other))
-	for _, block := range branch.IfElse.Other {
+	other := make([]*v1alpha1.IfBlock, 0, len(branch.GetIfElse().GetOther()))
+	for _, block := range branch.GetIfElse().GetOther() {
 		b, ns := buildIfBlockSpec(block, tasks, errs.NewScope())
 		other = append(other, b)
 		childNodes = append(childNodes, ns...)
@@ -285,12 +291,12 @@ func buildTasks(tasks []*core.CompiledTask, errs errors.CompileErrors) map[commo
 		if flyteTask == nil {
 			errs.Collect(errors.NewValueRequiredErr("root", "coreTask"))
 		} else {
-			taskID := flyteTask.Template.Id.String()
+			taskID := flyteTask.GetTemplate().GetId().String()
 			if _, exists := res[taskID]; exists {
 				errs.Collect(errors.NewValueCollisionError(taskID, "Id", taskID))
 			}
 
-			res[taskID] = &v1alpha1.TaskSpec{TaskTemplate: flyteTask.Template}
+			res[taskID] = &v1alpha1.TaskSpec{TaskTemplate: flyteTask.GetTemplate()}
 		}
 	}
 

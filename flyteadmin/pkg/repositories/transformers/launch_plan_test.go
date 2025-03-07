@@ -27,7 +27,7 @@ var expectedOutputs = &core.VariableMap{
 	},
 }
 
-func getRequest() admin.LaunchPlanCreateRequest {
+func getRequest() *admin.LaunchPlanCreateRequest {
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.DefaultInputs = expectedInputs
 	return request
@@ -39,13 +39,13 @@ func TestCreateLaunchPlan(t *testing.T) {
 	launchPlan := CreateLaunchPlan(request, expectedOutputs)
 	assert.True(t, proto.Equal(
 		&admin.LaunchPlan{
-			Id:   request.Id,
-			Spec: request.Spec,
+			Id:   request.GetId(),
+			Spec: request.GetSpec(),
 			Closure: &admin.LaunchPlanClosure{
 				ExpectedInputs:  expectedInputs,
 				ExpectedOutputs: expectedOutputs,
 			},
-		}, &launchPlan))
+		}, launchPlan))
 }
 
 func TestToLaunchPlanModel(t *testing.T) {
@@ -53,9 +53,9 @@ func TestToLaunchPlanModel(t *testing.T) {
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
-		Id:   lpRequest.Id,
-		Spec: lpRequest.Spec,
+	launchPlan := &admin.LaunchPlan{
+		Id:   lpRequest.GetId(),
+		Spec: lpRequest.GetSpec(),
 		Closure: &admin.LaunchPlanClosure{
 			ExpectedInputs:  expectedInputs,
 			ExpectedOutputs: expectedOutputs,
@@ -70,11 +70,11 @@ func TestToLaunchPlanModel(t *testing.T) {
 	assert.Equal(t, "version", launchPlanModel.Version)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
-	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
+	expectedSpec, _ := proto.Marshal(lpRequest.GetSpec())
 	assert.Equal(t, expectedSpec, launchPlanModel.Spec)
 	assert.Equal(t, models.LaunchPlanScheduleTypeNONE, launchPlanModel.ScheduleType)
 
-	expectedClosure := launchPlan.Closure
+	expectedClosure := launchPlan.GetClosure()
 
 	var actualClosure admin.LaunchPlanClosure
 	err = proto.Unmarshal(launchPlanModel.Closure, &actualClosure)
@@ -95,14 +95,14 @@ func TestToLaunchPlanModelWithCronSchedule(t *testing.T) {
 	})
 }
 
-func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCreateRequest) {
+func testLaunchPlanWithCronInternal(t *testing.T, lpRequest *admin.LaunchPlanCreateRequest) {
 	lpRequest.Spec.DefaultInputs = expectedInputs
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
-		Id:   lpRequest.Id,
-		Spec: lpRequest.Spec,
+	launchPlan := &admin.LaunchPlan{
+		Id:   lpRequest.GetId(),
+		Spec: lpRequest.GetSpec(),
 		Closure: &admin.LaunchPlanClosure{
 			ExpectedInputs:  expectedInputs,
 			ExpectedOutputs: expectedOutputs,
@@ -117,11 +117,11 @@ func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCrea
 	assert.Equal(t, "version", launchPlanModel.Version)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
-	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
+	expectedSpec, _ := proto.Marshal(lpRequest.GetSpec())
 	assert.Equal(t, expectedSpec, launchPlanModel.Spec)
 	assert.Equal(t, models.LaunchPlanScheduleTypeCRON, launchPlanModel.ScheduleType)
 
-	expectedClosure := launchPlan.Closure
+	expectedClosure := launchPlan.GetClosure()
 
 	var actualClosure admin.LaunchPlanClosure
 	err = proto.Unmarshal(launchPlanModel.Closure, &actualClosure)
@@ -136,9 +136,9 @@ func TestToLaunchPlanModelWithFixedRateSchedule(t *testing.T) {
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
-		Id:   lpRequest.Id,
-		Spec: lpRequest.Spec,
+	launchPlan := &admin.LaunchPlan{
+		Id:   lpRequest.GetId(),
+		Spec: lpRequest.GetSpec(),
 		Closure: &admin.LaunchPlanClosure{
 			ExpectedInputs:  expectedInputs,
 			ExpectedOutputs: expectedOutputs,
@@ -153,11 +153,11 @@ func TestToLaunchPlanModelWithFixedRateSchedule(t *testing.T) {
 	assert.Equal(t, "version", launchPlanModel.Version)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
-	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
+	expectedSpec, _ := proto.Marshal(lpRequest.GetSpec())
 	assert.Equal(t, expectedSpec, launchPlanModel.Spec)
 	assert.Equal(t, models.LaunchPlanScheduleTypeRATE, launchPlanModel.ScheduleType)
 
-	expectedClosure := launchPlan.Closure
+	expectedClosure := launchPlan.GetClosure()
 
 	var actualClosure admin.LaunchPlanClosure
 	err = proto.Unmarshal(launchPlanModel.Closure, &actualClosure)
@@ -174,13 +174,13 @@ func TestFromLaunchPlanModel(t *testing.T) {
 	updatedAt := createdAt.Add(time.Minute)
 	updatedAtProto, _ := ptypes.TimestampProto(updatedAt)
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 		CreatedAt:       createdAtProto,
 		UpdatedAt:       updatedAtProto,
 		State:           admin.LaunchPlanState_ACTIVE,
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	model := models.LaunchPlan{
@@ -206,9 +206,9 @@ func TestFromLaunchPlanModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
-	}, lp.Id))
-	assert.True(t, proto.Equal(&closure, lp.Closure))
-	assert.True(t, proto.Equal(lpRequest.Spec, lp.Spec))
+	}, lp.GetId()))
+	assert.True(t, proto.Equal(&closure, lp.GetClosure()))
+	assert.True(t, proto.Equal(lpRequest.GetSpec(), lp.GetSpec()))
 }
 
 func TestFromLaunchPlanModels(t *testing.T) {
@@ -220,13 +220,13 @@ func TestFromLaunchPlanModels(t *testing.T) {
 	updatedAt := createdAt.Add(time.Minute)
 	updatedAtProto, _ := ptypes.TimestampProto(updatedAt)
 	closure := admin.LaunchPlanClosure{
-		ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-		ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
+		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
+		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
 		CreatedAt:       createdAtProto,
 		UpdatedAt:       updatedAtProto,
 		State:           admin.LaunchPlanState_ACTIVE,
 	}
-	specBytes, _ := proto.Marshal(lpRequest.Spec)
+	specBytes, _ := proto.Marshal(lpRequest.GetSpec())
 	closureBytes, _ := proto.Marshal(&closure)
 
 	m1 := models.LaunchPlan{
@@ -272,7 +272,7 @@ func TestFromLaunchPlanModels(t *testing.T) {
 		Domain:       "staging",
 		Name:         "othername",
 		Version:      "versionsecond",
-	}, lp[1].Id))
-	assert.True(t, proto.Equal(&closure, lp[1].Closure))
-	assert.True(t, proto.Equal(lpRequest.Spec, lp[1].Spec))
+	}, lp[1].GetId()))
+	assert.True(t, proto.Equal(&closure, lp[1].GetClosure()))
+	assert.True(t, proto.Equal(lpRequest.GetSpec(), lp[1].GetSpec()))
 }

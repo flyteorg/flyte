@@ -88,11 +88,11 @@ func NewMockConfigurationProvider(
 	namespaceMappingConfiguration interfaces.NamespaceMappingConfiguration) interfaces.Configuration {
 
 	mockQualityOfServiceConfiguration := &ifaceMocks.QualityOfServiceConfiguration{}
-	mockQualityOfServiceConfiguration.OnGetDefaultTiers().Return(make(map[string]core.QualityOfService_Tier))
-	mockQualityOfServiceConfiguration.OnGetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]core.QualityOfServiceSpec))
+	mockQualityOfServiceConfiguration.EXPECT().GetDefaultTiers().Return(make(map[string]core.QualityOfService_Tier))
+	mockQualityOfServiceConfiguration.EXPECT().GetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec))
 
 	mockClusterPoolAssignmentConfiguration := &ifaceMocks.ClusterPoolAssignmentConfiguration{}
-	mockClusterPoolAssignmentConfiguration.OnGetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))
+	mockClusterPoolAssignmentConfiguration.EXPECT().GetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))
 
 	return &MockConfigurationProvider{
 		applicationConfiguration:           applicationConfiguration,

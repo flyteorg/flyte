@@ -10,49 +10,49 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-var archivableResourceTypes = sets.NewInt32(int32(core.ResourceType_WORKFLOW), int32(core.ResourceType_TASK))
+var archivableResourceTypes = sets.NewInt32(int32(core.ResourceType_WORKFLOW), int32(core.ResourceType_TASK), int32(core.ResourceType_LAUNCH_PLAN))
 
-func ValidateNamedEntityGetRequest(request admin.NamedEntityGetRequest) error {
-	if err := ValidateResourceType(request.ResourceType); err != nil {
+func ValidateNamedEntityGetRequest(request *admin.NamedEntityGetRequest) error {
+	if err := ValidateResourceType(request.GetResourceType()); err != nil {
 		return err
 	}
-	if err := ValidateNamedEntityIdentifier(request.Id); err != nil {
+	if err := ValidateNamedEntityIdentifier(request.GetId()); err != nil {
 		return err
 	}
 	return nil
 }
 
-func ValidateNamedEntityUpdateRequest(request admin.NamedEntityUpdateRequest) error {
-	if err := ValidateResourceType(request.ResourceType); err != nil {
+func ValidateNamedEntityUpdateRequest(request *admin.NamedEntityUpdateRequest) error {
+	if err := ValidateResourceType(request.GetResourceType()); err != nil {
 		return err
 	}
-	if err := ValidateNamedEntityIdentifier(request.Id); err != nil {
+	if err := ValidateNamedEntityIdentifier(request.GetId()); err != nil {
 		return err
 	}
-	if request.Metadata == nil {
+	if request.GetMetadata() == nil {
 		return shared.GetMissingArgumentError(shared.Metadata)
 	}
 
 	// Only tasks and workflow resources can be modified from the default state.
-	if request.Metadata.State != admin.NamedEntityState_NAMED_ENTITY_ACTIVE &&
-		!archivableResourceTypes.Has(int32(request.ResourceType)) {
+	if request.GetMetadata().GetState() != admin.NamedEntityState_NAMED_ENTITY_ACTIVE &&
+		!archivableResourceTypes.Has(int32(request.GetResourceType())) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"Resource [%s] cannot have its state updated", request.ResourceType.String())
+			"Resource [%s] cannot have its state updated", request.GetResourceType().String())
 	}
 	return nil
 }
 
-func ValidateNamedEntityListRequest(request admin.NamedEntityListRequest) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+func ValidateNamedEntityListRequest(request *admin.NamedEntityListRequest) error {
+	if err := ValidateEmptyStringField(request.GetProject(), shared.Project); err != nil {
 		return err
 	}
-	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+	if err := ValidateEmptyStringField(request.GetDomain(), shared.Domain); err != nil {
 		return err
 	}
-	if err := ValidateResourceType(request.ResourceType); err != nil {
+	if err := ValidateResourceType(request.GetResourceType()); err != nil {
 		return err
 	}
-	if err := ValidateLimit(request.Limit); err != nil {
+	if err := ValidateLimit(request.GetLimit()); err != nil {
 		return err
 	}
 	return nil

@@ -69,7 +69,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	exec, err := NewExecutor(ctx, config.GetConfig().NodeConfig, mockStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
-		adminClient, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		adminClient, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -116,7 +116,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 
 	failStorage := createFailingDatastore(t, testScope.NewSubScope("failing"))
 	execFail, err := NewExecutor(ctx, config.GetConfig().NodeConfig, failStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
-		adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	t.Run("StorageFailure", func(t *testing.T) {
 		w := createDummyBaseWorkflow(mockStorage)
@@ -145,7 +145,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient,
-			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -156,7 +156,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 
-		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, memStore, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -176,7 +176,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -281,7 +281,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -347,7 +347,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 				hf := &nodemocks.HandlerFactory{}
 				exec.nodeHandlerFactory = hf
 				h := &nodemocks.NodeHandler{}
-				hf.OnGetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
 				mockWf, mockNode, mockNodeStatus := createSingleNodeWf(test.parentNodePhase, 0)
 				execContext := executors.NewExecutionContext(mockWf, nil, nil, nil, executors.InitializeControlFlow())
@@ -453,9 +453,9 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(test.handlerReturn())
-				h.OnFinalizeRequired().Return(false)
+				h.EXPECT().FinalizeRequired().Return(false)
 
-				hf.OnGetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindEnd).Return(h, nil)
 
 				mockWf, execContext, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
 				startNode := mockWf.StartNode()
@@ -569,92 +569,92 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			// Setup
 			mockN2Status := &mocks.ExecutableNodeStatus{}
 			// No parent node
-			mockN2Status.OnGetParentNodeID().Return(nil)
-			mockN2Status.OnGetParentTaskID().Return(nil)
-			mockN2Status.OnGetPhase().Return(n2Phase)
+			mockN2Status.EXPECT().GetParentNodeID().Return(nil)
+			mockN2Status.EXPECT().GetParentTaskID().Return(nil)
+			mockN2Status.EXPECT().GetPhase().Return(n2Phase)
 			mockN2Status.On("SetDataDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.OnGetDataDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetDataDir().Return(storage.DataReference("blah"))
 			mockN2Status.On("SetOutputDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
-			mockN2Status.OnGetOutputDir().Return(storage.DataReference("blah"))
-			mockN2Status.OnGetWorkflowNodeStatus().Return(nil)
+			mockN2Status.EXPECT().GetOutputDir().Return(storage.DataReference("blah"))
+			mockN2Status.EXPECT().GetWorkflowNodeStatus().Return(nil)
 
-			mockN2Status.OnGetStoppedAt().Return(nil)
+			mockN2Status.EXPECT().GetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
 			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), expectedClearStateOnAnyTermination, ee)
-			mockN2Status.OnIsDirty().Return(false)
-			mockN2Status.OnGetTaskNodeStatus().Return(nil)
+			mockN2Status.EXPECT().IsDirty().Return(false)
+			mockN2Status.EXPECT().GetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
-			mockN2Status.OnGetAttempts().Return(uint32(0))
+			mockN2Status.EXPECT().GetAttempts().Return(uint32(0))
 			if expectedN2Phase == v1alpha1.NodePhaseFailed {
-				mockN2Status.OnGetExecutionError().Return(&core.ExecutionError{
+				mockN2Status.EXPECT().GetExecutionError().Return(&core.ExecutionError{
 					Message: "Expected Failure",
 				})
 			}
-			mockN2Status.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+			mockN2Status.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 			mockNode := &mocks.ExecutableNode{}
-			mockNode.OnGetID().Return(nodeN2)
-			mockNode.OnGetBranchNode().Return(nil)
-			mockNode.OnGetKind().Return(v1alpha1.NodeKindTask)
-			mockNode.OnIsStartNode().Return(false)
-			mockNode.OnIsEndNode().Return(false)
-			mockNode.OnGetTaskID().Return(&taskID)
-			mockNode.OnGetInputBindings().Return([]*v1alpha1.Binding{})
-			mockNode.OnIsInterruptible().Return(nil)
-			mockNode.OnGetName().Return("name")
-			mockNode.OnGetWorkflowNode().Return(nil)
+			mockNode.EXPECT().GetID().Return(nodeN2)
+			mockNode.EXPECT().GetBranchNode().Return(nil)
+			mockNode.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+			mockNode.EXPECT().IsStartNode().Return(false)
+			mockNode.EXPECT().IsEndNode().Return(false)
+			mockNode.EXPECT().GetTaskID().Return(&taskID)
+			mockNode.EXPECT().GetInputBindings().Return([]*v1alpha1.Binding{})
+			mockNode.EXPECT().IsInterruptible().Return(nil)
+			mockNode.EXPECT().GetName().Return("name")
+			mockNode.EXPECT().GetWorkflowNode().Return(nil)
 
 			mockNodeN0 := &mocks.ExecutableNode{}
-			mockNodeN0.OnGetID().Return(nodeN0)
-			mockNodeN0.OnGetBranchNode().Return(nil)
-			mockNodeN0.OnGetKind().Return(v1alpha1.NodeKindTask)
-			mockNodeN0.OnIsStartNode().Return(false)
-			mockNodeN0.OnIsEndNode().Return(false)
-			mockNodeN0.OnGetTaskID().Return(&taskID0)
-			mockNodeN0.OnIsInterruptible().Return(nil)
-			mockNodeN0.OnGetName().Return("name")
-			mockNodeN0.OnGetWorkflowNode().Return(nil)
+			mockNodeN0.EXPECT().GetID().Return(nodeN0)
+			mockNodeN0.EXPECT().GetBranchNode().Return(nil)
+			mockNodeN0.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+			mockNodeN0.EXPECT().IsStartNode().Return(false)
+			mockNodeN0.EXPECT().IsEndNode().Return(false)
+			mockNodeN0.EXPECT().GetTaskID().Return(&taskID0)
+			mockNodeN0.EXPECT().IsInterruptible().Return(nil)
+			mockNodeN0.EXPECT().GetName().Return("name")
+			mockNodeN0.EXPECT().GetWorkflowNode().Return(nil)
 
 			mockN0Status := &mocks.ExecutableNodeStatus{}
-			mockN0Status.OnGetPhase().Return(n0Phase)
-			mockN0Status.OnGetAttempts().Return(uint32(0))
-			mockN0Status.OnGetExecutionError().Return(nil)
+			mockN0Status.EXPECT().GetPhase().Return(n0Phase)
+			mockN0Status.EXPECT().GetAttempts().Return(uint32(0))
+			mockN0Status.EXPECT().GetExecutionError().Return(nil)
 
-			mockN0Status.OnIsDirty().Return(false)
-			mockN0Status.OnGetParentTaskID().Return(nil)
+			mockN0Status.EXPECT().IsDirty().Return(false)
+			mockN0Status.EXPECT().GetParentTaskID().Return(nil)
 			n := v1.Now()
-			mockN0Status.OnGetStoppedAt().Return(&n)
+			mockN0Status.EXPECT().GetStoppedAt().Return(&n)
 
-			mockN0Status.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+			mockN0Status.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 			tk := &mocks.ExecutableTask{}
-			tk.OnCoreTask().Return(&core.TaskTemplate{})
+			tk.EXPECT().CoreTask().Return(&core.TaskTemplate{})
 			mockWfStatus := &mocks.ExecutableWorkflowStatus{}
 			mockWf := &mocks.ExecutableWorkflow{}
-			mockWf.OnStartNode().Return(mockNodeN0)
-			mockWf.OnGetNode(nodeN2).Return(mockNode, true)
-			mockWf.OnGetNode(nodeN0).Return(mockNodeN0, true)
-			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN0).Return(mockN0Status)
-			mockWf.OnGetNodeExecutionStatusMatch(mock.Anything, nodeN2).Return(mockN2Status)
-			mockWf.OnGetConnections().Return(connections)
-			mockWf.OnGetID().Return("w1")
-			mockWf.OnToNode(nodeN2).Return([]string{nodeN0}, nil)
-			mockWf.OnFromNode(nodeN0).Return([]string{nodeN2}, nil)
-			mockWf.OnFromNode(nodeN2).Return([]string{}, fmt.Errorf("did not expect"))
-			mockWf.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-			mockWf.OnGetExecutionStatus().Return(mockWfStatus)
-			mockWf.OnGetTask(taskID0).Return(tk, nil)
-			mockWf.OnGetTask(taskID).Return(tk, nil)
-			mockWf.OnGetLabels().Return(make(map[string]string))
-			mockWf.OnIsInterruptible().Return(false)
-			mockWf.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-			mockWf.OnGetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
-			mockWf.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
+			mockWf.EXPECT().StartNode().Return(mockNodeN0)
+			mockWf.EXPECT().GetNode(nodeN2).Return(mockNode, true)
+			mockWf.EXPECT().GetNode(nodeN0).Return(mockNodeN0, true)
+			mockWf.EXPECT().GetNodeExecutionStatus(mock.Anything, nodeN0).Return(mockN0Status)
+			mockWf.EXPECT().GetNodeExecutionStatus(mock.Anything, nodeN2).Return(mockN2Status)
+			mockWf.EXPECT().GetConnections().Return(connections)
+			mockWf.EXPECT().GetID().Return("w1")
+			mockWf.EXPECT().ToNode(nodeN2).Return([]string{nodeN0}, nil)
+			mockWf.EXPECT().FromNode(nodeN0).Return([]string{nodeN2}, nil)
+			mockWf.EXPECT().FromNode(nodeN2).Return([]string{}, fmt.Errorf("did not expect"))
+			mockWf.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
+			mockWf.EXPECT().GetExecutionStatus().Return(mockWfStatus)
+			mockWf.EXPECT().GetTask(taskID0).Return(tk, nil)
+			mockWf.EXPECT().GetTask(taskID).Return(tk, nil)
+			mockWf.EXPECT().GetLabels().Return(make(map[string]string))
+			mockWf.EXPECT().IsInterruptible().Return(false)
+			mockWf.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+			mockWf.EXPECT().GetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
+			mockWf.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 			})
-			mockWf.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-			mockWfStatus.OnGetDataDir().Return(storage.DataReference("x"))
-			mockWfStatus.OnConstructNodeDataDirMatch(mock.Anything, mock.Anything, mock.Anything).Return("x", nil)
+			mockWf.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			mockWfStatus.EXPECT().GetDataDir().Return(storage.DataReference("x"))
+			mockWfStatus.EXPECT().ConstructNodeDataDir(mock.Anything, mock.Anything).Return("x", nil)
 			return mockWf, mockN2Status
 		}
 
@@ -681,12 +681,12 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 				h := &nodemocks.NodeHandler{}
-				h.OnHandleMatch(
+				h.EXPECT().Handle(
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
-				h.OnFinalizeRequired().Return(false)
-				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+				h.EXPECT().FinalizeRequired().Return(false)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.enableCRDebugMetadata)
 				startNode := mockWf.StartNode()
@@ -696,7 +696,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				nodeConfig := config.GetConfig().NodeConfig
 				nodeConfig.EnableCRDebugMetadata = test.enableCRDebugMetadata
 				execIface, err := NewExecutor(ctx, nodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
@@ -771,15 +771,15 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
 				called := false
 				evRecorder := &eventMocks.NodeEventRecorder{}
-				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
+				evRecorder.EXPECT().RecordNodeEvent(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -796,12 +796,12 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				h.On("FinalizeRequired").Return(true)
 
 				if test.finalizeReturnErr {
-					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+					h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 				} else {
-					h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
+					h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 				}
-				h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+				h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				mockWf, _, mockNodeStatus := createSingleNodeWf(test.currentNodePhase, 0)
 				execErr := mockNodeStatus.GetExecutionError()
@@ -885,15 +885,15 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+					"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
 
 				called := false
 				evRecorder := &eventMocks.NodeEventRecorder{}
-				evRecorder.OnRecordNodeEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
+				evRecorder.EXPECT().RecordNodeEvent(mock.Anything, mock.MatchedBy(func(ev *event.NodeExecutionEvent) bool {
 					assert.NotNil(t, ev)
-					assert.Equal(t, test.eventPhase, ev.Phase)
+					assert.Equal(t, test.eventPhase, ev.GetPhase())
 					called = true
 					return true
 				}), mock.Anything).Return(nil)
@@ -909,10 +909,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				).Return(test.handlerReturn())
 				h.On("FinalizeRequired").Return(true)
 				if test.currentNodePhase == v1alpha1.NodePhaseRetryableFailure {
-					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+					h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 					h.On("Finalize", mock.Anything, mock.Anything).Return(nil)
 				} else {
-					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+					h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 					h.On("Finalize", mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 				}
 				hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
@@ -939,7 +939,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				} else {
 					assert.Nil(t, s.Err)
 				}
-				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts())
+				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts()) // #nosec G115
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}
@@ -952,7 +952,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		store := createInmemoryDataStore(t, promutils.NewTestScope())
 		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -983,7 +983,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		store := createInmemoryDataStore(t, promutils.NewTestScope())
 		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 		execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+			"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 		assert.NoError(t, err)
 		exec := execIface.(*recursiveNodeExecutor)
 
@@ -1018,7 +1018,7 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -1131,7 +1131,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -1249,7 +1249,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 	// Node not yet started
@@ -1272,69 +1272,69 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				hf := &nodemocks.HandlerFactory{}
 				exec.nodeHandlerFactory = hf
 				h := &nodemocks.NodeHandler{}
-				h.OnHandleMatch(
+				h.EXPECT().Handle(
 					mock.MatchedBy(func(ctx context.Context) bool { return true }),
 					mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 				).Return(handler.UnknownTransition, fmt.Errorf("should not be called"))
-				h.OnFinalizeRequired().Return(true)
-				h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+				h.EXPECT().FinalizeRequired().Return(true)
+				h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 
-				hf.OnGetHandlerMatch(v1alpha1.NodeKindTask).Return(h, nil)
+				hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 				now := v1.Time{Time: time.Now()}
 				parentBranchNodeID := "branchNode"
 				parentBranchNode := &mocks.ExecutableNode{}
-				parentBranchNode.OnGetID().Return(parentBranchNodeID)
-				parentBranchNode.OnGetBranchNode().Return(&mocks.ExecutableBranchNode{})
+				parentBranchNode.EXPECT().GetID().Return(parentBranchNodeID)
+				parentBranchNode.EXPECT().GetBranchNode().Return(&mocks.ExecutableBranchNode{})
 				parentBranchNodeStatus := &mocks.ExecutableNodeStatus{}
-				parentBranchNodeStatus.OnGetPhase().Return(v1alpha1.NodePhaseRunning)
-				parentBranchNodeStatus.OnIsDirty().Return(false)
-				parentBranchNodeStatus.OnGetStartedAt().Return(&now)
-				parentBranchNodeStatus.OnGetLastUpdatedAt().Return(nil)
+				parentBranchNodeStatus.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
+				parentBranchNodeStatus.EXPECT().IsDirty().Return(false)
+				parentBranchNodeStatus.EXPECT().GetStartedAt().Return(&now)
+				parentBranchNodeStatus.EXPECT().GetLastUpdatedAt().Return(nil)
 				bns := &mocks.MutableBranchNodeStatus{}
-				parentBranchNodeStatus.OnGetBranchStatus().Return(bns)
-				bns.OnGetPhase().Return(test.parentNodePhase)
-				parentBranchNodeStatus.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+				parentBranchNodeStatus.EXPECT().GetBranchStatus().Return(bns)
+				bns.EXPECT().GetPhase().Return(test.parentNodePhase)
+				parentBranchNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				tk := &mocks.ExecutableTask{}
-				tk.OnCoreTask().Return(&core.TaskTemplate{})
+				tk.EXPECT().CoreTask().Return(&core.TaskTemplate{})
 
 				tid := "tid"
 				eCtx := &mocks4.ExecutionContext{}
-				eCtx.OnGetTask(tid).Return(tk, nil)
+				eCtx.EXPECT().GetTask(tid).Return(tk, nil)
 
-				eCtx.OnIsInterruptible().Return(true)
-				eCtx.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
-				eCtx.OnGetLabels().Return(nil)
-				eCtx.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-				eCtx.OnGetParentInfo().Return(nil)
-				eCtx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
+				eCtx.EXPECT().IsInterruptible().Return(true)
+				eCtx.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
+				eCtx.EXPECT().GetLabels().Return(nil)
+				eCtx.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+				eCtx.EXPECT().GetParentInfo().Return(nil)
+				eCtx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 					RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 				})
-				eCtx.OnIncrementParallelism().Return(0)
-				eCtx.OnCurrentParallelism().Return(0)
-				eCtx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-				eCtx.OnGetConsoleURL().Return("")
+				eCtx.EXPECT().IncrementParallelism().Return(0)
+				eCtx.EXPECT().CurrentParallelism().Return(0)
+				eCtx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+				eCtx.EXPECT().GetConsoleURL().Return("")
 
 				branchTakenNodeID := "branchTakenNode"
 				branchTakenNode := &mocks.ExecutableNode{}
-				branchTakenNode.OnGetID().Return(branchTakenNodeID)
-				branchTakenNode.OnGetKind().Return(v1alpha1.NodeKindTask)
-				branchTakenNode.OnGetTaskID().Return(&tid)
-				branchTakenNode.OnIsInterruptible().Return(nil)
-				branchTakenNode.OnIsStartNode().Return(false)
-				branchTakenNode.OnIsEndNode().Return(false)
-				branchTakenNode.OnGetInputBindings().Return(nil)
-				branchTakenNode.OnGetWorkflowNode().Return(nil)
+				branchTakenNode.EXPECT().GetID().Return(branchTakenNodeID)
+				branchTakenNode.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
+				branchTakenNode.EXPECT().GetTaskID().Return(&tid)
+				branchTakenNode.EXPECT().IsInterruptible().Return(nil)
+				branchTakenNode.EXPECT().IsStartNode().Return(false)
+				branchTakenNode.EXPECT().IsEndNode().Return(false)
+				branchTakenNode.EXPECT().GetInputBindings().Return(nil)
+				branchTakenNode.EXPECT().GetWorkflowNode().Return(nil)
 				branchTakeNodeStatus := &mocks.ExecutableNodeStatus{}
-				branchTakeNodeStatus.OnGetPhase().Return(test.currentNodePhase)
-				branchTakeNodeStatus.OnIsDirty().Return(false)
-				branchTakeNodeStatus.OnGetSystemFailures().Return(1)
-				branchTakeNodeStatus.OnGetDataDir().Return("data")
-				branchTakeNodeStatus.OnGetParentNodeID().Return(&parentBranchNodeID)
-				branchTakeNodeStatus.OnGetParentTaskID().Return(nil)
-				branchTakeNodeStatus.OnGetStartedAt().Return(&now)
-				branchTakeNodeStatus.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+				branchTakeNodeStatus.EXPECT().GetPhase().Return(test.currentNodePhase)
+				branchTakeNodeStatus.EXPECT().IsDirty().Return(false)
+				branchTakeNodeStatus.EXPECT().GetSystemFailures().Return(1)
+				branchTakeNodeStatus.EXPECT().GetDataDir().Return("data")
+				branchTakeNodeStatus.EXPECT().GetParentNodeID().Return(&parentBranchNodeID)
+				branchTakeNodeStatus.EXPECT().GetParentTaskID().Return(nil)
+				branchTakeNodeStatus.EXPECT().GetStartedAt().Return(&now)
+				branchTakeNodeStatus.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 
 				if test.phaseUpdateExpected {
 					var ee *core.ExecutionError
@@ -1499,8 +1499,8 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	queuedAtTime := &v1.Time{Time: queuedAt}
 	ns.On("GetQueuedAt").Return(queuedAtTime)
 	ns.On("GetLastAttemptStartedAt").Return(queuedAtTime)
-	ns.OnGetAttempts().Return(0)
-	ns.OnGetSystemFailures().Return(0)
+	ns.EXPECT().GetAttempts().Return(0)
+	ns.EXPECT().GetSystemFailures().Return(0)
 	ns.On("ClearLastAttemptStartedAt").Return()
 
 	for _, tt := range tests {
@@ -1526,7 +1526,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			mockNode.On("GetInputBindings").Return([]*v1alpha1.Binding{})
 			mockNode.On("GetActiveDeadline").Return(&tt.activeDeadline)
 			mockNode.On("GetExecutionDeadline").Return(&tt.executionDeadline)
-			mockNode.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
+			mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
 
 			nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
 			phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
@@ -1549,8 +1549,8 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 
 	// mocking status
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetAttempts().Return(0)
-	ns.OnGetSystemFailures().Return(0)
+	ns.EXPECT().GetAttempts().Return(0)
+	ns.EXPECT().GetSystemFailures().Return(0)
 	ns.On("GetQueuedAt").Return(&v1.Time{Time: time.Now()})
 	ns.On("GetLastAttemptStartedAt").Return(&v1.Time{Time: time.Now()})
 
@@ -1573,7 +1573,7 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 	mockNode.On("GetActiveDeadline").Return(nil)
 	mockNode.On("GetExecutionDeadline").Return(nil)
 	retries := 2
-	mockNode.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
+	mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
 
 	nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
 	phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
@@ -1589,10 +1589,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort error calls finalize", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(nil)
 
@@ -1603,10 +1603,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort error calls finalize with error", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(errors.New("finalize error"))
 
@@ -1617,10 +1617,10 @@ func Test_nodeExecutor_abort(t *testing.T) {
 
 	t.Run("abort calls finalize when no errors", func(t *testing.T) {
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		h.OnFinalizeRequired().Return(true)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		h.EXPECT().FinalizeRequired().Return(true)
 		var called bool
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Run(func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 			called = true
 		}).Return(nil)
 
@@ -1637,35 +1637,35 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 	t.Run("not-yet-started", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
+		n.EXPECT().GetID().Return(id)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.AbortHandler(ctx, nil, nil, nl, n, "aborting"))
 	})
 	t.Run("incompatible-cluster-err", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
-		n.OnGetKind().Return(v1alpha1.NodeKindStart)
-		n.OnGetTaskID().Return(&id)
-		n.OnGetWorkflowNode().Return(nil)
+		n.EXPECT().GetID().Return(id)
+		n.EXPECT().GetKind().Return(v1alpha1.NodeKindStart)
+		n.EXPECT().GetTaskID().Return(&id)
+		n.EXPECT().GetWorkflowNode().Return(nil)
 		interruptible := false
-		n.OnIsInterruptible().Return(&interruptible)
+		n.EXPECT().IsInterruptible().Return(&interruptible)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseRunning)
-		ns.OnGetDataDir().Return(storage.DataReference("s3:/foo"))
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-		nl.OnGetNode(id).Return(n, true)
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseRunning)
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("s3:/foo"))
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
+		nl.EXPECT().GetNode(id).Return(n, true)
 		incompatibleClusterErr := fakeEventRecorder{nodeErr: &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")}}
 
 		hf := &nodemocks.HandlerFactory{}
 		h := &nodemocks.NodeHandler{}
-		h.OnAbortMatch(mock.Anything, mock.Anything, "aborting").Return(nil)
-		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-		hf.OnGetHandlerMatch(v1alpha1.NodeKindStart).Return(h, nil)
+		h.EXPECT().Abort(mock.Anything, mock.Anything, "aborting").Return(nil)
+		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindStart).Return(h, nil)
 
 		nodeExecutor := &nodeExecutor{
 			nodeRecorder: incompatibleClusterErr,
@@ -1677,18 +1677,18 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		}
 
 		dag := mocks4.DAGStructure{}
-		dag.OnFromNode(id).Return(make([]string, 0), nil)
+		dag.EXPECT().FromNode(id).Return(make([]string, 0), nil)
 
 		execContext := mocks4.ExecutionContext{}
-		execContext.OnIsInterruptible().Return(false)
+		execContext.EXPECT().IsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
-		execContext.OnGetRawOutputDataConfig().Return(r)
-		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-		execContext.OnGetLabels().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetRawOutputDataConfig().Return(r)
+		execContext.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
+		execContext.EXPECT().GetLabels().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
 		et := &mocks.ExecutableTask{}
-		et.OnCoreTask().Return(&core.TaskTemplate{
+		et.EXPECT().CoreTask().Return(&core.TaskTemplate{
 			Id: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      "p",
@@ -1697,12 +1697,12 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 				Version:      "v",
 			},
 		})
-		execContext.OnGetTask("id").Return(et, nil)
+		execContext.EXPECT().GetTask("id").Return(et, nil)
 		parentInfo := &mocks4.ImmutableParentInfo{}
-		parentInfo.OnGetUniqueID().Return("someunique1")
-		parentInfo.OnCurrentAttempt().Return(uint32(1))
-		parentInfo.OnIsInDynamicChain().Return(false)
-		execContext.OnGetParentInfo().Return(parentInfo)
+		parentInfo.EXPECT().GetUniqueID().Return("someunique1")
+		parentInfo.EXPECT().CurrentAttempt().Return(uint32(1))
+		parentInfo.EXPECT().IsInDynamicChain().Return(false)
+		execContext.EXPECT().GetParentInfo().Return(parentInfo)
 
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
@@ -1715,14 +1715,15 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 	t.Run("not-yet-started", func(t *testing.T) {
 		id := "id"
 		n := &mocks.ExecutableNode{}
-		n.OnGetID().Return(id)
+		n.EXPECT().GetID().Return(id)
 		nl := &mocks4.NodeLookup{}
 		ns := &mocks.ExecutableNodeStatus{}
-		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
 }
+
 func TestNodeExecutionEventStartNode(t *testing.T) {
 	execID := &core.WorkflowExecutionIdentifier{
 		Name:    "e1",
@@ -1745,39 +1746,42 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
 	inputReader := &mocks3.InputReader{}
-	inputReader.OnGetInputPath().Return("reference")
+	inputReader.EXPECT().GetInputPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false)
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindStart)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindStart)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
-	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
-	ns.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
+	ns.EXPECT().GetParentTaskID().Return(tID)
+	ns.EXPECT().GetOutputDir().Return("dummy://dummyOutUrl")
+	ns.EXPECT().GetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
 	}, subWfID)
+
 	assert.NoError(t, err)
-	assert.Equal(t, "start-node", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
+	assert.Equal(t, "start-node", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
 	assert.Equal(t, "dummy://dummyOutUrl/outputs.pb",
-		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
-	assert.Equal(t, ev.ProducerId, testClusterID)
+		ev.GetOutputResult().(*event.NodeExecutionEvent_OutputUri).OutputUri)
+	assert.Equal(t, ev.GetProducerId(), testClusterID)
 	assert.Equal(t, subWfID, ev.GetTargetEntity())
+	assert.Nil(t, ev.GetInputValue())
 }
 
 func TestNodeExecutionEventV0(t *testing.T) {
@@ -1795,32 +1799,33 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false).Twice()
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false).Twice()
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindTask)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
+	ns.EXPECT().GetParentTaskID().Return(tID)
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
 	}, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, "n1", ev.Id.NodeId)
-	assert.Equal(t, execID, ev.Id.ExecutionId)
-	assert.Empty(t, ev.SpecNodeId)
-	assert.Nil(t, ev.ParentNodeMetadata)
-	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
-	assert.Empty(t, ev.NodeName)
-	assert.Empty(t, ev.RetryGroup)
-	assert.Empty(t, ev.TargetEntity)
+	assert.Equal(t, "n1", ev.GetId().GetNodeId())
+	assert.Equal(t, execID, ev.GetId().GetExecutionId())
+	assert.Empty(t, ev.GetSpecNodeId())
+	assert.Nil(t, ev.GetParentNodeMetadata())
+	assert.Equal(t, tID, ev.GetParentTaskMetadata().GetId())
+	assert.Empty(t, ev.GetNodeName())
+	assert.Empty(t, ev.GetRetryGroup())
+	assert.Empty(t, ev.GetTargetEntity())
+	assert.Equal(t, "reference", ev.GetInputUri())
 }
 
 func TestNodeExecutionEventV1(t *testing.T) {
@@ -1843,38 +1848,41 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	}
 	p := handler.PhaseInfoQueued("r", inputs)
 	//inputReader := &mocks3.InputReader{}
-	//inputReader.OnGetInputPath().Return("reference")
+	//inputReader.EXPECT().GetInputPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
-	parentInfo.OnGetUniqueID().Return("np1")
-	parentInfo.OnCurrentAttempt().Return(uint32(2))
-	parentInfo.OnIsInDynamicChain().Return(false)
+	parentInfo.EXPECT().GetUniqueID().Return("np1")
+	parentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	parentInfo.EXPECT().IsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
-	n.OnGetID().Return(id)
-	n.OnGetName().Return("name")
-	n.OnGetKind().Return(v1alpha1.NodeKindTask)
+	n.EXPECT().GetID().Return(id)
+	n.EXPECT().GetName().Return("name")
+	n.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 	nl := &mocks4.NodeLookup{}
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
-	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
-	ns.OnGetParentTaskID().Return(tID)
+	ns.EXPECT().GetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+	nl.EXPECT().GetNodeExecutionStatus(mock.Anything, id).Return(ns)
+	ns.EXPECT().GetParentTaskID().Return(tID)
+
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyInline,
 	}, nil)
+
 	assert.NoError(t, err)
-	assert.Equal(t, "np1-2-n1", eventOpt.Id.NodeId)
-	assert.Equal(t, execID, eventOpt.Id.ExecutionId)
-	assert.Equal(t, "id", eventOpt.SpecNodeId)
+	assert.Equal(t, "np1-2-n1", eventOpt.GetId().GetNodeId())
+	assert.Equal(t, execID, eventOpt.GetId().GetExecutionId())
+	assert.Equal(t, "id", eventOpt.GetSpecNodeId())
 	expectParentMetadata := event.ParentNodeExecutionMetadata{
 		NodeId: "np1",
 	}
-	assert.Equal(t, expectParentMetadata, *eventOpt.ParentNodeMetadata)
-	assert.Nil(t, eventOpt.ParentTaskMetadata)
-	assert.Equal(t, "name", eventOpt.NodeName)
-	assert.Equal(t, "2", eventOpt.RetryGroup)
+	assert.True(t, proto.Equal(&expectParentMetadata, eventOpt.GetParentNodeMetadata()))
+	assert.Nil(t, eventOpt.GetParentTaskMetadata())
+	assert.Equal(t, "name", eventOpt.GetNodeName())
+	assert.Equal(t, "2", eventOpt.GetRetryGroup())
 	assert.True(t, proto.Equal(eventOpt.GetInputData(), inputs))
-	assert.Empty(t, eventOpt.TargetEntity)
+	assert.Empty(t, eventOpt.GetTargetEntity())
+	assert.Equal(t, inputs, eventOpt.GetInputData())
 }
 
 func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
@@ -1889,7 +1897,7 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 	hf := &nodemocks.HandlerFactory{}
 	hf.On("Setup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
-		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
+		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*recursiveNodeExecutor)
 
@@ -1969,13 +1977,13 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		exec.nodeHandlerFactory = hf
 		h := &nodemocks.NodeHandler{}
-		h.OnHandleMatch(
+		h.EXPECT().Handle(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-		h.OnFinalizeRequired().Return(false)
+		h.EXPECT().FinalizeRequired().Return(false)
 
-		hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
 		assert.NoError(t, err)
@@ -2013,13 +2021,13 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 		hf := &nodemocks.HandlerFactory{}
 		exec.nodeHandlerFactory = hf
 		h := &nodemocks.NodeHandler{}
-		h.OnHandleMatch(
+		h.EXPECT().Handle(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
 		).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-		h.OnFinalizeRequired().Return(false)
+		h.EXPECT().FinalizeRequired().Return(false)
 
-		hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
+		hf.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
 		s, err := exec.RecursiveNodeHandler(ctx, eCtx, mockWf, mockWf, mockNode)
 		assert.NoError(t, err)
@@ -2076,30 +2084,30 @@ func TestRecover(t *testing.T) {
 	}
 
 	execContext := &mocks4.ExecutionContext{}
-	execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
 			WorkflowExecutionIdentifier: recoveryID,
 		},
 	})
-	execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+	execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
 	nm := &nodemocks.NodeExecutionMetadata{}
-	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+	nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 		ExecutionId: wfExecID,
 		NodeId:      nodeID,
 	})
 
 	ir := &mocks3.InputReader{}
-	ir.OnGetInputPath().Return(inputsPath)
+	ir.EXPECT().GetInputPath().Return(inputsPath)
 
 	ns := &mocks.ExecutableNodeStatus{}
-	ns.OnGetOutputDir().Return(storage.DataReference("out"))
+	ns.EXPECT().GetOutputDir().Return(storage.DataReference("out"))
 
 	nCtx := &nodemocks.NodeExecutionContext{}
-	nCtx.OnExecutionContext().Return(execContext)
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnInputReader().Return(ir)
-	nCtx.OnNodeStatus().Return(ns)
+	nCtx.EXPECT().ExecutionContext().Return(execContext)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().InputReader().Return(ir)
+	nCtx.EXPECT().NodeStatus().Return(ns)
 
 	t.Run("recover task node successfully", func(t *testing.T) {
 		recoveryClient := &recoveryMocks.Client{}
@@ -2122,7 +2130,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2133,7 +2141,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2153,10 +2161,10 @@ func TestRecover(t *testing.T) {
 
 		// initialize node execution context
 		nCtx := &nodemocks.NodeExecutionContext{}
-		nCtx.OnExecutionContext().Return(execContext)
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnNodeStatus().Return(ns)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		mockPBStore.On("CopyRaw", mock.Anything, storage.DataReference(srcDynamicJobSpecURI), storage.DataReference(dstDynamicJobSpecURI), mock.Anything).Return(nil)
@@ -2176,18 +2184,17 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &mockReferenceConstructor,
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		reader := &nodemocks.NodeStateReader{}
-		reader.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
-		nCtx.OnNodeStateReader().Return(reader)
+		reader.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(reader)
 
 		writer := &nodemocks.NodeStateWriter{}
-		writer.OnPutDynamicNodeStateMatch(mock.Anything).Run(func(args mock.Arguments) {
-			state := args.Get(0).(handler.DynamicNodeState)
+		writer.EXPECT().PutDynamicNodeState(mock.Anything).Run(func(state handler.DynamicNodeState) {
 			assert.Equal(t, v1alpha1.DynamicNodePhaseParentFinalized, state.Phase)
 		}).Return(nil)
-		nCtx.OnNodeStateWriter().Return(writer)
+		nCtx.EXPECT().NodeStateWriter().Return(writer)
 
 		// initialize node executor
 		recoveryClient := &recoveryMocks.Client{}
@@ -2288,7 +2295,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2299,7 +2306,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2318,8 +2325,8 @@ func TestRecover(t *testing.T) {
 			},
 			CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
 			DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-				Id:               dynamicWorkflow.Id,
-				CompiledWorkflow: dynamicWorkflow.CompiledWorkflow,
+				Id:               dynamicWorkflow.GetId(),
+				CompiledWorkflow: dynamicWorkflow.GetCompiledWorkflow(),
 			},
 		}, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata))
 	})
@@ -2353,7 +2360,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2363,7 +2370,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2400,14 +2407,13 @@ func TestRecover(t *testing.T) {
 		}
 
 		reader := &nodemocks.NodeStateReader{}
-		reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
-		nCtx.OnNodeStateReader().Return(reader)
+		reader.EXPECT().GetTaskNodeState().Return(handler.TaskNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(reader)
 		writer := &nodemocks.NodeStateWriter{}
-		writer.OnPutTaskNodeStateMatch(mock.Anything).Run(func(args mock.Arguments) {
-			state := args.Get(0).(handler.TaskNodeState)
+		writer.EXPECT().PutTaskNodeState(mock.Anything).Run(func(state handler.TaskNodeState) {
 			assert.Equal(t, state.PreviousNodeExecutionCheckpointURI.String(), "prev path")
 		}).Return(nil)
-		nCtx.OnNodeStateWriter().Return(writer)
+		nCtx.EXPECT().NodeStateWriter().Return(writer)
 
 		phaseInfo, err := executor.attemptRecovery(context.TODO(), nCtx)
 		assert.NoError(t, err)
@@ -2435,7 +2441,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
@@ -2449,7 +2455,7 @@ func TestRecover(t *testing.T) {
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
 
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
 			store:          storageClient,
@@ -2481,7 +2487,7 @@ func TestRecover(t *testing.T) {
 
 		mockPBStore := &storageMocks.ComposedProtobufStore{}
 		metadata := existsMetadata{}
-		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
+		mockPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
@@ -2493,7 +2499,7 @@ func TestRecover(t *testing.T) {
 			ComposedProtobufStore: mockPBStore,
 			ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 		}
-		nCtx.OnDataStore().Return(storageClient)
+		nCtx.EXPECT().DataStore().Return(storageClient)
 
 		executor := nodeExecutor{
 			recoveryClient: recoveryClient,
@@ -2513,24 +2519,24 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 	// Creates an execution context for the test
 	createExecContext := func(maxParallelism, currentParallelism uint32) executors.ExecutionContext {
 		m := &mocks4.ExecutionContext{}
-		m.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		m.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			MaxParallelism: maxParallelism,
 		})
-		m.OnCurrentParallelism().Return(currentParallelism)
+		m.EXPECT().CurrentParallelism().Return(currentParallelism)
 		return m
 	}
 
 	createNode := func(kind v1alpha1.NodeKind, lpRef bool) v1alpha1.ExecutableNode {
 		en := &mocks.ExecutableNode{}
-		en.OnGetKind().Return(kind)
+		en.EXPECT().GetKind().Return(kind)
 		if kind == v1alpha1.NodeKindWorkflow {
 			wn := &mocks.ExecutableWorkflowNode{}
 			var lp *v1alpha1.LaunchPlanRefID
 			if lpRef {
 				lp = &v1alpha1.LaunchPlanRefID{}
 			}
-			wn.OnGetLaunchPlanRefID().Return(lp)
-			en.OnGetWorkflowNode().Return(wn)
+			wn.EXPECT().GetLaunchPlanRefID().Return(lp)
+			en.EXPECT().GetWorkflowNode().Return(wn)
 		}
 		return en
 	}
@@ -2663,10 +2669,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 
 		// initialize node executor
 		mockHandlerFactory := &nodemocks.HandlerFactory{}
-		mockHandlerFactory.OnGetHandler(v1alpha1.NodeKindTask).Return(mockHandler, nil)
+		mockHandlerFactory.EXPECT().GetHandler(v1alpha1.NodeKindTask).Return(mockHandler, nil)
 		nodeExecutor, err := NewExecutor(ctx, nodeConfig, dataStore, enqueueWorkflow, mockEventSink,
 			adminClient, adminClient, rawOutputPrefix, fakeKubeClient, catalogClient,
-			recoveryClient, eventConfig, testClusterID, signalClient, mockHandlerFactory, testScope)
+			recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, mockHandlerFactory, testScope)
 		assert.NoError(t, err)
 
 		return nodeExecutor
@@ -2769,24 +2775,24 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 
 			// initialize nodeExecutor
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnGetMatch(mock.Anything, mock.Anything).
+			catalogClient.EXPECT().Get(mock.Anything, mock.Anything).
 				Return(pluginscatalog.NewCatalogEntry(nil, pluginscatalog.NewStatus(test.cacheStatus, nil)), nil)
-			catalogClient.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			catalogClient.EXPECT().GetOrExtendReservation(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 				Return(&datacatalog.Reservation{OwnerId: test.cacheReservationOwnerID}, nil)
 
 			mockHandler := &nodemocks.CacheableNodeHandler{}
-			mockHandler.OnIsCacheableMatch(
+			mockHandler.EXPECT().IsCacheable(
 				mock.Anything,
 				mock.MatchedBy(func(nCtx interfaces.NodeExecutionContext) bool { return nCtx.NodeID() == currentNodeID }),
 			).Return(test.cacheable, test.cacheSerializable, nil)
-			mockHandler.OnIsCacheableMatch(
+			mockHandler.EXPECT().IsCacheable(
 				mock.Anything,
 				mock.MatchedBy(func(nCtx interfaces.NodeExecutionContext) bool { return nCtx.NodeID() == downstreamNodeID }),
 			).Return(false, false, nil)
-			mockHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).
+			mockHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).
 				Return(pluginscatalog.Key{Identifier: core.Identifier{Name: currentNodeID}}, nil)
-			mockHandler.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil)
-			mockHandler.OnFinalizeRequiredMatch(mock.Anything).Return(false)
+			mockHandler.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil)
+			mockHandler.EXPECT().FinalizeRequired().Return(false)
 
 			nodeExecutor := setupNodeExecutor(t, catalogClient, dataStore, mockHandler, testScope.NewSubScope("node_executor"))
 
@@ -2835,12 +2841,12 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 			config.GetConfig().NodeConfig.DefaultMaxAttempts = test.maxAttempts
 
 			node := &mocks.ExecutableNode{}
-			node.OnGetRetryStrategy().Return(nil)
+			node.EXPECT().GetRetryStrategy().Return(nil)
 			nCtx := &nodeExecContext{node: node}
 
 			nodeStatus := &mocks.ExecutableNodeStatus{}
-			nodeStatus.OnGetAttempts().Return(test.attempts)
-			nodeStatus.OnGetSystemFailures().Return(test.systemFailures)
+			nodeStatus.EXPECT().GetAttempts().Return(test.attempts)
+			nodeStatus.EXPECT().GetSystemFailures().Return(test.systemFailures)
 
 			err := &core.ExecutionError{
 				Kind: test.errorKind,

@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -30,7 +31,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.Local,
 			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}))
@@ -39,7 +40,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.None,
 			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}))
@@ -47,7 +48,7 @@ func TestShouldFetchData(t *testing.T) {
 	t.Run("no config", func(t *testing.T) {
 		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme: common.None,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}))
@@ -56,7 +57,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}))
@@ -65,7 +66,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.False(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}))
@@ -74,7 +75,7 @@ func TestShouldFetchData(t *testing.T) {
 		assert.False(t, shouldFetchData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Bytes: 200,
 		}))
 	})
@@ -85,7 +86,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 		assert.True(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
 			Scheme:         common.Local,
 			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}, "s3://foo/bar.txt"))
@@ -94,7 +95,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 		assert.True(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}, "s3://foo/bar.txt"))
@@ -103,7 +104,7 @@ func TestShouldFetchOutputData(t *testing.T) {
 		assert.False(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
 			Scheme:         common.AWS,
 			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
+		}, &admin.UrlBlob{
 			Url:   "s3://data",
 			Bytes: 200,
 		}, ""))
@@ -113,16 +114,16 @@ func TestShouldFetchOutputData(t *testing.T) {
 func TestGetInputs(t *testing.T) {
 	inputsURI := "s3://foo/bar/inputs.pb"
 
-	expectedURLBlob := admin.UrlBlob{
+	expectedURLBlob := &admin.UrlBlob{
 		Url:   "s3://foo/signed/inputs.pb",
 		Bytes: 1000,
 	}
 
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	mockRemoteURL := &urlMocks.RemoteURLInterface{}
+	mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		assert.Equal(t, inputsURI, uri)
 		return expectedURLBlob, nil
-	}
+	})
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
 	}
@@ -143,7 +144,7 @@ func TestGetInputs(t *testing.T) {
 		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
-		assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
+		assert.True(t, proto.Equal(inputURLBlob, expectedURLBlob))
 	})
 	t.Run("should not sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -157,16 +158,16 @@ func TestGetInputs(t *testing.T) {
 }
 
 func TestGetOutputs(t *testing.T) {
-	expectedURLBlob := admin.UrlBlob{
+	expectedURLBlob := &admin.UrlBlob{
 		Url:   "s3://foo/signed/outputs.pb",
 		Bytes: 1000,
 	}
 
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	mockRemoteURL := &urlMocks.RemoteURLInterface{}
+	mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		assert.Equal(t, testOutputsURI, uri)
 		return expectedURLBlob, nil
-	}
+	})
 
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
@@ -192,7 +193,7 @@ func TestGetOutputs(t *testing.T) {
 		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
-		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
+		assert.True(t, proto.Equal(outputURLBlob, expectedURLBlob))
 	})
 	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -205,11 +206,11 @@ func TestGetOutputs(t *testing.T) {
 		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
-		mockRemoteURL := urlMocks.NewMockRemoteURL()
-		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+		mockRemoteURL := &urlMocks.RemoteURLInterface{}
+		mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 			t.Fatal("Should not fetch a remote URL for outputs stored inline for an execution model")
-			return admin.UrlBlob{}, nil
-		}
+			return &admin.UrlBlob{}, nil
+		})
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 2000
 

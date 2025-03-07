@@ -64,6 +64,9 @@ var (
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
+		UpdateBaseBackoffDuration:          10,
+		UpdateBackoffRetries:               5,
+		AddTolerationsForExtendedResources: []string{},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -206,6 +209,17 @@ type K8sPluginConfig struct {
 
 	// SendObjectEvents indicates whether to send k8s object events in TaskExecutionEvent updates (similar to kubectl get events).
 	SendObjectEvents bool `json:"send-object-events" pflag:",If true, will send k8s object events in TaskExecutionEvent updates."`
+
+	// Initial delay in exponential backoff when updating a resource in milliseconds.
+	UpdateBaseBackoffDuration int `json:"update-base-backoff-duration" pflag:",Initial delay in exponential backoff when updating a resource in milliseconds."`
+
+	// Number of retries for exponential backoff when updating a resource.
+	UpdateBackoffRetries int `json:"update-backoff-retries" pflag:",Number of retries for exponential backoff when updating a resource."`
+
+	// Extended resources that should be added to the tolerations automatically.
+	AddTolerationsForExtendedResources []string `json:"add-tolerations-for-extended-resources" pflag:",Name of the extended resources for which tolerations should be added."`
+
+	EnableDistributedErrorAggregation bool `json:"enable-distributed-error-aggregation" pflag:",If true, will aggregate errors of different worker pods for distributed tasks."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -37,7 +38,7 @@ const remoteClosureIdentifier = "remote closure id"
 var errExpected = errors.New("expected error")
 
 func TestPopulateExecutionID(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name := GetExecutionName(&admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 	})
@@ -46,7 +47,7 @@ func TestPopulateExecutionID(t *testing.T) {
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name := GetExecutionName(&admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
@@ -72,7 +73,7 @@ func TestGetTask(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -81,10 +82,10 @@ func TestGetTask(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, task)
-	assert.Equal(t, project, task.Id.Project)
-	assert.Equal(t, domain, task.Id.Domain)
-	assert.Equal(t, name, task.Id.Name)
-	assert.Equal(t, version, task.Id.Version)
+	assert.Equal(t, project, task.GetId().GetProject())
+	assert.Equal(t, domain, task.GetId().GetDomain())
+	assert.Equal(t, name, task.GetId().GetName())
+	assert.Equal(t, version, task.GetId().GetVersion())
 }
 
 func TestGetTask_DatabaseError(t *testing.T) {
@@ -93,7 +94,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 		return models.Task{}, errExpected
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -122,7 +123,7 @@ func TestGetTask_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	task, err := GetTask(context.Background(), repository, core.Identifier{
+	task, err := GetTask(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",
@@ -152,7 +153,7 @@ func TestGetWorkflowModel(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	workflow, err := GetWorkflowModel(context.Background(), repository, core.Identifier{
+	workflow, err := GetWorkflowModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",
@@ -173,7 +174,7 @@ func TestGetWorkflowModel_DatabaseError(t *testing.T) {
 		return models.Workflow{}, errExpected
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	workflow, err := GetWorkflowModel(context.Background(), repository, core.Identifier{
+	workflow, err := GetWorkflowModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",
@@ -240,7 +241,7 @@ func TestGetWorkflow(t *testing.T) {
 			return nil
 		}
 	workflow, err := GetWorkflow(
-		context.Background(), repository, mockStorageClient, core.Identifier{
+		context.Background(), repository, mockStorageClient, &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "project",
 			Domain:       "domain",
@@ -268,7 +269,7 @@ func TestGetLaunchPlanModel(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -289,7 +290,7 @@ func TestGetLaunchPlanModel_DatabaseError(t *testing.T) {
 		return models.LaunchPlan{}, errExpected
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlanModel(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -317,7 +318,7 @@ func TestGetLaunchPlan(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlan(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlan(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -326,10 +327,10 @@ func TestGetLaunchPlan(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, launchPlan)
-	assert.Equal(t, project, launchPlan.Id.Project)
-	assert.Equal(t, domain, launchPlan.Id.Domain)
-	assert.Equal(t, name, launchPlan.Id.Name)
-	assert.Equal(t, version, launchPlan.Id.Version)
+	assert.Equal(t, project, launchPlan.GetId().GetProject())
+	assert.Equal(t, domain, launchPlan.GetId().GetDomain())
+	assert.Equal(t, name, launchPlan.GetId().GetName())
+	assert.Equal(t, version, launchPlan.GetId().GetVersion())
 }
 
 func TestGetLaunchPlan_TransformerError(t *testing.T) {
@@ -350,7 +351,7 @@ func TestGetLaunchPlan_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
-	launchPlan, err := GetLaunchPlan(context.Background(), repository, core.Identifier{
+	launchPlan, err := GetLaunchPlan(context.Background(), repository, &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      "project",
 		Domain:       "domain",
@@ -383,7 +384,7 @@ func TestGetNamedEntityModel(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	entity, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -405,7 +406,7 @@ func TestGetNamedEntityModel_DatabaseError(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	launchPlan, err := GetNamedEntityModel(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -436,18 +437,18 @@ func TestGetNamedEntity(t *testing.T) {
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
 	entity, err := GetNamedEntity(context.Background(), repository,
 		core.ResourceType_WORKFLOW,
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
 		})
 	assert.Nil(t, err)
 	assert.NotNil(t, entity)
-	assert.Equal(t, project, entity.Id.Project)
-	assert.Equal(t, domain, entity.Id.Domain)
-	assert.Equal(t, name, entity.Id.Name)
-	assert.Equal(t, description, entity.Metadata.Description)
-	assert.Equal(t, resourceType, entity.ResourceType)
+	assert.Equal(t, project, entity.GetId().GetProject())
+	assert.Equal(t, domain, entity.GetId().GetDomain())
+	assert.Equal(t, name, entity.GetId().GetName())
+	assert.Equal(t, description, entity.GetMetadata().GetDescription())
+	assert.Equal(t, resourceType, entity.GetResourceType())
 }
 
 func TestGetActiveLaunchPlanVersionFilters(t *testing.T) {
@@ -485,8 +486,8 @@ func TestGetMatchableResource(t *testing.T) {
 	domain := "dummyDomain"
 	workflow := "dummyWorkflow"
 	t.Run("successful fetch", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -502,15 +503,15 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
-		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
+		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
 		assert.Nil(t, err)
 	})
 	t.Run("successful fetch workflow matchable", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -527,16 +528,16 @@ func TestGetMatchableResource(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 
 		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, workflow)
-		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
+		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().GetMaxParallelism())
 		assert.Nil(t, err)
 	})
 
 	t.Run("not found", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -544,15 +545,15 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "resource not found")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.Nil(t, err)
 	})
 
 	t.Run("internal error", func(t *testing.T) {
-		resourceManager := &managerMocks.MockResourceManager{}
-		resourceManager.GetResourceFunc = func(ctx context.Context,
+		resourceManager := &managerMocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 				Project:      project,
@@ -560,7 +561,7 @@ func TestGetMatchableResource(t *testing.T) {
 				ResourceType: resourceType,
 			})
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
-		}
+		})
 
 		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
 		assert.NotNil(t, err)
@@ -571,7 +572,7 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	t.Run("Get Description Entity model", func(t *testing.T) {
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -589,7 +590,7 @@ func TestGetDescriptionEntityModel(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err := GetDescriptionEntityModel(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -605,7 +606,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	t.Run("Get Description Entity", func(t *testing.T) {
 		entity, err := GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -614,7 +615,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 			})
 		assert.Nil(t, err)
 		assert.NotNil(t, entity)
-		assert.Equal(t, "hello world", entity.ShortDescription)
+		assert.Equal(t, "hello world", entity.GetShortDescription())
 	})
 
 	t.Run("Failed to get DescriptionEntity", func(t *testing.T) {
@@ -623,7 +624,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err := GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -638,7 +639,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		}
 		repository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(getFunction)
 		entity, err = GetDescriptionEntity(context.Background(), repository,
-			core.Identifier{
+			&core.Identifier{
 				ResourceType: core.ResourceType_TASK,
 				Project:      project,
 				Domain:       domain,
@@ -651,13 +652,13 @@ func TestGetDescriptionEntity(t *testing.T) {
 }
 
 func TestMergeIntoExecConfig(t *testing.T) {
-	var res admin.WorkflowExecutionConfig
+	var res *admin.WorkflowExecutionConfig
 	parameters := []struct {
-		higher, lower, expected admin.WorkflowExecutionConfig
+		higher, lower, expected *admin.WorkflowExecutionConfig
 	}{
 		// Max Parallelism taken from higher
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 5,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://test-bucket",
@@ -669,7 +670,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 0,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
@@ -678,7 +679,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"lab1": "oldvalue"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				MaxParallelism: 5,
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://test-bucket",
@@ -694,7 +695,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Values that are set to empty in higher priority get overwritten
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "",
 				},
@@ -705,7 +706,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -716,7 +717,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -731,8 +732,8 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Values that are not set at all get merged in
 		{
-			admin.WorkflowExecutionConfig{},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{},
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -743,7 +744,7 @@ func TestMergeIntoExecConfig(t *testing.T) {
 					Values: map[string]string{"ann1": "annval"},
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				RawOutputDataConfig: &admin.RawOutputDataConfig{
 					OutputLocationPrefix: "s3://asdf",
 				},
@@ -758,17 +759,17 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 		// Interruptible
 		{
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: false,
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: true,
 				},
 			},
-			admin.WorkflowExecutionConfig{
+			&admin.WorkflowExecutionConfig{
 				Interruptible: &wrappers.BoolValue{
 					Value: false,
 				},
@@ -778,8 +779,8 @@ func TestMergeIntoExecConfig(t *testing.T) {
 
 	for i := range parameters {
 		t.Run(fmt.Sprintf("Testing [%v]", i), func(t *testing.T) {
-			res = MergeIntoExecConfig(parameters[i].higher, &parameters[i].lower)
-			assert.True(t, proto.Equal(&parameters[i].expected, &res))
+			res = MergeIntoExecConfig(parameters[i].higher, parameters[i].lower)
+			assert.True(t, proto.Equal(parameters[i].expected, res))
 		})
 	}
 }

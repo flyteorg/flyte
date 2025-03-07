@@ -28,7 +28,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 1-4
 ```
@@ -39,9 +39,9 @@ We create a new deck named `pca` and render Markdown content along with a
 You can begin by initializing an {ref}`ImageSpec <image_spec_example>` object to encompass all the necessary dependencies.
 This approach automatically triggers a Docker build, alleviating the need for you to manually create a Docker image.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 15-19
+:lines: 15-27
 ```
 
 :::{important}
@@ -51,7 +51,7 @@ To upload the image to the local registry in the demo cluster, indicate the regi
 
 Note the usage of `append` to append the Plotly deck to the Markdown deck.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :pyobject: pca_plot
 ```
@@ -96,9 +96,9 @@ When the task connected with a deck object is executed, these objects employ ren
 
 Creates a profile report from a Pandas DataFrame.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 44-51
+:lines: 56-63
 ```
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_frame_renderer.png
@@ -113,9 +113,9 @@ Creates a profile report from a Pandas DataFrame.
 Renders DataFrame as an HTML table.
 This renderer doesn't necessitate plugin installation since it's accessible within the flytekit library.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 57-64
+:lines: 69-76
 ```
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_top_frame_renderer.png
@@ -127,7 +127,7 @@ This renderer doesn't necessitate plugin installation since it's accessible with
 
 Converts a Markdown string into HTML, producing HTML as a Unicode string.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :pyobject: markdown_renderer
 ```
@@ -147,9 +147,9 @@ The median (Q2) is indicated by a line within the box.
 Typically, the whiskers extend to the edges of the box,
 plus or minus 1.5 times the interquartile range (IQR: Q3-Q1).
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 85-91
+:lines: 97-103
 ```
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_box_renderer.png
@@ -162,9 +162,9 @@ plus or minus 1.5 times the interquartile range (IQR: Q3-Q1).
 Converts a {ref}`FlyteFile <files>` or `PIL.Image.Image` object into an HTML string,
 where the image data is encoded as a base64 string.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 97-111
+:lines: 109-123
 ```
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_image_renderer.png
@@ -176,9 +176,9 @@ where the image data is encoded as a base64 string.
 
 Converts a Pandas dataframe into an HTML table.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+```{literalinclude} /examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
-:lines: 115-123
+:lines: 127-135
 ```
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_table_renderer.png
@@ -194,3 +194,35 @@ if your deck renderers can enhance data visibility.
 Feel encouraged to open a pull request and play a part in enhancing the Flyte deck renderer ecosystem!
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
+
+## Streaming Decks
+
+Now you can visualize your deck directly if you call `Deck.publish()` in your code.
+
+```python
+from flytekit.deck import Deck
+
+@task(enable_deck=True)
+def t_deck():
+    Deck.publish()
+```
+
+You can click the refresh button and see the update until the deck succeeds.
+
+```{eval-rst}
+.. raw:: html
+
+   <video width="800" height="450" controls>
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_succeed.mp4">
+   </video>
+```
+
+When the task fails, you can also see the deck in the flyte console.
+
+```{eval-rst}
+.. raw:: html
+
+   <video width="800" height="450" controls>
+       <source src="https://raw.githubusercontent.com/flyteorg/static-resources/2f3c3c26e9c0168c350bb8cb1bef1ece36ee60ee/flyte/user_guide/development_lifecycle/decks/deck_fail.mp4">
+   </video>
+```

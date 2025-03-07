@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,12 +19,13 @@ func deleteTaskResourceAttributeSetup() {
 
 func TestDeleteTaskResourceAttributes(t *testing.T) {
 	t.Run("successful project domain attribute deletion commandline", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -31,10 +33,11 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("failed project domain attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(fmt.Errorf("failed to delete project domain attributes"))
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -43,12 +46,13 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("successful project domain attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_task_attribute.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -56,12 +60,13 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("successful workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -70,12 +75,13 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("failed workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(fmt.Errorf("failed to delete workflow attribute"))
 		err := deleteTaskResourceAttributes(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -85,12 +91,13 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("successful workflow attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_workflow_task_attribute.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -99,12 +106,13 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("workflow attribute deletion non existent file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = testDataNonExistentFile
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deleteTaskResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -113,7 +121,8 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 			admin.MatchableResource_TASK_RESOURCE)
 	})
 	t.Run("attribute deletion invalid file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
 		taskresourceattribute.DefaultDelConfig.AttrFile = testDataInvalidAttrFile

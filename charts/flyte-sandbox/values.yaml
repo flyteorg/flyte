@@ -57,6 +57,8 @@ flyte-binary:
             - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+            - FLYTE_PLATFORM_URL: '{{ printf "%s-grpc" .Release.Name }}.{{ .Release.Namespace }}:8089'
+            - FLYTE_PLATFORM_INSECURE: True
     inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
   clusterResourceTemplates:
     inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'

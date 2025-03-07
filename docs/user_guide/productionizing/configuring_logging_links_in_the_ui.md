@@ -40,7 +40,9 @@ The parameters can be used to generate a unique URL to the logs using a template
    * - ``{{ .logName }}``
      - A deployment specific name where to expect the logs to be
    * - ``{{ .hostname }}``
-     - The hostname where the pod is running and logs reside
+     - The value used to override the hostname the pod uses internally within its own network namespace (i.e., the pod's ``.spec.hostname``)
+   * - ``{{ .nodeName }}``
+     - The hostname of the node where the pod is running and logs reside (i.e., the pod's ``.spec.nodeName``)
    * - ``{{ .podRFC3339StartTime }}``
      - The pod creation time (in RFC3339 format, e.g. "2021-01-01T02:07:14Z", also conforming to ISO 8601)
    * - ``{{ .podRFC3339FinishTime }}``
@@ -101,6 +103,95 @@ task_logs:
           templateUris:
             - "https://..."
 ```
+
+### Configure dynamic log links
+
+Dynamic log links are links which are 1. not shown by default for all tasks and 2. which can use template variables provided during task registration.
+
+
+Configure dynamic log links in the flytepropeller configuration the following way:
+
+```yaml
+configmap:
+  task_logs:
+    plugins:
+      logs:
+        dynamic-log-links:
+        - log_link_a:  # Name of the dynamic log link
+            displayName: Custom dynamic log link A
+            templateUris: 'https://some-service.com/{{ .taskConfig.custom_param }}'
+```
+
+In `flytekit`, dynamic log links are activated and configured using a so-called `ClassDecorator`.
+You can define such a custom decorator for controlling dynamic log links for instance as follows:
+
+```py
+from flytekit.core.utils import ClassDecorator
+
+
+class configure_log_links(ClassDecorator):
+    """
+    Task function decorator to configure dynamic log links.
+    """
+    def __init__(
+        self,
+        task_function: Optional[Callable] = None,
+        enable_log_link_a: Optional[bool] = False,
+        custom_param: Optional[str] = None,
+        **kwargs,
+    ):
+        """
+        Configure dynamic log links for a task.
+
+        Args:
+            task_function (function, optional): The user function to be decorated. If the decorator is called
+                with arguments, task_function will be None. If the decorator is called without arguments,
+                task_function will be function to be decorated.
+            enable_log_link_a (bool, optional): Activate dynamic log link `log_link_a` configured in the backend.
+            custom_param (str, optional): Custom parameter for log link templates configured in the backend.
+        """
+        self.enable_log_link_a = enable_log_link_a
+        self.custom_param = custom_param
+
+        super().__init__(
+            task_function,
+            enable_log_link_a=enable_log_link_a,
+            custom_param=custom_param,
+            **kwargs,
+        )
+
+    def execute(self, *args, **kwargs):
+        output = self.task_function(*args, **kwargs)
+        return output
+
+    def get_extra_config(self) -> dict[str, str]:
+        """Return extra config for dynamic log links."""
+        extra_config = {}
+
+        log_link_types = []
+        if self.enable_log_link_a:
+            log_link_types.append("log_link_a")
+
+        if self.custom_param:
+            extra_config["custom_param"] = self.custom_param
+        # Activate other dynamic log links as needed
+
+        extra_config[self.LINK_TYPE_KEY] = ",".join(log_link_types)
+        return extra_config
+
+
+@task
+@configure_log_links(
+    enable_log_link_a=True,
+    custom_param="test-value",
+)
+def my_task():
+    ...
+
+```
+
+For inspiration, consider how the flytekit [wandb](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-wandb/flytekitplugins/wandb/tracking.py), [neptune](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-neptune/flytekitplugins/neptune/tracking.py) or [vscode](https://github.com/flyteorg/flytekit/blob/master/flytekit/interactive/vscode_lib/decorator.py) plugins make use of dynamic log links.
+
 
 ## Datadog integration
 

@@ -49,6 +49,13 @@ func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTempl
 func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *core.TaskTemplate {
 
 	podSpec := v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name:    "test-image",
+				Command: command,
+				Args:    args,
+			},
+		},
 		Containers: []v1.Container{
 			v1.Container{
 				Name:    "test-image",
@@ -100,7 +107,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
-	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
 	tID.On("GetID").Return(core.TaskExecutionIdentifier{
@@ -118,40 +125,42 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
-	to.OnGetContainerImage().Return(containerImage)
+	to.On("GetPodTemplate").Return(nil)
+
+	to.EXPECT().GetContainerImage().Return(containerImage)
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
-	taskMetadata.OnGetConsoleURL().Return("")
+	taskMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskMetadata
 }
 
 func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata pluginsCore.TaskExecutionMetadata) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
-	inputReader.OnGetInputPath().Return("test-data-reference")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference")
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
-	taskCtx.OnOutputWriter().Return(outputReader)
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
-	taskCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
-	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
-	taskCtx.OnPluginStateReader().Return(pluginStateReader)
+	pluginStateReader.EXPECT().Get(mock.Anything).Return(0, nil)
+	taskCtx.EXPECT().PluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
 }
@@ -174,24 +183,28 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 		taskTemplate         *core.TaskTemplate
 		taskMetadata         pluginsCore.TaskExecutionMetadata
 		expectServiceAccount string
+		checkInitContainer   bool
 	}{
 		{
 			name:                 "BuildResource",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: serviceAccount,
+			checkInitContainer:   false,
 		},
 		{
 			name:                 "BuildResource_PodTemplate",
 			taskTemplate:         dummyContainerTaskTemplateWithPodSpec(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: podTemplateServiceAccount,
+			checkInitContainer:   true,
 		},
 		{
 			name:                 "BuildResource_SecurityContext",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, false, ""),
 			expectServiceAccount: securityContextServiceAccount,
+			checkInitContainer:   false,
 		},
 	}
 	for _, tc := range testCases {
@@ -212,6 +225,11 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 
 			assert.Equal(t, command, j.Spec.Containers[0].Command)
 			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
+
+			if tc.checkInitContainer {
+				assert.Equal(t, command, j.Spec.InitContainers[0].Command)
+				assert.Equal(t, []string{"test-data-reference"}, j.Spec.InitContainers[0].Args)
+			}
 
 			assert.Equal(t, tc.expectServiceAccount, j.Spec.ServiceAccountName)
 		})
@@ -428,7 +446,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
-		assert.Equal(t, "UnknownError", ec)
+		assert.Equal(t, "Interrupted", ec)
 	})
 
 	t.Run("failConditionUnschedulable", func(t *testing.T) {

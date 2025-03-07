@@ -8,6 +8,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -40,6 +41,45 @@ type Metadata interface {
 	ContentMD5() string
 }
 
+type CursorState int
+
+const (
+	// Enum representing state of the cursor
+	AtStartCursorState     CursorState = 0
+	AtEndCursorState       CursorState = 1
+	AtCustomPosCursorState CursorState = 2
+)
+
+type Cursor struct {
+	cursorState    CursorState
+	customPosition string
+}
+
+func NewCursorAtStart() Cursor {
+	return Cursor{
+		cursorState:    AtStartCursorState,
+		customPosition: "",
+	}
+}
+
+func NewCursorAtEnd() Cursor {
+	return Cursor{
+		cursorState:    AtEndCursorState,
+		customPosition: "",
+	}
+}
+
+func NewCursorFromCustomPosition(customPosition string) Cursor {
+	return Cursor{
+		cursorState:    AtCustomPosCursorState,
+		customPosition: customPosition,
+	}
+}
+
+func IsCursorEnd(cursor Cursor) bool {
+	return cursor.cursorState == AtEndCursorState
+}
+
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
 // Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {
@@ -65,7 +105,7 @@ type SignedURLResponse struct {
 	RequiredRequestHeaders map[string]string
 }
 
-//go:generate mockery -name RawStore -case=underscore
+//go:generate mockery --name RawStore --case=underscore --with-expecter
 
 // RawStore defines a low level interface for accessing and storing bytes.
 type RawStore interface {
@@ -77,6 +117,9 @@ type RawStore interface {
 
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
+
+	// List gets a list of items (relative path to the reference input) given a prefix, using a paginated API
+	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
@@ -91,7 +134,7 @@ type RawStore interface {
 	Delete(ctx context.Context, reference DataReference) error
 }
 
-//go:generate mockery -name ReferenceConstructor -case=underscore
+//go:generate mockery --name ReferenceConstructor --case=underscore --with-expecter
 
 // ReferenceConstructor defines an interface for building data reference paths.
 type ReferenceConstructor interface {
@@ -111,7 +154,7 @@ type ProtobufStore interface {
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
 
-//go:generate mockery -name ComposedProtobufStore -case=underscore
+//go:generate mockery --name ComposedProtobufStore --case=underscore --with-expecter
 
 // ComposedProtobufStore interface includes all the necessary data to allow a ProtobufStore to interact with storage
 // through a RawStore.
@@ -132,4 +175,8 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 
 func (r DataReference) String() string {
 	return string(r)
+}
+
+func NewDataReference(scheme string, container string, key string) DataReference {
+	return DataReference(fmt.Sprintf("%s://%s/%s", scheme, container, key))
 }

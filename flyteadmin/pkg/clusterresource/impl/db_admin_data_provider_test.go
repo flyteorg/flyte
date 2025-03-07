@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -28,9 +29,9 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		"K1": "V1",
 		"K2": "V2",
 	}
-	resourceManager := mocks.MockResourceManager{}
 	t.Run("happy case", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 			return &interfaces.ResourceResponse{
 				Project:      request.Project,
 				Domain:       request.Domain,
@@ -43,18 +44,19 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
 		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
 		assert.NoError(t, err)
-		assert.EqualValues(t, attrs.Attributes, attributes)
+		assert.EqualValues(t, attrs.GetAttributes(), attributes)
 	})
 	t.Run("error", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 			return nil, errFoo
-		}
+		})
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
@@ -62,7 +64,8 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		assert.EqualError(t, err, errFoo.Error())
 	})
 	t.Run("weird db response", func(t *testing.T) {
-		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
+		resourceManager := mocks.ResourceInterface{}
+		resourceManager.EXPECT().GetResource(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 			return &interfaces.ResourceResponse{
 				Project:      request.Project,
 				Domain:       request.Domain,
@@ -75,7 +78,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 					},
 				},
 			}, nil
-		}
+		})
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
@@ -125,7 +128,7 @@ func TestGetProjects(t *testing.T) {
 		}
 		projects, err := provider.GetProjects(context.TODO())
 		assert.NoError(t, err)
-		assert.Len(t, projects.Projects, 2)
+		assert.Len(t, projects.GetProjects(), 2)
 	})
 	t.Run("db error", func(t *testing.T) {
 		mockRepo := repoMocks.NewMockRepository()

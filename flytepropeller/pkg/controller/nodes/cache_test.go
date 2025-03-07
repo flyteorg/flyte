@@ -50,32 +50,32 @@ func (t mockTaskReader) GetTaskID() *core.Identifier    { return nil }
 
 func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTemplate *core.TaskTemplate) *nodeExecContext {
 	mockNode := &mocks.ExecutableNode{}
-	mockNode.OnGetIDMatch(mock.Anything).Return(nodeID)
+	mockNode.EXPECT().GetID().Return(nodeID)
 
 	mockNodeStatus := &mocks.ExecutableNodeStatus{}
-	mockNodeStatus.OnGetAttemptsMatch().Return(currentAttempt)
-	mockNodeStatus.OnGetOutputDir().Return(nodeOutputDir)
+	mockNodeStatus.EXPECT().GetAttempts().Return(currentAttempt)
+	mockNodeStatus.EXPECT().GetOutputDir().Return(nodeOutputDir)
 
 	mockParentInfo := &executorsmocks.ImmutableParentInfo{}
-	mockParentInfo.OnCurrentAttemptMatch().Return(parentCurrentAttempt)
-	mockParentInfo.OnGetUniqueIDMatch().Return(uniqueID)
+	mockParentInfo.EXPECT().CurrentAttempt().Return(parentCurrentAttempt)
+	mockParentInfo.EXPECT().GetUniqueID().Return(uniqueID)
 
 	mockExecutionContext := &executorsmocks.ExecutionContext{}
-	mockExecutionContext.OnGetParentInfo().Return(mockParentInfo)
-	mockExecutionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	mockExecutionContext.EXPECT().GetParentInfo().Return(mockParentInfo)
+	mockExecutionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 
 	mockNodeExecutionMetadata := &interfacesmocks.NodeExecutionMetadata{}
-	mockNodeExecutionMetadata.OnGetOwnerID().Return(
+	mockNodeExecutionMetadata.EXPECT().GetOwnerID().Return(
 		types.NamespacedName{
 			Name: parentUniqueID,
 		},
 	)
-	mockNodeExecutionMetadata.OnGetNodeExecutionIDMatch().Return(
+	mockNodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(
 		&core.NodeExecutionIdentifier{
 			NodeId: nodeID,
 		},
 	)
-	mockNodeExecutionMetadata.OnGetConsoleURL().Return("")
+	mockNodeExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 
 	var taskReader interfaces.TaskReader
 	if taskTemplate != nil {
@@ -128,11 +128,11 @@ func TestUpdatePhaseCacheInfo(t *testing.T) {
 
 			// ensure cache and reservation status' are being set correctly
 			if test.cacheStatus != nil {
-				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
+				assert.Equal(t, cacheStatus.GetCacheStatus(), phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetCacheStatus())
 			}
 
 			if test.reservationStatus != nil {
-				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.ReservationStatus)
+				assert.Equal(t, reservationStatus, phaseInfo.GetInfo().TaskNodeInfo.TaskNodeMetadata.GetReservationStatus())
 			}
 		})
 	}
@@ -208,10 +208,10 @@ func TestCheckCatalogCache(t *testing.T) {
 			}
 
 			cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-			cacheableHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(test.catalogKey, nil)
+			cacheableHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(test.catalogKey, nil)
 
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnGetMatch(mock.Anything, mock.Anything).Return(test.cacheEntry, test.cacheError)
+			catalogClient.EXPECT().Get(mock.Anything, mock.Anything).Return(test.cacheEntry, test.cacheError)
 
 			dataStore, err := storage.NewDataStore(
 				&storage.Config{
@@ -280,10 +280,10 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 			}
 
 			cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-			cacheableHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
+			cacheableHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
+			catalogClient.EXPECT().GetOrExtendReservation(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(
 				&datacatalog.Reservation{
 					OwnerId: test.reservationOwnerID,
 				},
@@ -341,10 +341,10 @@ func TestReleaseCatalogReservation(t *testing.T) {
 			}
 
 			cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-			cacheableHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
+			cacheableHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnReleaseReservationMatch(mock.Anything, mock.Anything, mock.Anything).Return(test.releaseError)
+			catalogClient.EXPECT().ReleaseReservation(mock.Anything, mock.Anything, mock.Anything).Return(test.releaseError)
 
 			nodeExecutor := &nodeExecutor{
 				catalog: catalogClient,
@@ -415,10 +415,10 @@ func TestWriteCatalogCache(t *testing.T) {
 			}
 
 			cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-			cacheableHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(test.catalogKey, nil)
+			cacheableHandler.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(test.catalogKey, nil)
 
 			catalogClient := &catalogmocks.Client{}
-			catalogClient.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(test.cacheStatus, nil)
+			catalogClient.EXPECT().Put(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(test.cacheStatus, nil)
 
 			dataStore, err := storage.NewDataStore(
 				&storage.Config{

@@ -19,7 +19,7 @@ import (
 // The intention of these interfaces is to decouple the algorithm and usage from the actual CRD definition.
 // this would help in ease of changes underneath without affecting the code.
 
-//go:generate mockery -all
+//go:generate mockery --all --with-expecter
 
 type CustomState map[string]interface{}
 type WorkflowID = string
@@ -290,6 +290,7 @@ type ExecutableArrayNodeStatus interface {
 	GetSubNodeTaskPhases() bitarray.CompactArray
 	GetSubNodeRetryAttempts() bitarray.CompactArray
 	GetSubNodeSystemFailures() bitarray.CompactArray
+	GetSubNodeDeltaTimestamps() bitarray.CompactArray
 	GetTaskPhaseVersion() uint32
 }
 
@@ -302,6 +303,7 @@ type MutableArrayNodeStatus interface {
 	SetSubNodeTaskPhases(subNodeTaskPhases bitarray.CompactArray)
 	SetSubNodeRetryAttempts(subNodeRetryAttempts bitarray.CompactArray)
 	SetSubNodeSystemFailures(subNodeSystemFailures bitarray.CompactArray)
+	SetSubNodeDeltaTimestamps(subNodeDeltaTimestamps bitarray.CompactArray)
 	SetTaskPhaseVersion(taskPhaseVersion uint32)
 }
 
@@ -441,6 +443,7 @@ type ExecutableNode interface {
 	IsInterruptible() *bool
 	GetName() string
 	GetContainerImage() string
+	GetPodTemplate() *core.K8SPod
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow
@@ -552,6 +555,10 @@ type EnqueueWorkflow func(workflowID WorkflowID)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
 	return outputDir + "/outputs.pb"
+}
+
+func GetOutputsLiteralMetadataFile(literalKey string, outputDir DataReference) DataReference {
+	return outputDir + DataReference(fmt.Sprintf("/%s_offloaded_metadata.pb", literalKey))
 }
 
 func GetInputsFile(inputDir DataReference) DataReference {

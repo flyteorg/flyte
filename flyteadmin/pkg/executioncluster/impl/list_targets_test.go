@@ -16,7 +16,7 @@ func TestNewListTargets(t *testing.T) {
 	enabledCluster := "EC"
 	disabledCluster := "DC"
 	execTargetProvider := mocks.ExecutionTargetProvider{}
-	execTargetProvider.OnGetExecutionTargetMatch(mock.Anything,
+	execTargetProvider.EXPECT().GetExecutionTarget(mock.Anything,
 		mock.MatchedBy(func(cluster runtimeInterfaces.ClusterConfig) bool {
 			return cluster.Name == enabledCluster
 		})).Return(
@@ -24,7 +24,7 @@ func TestNewListTargets(t *testing.T) {
 			Enabled: true,
 			ID:      enabledCluster,
 		}, nil)
-	execTargetProvider.OnGetExecutionTargetMatch(mock.Anything,
+	execTargetProvider.EXPECT().GetExecutionTarget(mock.Anything,
 		mock.MatchedBy(func(cluster runtimeInterfaces.ClusterConfig) bool {
 			return cluster.Name == disabledCluster
 		})).Return(
@@ -33,7 +33,7 @@ func TestNewListTargets(t *testing.T) {
 			ID:      disabledCluster,
 		}, nil)
 	conf := runtimeMocks.ClusterConfiguration{}
-	conf.OnGetClusterConfigs().Return([]runtimeInterfaces.ClusterConfig{
+	conf.EXPECT().GetClusterConfigs().Return([]runtimeInterfaces.ClusterConfig{
 		{
 			Name:    enabledCluster,
 			Enabled: true,

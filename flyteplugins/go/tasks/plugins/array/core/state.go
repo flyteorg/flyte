@@ -17,7 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 //go:generate enumer -type=Phase
 
 type Phase uint8
@@ -303,7 +303,7 @@ func InvertBitSet(input *bitarray.BitSet, limit uint) *bitarray.BitSet {
 
 func NewPhasesCompactArray(count uint) bitarray.CompactArray {
 	// TODO: This is fragile, we should introduce a TaskPhaseCount as the last element in the enum
-	a, err := bitarray.NewCompactArray(count, bitarray.Item(len(core.Phases)-1))
+	a, err := bitarray.NewCompactArray(count, bitarray.Item(len(core.Phases)-1)) // #nosec G115
 	if err != nil {
 		logger.Warnf(context.Background(), "Failed to create compact array with provided parameters [count: %v]",
 			count)
@@ -322,7 +322,7 @@ func CalculateOriginalIndex(childIdx int, toCache *bitarray.BitSet) int {
 		}
 
 		if childIdx+1 == sum {
-			return int(i)
+			return int(i) // #nosec G115
 		}
 	}
 

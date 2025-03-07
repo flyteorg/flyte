@@ -53,7 +53,7 @@ func TestGetSandbox(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
 		c, err := GetSandbox(ctx, mockDocker)
 		assert.Equal(t, c.Names[0], FlyteSandboxClusterName)
 		assert.Nil(t, err)
@@ -63,7 +63,7 @@ func TestGetSandbox(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		c, err := GetSandbox(ctx, mockDocker)
 		assert.Nil(t, c)
 		assert.Nil(t, err)
@@ -73,8 +73,8 @@ func TestGetSandbox(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 		err := RemoveSandbox(ctx, mockDocker, strings.NewReader("y"))
 		assert.Nil(t, err)
 	})
@@ -88,8 +88,8 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 		ctx := context.Background()
 
 		// Verify the attributes
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 		err := RemoveSandbox(ctx, mockDocker, strings.NewReader("n"))
 		assert.NotNil(t, err)
 
@@ -103,8 +103,8 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 		ctx := context.Background()
 
 		// Verify the attributes
-		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 		err := RemoveSandbox(ctx, mockDocker, strings.NewReader("n"))
 		assert.Nil(t, err)
 	})
@@ -116,8 +116,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -126,8 +126,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -136,7 +136,7 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("error"))
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("error"))
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.NotNil(t, err)
 	})
@@ -145,8 +145,8 @@ func TestPullDockerImage(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImagePull(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -154,7 +154,7 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Success skip existing image with ImagePullPolicyIfNotPresent", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -162,7 +162,7 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Success skip existing image with ImagePullPolicyNever", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
@@ -170,7 +170,7 @@ func TestPullDockerImage(t *testing.T) {
 	t.Run("Error non-existent image with ImagePullPolicyNever", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
+		mockDocker.EXPECT().ImageList(ctx, types.ImageListOptions{}).Return([]image.Summary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
 		assert.ErrorContains(t, err, "Image does not exist, but image pull policy prevents pulling it")
 	})
@@ -185,7 +185,7 @@ func TestStartContainer(t *testing.T) {
 		ctx := context.Background()
 
 		// Verify the attributes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
+		mockDocker.EXPECT().ContainerCreate(ctx, &container.Config{
 			Env:          Environment,
 			Image:        imageName,
 			Tty:          false,
@@ -195,10 +195,10 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.CreateResponse{
+		}, mock.Anything, mock.Anything, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		id, err := StartContainer(ctx, mockDocker, Volumes, p1, p2, "nginx", imageName, nil, false)
 		assert.Nil(t, err)
 		assert.Greater(t, len(id), 0)
@@ -215,7 +215,7 @@ func TestStartContainer(t *testing.T) {
 		expectedEnv = append(expectedEnv, "b=2")
 
 		// Verify the attributes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
+		mockDocker.EXPECT().ContainerCreate(ctx, &container.Config{
 			Env:          expectedEnv,
 			Image:        imageName,
 			Tty:          false,
@@ -225,10 +225,10 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.CreateResponse{
+		}, mock.Anything, mock.Anything, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		id, err := StartContainer(ctx, mockDocker, Volumes, p1, p2, "nginx", imageName, additionalEnv, false)
 		assert.Nil(t, err)
 		assert.Greater(t, len(id), 0)
@@ -242,7 +242,7 @@ func TestStartContainer(t *testing.T) {
 		ctx := context.Background()
 
 		// Verify the attributes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
+		mockDocker.EXPECT().ContainerCreate(ctx, &container.Config{
 			Env:          Environment,
 			Image:        imageName,
 			Tty:          false,
@@ -252,10 +252,10 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.CreateResponse{
+		}, mock.Anything, mock.Anything, mock.Anything).Return(container.CreateResponse{
 			ID: "",
 		}, fmt.Errorf("error"))
-		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		id, err := StartContainer(ctx, mockDocker, Volumes, p1, p2, "nginx", imageName, nil, false)
 		assert.NotNil(t, err)
 		assert.Equal(t, len(id), 0)
@@ -268,7 +268,7 @@ func TestStartContainer(t *testing.T) {
 		ctx := context.Background()
 
 		// Verify the attributes
-		mockDocker.OnContainerCreate(ctx, &container.Config{
+		mockDocker.EXPECT().ContainerCreate(ctx, &container.Config{
 			Env:          Environment,
 			Image:        imageName,
 			Tty:          false,
@@ -278,10 +278,10 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.CreateResponse{
+		}, mock.Anything, mock.Anything, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(fmt.Errorf("error"))
+		mockDocker.EXPECT().ContainerStart(ctx, "Hello", container.StartOptions{}).Return(fmt.Errorf("error"))
 		id, err := StartContainer(ctx, mockDocker, Volumes, p1, p2, "nginx", imageName, nil, false)
 		assert.NotNil(t, err)
 		assert.Equal(t, len(id), 0)
@@ -295,7 +295,7 @@ func TestReadLogs(t *testing.T) {
 	t.Run("Successfully read logs", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
+		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -308,7 +308,7 @@ func TestReadLogs(t *testing.T) {
 	t.Run("Error in reading logs", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
+		mockDocker.EXPECT().ContainerLogs(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -358,7 +358,7 @@ func TestDockerExec(t *testing.T) {
 		Client = mockDocker
 		c := ExecConfig
 		c.Cmd = []string{"ls"}
-		mockDocker.OnContainerExecCreateMatch(ctx, mock.Anything, c).Return(types.IDResponse{}, nil)
+		mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, c).Return(types.IDResponse{}, nil)
 		_, err := ExecCommend(ctx, mockDocker, "test", []string{"ls"})
 		assert.Nil(t, err)
 	})
@@ -368,7 +368,7 @@ func TestDockerExec(t *testing.T) {
 		Client = mockDocker
 		c := ExecConfig
 		c.Cmd = []string{"ls"}
-		mockDocker.OnContainerExecCreateMatch(ctx, mock.Anything, c).Return(types.IDResponse{}, fmt.Errorf("test"))
+		mockDocker.EXPECT().ContainerExecCreate(ctx, mock.Anything, c).Return(types.IDResponse{}, fmt.Errorf("test"))
 		_, err := ExecCommend(ctx, mockDocker, "test", []string{"ls"})
 		assert.NotNil(t, err)
 	})
@@ -383,8 +383,8 @@ func TestInspectExecResp(t *testing.T) {
 		c.Cmd = []string{"ls"}
 		reader := bufio.NewReader(strings.NewReader("test"))
 
-		mockDocker.OnContainerExecInspectMatch(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
-		mockDocker.OnContainerExecAttachMatch(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecInspect(ctx, mock.Anything).Return(types.ContainerExecInspect{}, nil)
+		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
 			Reader: reader,
 		}, fmt.Errorf("err"))
 
@@ -399,7 +399,7 @@ func TestInspectExecResp(t *testing.T) {
 		c.Cmd = []string{"ls"}
 		reader := bufio.NewReader(strings.NewReader("test"))
 
-		mockDocker.OnContainerExecAttachMatch(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecAttach(ctx, mock.Anything, types.ExecStartCheck{}).Return(types.HijackedResponse{
 			Reader: reader,
 		}, nil)
 
@@ -415,7 +415,7 @@ func TestGetOrCreateVolume(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		expected := &volume.Volume{Name: "test"}
 
-		mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{expected}}, nil)
+		mockDocker.EXPECT().VolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{expected}}, nil)
 		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
 		assert.Equal(t, expected, actual, "volumes should match")
 		assert.Nil(t, err)
@@ -425,8 +425,8 @@ func TestGetOrCreateVolume(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		expected := volume.Volume{Name: "test"}
 
-		mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{}}, nil)
-		mockDocker.OnVolumeCreate(ctx, volume.CreateOptions{Name: "test"}).Return(expected, nil)
+		mockDocker.EXPECT().VolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{}}, nil)
+		mockDocker.EXPECT().VolumeCreate(ctx, volume.CreateOptions{Name: "test"}).Return(expected, nil)
 		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
 		assert.Equal(t, expected, *actual, "volumes should match")
 		assert.Nil(t, err)
@@ -435,7 +435,7 @@ func TestGetOrCreateVolume(t *testing.T) {
 }
 
 func TestDemoPorts(t *testing.T) {
-	_, ports, _ := GetDemoPorts()
+	_, ports, _ := GetDemoPorts("6443")
 	assert.Equal(t, 6, len(ports))
 }
 
@@ -473,12 +473,12 @@ func TestCopyFile(t *testing.T) {
 
 		// Mocks
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerCreate(
-			ctx, &container.Config{Image: image}, &container.HostConfig{}, nil, nil, containerName).Return(
+		mockDocker.EXPECT().ContainerCreate(
+			ctx, &container.Config{Image: image}, &container.HostConfig{}, mock.Anything, mock.Anything, containerName).Return(
 			container.CreateResponse{ID: containerName}, nil)
-		mockDocker.OnContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, nil)
-		mockDocker.OnCopyFromContainer(ctx, containerName, "some source").Return(reader, types.ContainerPathStat{}, nil)
-		mockDocker.OnContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, nil)
+		mockDocker.EXPECT().CopyFromContainer(ctx, containerName, "some source").Return(reader, types.ContainerPathStat{}, nil)
+		mockDocker.EXPECT().ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
 		assert.Nil(t, err)
 
 		// Run
@@ -496,11 +496,11 @@ func TestCopyFile(t *testing.T) {
 
 		// Mocks
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerCreate(
-			ctx, &container.Config{Image: image}, &container.HostConfig{}, nil, nil, containerName).Return(
+		mockDocker.EXPECT().ContainerCreate(
+			ctx, &container.Config{Image: image}, &container.HostConfig{}, mock.Anything, mock.Anything, containerName).Return(
 			container.CreateResponse{ID: containerName}, nil)
-		mockDocker.OnContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, myErr)
-		mockDocker.OnContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
+		mockDocker.EXPECT().ContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, myErr)
+		mockDocker.EXPECT().ContainerRemove(ctx, containerName, container.RemoveOptions{Force: true}).Return(nil)
 		assert.Nil(t, err)
 
 		// Run

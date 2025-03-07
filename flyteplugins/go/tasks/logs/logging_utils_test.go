@@ -19,8 +19,8 @@ const podName = "PodName"
 
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("generated-name")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("generated-name")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -37,7 +37,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		},
 		RetryAttempt: 1,
 	})
-	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.EXPECT().GetUniqueNodeID().Return("n0-0-n0")
 	return tID
 }
 
@@ -302,7 +302,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Stackdriver Logs my-Suffix",
 			},
-		}, "")
+		}, "", "")
 	})
 
 	t.Run("StackDriver", func(t *testing.T) {
@@ -315,11 +315,11 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Stackdriver Logs my-Suffix",
 			},
-		}, "")
+		}, "", "")
 	})
 }
 
-func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string) {
+func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string, nodeName string) {
 	logPlugin, err := InitializeLogPlugins(config)
 	assert.NoError(tb, err)
 
@@ -335,6 +335,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.Ta
 				},
 			},
 			Hostname: hostname,
+			NodeName: nodeName,
 		},
 		Status: v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
@@ -382,7 +383,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "Internal my-Suffix",
 		},
-	}, "")
+	}, "", "")
 }
 
 func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
@@ -402,7 +403,27 @@ func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "StackDriver my-Suffix",
 		},
-	}, "my-hostname")
+	}, "my-hostname", "")
+}
+
+func TestGetLogsForContainerInPodTemplates_NodeName(t *testing.T) {
+	assertTestSucceeded(t, &LogConfig{
+		Templates: []tasklog.TemplateLogPlugin{
+			{
+				DisplayName: "MyLog",
+				TemplateURIs: []string{
+					"{{ .nodeName }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				},
+				MessageFormat: core.TaskLog_JSON,
+			},
+		},
+	}, nil, []*core.TaskLog{
+		{
+			Uri:           "ip-1-2-3-4/my-namespace/my-pod/ContainerName/ContainerID",
+			MessageFormat: core.TaskLog_JSON,
+			Name:          "MyLog my-Suffix",
+		},
+	}, "my-hostname", "ip-1-2-3-4")
 }
 
 func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
@@ -562,7 +583,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "")
+			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "", "")
 		})
 	}
 }

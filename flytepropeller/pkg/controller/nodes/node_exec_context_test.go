@@ -122,8 +122,8 @@ func Test_NodeContextDefault(t *testing.T) {
 	w1 := getTestFlyteWorkflow()
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	nodeLookup := &mocks2.NodeLookup{}
-	nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(nil), true)
-	nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+	nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(nil), true)
+	nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 		SystemFailures: 0,
 	})
 
@@ -147,10 +147,10 @@ func Test_NodeContextDefault(t *testing.T) {
 
 	// Test that retrieving task nodes
 	taskIdentifier := common.GetTargetEntity(ctx, nodeExecContext)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Project, taskIdentifier.Project)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Domain, taskIdentifier.Domain)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Name, taskIdentifier.Name)
-	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Version, taskIdentifier.Version)
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetProject(), taskIdentifier.GetProject())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetDomain(), taskIdentifier.GetDomain())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetName(), taskIdentifier.GetName())
+	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetVersion(), taskIdentifier.GetVersion())
 }
 
 func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
@@ -163,30 +163,30 @@ func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
 	}
 
 	subWfNode := &mocks.ExecutableWorkflowNode{}
-	subWfNode.OnGetSubWorkflowRef().Return(nil)
-	subWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
+	subWfNode.EXPECT().GetSubWorkflowRef().Return(nil)
+	subWfNode.EXPECT().GetLaunchPlanRefID().Return(&v1alpha1.LaunchPlanRefID{Identifier: id})
 
 	n := &mocks.ExecutableNode{}
-	n.OnGetWorkflowNode().Return(subWfNode)
+	n.EXPECT().GetWorkflowNode().Return(subWfNode)
 
 	nCtx := &mocks3.NodeExecutionContext{}
-	nCtx.OnNode().Return(n)
+	nCtx.EXPECT().Node().Return(n)
 
 	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
-	assert.Equal(t, id.Project, fetchedID.Project)
-	assert.Equal(t, id.Domain, fetchedID.Domain)
-	assert.Equal(t, id.Name, fetchedID.Name)
-	assert.Equal(t, id.Version, fetchedID.Version)
+	assert.Equal(t, id.GetProject(), fetchedID.GetProject())
+	assert.Equal(t, id.GetDomain(), fetchedID.GetDomain())
+	assert.Equal(t, id.GetName(), fetchedID.GetName())
+	assert.Equal(t, id.GetVersion(), fetchedID.GetVersion())
 }
 
 func TestGetTargetEntity_EmptyTask(t *testing.T) {
 	n := &mocks.ExecutableNode{}
-	n.OnGetWorkflowNode().Return(nil)
+	n.EXPECT().GetWorkflowNode().Return(nil)
 	taskID := ""
-	n.OnGetTaskID().Return(&taskID)
+	n.EXPECT().GetTaskID().Return(&taskID)
 
 	nCtx := &mocks3.NodeExecutionContext{}
-	nCtx.OnNode().Return(n)
+	nCtx.EXPECT().Node().Return(n)
 
 	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
 	assert.Nil(t, fetchedID)
@@ -223,8 +223,8 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 		w := getTestFlyteWorkflow()
 
 		nodeLookup := &mocks2.NodeLookup{}
-		nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(nil), true)
-		nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+		nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(nil), true)
+		nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 			SystemFailures: 0,
 		})
 
@@ -266,8 +266,8 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 
 		interruptible := true
 		nodeLookup := &mocks2.NodeLookup{}
-		nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
-		nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+		nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
+		nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 			SystemFailures: 0,
 		})
 
@@ -309,8 +309,8 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 
 		interruptible := false
 		nodeLookup := &mocks2.NodeLookup{}
-		nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
-		nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+		nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
+		nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 			SystemFailures: 0,
 		})
 
@@ -475,8 +475,8 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 
 			nodeLookup := &mocks2.NodeLookup{}
 			interruptible := true
-			nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
-			nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+			nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
+			nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 				Attempts:       tt.attempts,
 				SystemFailures: tt.systemFailures,
 			})

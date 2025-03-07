@@ -24,7 +24,7 @@ func TestVersionManager_GetVersion(t *testing.T) {
 
 	v, err := vmanager.GetVersion(context.Background(), &admin.GetVersionRequest{})
 	assert.Nil(t, err)
-	assert.Equal(t, v.ControlPlaneVersion.BuildTime, buildTime)
-	assert.Equal(t, v.ControlPlaneVersion.Build, build)
-	assert.Equal(t, v.ControlPlaneVersion.Version, appversion)
+	assert.Equal(t, v.GetControlPlaneVersion().GetBuildTime(), buildTime)
+	assert.Equal(t, v.GetControlPlaneVersion().GetBuild(), build)
+	assert.Equal(t, v.GetControlPlaneVersion().GetVersion(), appversion)
 }

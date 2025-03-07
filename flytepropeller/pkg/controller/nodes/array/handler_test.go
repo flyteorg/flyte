@@ -4,21 +4,25 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	eventmocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	execmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -50,10 +54,12 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	// mock components
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
-	eventConfig := &config.EventConfig{}
+	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
+	offloadingConfig := config.LiteralOffloadingConfig{Enabled: false}
+	literalOffloadingConfig := config.LiteralOffloadingConfig{Enabled: true, MinSizeInMBForOffloading: 1024, MaxSizeInMBForOffloading: 1024 * 1024}
 	mockEventSink := eventmocks.NewMockEventSink()
 	mockHandlerFactory := &mocks.HandlerFactory{}
-	mockHandlerFactory.OnGetHandlerMatch(mock.Anything).Return(nodeHandler, nil)
+	mockHandlerFactory.EXPECT().GetHandler(mock.Anything).Return(nodeHandler, nil)
 	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
 	mockSignalClient := &gatemocks.SignalServiceClient{}
@@ -61,11 +67,11 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 
 	// create node executor
 	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient,
-		adminClient, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
+		adminClient, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
-	arrayNodeHandler, err := New(nodeExecutor, eventConfig, scope)
+	arrayNodeHandler, err := New(nodeExecutor, eventConfig, literalOffloadingConfig, scope)
 	if err != nil {
 		return nil, err
 	}
@@ -79,23 +85,23 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnCurrentAttempt().Return(uint32(0))
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(0))
 
 	// ContextualNodeLookup
 	nodeLookup := &execmocks.NodeLookup{}
-	nodeLookup.OnFromNodeMatch(mock.Anything).Return(nil, nil)
-	nCtx.OnContextualNodeLookup().Return(nodeLookup)
+	nodeLookup.EXPECT().FromNode(mock.Anything).Return(nil, nil)
+	nCtx.EXPECT().ContextualNodeLookup().Return(nodeLookup)
 
 	// DataStore
-	nCtx.OnDataStore().Return(dataStore)
+	nCtx.EXPECT().DataStore().Return(dataStore)
 
 	// ExecutionContext
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		MaxParallelism: maxParallelism,
 	})
-	executionContext.OnGetExecutionID().Return(
+	executionContext.EXPECT().GetExecutionID().Return(
 		v1alpha1.ExecutionID{
 			WorkflowExecutionIdentifier: &idlcore.WorkflowExecutionIdentifier{
 				Project: "project",
@@ -103,15 +109,15 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 				Name:    "name",
 			},
 		})
-	executionContext.OnGetLabels().Return(nil)
-	executionContext.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-	executionContext.OnIsInterruptible().Return(false)
-	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.EXPECT().GetLabels().Return(nil)
+	executionContext.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+	executionContext.EXPECT().IsInterruptible().Return(false)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
 	outputVariableMap := make(map[string]*idlcore.Variable)
 	for _, outputVariable := range outputVariables {
 		outputVariableMap[outputVariable] = &idlcore.Variable{}
 	}
-	executionContext.OnGetTask(taskRef).Return(
+	executionContext.EXPECT().GetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Interface: &idlcore.TypedInterface{
@@ -123,32 +129,32 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		},
 		nil,
 	)
-	executionContext.OnCurrentParallelism().Return(currentParallelism)
+	executionContext.EXPECT().CurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
-	executionContext.OnIncrementNodeExecutionCount().Return(1)
-	executionContext.OnIncrementTaskExecutionCount().Return(1)
-	executionContext.OnCurrentNodeExecutionCount().Return(1)
-	executionContext.OnCurrentTaskExecutionCount().Return(1)
-	nCtx.OnExecutionContext().Return(executionContext)
+	executionContext.EXPECT().IncrementNodeExecutionCount().Return(1)
+	executionContext.EXPECT().IncrementTaskExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentNodeExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentTaskExecutionCount().Return(1)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 	// EventsRecorder
-	nCtx.OnEventsRecorder().Return(eventRecorder)
+	nCtx.EXPECT().EventsRecorder().Return(eventRecorder)
 
 	// InputReader
-	inputFilePaths := &pluginmocks.InputFilePaths{}
-	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
-	nCtx.OnInputReader().Return(
+	inputFilePaths := &pluginiomocks.InputFilePaths{}
+	inputFilePaths.EXPECT().GetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	nCtx.EXPECT().InputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,
 			inputLiteralMap,
 		))
 
 	// Node
-	nCtx.OnNode().Return(arrayNodeSpec)
+	nCtx.EXPECT().Node().Return(arrayNodeSpec)
 
 	// NodeExecutionMetadata
 	nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnGetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
+	nodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
 		NodeId: "foo",
 		ExecutionId: &idlcore.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -156,33 +162,39 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 			Name:    "name",
 		},
 	})
-	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	nodeExecutionMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "wf-namespace",
 		Name:      "wf-name",
 	})
-	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nodeExecutionMetadata)
 
 	// NodeID
-	nCtx.OnNodeID().Return("foo")
+	nCtx.EXPECT().NodeID().Return("foo")
 
 	// NodeStateReader
 	nodeStateReader := &mocks.NodeStateReader{}
-	nodeStateReader.OnGetArrayNodeState().Return(*arrayNodeState)
-	nCtx.OnNodeStateReader().Return(nodeStateReader)
+	nodeStateReader.EXPECT().GetArrayNodeState().Return(*arrayNodeState)
+	nCtx.EXPECT().NodeStateReader().Return(nodeStateReader)
 
 	// NodeStateWriter
 	nodeStateWriter := &mocks.NodeStateWriter{}
-	nodeStateWriter.OnPutArrayNodeStateMatch(mock.Anything, mock.Anything).Run(
-		func(args mock.Arguments) {
-			*arrayNodeState = args.Get(0).(handler.ArrayNodeState)
+	nodeStateWriter.EXPECT().PutArrayNodeState(mock.Anything).Run(
+		func(s handler.ArrayNodeState) {
+			*arrayNodeState = s
 		},
 	).Return(nil)
-	nCtx.OnNodeStateWriter().Return(nodeStateWriter)
+	nCtx.EXPECT().NodeStateWriter().Return(nodeStateWriter)
 
 	// NodeStatus
-	nCtx.OnNodeStatus().Return(&v1alpha1.NodeStatus{
-		DataDir:   storage.DataReference("s3://bucket/data"),
-		OutputDir: storage.DataReference("s3://bucket/output"),
+	nowMinus := time.Now().Add(time.Duration(-5) * time.Second)
+	metav1NowMinus := metav1.Time{
+		Time: nowMinus,
+	}
+	nCtx.EXPECT().NodeStatus().Return(&v1alpha1.NodeStatus{
+		DataDir:              storage.DataReference("s3://bucket/data"),
+		OutputDir:            storage.DataReference("s3://bucket/output"),
+		LastAttemptStartedAt: &metav1NowMinus,
+		StartedAt:            &metav1NowMinus,
 	})
 
 	return nCtx
@@ -190,19 +202,6 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 func TestAbort(t *testing.T) {
 	ctx := context.Background()
-	scope := promutils.NewTestScope()
-	dataStore, err := storage.NewDataStore(&storage.Config{
-		Type: storage.TypeMemory,
-	}, scope)
-	assert.NoError(t, err)
-
-	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-
-	// initialize ArrayNodeHandler
-	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
-	assert.NoError(t, err)
 
 	tests := []struct {
 		name                           string
@@ -210,20 +209,49 @@ func TestAbort(t *testing.T) {
 		subNodePhases                  []v1alpha1.NodePhase
 		subNodeTaskPhases              []core.Phase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
+		arrayNodeState                 v1alpha1.ArrayNodePhase
+		expectedTaskExecutionPhase     idlcore.TaskExecution_Phase
 	}{
 		{
-			name: "Success",
+			name: "Aborted after failed",
 			inputMap: map[string][]int64{
 				"foo": []int64{0, 1, 2},
 			},
 			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
 			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			arrayNodeState:                 v1alpha1.ArrayNodePhaseFailing,
+			expectedTaskExecutionPhase:     idlcore.TaskExecution_FAILED,
+		},
+		{
+			name: "Aborted while running",
+			inputMap: map[string][]int64{
+				"foo": []int64{0, 1, 2},
+			},
+			subNodePhases:                  []v1alpha1.NodePhase{v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseNotYetStarted},
+			subNodeTaskPhases:              []core.Phase{core.PhaseSuccess, core.PhaseRunning, core.PhaseUndefined},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_ABORTED},
+			arrayNodeState:                 v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskExecutionPhase:     idlcore.TaskExecution_ABORTED,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+			dataStore, err := storage.NewDataStore(&storage.Config{
+				Type: storage.TypeMemory,
+			}, scope)
+			assert.NoError(t, err)
+
+			nodeHandler := &mocks.NodeHandler{}
+			nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+
+			// initialize ArrayNodeHandler
+			arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
+			assert.NoError(t, err)
+
 			// initialize universal variables
 			literalMap := convertMapToArrayLiterals(test.inputMap)
 
@@ -238,7 +266,7 @@ func TestAbort(t *testing.T) {
 
 			// initialize ArrayNodeState
 			arrayNodeState := &handler.ArrayNodeState{
-				Phase: v1alpha1.ArrayNodePhaseFailing,
+				Phase: test.arrayNodeState,
 			}
 			for _, item := range []struct {
 				arrayReference *bitarray.CompactArray
@@ -248,17 +276,18 @@ func TestAbort(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
 
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 			for i, taskPhase := range test.subNodeTaskPhases {
-				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase))
+				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
@@ -266,17 +295,18 @@ func TestAbort(t *testing.T) {
 			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
-			err := arrayNodeHandler.Abort(ctx, nCtx, "foo")
+			err = arrayNodeHandler.Abort(ctx, nCtx, "foo")
 			assert.NoError(t, err)
 
 			nodeHandler.AssertNumberOfCalls(t, "Abort", len(test.expectedExternalResourcePhases))
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				assert.Equal(t, test.expectedTaskExecutionPhase, eventRecorder.taskExecutionEvents[0].GetPhase())
 
-				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+				externalResources := eventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
 				for i, expectedPhase := range test.expectedExternalResourcePhases {
-					assert.Equal(t, expectedPhase, externalResources[i].Phase)
+					assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
 				}
 			} else {
 				assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
@@ -294,7 +324,7 @@ func TestFinalize(t *testing.T) {
 	assert.NoError(t, err)
 
 	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 
 	// initialize ArrayNodeHandler
 	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
@@ -344,17 +374,17 @@ func TestFinalize(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 			for i, taskPhase := range test.subNodeTaskPhases {
-				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase))
+				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
@@ -443,10 +473,10 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
 
-				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+				externalResources := eventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
 				for i, expectedPhase := range test.expectedExternalResourcePhases {
-					assert.Equal(t, expectedPhase, externalResources[i].Phase)
+					assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
 				}
 			} else {
 				assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
@@ -457,6 +487,24 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 
 func uint32Ptr(v uint32) *uint32 {
 	return &v
+}
+
+type fakeEventRecorder struct {
+	taskErr                  error
+	phaseVersionFailures     uint32
+	recordTaskEventCallCount int
+}
+
+func (f *fakeEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+	return nil
+}
+
+func (f *fakeEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+	f.recordTaskEventCallCount++
+	if f.phaseVersionFailures == 0 || event.GetPhaseVersion() < f.phaseVersionFailures {
+		return f.taskErr
+	}
+	return nil
 }
 
 func TestHandleArrayNodePhaseExecuting(t *testing.T) {
@@ -485,18 +533,27 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                           string
-		parallelism                    *uint32
-		minSuccessRatio                *float32
-		subNodePhases                  []v1alpha1.NodePhase
-		subNodeTaskPhases              []core.Phase
-		subNodeTransitions             []handler.Transition
-		expectedArrayNodePhase         v1alpha1.ArrayNodePhase
-		expectedTransitionPhase        handler.EPhase
-		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
-		currentWfParallelism           uint32
-		maxWfParallelism               uint32
-		incrementParallelismCount      uint32
+		name                                    string
+		parallelism                             *uint32
+		minSuccessRatio                         *float32
+		subNodePhases                           []v1alpha1.NodePhase
+		subNodeTaskPhases                       []core.Phase
+		subNodeDeltaTimestamps                  []uint64
+		subNodeTransitions                      []handler.Transition
+		expectedArrayNodePhase                  v1alpha1.ArrayNodePhase
+		expectedArrayNodeSubPhases              []v1alpha1.NodePhase
+		expectedDiffArrayNodeSubDeltaTimestamps []bool
+		expectedTransitionPhase                 handler.EPhase
+		expectedExternalResourcePhases          []idlcore.TaskExecution_Phase
+		currentWfParallelism                    uint32
+		maxWfParallelism                        uint32
+		incrementParallelismCount               uint32
+		useFakeEventRecorder                    bool
+		eventRecorderFailures                   uint32
+		eventRecorderError                      error
+		expectedTaskPhaseVersion                uint32
+		expectHandleError                       bool
+		expectedEventingCalls                   int
 	}{
 		{
 			name:        "StartAllSubNodes",
@@ -513,7 +570,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -532,7 +594,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseQueued,
+			},
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -552,7 +619,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			currentWfParallelism:           0,
@@ -572,7 +644,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseQueued,
+			},
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
 			currentWfParallelism:           workflowMaxParallelism - 1,
@@ -589,8 +666,13 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				core.PhaseUndefined,
 				core.PhaseUndefined,
 			},
-			subNodeTransitions:             []handler.Transition{},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			subNodeTransitions:     []handler.Transition{},
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{},
 			currentWfParallelism:           workflowMaxParallelism,
@@ -611,7 +693,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -631,7 +718,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseSucceeded,
+			},
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_SUCCEEDED},
 		},
@@ -651,7 +743,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
+			},
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_FAILED},
 		},
@@ -670,9 +767,119 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseFailing,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseFailing,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseSucceeded,
+			},
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
+		},
+		{
+			name:        "EventingAlreadyExists_EventuallySucceeds",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
+			expectedTaskPhaseVersion:       2,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderFailures:          2,
+			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
+			incrementParallelismCount:      1,
+			expectedEventingCalls:          2,
+		},
+		{
+			name:        "EventingAlreadyExists_EventuallyFails",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderFailures:          5,
+			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
+			expectHandleError:              true,
+			expectedEventingCalls:          4,
+		},
+		{
+			name:        "EventingFails",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderError:             fmt.Errorf("err"),
+			expectHandleError:              true,
+			expectedEventingCalls:          1,
+		},
+		{
+			name:        "DeltaTimestampUpdates",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseRunning,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseUndefined,
+				core.PhaseUndefined,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_SYSTEM, "", "", &handler.ExecutionInfo{})),
+			},
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRetryableFailure,
+			},
+			expectedTaskPhaseVersion:       1,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_FAILED},
+			incrementParallelismCount:      1,
 		},
 	}
 
@@ -684,6 +891,15 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			}, scope)
 			assert.NoError(t, err)
 
+			var eventRecorder interfaces.EventRecorder
+			if test.useFakeEventRecorder {
+				eventRecorder = &fakeEventRecorder{
+					phaseVersionFailures: test.eventRecorderFailures,
+					taskErr:              test.eventRecorderError,
+				}
+			} else {
+				eventRecorder = newBufferedEventRecorder()
+			}
 			// initialize ArrayNodeState
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseExecuting,
@@ -696,45 +912,43 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
-			}
-			for i, taskPhase := range test.subNodeTaskPhases {
-				arrayNodeState.SubNodeTaskPhases.SetItem(i, bitarray.Item(taskPhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
-			// create NodeExecutionContext
-			eventRecorder := newBufferedEventRecorder()
+			for i, deltaTimestmap := range test.subNodeDeltaTimestamps {
+				arrayNodeState.SubNodeDeltaTimestamps.SetItem(i, deltaTimestmap) // #nosec G115
+			}
 
 			nodeSpec := arrayNodeSpec
 			nodeSpec.ArrayNode.Parallelism = test.parallelism
 			nodeSpec.ArrayNode.MinSuccessRatio = test.minSuccessRatio
 
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, test.currentWfParallelism, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &nodeSpec, arrayNodeState, test.currentWfParallelism, workflowMaxParallelism)
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
-			nodeHandler.OnFinalizeRequired().Return(false)
+			nodeHandler.EXPECT().FinalizeRequired().Return(false)
 			for i, transition := range test.subNodeTransitions {
 				nodeID := fmt.Sprintf("n%d", i)
 				transitionPhase := test.expectedExternalResourcePhases[i]
 
-				nodeHandler.OnHandleMatch(mock.Anything, mock.MatchedBy(func(arrayNCtx interfaces.NodeExecutionContext) bool {
+				nodeHandler.EXPECT().Handle(mock.Anything, mock.MatchedBy(func(arrayNCtx interfaces.NodeExecutionContext) bool {
 					return arrayNCtx.NodeID() == nodeID // match on NodeID using index to ensure each subNode is handled independently
 				})).Run(
-					func(args mock.Arguments) {
+					func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 						// mock sending TaskExecutionEvent from handler to show task state transition
 						taskExecutionEvent := &event.TaskExecutionEvent{
 							Phase: transitionPhase,
 						}
 
-						err := args.Get(1).(interfaces.NodeExecutionContext).EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
+						err := executionContext.EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
 						assert.NoError(t, err)
 					},
 				).Return(transition, nil)
@@ -745,25 +959,114 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 			// evaluate node
 			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
-			assert.NoError(t, err)
+
+			fakeEventRecorder, ok := eventRecorder.(*fakeEventRecorder)
+			if ok {
+				assert.Equal(t, test.expectedEventingCalls, fakeEventRecorder.recordTaskEventCallCount)
+			}
+
+			if !test.expectHandleError {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				return
+			}
 
 			// validate results
 			assert.Equal(t, test.expectedArrayNodePhase, arrayNodeState.Phase)
 			assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
+			assert.Equal(t, test.expectedTaskPhaseVersion, arrayNodeState.TaskPhaseVersion)
 
-			if len(test.expectedExternalResourcePhases) > 0 {
-				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+			for i, expectedPhase := range test.expectedArrayNodeSubPhases {
+				assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i))) // #nosec G115
+			}
 
-				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
-				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
-				for i, expectedPhase := range test.expectedExternalResourcePhases {
-					assert.Equal(t, expectedPhase, externalResources[i].Phase)
+			for i, expectedDiffDeltaTimestamps := range test.expectedDiffArrayNodeSubDeltaTimestamps {
+				if expectedDiffDeltaTimestamps {
+					assert.NotEqual(t, arrayNodeState.SubNodeDeltaTimestamps.GetItem(i), test.subNodeDeltaTimestamps[i])
+				} else {
+					assert.Equal(t, arrayNodeState.SubNodeDeltaTimestamps.GetItem(i), test.subNodeDeltaTimestamps[i])
 				}
-			} else {
-				assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
+			}
+
+			bufferedEventRecorder, ok := eventRecorder.(*bufferedEventRecorder)
+			if ok {
+				if len(test.expectedExternalResourcePhases) > 0 {
+					assert.Equal(t, 1, len(bufferedEventRecorder.taskExecutionEvents))
+
+					externalResources := bufferedEventRecorder.taskExecutionEvents[0].GetMetadata().GetExternalResources()
+					assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
+					for i, expectedPhase := range test.expectedExternalResourcePhases {
+						assert.Equal(t, expectedPhase, externalResources[i].GetPhase())
+					}
+				} else {
+					assert.Equal(t, 0, len(bufferedEventRecorder.taskExecutionEvents))
+				}
 			}
 
 			nCtx.ExecutionContext().(*execmocks.ExecutionContext).AssertNumberOfCalls(t, "IncrementParallelism", int(test.incrementParallelismCount))
+		})
+	}
+}
+
+func TestHandle_InvalidLiteralType(t *testing.T) {
+	ctx := context.Background()
+	scope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, scope)
+	assert.NoError(t, err)
+	nodeHandler := &mocks.NodeHandler{}
+
+	// Initialize ArrayNodeHandler
+	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
+	assert.NoError(t, err)
+
+	// Test cases
+	tests := []struct {
+		name                      string
+		inputLiteral              *idlcore.Literal
+		expectedTransitionType    handler.TransitionType
+		expectedPhase             handler.EPhase
+		expectedErrorCode         string
+		expectedContainedErrorMsg string
+	}{
+		{
+			name: "InvalidLiteralType",
+			inputLiteral: &idlcore.Literal{
+				Value: &idlcore.Literal_Scalar{
+					Scalar: &idlcore.Scalar{},
+				},
+			},
+			expectedTransitionType:    handler.TransitionTypeEphemeral,
+			expectedPhase:             handler.EPhaseFailed,
+			expectedErrorCode:         errors.IDLNotFoundErr,
+			expectedContainedErrorMsg: "Failed to validate literal type",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Create NodeExecutionContext
+			literalMap := &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"invalidInput": test.inputLiteral,
+				},
+			}
+			arrayNodeState := &handler.ArrayNodeState{
+				Phase: v1alpha1.ArrayNodePhaseNone,
+			}
+			nCtx := createNodeExecutionContext(dataStore, newBufferedEventRecorder(), nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+
+			// Evaluate node
+			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
+			assert.NoError(t, err)
+
+			// Validate results
+			assert.Equal(t, test.expectedTransitionType, transition.Type())
+			assert.Equal(t, test.expectedPhase, transition.Info().GetPhase())
+			assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().GetCode())
+			assert.Contains(t, transition.Info().GetErr().GetMessage(), test.expectedContainedErrorMsg)
 		})
 	}
 }
@@ -843,10 +1146,10 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
-			nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-			nodeHandler.OnFinalizeRequired().Return(false)
-			nodeHandler.OnHandleMatch(mock.Anything, mock.Anything).Return(test.transition, nil)
+			nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().FinalizeRequired().Return(false)
+			nodeHandler.EXPECT().Handle(mock.Anything, mock.Anything).Return(test.transition, nil)
 
 			arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
 			assert.NoError(t, err)
@@ -937,7 +1240,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 			subNodePhases, err := bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(v1alpha1.NodePhaseRecovered))
 			assert.NoError(t, err)
 			for i, nodePhase := range test.subNodePhases {
-				subNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				subNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
 			retryAttempts, err := bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(1))
@@ -1010,6 +1313,9 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 					assert.Equal(t, int64(*outputValue), collection.GetLiterals()[i].GetScalar().GetPrimitive().GetInteger())
 				}
 			}
+
+			assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+			assert.Equal(t, idlcore.TaskExecution_SUCCEEDED, eventRecorder.taskExecutionEvents[0].GetPhase())
 		})
 	}
 }
@@ -1023,8 +1329,8 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 	assert.NoError(t, err)
 
 	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 
 	// initialize ArrayNodeHandler
 	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
@@ -1065,14 +1371,14 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 				{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 				{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: 1},
 				{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: 1},
+				{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: 1024},
 			} {
-
-				*item.arrayReference, err = bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(item.maxValue))
+				*item.arrayReference, err = bitarray.NewCompactArray(uint(len(test.subNodePhases)), bitarray.Item(item.maxValue)) // #nosec G115
 				assert.NoError(t, err)
 			}
 
 			for i, nodePhase := range test.subNodePhases {
-				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
+				arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase)) // #nosec G115
 			}
 
 			// create NodeExecutionContext
@@ -1088,6 +1394,9 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 			assert.Equal(t, test.expectedArrayNodePhase, arrayNodeState.Phase)
 			assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
 			nodeHandler.AssertNumberOfCalls(t, "Abort", test.expectedAbortCalls)
+
+			assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+			assert.Equal(t, idlcore.TaskExecution_FAILED, eventRecorder.taskExecutionEvents[0].GetPhase())
 		})
 	}
 }

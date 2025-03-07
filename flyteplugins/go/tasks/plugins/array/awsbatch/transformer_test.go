@@ -138,45 +138,45 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	}
 
 	id := &mocks.TaskExecutionID{}
-	id.OnGetGeneratedName().Return("Job_Name")
-	id.OnGetID().Return(core.TaskExecutionIdentifier{})
+	id.EXPECT().GetGeneratedName().Return("Job_Name")
+	id.EXPECT().GetID().Return(core.TaskExecutionIdentifier{})
 
 	to := &mocks.TaskOverrides{}
-	to.OnGetConfig().Return(&v12.ConfigMap{
+	to.EXPECT().GetConfig().Return(&v12.ConfigMap{
 		Data: map[string]string{
 			DynamicTaskQueueKey: "child_queue",
 		},
 	})
 
-	to.OnGetResources().Return(&v12.ResourceRequirements{
+	to.EXPECT().GetResources().Return(&v12.ResourceRequirements{
 		Limits:   v12.ResourceList{},
 		Requests: v12.ResourceList{},
 	})
 
 	tMetadata := &mocks.TaskExecutionMetadata{}
-	tMetadata.OnGetAnnotations().Return(map[string]string{"aKey": "aVal"})
-	tMetadata.OnGetNamespace().Return("ns")
-	tMetadata.OnGetLabels().Return(map[string]string{"lKey": "lVal"})
-	tMetadata.OnGetOwnerReference().Return(v1.OwnerReference{Name: "x"})
-	tMetadata.OnGetTaskExecutionID().Return(id)
-	tMetadata.OnGetOverrides().Return(to)
-	tMetadata.OnGetPlatformResources().Return(&v12.ResourceRequirements{})
+	tMetadata.EXPECT().GetAnnotations().Return(map[string]string{"aKey": "aVal"})
+	tMetadata.EXPECT().GetNamespace().Return("ns")
+	tMetadata.EXPECT().GetLabels().Return(map[string]string{"lKey": "lVal"})
+	tMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{Name: "x"})
+	tMetadata.EXPECT().GetTaskExecutionID().Return(id)
+	tMetadata.EXPECT().GetOverrides().Return(to)
+	tMetadata.EXPECT().GetPlatformResources().Return(&v12.ResourceRequirements{})
 
 	ir := &mocks2.InputReader{}
-	ir.OnGetInputPath().Return("inputs.pb")
-	ir.OnGetInputPrefixPath().Return("/inputs/prefix")
-	ir.OnGetMatch(mock.Anything).Return(nil, nil)
+	ir.EXPECT().GetInputPath().Return("inputs.pb")
+	ir.EXPECT().GetInputPrefixPath().Return("/inputs/prefix")
+	ir.EXPECT().Get(mock.Anything).Return(nil, nil)
 
 	or := &mocks2.OutputWriter{}
-	or.OnGetOutputPrefixPath().Return("/path/output")
-	or.OnGetRawOutputPrefix().Return("s3://")
-	or.OnGetCheckpointPrefix().Return("/checkpoint")
-	or.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	or.EXPECT().GetOutputPrefixPath().Return("/path/output")
+	or.EXPECT().GetRawOutputPrefix().Return("s3://")
+	or.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	or.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	taskCtx := &mocks.TaskExecutionContext{}
-	taskCtx.OnTaskExecutionMetadata().Return(tMetadata)
-	taskCtx.OnInputReader().Return(ir)
-	taskCtx.OnOutputWriter().Return(or)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(tMetadata)
+	taskCtx.EXPECT().InputReader().Return(ir)
+	taskCtx.EXPECT().OutputWriter().Return(or)
 
 	st, err := utils.MarshalObjToStruct(input)
 	assert.NoError(t, err)
@@ -191,20 +191,20 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	}
 
 	tr := &mocks.TaskReader{}
-	tr.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(tr)
 
 	ctx := context.Background()
 	batchInput, err := FlyteTaskToBatchInput(ctx, taskCtx, "", &config.Config{})
 	assert.NoError(t, err)
 
-	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.Size)
+	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.GetSize())
 	assert.NotNil(t, batchInput)
 	assert.Equal(t, *expectedBatchInput, *batchInput)
 
 	taskTemplate.Type = array.AwsBatchTaskType
-	tr.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(tr)
 
 	ctx = context.Background()
 	_, err = FlyteTaskToBatchInput(ctx, taskCtx, "", &config.Config{})
@@ -214,8 +214,8 @@ func TestArrayJobToBatchInput(t *testing.T) {
 func Test_getEnvVarsForTask(t *testing.T) {
 	ctx := context.Background()
 	id := &mocks.TaskExecutionID{}
-	id.OnGetGeneratedName().Return("Job_Name")
-	id.OnGetID().Return(core.TaskExecutionIdentifier{})
+	id.EXPECT().GetGeneratedName().Return("Job_Name")
+	id.EXPECT().GetID().Return(core.TaskExecutionIdentifier{})
 
 	assert.NoError(t, flyteK8sConfig.SetK8sPluginConfig(&flyteK8sConfig.K8sPluginConfig{
 		DefaultEnvVars: map[string]string{

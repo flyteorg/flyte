@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -107,6 +108,12 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Error(t, err)
 		cfg.Memory = old
 	})
+
+	t.Run("sidecar-container-name-change", func(t *testing.T) {
+		c, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, []string{"hello"})
+		assert.NoError(t, err)
+		assert.Equal(t, "uploader", strings.Split(c.Name, "-")[1])
+	})
 }
 
 func TestDownloadCommandArgs(t *testing.T) {
@@ -132,11 +139,11 @@ func TestDownloadCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			vm := &core.VariableMap{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, vm))
-			assert.Len(t, vm.Variables, 2)
-			for k, v := range iFace.Variables {
-				v2, ok := vm.Variables[k]
+			assert.Len(t, vm.GetVariables(), 2)
+			for k, v := range iFace.GetVariables() {
+				v2, ok := vm.GetVariables()[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -167,11 +174,11 @@ func TestSidecarCommandArgs(t *testing.T) {
 		if assert.NoError(t, err) {
 			if2 := &core.TypedInterface{}
 			assert.NoError(t, proto.Unmarshal(serIFaceBytes, if2))
-			assert.Len(t, if2.Outputs.Variables, 2)
-			for k, v := range iFace.Outputs.Variables {
-				v2, ok := if2.Outputs.Variables[k]
+			assert.Len(t, if2.GetOutputs().GetVariables(), 2)
+			for k, v := range iFace.GetOutputs().GetVariables() {
+				v2, ok := if2.GetOutputs().GetVariables()[k]
 				assert.True(t, ok)
-				assert.Equal(t, v.Type.GetSimple(), v2.Type.GetSimple(), "for %s, types do not match", k)
+				assert.Equal(t, v.GetType().GetSimple(), v2.GetType().GetSimple(), "for %s, types do not match", k)
 			}
 		}
 	}
@@ -196,20 +203,20 @@ func assertContainerHasVolumeMounts(t *testing.T, cfg config.FlyteCoPilotConfig,
 		for _, v := range c.VolumeMounts {
 			vmap[v.Name] = v
 		}
-		if iFace.Inputs != nil {
+		if iFace.GetInputs() != nil {
 			path := cfg.DefaultInputDataPath
-			if pilot.InputPath != "" {
-				path = pilot.InputPath
+			if pilot.GetInputPath() != "" {
+				path = pilot.GetInputPath()
 			}
 			v, found := vmap[cfg.InputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Input Path does not match")
 			assert.True(t, found, "Input volume mount expected but not found!")
 		}
 
-		if iFace.Outputs != nil {
+		if iFace.GetOutputs() != nil {
 			path := cfg.DefaultOutputPath
-			if pilot.OutputPath != "" {
-				path = pilot.OutputPath
+			if pilot.GetOutputPath() != "" {
+				path = pilot.GetOutputPath()
 			}
 			v, found := vmap[cfg.OutputVolumeName]
 			assert.Equal(t, path, v.MountPath, "Output Path does not match")
@@ -260,10 +267,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 					for _, v := range c.VolumeMounts {
 						vmap[v.Name] = v
 					}
-					if iFace.Inputs != nil {
+					if iFace.GetInputs() != nil {
 						path := cfg.DefaultInputDataPath
 						if pilot != nil {
-							path = pilot.InputPath
+							path = pilot.GetInputPath()
 						}
 						v, found := vmap[cfg.InputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteInitContainerName {
@@ -274,10 +281,10 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 						}
 					}
 
-					if iFace.Outputs != nil {
+					if iFace.GetOutputs() != nil {
 						path := cfg.DefaultOutputPath
 						if pilot != nil {
-							path = pilot.OutputPath
+							path = pilot.GetOutputPath()
 						}
 						v, found := vmap[cfg.OutputVolumeName]
 						if c.Name == cfg.NamePrefix+flyteInitContainerName {
@@ -470,22 +477,22 @@ func TestAddCoPilotToPod(t *testing.T) {
 	}
 
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.OnGetNamespace().Return("test-namespace")
-	taskMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
-	taskMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
+	taskMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskMetadata.OnGetK8sServiceAccount().Return("")
-	taskMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	taskMetadata.EXPECT().GetK8sServiceAccount().Return("")
+	taskMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
-	taskMetadata.OnIsInterruptible().Return(false)
+	taskMetadata.EXPECT().IsInterruptible().Return(false)
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			Name: "my-task",
 		},
@@ -497,21 +504,21 @@ func TestAddCoPilotToPod(t *testing.T) {
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("name")
-	taskMetadata.OnGetTaskExecutionID().Return(tID)
+	tID.EXPECT().GetGeneratedName().Return("name")
+	taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.OnGetResources().Return(resourceRequirements)
-	taskMetadata.OnGetOverrides().Return(to)
+	to.EXPECT().GetResources().Return(resourceRequirements)
+	taskMetadata.EXPECT().GetOverrides().Return(to)
 
 	inputPaths := &pluginsIOMock.InputFilePaths{}
 	inputs := "/base/inputs"
-	inputPaths.OnGetInputPrefixPath().Return(storage.DataReference(inputs))
-	inputPaths.OnGetInputPath().Return(storage.DataReference(inputs + "/inputs.pb"))
+	inputPaths.EXPECT().GetInputPrefixPath().Return(storage.DataReference(inputs))
+	inputPaths.EXPECT().GetInputPath().Return(storage.DataReference(inputs + "/inputs.pb"))
 
 	opath := &pluginsIOMock.OutputFilePaths{}
-	opath.OnGetRawOutputPrefix().Return("/raw")
-	opath.OnGetOutputPrefixPath().Return("/output")
+	opath.EXPECT().GetRawOutputPrefix().Return("/raw")
+	opath.EXPECT().GetOutputPrefixPath().Return("/output")
 
 	t.Run("happy", func(t *testing.T) {
 		pod := v1.PodSpec{}
@@ -533,7 +540,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Equal(t, "test-downloader", primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -545,7 +554,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, nil, &pod)
 	})
@@ -565,7 +576,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Equal(t, "test-downloader", primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -584,7 +597,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -603,11 +618,15 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assert.Len(t, pod.Volumes, 0)
 	})
 
 	t.Run("nil", func(t *testing.T) {
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 	})
 }

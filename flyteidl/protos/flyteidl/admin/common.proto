@@ -29,6 +29,7 @@ message NamedEntityIdentifier {
 
 // The status of the named entity is used to control its visibility in the UI.
 enum NamedEntityState {
+    reserved 3, 4;
     // By default, all named entities are considered active and under development.
     NAMED_ENTITY_ACTIVE = 0;
 
@@ -228,6 +229,9 @@ message EmailNotification {
     // The list of email addresses recipients for this notification.
     // +required
     repeated string recipients_email = 1;
+    // The template to use for this notification.
+    // +optional
+    string template = 2;
 }
 
 // Defines a pager duty notification specification.
@@ -235,6 +239,9 @@ message PagerDutyNotification {
     // Currently, PagerDuty notifications leverage email to trigger a notification.
     // +required
     repeated string recipients_email = 1;
+    // The template to use for this notification.
+    // +optional
+    string template = 2;
 }
 
 // Defines a slack notification specification.
@@ -242,6 +249,9 @@ message SlackNotification {
     // Currently, Slack notifications leverage email to trigger a notification.
     // +required
     repeated string recipients_email = 1;
+    // The template to use for this notification.
+    // +optional
+    string template = 2;
 }
 
 // Represents a structure for notifications based on execution status.

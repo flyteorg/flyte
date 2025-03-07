@@ -224,6 +224,7 @@ postgres (`database.PostgresConfig`_)
   password: postgres
   passwordPath: ""
   port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -257,6 +258,18 @@ host (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
 
 **Default Value**: 
 
@@ -355,7 +368,7 @@ database.SQLiteConfig
 file (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be re-used, else a new will be created
+The path to the file (existing or new) where the DB should be created / stored. If existing, then this will be reused, else a new will be created
 
 **Default Value**: 
 

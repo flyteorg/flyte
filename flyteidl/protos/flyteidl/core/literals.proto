@@ -42,8 +42,8 @@ message BlobMetadata {
 // A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
 // It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
 message Binary {
-    bytes value = 1;
-    string tag = 2;
+    bytes value = 1; // Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
+    string tag = 2; // The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
 }
 
 // A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
@@ -93,6 +93,7 @@ message Scalar {
 
 // A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
 message Literal {
+    reserved 6, 7;
     oneof value {
         // A simple value.
         Scalar scalar = 1;
@@ -102,6 +103,10 @@ message Literal {
 
         // A map of strings to literals.
         LiteralMap map = 3;
+
+        // Offloaded literal metadata
+        // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        LiteralOffloadedMetadata offloaded_metadata = 8;
     }
 
     // A hash representing this literal.
@@ -111,12 +116,18 @@ message Literal {
 
     // Additional metadata for literals.
     map<string, string> metadata = 5;
+}
 
-    // If this literal is offloaded, this field will contain metadata including the offload location.
-    string uri = 6;
+// A message that contains the metadata of the offloaded data.
+message LiteralOffloadedMetadata {
+    // The location of the offloaded core.Literal.
+    string uri = 1;
 
-    // Includes information about the size of the literal.
-    uint64 size_bytes = 7;
+    // The size of the offloaded data.
+    uint64 size_bytes = 2;
+
+    // The inferred literal type of the offloaded data.
+    LiteralType inferred_type = 3;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
@@ -158,6 +169,11 @@ message BindingData {
 
         // A map of bindings. The key is always a string.
         BindingDataMap map = 4;
+
+        // Offloaded literal metadata
+        // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        // Used for nodes that don't have promises from upstream nodes such as ArrayNode subNodes.
+        LiteralOffloadedMetadata offloaded_metadata = 6;
     }
 
     UnionInfo union = 5;

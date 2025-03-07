@@ -3,6 +3,8 @@ package flytek8s
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
@@ -24,9 +26,10 @@ import (
 	config1 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionMetadata {
+func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage string, podTemplate *core.K8SPod) pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
 	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -53,11 +56,12 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
 	to.On("GetContainerImage").Return(containerImage)
+	to.On("GetPodTemplate").Return(podTemplate)
 	taskExecutionMetadata.On("GetOverrides").Return(to)
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	return taskExecutionMetadata
 }
 
@@ -75,27 +79,27 @@ func dummyTaskTemplate() *core.TaskTemplate {
 
 func dummyInputReader() io.InputReader {
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	return inputReader
 }
 
-func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirements, rm *core.ExtendedResources, containerImage string) pluginsCore.TaskExecutionContext {
+func dummyExecContext(taskTemplate *core.TaskTemplate, r *v1.ResourceRequirements, rm *core.ExtendedResources, containerImage string, podTemplate *core.K8SPod) pluginsCore.TaskExecutionContext {
 	ow := &pluginsIOMock.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("")
-	ow.OnGetRawOutputPrefix().Return("")
-	ow.OnGetCheckpointPrefix().Return("/checkpoint")
-	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	ow.EXPECT().GetOutputPrefixPath().Return("")
+	ow.EXPECT().GetRawOutputPrefix().Return("")
+	ow.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	ow.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage))
-	tCtx.OnInputReader().Return(dummyInputReader())
-	tCtx.OnOutputWriter().Return(ow)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r, rm, containerImage, podTemplate))
+	tCtx.EXPECT().InputReader().Return(dummyInputReader())
+	tCtx.EXPECT().OutputWriter().Return(ow)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
-	tCtx.OnTaskReader().Return(taskReader)
+	tCtx.EXPECT().TaskReader().Return(taskReader)
 	return tCtx
 }
 
@@ -702,7 +706,7 @@ func updatePod(t *testing.T) {
 			v1.ResourceCPU:              resource.MustParse("1024m"),
 			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
-	}, nil, "")
+	}, nil, "", nil)
 
 	pod := &v1.Pod{
 		Spec: v1.PodSpec{
@@ -755,7 +759,7 @@ func updatePod(t *testing.T) {
 }
 
 func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *testing.T) {
-	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "")
+	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil)
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		DefaultAffinity: &v1.Affinity{
 			NodeAffinity: &v1.NodeAffinity{
@@ -819,7 +823,7 @@ func toK8sPodInterruptible(t *testing.T) {
 			v1.ResourceCPU:              resource.MustParse("1024m"),
 			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
-	}, nil, "")
+	}, nil, "", nil)
 
 	p, _, _, err := ToK8sPodSpec(ctx, x)
 	assert.NoError(t, err)
@@ -886,7 +890,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
@@ -903,7 +907,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
@@ -921,7 +925,7 @@ func TestToK8sPod(t *testing.T) {
 				v1.ResourceCPU:              resource.MustParse("1024m"),
 				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
-		}, nil, "")
+		}, nil, "", nil)
 
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			DefaultNodeSelector: map[string]string{
@@ -948,7 +952,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		}))
 
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.SecurityContext)
@@ -960,7 +964,7 @@ func TestToK8sPod(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			EnableHostNetworkingPod: &enabled,
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.True(t, p.HostNetwork)
@@ -971,7 +975,7 @@ func TestToK8sPod(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 			EnableHostNetworkingPod: &enabled,
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
@@ -979,7 +983,7 @@ func TestToK8sPod(t *testing.T) {
 
 	t.Run("skipSettingHostNetwork", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.False(t, p.HostNetwork)
@@ -1013,7 +1017,7 @@ func TestToK8sPod(t *testing.T) {
 			},
 		}))
 
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.NotNil(t, p.DNSConfig)
@@ -1034,7 +1038,7 @@ func TestToK8sPod(t *testing.T) {
 				"foo": "bar",
 			},
 		}))
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		for _, c := range p.Containers {
@@ -1054,10 +1058,51 @@ func TestToK8sPodContainerImage(t *testing.T) {
 		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Requests: v1.ResourceList{
 				v1.ResourceCPU: resource.MustParse("1024m"),
-			}}, nil, "foo:latest")
+			}}, nil, "foo:latest", nil)
 		p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo:latest", p.Containers[0].Image)
+	})
+}
+
+func TestPodTemplateOverride(t *testing.T) {
+	metadata := &core.K8SObjectMetadata{
+		Labels: map[string]string{
+			"l": "a",
+		},
+		Annotations: map[string]string{
+			"a": "b",
+		},
+	}
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name:  "foo",
+				Image: "foo:latest",
+				Args:  []string{"foo", "bar"},
+			},
+		},
+	}
+
+	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	assert.NoError(t, err)
+
+	t.Run("Override pod template", func(t *testing.T) {
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1024m"),
+			}}, nil, "", &core.K8SPod{
+			PrimaryContainerName: "foo",
+			PodSpec:              podSpecStruct,
+			Metadata:             metadata,
+		})
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, "a", m.Labels["l"])
+		assert.Equal(t, "b", m.Annotations["a"])
+		assert.Equal(t, "foo:latest", p.Containers[0].Image)
+		assert.Equal(t, "foo", p.Containers[0].Name)
 	})
 }
 
@@ -1166,7 +1211,7 @@ func TestToK8sPodExtendedResources(t *testing.T) {
 		t.Run(f.name, func(t *testing.T) {
 			taskTemplate := dummyTaskTemplate()
 			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskContext := dummyExecContext(taskTemplate, f.resources, f.extendedResourcesOverride, "")
+			taskContext := dummyExecContext(taskTemplate, f.resources, f.extendedResourcesOverride, "", nil)
 			p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
 			assert.NoError(t, err)
 
@@ -1529,7 +1574,7 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
-		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
+		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().GetCode())
 		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
@@ -1549,7 +1594,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
 	})
 
 	t.Run("InitContainer OOMKilled", func(t *testing.T) {
@@ -1566,7 +1611,7 @@ func TestDemystifySuccess(t *testing.T) {
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -1577,24 +1622,26 @@ func TestDemystifySuccess(t *testing.T) {
 }
 
 func TestDemystifyFailure(t *testing.T) {
+	ctx := context.TODO()
+
 	t.Run("unknown-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{}, pluginsCore.TaskInfo{})
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "UnknownError", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("known-error", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{})
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{Reason: "hello"}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "hello", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "hello", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("OOMKilled", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					State: v1.ContainerState{
@@ -1605,15 +1652,15 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
 	})
 
-	t.Run("SIGKILL", func(t *testing.T) {
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+	t.Run("SIGKILL non-primary container", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
 				{
 					LastTerminationState: v1.ContainerState{
@@ -1622,18 +1669,39 @@ func TestDemystifyFailure(t *testing.T) {
 							ExitCode: SIGKILL,
 						},
 					},
+					Name: "non-primary-container",
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "primary-container")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+	})
+
+	t.Run("SIGKILL primary container", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "some reason",
+							ExitCode: SIGKILL,
+						},
+					},
+					Name: "primary-container",
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "primary-container")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
 		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			Message: "Pod Node is in progress of shutting down, not admitting any new pods",
 			Reason:  "Shutdown",
 			ContainerStatuses: []v1.ContainerStatus{
@@ -1646,17 +1714,17 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Contains(t, phaseInfo.Err().Message, containerReason)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
 		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(v1.PodStatus{
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			Message: "Foobar",
 			Reason:  "Terminated",
 			ContainerStatuses: []v1.ContainerStatus{
@@ -1669,12 +1737,12 @@ func TestDemystifyFailure(t *testing.T) {
 					},
 				},
 			},
-		}, pluginsCore.TaskInfo{})
+		}, pluginsCore.TaskInfo{}, "")
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-		assert.Contains(t, phaseInfo.Err().Message, containerReason)
+		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
 	})
 }
 
@@ -1705,8 +1773,8 @@ func TestDemystifyPending_testcases(t *testing.T) {
 					assert.NotNil(t, p)
 					assert.Equal(t, p.Phase(), pluginsCore.PhaseRetryableFailure)
 					if assert.NotNil(t, p.Err()) {
-						assert.Equal(t, p.Err().Code, tt.errCode)
-						assert.Equal(t, p.Err().Message, tt.message)
+						assert.Equal(t, p.Err().GetCode(), tt.errCode)
+						assert.Equal(t, p.Err().GetMessage(), tt.message)
 					}
 				}
 			}
@@ -1715,6 +1783,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 }
 
 func TestDeterminePrimaryContainerPhase(t *testing.T) {
+	ctx := context.TODO()
 	primaryContainerName := "primary"
 	secondaryContainer := v1.ContainerStatus{
 		Name: "secondary",
@@ -1726,7 +1795,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 	}
 	var info = &pluginsCore.TaskInfo{}
 	t.Run("primary container waiting", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1739,7 +1808,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 	})
 	t.Run("primary container running", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1752,7 +1821,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 	})
 	t.Run("primary container failed", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1765,11 +1834,48 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
+	t.Run("primary container failed - SIGKILL", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 137,
+						Reason:   "foo",
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
+	t.Run("primary container failed - SIGKILL unsigned", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 247,
+						Reason:   "foo",
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "foo", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (247). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container succeeded", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1782,15 +1888,15 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 	t.Run("missing primary container", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer,
 		}, info)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
-		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().Code)
-		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
+		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().GetCode())
+		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().GetMessage())
 	})
 	t.Run("primary container failed with OOMKilled", func(t *testing.T) {
-		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
 			secondaryContainer, {
 				Name: primaryContainerName,
 				State: v1.ContainerState{
@@ -1803,8 +1909,27 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			},
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
-		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
+	})
+	t.Run("primary container failed with OOMKilled - SIGKILL", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(ctx, primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 137,
+						Reason:   OOMKilled,
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().GetCode())
+		assert.Equal(t, "\r\n[primary] terminated with exit code (137). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().GetMessage())
 	})
 }
 
@@ -1828,8 +1953,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -1854,8 +1979,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -1881,8 +2006,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -1909,8 +2034,8 @@ func TestGetPodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
 		// initialize PodTemplateStore
 		store := NewPodTemplateStore()
@@ -1934,6 +2059,14 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Name: "bar",
 			},
 		},
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name: "foo-init",
+			},
+			v1.Container{
+				Name: "foo-bar",
+			},
+		},
 	}
 
 	objectMeta := metav1.ObjectMeta{
@@ -1951,10 +2084,10 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podSpec, *resultPodSpec))
 		assert.True(t, reflect.DeepEqual(objectMeta, *resultObjectMeta))
@@ -1964,6 +2097,11 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
 			Name:                   primaryContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-termination-log",
+		}
+
+		primaryInitContainerTemplate := v1.Container{
+			Name:                   primaryInitContainerTemplateName,
+			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
 		podTemplate := v1.PodTemplate{
@@ -1981,6 +2119,9 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						primaryContainerTemplate,
+					},
+					InitContainers: []v1.Container{
+						primaryInitContainerTemplate,
 					},
 				},
 			},
@@ -2005,16 +2146,19 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		taskReader.On("Read", mock.Anything).Return(task, nil)
 
 		tCtx := &pluginsCoreMock.TaskExecutionContext{}
-		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
-		tCtx.OnTaskReader().Return(taskReader)
+		tCtx.EXPECT().TaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, "", nil))
+		tCtx.EXPECT().TaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 
 		// test that template podSpec is merged
 		primaryContainer := resultPodSpec.Containers[0]
 		assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 		assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+		primaryInitContainer := resultPodSpec.InitContainers[0]
+		assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
+		assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
 
 		// test that template object metadata is copied
 		assert.Contains(t, resultObjectMeta.Labels, "fooKey")
@@ -2024,99 +2168,449 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 	})
 }
 
-func TestMergePodSpecs(t *testing.T) {
-	var priority int32 = 1
+func TestMergeBasePodSpecsOntoTemplate(t *testing.T) {
 
-	podSpec1, _ := mergePodSpecs(nil, nil, "foo")
-	assert.Nil(t, podSpec1)
+	baseContainer1 := v1.Container{
+		Name:  "task-1",
+		Image: "task-image",
+	}
 
-	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo")
-	assert.Nil(t, podSpec2)
+	baseContainer2 := v1.Container{
+		Name:  "task-2",
+		Image: "task-image",
+	}
 
-	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo")
-	assert.Nil(t, podSpec3)
+	initContainer1 := v1.Container{
+		Name:  "task-init-1",
+		Image: "task-init-image",
+	}
 
-	podSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			v1.Container{
-				Name: "primary",
-				VolumeMounts: []v1.VolumeMount{
+	initContainer2 := v1.Container{
+		Name:  "task-init-2",
+		Image: "task-init-image",
+	}
+
+	tests := []struct {
+		name                     string
+		templatePodSpec          *v1.PodSpec
+		basePodSpec              *v1.PodSpec
+		primaryContainerName     string
+		primaryInitContainerName string
+		expectedResult           *v1.PodSpec
+		expectedError            error
+	}{
+		{
+			name:            "nil template",
+			templatePodSpec: nil,
+			basePodSpec:     &v1.PodSpec{},
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name:            "nil base",
+			templatePodSpec: &v1.PodSpec{},
+			basePodSpec:     nil,
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name:            "nil template and base",
+			templatePodSpec: nil,
+			basePodSpec:     nil,
+			expectedError:   errors.New("neither the templatePodSpec or the basePodSpec can be nil"),
+		},
+		{
+			name: "template and base with no overlap",
+			templatePodSpec: &v1.PodSpec{
+				SchedulerName: "templateScheduler",
+			},
+			basePodSpec: &v1.PodSpec{
+				ServiceAccountName: "baseServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "templateScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+		},
+		{
+			name: "template and base with overlap",
+			templatePodSpec: &v1.PodSpec{
+				SchedulerName: "templateScheduler",
+			},
+			basePodSpec: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "baseServiceAccount",
+			},
+		},
+		{
+			name: "template with default containers and base with no containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
 					{
-						Name:      "nccl",
-						MountPath: "abc",
+						Name:  "default",
+						Image: "default-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "default-init",
+						Image: "default-init-image",
 					},
 				},
 			},
-			v1.Container{
-				Name: "bar",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
 			},
 		},
-		NodeSelector: map[string]string{
-			"baz": "bar",
-		},
-		Priority:      &priority,
-		SchedulerName: "overrideScheduler",
-		Tolerations: []v1.Toleration{
-			v1.Toleration{
-				Key: "bar",
+		{
+			name:            "template with no default containers and base containers",
+			templatePodSpec: &v1.PodSpec{},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
 			},
-			v1.Toleration{
-				Key: "baz",
+			expectedResult: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+		},
+		{
+			name: "template and base with matching containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+				SchedulerName: "baseScheduler",
+			},
+		},
+		{
+			name: "template and base with no matching containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "not-matching",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "not-matching-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1},
+				InitContainers: []v1.Container{initContainer1},
+				SchedulerName:  "baseScheduler",
+			},
+		},
+		{
+			name: "template with default containers and base with containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "default",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "default-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1, baseContainer2},
+				InitContainers: []v1.Container{initContainer1, initContainer2},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+					{
+						Name:                   "task-2",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+					{
+						Name:                   "task-init-2",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+				SchedulerName: "baseScheduler",
+			},
+		},
+		{
+			name: "template with primary containers and base with containers",
+			templatePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "primary",
+						Image:                  "default-task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "primary-init",
+						Image:                  "default-task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+				},
+			},
+			basePodSpec: &v1.PodSpec{
+				Containers:     []v1.Container{baseContainer1, baseContainer2},
+				InitContainers: []v1.Container{initContainer1, initContainer2},
+				SchedulerName:  "baseScheduler",
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:                   "task-1",
+						Image:                  "task-image",
+						TerminationMessagePath: "/dev/template-termination-log",
+					},
+					baseContainer2,
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:                   "task-init-1",
+						Image:                  "task-init-image",
+						TerminationMessagePath: "/dev/template-init-termination-log",
+					},
+					initContainer2,
+				},
+				SchedulerName: "baseScheduler",
+			},
+			primaryContainerName:     "task-1",
+			primaryInitContainerName: "task-init-1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, mergeErr := MergeBasePodSpecOntoTemplate(tt.templatePodSpec, tt.basePodSpec, tt.primaryContainerName, tt.primaryInitContainerName)
+			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, mergeErr)
+		})
+	}
+}
+
+func TestMergeOverlayPodSpecOntoBase(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		basePodSpec    *v1.PodSpec
+		overlayPodSpec *v1.PodSpec
+		expectedResult *v1.PodSpec
+		expectedError  error
+	}{
+		{
+			name:           "nil overlay",
+			basePodSpec:    &v1.PodSpec{},
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base",
+			basePodSpec:    nil,
+			overlayPodSpec: &v1.PodSpec{},
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name:           "nil base and overlay",
+			basePodSpec:    nil,
+			overlayPodSpec: nil,
+			expectedError:  errors.New("neither the basePodSpec or the overlayPodSpec can be nil"),
+		},
+		{
+			name: "base and overlay no overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "baseScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with overlap",
+			basePodSpec: &v1.PodSpec{
+				SchedulerName: "baseScheduler",
+			},
+			overlayPodSpec: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+			expectedResult: &v1.PodSpec{
+				SchedulerName:      "overlayScheduler",
+				ServiceAccountName: "overlayServiceAccount",
+			},
+		},
+		{
+			name: "template and base with matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+		},
+		{
+			name: "base and overlay with no matching containers",
+			basePodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
+			},
+			overlayPodSpec: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "overlay-1",
+						Image: "overlay-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "overlay-init-1",
+						Image: "overlay-init-image",
+					},
+				},
+			},
+			expectedResult: &v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name:  "task-1",
+						Image: "task-image",
+					},
+				},
+				InitContainers: []v1.Container{
+					{
+						Name:  "task-init-1",
+						Image: "task-init-image",
+					},
+				},
 			},
 		},
 	}
 
-	defaultContainerTemplate := v1.Container{
-		Name:                   defaultContainerTemplateName,
-		TerminationMessagePath: "/dev/default-termination-log",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, mergeErr := MergeOverlayPodSpecOntoBase(tt.basePodSpec, tt.overlayPodSpec)
+			assert.Equal(t, tt.expectedResult, result)
+			assert.Equal(t, tt.expectedError, mergeErr)
+		})
 	}
-
-	primaryContainerTemplate := v1.Container{
-		Name:                   primaryContainerTemplateName,
-		TerminationMessagePath: "/dev/primary-termination-log",
-	}
-
-	podTemplateSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			defaultContainerTemplate,
-			primaryContainerTemplate,
-		},
-		HostNetwork: true,
-		NodeSelector: map[string]string{
-			"foo": "bar",
-		},
-		SchedulerName: "defaultScheduler",
-		Tolerations: []v1.Toleration{
-			v1.Toleration{
-				Key: "foo",
-			},
-		},
-	}
-
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary")
-	assert.Nil(t, err)
-
-	// validate a PodTemplate-only field
-	assert.Equal(t, podTemplateSpec.HostNetwork, mergedPodSpec.HostNetwork)
-	// validate a PodSpec-only field
-	assert.Equal(t, podSpec.Priority, mergedPodSpec.Priority)
-	// validate an overwritten PodTemplate field
-	assert.Equal(t, podSpec.SchedulerName, mergedPodSpec.SchedulerName)
-	// validate a merged map
-	assert.Equal(t, len(podTemplateSpec.NodeSelector)+len(podSpec.NodeSelector), len(mergedPodSpec.NodeSelector))
-	// validate an appended array
-	assert.Equal(t, len(podTemplateSpec.Tolerations)+len(podSpec.Tolerations), len(mergedPodSpec.Tolerations))
-
-	// validate primary container
-	primaryContainer := mergedPodSpec.Containers[0]
-	assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
-	assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
-	assert.Equal(t, 1, len(primaryContainer.VolumeMounts))
-
-	// validate default container
-	defaultContainer := mergedPodSpec.Containers[1]
-	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
-	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
 }
 
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
@@ -2183,6 +2677,330 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 				}
 				t.Fail()
 			}
+		})
+	}
+}
+
+func TestAddTolerationsForExtendedResources(t *testing.T) {
+	gpuResourceName := v1.ResourceName("nvidia.com/gpu")
+	addTolerationResourceName := v1.ResourceName("foo/bar")
+	noTolerationResourceName := v1.ResourceName("foo/baz")
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuResourceName: gpuResourceName,
+		AddTolerationsForExtendedResources: []string{
+			gpuResourceName.String(),
+			addTolerationResourceName.String(),
+		},
+	}))
+
+	podSpec := &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	fmt.Printf("%v\n", podSpec.Tolerations)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+
+	podSpec = &v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Resources: v1.ResourceRequirements{
+					Requests: v1.ResourceList{
+						gpuResourceName:           resource.MustParse("1"),
+						addTolerationResourceName: resource.MustParse("1"),
+						noTolerationResourceName:  resource.MustParse("1"),
+					},
+				},
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:      "foo",
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      gpuResourceName.String(),
+				Operator: v1.TolerationOpExists,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+	}
+
+	podSpec = AddTolerationsForExtendedResources(podSpec)
+	assert.Equal(t, 3, len(podSpec.Tolerations))
+	assert.Equal(t, gpuResourceName.String(), podSpec.Tolerations[1].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[1].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[1].Effect)
+	assert.Equal(t, addTolerationResourceName.String(), podSpec.Tolerations[2].Key)
+	assert.Equal(t, v1.TolerationOpExists, podSpec.Tolerations[2].Operator)
+	assert.Equal(t, v1.TaintEffectNoSchedule, podSpec.Tolerations[2].Effect)
+}
+
+func TestApplyExtendedResourcesOverridesSharedMemory(t *testing.T) {
+	SharedMemory := &core.ExtendedResources{
+		SharedMemory: &core.SharedMemory{
+			MountName: "flyte-shared-memory",
+			MountPath: "/dev/shm",
+		},
+	}
+
+	newSharedMemory := &core.ExtendedResources{
+		SharedMemory: &core.SharedMemory{
+			MountName: "flyte-shared-memory-v2",
+			MountPath: "/dev/shm",
+		},
+	}
+
+	t.Run("base is nil", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(nil, SharedMemory)
+		assert.EqualValues(
+			t,
+			SharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+
+	t.Run("overrides is nil", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(SharedMemory, nil)
+		assert.EqualValues(
+			t,
+			SharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+
+	t.Run("merging", func(t *testing.T) {
+		final := applyExtendedResourcesOverrides(SharedMemory, newSharedMemory)
+		assert.EqualValues(
+			t,
+			newSharedMemory.GetSharedMemory(),
+			final.GetSharedMemory(),
+		)
+	})
+}
+
+func TestApplySharedMemoryErrors(t *testing.T) {
+
+	type test struct {
+		name                 string
+		podSpec              *v1.PodSpec
+		primaryContainerName string
+		sharedVolume         *core.SharedMemory
+		errorMsg             string
+	}
+
+	tests := []test{
+		{
+			name:                 "No mount name",
+			podSpec:              nil,
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountPath: "/dev/shm"},
+			errorMsg:             "mount name is not set",
+		},
+		{
+			name:                 "No mount path name",
+			podSpec:              nil,
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory"},
+			errorMsg:             "mount path is not set",
+		},
+		{
+			name: "No primary container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "secondary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "Unable to find primary container",
+		},
+
+		{
+			name: "Volume already exists in spec",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+				Volumes: []v1.Volume{{
+					Name: "flyte-shared-memory",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "A volume is already named flyte-shared-memory in pod spec",
+		},
+		{
+			name: "Volume already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+					VolumeMounts: []v1.VolumeMount{{
+						Name:      "flyte-shared-memory",
+						MountPath: "/dev/shm",
+					}},
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "A volume is already named flyte-shared-memory in container",
+		},
+		{
+			name: "Mount path already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+					VolumeMounts: []v1.VolumeMount{{
+						Name:      "flyte-shared-memory-v2",
+						MountPath: "/dev/shm",
+					}},
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+			errorMsg:             "/dev/shm is already mounted in container",
+		},
+		{
+			name: "Mount path already in container",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm", SizeLimit: "bad-name"},
+			errorMsg:             "Unable to parse size limit: bad-name",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ApplySharedMemory(test.podSpec, test.primaryContainerName, test.sharedVolume)
+			assert.Errorf(t, err, test.errorMsg)
+		})
+	}
+}
+
+func TestApplySharedMemory(t *testing.T) {
+
+	type test struct {
+		name                 string
+		podSpec              *v1.PodSpec
+		primaryContainerName string
+		sharedVolume         *core.SharedMemory
+	}
+
+	tests := []test{
+		{
+			name: "No size limit works",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm"},
+		},
+		{
+			name: "With size limits works",
+			podSpec: &v1.PodSpec{
+				Containers: []v1.Container{{
+					Name: "primary",
+				}},
+			},
+			primaryContainerName: "primary",
+			sharedVolume:         &core.SharedMemory{MountName: "flyte-shared-memory", MountPath: "/dev/shm", SizeLimit: "2Gi"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ApplySharedMemory(test.podSpec, test.primaryContainerName, test.sharedVolume)
+			assert.NoError(t, err)
+
+			assert.Len(t, test.podSpec.Volumes, 1)
+			assert.Len(t, test.podSpec.Containers[0].VolumeMounts, 1)
+
+			assert.Equal(
+				t,
+				test.podSpec.Containers[0].VolumeMounts[0],
+				v1.VolumeMount{
+					Name:      test.sharedVolume.GetMountName(),
+					MountPath: test.sharedVolume.GetMountPath(),
+				},
+			)
+
+			var quantity resource.Quantity
+			if test.sharedVolume.GetSizeLimit() != "" {
+				quantity, err = resource.ParseQuantity(test.sharedVolume.GetSizeLimit())
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(
+				t,
+				test.podSpec.Volumes[0],
+				v1.Volume{
+					Name: test.sharedVolume.GetMountName(),
+					VolumeSource: v1.VolumeSource{
+						EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity},
+					},
+				},
+			)
+
 		})
 	}
 }

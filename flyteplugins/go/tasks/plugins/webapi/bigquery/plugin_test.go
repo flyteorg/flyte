@@ -88,8 +88,8 @@ func TestOutputWriter(t *testing.T) {
 
 	template := flyteIdlCore.TaskTemplate{}
 	tr := &coreMocks.TaskReader{}
-	tr.OnRead(ctx).Return(&template, nil)
-	statusContext.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(ctx).Return(&template, nil)
+	statusContext.EXPECT().TaskReader().Return(tr)
 
 	outputLocation := "bq://project:flyte.table"
 	err := writeOutput(ctx, statusContext, outputLocation)
@@ -99,15 +99,14 @@ func TestOutputWriter(t *testing.T) {
 	assert.NoError(t, err)
 
 	outputWriter := &ioMocks.OutputWriter{}
-	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		or := args.Get(1).(io.OutputReader)
+	outputWriter.EXPECT().Put(mock.Anything, mock.Anything).Return(nil).Run(func(ctx context.Context, or io.OutputReader) {
 		literals, ee, err := or.Read(ctx)
 		assert.NoError(t, err)
 
 		sd := literals.GetLiterals()["results"].GetScalar().GetStructuredDataset()
-		assert.Equal(t, sd.Uri, outputLocation)
-		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].Name, "col1")
-		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].LiteralType.GetSimple(), flyteIdlCore.SimpleType_INTEGER)
+		assert.Equal(t, sd.GetUri(), outputLocation)
+		assert.Equal(t, sd.GetMetadata().GetStructuredDatasetType().GetColumns()[0].GetName(), "col1")
+		assert.Equal(t, sd.GetMetadata().GetStructuredDatasetType().GetColumns()[0].GetLiteralType().GetSimple(), flyteIdlCore.SimpleType_INTEGER)
 
 		if ee != nil {
 			assert.NoError(t, ds.WriteProtobuf(ctx, outputWriter.GetErrorPath(), storage.Options{}, ee))
@@ -120,8 +119,8 @@ func TestOutputWriter(t *testing.T) {
 
 	execID := rand.String(3)
 	basePrefix := storage.DataReference("fake://bucket/prefix/" + execID)
-	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
-	statusContext.OnOutputWriter().Return(outputWriter)
+	outputWriter.EXPECT().GetOutputPath().Return(basePrefix + "/outputs.pb")
+	statusContext.EXPECT().OutputWriter().Return(outputWriter)
 
 	template = flyteIdlCore.TaskTemplate{
 		Interface: &flyteIdlCore.TypedInterface{
@@ -149,8 +148,8 @@ func TestOutputWriter(t *testing.T) {
 			},
 		},
 	}
-	tr.OnRead(ctx).Return(&template, nil)
-	statusContext.OnTaskReader().Return(tr)
+	tr.EXPECT().Read(ctx).Return(&template, nil)
+	statusContext.EXPECT().TaskReader().Return(tr)
 	err = writeOutput(ctx, statusContext, outputLocation)
 	assert.NoError(t, err)
 }
@@ -307,9 +306,9 @@ func TestHandleErrorResult(t *testing.T) {
 			phaseInfo := handleErrorResult(test.reason, "message", &taskInfo)
 
 			assert.Equal(t, test.phase, phaseInfo.Phase())
-			assert.Equal(t, test.reason, phaseInfo.Err().Code)
-			assert.Equal(t, test.errorKind, phaseInfo.Err().Kind)
-			assert.Equal(t, "message", phaseInfo.Err().Message)
+			assert.Equal(t, test.reason, phaseInfo.Err().GetCode())
+			assert.Equal(t, test.errorKind, phaseInfo.Err().GetKind())
+			assert.Equal(t, "message", phaseInfo.Err().GetMessage())
 		})
 	}
 }

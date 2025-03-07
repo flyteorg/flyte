@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
@@ -304,6 +305,8 @@ func TestDecorateEnvVars(t *testing.T) {
 
 	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
 	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	expectedOffloaded := append(expected, v12.EnvVar{Name: "_F_L_MIN_SIZE_MB", Value: "1"})
+	expectedOffloaded = append(expectedOffloaded, v12.EnvVar{Name: "_F_L_MAX_SIZE_MB", Value: "42"})
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
 	type args struct {
@@ -315,17 +318,77 @@ func TestDecorateEnvVars(t *testing.T) {
 		args                  args
 		additionEnvVar        map[string]string
 		additionEnvVarFromEnv map[string]string
+		offloadingEnabled     bool
+		offloadingEnvVar      map[string]string
 		executionEnvVar       map[string]string
 		consoleURL            string
 		want                  []v12.EnvVar
 	}{
-		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, "", expected},
-		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, emptyEnvVar, "", aggregated},
-		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, emptyEnvVar, "", aggregated},
-		{"from-execution-metadata", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, additionalEnv, "", aggregated},
+		{
+			"no-additional",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			expected,
+		},
+		{
+			"no-additional-offloading-enabled",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			true,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			expectedOffloaded,
+		},
+		{
+			"with-additional",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			additionalEnv,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			aggregated,
+		},
+		{
+			"from-env",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			envVarsFromEnv,
+			false,
+			emptyEnvVar,
+			emptyEnvVar,
+			"",
+			aggregated,
+		},
+		{
+			"from-execution-metadata",
+			args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}},
+			emptyEnvVar,
+			emptyEnvVar,
+			false,
+			emptyEnvVar,
+			additionalEnv,
+			"",
+			aggregated,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			cfg := propellerCfg.GetConfig()
+			cfg.LiteralOffloadingConfig = propellerCfg.LiteralOffloadingConfig{
+				Enabled:                  tt.offloadingEnabled,
+				MinSizeInMBForOffloading: 1,
+				MaxSizeInMBForOffloading: 42,
+			}
+
 			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 				DefaultEnvVars:        tt.additionEnvVar,
 				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,

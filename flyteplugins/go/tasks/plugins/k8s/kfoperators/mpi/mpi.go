@@ -60,7 +60,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	var launcherReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
 
-	if taskTemplate.TaskTypeVersion == 0 {
+	if taskTemplate.GetTaskTypeVersion() == 0 {
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &mpiTaskExtraArgs)
 		if err != nil {
@@ -98,7 +98,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			}
 		}
 
-	} else if taskTemplate.TaskTypeVersion == 1 {
+	} else if taskTemplate.GetTaskTypeVersion() == 1 {
 		kfMPITaskExtraArgs := kfplugins.DistributedMPITrainingTask{}
 
 		err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &kfMPITaskExtraArgs)
@@ -122,7 +122,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
-			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
+			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
 	if *workerReplicaSpec.Replicas <= 0 {
@@ -155,17 +155,22 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 // Analyzes the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (mpiOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	var numWorkers, numLauncherReplicas *int32
 	app, ok := resource.(*kubeflowv1.MPIJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
 	}
 
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
 	numWorkers = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker)
 	numLauncherReplicas = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher)
 
-	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, false,
+	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, taskTemplate, false,
 		*numWorkers, *numLauncherReplicas, 0, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
