@@ -130,8 +130,8 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 		err := deleteClusterResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t,
-			fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""),
-			err)
+			"error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\"",
+			err.Error())
 		s.DeleterExt.AssertNotCalled(t, "DeleteProjectDomainAttributes",
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_CLUSTER_RESOURCE)
 	})
