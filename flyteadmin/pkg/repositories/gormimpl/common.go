@@ -80,7 +80,7 @@ func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdmi
 	return nil
 }
 
-func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter, isolationFilter common.IsolationFilter) (*gorm.DB, error) {
 	for _, filter := range inlineFilters {
 		gormQueryExpr, err := filter.GetGormQueryExpr()
 		if err != nil {
@@ -91,10 +91,14 @@ func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters [
 	for _, mapFilter := range mapFilters {
 		tx = tx.Where(mapFilter.GetFilter())
 	}
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
 	return tx, nil
 }
 
-func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter, isolationFilter common.IsolationFilter) (*gorm.DB, error) {
 	for _, filter := range inlineFilters {
 		tableName, ok := entityToTableName[filter.GetEntity()]
 		if !ok {
@@ -109,6 +113,10 @@ func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFil
 	}
 	for _, mapFilter := range mapFilters {
 		tx = tx.Where(mapFilter.GetFilter())
+	}
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
 	}
 	return tx, nil
 }
