@@ -233,8 +233,7 @@ func ComputePreviousCheckpointPath(ctx context.Context, length int, nCtx interfa
 		return nCtx.NodeStateReader().GetTaskNodeState().PreviousNodeExecutionCheckpointURI, nil
 	}
 	// Otherwise derive previous checkpoint path from the prior attempt
-	prevAttempt := currentAttempt - 1
-	prevRawOutputPrefix, _, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, prevAttempt)
+	prevRawOutputPrefix, _, err := ComputeRawOutputPrefix(ctx, length, nCtx, currentNodeUniqueID, currentAttempt-1)
 	if err != nil {
 		return "", err
 	}
