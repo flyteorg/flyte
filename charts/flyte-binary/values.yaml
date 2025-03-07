@@ -174,8 +174,18 @@ configuration:
       endpoint: "k8s://flyteagent.flyte:8000"
       insecure: true
       timeouts:
+        CreateTask: 10s
         GetTask: 10s
+        DeleteTask: 10s
+        ExecuteTaskSync: 10s
       defaultTimeout: 10s
+    supportedTaskTypes: []
+    agents:
+      custom_agent:
+        endpoint: "k8s://flyte_custom_agent.flyte:8000"
+        insecure: true
+    agentForTaskTypes:
+      - noop_task: custom_agent
   # propeller Specify configuration for Flyte Propeller
   propeller:
     # createCRDs If true, Propeller will install CRDs at runtime, if false, CRDs will be installed during helm install
