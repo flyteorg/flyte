@@ -77,7 +77,7 @@ message ExecutionRecoverRequest {
     string name = 2;
 
    // Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution.
-   ExecutionMetadata metadata = 3; 
+   ExecutionMetadata metadata = 3;
 }
 
 // The unique identifier for a successfully created execution.
@@ -411,6 +411,9 @@ message ExecutionStateChangeDetails {
 
     // Identifies the entity (if any) responsible for causing the state change of the execution
     string principal = 3;
+
+    // Includes the reason for the `PENDING` phase
+    string description = 4;
 }
 
 message ExecutionUpdateResponse {}

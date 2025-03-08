@@ -1447,6 +1447,13 @@ export class ExecutionStateChangeDetails extends Message<ExecutionStateChangeDet
    */
   principal = "";
 
+  /**
+   * Includes the reason for the `PENDING` phase
+   *
+   * @generated from field: string description = 4;
+   */
+  description = "";
+
   constructor(data?: PartialMessage<ExecutionStateChangeDetails>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1458,6 +1465,7 @@ export class ExecutionStateChangeDetails extends Message<ExecutionStateChangeDet
     { no: 1, name: "state", kind: "enum", T: proto3.getEnumType(ExecutionState) },
     { no: 2, name: "occurred_at", kind: "message", T: Timestamp },
     { no: 3, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionStateChangeDetails {

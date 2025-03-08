@@ -271,14 +271,16 @@ class ExecutionUpdateRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., state: _Optional[_Union[ExecutionState, str]] = ...) -> None: ...
 
 class ExecutionStateChangeDetails(_message.Message):
-    __slots__ = ["state", "occurred_at", "principal"]
+    __slots__ = ["state", "occurred_at", "principal", "description"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     state: ExecutionState
     occurred_at: _timestamp_pb2.Timestamp
     principal: str
-    def __init__(self, state: _Optional[_Union[ExecutionState, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., principal: _Optional[str] = ...) -> None: ...
+    description: str
+    def __init__(self, state: _Optional[_Union[ExecutionState, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., principal: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
 
 class ExecutionUpdateResponse(_message.Message):
     __slots__ = []

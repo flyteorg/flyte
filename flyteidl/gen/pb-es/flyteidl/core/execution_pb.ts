@@ -92,6 +92,11 @@ export enum WorkflowExecution_Phase {
    * @generated from enum value: ABORTING = 9;
    */
   ABORTING = 9,
+
+  /**
+   * @generated from enum value: PENDING = 10;
+   */
+  PENDING = 10,
 }
 // Retrieve enum metadata with: proto3.getEnumType(WorkflowExecution_Phase)
 proto3.util.setEnumType(WorkflowExecution_Phase, "flyteidl.core.WorkflowExecution.Phase", [
@@ -105,6 +110,7 @@ proto3.util.setEnumType(WorkflowExecution_Phase, "flyteidl.core.WorkflowExecutio
   { no: 7, name: "ABORTED" },
   { no: 8, name: "TIMED_OUT" },
   { no: 9, name: "ABORTING" },
+  { no: 10, name: "PENDING" },
 ]);
 
 /**

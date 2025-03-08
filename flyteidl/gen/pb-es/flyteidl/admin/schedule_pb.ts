@@ -35,6 +35,68 @@ proto3.util.setEnumType(FixedRateUnit, "flyteidl.admin.FixedRateUnit", [
 ]);
 
 /**
+ * @generated from enum flyteidl.admin.ConcurrencyPolicy
+ */
+export enum ConcurrencyPolicy {
+  /**
+   * @generated from enum value: UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * wait for previous executions to terminate before starting a new one
+   *
+   * @generated from enum value: WAIT = 1;
+   */
+  WAIT = 1,
+
+  /**
+   * fail the CreateExecution request and do not permit the execution to start
+   *
+   * @generated from enum value: ABORT = 2;
+   */
+  ABORT = 2,
+
+  /**
+   * terminate the oldest execution when the concurrency limit is reached and immediately begin proceeding with the new execution
+   *
+   * @generated from enum value: REPLACE = 3;
+   */
+  REPLACE = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ConcurrencyPolicy)
+proto3.util.setEnumType(ConcurrencyPolicy, "flyteidl.admin.ConcurrencyPolicy", [
+  { no: 0, name: "UNSPECIFIED" },
+  { no: 1, name: "WAIT" },
+  { no: 2, name: "ABORT" },
+  { no: 3, name: "REPLACE" },
+]);
+
+/**
+ * @generated from enum flyteidl.admin.ConcurrencyLevel
+ */
+export enum ConcurrencyLevel {
+  /**
+   * Applies concurrency limits across all launch plan versions.
+   *
+   * @generated from enum value: LAUNCH_PLAN = 0;
+   */
+  LAUNCH_PLAN = 0,
+
+  /**
+   * Applies concurrency at the versioned launch plan level
+   *
+   * @generated from enum value: LAUNCH_PLAN_VERSION = 1;
+   */
+  LAUNCH_PLAN_VERSION = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ConcurrencyLevel)
+proto3.util.setEnumType(ConcurrencyLevel, "flyteidl.admin.ConcurrencyLevel", [
+  { no: 0, name: "LAUNCH_PLAN" },
+  { no: 1, name: "LAUNCH_PLAN_VERSION" },
+]);
+
+/**
  * Option for schedules run at a certain frequency e.g. every 2 minutes.
  *
  * @generated from message flyteidl.admin.FixedRate
@@ -171,6 +233,11 @@ export class Schedule extends Message<Schedule> {
    */
   kickoffTimeInputArg = "";
 
+  /**
+   * @generated from field: flyteidl.admin.SchedulerPolicy scheduler_policy = 5;
+   */
+  schedulerPolicy?: SchedulerPolicy;
+
   constructor(data?: PartialMessage<Schedule>) {
     super();
     proto3.util.initPartial(data, this);
@@ -183,6 +250,7 @@ export class Schedule extends Message<Schedule> {
     { no: 2, name: "rate", kind: "message", T: FixedRate, oneof: "ScheduleExpression" },
     { no: 4, name: "cron_schedule", kind: "message", T: CronSchedule, oneof: "ScheduleExpression" },
     { no: 3, name: "kickoff_time_input_arg", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "scheduler_policy", kind: "message", T: SchedulerPolicy },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Schedule {
@@ -199,6 +267,53 @@ export class Schedule extends Message<Schedule> {
 
   static equals(a: Schedule | PlainMessage<Schedule> | undefined, b: Schedule | PlainMessage<Schedule> | undefined): boolean {
     return proto3.util.equals(Schedule, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.SchedulerPolicy
+ */
+export class SchedulerPolicy extends Message<SchedulerPolicy> {
+  /**
+   * Defines how many executions with this launch plan can run in parallel
+   *
+   * @generated from field: uint32 max = 1;
+   */
+  max = 0;
+
+  /**
+   * Defines how to handle the execution when the max concurrency is reached.
+   *
+   * @generated from field: flyteidl.admin.ConcurrencyPolicy policy = 2;
+   */
+  policy = ConcurrencyPolicy.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<SchedulerPolicy>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.SchedulerPolicy";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "policy", kind: "enum", T: proto3.getEnumType(ConcurrencyPolicy) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SchedulerPolicy {
+    return new SchedulerPolicy().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SchedulerPolicy {
+    return new SchedulerPolicy().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SchedulerPolicy {
+    return new SchedulerPolicy().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SchedulerPolicy | PlainMessage<SchedulerPolicy> | undefined, b: SchedulerPolicy | PlainMessage<SchedulerPolicy> | undefined): boolean {
+    return proto3.util.equals(SchedulerPolicy, a, b);
   }
 }
 

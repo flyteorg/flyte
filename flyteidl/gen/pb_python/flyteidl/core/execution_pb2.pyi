@@ -21,6 +21,7 @@ class WorkflowExecution(_message.Message):
         ABORTED: _ClassVar[WorkflowExecution.Phase]
         TIMED_OUT: _ClassVar[WorkflowExecution.Phase]
         ABORTING: _ClassVar[WorkflowExecution.Phase]
+        PENDING: _ClassVar[WorkflowExecution.Phase]
     UNDEFINED: WorkflowExecution.Phase
     QUEUED: WorkflowExecution.Phase
     RUNNING: WorkflowExecution.Phase
@@ -31,6 +32,7 @@ class WorkflowExecution(_message.Message):
     ABORTED: WorkflowExecution.Phase
     TIMED_OUT: WorkflowExecution.Phase
     ABORTING: WorkflowExecution.Phase
+    PENDING: WorkflowExecution.Phase
     def __init__(self) -> None: ...
 
 class NodeExecution(_message.Message):

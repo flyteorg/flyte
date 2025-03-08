@@ -20,6 +20,7 @@ message WorkflowExecution {
         ABORTED = 7;
         TIMED_OUT = 8;
         ABORTING = 9;
+        PENDING = 10;
     }
 }
 
