@@ -104,6 +104,10 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 				Value: "",
 			},
 		}
+		if secret.GetEnvVar() != "" {
+			extraEnvVar := CreateVolumeMountEnvVarForSecretWithEnvName(secret)
+			envVars = append(envVars, extraEnvVar)
+		}
 
 		for _, envVar := range envVars {
 			p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
