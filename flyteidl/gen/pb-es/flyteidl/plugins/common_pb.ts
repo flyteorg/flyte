@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { Resources } from "../core/tasks_pb.js";
+import { Annotations, Labels } from "../admin/common_pb.js";
 
 /**
  * @generated from enum flyteidl.plugins.RestartPolicy
@@ -93,6 +94,51 @@ export class CommonReplicaSpec extends Message<CommonReplicaSpec> {
 
   static equals(a: CommonReplicaSpec | PlainMessage<CommonReplicaSpec> | undefined, b: CommonReplicaSpec | PlainMessage<CommonReplicaSpec> | undefined): boolean {
     return proto3.util.equals(CommonReplicaSpec, a, b);
+  }
+}
+
+/**
+ * Object metadata applied to the CRD object underlying a task execution
+ *
+ * @generated from message flyteidl.plugins.JobObjectMeta
+ */
+export class JobObjectMeta extends Message<JobObjectMeta> {
+  /**
+   * @generated from field: flyteidl.admin.Annotations annotations = 1;
+   */
+  annotations?: Annotations;
+
+  /**
+   * @generated from field: flyteidl.admin.Labels labels = 2;
+   */
+  labels?: Labels;
+
+  constructor(data?: PartialMessage<JobObjectMeta>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.plugins.JobObjectMeta";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "annotations", kind: "message", T: Annotations },
+    { no: 2, name: "labels", kind: "message", T: Labels },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JobObjectMeta {
+    return new JobObjectMeta().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): JobObjectMeta {
+    return new JobObjectMeta().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): JobObjectMeta {
+    return new JobObjectMeta().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: JobObjectMeta | PlainMessage<JobObjectMeta> | undefined, b: JobObjectMeta | PlainMessage<JobObjectMeta> | undefined): boolean {
+    return proto3.util.equals(JobObjectMeta, a, b);
   }
 }
 

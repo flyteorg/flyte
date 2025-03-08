@@ -4,6 +4,7 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 from flyteidl.plugins.common_pb2 import CommonReplicaSpec
+from flyteidl.plugins.common_pb2 import JobObjectMeta
 from flyteidl.plugins.common_pb2 import RestartPolicy
 
 DESCRIPTOR: _descriptor.FileDescriptor

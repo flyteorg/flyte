@@ -4,6 +4,7 @@ package flyteidl.plugins;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
+import "flyteidl/admin/common.proto";
 import "flyteidl/core/tasks.proto";
 
 enum RestartPolicy {
@@ -24,4 +25,11 @@ message CommonReplicaSpec {
 
   // RestartPolicy determines whether pods will be restarted when they exit
   RestartPolicy restart_policy = 4;
+}
+
+// Object metadata applied to the CRD object underlying a task execution
+message JobObjectMeta {
+  admin.Annotations annotations = 1;
+  
+  admin.Labels labels = 2;
 }

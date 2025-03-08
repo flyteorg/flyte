@@ -50,6 +50,15 @@ pub struct CommonReplicaSpec {
     #[prost(enumeration="RestartPolicy", tag="4")]
     pub restart_policy: i32,
 }
+/// Object metadata applied to the CRD object underlying a task execution
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct JobObjectMeta {
+    #[prost(message, optional, tag="1")]
+    pub annotations: ::core::option::Option<super::admin::Annotations>,
+    #[prost(message, optional, tag="2")]
+    pub labels: ::core::option::Option<super::admin::Labels>,
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum RestartPolicy {
