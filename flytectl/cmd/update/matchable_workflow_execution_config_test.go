@@ -32,7 +32,7 @@ func TestWorkflowExecutionConfigUpdateFailsWhenAttributeFileDoesNotExist(t *test
 	testWorkflowExecutionConfigUpdate(
 		t,
 		/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-			config.AttrFile = testDataNonExistentFile
+			config.AttrFile = []string{testDataNonExistentFile}
 			config.Force = true
 		},
 		/* assert */ func(s *testutils.TestStruct, err error) {
@@ -46,7 +46,7 @@ func TestWorkflowExecutionConfigUpdateFailsWhenAttributeFileIsMalformed(t *testi
 	testWorkflowExecutionConfigUpdate(
 		t,
 		/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-			config.AttrFile = testDataInvalidAttrFile
+			config.AttrFile = []string{testDataInvalidAttrFile}
 			config.Force = true
 		},
 		/* assert */ func(s *testutils.TestStruct, err error) {
@@ -61,7 +61,7 @@ func TestWorkflowExecutionConfigUpdateHappyPath(t *testing.T) {
 		testWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -75,7 +75,7 @@ func TestWorkflowExecutionConfigUpdateHappyPath(t *testing.T) {
 		testProjectDomainWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -89,7 +89,7 @@ func TestWorkflowExecutionConfigUpdateHappyPath(t *testing.T) {
 		testProjectWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -100,12 +100,56 @@ func TestWorkflowExecutionConfigUpdateHappyPath(t *testing.T) {
 	})
 }
 
+func TestWorkflowExecutionConfigUpdateHappyPathMultipleFiles(t *testing.T) {
+	t.Run("workflow", func(t *testing.T) {
+		testWorkflowExecutionConfigUpdate(
+			t,
+			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath, validWorkflowExecutionConfigFilePath}
+				config.Force = true
+			},
+			/* assert */ func(s *testutils.TestStruct, err error) {
+				assert.Nil(t, err)
+				s.UpdaterExt.AssertCalled(t, "UpdateWorkflowAttributes", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+				s.TearDownAndVerifyContainsSpecificCount(t, `Updated attributes from flytesnacks project and domain development`, 2)
+			})
+	})
+
+	t.Run("domain", func(t *testing.T) {
+		testProjectDomainWorkflowExecutionConfigUpdate(
+			t,
+			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath, validProjectDomainWorkflowExecutionConfigFilePath}
+				config.Force = true
+			},
+			/* assert */ func(s *testutils.TestStruct, err error) {
+				assert.Nil(t, err)
+				s.UpdaterExt.AssertCalled(t, "UpdateProjectDomainAttributes", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+				s.TearDownAndVerifyContainsSpecificCount(t, `Updated attributes from flytesnacks project and domain development`, 2)
+			})
+	})
+
+	t.Run("project", func(t *testing.T) {
+		testProjectWorkflowExecutionConfigUpdate(
+			t,
+			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath, validProjectWorkflowExecutionConfigFilePath}
+				config.Force = true
+			},
+			/* assert */ func(s *testutils.TestStruct, err error) {
+				assert.Nil(t, err)
+				s.UpdaterExt.AssertCalled(t, "UpdateProjectAttributes", mock.Anything, mock.Anything, mock.Anything)
+				s.TearDownAndVerifyContainsSpecificCount(t, `Updated attributes from flytesnacks project`, 2)
+			})
+	})
+}
+
 func TestWorkflowExecutionConfigUpdateFailsWithoutForceFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = false
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -118,7 +162,7 @@ func TestWorkflowExecutionConfigUpdateFailsWithoutForceFlag(t *testing.T) {
 		testProjectDomainWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = false
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -131,7 +175,7 @@ func TestWorkflowExecutionConfigUpdateFailsWithoutForceFlag(t *testing.T) {
 		testProjectWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = false
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -146,7 +190,7 @@ func TestWorkflowExecutionConfigUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 		testWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.DryRun = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -159,7 +203,7 @@ func TestWorkflowExecutionConfigUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 		testProjectDomainWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.DryRun = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -172,7 +216,7 @@ func TestWorkflowExecutionConfigUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 		testProjectWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.DryRun = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -187,7 +231,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = false
 				config.DryRun = true
 			},
@@ -201,7 +245,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = true
 				config.DryRun = true
 			},
@@ -215,7 +259,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testProjectDomainWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = false
 				config.DryRun = true
 			},
@@ -229,7 +273,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testProjectDomainWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = true
 				config.DryRun = true
 			},
@@ -243,7 +287,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testProjectWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = false
 				config.DryRun = true
 			},
@@ -257,7 +301,7 @@ func TestWorkflowExecutionConfigUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 		testProjectWorkflowExecutionConfigUpdate(
 			t,
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = true
 				config.DryRun = true
 			},
@@ -281,7 +325,7 @@ func TestWorkflowExecutionConfigUpdateSucceedsWhenAttributesDoNotExist(t *testin
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -303,7 +347,7 @@ func TestWorkflowExecutionConfigUpdateSucceedsWhenAttributesDoNotExist(t *testin
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -325,7 +369,7 @@ func TestWorkflowExecutionConfigUpdateSucceedsWhenAttributesDoNotExist(t *testin
 					Return(nil)
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -349,7 +393,7 @@ func TestWorkflowExecutionConfigUpdateFailsWhenAdminClientFails(t *testing.T) {
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.WorkflowAttributes) {
-				config.AttrFile = validWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -370,7 +414,7 @@ func TestWorkflowExecutionConfigUpdateFailsWhenAdminClientFails(t *testing.T) {
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
-				config.AttrFile = validProjectDomainWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectDomainWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {
@@ -391,7 +435,7 @@ func TestWorkflowExecutionConfigUpdateFailsWhenAdminClientFails(t *testing.T) {
 					Return(fmt.Errorf("network error"))
 			},
 			/* setup */ func(s *testutils.TestStruct, config *workflowexecutionconfig.AttrUpdateConfig, target *admin.ProjectAttributes) {
-				config.AttrFile = validProjectWorkflowExecutionConfigFilePath
+				config.AttrFile = []string{validProjectWorkflowExecutionConfigFilePath}
 				config.Force = true
 			},
 			/* assert */ func(s *testutils.TestStruct, err error) {

@@ -102,11 +102,11 @@ func TestAttrUpdateConfig_SetFlags(t *testing.T) {
 	t.Run("Test_attrFile", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
+			testValue := join_AttrUpdateConfig(DefaultUpdateConfig.AttrFile, ",")
 
 			cmdFlags.Set("attrFile", testValue)
-			if vString, err := cmdFlags.GetString("attrFile"); err == nil {
-				testDecodeJson_AttrUpdateConfig(t, fmt.Sprintf("%v", vString), &actual.AttrFile)
+			if vStringSlice, err := cmdFlags.GetStringSlice("attrFile"); err == nil {
+				testDecodeRaw_AttrUpdateConfig(t, join_AttrUpdateConfig(vStringSlice, ","), &actual.AttrFile)
 
 			} else {
 				assert.FailNow(t, err.Error())
