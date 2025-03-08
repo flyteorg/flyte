@@ -234,7 +234,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 		sandboxEnv = append(sandboxEnv, "FLYTE_DEV=True")
 	}
 
-	if sandboxConfig.DisableAgent {
+	if sandboxConfig.DisableConnector {
 		sandboxEnv = append(sandboxEnv, "DISABLE_AGENT=True")
 	}
 

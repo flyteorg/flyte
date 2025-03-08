@@ -88,7 +88,7 @@ func parseResolverTarget(target resolver.Target) (targetInfo, error) {
 	}, nil
 }
 
-// Build creates a new resolver for the given target, e.g. k8s:///flyteagent:flyte:8000.
+// Build creates a new resolver for the given target, e.g. k8s:///flyteconnector:flyte:8000.
 func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	ti, err := parseResolverTarget(target)
 	if err != nil {

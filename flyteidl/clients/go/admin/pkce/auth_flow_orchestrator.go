@@ -40,7 +40,7 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 	// pkceCodeVerifier stores the generated random value which the client will on-send to the auth server with the received
 	// authorization code. This way the oauth server can verify that the base64URLEncoded(sha265(codeVerifier)) matches
 	// the stored code challenge, which was initially sent through with the code+PKCE authorization request to ensure
-	// that this is the original user-agent who requested the access token.
+	// that this is the original user-connector who requested the access token.
 	pkceCodeVerifier := generateCodeVerifier(64)
 
 	// pkceCodeChallenge stores the base64(sha256(codeVerifier)) which is sent from the

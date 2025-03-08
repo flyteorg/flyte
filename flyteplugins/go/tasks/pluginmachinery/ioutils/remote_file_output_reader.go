@@ -63,7 +63,7 @@ type earliestFileErrorReader struct {
    error.pb file (as there was a race condition on overwriting error files), which is almost always
    not the earliest error.
    - The training operator does not have any error aggregation strategy implemented. PyTorch
-   distributed itself aggregates errors from the trainers running under the same elastic agent,
+   distributed itself aggregates errors from the trainers running under the same elastic connection,
    and reports the earliest error. The aggregation we perform here extends that to across pods.
 */
 

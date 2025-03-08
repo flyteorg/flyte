@@ -1,4 +1,4 @@
-package agent
+package connector
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	connectorMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
@@ -22,7 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-const defaultAgentEndpoint = "localhost:8000"
+const defaultConnectorEndpoint = "localhost:8000"
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
@@ -31,16 +31,16 @@ func TestPlugin(t *testing.T) {
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-	cfg.DefaultAgent = Deployment{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
-	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
-	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
+	cfg.DefaultConnector = Deployment{Endpoint: "test-connection.flyte.svc.cluster.local:80"}
+	cfg.ConnectorDeployments = map[string]*Deployment{"spark_connector": {Endpoint: "localhost:80"}}
+	cfg.ConnectorForTaskTypes = map[string]string{"spark": "spark_connector", "bar": "bar_connector"}
 
-	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+	connector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:80"}}
+	connectorRegistry := Registry{"spark": {defaultTaskTypeVersion: connector}}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
-		registry:    agentRegistry,
+		registry:    connectorRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -54,23 +54,23 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, plugin.cfg.ResourceConstraints, constraints)
 	})
 
-	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newMockAsyncAgentPlugin()
+	t.Run("test newConnectorPlugin", func(t *testing.T) {
+		p := newMockAsyncConnectorPlugin()
 		assert.NotNil(t, p)
-		assert.Equal(t, "agent-service", p.ID)
+		assert.Equal(t, "connection-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)
 	})
 
-	t.Run("test getFinalAgent", func(t *testing.T) {
+	t.Run("test getFinalConnector", func(t *testing.T) {
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := plugin.getFinalAgent(spark, &cfg)
-		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = plugin.getFinalAgent(foo, &cfg)
-		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = plugin.getFinalAgent(bar, &cfg)
-		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
+		connectorDeployment, _ := plugin.getFinalConnector(spark, &cfg)
+		assert.Equal(t, connectorDeployment.Endpoint, "localhost:80")
+		connectorDeployment, _ = plugin.getFinalConnector(foo, &cfg)
+		assert.Equal(t, connectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connectorDeployment, _ = plugin.getFinalConnector(bar, &cfg)
+		assert.Equal(t, connectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
@@ -268,7 +268,7 @@ func TestPlugin(t *testing.T) {
 			Outputs:  nil,
 			Message:  "boom",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
-			AgentError: &admin.AgentError{
+			ConnectorError: &admin.ConnectorError{
 				Code: "ERROR: 500",
 			},
 		})
@@ -280,7 +280,7 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, "failed to run the job: boom", phase.Err().GetMessage())
 	})
 
-	t.Run("test TaskExecution_FAILED Status Without Agent Error", func(t *testing.T) {
+	t.Run("test TaskExecution_FAILED Status Without Connector Error", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
 			Phase:    flyteIdlCore.TaskExecution_FAILED,
@@ -310,48 +310,48 @@ func TestPlugin(t *testing.T) {
 	})
 }
 
-func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
-	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
-	mockRequest := &admin.ListAgentsRequest{}
+func getMockMetadataServiceClient() *connectorMocks.ConnectorMetadataServiceClient {
+	mockMetadataServiceClient := new(connectorMocks.ConnectorMetadataServiceClient)
+	mockRequest := &admin.ListConnectorsRequest{}
 	supportedTaskCategories := make([]*admin.TaskCategory, 3)
 	supportedTaskCategories[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
 	supportedTaskCategories[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
 	supportedTaskCategories[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
-	mockResponse := &admin.ListAgentsResponse{
-		Agents: []*admin.Agent{
+	mockResponse := &admin.ListConnectorsResponse{
+		Connectors: []*admin.Connector{
 			{
-				Name:                    "test-agent",
+				Name:                    "test-connection",
 				SupportedTaskCategories: supportedTaskCategories,
 			},
 		},
 	}
 
-	mockMetadataServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	mockMetadataServiceClient.On("ListConnectors", mock.Anything, mockRequest).Return(mockResponse, nil)
 	return mockMetadataServiceClient
 }
 
-func TestInitializeAgentRegistry(t *testing.T) {
-	agentClients := make(map[string]service.AsyncAgentServiceClient)
-	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
-	agentClients[defaultAgentEndpoint] = &agentMocks.AsyncAgentServiceClient{}
-	agentMetadataClients[defaultAgentEndpoint] = getMockMetadataServiceClient()
+func TestInitializeConnectorRegistry(t *testing.T) {
+	connectorClients := make(map[string]service.AsyncConnectorServiceClient)
+	connectorMetadataClients := make(map[string]service.ConnectorMetadataServiceClient)
+	connectorClients[defaultConnectorEndpoint] = &connectorMocks.AsyncConnectorServiceClient{}
+	connectorMetadataClients[defaultConnectorEndpoint] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{
-		asyncAgentClients:    agentClients,
-		agentMetadataClients: agentMetadataClients,
+		asyncConnectorClients:    connectorClients,
+		connectorMetadataClients: connectorMetadataClients,
 	}
 
 	cfg := defaultConfig
-	cfg.AgentDeployments = map[string]*Deployment{"custom_agent": {Endpoint: defaultAgentEndpoint}}
-	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
+	cfg.ConnectorDeployments = map[string]*Deployment{"custom_connector": {Endpoint: defaultConnectorEndpoint}}
+	cfg.ConnectorForTaskTypes = map[string]string{"task1": "connection-deployment-1", "task2": "connection-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 
-	agentRegistry := getAgentRegistry(context.Background(), cs)
-	agentRegistryKeys := maps.Keys(agentRegistry)
+	connectorRegistry := getConnectorRegistry(context.Background(), cs)
+	connectorRegistryKeys := maps.Keys(connectorRegistry)
 	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
 
 	for _, key := range expectedKeys {
-		assert.Contains(t, agentRegistryKeys, key)
+		assert.Contains(t, connectorRegistryKeys, key)
 	}
 }
