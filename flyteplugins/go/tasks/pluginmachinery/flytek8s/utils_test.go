@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func TestToK8sEnvVar(t *testing.T) {
@@ -43,6 +44,18 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.Equal(t, resource.MustParse("1"), r[ResourceNvidiaGPU])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceMemory])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
+	}
+	{
+		gpuResourceName := v1.ResourceName("amd.com/gpu")
+		cfg := config.GetK8sPluginConfig()
+		cfg.GpuResourceName = gpuResourceName
+		assert.NoError(t, config.SetK8sPluginConfig(cfg))
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
+			{Name: core.Resources_GPU, Value: "1"},
+		})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, r)
+		assert.Equal(t, resource.MustParse("1"), r[gpuResourceName])
 	}
 	{
 		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{})
