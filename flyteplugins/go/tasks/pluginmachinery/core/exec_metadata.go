@@ -37,6 +37,13 @@ type TaskExecutionID interface {
 	GetUniqueNodeID() string
 }
 
+// OnOOMConfig is a simple interface to expose the configuration for handling OOM events
+type OnOOMConfig interface {
+	GetFactor() float32
+	GetLimit() string
+	GetExponent() uint32
+}
+
 // TaskExecutionMetadata represents any execution information for a Task. It is used to communicate meta information about the
 // execution or any previously stored information
 type TaskExecutionMetadata interface {
@@ -49,6 +56,7 @@ type TaskExecutionMetadata interface {
 	GetOverrides() TaskOverrides
 	GetLabels() map[string]string
 	GetMaxAttempts() uint32
+	GetOnOOMConfig() OnOOMConfig
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
 	GetSecurityContext() core.SecurityContext // TODO (whynopointer)
