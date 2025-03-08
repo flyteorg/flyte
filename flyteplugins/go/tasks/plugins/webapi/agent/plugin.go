@@ -346,7 +346,7 @@ func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (se
 }
 
 func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
-	go wait.Until(func() {
+	wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		clientSet := getAgentClientSets(childCtx)
@@ -419,7 +419,7 @@ func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
 				cs:          clientSet,
 				registry:    agentRegistry,
 			}
-			plugin.watchAgents(ctx, agentService)
+			go plugin.watchAgents(ctx, agentService)
 			return plugin, nil
 		},
 	}
