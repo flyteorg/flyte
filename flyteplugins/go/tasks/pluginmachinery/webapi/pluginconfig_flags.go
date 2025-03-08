@@ -50,9 +50,9 @@ func (PluginConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg PluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("PluginConfig", pflag.ExitOnError)
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "readRateLimiter.qps"), DefaultPluginConfig.ReadRateLimiter.QPS, "Defines the max rate of calls per second.")
+	cmdFlags.Float64(fmt.Sprintf("%v%v", prefix, "readRateLimiter.qps"), DefaultPluginConfig.ReadRateLimiter.QPS, "Defines the max rate of calls per second.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "readRateLimiter.burst"), DefaultPluginConfig.ReadRateLimiter.Burst, "Defines the maximum burst size.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writeRateLimiter.qps"), DefaultPluginConfig.WriteRateLimiter.QPS, "Defines the max rate of calls per second.")
+	cmdFlags.Float64(fmt.Sprintf("%v%v", prefix, "writeRateLimiter.qps"), DefaultPluginConfig.WriteRateLimiter.QPS, "Defines the max rate of calls per second.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writeRateLimiter.burst"), DefaultPluginConfig.WriteRateLimiter.Burst, "Defines the maximum burst size.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "caching.size"), DefaultPluginConfig.Caching.Size, "Defines the maximum number of items to cache.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "caching.resyncInterval"), DefaultPluginConfig.Caching.ResyncInterval.String(), "Defines the sync interval.")
