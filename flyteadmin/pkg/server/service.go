@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -422,11 +425,29 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
 	}
 
-	err = server.ListenAndServe()
-	if err != nil {
-		return errors.Wrapf(err, "failed to Start HTTP Server")
+	go func() {
+		err = server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			logger.Fatalf(ctx, "Failed to start HTTP Server: %v", err)
+		}
+	}()
+
+	// Gracefully shutdown the servers
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+
+	// Create a context with timeout for the shutdown process
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		logger.Errorf(ctx, "Failed to shutdown HTTP server: %v", err)
 	}
 
+	grpcServer.GracefulStop()
+
+	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
 }
 
@@ -534,10 +555,26 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
 	}
 
-	err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
+	go func() {
+		err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
+		if err != nil && err != http.ErrServerClosed {
+			logger.Errorf(ctx, "Failed to start HTTP/2 Server: %v", err)
+		}
+	}()
 
-	if err != nil {
-		return errors.Wrapf(err, "failed to Start HTTP/2 Server")
+	// Gracefully shutdown the servers
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+
+	// Create a context with timeout for the shutdown process
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Errorf(ctx, "Failed to shutdown HTTP server: %v", err)
 	}
+
+	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
 }
