@@ -345,7 +345,7 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 	return client, nil
 }
 
-func (p *Plugin) watchConnectors(ctx context.Context, connectorService *core.AgentService) {
+func (p *Plugin) watchConnectors(ctx context.Context, connectorService *core.ConnectorService) {
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -402,7 +402,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newConnectorPlugin(connectorService *core.AgentService) webapi.PluginEntry {
+func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEntry {
 	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
@@ -421,7 +421,7 @@ func newConnectorPlugin(connectorService *core.AgentService) webapi.PluginEntry 
 	plugin.watchConnectors(ctx, connectorService)
 
 	return webapi.PluginEntry{
-		ID:                 "connector-service",
+		ID:                 ID,
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return plugin, nil
@@ -429,7 +429,7 @@ func newConnectorPlugin(connectorService *core.AgentService) webapi.PluginEntry 
 	}
 }
 
-func RegisterConnectorPlugin(connectorService *core.AgentService) {
+func RegisterConnectorPlugin(connectorService *core.ConnectorService) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))

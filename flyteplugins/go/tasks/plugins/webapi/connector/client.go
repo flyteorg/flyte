@@ -107,7 +107,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 			continue
 		}
 
-		finalCtx, cancel := getFinalContext(ctx, "ListConnectors", connectorDeployment)
+		finalCtx, cancel := getFinalContext(ctx, "ListAgents", connectorDeployment)
 		defer cancel()
 
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
