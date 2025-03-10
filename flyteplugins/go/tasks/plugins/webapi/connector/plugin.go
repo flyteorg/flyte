@@ -421,7 +421,7 @@ func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEn
 	plugin.watchConnectors(ctx, connectorService)
 
 	return webapi.PluginEntry{
-		ID:                 "connector-service",
+		ID:                 ID,
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return plugin, nil
