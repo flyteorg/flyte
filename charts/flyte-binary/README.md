@@ -21,10 +21,17 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
+| configuration.agentService.agentForTaskTypes[0].noop_task | string | `"custom_agent"` |  |
+| configuration.agentService.agents.custom_agent.endpoint | string | `"k8s://flyte_custom_agent.flyte:8000"` |  |
+| configuration.agentService.agents.custom_agent.insecure | bool | `true` |  |
 | configuration.agentService.defaultAgent.defaultTimeout | string | `"10s"` |  |
 | configuration.agentService.defaultAgent.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
 | configuration.agentService.defaultAgent.insecure | bool | `true` |  |
+| configuration.agentService.defaultAgent.timeouts.CreateTask | string | `"10s"` |  |
+| configuration.agentService.defaultAgent.timeouts.DeleteTask | string | `"10s"` |  |
+| configuration.agentService.defaultAgent.timeouts.ExecuteTaskSync | string | `"10s"` |  |
 | configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
+| configuration.agentService.supportedTaskTypes | list | `[]` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
