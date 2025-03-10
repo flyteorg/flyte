@@ -64,6 +64,7 @@ func updateWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCt
 		return fmt.Errorf("attrFile is mandatory while calling update for workflow execution config")
 	}
 
+	// Process each attribute file
 	workflowExecutionConfigFileConfig := workflowexecutionconfig.FileConfig{}
 	if err := sconfig.ReadConfigFromFile(&workflowExecutionConfigFileConfig, updateConfig.AttrFile); err != nil {
 		return err
