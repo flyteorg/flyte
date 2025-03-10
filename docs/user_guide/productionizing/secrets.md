@@ -305,6 +305,31 @@ Furthermore, this method also allows you to have separate credentials for differ
 When using the AWS secret management plugin, secrets need to be specified by naming them in the format
 `<SECRET_GROUP>:<SECRET_KEY>`, where the secret string is a plain-text value, **not** key/value json.
 
+To enable the AWS secret management plugin in your Flyte deployment, add the following configuration to your `values.yaml` file:
+
+```yaml
+configmap:
+  core:
+    webhook:
+      secretManagerType: "AWS"
+```
+
+Once redeployed, secrets can be requested using the ARN of the secret as the secret group and the secret key as the secret key.
+```python
+SECRET_GROUP = f"arn:aws:secretsmanager:{region}:{account}:secret"
+SECRET_KEY = "secret_key"
+
+@task(
+    secret_requests=[
+        Secret(group=SECRET_GROUP, key=SECRET_KEY, mount_requirement=Secret.MountType.FILE)
+    ]
+)
+def get_secret() -> str:
+    ctx = current_context()
+    token = ctx.secrets.get(SECRET_GROUP, SECRET_KEY)
+    return f"Secret length: {len(token)}"
+```
+
 ### Vault secrets manager
 
 When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster as described in this [step-by-step tutorial](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar).
