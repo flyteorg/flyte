@@ -18,7 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -233,23 +233,23 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog         catalog.Client
-	asyncCatalog    catalog.AsyncClient
-	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap  map[MetricKey]*taskMetrics
-	defaultPlugin   pluginCore.Plugin
-	metrics         *metrics
-	pluginRegistry  PluginRegistryIface
-	kubeClient      pluginCore.KubeClient
-	kubeClientset   kubernetes.Interface
-	secretManager   pluginCore.SecretManager
-	resourceManager resourcemanager.BaseResourceManager
-	cfg             *config.Config
-	pluginScope     promutils.Scope
-	eventConfig     *controllerConfig.EventConfig
-	clusterID       string
-	agentService    *pluginCore.AgentService
+	catalog          catalog.Client
+	asyncCatalog     catalog.AsyncClient
+	defaultPlugins   map[pluginCore.TaskType]pluginCore.Plugin
+	pluginsForType   map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap   map[MetricKey]*taskMetrics
+	defaultPlugin    pluginCore.Plugin
+	metrics          *metrics
+	pluginRegistry   PluginRegistryIface
+	kubeClient       pluginCore.KubeClient
+	kubeClientset    kubernetes.Interface
+	secretManager    pluginCore.SecretManager
+	resourceManager  resourcemanager.BaseResourceManager
+	cfg              *config.Config
+	pluginScope      promutils.Scope
+	eventConfig      *controllerConfig.EventConfig
+	clusterID        string
+	connectorService *pluginCore.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -276,7 +276,10 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
-	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
+	once.Do(func() {
+		// Register connector plugin
+		connector.RegisterConnectorPlugin(t.connectorService)
+	})
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
@@ -301,8 +304,8 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
 
-		if cp.GetID() == agent.ID {
-			t.agentService.CorePlugin = cp
+		if cp.GetID() == connector.ID {
+			t.connectorService.CorePlugin = cp
 		}
 
 		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
@@ -394,8 +397,8 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		return p, nil
 	}
 
-	if t.agentService.ContainTaskType(ttype) {
-		return t.agentService.CorePlugin, nil
+	if t.connectorService.ContainTaskType(ttype) {
+		return t.connectorService.CorePlugin, nil
 	}
 
 	if t.defaultPlugin != nil {
@@ -779,7 +782,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	return pluginTrns.FinalTransition(ctx)
 }
 
-func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+func (t Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 	r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
 	tr ioutils.SimpleTaskReader) (*io.ExecutionError, error) {
 
@@ -1024,16 +1027,16 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
 			scope:                  scope,
 		},
-		pluginScope:     scope.NewSubScope("plugin"),
-		kubeClient:      kubeClient,
-		kubeClientset:   kubeClientset,
-		catalog:         client,
-		asyncCatalog:    async,
-		resourceManager: nil,
-		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		cfg:             cfg,
-		eventConfig:     eventConfig,
-		clusterID:       clusterID,
-		agentService:    &pluginCore.AgentService{},
+		pluginScope:      scope.NewSubScope("plugin"),
+		kubeClient:       kubeClient,
+		kubeClientset:    kubeClientset,
+		catalog:          client,
+		asyncCatalog:     async,
+		resourceManager:  nil,
+		secretManager:    secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		cfg:              cfg,
+		eventConfig:      eventConfig,
+		clusterID:        clusterID,
+		connectorService: &pluginCore.ConnectorService{},
 	}, nil
 }
