@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -18,6 +19,9 @@ type NodeExecutionEventRepo struct {
 }
 
 func (r *NodeExecutionEventRepo) Create(ctx context.Context, input models.NodeExecutionEvent) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()

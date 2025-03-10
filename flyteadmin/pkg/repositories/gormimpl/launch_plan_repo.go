@@ -7,12 +7,19 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	launchPlanColumnNames = common.ResourceColumns{Project: "launch_plans.project", Domain: "launch_plans.domain"}
 )
 
 const launchPlanTableName = "launch_plans"
@@ -30,6 +37,9 @@ type LaunchPlanRepo struct {
 }
 
 func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
@@ -40,6 +50,9 @@ func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) er
 }
 
 func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&input).Updates(input)
 	timer.Stop()
@@ -52,6 +65,7 @@ func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) er
 func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
 	var launchPlan models.LaunchPlan
 	timer := r.metrics.GetDuration.Start()
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, launchPlanColumnNames)
 	tx := r.db.WithContext(ctx).Where(&models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: input.Project,
@@ -59,7 +73,12 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).Take(&launchPlan)
+	})
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&launchPlan)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -81,6 +100,14 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 // the existing launch plan version (if any).
 func (r *LaunchPlanRepo) SetActive(
 	ctx context.Context, toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error {
+	if err := util.FilterResourceMutation(ctx, toEnable.Project, toEnable.Domain); err != nil {
+		return err
+	}
+	if toDisable != nil {
+		if err := util.FilterResourceMutation(ctx, toDisable.Project, toDisable.Domain); err != nil {
+			return err
+		}
+	}
 	timer := r.launchPlanMetrics.SetActiveDuration.Start()
 	defer timer.Stop()
 	// Use a transaction to guarantee no partial updates.
@@ -113,6 +140,7 @@ func (r *LaunchPlanRepo) List(ctx context.Context, input interfaces.ListResource
 	if err := ValidateListInput(input); err != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, launchPlanColumnNames)
 	var launchPlans []models.LaunchPlan
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
@@ -120,7 +148,7 @@ func (r *LaunchPlanRepo) List(ctx context.Context, input interfaces.ListResource
 	tx = tx.Joins("inner join workflows on launch_plans.workflow_id = workflows.id")
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
@@ -151,10 +179,11 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
 
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, launchPlanColumnNames)
 	tx := r.db.WithContext(ctx).Model(models.LaunchPlan{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}

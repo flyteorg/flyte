@@ -6,11 +6,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	workflowColumnNames = common.ResourceColumns{Project: Project, Domain: Domain}
 )
 
 // Implementation of WorkflowRepoInterface.
@@ -21,6 +28,9 @@ type WorkflowRepo struct {
 }
 
 func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity != nil {
@@ -41,6 +51,7 @@ func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow, descri
 }
 
 func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, workflowColumnNames)
 	var workflow models.Workflow
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Workflow{
@@ -50,7 +61,12 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).Take(&workflow)
+	})
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&workflow)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -76,7 +92,8 @@ func (r *WorkflowRepo) List(
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, workflowColumnNames)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.WorkflowCollectionOutput{}, err
 	}
@@ -106,7 +123,8 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 	tx := r.db.WithContext(ctx).Model(models.Workflow{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, workflowColumnNames)
+	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.WorkflowCollectionOutput{}, err
 	}
