@@ -150,8 +150,7 @@ message Connector {
   // Name is the developer-assigned name of the connector.
   string name = 1;
 
-  // SupportedTaskTypes are the types of the tasks that the connector can handle.
-  repeated string supported_task_types = 2 [deprecated = true];
+  reserved 2;
 
   // IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
   // results synchronously when called by propeller. Given that sync connectors can affect the performance

@@ -164,16 +164,14 @@ class DeleteTaskResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Connector(_message.Message):
-    __slots__ = ["name", "supported_task_types", "is_sync", "supported_task_categories"]
+    __slots__ = ["name", "is_sync", "supported_task_categories"]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
     IS_SYNC_FIELD_NUMBER: _ClassVar[int]
     SUPPORTED_TASK_CATEGORIES_FIELD_NUMBER: _ClassVar[int]
     name: str
-    supported_task_types: _containers.RepeatedScalarFieldContainer[str]
     is_sync: bool
     supported_task_categories: _containers.RepeatedCompositeFieldContainer[TaskCategory]
-    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ..., is_sync: bool = ..., supported_task_categories: _Optional[_Iterable[_Union[TaskCategory, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., is_sync: bool = ..., supported_task_categories: _Optional[_Iterable[_Union[TaskCategory, _Mapping]]] = ...) -> None: ...
 
 class TaskCategory(_message.Message):
     __slots__ = ["name", "version"]
