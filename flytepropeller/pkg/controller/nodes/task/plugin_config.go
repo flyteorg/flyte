@@ -17,7 +17,8 @@ import (
 
 var (
 	connectorOnce sync.Once
-	agentOnce     sync.Once
+	// The agent service plugin is deprecated and will be removed in the future
+	agentOnce sync.Once
 )
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,

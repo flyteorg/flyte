@@ -408,7 +408,7 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		return t.connectorService.CorePlugin, nil
 	}
 
-	// The agent service plugin is deprecated and will be removed in the future1
+	// The agent service plugin is deprecated and will be removed in the future
 	if t.agentService.ContainTaskType(ttype) {
 		return t.agentService.CorePlugin, nil
 	}
