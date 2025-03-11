@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -110,7 +110,7 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListAgents", agentDeployment)
 		defer cancel()
 
-		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
+		res, err := client.ListAgents(finalCtx, &connector.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {

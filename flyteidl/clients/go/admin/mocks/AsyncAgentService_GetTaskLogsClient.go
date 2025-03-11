@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	metadata "google.golang.org/grpc/metadata"
 
@@ -175,23 +175,23 @@ func (_c *AsyncAgentService_GetTaskLogsClient_Header_Call) RunAndReturn(run func
 }
 
 // Recv provides a mock function with given fields:
-func (_m *AsyncAgentService_GetTaskLogsClient) Recv() (*admin.GetTaskLogsResponse, error) {
+func (_m *AsyncAgentService_GetTaskLogsClient) Recv() (*connector.GetTaskLogsResponse, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Recv")
 	}
 
-	var r0 *admin.GetTaskLogsResponse
+	var r0 *connector.GetTaskLogsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (*admin.GetTaskLogsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func() (*connector.GetTaskLogsResponse, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() *admin.GetTaskLogsResponse); ok {
+	if rf, ok := ret.Get(0).(func() *connector.GetTaskLogsResponse); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetTaskLogsResponse)
+			r0 = ret.Get(0).(*connector.GetTaskLogsResponse)
 		}
 	}
 
@@ -221,12 +221,12 @@ func (_c *AsyncAgentService_GetTaskLogsClient_Recv_Call) Run(run func()) *AsyncA
 	return _c
 }
 
-func (_c *AsyncAgentService_GetTaskLogsClient_Recv_Call) Return(_a0 *admin.GetTaskLogsResponse, _a1 error) *AsyncAgentService_GetTaskLogsClient_Recv_Call {
+func (_c *AsyncAgentService_GetTaskLogsClient_Recv_Call) Return(_a0 *connector.GetTaskLogsResponse, _a1 error) *AsyncAgentService_GetTaskLogsClient_Recv_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentService_GetTaskLogsClient_Recv_Call) RunAndReturn(run func() (*admin.GetTaskLogsResponse, error)) *AsyncAgentService_GetTaskLogsClient_Recv_Call {
+func (_c *AsyncAgentService_GetTaskLogsClient_Recv_Call) RunAndReturn(run func() (*connector.GetTaskLogsResponse, error)) *AsyncAgentService_GetTaskLogsClient_Recv_Call {
 	_c.Call.Return(run)
 	return _c
 }

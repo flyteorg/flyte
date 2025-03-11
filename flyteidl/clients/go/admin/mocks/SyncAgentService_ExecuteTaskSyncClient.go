@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	metadata "google.golang.org/grpc/metadata"
 
@@ -175,23 +175,23 @@ func (_c *SyncAgentService_ExecuteTaskSyncClient_Header_Call) RunAndReturn(run f
 }
 
 // Recv provides a mock function with given fields:
-func (_m *SyncAgentService_ExecuteTaskSyncClient) Recv() (*admin.ExecuteTaskSyncResponse, error) {
+func (_m *SyncAgentService_ExecuteTaskSyncClient) Recv() (*connector.ExecuteTaskSyncResponse, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Recv")
 	}
 
-	var r0 *admin.ExecuteTaskSyncResponse
+	var r0 *connector.ExecuteTaskSyncResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func() (*admin.ExecuteTaskSyncResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func() (*connector.ExecuteTaskSyncResponse, error)); ok {
 		return rf()
 	}
-	if rf, ok := ret.Get(0).(func() *admin.ExecuteTaskSyncResponse); ok {
+	if rf, ok := ret.Get(0).(func() *connector.ExecuteTaskSyncResponse); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ExecuteTaskSyncResponse)
+			r0 = ret.Get(0).(*connector.ExecuteTaskSyncResponse)
 		}
 	}
 
@@ -221,12 +221,12 @@ func (_c *SyncAgentService_ExecuteTaskSyncClient_Recv_Call) Run(run func()) *Syn
 	return _c
 }
 
-func (_c *SyncAgentService_ExecuteTaskSyncClient_Recv_Call) Return(_a0 *admin.ExecuteTaskSyncResponse, _a1 error) *SyncAgentService_ExecuteTaskSyncClient_Recv_Call {
+func (_c *SyncAgentService_ExecuteTaskSyncClient_Recv_Call) Return(_a0 *connector.ExecuteTaskSyncResponse, _a1 error) *SyncAgentService_ExecuteTaskSyncClient_Recv_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *SyncAgentService_ExecuteTaskSyncClient_Recv_Call) RunAndReturn(run func() (*admin.ExecuteTaskSyncResponse, error)) *SyncAgentService_ExecuteTaskSyncClient_Recv_Call {
+func (_c *SyncAgentService_ExecuteTaskSyncClient_Recv_Call) RunAndReturn(run func() (*connector.ExecuteTaskSyncResponse, error)) *SyncAgentService_ExecuteTaskSyncClient_Recv_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -278,7 +278,7 @@ func (_c *SyncAgentService_ExecuteTaskSyncClient_RecvMsg_Call) RunAndReturn(run 
 }
 
 // Send provides a mock function with given fields: _a0
-func (_m *SyncAgentService_ExecuteTaskSyncClient) Send(_a0 *admin.ExecuteTaskSyncRequest) error {
+func (_m *SyncAgentService_ExecuteTaskSyncClient) Send(_a0 *connector.ExecuteTaskSyncRequest) error {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
@@ -286,7 +286,7 @@ func (_m *SyncAgentService_ExecuteTaskSyncClient) Send(_a0 *admin.ExecuteTaskSyn
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*admin.ExecuteTaskSyncRequest) error); ok {
+	if rf, ok := ret.Get(0).(func(*connector.ExecuteTaskSyncRequest) error); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)
@@ -301,14 +301,14 @@ type SyncAgentService_ExecuteTaskSyncClient_Send_Call struct {
 }
 
 // Send is a helper method to define mock.On call
-//   - _a0 *admin.ExecuteTaskSyncRequest
+//   - _a0 *connector.ExecuteTaskSyncRequest
 func (_e *SyncAgentService_ExecuteTaskSyncClient_Expecter) Send(_a0 interface{}) *SyncAgentService_ExecuteTaskSyncClient_Send_Call {
 	return &SyncAgentService_ExecuteTaskSyncClient_Send_Call{Call: _e.mock.On("Send", _a0)}
 }
 
-func (_c *SyncAgentService_ExecuteTaskSyncClient_Send_Call) Run(run func(_a0 *admin.ExecuteTaskSyncRequest)) *SyncAgentService_ExecuteTaskSyncClient_Send_Call {
+func (_c *SyncAgentService_ExecuteTaskSyncClient_Send_Call) Run(run func(_a0 *connector.ExecuteTaskSyncRequest)) *SyncAgentService_ExecuteTaskSyncClient_Send_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*admin.ExecuteTaskSyncRequest))
+		run(args[0].(*connector.ExecuteTaskSyncRequest))
 	})
 	return _c
 }
@@ -318,7 +318,7 @@ func (_c *SyncAgentService_ExecuteTaskSyncClient_Send_Call) Return(_a0 error) *S
 	return _c
 }
 
-func (_c *SyncAgentService_ExecuteTaskSyncClient_Send_Call) RunAndReturn(run func(*admin.ExecuteTaskSyncRequest) error) *SyncAgentService_ExecuteTaskSyncClient_Send_Call {
+func (_c *SyncAgentService_ExecuteTaskSyncClient_Send_Call) RunAndReturn(run func(*connector.ExecuteTaskSyncRequest) error) *SyncAgentService_ExecuteTaskSyncClient_Send_Call {
 	_c.Call.Return(run)
 	return _c
 }

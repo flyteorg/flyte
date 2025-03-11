@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+
 	"sync"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -40,12 +41,12 @@ type Plugin struct {
 type ResourceWrapper struct {
 	Phase flyteIdl.TaskExecution_Phase
 	// Deprecated: Please Use Phase instead.
-	State      admin.State
+	State      connector.State
 	Outputs    *flyteIdl.LiteralMap
 	Message    string
 	LogLinks   []*flyteIdl.TaskLog
 	CustomInfo *structpb.Struct
-	AgentError *admin.AgentError
+	AgentError *connector.AgentError
 }
 
 // IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
@@ -56,7 +57,7 @@ func (r ResourceWrapper) IsTerminal() bool {
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
-	TaskCategory      admin.TaskCategory
+	TaskCategory      connector.TaskCategory
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -108,7 +109,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
+	taskCategory := connector.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
 	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
@@ -120,7 +121,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		header := &connector.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
@@ -132,7 +133,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &connector.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create task from agent with %v", err)
@@ -148,7 +149,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
 	client service.SyncAgentServiceClient,
-	header *admin.CreateRequestHeader,
+	header *connector.CreateRequestHeader,
 	inputs *flyteIdl.LiteralMap,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
 	stream, err := client.ExecuteTaskSync(ctx)
@@ -157,8 +158,8 @@ func (p *Plugin) ExecuteTaskSync(
 		return nil, nil, fmt.Errorf("failed to execute task from agent with %v", err)
 	}
 
-	headerProto := &admin.ExecuteTaskSyncRequest{
-		Part: &admin.ExecuteTaskSyncRequest_Header{
+	headerProto := &connector.ExecuteTaskSyncRequest{
+		Part: &connector.ExecuteTaskSyncRequest_Header{
 			Header: header,
 		},
 	}
@@ -167,8 +168,8 @@ func (p *Plugin) ExecuteTaskSync(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
 	}
-	inputsProto := &admin.ExecuteTaskSyncRequest{
-		Part: &admin.ExecuteTaskSyncRequest_Inputs{
+	inputsProto := &connector.ExecuteTaskSyncRequest{
+		Part: &connector.ExecuteTaskSyncRequest_Inputs{
 			Inputs: inputs,
 		},
 	}
@@ -217,7 +218,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	request := &admin.GetTaskRequest{
+	request := &connector.GetTaskRequest{
 		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
@@ -252,7 +253,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	request := &admin.DeleteTaskRequest{
+	request := &connector.DeleteTaskRequest{
 		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
@@ -300,15 +301,15 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 
 	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.State {
-	case admin.State_PENDING:
+	case connector.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
-	case admin.State_RUNNING:
+	case connector.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
-	case admin.State_PERMANENT_FAILURE:
+	case connector.State_PERMANENT_FAILURE:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case admin.State_RETRYABLE_FAILURE:
+	case connector.State_RETRYABLE_FAILURE:
 		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case admin.State_SUCCEEDED:
+	case connector.State_SUCCEEDED:
 		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
@@ -356,7 +357,7 @@ func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentServic
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+func (p *Plugin) getFinalAgent(taskCategory *connector.TaskCategory, cfg *Config) (*Deployment, bool) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
@@ -388,10 +389,10 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
+func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) connector.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 
-	return admin.TaskExecutionMetadata{
+	return connector.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
 		Labels:               taskExecutionMetadata.GetLabels(),

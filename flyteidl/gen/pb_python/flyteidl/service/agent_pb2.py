@@ -12,10 +12,10 @@ _sym_db = _symbol_database.Default()
 
 
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
-from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
+from flyteidl.connector import connector_pb2 as flyteidl_dot_connector_dot_connector__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x66lyteidl/service/agent.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a\x1a\x66lyteidl/admin/agent.proto2\xa1\x01\n\x10SyncAgentService\x12\x8c\x01\n\x0f\x45xecuteTaskSync\x12&.flyteidl.admin.ExecuteTaskSyncRequest\x1a\'.flyteidl.admin.ExecuteTaskSyncResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/agent/task/stream(\x01\x30\x01\x32\xe3\x06\n\x11\x41syncAgentService\x12r\n\nCreateTask\x12!.flyteidl.admin.CreateTaskRequest\x1a\".flyteidl.admin.CreateTaskResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/agent/task\x12\xa3\x01\n\x07GetTask\x12\x1e.flyteidl.admin.GetTaskRequest\x1a\x1f.flyteidl.admin.GetTaskResponse\"W\x82\xd3\xe4\x93\x02Q\x12O/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}\x12\xb7\x01\n\nDeleteTask\x12!.flyteidl.admin.DeleteTaskRequest\x1a\".flyteidl.admin.DeleteTaskResponse\"b\x82\xd3\xe4\x93\x02\\*Z/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}\x12\xc0\x01\n\x0eGetTaskMetrics\x12%.flyteidl.admin.GetTaskMetricsRequest\x1a&.flyteidl.admin.GetTaskMetricsResponse\"_\x82\xd3\xe4\x93\x02Y\x12W/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}\x12\xb6\x01\n\x0bGetTaskLogs\x12\".flyteidl.admin.GetTaskLogsRequest\x1a#.flyteidl.admin.GetTaskLogsResponse\"\\\x82\xd3\xe4\x93\x02V\x12T/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}0\x01\x32\xf0\x01\n\x14\x41gentMetadataService\x12k\n\x08GetAgent\x12\x1f.flyteidl.admin.GetAgentRequest\x1a .flyteidl.admin.GetAgentResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/agent/{name}\x12k\n\nListAgents\x12!.flyteidl.admin.ListAgentsRequest\x1a\".flyteidl.admin.ListAgentsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/agentsB\xc2\x01\n\x14\x63om.flyteidl.serviceB\nAgentProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl.Service\xca\x02\x10\x46lyteidl\\Service\xe2\x02\x1c\x46lyteidl\\Service\\GPBMetadata\xea\x02\x11\x46lyteidl::Serviceb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x66lyteidl/service/agent.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a\"flyteidl/connector/connector.proto2\xa9\x01\n\x10SyncAgentService\x12\x94\x01\n\x0f\x45xecuteTaskSync\x12*.flyteidl.connector.ExecuteTaskSyncRequest\x1a+.flyteidl.connector.ExecuteTaskSyncResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/agent/task/stream(\x01\x30\x01\x32\x8b\x07\n\x11\x41syncAgentService\x12z\n\nCreateTask\x12%.flyteidl.connector.CreateTaskRequest\x1a&.flyteidl.connector.CreateTaskResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/agent/task\x12\xab\x01\n\x07GetTask\x12\".flyteidl.connector.GetTaskRequest\x1a#.flyteidl.connector.GetTaskResponse\"W\x82\xd3\xe4\x93\x02Q\x12O/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}\x12\xbf\x01\n\nDeleteTask\x12%.flyteidl.connector.DeleteTaskRequest\x1a&.flyteidl.connector.DeleteTaskResponse\"b\x82\xd3\xe4\x93\x02\\*Z/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}\x12\xc8\x01\n\x0eGetTaskMetrics\x12).flyteidl.connector.GetTaskMetricsRequest\x1a*.flyteidl.connector.GetTaskMetricsResponse\"_\x82\xd3\xe4\x93\x02Y\x12W/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}\x12\xbe\x01\n\x0bGetTaskLogs\x12&.flyteidl.connector.GetTaskLogsRequest\x1a\'.flyteidl.connector.GetTaskLogsResponse\"\\\x82\xd3\xe4\x93\x02V\x12T/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}0\x01\x32\x80\x02\n\x14\x41gentMetadataService\x12s\n\x08GetAgent\x12#.flyteidl.connector.GetAgentRequest\x1a$.flyteidl.connector.GetAgentResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/agent/{name}\x12s\n\nListAgents\x12%.flyteidl.connector.ListAgentsRequest\x1a&.flyteidl.connector.ListAgentsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/agentsB\xc2\x01\n\x14\x63om.flyteidl.serviceB\nAgentProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl.Service\xca\x02\x10\x46lyteidl\\Service\xe2\x02\x1c\x46lyteidl\\Service\\GPBMetadata\xea\x02\x11\x46lyteidl::Serviceb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -40,10 +40,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _AGENTMETADATASERVICE.methods_by_name['GetAgent']._serialized_options = b'\202\323\344\223\002\026\022\024/api/v1/agent/{name}'
   _AGENTMETADATASERVICE.methods_by_name['ListAgents']._options = None
   _AGENTMETADATASERVICE.methods_by_name['ListAgents']._serialized_options = b'\202\323\344\223\002\020\022\016/api/v1/agents'
-  _globals['_SYNCAGENTSERVICE']._serialized_start=109
-  _globals['_SYNCAGENTSERVICE']._serialized_end=270
-  _globals['_ASYNCAGENTSERVICE']._serialized_start=273
-  _globals['_ASYNCAGENTSERVICE']._serialized_end=1140
-  _globals['_AGENTMETADATASERVICE']._serialized_start=1143
-  _globals['_AGENTMETADATASERVICE']._serialized_end=1383
+  _globals['_SYNCAGENTSERVICE']._serialized_start=117
+  _globals['_SYNCAGENTSERVICE']._serialized_end=286
+  _globals['_ASYNCAGENTSERVICE']._serialized_start=289
+  _globals['_ASYNCAGENTSERVICE']._serialized_end=1196
+  _globals['_AGENTMETADATASERVICE']._serialized_start=1199
+  _globals['_AGENTMETADATASERVICE']._serialized_end=1455
 # @@protoc_insertion_point(module_scope)

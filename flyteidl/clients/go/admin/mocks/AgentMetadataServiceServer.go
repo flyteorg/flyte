@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -24,27 +24,27 @@ func (_m *AgentMetadataServiceServer) EXPECT() *AgentMetadataServiceServer_Expec
 }
 
 // GetAgent provides a mock function with given fields: _a0, _a1
-func (_m *AgentMetadataServiceServer) GetAgent(_a0 context.Context, _a1 *admin.GetAgentRequest) (*admin.GetAgentResponse, error) {
+func (_m *AgentMetadataServiceServer) GetAgent(_a0 context.Context, _a1 *connector.GetAgentRequest) (*connector.GetAgentResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAgent")
 	}
 
-	var r0 *admin.GetAgentResponse
+	var r0 *connector.GetAgentResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetAgentRequest) (*admin.GetAgentResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetAgentRequest) (*connector.GetAgentResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetAgentRequest) *admin.GetAgentResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetAgentRequest) *connector.GetAgentResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetAgentResponse)
+			r0 = ret.Get(0).(*connector.GetAgentResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetAgentRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetAgentRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -60,50 +60,50 @@ type AgentMetadataServiceServer_GetAgent_Call struct {
 
 // GetAgent is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.GetAgentRequest
+//   - _a1 *connector.GetAgentRequest
 func (_e *AgentMetadataServiceServer_Expecter) GetAgent(_a0 interface{}, _a1 interface{}) *AgentMetadataServiceServer_GetAgent_Call {
 	return &AgentMetadataServiceServer_GetAgent_Call{Call: _e.mock.On("GetAgent", _a0, _a1)}
 }
 
-func (_c *AgentMetadataServiceServer_GetAgent_Call) Run(run func(_a0 context.Context, _a1 *admin.GetAgentRequest)) *AgentMetadataServiceServer_GetAgent_Call {
+func (_c *AgentMetadataServiceServer_GetAgent_Call) Run(run func(_a0 context.Context, _a1 *connector.GetAgentRequest)) *AgentMetadataServiceServer_GetAgent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.GetAgentRequest))
+		run(args[0].(context.Context), args[1].(*connector.GetAgentRequest))
 	})
 	return _c
 }
 
-func (_c *AgentMetadataServiceServer_GetAgent_Call) Return(_a0 *admin.GetAgentResponse, _a1 error) *AgentMetadataServiceServer_GetAgent_Call {
+func (_c *AgentMetadataServiceServer_GetAgent_Call) Return(_a0 *connector.GetAgentResponse, _a1 error) *AgentMetadataServiceServer_GetAgent_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AgentMetadataServiceServer_GetAgent_Call) RunAndReturn(run func(context.Context, *admin.GetAgentRequest) (*admin.GetAgentResponse, error)) *AgentMetadataServiceServer_GetAgent_Call {
+func (_c *AgentMetadataServiceServer_GetAgent_Call) RunAndReturn(run func(context.Context, *connector.GetAgentRequest) (*connector.GetAgentResponse, error)) *AgentMetadataServiceServer_GetAgent_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListAgents provides a mock function with given fields: _a0, _a1
-func (_m *AgentMetadataServiceServer) ListAgents(_a0 context.Context, _a1 *admin.ListAgentsRequest) (*admin.ListAgentsResponse, error) {
+func (_m *AgentMetadataServiceServer) ListAgents(_a0 context.Context, _a1 *connector.ListAgentsRequest) (*connector.ListAgentsResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListAgents")
 	}
 
-	var r0 *admin.ListAgentsResponse
+	var r0 *connector.ListAgentsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.ListAgentsRequest) (*admin.ListAgentsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListAgentsRequest) (*connector.ListAgentsResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.ListAgentsRequest) *admin.ListAgentsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListAgentsRequest) *connector.ListAgentsResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ListAgentsResponse)
+			r0 = ret.Get(0).(*connector.ListAgentsResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.ListAgentsRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.ListAgentsRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -119,24 +119,24 @@ type AgentMetadataServiceServer_ListAgents_Call struct {
 
 // ListAgents is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.ListAgentsRequest
+//   - _a1 *connector.ListAgentsRequest
 func (_e *AgentMetadataServiceServer_Expecter) ListAgents(_a0 interface{}, _a1 interface{}) *AgentMetadataServiceServer_ListAgents_Call {
 	return &AgentMetadataServiceServer_ListAgents_Call{Call: _e.mock.On("ListAgents", _a0, _a1)}
 }
 
-func (_c *AgentMetadataServiceServer_ListAgents_Call) Run(run func(_a0 context.Context, _a1 *admin.ListAgentsRequest)) *AgentMetadataServiceServer_ListAgents_Call {
+func (_c *AgentMetadataServiceServer_ListAgents_Call) Run(run func(_a0 context.Context, _a1 *connector.ListAgentsRequest)) *AgentMetadataServiceServer_ListAgents_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.ListAgentsRequest))
+		run(args[0].(context.Context), args[1].(*connector.ListAgentsRequest))
 	})
 	return _c
 }
 
-func (_c *AgentMetadataServiceServer_ListAgents_Call) Return(_a0 *admin.ListAgentsResponse, _a1 error) *AgentMetadataServiceServer_ListAgents_Call {
+func (_c *AgentMetadataServiceServer_ListAgents_Call) Return(_a0 *connector.ListAgentsResponse, _a1 error) *AgentMetadataServiceServer_ListAgents_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AgentMetadataServiceServer_ListAgents_Call) RunAndReturn(run func(context.Context, *admin.ListAgentsRequest) (*admin.ListAgentsResponse, error)) *AgentMetadataServiceServer_ListAgents_Call {
+func (_c *AgentMetadataServiceServer_ListAgents_Call) RunAndReturn(run func(context.Context, *connector.ListAgentsRequest) (*connector.ListAgentsResponse, error)) *AgentMetadataServiceServer_ListAgents_Call {
 	_c.Call.Return(run)
 	return _c
 }

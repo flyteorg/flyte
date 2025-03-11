@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, ExecuteTaskSyncRequest, ExecuteTaskSyncResponse, GetAgentRequest, GetAgentResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListAgentsRequest, ListAgentsResponse } from "../admin/agent_pb.js";
+import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, ExecuteTaskSyncRequest, ExecuteTaskSyncResponse, GetAgentRequest, GetAgentResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListAgentsRequest, ListAgentsResponse } from "../connector/connector_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -108,7 +108,7 @@ export const AgentMetadataService = {
   typeName: "flyteidl.service.AgentMetadataService",
   methods: {
     /**
-     * Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+     * Fetch a :ref:`ref_connector.Agent` definition.
      *
      * @generated from rpc flyteidl.service.AgentMetadataService.GetAgent
      */
@@ -119,7 +119,7 @@ export const AgentMetadataService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+     * Fetch a list of :ref:`ref_connector.Agent` definitions.
      *
      * @generated from rpc flyteidl.service.AgentMetadataService.ListAgents
      */

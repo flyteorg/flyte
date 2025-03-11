@@ -13,7 +13,7 @@ import (
 	"io"
 	"net/http"
 
-	extAdmin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	extConnector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	extService "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
@@ -42,7 +42,7 @@ func request_SyncAgentService_ExecuteTaskSync_0(ctx context.Context, marshaler r
 	}
 	dec := marshaler.NewDecoder(req.Body)
 	handleSend := func() error {
-		var protoReq extAdmin.ExecuteTaskSyncRequest
+		var protoReq extConnector.ExecuteTaskSyncRequest
 		err := dec.Decode(&protoReq)
 		if err == io.EOF {
 			return err
@@ -77,7 +77,7 @@ func request_SyncAgentService_ExecuteTaskSync_0(ctx context.Context, marshaler r
 }
 
 func request_AsyncAgentService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.CreateTaskRequest
+	var protoReq extConnector.CreateTaskRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -94,7 +94,7 @@ func request_AsyncAgentService_CreateTask_0(ctx context.Context, marshaler runti
 }
 
 func local_request_AsyncAgentService_CreateTask_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AsyncAgentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.CreateTaskRequest
+	var protoReq extConnector.CreateTaskRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -115,7 +115,7 @@ var (
 )
 
 func request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetTaskRequest
+	var protoReq extConnector.GetTaskRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -168,7 +168,7 @@ func request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler runtime.
 }
 
 func local_request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AsyncAgentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetTaskRequest
+	var protoReq extConnector.GetTaskRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -225,7 +225,7 @@ var (
 )
 
 func request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.DeleteTaskRequest
+	var protoReq extConnector.DeleteTaskRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -278,7 +278,7 @@ func request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler runti
 }
 
 func local_request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AsyncAgentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.DeleteTaskRequest
+	var protoReq extConnector.DeleteTaskRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -335,7 +335,7 @@ var (
 )
 
 func request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetTaskMetricsRequest
+	var protoReq extConnector.GetTaskMetricsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -388,7 +388,7 @@ func request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marshaler r
 }
 
 func local_request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AsyncAgentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetTaskMetricsRequest
+	var protoReq extConnector.GetTaskMetricsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -445,7 +445,7 @@ var (
 )
 
 func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (extService.AsyncAgentService_GetTaskLogsClient, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetTaskLogsRequest
+	var protoReq extConnector.GetTaskLogsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -506,7 +506,7 @@ func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runt
 }
 
 func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetAgentRequest
+	var protoReq extConnector.GetAgentRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -532,7 +532,7 @@ func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runt
 }
 
 func local_request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AgentMetadataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.GetAgentRequest
+	var protoReq extConnector.GetAgentRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -558,7 +558,7 @@ func local_request_AgentMetadataService_GetAgent_0(ctx context.Context, marshale
 }
 
 func request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.ListAgentsRequest
+	var protoReq extConnector.ListAgentsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.ListAgents(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -567,7 +567,7 @@ func request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler ru
 }
 
 func local_request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AgentMetadataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.ListAgentsRequest
+	var protoReq extConnector.ListAgentsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.ListAgents(ctx, &protoReq)
