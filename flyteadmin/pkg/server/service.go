@@ -389,8 +389,9 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	}
 
 	go func() {
-		err := grpcServer.Serve(lis)
-		logger.Fatalf(ctx, "Failed to create GRPC Server, Err: ", err)
+		if err := grpcServer.Serve(lis); err != nil {
+			logger.Fatalf(ctx, "Failed to create GRPC Server, Err: ", err)
+		}
 	}()
 
 	logger.Infof(ctx, "Starting HTTP/1 Gateway server on %s", cfg.GetHostAddress())
