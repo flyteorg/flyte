@@ -184,6 +184,13 @@ jobs:
           repository: flyteorg/flytesnacks
           path: flytesnacks
           ref: ${{ env.FLYTESNACKS_VERSION }}
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.FLYTE_BOT_USERNAME }}
+          password: ${{ secrets.FLYTE_BOT_PAT }}
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
@@ -274,6 +281,13 @@ jobs:
           repository: flyteorg/flytesnacks
           path: flytesnacks
           ref: ${{ env.FLYTESNACKS_VERSION }}
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.FLYTE_BOT_USERNAME }}
+          password: ${{ secrets.FLYTE_BOT_PAT }}
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
