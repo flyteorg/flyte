@@ -6,8 +6,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
-
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -21,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
