@@ -166,8 +166,8 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
 	tags := make([]*models.ExecutionTag, 0)
 
-	if input.RequestSpec.Labels != nil {
-		for k, v := range input.RequestSpec.Labels.Values {
+	if input.ResolvedSpec.Labels != nil {
+		for k, v := range input.ResolvedSpec.Labels.Values {
 			tags = append(tags, &models.ExecutionTag{
 				ExecutionKey: models.ExecutionKey{
 					Org:     input.WorkflowExecutionID.Org,
@@ -181,7 +181,7 @@ func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.Executi
 		}
 	}
 
-	for _, v := range input.RequestSpec.Tags {
+	for _, v := range input.ResolvedSpec.Tags {
 		tags = append(tags, &models.ExecutionTag{
 			ExecutionKey: models.ExecutionKey{
 				Org:     input.WorkflowExecutionID.Org,
