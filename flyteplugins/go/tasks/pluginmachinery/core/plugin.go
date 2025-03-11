@@ -58,6 +58,12 @@ type Plugin interface {
 	Finalize(ctx context.Context, tCtx TaskExecutionContext) error
 }
 
+type ConnectorService struct {
+	mu                 sync.RWMutex
+	supportedTaskTypes []TaskType
+	CorePlugin         Plugin
+}
+
 type AgentService struct {
 	mu                 sync.RWMutex
 	supportedTaskTypes []TaskType
@@ -73,6 +79,20 @@ func (p *AgentService) ContainTaskType(taskType TaskType) bool {
 
 // SetSupportedTaskType set supportTaskType in the agent service.
 func (p *AgentService) SetSupportedTaskType(taskTypes []TaskType) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.supportedTaskTypes = taskTypes
+}
+
+// ContainTaskType check if connector supports this task type.
+func (p *ConnectorService) ContainTaskType(taskType TaskType) bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return slices.Contains(p.supportedTaskTypes, taskType)
+}
+
+// SetSupportedTaskType set supportTaskType in the connector service.
+func (p *ConnectorService) SetSupportedTaskType(taskTypes []TaskType) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.supportedTaskTypes = taskTypes
