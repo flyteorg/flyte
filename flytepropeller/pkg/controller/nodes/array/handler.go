@@ -245,7 +245,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		if size == -1 {
 			// handles case where all inputs are bound
-			if len(arrayNode.GetBoundInputs()) == len(literalMap.Literals) {
+			if len(arrayNode.GetBoundInputs()) == len(literalMap.GetLiterals()) {
 				size = 1
 			} else {
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
