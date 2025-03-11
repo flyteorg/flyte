@@ -185,7 +185,6 @@ jobs:
           path: flytesnacks
           ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
@@ -194,7 +193,6 @@ jobs:
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
-          export FLYTE_PUSH_IMAGE_SPEC=${{ github.event_name != 'pull_request' }}
           while read -r line;
           do
               pyflyte -vv --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
@@ -283,7 +281,6 @@ jobs:
           path: flytesnacks
           ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
@@ -292,7 +289,6 @@ jobs:
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
-          export FLYTE_PUSH_IMAGE_SPEC=${{ github.event_name != 'pull_request' }}
           while read -r line;
           do
               pyflyte -vv --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
