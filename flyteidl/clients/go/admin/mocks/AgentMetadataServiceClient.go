@@ -26,7 +26,7 @@ func (_m *AgentMetadataServiceClient) EXPECT() *AgentMetadataServiceClient_Expec
 }
 
 // GetAgent provides a mock function with given fields: ctx, in, opts
-func (_m *AgentMetadataServiceClient) GetAgent(ctx context.Context, in *connector.GetAgentRequest, opts ...grpc.CallOption) (*connector.GetAgentResponse, error) {
+func (_m *AgentMetadataServiceClient) GetAgent(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption) (*connector.GetConnectorResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -40,20 +40,20 @@ func (_m *AgentMetadataServiceClient) GetAgent(ctx context.Context, in *connecto
 		panic("no return value specified for GetAgent")
 	}
 
-	var r0 *connector.GetAgentResponse
+	var r0 *connector.GetConnectorResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetAgentRequest, ...grpc.CallOption) (*connector.GetAgentResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetConnectorRequest, ...grpc.CallOption) (*connector.GetConnectorResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetAgentRequest, ...grpc.CallOption) *connector.GetAgentResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetConnectorRequest, ...grpc.CallOption) *connector.GetConnectorResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connector.GetAgentResponse)
+			r0 = ret.Get(0).(*connector.GetConnectorResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetAgentRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetConnectorRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -69,14 +69,14 @@ type AgentMetadataServiceClient_GetAgent_Call struct {
 
 // GetAgent is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *connector.GetAgentRequest
+//   - in *connector.GetConnectorRequest
 //   - opts ...grpc.CallOption
 func (_e *AgentMetadataServiceClient_Expecter) GetAgent(ctx interface{}, in interface{}, opts ...interface{}) *AgentMetadataServiceClient_GetAgent_Call {
 	return &AgentMetadataServiceClient_GetAgent_Call{Call: _e.mock.On("GetAgent",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AgentMetadataServiceClient_GetAgent_Call) Run(run func(ctx context.Context, in *connector.GetAgentRequest, opts ...grpc.CallOption)) *AgentMetadataServiceClient_GetAgent_Call {
+func (_c *AgentMetadataServiceClient_GetAgent_Call) Run(run func(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption)) *AgentMetadataServiceClient_GetAgent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -84,23 +84,23 @@ func (_c *AgentMetadataServiceClient_GetAgent_Call) Run(run func(ctx context.Con
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*connector.GetAgentRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.GetConnectorRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AgentMetadataServiceClient_GetAgent_Call) Return(_a0 *connector.GetAgentResponse, _a1 error) *AgentMetadataServiceClient_GetAgent_Call {
+func (_c *AgentMetadataServiceClient_GetAgent_Call) Return(_a0 *connector.GetConnectorResponse, _a1 error) *AgentMetadataServiceClient_GetAgent_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AgentMetadataServiceClient_GetAgent_Call) RunAndReturn(run func(context.Context, *connector.GetAgentRequest, ...grpc.CallOption) (*connector.GetAgentResponse, error)) *AgentMetadataServiceClient_GetAgent_Call {
+func (_c *AgentMetadataServiceClient_GetAgent_Call) RunAndReturn(run func(context.Context, *connector.GetConnectorRequest, ...grpc.CallOption) (*connector.GetConnectorResponse, error)) *AgentMetadataServiceClient_GetAgent_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListAgents provides a mock function with given fields: ctx, in, opts
-func (_m *AgentMetadataServiceClient) ListAgents(ctx context.Context, in *connector.ListAgentsRequest, opts ...grpc.CallOption) (*connector.ListAgentsResponse, error) {
+func (_m *AgentMetadataServiceClient) ListAgents(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption) (*connector.ListConnectorsResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -114,20 +114,20 @@ func (_m *AgentMetadataServiceClient) ListAgents(ctx context.Context, in *connec
 		panic("no return value specified for ListAgents")
 	}
 
-	var r0 *connector.ListAgentsResponse
+	var r0 *connector.ListConnectorsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListAgentsRequest, ...grpc.CallOption) (*connector.ListAgentsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListConnectorsRequest, ...grpc.CallOption) (*connector.ListConnectorsResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListAgentsRequest, ...grpc.CallOption) *connector.ListAgentsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.ListConnectorsRequest, ...grpc.CallOption) *connector.ListConnectorsResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connector.ListAgentsResponse)
+			r0 = ret.Get(0).(*connector.ListConnectorsResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *connector.ListAgentsRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.ListConnectorsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -143,14 +143,14 @@ type AgentMetadataServiceClient_ListAgents_Call struct {
 
 // ListAgents is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *connector.ListAgentsRequest
+//   - in *connector.ListConnectorsRequest
 //   - opts ...grpc.CallOption
 func (_e *AgentMetadataServiceClient_Expecter) ListAgents(ctx interface{}, in interface{}, opts ...interface{}) *AgentMetadataServiceClient_ListAgents_Call {
 	return &AgentMetadataServiceClient_ListAgents_Call{Call: _e.mock.On("ListAgents",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AgentMetadataServiceClient_ListAgents_Call) Run(run func(ctx context.Context, in *connector.ListAgentsRequest, opts ...grpc.CallOption)) *AgentMetadataServiceClient_ListAgents_Call {
+func (_c *AgentMetadataServiceClient_ListAgents_Call) Run(run func(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption)) *AgentMetadataServiceClient_ListAgents_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -158,17 +158,17 @@ func (_c *AgentMetadataServiceClient_ListAgents_Call) Run(run func(ctx context.C
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*connector.ListAgentsRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.ListConnectorsRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AgentMetadataServiceClient_ListAgents_Call) Return(_a0 *connector.ListAgentsResponse, _a1 error) *AgentMetadataServiceClient_ListAgents_Call {
+func (_c *AgentMetadataServiceClient_ListAgents_Call) Return(_a0 *connector.ListConnectorsResponse, _a1 error) *AgentMetadataServiceClient_ListAgents_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AgentMetadataServiceClient_ListAgents_Call) RunAndReturn(run func(context.Context, *connector.ListAgentsRequest, ...grpc.CallOption) (*connector.ListAgentsResponse, error)) *AgentMetadataServiceClient_ListAgents_Call {
+func (_c *AgentMetadataServiceClient_ListAgents_Call) RunAndReturn(run func(context.Context, *connector.ListConnectorsRequest, ...grpc.CallOption) (*connector.ListConnectorsResponse, error)) *AgentMetadataServiceClient_ListAgents_Call {
 	_c.Call.Return(run)
 	return _c
 }

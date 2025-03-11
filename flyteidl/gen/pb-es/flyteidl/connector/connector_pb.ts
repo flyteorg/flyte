@@ -14,47 +14,6 @@ import { ExecutionError_ErrorKind, TaskExecution_Phase, TaskLog } from "../core/
 import { ExecutionMetricResult } from "../core/metrics_pb.js";
 
 /**
- * The state of the execution is used to control its visibility in the UI/CLI.
- *
- * @generated from enum flyteidl.connector.State
- * @deprecated
- */
-export enum State {
-  /**
-   * @generated from enum value: RETRYABLE_FAILURE = 0;
-   */
-  RETRYABLE_FAILURE = 0,
-
-  /**
-   * @generated from enum value: PERMANENT_FAILURE = 1;
-   */
-  PERMANENT_FAILURE = 1,
-
-  /**
-   * @generated from enum value: PENDING = 2;
-   */
-  PENDING = 2,
-
-  /**
-   * @generated from enum value: RUNNING = 3;
-   */
-  RUNNING = 3,
-
-  /**
-   * @generated from enum value: SUCCEEDED = 4;
-   */
-  SUCCEEDED = 4,
-}
-// Retrieve enum metadata with: proto3.getEnumType(State)
-proto3.util.setEnumType(State, "flyteidl.connector.State", [
-  { no: 0, name: "RETRYABLE_FAILURE" },
-  { no: 1, name: "PERMANENT_FAILURE" },
-  { no: 2, name: "PENDING" },
-  { no: 3, name: "RUNNING" },
-  { no: 4, name: "SUCCEEDED" },
-]);
-
-/**
  * Represents a subset of runtime task execution metadata that are relevant to external plugins.
  *
  * ID of the task execution
@@ -254,7 +213,7 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
  */
 export class CreateTaskResponse extends Message<CreateTaskResponse> {
   /**
-   * ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+   * ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    *
    * @generated from field: bytes resource_meta = 1;
    */
@@ -443,7 +402,7 @@ export class ExecuteTaskSyncResponseHeader extends Message<ExecuteTaskSyncRespon
  */
 export class ExecuteTaskSyncResponse extends Message<ExecuteTaskSyncResponse> {
   /**
-   * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+   * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    * Resource is for synchronous task execution.
    *
    * @generated from oneof flyteidl.connector.ExecuteTaskSyncResponse.res
@@ -492,7 +451,7 @@ export class ExecuteTaskSyncResponse extends Message<ExecuteTaskSyncResponse> {
 }
 
 /**
- * A message used to fetch a job resource from flyte agent server.
+ * A message used to fetch a job resource from flyte connector server.
  *
  * @generated from message flyteidl.connector.GetTaskRequest
  */
@@ -506,7 +465,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   taskType = "";
 
   /**
-   * Metadata about the resource to be pass to the agent.
+   * Metadata about the resource to be pass to the connector.
    *
    * @generated from field: bytes resource_meta = 2;
    */
@@ -601,16 +560,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
  */
 export class Resource extends Message<Resource> {
   /**
-   * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
-   *
-   * @generated from field: flyteidl.connector.State state = 1 [deprecated = true];
-   * @deprecated
-   */
-  state = State.RETRYABLE_FAILURE;
-
-  /**
-   * The outputs of the execution. It's typically used by sql task. Agent service will create a
-   * Structured dataset pointing to the query result table.
    * +optional
    *
    * @generated from field: flyteidl.core.LiteralMap outputs = 2;
@@ -639,7 +588,7 @@ export class Resource extends Message<Resource> {
   phase = TaskExecution_Phase.UNDEFINED;
 
   /**
-   * Custom data specific to the agent.
+   * Custom data specific to the connector.
    *
    * @generated from field: google.protobuf.Struct custom_info = 6;
    */
@@ -648,9 +597,9 @@ export class Resource extends Message<Resource> {
   /**
    * The error raised during execution
    *
-   * @generated from field: flyteidl.connector.AgentError agent_error = 7;
+   * @generated from field: flyteidl.connector.ConnectorError connector_error = 7;
    */
-  agentError?: AgentError;
+  connectorError?: ConnectorError;
 
   constructor(data?: PartialMessage<Resource>) {
     super();
@@ -660,13 +609,12 @@ export class Resource extends Message<Resource> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.connector.Resource";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "state", kind: "enum", T: proto3.getEnumType(State) },
     { no: 2, name: "outputs", kind: "message", T: LiteralMap },
     { no: 3, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "log_links", kind: "message", T: TaskLog, repeated: true },
     { no: 5, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 6, name: "custom_info", kind: "message", T: Struct },
-    { no: 7, name: "agent_error", kind: "message", T: AgentError },
+    { no: 7, name: "connector_error", kind: "message", T: ConnectorError },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resource {
@@ -701,7 +649,7 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   taskType = "";
 
   /**
-   * Metadata about the resource to be pass to the agent.
+   * Metadata about the resource to be pass to the connector.
    *
    * @generated from field: bytes resource_meta = 2;
    */
@@ -778,20 +726,20 @@ export class DeleteTaskResponse extends Message<DeleteTaskResponse> {
 }
 
 /**
- * A message containing the agent metadata.
+ * A message containing the connector metadata.
  *
- * @generated from message flyteidl.connector.Agent
+ * @generated from message flyteidl.connector.Connector
  */
-export class Agent extends Message<Agent> {
+export class Connector extends Message<Connector> {
   /**
-   * Name is the developer-assigned name of the agent.
+   * Name is the developer-assigned name of the connector.
    *
    * @generated from field: string name = 1;
    */
   name = "";
 
   /**
-   * SupportedTaskTypes are the types of the tasks that the agent can handle.
+   * SupportedTaskTypes are the types of the tasks that the connector can handle.
    *
    * @generated from field: repeated string supported_task_types = 2 [deprecated = true];
    * @deprecated
@@ -799,10 +747,10 @@ export class Agent extends Message<Agent> {
   supportedTaskTypes: string[] = [];
 
   /**
-   * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
-   * results synchronously when called by propeller. Given that sync agents can affect the performance
+   * IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
+   * results synchronously when called by propeller. Given that sync connectors can affect the performance
    * of the system, it's important to enforce strict timeout policies.
-   * An Async agent, on the other hand, is required to be able to identify jobs by an
+   * An Async connector, on the other hand, is required to be able to identify jobs by an
    * identifier and query for job statuses as jobs progress.
    *
    * @generated from field: bool is_sync = 3;
@@ -810,19 +758,19 @@ export class Agent extends Message<Agent> {
   isSync = false;
 
   /**
-   * Supported_task_categories are the categories of the tasks that the agent can handle.
+   * Supported_task_categories are the categories of the tasks that the connector can handle.
    *
    * @generated from field: repeated flyteidl.connector.TaskCategory supported_task_categories = 4;
    */
   supportedTaskCategories: TaskCategory[] = [];
 
-  constructor(data?: PartialMessage<Agent>) {
+  constructor(data?: PartialMessage<Connector>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.Agent";
+  static readonly typeName = "flyteidl.connector.Connector";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "supported_task_types", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
@@ -830,20 +778,20 @@ export class Agent extends Message<Agent> {
     { no: 4, name: "supported_task_categories", kind: "message", T: TaskCategory, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Agent {
-    return new Agent().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Connector {
+    return new Connector().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Agent {
-    return new Agent().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Connector {
+    return new Connector().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Agent {
-    return new Agent().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Connector {
+    return new Connector().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Agent | PlainMessage<Agent> | undefined, b: Agent | PlainMessage<Agent> | undefined): boolean {
-    return proto3.util.equals(Agent, a, b);
+  static equals(a: Connector | PlainMessage<Connector> | undefined, b: Connector | PlainMessage<Connector> | undefined): boolean {
+    return proto3.util.equals(Connector, a, b);
   }
 }
 
@@ -895,154 +843,154 @@ export class TaskCategory extends Message<TaskCategory> {
 }
 
 /**
- * A request to get an agent.
+ * A request to get an connector.
  *
- * @generated from message flyteidl.connector.GetAgentRequest
+ * @generated from message flyteidl.connector.GetConnectorRequest
  */
-export class GetAgentRequest extends Message<GetAgentRequest> {
+export class GetConnectorRequest extends Message<GetConnectorRequest> {
   /**
-   * The name of the agent.
+   * The name of the connector.
    *
    * @generated from field: string name = 1;
    */
   name = "";
 
-  constructor(data?: PartialMessage<GetAgentRequest>) {
+  constructor(data?: PartialMessage<GetConnectorRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.GetAgentRequest";
+  static readonly typeName = "flyteidl.connector.GetConnectorRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAgentRequest {
-    return new GetAgentRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConnectorRequest {
+    return new GetConnectorRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAgentRequest {
-    return new GetAgentRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConnectorRequest {
+    return new GetConnectorRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAgentRequest {
-    return new GetAgentRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConnectorRequest {
+    return new GetConnectorRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: GetAgentRequest | PlainMessage<GetAgentRequest> | undefined, b: GetAgentRequest | PlainMessage<GetAgentRequest> | undefined): boolean {
-    return proto3.util.equals(GetAgentRequest, a, b);
+  static equals(a: GetConnectorRequest | PlainMessage<GetConnectorRequest> | undefined, b: GetConnectorRequest | PlainMessage<GetConnectorRequest> | undefined): boolean {
+    return proto3.util.equals(GetConnectorRequest, a, b);
   }
 }
 
 /**
- * A response containing an agent.
+ * A response containing an connector.
  *
- * @generated from message flyteidl.connector.GetAgentResponse
+ * @generated from message flyteidl.connector.GetConnectorResponse
  */
-export class GetAgentResponse extends Message<GetAgentResponse> {
+export class GetConnectorResponse extends Message<GetConnectorResponse> {
   /**
-   * @generated from field: flyteidl.connector.Agent agent = 1;
+   * @generated from field: flyteidl.connector.Connector connector = 1;
    */
-  agent?: Agent;
+  connector?: Connector;
 
-  constructor(data?: PartialMessage<GetAgentResponse>) {
+  constructor(data?: PartialMessage<GetConnectorResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.GetAgentResponse";
+  static readonly typeName = "flyteidl.connector.GetConnectorResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "agent", kind: "message", T: Agent },
+    { no: 1, name: "connector", kind: "message", T: Connector },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAgentResponse {
-    return new GetAgentResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetConnectorResponse {
+    return new GetConnectorResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAgentResponse {
-    return new GetAgentResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetConnectorResponse {
+    return new GetConnectorResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAgentResponse {
-    return new GetAgentResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetConnectorResponse {
+    return new GetConnectorResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: GetAgentResponse | PlainMessage<GetAgentResponse> | undefined, b: GetAgentResponse | PlainMessage<GetAgentResponse> | undefined): boolean {
-    return proto3.util.equals(GetAgentResponse, a, b);
+  static equals(a: GetConnectorResponse | PlainMessage<GetConnectorResponse> | undefined, b: GetConnectorResponse | PlainMessage<GetConnectorResponse> | undefined): boolean {
+    return proto3.util.equals(GetConnectorResponse, a, b);
   }
 }
 
 /**
- * A request to list all agents.
+ * A request to list all connectors.
  *
- * @generated from message flyteidl.connector.ListAgentsRequest
+ * @generated from message flyteidl.connector.ListConnectorsRequest
  */
-export class ListAgentsRequest extends Message<ListAgentsRequest> {
-  constructor(data?: PartialMessage<ListAgentsRequest>) {
+export class ListConnectorsRequest extends Message<ListConnectorsRequest> {
+  constructor(data?: PartialMessage<ListConnectorsRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.ListAgentsRequest";
+  static readonly typeName = "flyteidl.connector.ListConnectorsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAgentsRequest {
-    return new ListAgentsRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListConnectorsRequest {
+    return new ListConnectorsRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAgentsRequest {
-    return new ListAgentsRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListConnectorsRequest {
+    return new ListConnectorsRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAgentsRequest {
-    return new ListAgentsRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListConnectorsRequest {
+    return new ListConnectorsRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ListAgentsRequest | PlainMessage<ListAgentsRequest> | undefined, b: ListAgentsRequest | PlainMessage<ListAgentsRequest> | undefined): boolean {
-    return proto3.util.equals(ListAgentsRequest, a, b);
+  static equals(a: ListConnectorsRequest | PlainMessage<ListConnectorsRequest> | undefined, b: ListConnectorsRequest | PlainMessage<ListConnectorsRequest> | undefined): boolean {
+    return proto3.util.equals(ListConnectorsRequest, a, b);
   }
 }
 
 /**
- * A response containing a list of agents.
+ * A response containing a list of connectors.
  *
- * @generated from message flyteidl.connector.ListAgentsResponse
+ * @generated from message flyteidl.connector.ListConnectorsResponse
  */
-export class ListAgentsResponse extends Message<ListAgentsResponse> {
+export class ListConnectorsResponse extends Message<ListConnectorsResponse> {
   /**
-   * @generated from field: repeated flyteidl.connector.Agent agents = 1;
+   * @generated from field: repeated flyteidl.connector.Connector connectors = 1;
    */
-  agents: Agent[] = [];
+  connectors: Connector[] = [];
 
-  constructor(data?: PartialMessage<ListAgentsResponse>) {
+  constructor(data?: PartialMessage<ListConnectorsResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.ListAgentsResponse";
+  static readonly typeName = "flyteidl.connector.ListConnectorsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "agents", kind: "message", T: Agent, repeated: true },
+    { no: 1, name: "connectors", kind: "message", T: Connector, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAgentsResponse {
-    return new ListAgentsResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListConnectorsResponse {
+    return new ListConnectorsResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAgentsResponse {
-    return new ListAgentsResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListConnectorsResponse {
+    return new ListConnectorsResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAgentsResponse {
-    return new ListAgentsResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListConnectorsResponse {
+    return new ListConnectorsResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ListAgentsResponse | PlainMessage<ListAgentsResponse> | undefined, b: ListAgentsResponse | PlainMessage<ListAgentsResponse> | undefined): boolean {
-    return proto3.util.equals(ListAgentsResponse, a, b);
+  static equals(a: ListConnectorsResponse | PlainMessage<ListConnectorsResponse> | undefined, b: ListConnectorsResponse | PlainMessage<ListConnectorsResponse> | undefined): boolean {
+    return proto3.util.equals(ListConnectorsResponse, a, b);
   }
 }
 
@@ -1061,7 +1009,7 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
   taskType = "";
 
   /**
-   * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+   * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    *
    * @generated from field: bytes resource_meta = 2;
    */
@@ -1193,7 +1141,7 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
   taskType = "";
 
   /**
-   * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+   * Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
    *
    * @generated from field: bytes resource_meta = 2;
    */
@@ -1385,12 +1333,12 @@ export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
 }
 
 /**
- * Error message to propagate detailed errors from agent executions to the execution
+ * Error message to propagate detailed errors from connector executions to the execution
  * engine.
  *
- * @generated from message flyteidl.connector.AgentError
+ * @generated from message flyteidl.connector.ConnectorError
  */
-export class AgentError extends Message<AgentError> {
+export class ConnectorError extends Message<ConnectorError> {
   /**
    * A simplified code for errors, so that we can provide a glossary of all possible errors.
    *
@@ -1401,9 +1349,9 @@ export class AgentError extends Message<AgentError> {
   /**
    * An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
    *
-   * @generated from field: flyteidl.connector.AgentError.Kind kind = 3;
+   * @generated from field: flyteidl.connector.ConnectorError.Kind kind = 3;
    */
-  kind = AgentError_Kind.NON_RECOVERABLE;
+  kind = ConnectorError_Kind.NON_RECOVERABLE;
 
   /**
    * Defines the origin of the error (system, user, unknown).
@@ -1412,42 +1360,42 @@ export class AgentError extends Message<AgentError> {
    */
   origin = ExecutionError_ErrorKind.UNKNOWN;
 
-  constructor(data?: PartialMessage<AgentError>) {
+  constructor(data?: PartialMessage<ConnectorError>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.connector.AgentError";
+  static readonly typeName = "flyteidl.connector.ConnectorError";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "kind", kind: "enum", T: proto3.getEnumType(AgentError_Kind) },
+    { no: 3, name: "kind", kind: "enum", T: proto3.getEnumType(ConnectorError_Kind) },
     { no: 4, name: "origin", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AgentError {
-    return new AgentError().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConnectorError {
+    return new ConnectorError().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AgentError {
-    return new AgentError().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ConnectorError {
+    return new ConnectorError().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AgentError {
-    return new AgentError().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ConnectorError {
+    return new ConnectorError().fromJsonString(jsonString, options);
   }
 
-  static equals(a: AgentError | PlainMessage<AgentError> | undefined, b: AgentError | PlainMessage<AgentError> | undefined): boolean {
-    return proto3.util.equals(AgentError, a, b);
+  static equals(a: ConnectorError | PlainMessage<ConnectorError> | undefined, b: ConnectorError | PlainMessage<ConnectorError> | undefined): boolean {
+    return proto3.util.equals(ConnectorError, a, b);
   }
 }
 
 /**
  * Defines a generic error type that dictates the behavior of the retry strategy.
  *
- * @generated from enum flyteidl.connector.AgentError.Kind
+ * @generated from enum flyteidl.connector.ConnectorError.Kind
  */
-export enum AgentError_Kind {
+export enum ConnectorError_Kind {
   /**
    * @generated from enum value: NON_RECOVERABLE = 0;
    */
@@ -1458,8 +1406,8 @@ export enum AgentError_Kind {
    */
   RECOVERABLE = 1,
 }
-// Retrieve enum metadata with: proto3.getEnumType(AgentError_Kind)
-proto3.util.setEnumType(AgentError_Kind, "flyteidl.connector.AgentError.Kind", [
+// Retrieve enum metadata with: proto3.getEnumType(ConnectorError_Kind)
+proto3.util.setEnumType(ConnectorError_Kind, "flyteidl.connector.ConnectorError.Kind", [
   { no: 0, name: "NON_RECOVERABLE" },
   { no: 1, name: "RECOVERABLE" },
 ]);

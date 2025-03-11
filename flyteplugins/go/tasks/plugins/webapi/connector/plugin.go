@@ -38,14 +38,12 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	Phase flyteIdl.TaskExecution_Phase
-	// Deprecated: Please Use Phase instead.
-	State          connectorIDL.State
+	Phase          flyteIdl.TaskExecution_Phase
 	Outputs        *flyteIdl.LiteralMap
 	Message        string
 	LogLinks       []*flyteIdl.TaskLog
 	CustomInfo     *structpb.Struct
-	ConnectorError *connectorIDL.AgentError
+	ConnectorError *connectorIDL.ConnectorError
 }
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
@@ -202,7 +200,7 @@ func (p *Plugin) ExecuteTaskSync(
 		Message:        resource.GetMessage(),
 		LogLinks:       resource.GetLogLinks(),
 		CustomInfo:     resource.GetCustomInfo(),
-		ConnectorError: resource.GetAgentError(),
+		ConnectorError: resource.GetConnectorError(),
 	}, nil
 }
 
@@ -230,7 +228,6 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 
 	return ResourceWrapper{
 		Phase:      res.GetResource().GetPhase(),
-		State:      res.GetResource().GetState(),
 		Outputs:    res.GetResource().GetOutputs(),
 		Message:    res.GetResource().GetMessage(),
 		LogLinks:   res.GetResource().GetLogLinks(),
@@ -298,24 +295,6 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
 	}
 
-	// If the phase is undefined, we will use state to determine the phase.
-	switch resource.State {
-	case connectorIDL.State_PENDING:
-		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
-	case connectorIDL.State_RUNNING:
-		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
-	case connectorIDL.State_PERMANENT_FAILURE:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case connectorIDL.State_RETRYABLE_FAILURE:
-		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
-	case connectorIDL.State_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource.Outputs)
-		if err != nil {
-			logger.Errorf(ctx, "failed to write output with err %s", err.Error())
-			return core.PhaseInfoUndefined, fmt.Errorf("failed to write output with err %s", err.Error())
-		}
-		return core.PhaseInfoSuccess(taskInfo), nil
-	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 

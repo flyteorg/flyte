@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, ExecuteTaskSyncRequest, ExecuteTaskSyncResponse, GetAgentRequest, GetAgentResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListAgentsRequest, ListAgentsResponse } from "../connector/connector_pb.js";
+import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, ExecuteTaskSyncRequest, ExecuteTaskSyncResponse, GetConnectorRequest, GetConnectorResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListConnectorsRequest, ListConnectorsResponse } from "../connector/connector_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -114,8 +114,8 @@ export const AgentMetadataService = {
      */
     getAgent: {
       name: "GetAgent",
-      I: GetAgentRequest,
-      O: GetAgentResponse,
+      I: GetConnectorRequest,
+      O: GetConnectorResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -125,8 +125,8 @@ export const AgentMetadataService = {
      */
     listAgents: {
       name: "ListAgents",
-      I: ListAgentsRequest,
-      O: ListAgentsResponse,
+      I: ListConnectorsRequest,
+      O: ListConnectorsResponse,
       kind: MethodKind.Unary,
     },
   }

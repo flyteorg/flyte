@@ -14,16 +14,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
-// The state of the execution is used to control its visibility in the UI/CLI.
-enum State {
-  option deprecated = true;
-  RETRYABLE_FAILURE = 0;
-  PERMANENT_FAILURE = 1;
-  PENDING = 2;
-  RUNNING = 3;
-  SUCCEEDED = 4;
-}
-
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
 message TaskExecutionMetadata {
   // ID of the task execution
@@ -72,7 +62,7 @@ message CreateTaskRequest {
 
 // Represents a create response structure.
 message CreateTaskResponse {
-  // ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  // ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 1;
 }
 
@@ -100,7 +90,7 @@ message ExecuteTaskSyncResponseHeader {
 }
 
 message ExecuteTaskSyncResponse {
-  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
   // Resource is for synchronous task execution.
   oneof res {
     ExecuteTaskSyncResponseHeader header = 1;
@@ -108,12 +98,12 @@ message ExecuteTaskSyncResponse {
   }
 }
 
-// A message used to fetch a job resource from flyte agent server.
+// A message used to fetch a job resource from flyte connector server.
 message GetTaskRequest {
   reserved 5;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
-  // Metadata about the resource to be pass to the agent.
+  // Metadata about the resource to be pass to the connector.
   bytes resource_meta = 2;
   // A predefined yet extensible Task type identifier.
   TaskCategory task_category = 3;
@@ -127,10 +117,7 @@ message GetTaskResponse {
 }
 
 message Resource {
-  // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
-  State state = 1 [deprecated = true];
-  // The outputs of the execution. It's typically used by sql task. Agent service will create a
-  // Structured dataset pointing to the query result table.
+  reserved 1;
   // +optional
   core.LiteralMap outputs = 2;
   // A descriptive message for the current state. e.g. waiting for cluster.
@@ -139,17 +126,17 @@ message Resource {
   repeated core.TaskLog log_links = 4;
   // The phase of the execution is used to determine the phase of the plugin's execution.
   core.TaskExecution.Phase phase = 5;
-  // Custom data specific to the agent.
+  // Custom data specific to the connector.
   google.protobuf.Struct custom_info = 6;
   // The error raised during execution
-  AgentError agent_error = 7;
+  ConnectorError connector_error = 7;
 }
 
 // A message used to delete a task.
 message DeleteTaskRequest {
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
-  // Metadata about the resource to be pass to the agent.
+  // Metadata about the resource to be pass to the connector.
   bytes resource_meta = 2;
   // A predefined yet extensible Task type identifier.
   TaskCategory task_category = 3;
@@ -158,22 +145,22 @@ message DeleteTaskRequest {
 // Response to delete a task.
 message DeleteTaskResponse {}
 
-// A message containing the agent metadata.
-message Agent {
-  // Name is the developer-assigned name of the agent.
+// A message containing the connector metadata.
+message Connector {
+  // Name is the developer-assigned name of the connector.
   string name = 1;
 
-  // SupportedTaskTypes are the types of the tasks that the agent can handle.
+  // SupportedTaskTypes are the types of the tasks that the connector can handle.
   repeated string supported_task_types = 2 [deprecated = true];
 
-  // IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
-  // results synchronously when called by propeller. Given that sync agents can affect the performance
+  // IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
+  // results synchronously when called by propeller. Given that sync connectors can affect the performance
   // of the system, it's important to enforce strict timeout policies.
-  // An Async agent, on the other hand, is required to be able to identify jobs by an
+  // An Async connector, on the other hand, is required to be able to identify jobs by an
   // identifier and query for job statuses as jobs progress.
   bool is_sync = 3;
 
-  // Supported_task_categories are the categories of the tasks that the agent can handle.
+  // Supported_task_categories are the categories of the tasks that the connector can handle.
   repeated TaskCategory supported_task_categories = 4;
 }
 
@@ -184,30 +171,30 @@ message TaskCategory {
   int32 version = 2;
 }
 
-// A request to get an agent.
-message GetAgentRequest {
-  // The name of the agent.
+// A request to get an connector.
+message GetConnectorRequest {
+  // The name of the connector.
   string name = 1;
 }
 
-// A response containing an agent.
-message GetAgentResponse {
-  Agent agent = 1;
+// A response containing an connector.
+message GetConnectorResponse {
+  Connector connector = 1;
 }
 
-// A request to list all agents.
-message ListAgentsRequest {}
+// A request to list all connectors.
+message ListConnectorsRequest {}
 
-// A response containing a list of agents.
-message ListAgentsResponse {
-  repeated Agent agents = 1;
+// A response containing a list of connectors.
+message ListConnectorsResponse {
+  repeated Connector connectors = 1;
 }
 
 // A request to get the metrics from a task execution.
 message GetTaskMetricsRequest {
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
-  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 2;
   // The metrics to query. If empty, will return a default set of metrics.
   // e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
@@ -232,7 +219,7 @@ message GetTaskMetricsResponse {
 message GetTaskLogsRequest {
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
-  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  // Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 2;
   // Number of lines to return.
   uint64 lines = 3;
@@ -262,9 +249,9 @@ message GetTaskLogsResponse {
   }
 }
 
-// Error message to propagate detailed errors from agent executions to the execution
+// Error message to propagate detailed errors from connector executions to the execution
 // engine.
-message AgentError {
+message ConnectorError {
   // A simplified code for errors, so that we can provide a glossary of all possible errors.
   string code = 1;
 

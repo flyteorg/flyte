@@ -23202,31 +23202,31 @@ export namespace flyteidl {
 
             /**
              * Calls GetAgent.
-             * @param request GetAgentRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and GetAgentResponse
+             * @param request GetConnectorRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetConnectorResponse
              */
-            public getAgent(request: flyteidl.connector.IGetAgentRequest, callback: flyteidl.service.AgentMetadataService.GetAgentCallback): void;
+            public getAgent(request: flyteidl.connector.IGetConnectorRequest, callback: flyteidl.service.AgentMetadataService.GetAgentCallback): void;
 
             /**
              * Calls GetAgent.
-             * @param request GetAgentRequest message or plain object
+             * @param request GetConnectorRequest message or plain object
              * @returns Promise
              */
-            public getAgent(request: flyteidl.connector.IGetAgentRequest): Promise<flyteidl.connector.GetAgentResponse>;
+            public getAgent(request: flyteidl.connector.IGetConnectorRequest): Promise<flyteidl.connector.GetConnectorResponse>;
 
             /**
              * Calls ListAgents.
-             * @param request ListAgentsRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and ListAgentsResponse
+             * @param request ListConnectorsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ListConnectorsResponse
              */
-            public listAgents(request: flyteidl.connector.IListAgentsRequest, callback: flyteidl.service.AgentMetadataService.ListAgentsCallback): void;
+            public listAgents(request: flyteidl.connector.IListConnectorsRequest, callback: flyteidl.service.AgentMetadataService.ListAgentsCallback): void;
 
             /**
              * Calls ListAgents.
-             * @param request ListAgentsRequest message or plain object
+             * @param request ListConnectorsRequest message or plain object
              * @returns Promise
              */
-            public listAgents(request: flyteidl.connector.IListAgentsRequest): Promise<flyteidl.connector.ListAgentsResponse>;
+            public listAgents(request: flyteidl.connector.IListConnectorsRequest): Promise<flyteidl.connector.ListConnectorsResponse>;
         }
 
         namespace AgentMetadataService {
@@ -23234,16 +23234,16 @@ export namespace flyteidl {
             /**
              * Callback as used by {@link flyteidl.service.AgentMetadataService#getAgent}.
              * @param error Error, if any
-             * @param [response] GetAgentResponse
+             * @param [response] GetConnectorResponse
              */
-            type GetAgentCallback = (error: (Error|null), response?: flyteidl.connector.GetAgentResponse) => void;
+            type GetAgentCallback = (error: (Error|null), response?: flyteidl.connector.GetConnectorResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgents}.
              * @param error Error, if any
-             * @param [response] ListAgentsResponse
+             * @param [response] ListConnectorsResponse
              */
-            type ListAgentsCallback = (error: (Error|null), response?: flyteidl.connector.ListAgentsResponse) => void;
+            type ListAgentsCallback = (error: (Error|null), response?: flyteidl.connector.ListConnectorsResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */
@@ -25002,15 +25002,6 @@ export namespace flyteidl {
     /** Namespace connector. */
     namespace connector {
 
-        /** State enum. */
-        enum State {
-            RETRYABLE_FAILURE = 0,
-            PERMANENT_FAILURE = 1,
-            PENDING = 2,
-            RUNNING = 3,
-            SUCCEEDED = 4
-        }
-
         /** Properties of a TaskExecutionMetadata. */
         interface ITaskExecutionMetadata {
 
@@ -25614,9 +25605,6 @@ export namespace flyteidl {
         /** Properties of a Resource. */
         interface IResource {
 
-            /** Resource state */
-            state?: (flyteidl.connector.State|null);
-
             /** Resource outputs */
             outputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -25632,8 +25620,8 @@ export namespace flyteidl {
             /** Resource customInfo */
             customInfo?: (google.protobuf.IStruct|null);
 
-            /** Resource agentError */
-            agentError?: (flyteidl.connector.IAgentError|null);
+            /** Resource connectorError */
+            connectorError?: (flyteidl.connector.IConnectorError|null);
         }
 
         /** Represents a Resource. */
@@ -25644,9 +25632,6 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.connector.IResource);
-
-            /** Resource state. */
-            public state: flyteidl.connector.State;
 
             /** Resource outputs. */
             public outputs?: (flyteidl.core.ILiteralMap|null);
@@ -25663,8 +25648,8 @@ export namespace flyteidl {
             /** Resource customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
 
-            /** Resource agentError. */
-            public agentError?: (flyteidl.connector.IAgentError|null);
+            /** Resource connectorError. */
+            public connectorError?: (flyteidl.connector.IConnectorError|null);
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -25809,70 +25794,70 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of an Agent. */
-        interface IAgent {
+        /** Properties of a Connector. */
+        interface IConnector {
 
-            /** Agent name */
+            /** Connector name */
             name?: (string|null);
 
-            /** Agent supportedTaskTypes */
+            /** Connector supportedTaskTypes */
             supportedTaskTypes?: (string[]|null);
 
-            /** Agent isSync */
+            /** Connector isSync */
             isSync?: (boolean|null);
 
-            /** Agent supportedTaskCategories */
+            /** Connector supportedTaskCategories */
             supportedTaskCategories?: (flyteidl.connector.ITaskCategory[]|null);
         }
 
-        /** Represents an Agent. */
-        class Agent implements IAgent {
+        /** Represents a Connector. */
+        class Connector implements IConnector {
 
             /**
-             * Constructs a new Agent.
+             * Constructs a new Connector.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IAgent);
+            constructor(properties?: flyteidl.connector.IConnector);
 
-            /** Agent name. */
+            /** Connector name. */
             public name: string;
 
-            /** Agent supportedTaskTypes. */
+            /** Connector supportedTaskTypes. */
             public supportedTaskTypes: string[];
 
-            /** Agent isSync. */
+            /** Connector isSync. */
             public isSync: boolean;
 
-            /** Agent supportedTaskCategories. */
+            /** Connector supportedTaskCategories. */
             public supportedTaskCategories: flyteidl.connector.ITaskCategory[];
 
             /**
-             * Creates a new Agent instance using the specified properties.
+             * Creates a new Connector instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns Agent instance
+             * @returns Connector instance
              */
-            public static create(properties?: flyteidl.connector.IAgent): flyteidl.connector.Agent;
+            public static create(properties?: flyteidl.connector.IConnector): flyteidl.connector.Connector;
 
             /**
-             * Encodes the specified Agent message. Does not implicitly {@link flyteidl.connector.Agent.verify|verify} messages.
-             * @param message Agent message or plain object to encode
+             * Encodes the specified Connector message. Does not implicitly {@link flyteidl.connector.Connector.verify|verify} messages.
+             * @param message Connector message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IAgent, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IConnector, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes an Agent message from the specified reader or buffer.
+             * Decodes a Connector message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns Agent
+             * @returns Connector
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.Agent;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.Connector;
 
             /**
-             * Verifies an Agent message.
+             * Verifies a Connector message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -25937,202 +25922,202 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a GetAgentRequest. */
-        interface IGetAgentRequest {
+        /** Properties of a GetConnectorRequest. */
+        interface IGetConnectorRequest {
 
-            /** GetAgentRequest name */
+            /** GetConnectorRequest name */
             name?: (string|null);
         }
 
-        /** Represents a GetAgentRequest. */
-        class GetAgentRequest implements IGetAgentRequest {
+        /** Represents a GetConnectorRequest. */
+        class GetConnectorRequest implements IGetConnectorRequest {
 
             /**
-             * Constructs a new GetAgentRequest.
+             * Constructs a new GetConnectorRequest.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IGetAgentRequest);
+            constructor(properties?: flyteidl.connector.IGetConnectorRequest);
 
-            /** GetAgentRequest name. */
+            /** GetConnectorRequest name. */
             public name: string;
 
             /**
-             * Creates a new GetAgentRequest instance using the specified properties.
+             * Creates a new GetConnectorRequest instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns GetAgentRequest instance
+             * @returns GetConnectorRequest instance
              */
-            public static create(properties?: flyteidl.connector.IGetAgentRequest): flyteidl.connector.GetAgentRequest;
+            public static create(properties?: flyteidl.connector.IGetConnectorRequest): flyteidl.connector.GetConnectorRequest;
 
             /**
-             * Encodes the specified GetAgentRequest message. Does not implicitly {@link flyteidl.connector.GetAgentRequest.verify|verify} messages.
-             * @param message GetAgentRequest message or plain object to encode
+             * Encodes the specified GetConnectorRequest message. Does not implicitly {@link flyteidl.connector.GetConnectorRequest.verify|verify} messages.
+             * @param message GetConnectorRequest message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IGetAgentRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IGetConnectorRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a GetAgentRequest message from the specified reader or buffer.
+             * Decodes a GetConnectorRequest message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns GetAgentRequest
+             * @returns GetConnectorRequest
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetAgentRequest;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetConnectorRequest;
 
             /**
-             * Verifies a GetAgentRequest message.
+             * Verifies a GetConnectorRequest message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a GetAgentResponse. */
-        interface IGetAgentResponse {
+        /** Properties of a GetConnectorResponse. */
+        interface IGetConnectorResponse {
 
-            /** GetAgentResponse agent */
-            agent?: (flyteidl.connector.IAgent|null);
+            /** GetConnectorResponse connector */
+            connector?: (flyteidl.connector.IConnector|null);
         }
 
-        /** Represents a GetAgentResponse. */
-        class GetAgentResponse implements IGetAgentResponse {
+        /** Represents a GetConnectorResponse. */
+        class GetConnectorResponse implements IGetConnectorResponse {
 
             /**
-             * Constructs a new GetAgentResponse.
+             * Constructs a new GetConnectorResponse.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IGetAgentResponse);
+            constructor(properties?: flyteidl.connector.IGetConnectorResponse);
 
-            /** GetAgentResponse agent. */
-            public agent?: (flyteidl.connector.IAgent|null);
+            /** GetConnectorResponse connector. */
+            public connector?: (flyteidl.connector.IConnector|null);
 
             /**
-             * Creates a new GetAgentResponse instance using the specified properties.
+             * Creates a new GetConnectorResponse instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns GetAgentResponse instance
+             * @returns GetConnectorResponse instance
              */
-            public static create(properties?: flyteidl.connector.IGetAgentResponse): flyteidl.connector.GetAgentResponse;
+            public static create(properties?: flyteidl.connector.IGetConnectorResponse): flyteidl.connector.GetConnectorResponse;
 
             /**
-             * Encodes the specified GetAgentResponse message. Does not implicitly {@link flyteidl.connector.GetAgentResponse.verify|verify} messages.
-             * @param message GetAgentResponse message or plain object to encode
+             * Encodes the specified GetConnectorResponse message. Does not implicitly {@link flyteidl.connector.GetConnectorResponse.verify|verify} messages.
+             * @param message GetConnectorResponse message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IGetAgentResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IGetConnectorResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a GetAgentResponse message from the specified reader or buffer.
+             * Decodes a GetConnectorResponse message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns GetAgentResponse
+             * @returns GetConnectorResponse
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetAgentResponse;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetConnectorResponse;
 
             /**
-             * Verifies a GetAgentResponse message.
+             * Verifies a GetConnectorResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a ListAgentsRequest. */
-        interface IListAgentsRequest {
+        /** Properties of a ListConnectorsRequest. */
+        interface IListConnectorsRequest {
         }
 
-        /** Represents a ListAgentsRequest. */
-        class ListAgentsRequest implements IListAgentsRequest {
+        /** Represents a ListConnectorsRequest. */
+        class ListConnectorsRequest implements IListConnectorsRequest {
 
             /**
-             * Constructs a new ListAgentsRequest.
+             * Constructs a new ListConnectorsRequest.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IListAgentsRequest);
+            constructor(properties?: flyteidl.connector.IListConnectorsRequest);
 
             /**
-             * Creates a new ListAgentsRequest instance using the specified properties.
+             * Creates a new ListConnectorsRequest instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns ListAgentsRequest instance
+             * @returns ListConnectorsRequest instance
              */
-            public static create(properties?: flyteidl.connector.IListAgentsRequest): flyteidl.connector.ListAgentsRequest;
+            public static create(properties?: flyteidl.connector.IListConnectorsRequest): flyteidl.connector.ListConnectorsRequest;
 
             /**
-             * Encodes the specified ListAgentsRequest message. Does not implicitly {@link flyteidl.connector.ListAgentsRequest.verify|verify} messages.
-             * @param message ListAgentsRequest message or plain object to encode
+             * Encodes the specified ListConnectorsRequest message. Does not implicitly {@link flyteidl.connector.ListConnectorsRequest.verify|verify} messages.
+             * @param message ListConnectorsRequest message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IListAgentsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IListConnectorsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a ListAgentsRequest message from the specified reader or buffer.
+             * Decodes a ListConnectorsRequest message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns ListAgentsRequest
+             * @returns ListConnectorsRequest
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListAgentsRequest;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListConnectorsRequest;
 
             /**
-             * Verifies a ListAgentsRequest message.
+             * Verifies a ListConnectorsRequest message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a ListAgentsResponse. */
-        interface IListAgentsResponse {
+        /** Properties of a ListConnectorsResponse. */
+        interface IListConnectorsResponse {
 
-            /** ListAgentsResponse agents */
-            agents?: (flyteidl.connector.IAgent[]|null);
+            /** ListConnectorsResponse connectors */
+            connectors?: (flyteidl.connector.IConnector[]|null);
         }
 
-        /** Represents a ListAgentsResponse. */
-        class ListAgentsResponse implements IListAgentsResponse {
+        /** Represents a ListConnectorsResponse. */
+        class ListConnectorsResponse implements IListConnectorsResponse {
 
             /**
-             * Constructs a new ListAgentsResponse.
+             * Constructs a new ListConnectorsResponse.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IListAgentsResponse);
+            constructor(properties?: flyteidl.connector.IListConnectorsResponse);
 
-            /** ListAgentsResponse agents. */
-            public agents: flyteidl.connector.IAgent[];
+            /** ListConnectorsResponse connectors. */
+            public connectors: flyteidl.connector.IConnector[];
 
             /**
-             * Creates a new ListAgentsResponse instance using the specified properties.
+             * Creates a new ListConnectorsResponse instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns ListAgentsResponse instance
+             * @returns ListConnectorsResponse instance
              */
-            public static create(properties?: flyteidl.connector.IListAgentsResponse): flyteidl.connector.ListAgentsResponse;
+            public static create(properties?: flyteidl.connector.IListConnectorsResponse): flyteidl.connector.ListConnectorsResponse;
 
             /**
-             * Encodes the specified ListAgentsResponse message. Does not implicitly {@link flyteidl.connector.ListAgentsResponse.verify|verify} messages.
-             * @param message ListAgentsResponse message or plain object to encode
+             * Encodes the specified ListConnectorsResponse message. Does not implicitly {@link flyteidl.connector.ListConnectorsResponse.verify|verify} messages.
+             * @param message ListConnectorsResponse message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IListAgentsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IListConnectorsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a ListAgentsResponse message from the specified reader or buffer.
+             * Decodes a ListConnectorsResponse message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns ListAgentsResponse
+             * @returns ListConnectorsResponse
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListAgentsResponse;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListConnectorsResponse;
 
             /**
-             * Verifies a ListAgentsResponse message.
+             * Verifies a ListConnectorsResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -26520,71 +26505,71 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of an AgentError. */
-        interface IAgentError {
+        /** Properties of a ConnectorError. */
+        interface IConnectorError {
 
-            /** AgentError code */
+            /** ConnectorError code */
             code?: (string|null);
 
-            /** AgentError kind */
-            kind?: (flyteidl.connector.AgentError.Kind|null);
+            /** ConnectorError kind */
+            kind?: (flyteidl.connector.ConnectorError.Kind|null);
 
-            /** AgentError origin */
+            /** ConnectorError origin */
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
         }
 
-        /** Represents an AgentError. */
-        class AgentError implements IAgentError {
+        /** Represents a ConnectorError. */
+        class ConnectorError implements IConnectorError {
 
             /**
-             * Constructs a new AgentError.
+             * Constructs a new ConnectorError.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.connector.IAgentError);
+            constructor(properties?: flyteidl.connector.IConnectorError);
 
-            /** AgentError code. */
+            /** ConnectorError code. */
             public code: string;
 
-            /** AgentError kind. */
-            public kind: flyteidl.connector.AgentError.Kind;
+            /** ConnectorError kind. */
+            public kind: flyteidl.connector.ConnectorError.Kind;
 
-            /** AgentError origin. */
+            /** ConnectorError origin. */
             public origin: flyteidl.core.ExecutionError.ErrorKind;
 
             /**
-             * Creates a new AgentError instance using the specified properties.
+             * Creates a new ConnectorError instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns AgentError instance
+             * @returns ConnectorError instance
              */
-            public static create(properties?: flyteidl.connector.IAgentError): flyteidl.connector.AgentError;
+            public static create(properties?: flyteidl.connector.IConnectorError): flyteidl.connector.ConnectorError;
 
             /**
-             * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.connector.AgentError.verify|verify} messages.
-             * @param message AgentError message or plain object to encode
+             * Encodes the specified ConnectorError message. Does not implicitly {@link flyteidl.connector.ConnectorError.verify|verify} messages.
+             * @param message ConnectorError message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.connector.IAgentError, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.connector.IConnectorError, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes an AgentError message from the specified reader or buffer.
+             * Decodes a ConnectorError message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns AgentError
+             * @returns ConnectorError
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.AgentError;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ConnectorError;
 
             /**
-             * Verifies an AgentError message.
+             * Verifies a ConnectorError message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        namespace AgentError {
+        namespace ConnectorError {
 
             /** Kind enum. */
             enum Kind {

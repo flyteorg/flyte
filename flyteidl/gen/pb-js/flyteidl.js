@@ -54677,7 +54677,7 @@
                  * @typedef GetAgentCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
-                 * @param {flyteidl.connector.GetAgentResponse} [response] GetAgentResponse
+                 * @param {flyteidl.connector.GetConnectorResponse} [response] GetConnectorResponse
                  */
     
                 /**
@@ -54685,13 +54685,13 @@
                  * @function getAgent
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
-                 * @param {flyteidl.connector.IGetAgentRequest} request GetAgentRequest message or plain object
-                 * @param {flyteidl.service.AgentMetadataService.GetAgentCallback} callback Node-style callback called with the error, if any, and GetAgentResponse
+                 * @param {flyteidl.connector.IGetConnectorRequest} request GetConnectorRequest message or plain object
+                 * @param {flyteidl.service.AgentMetadataService.GetAgentCallback} callback Node-style callback called with the error, if any, and GetConnectorResponse
                  * @returns {undefined}
                  * @variation 1
                  */
                 Object.defineProperty(AgentMetadataService.prototype.getAgent = function getAgent(request, callback) {
-                    return this.rpcCall(getAgent, $root.flyteidl.connector.GetAgentRequest, $root.flyteidl.connector.GetAgentResponse, request, callback);
+                    return this.rpcCall(getAgent, $root.flyteidl.connector.GetConnectorRequest, $root.flyteidl.connector.GetConnectorResponse, request, callback);
                 }, "name", { value: "GetAgent" });
     
                 /**
@@ -54699,8 +54699,8 @@
                  * @function getAgent
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
-                 * @param {flyteidl.connector.IGetAgentRequest} request GetAgentRequest message or plain object
-                 * @returns {Promise<flyteidl.connector.GetAgentResponse>} Promise
+                 * @param {flyteidl.connector.IGetConnectorRequest} request GetConnectorRequest message or plain object
+                 * @returns {Promise<flyteidl.connector.GetConnectorResponse>} Promise
                  * @variation 2
                  */
     
@@ -54710,7 +54710,7 @@
                  * @typedef ListAgentsCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
-                 * @param {flyteidl.connector.ListAgentsResponse} [response] ListAgentsResponse
+                 * @param {flyteidl.connector.ListConnectorsResponse} [response] ListConnectorsResponse
                  */
     
                 /**
@@ -54718,13 +54718,13 @@
                  * @function listAgents
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
-                 * @param {flyteidl.connector.IListAgentsRequest} request ListAgentsRequest message or plain object
-                 * @param {flyteidl.service.AgentMetadataService.ListAgentsCallback} callback Node-style callback called with the error, if any, and ListAgentsResponse
+                 * @param {flyteidl.connector.IListConnectorsRequest} request ListConnectorsRequest message or plain object
+                 * @param {flyteidl.service.AgentMetadataService.ListAgentsCallback} callback Node-style callback called with the error, if any, and ListConnectorsResponse
                  * @returns {undefined}
                  * @variation 1
                  */
                 Object.defineProperty(AgentMetadataService.prototype.listAgents = function listAgents(request, callback) {
-                    return this.rpcCall(listAgents, $root.flyteidl.connector.ListAgentsRequest, $root.flyteidl.connector.ListAgentsResponse, request, callback);
+                    return this.rpcCall(listAgents, $root.flyteidl.connector.ListConnectorsRequest, $root.flyteidl.connector.ListConnectorsResponse, request, callback);
                 }, "name", { value: "ListAgents" });
     
                 /**
@@ -54732,8 +54732,8 @@
                  * @function listAgents
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
-                 * @param {flyteidl.connector.IListAgentsRequest} request ListAgentsRequest message or plain object
-                 * @returns {Promise<flyteidl.connector.ListAgentsResponse>} Promise
+                 * @param {flyteidl.connector.IListConnectorsRequest} request ListConnectorsRequest message or plain object
+                 * @returns {Promise<flyteidl.connector.ListConnectorsResponse>} Promise
                  * @variation 2
                  */
     
@@ -58564,26 +58564,6 @@
              */
             var connector = {};
     
-            /**
-             * State enum.
-             * @name flyteidl.connector.State
-             * @enum {string}
-             * @property {number} RETRYABLE_FAILURE=0 RETRYABLE_FAILURE value
-             * @property {number} PERMANENT_FAILURE=1 PERMANENT_FAILURE value
-             * @property {number} PENDING=2 PENDING value
-             * @property {number} RUNNING=3 RUNNING value
-             * @property {number} SUCCEEDED=4 SUCCEEDED value
-             */
-            connector.State = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "RETRYABLE_FAILURE"] = 0;
-                values[valuesById[1] = "PERMANENT_FAILURE"] = 1;
-                values[valuesById[2] = "PENDING"] = 2;
-                values[valuesById[3] = "RUNNING"] = 3;
-                values[valuesById[4] = "SUCCEEDED"] = 4;
-                return values;
-            })();
-    
             connector.TaskExecutionMetadata = (function() {
     
                 /**
@@ -60049,13 +60029,12 @@
                  * Properties of a Resource.
                  * @memberof flyteidl.connector
                  * @interface IResource
-                 * @property {flyteidl.connector.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  * @property {google.protobuf.IStruct|null} [customInfo] Resource customInfo
-                 * @property {flyteidl.connector.IAgentError|null} [agentError] Resource agentError
+                 * @property {flyteidl.connector.IConnectorError|null} [connectorError] Resource connectorError
                  */
     
                 /**
@@ -60073,14 +60052,6 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * Resource state.
-                 * @member {flyteidl.connector.State} state
-                 * @memberof flyteidl.connector.Resource
-                 * @instance
-                 */
-                Resource.prototype.state = 0;
     
                 /**
                  * Resource outputs.
@@ -60123,12 +60094,12 @@
                 Resource.prototype.customInfo = null;
     
                 /**
-                 * Resource agentError.
-                 * @member {flyteidl.connector.IAgentError|null|undefined} agentError
+                 * Resource connectorError.
+                 * @member {flyteidl.connector.IConnectorError|null|undefined} connectorError
                  * @memberof flyteidl.connector.Resource
                  * @instance
                  */
-                Resource.prototype.agentError = null;
+                Resource.prototype.connectorError = null;
     
                 /**
                  * Creates a new Resource instance using the specified properties.
@@ -60154,8 +60125,6 @@
                 Resource.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.state != null && message.hasOwnProperty("state"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.state);
                     if (message.outputs != null && message.hasOwnProperty("outputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.message != null && message.hasOwnProperty("message"))
@@ -60167,8 +60136,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                         $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-                    if (message.agentError != null && message.hasOwnProperty("agentError"))
-                        $root.flyteidl.connector.AgentError.encode(message.agentError, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.connectorError != null && message.hasOwnProperty("connectorError"))
+                        $root.flyteidl.connector.ConnectorError.encode(message.connectorError, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -60190,9 +60159,6 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
-                            message.state = reader.int32();
-                            break;
                         case 2:
                             message.outputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
@@ -60211,7 +60177,7 @@
                             message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
                             break;
                         case 7:
-                            message.agentError = $root.flyteidl.connector.AgentError.decode(reader, reader.uint32());
+                            message.connectorError = $root.flyteidl.connector.ConnectorError.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -60232,17 +60198,6 @@
                 Resource.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.state != null && message.hasOwnProperty("state"))
-                        switch (message.state) {
-                        default:
-                            return "state: enum value expected";
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            break;
-                        }
                     if (message.outputs != null && message.hasOwnProperty("outputs")) {
                         var error = $root.flyteidl.core.LiteralMap.verify(message.outputs);
                         if (error)
@@ -60279,10 +60234,10 @@
                         if (error)
                             return "customInfo." + error;
                     }
-                    if (message.agentError != null && message.hasOwnProperty("agentError")) {
-                        var error = $root.flyteidl.connector.AgentError.verify(message.agentError);
+                    if (message.connectorError != null && message.hasOwnProperty("connectorError")) {
+                        var error = $root.flyteidl.connector.ConnectorError.verify(message.connectorError);
                         if (error)
-                            return "agentError." + error;
+                            return "connectorError." + error;
                     }
                     return null;
                 };
@@ -60529,27 +60484,27 @@
                 return DeleteTaskResponse;
             })();
     
-            connector.Agent = (function() {
+            connector.Connector = (function() {
     
                 /**
-                 * Properties of an Agent.
+                 * Properties of a Connector.
                  * @memberof flyteidl.connector
-                 * @interface IAgent
-                 * @property {string|null} [name] Agent name
-                 * @property {Array.<string>|null} [supportedTaskTypes] Agent supportedTaskTypes
-                 * @property {boolean|null} [isSync] Agent isSync
-                 * @property {Array.<flyteidl.connector.ITaskCategory>|null} [supportedTaskCategories] Agent supportedTaskCategories
+                 * @interface IConnector
+                 * @property {string|null} [name] Connector name
+                 * @property {Array.<string>|null} [supportedTaskTypes] Connector supportedTaskTypes
+                 * @property {boolean|null} [isSync] Connector isSync
+                 * @property {Array.<flyteidl.connector.ITaskCategory>|null} [supportedTaskCategories] Connector supportedTaskCategories
                  */
     
                 /**
-                 * Constructs a new Agent.
+                 * Constructs a new Connector.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents an Agent.
-                 * @implements IAgent
+                 * @classdesc Represents a Connector.
+                 * @implements IConnector
                  * @constructor
-                 * @param {flyteidl.connector.IAgent=} [properties] Properties to set
+                 * @param {flyteidl.connector.IConnector=} [properties] Properties to set
                  */
-                function Agent(properties) {
+                function Connector(properties) {
                     this.supportedTaskTypes = [];
                     this.supportedTaskCategories = [];
                     if (properties)
@@ -60559,59 +60514,59 @@
                 }
     
                 /**
-                 * Agent name.
+                 * Connector name.
                  * @member {string} name
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @instance
                  */
-                Agent.prototype.name = "";
+                Connector.prototype.name = "";
     
                 /**
-                 * Agent supportedTaskTypes.
+                 * Connector supportedTaskTypes.
                  * @member {Array.<string>} supportedTaskTypes
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @instance
                  */
-                Agent.prototype.supportedTaskTypes = $util.emptyArray;
+                Connector.prototype.supportedTaskTypes = $util.emptyArray;
     
                 /**
-                 * Agent isSync.
+                 * Connector isSync.
                  * @member {boolean} isSync
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @instance
                  */
-                Agent.prototype.isSync = false;
+                Connector.prototype.isSync = false;
     
                 /**
-                 * Agent supportedTaskCategories.
+                 * Connector supportedTaskCategories.
                  * @member {Array.<flyteidl.connector.ITaskCategory>} supportedTaskCategories
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @instance
                  */
-                Agent.prototype.supportedTaskCategories = $util.emptyArray;
+                Connector.prototype.supportedTaskCategories = $util.emptyArray;
     
                 /**
-                 * Creates a new Agent instance using the specified properties.
+                 * Creates a new Connector instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @static
-                 * @param {flyteidl.connector.IAgent=} [properties] Properties to set
-                 * @returns {flyteidl.connector.Agent} Agent instance
+                 * @param {flyteidl.connector.IConnector=} [properties] Properties to set
+                 * @returns {flyteidl.connector.Connector} Connector instance
                  */
-                Agent.create = function create(properties) {
-                    return new Agent(properties);
+                Connector.create = function create(properties) {
+                    return new Connector(properties);
                 };
     
                 /**
-                 * Encodes the specified Agent message. Does not implicitly {@link flyteidl.connector.Agent.verify|verify} messages.
+                 * Encodes the specified Connector message. Does not implicitly {@link flyteidl.connector.Connector.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @static
-                 * @param {flyteidl.connector.IAgent} message Agent message or plain object to encode
+                 * @param {flyteidl.connector.IConnector} message Connector message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Agent.encode = function encode(message, writer) {
+                Connector.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.name != null && message.hasOwnProperty("name"))
@@ -60628,20 +60583,20 @@
                 };
     
                 /**
-                 * Decodes an Agent message from the specified reader or buffer.
+                 * Decodes a Connector message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.Agent} Agent
+                 * @returns {flyteidl.connector.Connector} Connector
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Agent.decode = function decode(reader, length) {
+                Connector.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.Agent();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.Connector();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -60670,14 +60625,14 @@
                 };
     
                 /**
-                 * Verifies an Agent message.
+                 * Verifies a Connector message.
                  * @function verify
-                 * @memberof flyteidl.connector.Agent
+                 * @memberof flyteidl.connector.Connector
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                Agent.verify = function verify(message) {
+                Connector.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.name != null && message.hasOwnProperty("name"))
@@ -60705,7 +60660,7 @@
                     return null;
                 };
     
-                return Agent;
+                return Connector;
             })();
     
             connector.TaskCategory = (function() {
@@ -60835,24 +60790,24 @@
                 return TaskCategory;
             })();
     
-            connector.GetAgentRequest = (function() {
+            connector.GetConnectorRequest = (function() {
     
                 /**
-                 * Properties of a GetAgentRequest.
+                 * Properties of a GetConnectorRequest.
                  * @memberof flyteidl.connector
-                 * @interface IGetAgentRequest
-                 * @property {string|null} [name] GetAgentRequest name
+                 * @interface IGetConnectorRequest
+                 * @property {string|null} [name] GetConnectorRequest name
                  */
     
                 /**
-                 * Constructs a new GetAgentRequest.
+                 * Constructs a new GetConnectorRequest.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents a GetAgentRequest.
-                 * @implements IGetAgentRequest
+                 * @classdesc Represents a GetConnectorRequest.
+                 * @implements IGetConnectorRequest
                  * @constructor
-                 * @param {flyteidl.connector.IGetAgentRequest=} [properties] Properties to set
+                 * @param {flyteidl.connector.IGetConnectorRequest=} [properties] Properties to set
                  */
-                function GetAgentRequest(properties) {
+                function GetConnectorRequest(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -60860,35 +60815,35 @@
                 }
     
                 /**
-                 * GetAgentRequest name.
+                 * GetConnectorRequest name.
                  * @member {string} name
-                 * @memberof flyteidl.connector.GetAgentRequest
+                 * @memberof flyteidl.connector.GetConnectorRequest
                  * @instance
                  */
-                GetAgentRequest.prototype.name = "";
+                GetConnectorRequest.prototype.name = "";
     
                 /**
-                 * Creates a new GetAgentRequest instance using the specified properties.
+                 * Creates a new GetConnectorRequest instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.GetAgentRequest
+                 * @memberof flyteidl.connector.GetConnectorRequest
                  * @static
-                 * @param {flyteidl.connector.IGetAgentRequest=} [properties] Properties to set
-                 * @returns {flyteidl.connector.GetAgentRequest} GetAgentRequest instance
+                 * @param {flyteidl.connector.IGetConnectorRequest=} [properties] Properties to set
+                 * @returns {flyteidl.connector.GetConnectorRequest} GetConnectorRequest instance
                  */
-                GetAgentRequest.create = function create(properties) {
-                    return new GetAgentRequest(properties);
+                GetConnectorRequest.create = function create(properties) {
+                    return new GetConnectorRequest(properties);
                 };
     
                 /**
-                 * Encodes the specified GetAgentRequest message. Does not implicitly {@link flyteidl.connector.GetAgentRequest.verify|verify} messages.
+                 * Encodes the specified GetConnectorRequest message. Does not implicitly {@link flyteidl.connector.GetConnectorRequest.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.GetAgentRequest
+                 * @memberof flyteidl.connector.GetConnectorRequest
                  * @static
-                 * @param {flyteidl.connector.IGetAgentRequest} message GetAgentRequest message or plain object to encode
+                 * @param {flyteidl.connector.IGetConnectorRequest} message GetConnectorRequest message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                GetAgentRequest.encode = function encode(message, writer) {
+                GetConnectorRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.name != null && message.hasOwnProperty("name"))
@@ -60897,20 +60852,20 @@
                 };
     
                 /**
-                 * Decodes a GetAgentRequest message from the specified reader or buffer.
+                 * Decodes a GetConnectorRequest message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.GetAgentRequest
+                 * @memberof flyteidl.connector.GetConnectorRequest
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.GetAgentRequest} GetAgentRequest
+                 * @returns {flyteidl.connector.GetConnectorRequest} GetConnectorRequest
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                GetAgentRequest.decode = function decode(reader, length) {
+                GetConnectorRequest.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.GetAgentRequest();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.GetConnectorRequest();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -60926,14 +60881,14 @@
                 };
     
                 /**
-                 * Verifies a GetAgentRequest message.
+                 * Verifies a GetConnectorRequest message.
                  * @function verify
-                 * @memberof flyteidl.connector.GetAgentRequest
+                 * @memberof flyteidl.connector.GetConnectorRequest
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                GetAgentRequest.verify = function verify(message) {
+                GetConnectorRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.name != null && message.hasOwnProperty("name"))
@@ -60942,27 +60897,27 @@
                     return null;
                 };
     
-                return GetAgentRequest;
+                return GetConnectorRequest;
             })();
     
-            connector.GetAgentResponse = (function() {
+            connector.GetConnectorResponse = (function() {
     
                 /**
-                 * Properties of a GetAgentResponse.
+                 * Properties of a GetConnectorResponse.
                  * @memberof flyteidl.connector
-                 * @interface IGetAgentResponse
-                 * @property {flyteidl.connector.IAgent|null} [agent] GetAgentResponse agent
+                 * @interface IGetConnectorResponse
+                 * @property {flyteidl.connector.IConnector|null} [connector] GetConnectorResponse connector
                  */
     
                 /**
-                 * Constructs a new GetAgentResponse.
+                 * Constructs a new GetConnectorResponse.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents a GetAgentResponse.
-                 * @implements IGetAgentResponse
+                 * @classdesc Represents a GetConnectorResponse.
+                 * @implements IGetConnectorResponse
                  * @constructor
-                 * @param {flyteidl.connector.IGetAgentResponse=} [properties] Properties to set
+                 * @param {flyteidl.connector.IGetConnectorResponse=} [properties] Properties to set
                  */
-                function GetAgentResponse(properties) {
+                function GetConnectorResponse(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -60970,62 +60925,62 @@
                 }
     
                 /**
-                 * GetAgentResponse agent.
-                 * @member {flyteidl.connector.IAgent|null|undefined} agent
-                 * @memberof flyteidl.connector.GetAgentResponse
+                 * GetConnectorResponse connector.
+                 * @member {flyteidl.connector.IConnector|null|undefined} connector
+                 * @memberof flyteidl.connector.GetConnectorResponse
                  * @instance
                  */
-                GetAgentResponse.prototype.agent = null;
+                GetConnectorResponse.prototype.connector = null;
     
                 /**
-                 * Creates a new GetAgentResponse instance using the specified properties.
+                 * Creates a new GetConnectorResponse instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.GetAgentResponse
+                 * @memberof flyteidl.connector.GetConnectorResponse
                  * @static
-                 * @param {flyteidl.connector.IGetAgentResponse=} [properties] Properties to set
-                 * @returns {flyteidl.connector.GetAgentResponse} GetAgentResponse instance
+                 * @param {flyteidl.connector.IGetConnectorResponse=} [properties] Properties to set
+                 * @returns {flyteidl.connector.GetConnectorResponse} GetConnectorResponse instance
                  */
-                GetAgentResponse.create = function create(properties) {
-                    return new GetAgentResponse(properties);
+                GetConnectorResponse.create = function create(properties) {
+                    return new GetConnectorResponse(properties);
                 };
     
                 /**
-                 * Encodes the specified GetAgentResponse message. Does not implicitly {@link flyteidl.connector.GetAgentResponse.verify|verify} messages.
+                 * Encodes the specified GetConnectorResponse message. Does not implicitly {@link flyteidl.connector.GetConnectorResponse.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.GetAgentResponse
+                 * @memberof flyteidl.connector.GetConnectorResponse
                  * @static
-                 * @param {flyteidl.connector.IGetAgentResponse} message GetAgentResponse message or plain object to encode
+                 * @param {flyteidl.connector.IGetConnectorResponse} message GetConnectorResponse message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                GetAgentResponse.encode = function encode(message, writer) {
+                GetConnectorResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.agent != null && message.hasOwnProperty("agent"))
-                        $root.flyteidl.connector.Agent.encode(message.agent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.connector != null && message.hasOwnProperty("connector"))
+                        $root.flyteidl.connector.Connector.encode(message.connector, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     return writer;
                 };
     
                 /**
-                 * Decodes a GetAgentResponse message from the specified reader or buffer.
+                 * Decodes a GetConnectorResponse message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.GetAgentResponse
+                 * @memberof flyteidl.connector.GetConnectorResponse
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.GetAgentResponse} GetAgentResponse
+                 * @returns {flyteidl.connector.GetConnectorResponse} GetConnectorResponse
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                GetAgentResponse.decode = function decode(reader, length) {
+                GetConnectorResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.GetAgentResponse();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.GetConnectorResponse();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.agent = $root.flyteidl.connector.Agent.decode(reader, reader.uint32());
+                            message.connector = $root.flyteidl.connector.Connector.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -61036,44 +60991,44 @@
                 };
     
                 /**
-                 * Verifies a GetAgentResponse message.
+                 * Verifies a GetConnectorResponse message.
                  * @function verify
-                 * @memberof flyteidl.connector.GetAgentResponse
+                 * @memberof flyteidl.connector.GetConnectorResponse
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                GetAgentResponse.verify = function verify(message) {
+                GetConnectorResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.agent != null && message.hasOwnProperty("agent")) {
-                        var error = $root.flyteidl.connector.Agent.verify(message.agent);
+                    if (message.connector != null && message.hasOwnProperty("connector")) {
+                        var error = $root.flyteidl.connector.Connector.verify(message.connector);
                         if (error)
-                            return "agent." + error;
+                            return "connector." + error;
                     }
                     return null;
                 };
     
-                return GetAgentResponse;
+                return GetConnectorResponse;
             })();
     
-            connector.ListAgentsRequest = (function() {
+            connector.ListConnectorsRequest = (function() {
     
                 /**
-                 * Properties of a ListAgentsRequest.
+                 * Properties of a ListConnectorsRequest.
                  * @memberof flyteidl.connector
-                 * @interface IListAgentsRequest
+                 * @interface IListConnectorsRequest
                  */
     
                 /**
-                 * Constructs a new ListAgentsRequest.
+                 * Constructs a new ListConnectorsRequest.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents a ListAgentsRequest.
-                 * @implements IListAgentsRequest
+                 * @classdesc Represents a ListConnectorsRequest.
+                 * @implements IListConnectorsRequest
                  * @constructor
-                 * @param {flyteidl.connector.IListAgentsRequest=} [properties] Properties to set
+                 * @param {flyteidl.connector.IListConnectorsRequest=} [properties] Properties to set
                  */
-                function ListAgentsRequest(properties) {
+                function ListConnectorsRequest(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -61081,47 +61036,47 @@
                 }
     
                 /**
-                 * Creates a new ListAgentsRequest instance using the specified properties.
+                 * Creates a new ListConnectorsRequest instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.ListAgentsRequest
+                 * @memberof flyteidl.connector.ListConnectorsRequest
                  * @static
-                 * @param {flyteidl.connector.IListAgentsRequest=} [properties] Properties to set
-                 * @returns {flyteidl.connector.ListAgentsRequest} ListAgentsRequest instance
+                 * @param {flyteidl.connector.IListConnectorsRequest=} [properties] Properties to set
+                 * @returns {flyteidl.connector.ListConnectorsRequest} ListConnectorsRequest instance
                  */
-                ListAgentsRequest.create = function create(properties) {
-                    return new ListAgentsRequest(properties);
+                ListConnectorsRequest.create = function create(properties) {
+                    return new ListConnectorsRequest(properties);
                 };
     
                 /**
-                 * Encodes the specified ListAgentsRequest message. Does not implicitly {@link flyteidl.connector.ListAgentsRequest.verify|verify} messages.
+                 * Encodes the specified ListConnectorsRequest message. Does not implicitly {@link flyteidl.connector.ListConnectorsRequest.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.ListAgentsRequest
+                 * @memberof flyteidl.connector.ListConnectorsRequest
                  * @static
-                 * @param {flyteidl.connector.IListAgentsRequest} message ListAgentsRequest message or plain object to encode
+                 * @param {flyteidl.connector.IListConnectorsRequest} message ListConnectorsRequest message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                ListAgentsRequest.encode = function encode(message, writer) {
+                ListConnectorsRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     return writer;
                 };
     
                 /**
-                 * Decodes a ListAgentsRequest message from the specified reader or buffer.
+                 * Decodes a ListConnectorsRequest message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.ListAgentsRequest
+                 * @memberof flyteidl.connector.ListConnectorsRequest
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.ListAgentsRequest} ListAgentsRequest
+                 * @returns {flyteidl.connector.ListConnectorsRequest} ListConnectorsRequest
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                ListAgentsRequest.decode = function decode(reader, length) {
+                ListConnectorsRequest.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.ListAgentsRequest();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.ListConnectorsRequest();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -61134,41 +61089,41 @@
                 };
     
                 /**
-                 * Verifies a ListAgentsRequest message.
+                 * Verifies a ListConnectorsRequest message.
                  * @function verify
-                 * @memberof flyteidl.connector.ListAgentsRequest
+                 * @memberof flyteidl.connector.ListConnectorsRequest
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                ListAgentsRequest.verify = function verify(message) {
+                ListConnectorsRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     return null;
                 };
     
-                return ListAgentsRequest;
+                return ListConnectorsRequest;
             })();
     
-            connector.ListAgentsResponse = (function() {
+            connector.ListConnectorsResponse = (function() {
     
                 /**
-                 * Properties of a ListAgentsResponse.
+                 * Properties of a ListConnectorsResponse.
                  * @memberof flyteidl.connector
-                 * @interface IListAgentsResponse
-                 * @property {Array.<flyteidl.connector.IAgent>|null} [agents] ListAgentsResponse agents
+                 * @interface IListConnectorsResponse
+                 * @property {Array.<flyteidl.connector.IConnector>|null} [connectors] ListConnectorsResponse connectors
                  */
     
                 /**
-                 * Constructs a new ListAgentsResponse.
+                 * Constructs a new ListConnectorsResponse.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents a ListAgentsResponse.
-                 * @implements IListAgentsResponse
+                 * @classdesc Represents a ListConnectorsResponse.
+                 * @implements IListConnectorsResponse
                  * @constructor
-                 * @param {flyteidl.connector.IListAgentsResponse=} [properties] Properties to set
+                 * @param {flyteidl.connector.IListConnectorsResponse=} [properties] Properties to set
                  */
-                function ListAgentsResponse(properties) {
-                    this.agents = [];
+                function ListConnectorsResponse(properties) {
+                    this.connectors = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -61176,65 +61131,65 @@
                 }
     
                 /**
-                 * ListAgentsResponse agents.
-                 * @member {Array.<flyteidl.connector.IAgent>} agents
-                 * @memberof flyteidl.connector.ListAgentsResponse
+                 * ListConnectorsResponse connectors.
+                 * @member {Array.<flyteidl.connector.IConnector>} connectors
+                 * @memberof flyteidl.connector.ListConnectorsResponse
                  * @instance
                  */
-                ListAgentsResponse.prototype.agents = $util.emptyArray;
+                ListConnectorsResponse.prototype.connectors = $util.emptyArray;
     
                 /**
-                 * Creates a new ListAgentsResponse instance using the specified properties.
+                 * Creates a new ListConnectorsResponse instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.ListAgentsResponse
+                 * @memberof flyteidl.connector.ListConnectorsResponse
                  * @static
-                 * @param {flyteidl.connector.IListAgentsResponse=} [properties] Properties to set
-                 * @returns {flyteidl.connector.ListAgentsResponse} ListAgentsResponse instance
+                 * @param {flyteidl.connector.IListConnectorsResponse=} [properties] Properties to set
+                 * @returns {flyteidl.connector.ListConnectorsResponse} ListConnectorsResponse instance
                  */
-                ListAgentsResponse.create = function create(properties) {
-                    return new ListAgentsResponse(properties);
+                ListConnectorsResponse.create = function create(properties) {
+                    return new ListConnectorsResponse(properties);
                 };
     
                 /**
-                 * Encodes the specified ListAgentsResponse message. Does not implicitly {@link flyteidl.connector.ListAgentsResponse.verify|verify} messages.
+                 * Encodes the specified ListConnectorsResponse message. Does not implicitly {@link flyteidl.connector.ListConnectorsResponse.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.ListAgentsResponse
+                 * @memberof flyteidl.connector.ListConnectorsResponse
                  * @static
-                 * @param {flyteidl.connector.IListAgentsResponse} message ListAgentsResponse message or plain object to encode
+                 * @param {flyteidl.connector.IListConnectorsResponse} message ListConnectorsResponse message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                ListAgentsResponse.encode = function encode(message, writer) {
+                ListConnectorsResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.agents != null && message.agents.length)
-                        for (var i = 0; i < message.agents.length; ++i)
-                            $root.flyteidl.connector.Agent.encode(message.agents[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.connectors != null && message.connectors.length)
+                        for (var i = 0; i < message.connectors.length; ++i)
+                            $root.flyteidl.connector.Connector.encode(message.connectors[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     return writer;
                 };
     
                 /**
-                 * Decodes a ListAgentsResponse message from the specified reader or buffer.
+                 * Decodes a ListConnectorsResponse message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.ListAgentsResponse
+                 * @memberof flyteidl.connector.ListConnectorsResponse
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.ListAgentsResponse} ListAgentsResponse
+                 * @returns {flyteidl.connector.ListConnectorsResponse} ListConnectorsResponse
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                ListAgentsResponse.decode = function decode(reader, length) {
+                ListConnectorsResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.ListAgentsResponse();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.ListConnectorsResponse();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            if (!(message.agents && message.agents.length))
-                                message.agents = [];
-                            message.agents.push($root.flyteidl.connector.Agent.decode(reader, reader.uint32()));
+                            if (!(message.connectors && message.connectors.length))
+                                message.connectors = [];
+                            message.connectors.push($root.flyteidl.connector.Connector.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -61245,29 +61200,29 @@
                 };
     
                 /**
-                 * Verifies a ListAgentsResponse message.
+                 * Verifies a ListConnectorsResponse message.
                  * @function verify
-                 * @memberof flyteidl.connector.ListAgentsResponse
+                 * @memberof flyteidl.connector.ListConnectorsResponse
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                ListAgentsResponse.verify = function verify(message) {
+                ListConnectorsResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.agents != null && message.hasOwnProperty("agents")) {
-                        if (!Array.isArray(message.agents))
-                            return "agents: array expected";
-                        for (var i = 0; i < message.agents.length; ++i) {
-                            var error = $root.flyteidl.connector.Agent.verify(message.agents[i]);
+                    if (message.connectors != null && message.hasOwnProperty("connectors")) {
+                        if (!Array.isArray(message.connectors))
+                            return "connectors: array expected";
+                        for (var i = 0; i < message.connectors.length; ++i) {
+                            var error = $root.flyteidl.connector.Connector.verify(message.connectors[i]);
                             if (error)
-                                return "agents." + error;
+                                return "connectors." + error;
                         }
                     }
                     return null;
                 };
     
-                return ListAgentsResponse;
+                return ListConnectorsResponse;
             })();
     
             connector.GetTaskMetricsRequest = (function() {
@@ -62180,26 +62135,26 @@
                 return GetTaskLogsResponse;
             })();
     
-            connector.AgentError = (function() {
+            connector.ConnectorError = (function() {
     
                 /**
-                 * Properties of an AgentError.
+                 * Properties of a ConnectorError.
                  * @memberof flyteidl.connector
-                 * @interface IAgentError
-                 * @property {string|null} [code] AgentError code
-                 * @property {flyteidl.connector.AgentError.Kind|null} [kind] AgentError kind
-                 * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] AgentError origin
+                 * @interface IConnectorError
+                 * @property {string|null} [code] ConnectorError code
+                 * @property {flyteidl.connector.ConnectorError.Kind|null} [kind] ConnectorError kind
+                 * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ConnectorError origin
                  */
     
                 /**
-                 * Constructs a new AgentError.
+                 * Constructs a new ConnectorError.
                  * @memberof flyteidl.connector
-                 * @classdesc Represents an AgentError.
-                 * @implements IAgentError
+                 * @classdesc Represents a ConnectorError.
+                 * @implements IConnectorError
                  * @constructor
-                 * @param {flyteidl.connector.IAgentError=} [properties] Properties to set
+                 * @param {flyteidl.connector.IConnectorError=} [properties] Properties to set
                  */
-                function AgentError(properties) {
+                function ConnectorError(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -62207,51 +62162,51 @@
                 }
     
                 /**
-                 * AgentError code.
+                 * ConnectorError code.
                  * @member {string} code
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @instance
                  */
-                AgentError.prototype.code = "";
+                ConnectorError.prototype.code = "";
     
                 /**
-                 * AgentError kind.
-                 * @member {flyteidl.connector.AgentError.Kind} kind
-                 * @memberof flyteidl.connector.AgentError
+                 * ConnectorError kind.
+                 * @member {flyteidl.connector.ConnectorError.Kind} kind
+                 * @memberof flyteidl.connector.ConnectorError
                  * @instance
                  */
-                AgentError.prototype.kind = 0;
+                ConnectorError.prototype.kind = 0;
     
                 /**
-                 * AgentError origin.
+                 * ConnectorError origin.
                  * @member {flyteidl.core.ExecutionError.ErrorKind} origin
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @instance
                  */
-                AgentError.prototype.origin = 0;
+                ConnectorError.prototype.origin = 0;
     
                 /**
-                 * Creates a new AgentError instance using the specified properties.
+                 * Creates a new ConnectorError instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @static
-                 * @param {flyteidl.connector.IAgentError=} [properties] Properties to set
-                 * @returns {flyteidl.connector.AgentError} AgentError instance
+                 * @param {flyteidl.connector.IConnectorError=} [properties] Properties to set
+                 * @returns {flyteidl.connector.ConnectorError} ConnectorError instance
                  */
-                AgentError.create = function create(properties) {
-                    return new AgentError(properties);
+                ConnectorError.create = function create(properties) {
+                    return new ConnectorError(properties);
                 };
     
                 /**
-                 * Encodes the specified AgentError message. Does not implicitly {@link flyteidl.connector.AgentError.verify|verify} messages.
+                 * Encodes the specified ConnectorError message. Does not implicitly {@link flyteidl.connector.ConnectorError.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @static
-                 * @param {flyteidl.connector.IAgentError} message AgentError message or plain object to encode
+                 * @param {flyteidl.connector.IConnectorError} message ConnectorError message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                AgentError.encode = function encode(message, writer) {
+                ConnectorError.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.code != null && message.hasOwnProperty("code"))
@@ -62264,20 +62219,20 @@
                 };
     
                 /**
-                 * Decodes an AgentError message from the specified reader or buffer.
+                 * Decodes a ConnectorError message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.connector.AgentError} AgentError
+                 * @returns {flyteidl.connector.ConnectorError} ConnectorError
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                AgentError.decode = function decode(reader, length) {
+                ConnectorError.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.AgentError();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.connector.ConnectorError();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -62299,14 +62254,14 @@
                 };
     
                 /**
-                 * Verifies an AgentError message.
+                 * Verifies a ConnectorError message.
                  * @function verify
-                 * @memberof flyteidl.connector.AgentError
+                 * @memberof flyteidl.connector.ConnectorError
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                AgentError.verify = function verify(message) {
+                ConnectorError.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.code != null && message.hasOwnProperty("code"))
@@ -62334,19 +62289,19 @@
     
                 /**
                  * Kind enum.
-                 * @name flyteidl.connector.AgentError.Kind
+                 * @name flyteidl.connector.ConnectorError.Kind
                  * @enum {string}
                  * @property {number} NON_RECOVERABLE=0 NON_RECOVERABLE value
                  * @property {number} RECOVERABLE=1 RECOVERABLE value
                  */
-                AgentError.Kind = (function() {
+                ConnectorError.Kind = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "NON_RECOVERABLE"] = 0;
                     values[valuesById[1] = "RECOVERABLE"] = 1;
                     return values;
                 })();
     
-                return AgentError;
+                return ConnectorError;
             })();
     
             return connector;

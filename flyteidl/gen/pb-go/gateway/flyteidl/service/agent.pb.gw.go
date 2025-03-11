@@ -506,7 +506,7 @@ func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runt
 }
 
 func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extConnector.GetAgentRequest
+	var protoReq extConnector.GetConnectorRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -532,7 +532,7 @@ func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runt
 }
 
 func local_request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AgentMetadataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extConnector.GetAgentRequest
+	var protoReq extConnector.GetConnectorRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -558,7 +558,7 @@ func local_request_AgentMetadataService_GetAgent_0(ctx context.Context, marshale
 }
 
 func request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extConnector.ListAgentsRequest
+	var protoReq extConnector.ListConnectorsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.ListAgents(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -567,7 +567,7 @@ func request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler ru
 }
 
 func local_request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AgentMetadataServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extConnector.ListAgentsRequest
+	var protoReq extConnector.ListConnectorsRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.ListAgents(ctx, &protoReq)

@@ -67,7 +67,7 @@ pub struct CreateTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTaskResponse {
-    /// ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
     #[prost(bytes="vec", tag="1")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
 }
@@ -113,14 +113,14 @@ pub struct ExecuteTaskSyncResponseHeader {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecuteTaskSyncResponse {
-    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
     /// Resource is for synchronous task execution.
     #[prost(oneof="execute_task_sync_response::Res", tags="1, 2")]
     pub res: ::core::option::Option<execute_task_sync_response::Res>,
 }
 /// Nested message and enum types in `ExecuteTaskSyncResponse`.
 pub mod execute_task_sync_response {
-    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
     /// Resource is for synchronous task execution.
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -131,7 +131,7 @@ pub mod execute_task_sync_response {
         Outputs(super::super::core::LiteralMap),
     }
 }
-/// A message used to fetch a job resource from flyte agent server.
+/// A message used to fetch a job resource from flyte connector server.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetTaskRequest {
@@ -139,7 +139,7 @@ pub struct GetTaskRequest {
     #[deprecated]
     #[prost(string, tag="1")]
     pub task_type: ::prost::alloc::string::String,
-    /// Metadata about the resource to be pass to the agent.
+    /// Metadata about the resource to be pass to the connector.
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// A predefined yet extensible Task type identifier.
@@ -159,12 +159,6 @@ pub struct GetTaskResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Resource {
-    /// DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
-    #[deprecated]
-    #[prost(enumeration="State", tag="1")]
-    pub state: i32,
-    /// The outputs of the execution. It's typically used by sql task. Agent service will create a
-    /// Structured dataset pointing to the query result table.
     /// +optional
     #[prost(message, optional, tag="2")]
     pub outputs: ::core::option::Option<super::core::LiteralMap>,
@@ -177,12 +171,12 @@ pub struct Resource {
     /// The phase of the execution is used to determine the phase of the plugin's execution.
     #[prost(enumeration="super::core::task_execution::Phase", tag="5")]
     pub phase: i32,
-    /// Custom data specific to the agent.
+    /// Custom data specific to the connector.
     #[prost(message, optional, tag="6")]
     pub custom_info: ::core::option::Option<::prost_types::Struct>,
     /// The error raised during execution
     #[prost(message, optional, tag="7")]
-    pub agent_error: ::core::option::Option<AgentError>,
+    pub connector_error: ::core::option::Option<ConnectorError>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -192,7 +186,7 @@ pub struct DeleteTaskRequest {
     #[deprecated]
     #[prost(string, tag="1")]
     pub task_type: ::prost::alloc::string::String,
-    /// Metadata about the resource to be pass to the agent.
+    /// Metadata about the resource to be pass to the connector.
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// A predefined yet extensible Task type identifier.
@@ -204,25 +198,25 @@ pub struct DeleteTaskRequest {
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
 }
-/// A message containing the agent metadata.
+/// A message containing the connector metadata.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Agent {
-    /// Name is the developer-assigned name of the agent.
+pub struct Connector {
+    /// Name is the developer-assigned name of the connector.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
-    /// SupportedTaskTypes are the types of the tasks that the agent can handle.
+    /// SupportedTaskTypes are the types of the tasks that the connector can handle.
     #[deprecated]
     #[prost(string, repeated, tag="2")]
     pub supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
-    /// results synchronously when called by propeller. Given that sync agents can affect the performance
+    /// IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
+    /// results synchronously when called by propeller. Given that sync connectors can affect the performance
     /// of the system, it's important to enforce strict timeout policies.
-    /// An Async agent, on the other hand, is required to be able to identify jobs by an
+    /// An Async connector, on the other hand, is required to be able to identify jobs by an
     /// identifier and query for job statuses as jobs progress.
     #[prost(bool, tag="3")]
     pub is_sync: bool,
-    /// Supported_task_categories are the categories of the tasks that the agent can handle.
+    /// Supported_task_categories are the categories of the tasks that the connector can handle.
     #[prost(message, repeated, tag="4")]
     pub supported_task_categories: ::prost::alloc::vec::Vec<TaskCategory>,
 }
@@ -236,32 +230,32 @@ pub struct TaskCategory {
     #[prost(int32, tag="2")]
     pub version: i32,
 }
-/// A request to get an agent.
+/// A request to get an connector.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetAgentRequest {
-    /// The name of the agent.
+pub struct GetConnectorRequest {
+    /// The name of the connector.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
 }
-/// A response containing an agent.
+/// A response containing an connector.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetAgentResponse {
+pub struct GetConnectorResponse {
     #[prost(message, optional, tag="1")]
-    pub agent: ::core::option::Option<Agent>,
+    pub connector: ::core::option::Option<Connector>,
 }
-/// A request to list all agents.
+/// A request to list all connectors.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
-pub struct ListAgentsRequest {
+pub struct ListConnectorsRequest {
 }
-/// A response containing a list of agents.
+/// A response containing a list of connectors.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListAgentsResponse {
+pub struct ListConnectorsResponse {
     #[prost(message, repeated, tag="1")]
-    pub agents: ::prost::alloc::vec::Vec<Agent>,
+    pub connectors: ::prost::alloc::vec::Vec<Connector>,
 }
 /// A request to get the metrics from a task execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -271,7 +265,7 @@ pub struct GetTaskMetricsRequest {
     #[deprecated]
     #[prost(string, tag="1")]
     pub task_type: ::prost::alloc::string::String,
-    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// The metrics to query. If empty, will return a default set of metrics.
@@ -307,7 +301,7 @@ pub struct GetTaskLogsRequest {
     #[deprecated]
     #[prost(string, tag="1")]
     pub task_type: ::prost::alloc::string::String,
-    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// Number of lines to return.
@@ -354,23 +348,23 @@ pub mod get_task_logs_response {
         Body(super::GetTaskLogsResponseBody),
     }
 }
-/// Error message to propagate detailed errors from agent executions to the execution
+/// Error message to propagate detailed errors from connector executions to the execution
 /// engine.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct AgentError {
+pub struct ConnectorError {
     /// A simplified code for errors, so that we can provide a glossary of all possible errors.
     #[prost(string, tag="1")]
     pub code: ::prost::alloc::string::String,
     /// An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
-    #[prost(enumeration="agent_error::Kind", tag="3")]
+    #[prost(enumeration="connector_error::Kind", tag="3")]
     pub kind: i32,
     /// Defines the origin of the error (system, user, unknown).
     #[prost(enumeration="super::core::execution_error::ErrorKind", tag="4")]
     pub origin: i32,
 }
-/// Nested message and enum types in `AgentError`.
-pub mod agent_error {
+/// Nested message and enum types in `ConnectorError`.
+pub mod connector_error {
     /// Defines a generic error type that dictates the behavior of the retry strategy.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
@@ -396,42 +390,6 @@ pub mod agent_error {
                 "RECOVERABLE" => Some(Self::Recoverable),
                 _ => None,
             }
-        }
-    }
-}
-/// The state of the execution is used to control its visibility in the UI/CLI.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum State {
-    RetryableFailure = 0,
-    PermanentFailure = 1,
-    Pending = 2,
-    Running = 3,
-    Succeeded = 4,
-}
-impl State {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            State::RetryableFailure => "RETRYABLE_FAILURE",
-            State::PermanentFailure => "PERMANENT_FAILURE",
-            State::Pending => "PENDING",
-            State::Running => "RUNNING",
-            State::Succeeded => "SUCCEEDED",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "RETRYABLE_FAILURE" => Some(Self::RetryableFailure),
-            "PERMANENT_FAILURE" => Some(Self::PermanentFailure),
-            "PENDING" => Some(Self::Pending),
-            "RUNNING" => Some(Self::Running),
-            "SUCCEEDED" => Some(Self::Succeeded),
-            _ => None,
         }
     }
 }
