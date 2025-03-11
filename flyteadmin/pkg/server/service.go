@@ -437,7 +437,6 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
 
-	// Create a context with timeout for the shutdown process
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -445,7 +444,14 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		logger.Errorf(ctx, "Failed to shutdown HTTP server: %v", err)
 	}
 
-	grpcServer.GracefulStop()
+	grpcShutdownCtx, grpcCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer grpcCancel()
+
+	go func() {
+		grpcServer.GracefulStop()
+		grpcCancel()
+	}()
+	<-grpcShutdownCtx.Done()
 
 	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
