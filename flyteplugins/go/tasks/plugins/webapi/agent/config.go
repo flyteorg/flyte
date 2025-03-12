@@ -45,6 +45,24 @@ var (
 			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
 			DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
 		},
+		AgentDeployments: map[string]*Deployment{
+			"agent_1": {
+				Endpoint:       "",
+				Insecure:       true,
+				DefaultTimeout: config.Duration{Duration: 300 * time.Second},
+				Timeouts: map[string]config.Duration{
+					"ExecuteTaskSync": {
+						Duration: 300 * time.Second,
+					},
+					"GetTask": {
+						Duration: 100 * time.Second,
+					},
+				},
+			},
+		},
+		AgentForTaskTypes: map[string]string{
+			"task_type_1": "agent_1",
+		},
 		// AsyncPlugin should be registered to at least one task type.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
 		SupportedTaskTypes: []string{"task_type_1", "task_type_2"},
