@@ -16,6 +16,19 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    RETRYABLE_FAILURE: _ClassVar[State]
+    PERMANENT_FAILURE: _ClassVar[State]
+    PENDING: _ClassVar[State]
+    RUNNING: _ClassVar[State]
+    SUCCEEDED: _ClassVar[State]
+RETRYABLE_FAILURE: State
+PERMANENT_FAILURE: State
+PENDING: State
+RUNNING: State
+SUCCEEDED: State
+
 class TaskExecutionMetadata(_message.Message):
     __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides", "identity"]
     class LabelsEntry(_message.Message):
@@ -134,20 +147,22 @@ class GetTaskResponse(_message.Message):
     def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["outputs", "message", "log_links", "phase", "custom_info", "connector_error"]
+    __slots__ = ["state", "outputs", "message", "log_links", "phase", "custom_info", "agent_error"]
+    STATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
-    CONNECTOR_ERROR_FIELD_NUMBER: _ClassVar[int]
+    AGENT_ERROR_FIELD_NUMBER: _ClassVar[int]
+    state: State
     outputs: _literals_pb2.LiteralMap
     message: str
     log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     phase: _execution_pb2.TaskExecution.Phase
     custom_info: _struct_pb2.Struct
-    connector_error: ConnectorError
-    def __init__(self, outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., connector_error: _Optional[_Union[ConnectorError, _Mapping]] = ...) -> None: ...
+    agent_error: AgentError
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., agent_error: _Optional[_Union[AgentError, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta", "task_category"]
@@ -163,7 +178,7 @@ class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class Connector(_message.Message):
+class Agent(_message.Message):
     __slots__ = ["name", "supported_task_types", "is_sync", "supported_task_categories"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
@@ -183,27 +198,27 @@ class TaskCategory(_message.Message):
     version: int
     def __init__(self, name: _Optional[str] = ..., version: _Optional[int] = ...) -> None: ...
 
-class GetConnectorRequest(_message.Message):
+class GetAgentRequest(_message.Message):
     __slots__ = ["name"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     name: str
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
-class GetConnectorResponse(_message.Message):
-    __slots__ = ["connector"]
-    CONNECTOR_FIELD_NUMBER: _ClassVar[int]
-    connector: Connector
-    def __init__(self, connector: _Optional[_Union[Connector, _Mapping]] = ...) -> None: ...
+class GetAgentResponse(_message.Message):
+    __slots__ = ["agent"]
+    AGENT_FIELD_NUMBER: _ClassVar[int]
+    agent: Agent
+    def __init__(self, agent: _Optional[_Union[Agent, _Mapping]] = ...) -> None: ...
 
-class ListConnectorsRequest(_message.Message):
+class ListAgentsRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class ListConnectorsResponse(_message.Message):
-    __slots__ = ["connectors"]
-    CONNECTORS_FIELD_NUMBER: _ClassVar[int]
-    connectors: _containers.RepeatedCompositeFieldContainer[Connector]
-    def __init__(self, connectors: _Optional[_Iterable[_Union[Connector, _Mapping]]] = ...) -> None: ...
+class ListAgentsResponse(_message.Message):
+    __slots__ = ["agents"]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
+    agents: _containers.RepeatedCompositeFieldContainer[Agent]
+    def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
 
 class GetTaskMetricsRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta", "queries", "start_time", "end_time", "step", "task_category"]
@@ -263,18 +278,18 @@ class GetTaskLogsResponse(_message.Message):
     body: GetTaskLogsResponseBody
     def __init__(self, header: _Optional[_Union[GetTaskLogsResponseHeader, _Mapping]] = ..., body: _Optional[_Union[GetTaskLogsResponseBody, _Mapping]] = ...) -> None: ...
 
-class ConnectorError(_message.Message):
+class AgentError(_message.Message):
     __slots__ = ["code", "kind", "origin"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
-        NON_RECOVERABLE: _ClassVar[ConnectorError.Kind]
-        RECOVERABLE: _ClassVar[ConnectorError.Kind]
-    NON_RECOVERABLE: ConnectorError.Kind
-    RECOVERABLE: ConnectorError.Kind
+        NON_RECOVERABLE: _ClassVar[AgentError.Kind]
+        RECOVERABLE: _ClassVar[AgentError.Kind]
+    NON_RECOVERABLE: AgentError.Kind
+    RECOVERABLE: AgentError.Kind
     CODE_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     ORIGIN_FIELD_NUMBER: _ClassVar[int]
     code: str
-    kind: ConnectorError.Kind
+    kind: AgentError.Kind
     origin: _execution_pb2.ExecutionError.ErrorKind
-    def __init__(self, code: _Optional[str] = ..., kind: _Optional[_Union[ConnectorError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...
+    def __init__(self, code: _Optional[str] = ..., kind: _Optional[_Union[AgentError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...

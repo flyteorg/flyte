@@ -6408,11 +6408,9 @@ pub mod agent_metadata_service_client {
 */
         pub async fn get_agent(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::connector::GetConnectorRequest,
-            >,
+            request: impl tonic::IntoRequest<super::super::connector::GetAgentRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::connector::GetConnectorResponse>,
+            tonic::Response<super::super::connector::GetAgentResponse>,
             tonic::Status,
         > {
             self.inner
@@ -6439,11 +6437,9 @@ pub mod agent_metadata_service_client {
 */
         pub async fn list_agents(
             &mut self,
-            request: impl tonic::IntoRequest<
-                super::super::connector::ListConnectorsRequest,
-            >,
+            request: impl tonic::IntoRequest<super::super::connector::ListAgentsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::connector::ListConnectorsResponse>,
+            tonic::Response<super::super::connector::ListAgentsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -6482,18 +6478,18 @@ pub mod agent_metadata_service_server {
 */
         async fn get_agent(
             &self,
-            request: tonic::Request<super::super::connector::GetConnectorRequest>,
+            request: tonic::Request<super::super::connector::GetAgentRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::connector::GetConnectorResponse>,
+            tonic::Response<super::super::connector::GetAgentResponse>,
             tonic::Status,
         >;
         /** Fetch a list of :ref:`ref_connector.Agent` definitions.
 */
         async fn list_agents(
             &self,
-            request: tonic::Request<super::super::connector::ListConnectorsRequest>,
+            request: tonic::Request<super::super::connector::ListAgentsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::connector::ListConnectorsResponse>,
+            tonic::Response<super::super::connector::ListAgentsResponse>,
             tonic::Status,
         >;
     }
@@ -6586,9 +6582,9 @@ pub mod agent_metadata_service_server {
                     impl<
                         T: AgentMetadataService,
                     > tonic::server::UnaryService<
-                        super::super::connector::GetConnectorRequest,
+                        super::super::connector::GetAgentRequest,
                     > for GetAgentSvc<T> {
-                        type Response = super::super::connector::GetConnectorResponse;
+                        type Response = super::super::connector::GetAgentResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6596,7 +6592,7 @@ pub mod agent_metadata_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::connector::GetConnectorRequest,
+                                super::super::connector::GetAgentRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
@@ -6636,9 +6632,9 @@ pub mod agent_metadata_service_server {
                     impl<
                         T: AgentMetadataService,
                     > tonic::server::UnaryService<
-                        super::super::connector::ListConnectorsRequest,
+                        super::super::connector::ListAgentsRequest,
                     > for ListAgentsSvc<T> {
-                        type Response = super::super::connector::ListConnectorsResponse;
+                        type Response = super::super::connector::ListAgentsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6646,7 +6642,7 @@ pub mod agent_metadata_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::connector::ListConnectorsRequest,
+                                super::super::connector::ListAgentsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);

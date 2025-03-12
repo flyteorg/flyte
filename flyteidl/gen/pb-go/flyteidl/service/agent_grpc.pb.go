@@ -433,9 +433,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentMetadataServiceClient interface {
 	// Fetch a :ref:`ref_connector.Agent` definition.
-	GetAgent(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption) (*connector.GetConnectorResponse, error)
+	GetAgent(ctx context.Context, in *connector.GetAgentRequest, opts ...grpc.CallOption) (*connector.GetAgentResponse, error)
 	// Fetch a list of :ref:`ref_connector.Agent` definitions.
-	ListAgents(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption) (*connector.ListConnectorsResponse, error)
+	ListAgents(ctx context.Context, in *connector.ListAgentsRequest, opts ...grpc.CallOption) (*connector.ListAgentsResponse, error)
 }
 
 type agentMetadataServiceClient struct {
@@ -446,8 +446,8 @@ func NewAgentMetadataServiceClient(cc grpc.ClientConnInterface) AgentMetadataSer
 	return &agentMetadataServiceClient{cc}
 }
 
-func (c *agentMetadataServiceClient) GetAgent(ctx context.Context, in *connector.GetConnectorRequest, opts ...grpc.CallOption) (*connector.GetConnectorResponse, error) {
-	out := new(connector.GetConnectorResponse)
+func (c *agentMetadataServiceClient) GetAgent(ctx context.Context, in *connector.GetAgentRequest, opts ...grpc.CallOption) (*connector.GetAgentResponse, error) {
+	out := new(connector.GetAgentResponse)
 	err := c.cc.Invoke(ctx, AgentMetadataService_GetAgent_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -455,8 +455,8 @@ func (c *agentMetadataServiceClient) GetAgent(ctx context.Context, in *connector
 	return out, nil
 }
 
-func (c *agentMetadataServiceClient) ListAgents(ctx context.Context, in *connector.ListConnectorsRequest, opts ...grpc.CallOption) (*connector.ListConnectorsResponse, error) {
-	out := new(connector.ListConnectorsResponse)
+func (c *agentMetadataServiceClient) ListAgents(ctx context.Context, in *connector.ListAgentsRequest, opts ...grpc.CallOption) (*connector.ListAgentsResponse, error) {
+	out := new(connector.ListAgentsResponse)
 	err := c.cc.Invoke(ctx, AgentMetadataService_ListAgents_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -469,19 +469,19 @@ func (c *agentMetadataServiceClient) ListAgents(ctx context.Context, in *connect
 // for forward compatibility
 type AgentMetadataServiceServer interface {
 	// Fetch a :ref:`ref_connector.Agent` definition.
-	GetAgent(context.Context, *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error)
+	GetAgent(context.Context, *connector.GetAgentRequest) (*connector.GetAgentResponse, error)
 	// Fetch a list of :ref:`ref_connector.Agent` definitions.
-	ListAgents(context.Context, *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error)
+	ListAgents(context.Context, *connector.ListAgentsRequest) (*connector.ListAgentsResponse, error)
 }
 
 // UnimplementedAgentMetadataServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedAgentMetadataServiceServer struct {
 }
 
-func (UnimplementedAgentMetadataServiceServer) GetAgent(context.Context, *connector.GetConnectorRequest) (*connector.GetConnectorResponse, error) {
+func (UnimplementedAgentMetadataServiceServer) GetAgent(context.Context, *connector.GetAgentRequest) (*connector.GetAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAgent not implemented")
 }
-func (UnimplementedAgentMetadataServiceServer) ListAgents(context.Context, *connector.ListConnectorsRequest) (*connector.ListConnectorsResponse, error) {
+func (UnimplementedAgentMetadataServiceServer) ListAgents(context.Context, *connector.ListAgentsRequest) (*connector.ListAgentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAgents not implemented")
 }
 
@@ -497,7 +497,7 @@ func RegisterAgentMetadataServiceServer(s grpc.ServiceRegistrar, srv AgentMetada
 }
 
 func _AgentMetadataService_GetAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(connector.GetConnectorRequest)
+	in := new(connector.GetAgentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -509,13 +509,13 @@ func _AgentMetadataService_GetAgent_Handler(srv interface{}, ctx context.Context
 		FullMethod: AgentMetadataService_GetAgent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentMetadataServiceServer).GetAgent(ctx, req.(*connector.GetConnectorRequest))
+		return srv.(AgentMetadataServiceServer).GetAgent(ctx, req.(*connector.GetAgentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AgentMetadataService_ListAgents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(connector.ListConnectorsRequest)
+	in := new(connector.ListAgentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -527,7 +527,7 @@ func _AgentMetadataService_ListAgents_Handler(srv interface{}, ctx context.Conte
 		FullMethod: AgentMetadataService_ListAgents_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentMetadataServiceServer).ListAgents(ctx, req.(*connector.ListConnectorsRequest))
+		return srv.(AgentMetadataServiceServer).ListAgents(ctx, req.(*connector.ListAgentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

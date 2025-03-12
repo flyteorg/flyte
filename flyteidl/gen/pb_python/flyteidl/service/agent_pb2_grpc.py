@@ -288,13 +288,13 @@ class AgentMetadataServiceStub(object):
         """
         self.GetAgent = channel.unary_unary(
                 '/flyteidl.service.AgentMetadataService/GetAgent',
-                request_serializer=flyteidl_dot_connector_dot_connector__pb2.GetConnectorRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_connector_dot_connector__pb2.GetConnectorResponse.FromString,
+                request_serializer=flyteidl_dot_connector_dot_connector__pb2.GetAgentRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_connector_dot_connector__pb2.GetAgentResponse.FromString,
                 )
         self.ListAgents = channel.unary_unary(
                 '/flyteidl.service.AgentMetadataService/ListAgents',
-                request_serializer=flyteidl_dot_connector_dot_connector__pb2.ListConnectorsRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_connector_dot_connector__pb2.ListConnectorsResponse.FromString,
+                request_serializer=flyteidl_dot_connector_dot_connector__pb2.ListAgentsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_connector_dot_connector__pb2.ListAgentsResponse.FromString,
                 )
 
 
@@ -322,13 +322,13 @@ def add_AgentMetadataServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetAgent': grpc.unary_unary_rpc_method_handler(
                     servicer.GetAgent,
-                    request_deserializer=flyteidl_dot_connector_dot_connector__pb2.GetConnectorRequest.FromString,
-                    response_serializer=flyteidl_dot_connector_dot_connector__pb2.GetConnectorResponse.SerializeToString,
+                    request_deserializer=flyteidl_dot_connector_dot_connector__pb2.GetAgentRequest.FromString,
+                    response_serializer=flyteidl_dot_connector_dot_connector__pb2.GetAgentResponse.SerializeToString,
             ),
             'ListAgents': grpc.unary_unary_rpc_method_handler(
                     servicer.ListAgents,
-                    request_deserializer=flyteidl_dot_connector_dot_connector__pb2.ListConnectorsRequest.FromString,
-                    response_serializer=flyteidl_dot_connector_dot_connector__pb2.ListConnectorsResponse.SerializeToString,
+                    request_deserializer=flyteidl_dot_connector_dot_connector__pb2.ListAgentsRequest.FromString,
+                    response_serializer=flyteidl_dot_connector_dot_connector__pb2.ListAgentsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -354,8 +354,8 @@ class AgentMetadataService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentMetadataService/GetAgent',
-            flyteidl_dot_connector_dot_connector__pb2.GetConnectorRequest.SerializeToString,
-            flyteidl_dot_connector_dot_connector__pb2.GetConnectorResponse.FromString,
+            flyteidl_dot_connector_dot_connector__pb2.GetAgentRequest.SerializeToString,
+            flyteidl_dot_connector_dot_connector__pb2.GetAgentResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -371,7 +371,7 @@ class AgentMetadataService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentMetadataService/ListAgents',
-            flyteidl_dot_connector_dot_connector__pb2.ListConnectorsRequest.SerializeToString,
-            flyteidl_dot_connector_dot_connector__pb2.ListConnectorsResponse.FromString,
+            flyteidl_dot_connector_dot_connector__pb2.ListAgentsRequest.SerializeToString,
+            flyteidl_dot_connector_dot_connector__pb2.ListAgentsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

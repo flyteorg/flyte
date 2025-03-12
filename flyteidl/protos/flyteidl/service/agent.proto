@@ -64,14 +64,14 @@ service AsyncAgentService {
 // This service allows propeller or users to get the metadata of agents.
 service AgentMetadataService {
   // Fetch a :ref:`ref_connector.Agent` definition.
-  rpc GetAgent (flyteidl.connector.GetConnectorRequest) returns (flyteidl.connector.GetConnectorResponse){
+  rpc GetAgent (flyteidl.connector.GetAgentRequest) returns (flyteidl.connector.GetAgentResponse){
     option (google.api.http) = {
       get: "/api/v1/agent/{name}"
     };
   };
 
   // Fetch a list of :ref:`ref_connector.Agent` definitions.
-  rpc ListAgents (flyteidl.connector.ListConnectorsRequest) returns (flyteidl.connector.ListConnectorsResponse){
+  rpc ListAgents (flyteidl.connector.ListAgentsRequest) returns (flyteidl.connector.ListAgentsResponse){
     option (google.api.http) = {
       get: "/api/v1/agents"
     };
