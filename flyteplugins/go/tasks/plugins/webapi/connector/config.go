@@ -51,7 +51,7 @@ var (
 		PollInterval:       config.Duration{Duration: 10 * time.Second},
 	}
 
-	configSection = pluginsConfig.MustRegisterSubSection("connector-service-legacy", &defaultLegacyConfig)
+	//configSection = pluginsConfig.MustRegisterSubSection("connector-service-legacy", &defaultLegacyConfig)
 )
 
 var (
@@ -168,11 +168,11 @@ func GetConfig() *ConnectorConfig {
 	return connectorConfigSection.GetConfig().(*ConnectorConfig)
 }
 
-// Keep the original GetConfig function but rename it to GetLegacyConfig
-func GetLegacyConfig() *Config {
-	return configSection.GetConfig().(*Config)
-}
+//// Keep the original GetConfig function but rename it to GetLegacyConfig
+//func GetLegacyConfig() *Config {
+//	return configSection.GetConfig().(*Config)
+//}
 
 func SetConfig(cfg *Config) error {
-	return configSection.SetConfig(cfg)
+	return connectorConfigSection.SetConfig(cfg)
 }
