@@ -9,10 +9,10 @@ import (
 	"runtime/pprof"
 	"time"
 
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
@@ -55,6 +55,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -481,7 +482,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	controller.workerPool = NewWorkerPool(ctx, scope, workQ, handler)
 
 	if cfg.EnableGrpcLatencyMetrics {
-		grpc_prometheus.EnableClientHandlingTimeHistogram()
+		grpcutils.GrpcClientMetrics(grpcprometheus.WithClientHandlingTimeHistogram())
 	}
 
 	logger.Info(ctx, "Setting up event handlers")

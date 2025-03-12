@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
-	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -24,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
@@ -502,7 +502,7 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogClientTracer)
 	opts = append(opts, grpc.WithChainUnaryInterceptor(
-		grpcPrometheus.UnaryClientInterceptor,
+		grpcutils.GrpcClientMetrics().UnaryClientInterceptor(),
 		otelgrpc.UnaryClientInterceptor(
 			otelgrpc.WithTracerProvider(tracerProvider),
 			otelgrpc.WithPropagators(propagation.TraceContext{}),

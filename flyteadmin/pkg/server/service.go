@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -47,6 +47,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -95,10 +96,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			auth.BlanketAuthorization,
 			auth.ExecutionUserIdentifierInterceptor))
 
+	srvMetricsOpts := []grpcprometheus.ServerMetricsOption{}
 	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
-		logger.Debugf(ctx, "enabling grpc histogram metrics")
-		grpcprometheus.EnableHandlingTimeHistogram()
+		srvMetricsOpts = append(srvMetricsOpts, grpcprometheus.WithServerHandlingTimeHistogram())
 	}
+	srvMetrics := grpcutils.GrpcServerMetrics(srvMetricsOpts...)
 
 	// Not yet implemented for streaming
 	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
@@ -118,7 +120,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
 			grpcrecovery.UnaryServerInterceptor(),
-			grpcprometheus.UnaryServerInterceptor,
+			srvMetrics.UnaryServerInterceptor(),
 			otelUnaryServerInterceptor,
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
@@ -130,7 +132,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
-			grpcprometheus.UnaryServerInterceptor,
+			srvMetrics.UnaryServerInterceptor(),
 			otelUnaryServerInterceptor,
 		)
 	}
@@ -138,7 +140,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	chainedStreamInterceptors := grpcmiddleware.ChainStreamServer(
 		// recovery interceptor should always be first in order to handle any panics in the middleware or server
 		recoveryInterceptor.StreamServerInterceptor(),
-		grpcprometheus.StreamServerInterceptor,
+		srvMetrics.StreamServerInterceptor(),
 	)
 
 	serverOpts := []grpc.ServerOption{
@@ -151,7 +153,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
-	grpcprometheus.Register(grpcServer)
 	dataStorageClient, err := storage.NewDataStore(storageCfg, scope.NewSubScope("storage"))
 	if err != nil {
 		logger.Error(ctx, "Failed to initialize storage config")

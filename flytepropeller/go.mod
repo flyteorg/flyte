@@ -20,12 +20,12 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-test/deep v1.0.7
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/googleapis/gax-go/v2 v2.12.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20210315223345-82c243799c99
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/imdario/mergo v0.3.13
 	github.com/magiconair/properties v1.8.6

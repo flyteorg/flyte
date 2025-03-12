@@ -14,7 +14,7 @@ require (
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/imdario/mergo v0.3.13
 	github.com/kubeflow/common v0.4.3

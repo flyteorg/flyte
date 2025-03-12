@@ -9,7 +9,6 @@ import (
 	"time"
 
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
@@ -24,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	catalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -135,10 +135,11 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
+	srvMetrics := grpcutils.GrpcServerMetrics()
 	serverOpts := []grpc.ServerOption{
-		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		grpc.StreamInterceptor(srvMetrics.StreamServerInterceptor()),
 		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
-			grpcprometheus.UnaryServerInterceptor,
+			srvMetrics.UnaryServerInterceptor(),
 			otelgrpc.UnaryServerInterceptor(
 				otelgrpc.WithTracerProvider(tracerProvider),
 				otelgrpc.WithPropagators(propagation.TraceContext{}),
@@ -146,7 +147,6 @@ func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 		)),
 	}
 	grpcServer := grpc.NewServer(serverOpts...)
-	grpcprometheus.Register(grpcServer)
 
 	catalog.RegisterDataCatalogServer(grpcServer, NewDataCatalogService())
 

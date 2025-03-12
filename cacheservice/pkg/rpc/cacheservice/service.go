@@ -9,7 +9,6 @@ import (
 	"time"
 
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
@@ -25,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -117,8 +117,10 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		otelgrpc.WithPropagators(propagation.TraceContext{}),
 	)
 
+	srvMetrics := grpcutils.GrpcServerMetrics()
+
 	interceptors := []grpc.UnaryServerInterceptor{
-		grpcprometheus.UnaryServerInterceptor,
+		srvMetrics.UnaryServerInterceptor(),
 		otelUnaryServerInterceptor,
 	}
 	middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
@@ -129,12 +131,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	chainedUnaryInterceptors := grpcmiddleware.ChainUnaryServer(interceptors...)
 
 	serverOpts := []grpc.ServerOption{
-		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		grpc.StreamInterceptor(srvMetrics.StreamServerInterceptor()),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
 
 	grpcServer := grpc.NewServer(serverOpts...)
-	grpcprometheus.Register(grpcServer)
 
 	cacheservice.RegisterCacheServiceServer(grpcServer, NewCacheServiceServer())
 

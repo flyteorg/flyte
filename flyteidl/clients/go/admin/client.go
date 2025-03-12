@@ -11,7 +11,6 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
-	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -20,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -93,7 +93,7 @@ func GetAdditionalAdminClientConfigOptions(cfg *Config) []grpc.DialOption {
 
 	// We only make unary calls in this client, no streaming calls.  We can add a streaming interceptor if admin
 	// ever has those endpoints
-	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor, retryInterceptor))
+	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcutils.GrpcClientMetrics().UnaryClientInterceptor(), retryInterceptor))
 
 	if cfg.MaxMessageSizeBytes > 0 {
 		opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.MaxMessageSizeBytes)))
