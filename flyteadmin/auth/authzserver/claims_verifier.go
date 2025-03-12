@@ -52,7 +52,7 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 		case []interface{}:
 			scopes = sets.NewString(interfaceSliceToStringSlice(sct)...)
 		case string:
-			sets.NewString(fmt.Sprintf("%v", scopesClaim))
+			scopes = sets.NewString(fmt.Sprintf("%v", scopesClaim))
 		default:
 			return nil, fmt.Errorf("failed getting scope claims due to  unknown type %T with value %v", sct, sct)
 		}
