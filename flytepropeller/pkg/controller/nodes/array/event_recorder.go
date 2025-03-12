@@ -132,22 +132,10 @@ func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, ev
 }
 
 func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
-	// generate externalResourceID
-	currentNodeUniqueID := nCtx.NodeID()
-	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
-		var err error
-		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
-		if err != nil {
-			return err
-		}
-	}
-
-	uniqueID, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(retryAttempt))})
+	externalResourceID, err := generateExternalResourceID(nCtx, index, retryAttempt)
 	if err != nil {
 		return err
 	}
-
-	externalResourceID := fmt.Sprintf("%s-n%d-%d", uniqueID, index, retryAttempt)
 
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
@@ -517,6 +505,29 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	}
 
 	return nil
+}
+
+func generateExternalResourceID(nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) (string, error) {
+	currentNodeUniqueID := nCtx.NodeID()
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		var err error
+		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
+		if err != nil {
+			return "", err
+		}
+	}
+
+	uniqueID, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(nCtx.CurrentAttempt()))})
+	if err != nil {
+		return "", err
+	}
+
+	// Note: if the subNode is a task, then this value should map to the subNode's pod name. Services such as
+	// usage utilize ExternalResourceInfo.ExternalId to identify the pod.
+
+	externalResourceID := fmt.Sprintf("%s-n%d-%d", uniqueID, index, retryAttempt)
+
+	return externalResourceID, nil
 }
 
 func generateExternalResourceID(nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) (string, error) {
