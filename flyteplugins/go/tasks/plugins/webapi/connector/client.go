@@ -110,7 +110,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListConnectors", connectorDeployment)
 		defer cancel()
 
-		res, err := client.ListAgents(finalCtx, &connector.ListConnectorsRequest{})
+		res, err := client.ListAgents(finalCtx, &connector.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
@@ -129,7 +129,14 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 
 		connectorSupportedTaskCategories := make(map[string]struct{})
-		for _, connector := range res.GetConnectors() {
+		for _, connector := range res.GetAgents() {
+			deprecatedSupportedTaskTypes := connector.GetSupportedTaskTypes()
+			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
+				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
+				newConnectorRegistry[supportedTaskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+				connectorSupportedTaskCategories[supportedTaskType] = struct{}{}
+			}
+
 			supportedTaskCategories := connector.GetSupportedTaskCategories()
 			for _, supportedCategory := range supportedTaskCategories {
 				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}

@@ -739,6 +739,14 @@ export class Connector extends Message<Connector> {
   name = "";
 
   /**
+   * SupportedTaskTypes are the types of the tasks that the connector can handle.
+   *
+   * @generated from field: repeated string supported_task_types = 2 [deprecated = true];
+   * @deprecated
+   */
+  supportedTaskTypes: string[] = [];
+
+  /**
    * IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
    * results synchronously when called by propeller. Given that sync connectors can affect the performance
    * of the system, it's important to enforce strict timeout policies.
@@ -765,6 +773,7 @@ export class Connector extends Message<Connector> {
   static readonly typeName = "flyteidl.connector.Connector";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "supported_task_types", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 3, name: "is_sync", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "supported_task_categories", kind: "message", T: TaskCategory, repeated: true },
   ]);

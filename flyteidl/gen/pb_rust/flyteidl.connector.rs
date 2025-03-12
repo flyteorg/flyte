@@ -205,6 +205,10 @@ pub struct Connector {
     /// Name is the developer-assigned name of the connector.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
+    /// SupportedTaskTypes are the types of the tasks that the connector can handle.
+    #[deprecated]
+    #[prost(string, repeated, tag="2")]
+    pub supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their
     /// results synchronously when called by propeller. Given that sync connectors can affect the performance
     /// of the system, it's important to enforce strict timeout policies.

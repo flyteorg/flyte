@@ -25800,6 +25800,9 @@ export namespace flyteidl {
             /** Connector name */
             name?: (string|null);
 
+            /** Connector supportedTaskTypes */
+            supportedTaskTypes?: (string[]|null);
+
             /** Connector isSync */
             isSync?: (boolean|null);
 
@@ -25818,6 +25821,9 @@ export namespace flyteidl {
 
             /** Connector name. */
             public name: string;
+
+            /** Connector supportedTaskTypes. */
+            public supportedTaskTypes: string[];
 
             /** Connector isSync. */
             public isSync: boolean;

@@ -290,7 +290,12 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	case flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
+	// The default phase is undefined.
+	if resource.Phase != flyteIdl.TaskExecution_UNDEFINED {
+		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
+	}
+
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
 func (p *Plugin) getSyncConnectorClient(ctx context.Context, connector *Deployment) (service.SyncAgentServiceClient, error) {

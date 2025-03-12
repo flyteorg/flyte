@@ -615,6 +615,13 @@
           "type": "string",
           "description": "Name is the developer-assigned name of the connector."
         },
+        "supported_task_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SupportedTaskTypes are the types of the tasks that the connector can handle."
+        },
         "is_sync": {
           "type": "boolean",
           "description": "IsSync indicates whether this connector is a sync connector. Sync connector are expected to return their\nresults synchronously when called by propeller. Given that sync connectors can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async connector, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
