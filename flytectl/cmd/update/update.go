@@ -64,18 +64,18 @@ var updateResourcesFuncs = map[string]cmdCore.CommandEntry{
 }
 
 var configStructMap = map[string]interface{}{
-	"launchplan": launchplan.UConfig,
-    "launchplan-meta": namedEntityConfig,
-    "project": project.DefaultProjectConfig,
-	"execution": execution.UConfig,
-	"task-meta": namedEntityConfig,
-	"workflow-meta": namedEntityConfig,
-	"task-resource-attribute": taskresourceattribute.DefaultUpdateConfig,  // TODO
+	"launchplan":                 launchplan.UConfig,
+	"launchplan-meta":            namedEntityConfig,
+	"project":                    project.DefaultProjectConfig,
+	"execution":                  execution.UConfig,
+	"task-meta":                  namedEntityConfig,
+	"workflow-meta":              namedEntityConfig,
+	"task-resource-attribute":    taskresourceattribute.DefaultUpdateConfig,    // TODO
 	"cluster-resource-attribute": clusterresourceattribute.DefaultUpdateConfig, // TODO
-	"execution-queue-attribute": executionqueueattribute.DefaultUpdateConfig, // TODO
-	"execution-cluster-label": executionclusterlabel.DefaultUpdateConfig,  // TODO
-	"plugin-override": pluginoverride.DefaultUpdateConfig,  // TODO
-	"workflow-execution-config": workflowexecutionconfig.DefaultFileConfig,
+	"execution-queue-attribute":  executionqueueattribute.DefaultUpdateConfig,  // TODO
+	"execution-cluster-label":    executionclusterlabel.DefaultUpdateConfig,    // TODO
+	"plugin-override":            pluginoverride.DefaultUpdateConfig,           // TODO
+	"workflow-execution-config":  workflowexecutionconfig.DefaultFileConfig,
 }
 
 var subCmdMap = make(map[string]*cobra.Command)
@@ -129,8 +129,7 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			}
 
 			// Find the corresponding subcommand
-			// subCmdEntry, found := updateResourcesFuncs[kind]
-            cmdStruct, found := configStructMap[kind]
+			cmdStruct, found := configStructMap[kind]
 			if !found {
 				return fmt.Errorf("subcommand not found for kind %s", kind)
 			}
@@ -146,6 +145,15 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			}
 
 			if err := json.Unmarshal(data, cmdStruct); err != nil {
+				return err
+			}
+
+			// Set the dryRun flag
+			if err := subCmd.Flags().Set("dryRun", fmt.Sprintf("%v", updateConfig.DryRun)); err != nil {
+				return err
+			}
+			// Set the force flag
+			if err := subCmd.Flags().Set("force", fmt.Sprintf("%v", updateConfig.Force)); err != nil {
 				return err
 			}
 
