@@ -177,7 +177,7 @@ You can also catch exceptions in eager workflows through `EagerException`:
 
 ```{literalinclude} /examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
-:lines: 102-117
+:lines: 101-116
 ```
 
 Even though the `raises_exc` exception task raises a `TypeError`, the
@@ -188,27 +188,6 @@ block.
 ```{note}
 This is a current limitation in the `@eager` workflow implementation.
 ````
-
-## Executing eager workflows
-
-As with most Flyte constructs, you can execute eager workflows both locally
-and remotely.
-
-### Local execution
-
-You can execute eager workflows locally by simply calling them like a regular
-`async` function:
-
-```{literalinclude} /examples/advanced_composition/advanced_composition/eager_workflows.py
-:caption: advanced_composition/eager_workflows.py
-:lines: 123-125
-```
-
-This just uses the `asyncio.run` function to execute the eager workflow just
-like any other Python async code. This is useful for local debugging as you're
-developing your workflows and tasks.
-
-(eager_workflows_remote)=
 
 ### Setting up remote Flyte cluster access
 
