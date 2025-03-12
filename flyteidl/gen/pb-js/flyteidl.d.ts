@@ -23592,6 +23592,246 @@ export namespace flyteidl {
             type GetPublicClientConfigCallback = (error: (Error|null), response?: flyteidl.service.PublicClientAuthConfigResponse) => void;
         }
 
+        /** Represents a SyncConnectorService */
+        class SyncConnectorService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new SyncConnectorService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new SyncConnectorService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): SyncConnectorService;
+
+            /**
+             * Calls ExecuteTaskSync.
+             * @param request ExecuteTaskSyncRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ExecuteTaskSyncResponse
+             */
+            public executeTaskSync(request: flyteidl.connector.IExecuteTaskSyncRequest, callback: flyteidl.service.SyncConnectorService.ExecuteTaskSyncCallback): void;
+
+            /**
+             * Calls ExecuteTaskSync.
+             * @param request ExecuteTaskSyncRequest message or plain object
+             * @returns Promise
+             */
+            public executeTaskSync(request: flyteidl.connector.IExecuteTaskSyncRequest): Promise<flyteidl.connector.ExecuteTaskSyncResponse>;
+        }
+
+        namespace SyncConnectorService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.SyncConnectorService#executeTaskSync}.
+             * @param error Error, if any
+             * @param [response] ExecuteTaskSyncResponse
+             */
+            type ExecuteTaskSyncCallback = (error: (Error|null), response?: flyteidl.connector.ExecuteTaskSyncResponse) => void;
+        }
+
+        /** Represents an AsyncConnectorService */
+        class AsyncConnectorService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new AsyncConnectorService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new AsyncConnectorService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AsyncConnectorService;
+
+            /**
+             * Calls CreateTask.
+             * @param request CreateTaskRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and CreateTaskResponse
+             */
+            public createTask(request: flyteidl.connector.ICreateTaskRequest, callback: flyteidl.service.AsyncConnectorService.CreateTaskCallback): void;
+
+            /**
+             * Calls CreateTask.
+             * @param request CreateTaskRequest message or plain object
+             * @returns Promise
+             */
+            public createTask(request: flyteidl.connector.ICreateTaskRequest): Promise<flyteidl.connector.CreateTaskResponse>;
+
+            /**
+             * Calls GetTask.
+             * @param request GetTaskRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetTaskResponse
+             */
+            public getTask(request: flyteidl.connector.IGetTaskRequest, callback: flyteidl.service.AsyncConnectorService.GetTaskCallback): void;
+
+            /**
+             * Calls GetTask.
+             * @param request GetTaskRequest message or plain object
+             * @returns Promise
+             */
+            public getTask(request: flyteidl.connector.IGetTaskRequest): Promise<flyteidl.connector.GetTaskResponse>;
+
+            /**
+             * Calls DeleteTask.
+             * @param request DeleteTaskRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DeleteTaskResponse
+             */
+            public deleteTask(request: flyteidl.connector.IDeleteTaskRequest, callback: flyteidl.service.AsyncConnectorService.DeleteTaskCallback): void;
+
+            /**
+             * Calls DeleteTask.
+             * @param request DeleteTaskRequest message or plain object
+             * @returns Promise
+             */
+            public deleteTask(request: flyteidl.connector.IDeleteTaskRequest): Promise<flyteidl.connector.DeleteTaskResponse>;
+
+            /**
+             * Calls GetTaskMetrics.
+             * @param request GetTaskMetricsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetTaskMetricsResponse
+             */
+            public getTaskMetrics(request: flyteidl.connector.IGetTaskMetricsRequest, callback: flyteidl.service.AsyncConnectorService.GetTaskMetricsCallback): void;
+
+            /**
+             * Calls GetTaskMetrics.
+             * @param request GetTaskMetricsRequest message or plain object
+             * @returns Promise
+             */
+            public getTaskMetrics(request: flyteidl.connector.IGetTaskMetricsRequest): Promise<flyteidl.connector.GetTaskMetricsResponse>;
+
+            /**
+             * Calls GetTaskLogs.
+             * @param request GetTaskLogsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetTaskLogsResponse
+             */
+            public getTaskLogs(request: flyteidl.connector.IGetTaskLogsRequest, callback: flyteidl.service.AsyncConnectorService.GetTaskLogsCallback): void;
+
+            /**
+             * Calls GetTaskLogs.
+             * @param request GetTaskLogsRequest message or plain object
+             * @returns Promise
+             */
+            public getTaskLogs(request: flyteidl.connector.IGetTaskLogsRequest): Promise<flyteidl.connector.GetTaskLogsResponse>;
+        }
+
+        namespace AsyncConnectorService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncConnectorService#createTask}.
+             * @param error Error, if any
+             * @param [response] CreateTaskResponse
+             */
+            type CreateTaskCallback = (error: (Error|null), response?: flyteidl.connector.CreateTaskResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncConnectorService#getTask}.
+             * @param error Error, if any
+             * @param [response] GetTaskResponse
+             */
+            type GetTaskCallback = (error: (Error|null), response?: flyteidl.connector.GetTaskResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncConnectorService#deleteTask}.
+             * @param error Error, if any
+             * @param [response] DeleteTaskResponse
+             */
+            type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.connector.DeleteTaskResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncConnectorService#getTaskMetrics}.
+             * @param error Error, if any
+             * @param [response] GetTaskMetricsResponse
+             */
+            type GetTaskMetricsCallback = (error: (Error|null), response?: flyteidl.connector.GetTaskMetricsResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncConnectorService#getTaskLogs}.
+             * @param error Error, if any
+             * @param [response] GetTaskLogsResponse
+             */
+            type GetTaskLogsCallback = (error: (Error|null), response?: flyteidl.connector.GetTaskLogsResponse) => void;
+        }
+
+        /** Represents a ConnectorMetadataService */
+        class ConnectorMetadataService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new ConnectorMetadataService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new ConnectorMetadataService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): ConnectorMetadataService;
+
+            /**
+             * Calls GetConnector.
+             * @param request GetConnectorRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetConnectorResponse
+             */
+            public getConnector(request: flyteidl.connector.IGetConnectorRequest, callback: flyteidl.service.ConnectorMetadataService.GetConnectorCallback): void;
+
+            /**
+             * Calls GetConnector.
+             * @param request GetConnectorRequest message or plain object
+             * @returns Promise
+             */
+            public getConnector(request: flyteidl.connector.IGetConnectorRequest): Promise<flyteidl.connector.GetConnectorResponse>;
+
+            /**
+             * Calls ListConnectors.
+             * @param request ListConnectorsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ListConnectorsResponse
+             */
+            public listConnectors(request: flyteidl.connector.IListConnectorsRequest, callback: flyteidl.service.ConnectorMetadataService.ListConnectorsCallback): void;
+
+            /**
+             * Calls ListConnectors.
+             * @param request ListConnectorsRequest message or plain object
+             * @returns Promise
+             */
+            public listConnectors(request: flyteidl.connector.IListConnectorsRequest): Promise<flyteidl.connector.ListConnectorsResponse>;
+        }
+
+        namespace ConnectorMetadataService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.ConnectorMetadataService#getConnector}.
+             * @param error Error, if any
+             * @param [response] GetConnectorResponse
+             */
+            type GetConnectorCallback = (error: (Error|null), response?: flyteidl.connector.GetConnectorResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.ConnectorMetadataService#listConnectors}.
+             * @param error Error, if any
+             * @param [response] ListConnectorsResponse
+             */
+            type ListConnectorsCallback = (error: (Error|null), response?: flyteidl.connector.ListConnectorsResponse) => void;
+        }
+
         /** Properties of a CreateUploadLocationResponse. */
         interface ICreateUploadLocationResponse {
 
@@ -24996,6 +25236,1601 @@ export namespace flyteidl {
              * @param [response] SignalSetResponse
              */
             type SetSignalCallback = (error: (Error|null), response?: flyteidl.admin.SignalSetResponse) => void;
+        }
+    }
+
+    /** Namespace connector. */
+    namespace connector {
+
+        /** State enum. */
+        enum State {
+            RETRYABLE_FAILURE = 0,
+            PERMANENT_FAILURE = 1,
+            PENDING = 2,
+            RUNNING = 3,
+            SUCCEEDED = 4
+        }
+
+        /** Properties of a TaskExecutionMetadata. */
+        interface ITaskExecutionMetadata {
+
+            /** TaskExecutionMetadata taskExecutionId */
+            taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionMetadata namespace */
+            namespace?: (string|null);
+
+            /** TaskExecutionMetadata labels */
+            labels?: ({ [k: string]: string }|null);
+
+            /** TaskExecutionMetadata annotations */
+            annotations?: ({ [k: string]: string }|null);
+
+            /** TaskExecutionMetadata k8sServiceAccount */
+            k8sServiceAccount?: (string|null);
+
+            /** TaskExecutionMetadata environmentVariables */
+            environmentVariables?: ({ [k: string]: string }|null);
+
+            /** TaskExecutionMetadata maxAttempts */
+            maxAttempts?: (number|null);
+
+            /** TaskExecutionMetadata interruptible */
+            interruptible?: (boolean|null);
+
+            /** TaskExecutionMetadata interruptibleFailureThreshold */
+            interruptibleFailureThreshold?: (number|null);
+
+            /** TaskExecutionMetadata overrides */
+            overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity */
+            identity?: (flyteidl.core.IIdentity|null);
+        }
+
+        /** Represents a TaskExecutionMetadata. */
+        class TaskExecutionMetadata implements ITaskExecutionMetadata {
+
+            /**
+             * Constructs a new TaskExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.ITaskExecutionMetadata);
+
+            /** TaskExecutionMetadata taskExecutionId. */
+            public taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** TaskExecutionMetadata namespace. */
+            public namespace: string;
+
+            /** TaskExecutionMetadata labels. */
+            public labels: { [k: string]: string };
+
+            /** TaskExecutionMetadata annotations. */
+            public annotations: { [k: string]: string };
+
+            /** TaskExecutionMetadata k8sServiceAccount. */
+            public k8sServiceAccount: string;
+
+            /** TaskExecutionMetadata environmentVariables. */
+            public environmentVariables: { [k: string]: string };
+
+            /** TaskExecutionMetadata maxAttempts. */
+            public maxAttempts: number;
+
+            /** TaskExecutionMetadata interruptible. */
+            public interruptible: boolean;
+
+            /** TaskExecutionMetadata interruptibleFailureThreshold. */
+            public interruptibleFailureThreshold: number;
+
+            /** TaskExecutionMetadata overrides. */
+            public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity. */
+            public identity?: (flyteidl.core.IIdentity|null);
+
+            /**
+             * Creates a new TaskExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.connector.ITaskExecutionMetadata): flyteidl.connector.TaskExecutionMetadata;
+
+            /**
+             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.connector.TaskExecutionMetadata.verify|verify} messages.
+             * @param message TaskExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.ITaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.TaskExecutionMetadata;
+
+            /**
+             * Verifies a TaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateTaskRequest. */
+        interface ICreateTaskRequest {
+
+            /** CreateTaskRequest inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** CreateTaskRequest template */
+            template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** CreateTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
+
+            /** CreateTaskRequest taskExecutionMetadata */
+            taskExecutionMetadata?: (flyteidl.connector.ITaskExecutionMetadata|null);
+        }
+
+        /** Represents a CreateTaskRequest. */
+        class CreateTaskRequest implements ICreateTaskRequest {
+
+            /**
+             * Constructs a new CreateTaskRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.ICreateTaskRequest);
+
+            /** CreateTaskRequest inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** CreateTaskRequest template. */
+            public template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** CreateTaskRequest outputPrefix. */
+            public outputPrefix: string;
+
+            /** CreateTaskRequest taskExecutionMetadata. */
+            public taskExecutionMetadata?: (flyteidl.connector.ITaskExecutionMetadata|null);
+
+            /**
+             * Creates a new CreateTaskRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateTaskRequest instance
+             */
+            public static create(properties?: flyteidl.connector.ICreateTaskRequest): flyteidl.connector.CreateTaskRequest;
+
+            /**
+             * Encodes the specified CreateTaskRequest message. Does not implicitly {@link flyteidl.connector.CreateTaskRequest.verify|verify} messages.
+             * @param message CreateTaskRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.ICreateTaskRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateTaskRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateTaskRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.CreateTaskRequest;
+
+            /**
+             * Verifies a CreateTaskRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateTaskResponse. */
+        interface ICreateTaskResponse {
+
+            /** CreateTaskResponse resourceMeta */
+            resourceMeta?: (Uint8Array|null);
+        }
+
+        /** Represents a CreateTaskResponse. */
+        class CreateTaskResponse implements ICreateTaskResponse {
+
+            /**
+             * Constructs a new CreateTaskResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.ICreateTaskResponse);
+
+            /** CreateTaskResponse resourceMeta. */
+            public resourceMeta: Uint8Array;
+
+            /**
+             * Creates a new CreateTaskResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateTaskResponse instance
+             */
+            public static create(properties?: flyteidl.connector.ICreateTaskResponse): flyteidl.connector.CreateTaskResponse;
+
+            /**
+             * Encodes the specified CreateTaskResponse message. Does not implicitly {@link flyteidl.connector.CreateTaskResponse.verify|verify} messages.
+             * @param message CreateTaskResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.ICreateTaskResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateTaskResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateTaskResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.CreateTaskResponse;
+
+            /**
+             * Verifies a CreateTaskResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateRequestHeader. */
+        interface ICreateRequestHeader {
+
+            /** CreateRequestHeader template */
+            template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** CreateRequestHeader outputPrefix */
+            outputPrefix?: (string|null);
+
+            /** CreateRequestHeader taskExecutionMetadata */
+            taskExecutionMetadata?: (flyteidl.connector.ITaskExecutionMetadata|null);
+
+            /** CreateRequestHeader maxDatasetSizeBytes */
+            maxDatasetSizeBytes?: (Long|null);
+        }
+
+        /** Represents a CreateRequestHeader. */
+        class CreateRequestHeader implements ICreateRequestHeader {
+
+            /**
+             * Constructs a new CreateRequestHeader.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.ICreateRequestHeader);
+
+            /** CreateRequestHeader template. */
+            public template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** CreateRequestHeader outputPrefix. */
+            public outputPrefix: string;
+
+            /** CreateRequestHeader taskExecutionMetadata. */
+            public taskExecutionMetadata?: (flyteidl.connector.ITaskExecutionMetadata|null);
+
+            /** CreateRequestHeader maxDatasetSizeBytes. */
+            public maxDatasetSizeBytes: Long;
+
+            /**
+             * Creates a new CreateRequestHeader instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateRequestHeader instance
+             */
+            public static create(properties?: flyteidl.connector.ICreateRequestHeader): flyteidl.connector.CreateRequestHeader;
+
+            /**
+             * Encodes the specified CreateRequestHeader message. Does not implicitly {@link flyteidl.connector.CreateRequestHeader.verify|verify} messages.
+             * @param message CreateRequestHeader message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.ICreateRequestHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateRequestHeader message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateRequestHeader
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.CreateRequestHeader;
+
+            /**
+             * Verifies a CreateRequestHeader message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecuteTaskSyncRequest. */
+        interface IExecuteTaskSyncRequest {
+
+            /** ExecuteTaskSyncRequest header */
+            header?: (flyteidl.connector.ICreateRequestHeader|null);
+
+            /** ExecuteTaskSyncRequest inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents an ExecuteTaskSyncRequest. */
+        class ExecuteTaskSyncRequest implements IExecuteTaskSyncRequest {
+
+            /**
+             * Constructs a new ExecuteTaskSyncRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IExecuteTaskSyncRequest);
+
+            /** ExecuteTaskSyncRequest header. */
+            public header?: (flyteidl.connector.ICreateRequestHeader|null);
+
+            /** ExecuteTaskSyncRequest inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** ExecuteTaskSyncRequest part. */
+            public part?: ("header"|"inputs");
+
+            /**
+             * Creates a new ExecuteTaskSyncRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecuteTaskSyncRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IExecuteTaskSyncRequest): flyteidl.connector.ExecuteTaskSyncRequest;
+
+            /**
+             * Encodes the specified ExecuteTaskSyncRequest message. Does not implicitly {@link flyteidl.connector.ExecuteTaskSyncRequest.verify|verify} messages.
+             * @param message ExecuteTaskSyncRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IExecuteTaskSyncRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecuteTaskSyncRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecuteTaskSyncRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ExecuteTaskSyncRequest;
+
+            /**
+             * Verifies an ExecuteTaskSyncRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecuteTaskSyncResponseHeader. */
+        interface IExecuteTaskSyncResponseHeader {
+
+            /** ExecuteTaskSyncResponseHeader resource */
+            resource?: (flyteidl.connector.IResource|null);
+        }
+
+        /** Represents an ExecuteTaskSyncResponseHeader. */
+        class ExecuteTaskSyncResponseHeader implements IExecuteTaskSyncResponseHeader {
+
+            /**
+             * Constructs a new ExecuteTaskSyncResponseHeader.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IExecuteTaskSyncResponseHeader);
+
+            /** ExecuteTaskSyncResponseHeader resource. */
+            public resource?: (flyteidl.connector.IResource|null);
+
+            /**
+             * Creates a new ExecuteTaskSyncResponseHeader instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecuteTaskSyncResponseHeader instance
+             */
+            public static create(properties?: flyteidl.connector.IExecuteTaskSyncResponseHeader): flyteidl.connector.ExecuteTaskSyncResponseHeader;
+
+            /**
+             * Encodes the specified ExecuteTaskSyncResponseHeader message. Does not implicitly {@link flyteidl.connector.ExecuteTaskSyncResponseHeader.verify|verify} messages.
+             * @param message ExecuteTaskSyncResponseHeader message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IExecuteTaskSyncResponseHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecuteTaskSyncResponseHeader message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecuteTaskSyncResponseHeader
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ExecuteTaskSyncResponseHeader;
+
+            /**
+             * Verifies an ExecuteTaskSyncResponseHeader message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecuteTaskSyncResponse. */
+        interface IExecuteTaskSyncResponse {
+
+            /** ExecuteTaskSyncResponse header */
+            header?: (flyteidl.connector.IExecuteTaskSyncResponseHeader|null);
+
+            /** ExecuteTaskSyncResponse outputs */
+            outputs?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents an ExecuteTaskSyncResponse. */
+        class ExecuteTaskSyncResponse implements IExecuteTaskSyncResponse {
+
+            /**
+             * Constructs a new ExecuteTaskSyncResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IExecuteTaskSyncResponse);
+
+            /** ExecuteTaskSyncResponse header. */
+            public header?: (flyteidl.connector.IExecuteTaskSyncResponseHeader|null);
+
+            /** ExecuteTaskSyncResponse outputs. */
+            public outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** ExecuteTaskSyncResponse res. */
+            public res?: ("header"|"outputs");
+
+            /**
+             * Creates a new ExecuteTaskSyncResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecuteTaskSyncResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IExecuteTaskSyncResponse): flyteidl.connector.ExecuteTaskSyncResponse;
+
+            /**
+             * Encodes the specified ExecuteTaskSyncResponse message. Does not implicitly {@link flyteidl.connector.ExecuteTaskSyncResponse.verify|verify} messages.
+             * @param message ExecuteTaskSyncResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IExecuteTaskSyncResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecuteTaskSyncResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecuteTaskSyncResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ExecuteTaskSyncResponse;
+
+            /**
+             * Verifies an ExecuteTaskSyncResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskRequest. */
+        interface IGetTaskRequest {
+
+            /** GetTaskRequest taskType */
+            taskType?: (string|null);
+
+            /** GetTaskRequest resourceMeta */
+            resourceMeta?: (Uint8Array|null);
+
+            /** GetTaskRequest taskCategory */
+            taskCategory?: (flyteidl.connector.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
+        }
+
+        /** Represents a GetTaskRequest. */
+        class GetTaskRequest implements IGetTaskRequest {
+
+            /**
+             * Constructs a new GetTaskRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskRequest);
+
+            /** GetTaskRequest taskType. */
+            public taskType: string;
+
+            /** GetTaskRequest resourceMeta. */
+            public resourceMeta: Uint8Array;
+
+            /** GetTaskRequest taskCategory. */
+            public taskCategory?: (flyteidl.connector.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix. */
+            public outputPrefix: string;
+
+            /**
+             * Creates a new GetTaskRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskRequest): flyteidl.connector.GetTaskRequest;
+
+            /**
+             * Encodes the specified GetTaskRequest message. Does not implicitly {@link flyteidl.connector.GetTaskRequest.verify|verify} messages.
+             * @param message GetTaskRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskRequest;
+
+            /**
+             * Verifies a GetTaskRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskResponse. */
+        interface IGetTaskResponse {
+
+            /** GetTaskResponse resource */
+            resource?: (flyteidl.connector.IResource|null);
+        }
+
+        /** Represents a GetTaskResponse. */
+        class GetTaskResponse implements IGetTaskResponse {
+
+            /**
+             * Constructs a new GetTaskResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskResponse);
+
+            /** GetTaskResponse resource. */
+            public resource?: (flyteidl.connector.IResource|null);
+
+            /**
+             * Creates a new GetTaskResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskResponse): flyteidl.connector.GetTaskResponse;
+
+            /**
+             * Encodes the specified GetTaskResponse message. Does not implicitly {@link flyteidl.connector.GetTaskResponse.verify|verify} messages.
+             * @param message GetTaskResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskResponse;
+
+            /**
+             * Verifies a GetTaskResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Resource. */
+        interface IResource {
+
+            /** Resource state */
+            state?: (flyteidl.connector.State|null);
+
+            /** Resource outputs */
+            outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** Resource message */
+            message?: (string|null);
+
+            /** Resource logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
+
+            /** Resource phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
+
+            /** Resource customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource connectorError */
+            connectorError?: (flyteidl.connector.IConnectorError|null);
+        }
+
+        /** Represents a Resource. */
+        class Resource implements IResource {
+
+            /**
+             * Constructs a new Resource.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IResource);
+
+            /** Resource state. */
+            public state: flyteidl.connector.State;
+
+            /** Resource outputs. */
+            public outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** Resource message. */
+            public message: string;
+
+            /** Resource logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
+
+            /** Resource phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
+
+            /** Resource customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource connectorError. */
+            public connectorError?: (flyteidl.connector.IConnectorError|null);
+
+            /**
+             * Creates a new Resource instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Resource instance
+             */
+            public static create(properties?: flyteidl.connector.IResource): flyteidl.connector.Resource;
+
+            /**
+             * Encodes the specified Resource message. Does not implicitly {@link flyteidl.connector.Resource.verify|verify} messages.
+             * @param message Resource message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IResource, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Resource message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Resource
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.Resource;
+
+            /**
+             * Verifies a Resource message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DeleteTaskRequest. */
+        interface IDeleteTaskRequest {
+
+            /** DeleteTaskRequest taskType */
+            taskType?: (string|null);
+
+            /** DeleteTaskRequest resourceMeta */
+            resourceMeta?: (Uint8Array|null);
+
+            /** DeleteTaskRequest taskCategory */
+            taskCategory?: (flyteidl.connector.ITaskCategory|null);
+        }
+
+        /** Represents a DeleteTaskRequest. */
+        class DeleteTaskRequest implements IDeleteTaskRequest {
+
+            /**
+             * Constructs a new DeleteTaskRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IDeleteTaskRequest);
+
+            /** DeleteTaskRequest taskType. */
+            public taskType: string;
+
+            /** DeleteTaskRequest resourceMeta. */
+            public resourceMeta: Uint8Array;
+
+            /** DeleteTaskRequest taskCategory. */
+            public taskCategory?: (flyteidl.connector.ITaskCategory|null);
+
+            /**
+             * Creates a new DeleteTaskRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DeleteTaskRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IDeleteTaskRequest): flyteidl.connector.DeleteTaskRequest;
+
+            /**
+             * Encodes the specified DeleteTaskRequest message. Does not implicitly {@link flyteidl.connector.DeleteTaskRequest.verify|verify} messages.
+             * @param message DeleteTaskRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IDeleteTaskRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DeleteTaskRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DeleteTaskRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.DeleteTaskRequest;
+
+            /**
+             * Verifies a DeleteTaskRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DeleteTaskResponse. */
+        interface IDeleteTaskResponse {
+        }
+
+        /** Represents a DeleteTaskResponse. */
+        class DeleteTaskResponse implements IDeleteTaskResponse {
+
+            /**
+             * Constructs a new DeleteTaskResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IDeleteTaskResponse);
+
+            /**
+             * Creates a new DeleteTaskResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DeleteTaskResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IDeleteTaskResponse): flyteidl.connector.DeleteTaskResponse;
+
+            /**
+             * Encodes the specified DeleteTaskResponse message. Does not implicitly {@link flyteidl.connector.DeleteTaskResponse.verify|verify} messages.
+             * @param message DeleteTaskResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IDeleteTaskResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DeleteTaskResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DeleteTaskResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.DeleteTaskResponse;
+
+            /**
+             * Verifies a DeleteTaskResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Connector. */
+        interface IConnector {
+
+            /** Connector name */
+            name?: (string|null);
+
+            /** Connector supportedTaskTypes */
+            supportedTaskTypes?: (string[]|null);
+
+            /** Connector isSync */
+            isSync?: (boolean|null);
+
+            /** Connector supportedTaskCategories */
+            supportedTaskCategories?: (flyteidl.connector.ITaskCategory[]|null);
+        }
+
+        /** Represents a Connector. */
+        class Connector implements IConnector {
+
+            /**
+             * Constructs a new Connector.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IConnector);
+
+            /** Connector name. */
+            public name: string;
+
+            /** Connector supportedTaskTypes. */
+            public supportedTaskTypes: string[];
+
+            /** Connector isSync. */
+            public isSync: boolean;
+
+            /** Connector supportedTaskCategories. */
+            public supportedTaskCategories: flyteidl.connector.ITaskCategory[];
+
+            /**
+             * Creates a new Connector instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Connector instance
+             */
+            public static create(properties?: flyteidl.connector.IConnector): flyteidl.connector.Connector;
+
+            /**
+             * Encodes the specified Connector message. Does not implicitly {@link flyteidl.connector.Connector.verify|verify} messages.
+             * @param message Connector message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IConnector, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Connector message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Connector
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.Connector;
+
+            /**
+             * Verifies a Connector message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskCategory. */
+        interface ITaskCategory {
+
+            /** TaskCategory name */
+            name?: (string|null);
+
+            /** TaskCategory version */
+            version?: (number|null);
+        }
+
+        /** Represents a TaskCategory. */
+        class TaskCategory implements ITaskCategory {
+
+            /**
+             * Constructs a new TaskCategory.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.ITaskCategory);
+
+            /** TaskCategory name. */
+            public name: string;
+
+            /** TaskCategory version. */
+            public version: number;
+
+            /**
+             * Creates a new TaskCategory instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskCategory instance
+             */
+            public static create(properties?: flyteidl.connector.ITaskCategory): flyteidl.connector.TaskCategory;
+
+            /**
+             * Encodes the specified TaskCategory message. Does not implicitly {@link flyteidl.connector.TaskCategory.verify|verify} messages.
+             * @param message TaskCategory message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.ITaskCategory, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskCategory message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskCategory
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.TaskCategory;
+
+            /**
+             * Verifies a TaskCategory message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetConnectorRequest. */
+        interface IGetConnectorRequest {
+
+            /** GetConnectorRequest name */
+            name?: (string|null);
+        }
+
+        /** Represents a GetConnectorRequest. */
+        class GetConnectorRequest implements IGetConnectorRequest {
+
+            /**
+             * Constructs a new GetConnectorRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetConnectorRequest);
+
+            /** GetConnectorRequest name. */
+            public name: string;
+
+            /**
+             * Creates a new GetConnectorRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetConnectorRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IGetConnectorRequest): flyteidl.connector.GetConnectorRequest;
+
+            /**
+             * Encodes the specified GetConnectorRequest message. Does not implicitly {@link flyteidl.connector.GetConnectorRequest.verify|verify} messages.
+             * @param message GetConnectorRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetConnectorRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetConnectorRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetConnectorRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetConnectorRequest;
+
+            /**
+             * Verifies a GetConnectorRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetConnectorResponse. */
+        interface IGetConnectorResponse {
+
+            /** GetConnectorResponse connector */
+            connector?: (flyteidl.connector.IConnector|null);
+        }
+
+        /** Represents a GetConnectorResponse. */
+        class GetConnectorResponse implements IGetConnectorResponse {
+
+            /**
+             * Constructs a new GetConnectorResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetConnectorResponse);
+
+            /** GetConnectorResponse connector. */
+            public connector?: (flyteidl.connector.IConnector|null);
+
+            /**
+             * Creates a new GetConnectorResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetConnectorResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IGetConnectorResponse): flyteidl.connector.GetConnectorResponse;
+
+            /**
+             * Encodes the specified GetConnectorResponse message. Does not implicitly {@link flyteidl.connector.GetConnectorResponse.verify|verify} messages.
+             * @param message GetConnectorResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetConnectorResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetConnectorResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetConnectorResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetConnectorResponse;
+
+            /**
+             * Verifies a GetConnectorResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListConnectorsRequest. */
+        interface IListConnectorsRequest {
+        }
+
+        /** Represents a ListConnectorsRequest. */
+        class ListConnectorsRequest implements IListConnectorsRequest {
+
+            /**
+             * Constructs a new ListConnectorsRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IListConnectorsRequest);
+
+            /**
+             * Creates a new ListConnectorsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListConnectorsRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IListConnectorsRequest): flyteidl.connector.ListConnectorsRequest;
+
+            /**
+             * Encodes the specified ListConnectorsRequest message. Does not implicitly {@link flyteidl.connector.ListConnectorsRequest.verify|verify} messages.
+             * @param message ListConnectorsRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IListConnectorsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListConnectorsRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListConnectorsRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListConnectorsRequest;
+
+            /**
+             * Verifies a ListConnectorsRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListConnectorsResponse. */
+        interface IListConnectorsResponse {
+
+            /** ListConnectorsResponse connectors */
+            connectors?: (flyteidl.connector.IConnector[]|null);
+        }
+
+        /** Represents a ListConnectorsResponse. */
+        class ListConnectorsResponse implements IListConnectorsResponse {
+
+            /**
+             * Constructs a new ListConnectorsResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IListConnectorsResponse);
+
+            /** ListConnectorsResponse connectors. */
+            public connectors: flyteidl.connector.IConnector[];
+
+            /**
+             * Creates a new ListConnectorsResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListConnectorsResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IListConnectorsResponse): flyteidl.connector.ListConnectorsResponse;
+
+            /**
+             * Encodes the specified ListConnectorsResponse message. Does not implicitly {@link flyteidl.connector.ListConnectorsResponse.verify|verify} messages.
+             * @param message ListConnectorsResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IListConnectorsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListConnectorsResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListConnectorsResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ListConnectorsResponse;
+
+            /**
+             * Verifies a ListConnectorsResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskMetricsRequest. */
+        interface IGetTaskMetricsRequest {
+
+            /** GetTaskMetricsRequest taskType */
+            taskType?: (string|null);
+
+            /** GetTaskMetricsRequest resourceMeta */
+            resourceMeta?: (Uint8Array|null);
+
+            /** GetTaskMetricsRequest queries */
+            queries?: (string[]|null);
+
+            /** GetTaskMetricsRequest startTime */
+            startTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest endTime */
+            endTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest step */
+            step?: (google.protobuf.IDuration|null);
+
+            /** GetTaskMetricsRequest taskCategory */
+            taskCategory?: (flyteidl.connector.ITaskCategory|null);
+        }
+
+        /** Represents a GetTaskMetricsRequest. */
+        class GetTaskMetricsRequest implements IGetTaskMetricsRequest {
+
+            /**
+             * Constructs a new GetTaskMetricsRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskMetricsRequest);
+
+            /** GetTaskMetricsRequest taskType. */
+            public taskType: string;
+
+            /** GetTaskMetricsRequest resourceMeta. */
+            public resourceMeta: Uint8Array;
+
+            /** GetTaskMetricsRequest queries. */
+            public queries: string[];
+
+            /** GetTaskMetricsRequest startTime. */
+            public startTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest endTime. */
+            public endTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest step. */
+            public step?: (google.protobuf.IDuration|null);
+
+            /** GetTaskMetricsRequest taskCategory. */
+            public taskCategory?: (flyteidl.connector.ITaskCategory|null);
+
+            /**
+             * Creates a new GetTaskMetricsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskMetricsRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskMetricsRequest): flyteidl.connector.GetTaskMetricsRequest;
+
+            /**
+             * Encodes the specified GetTaskMetricsRequest message. Does not implicitly {@link flyteidl.connector.GetTaskMetricsRequest.verify|verify} messages.
+             * @param message GetTaskMetricsRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskMetricsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskMetricsRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskMetricsRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskMetricsRequest;
+
+            /**
+             * Verifies a GetTaskMetricsRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskMetricsResponse. */
+        interface IGetTaskMetricsResponse {
+
+            /** GetTaskMetricsResponse results */
+            results?: (flyteidl.core.IExecutionMetricResult[]|null);
+        }
+
+        /** Represents a GetTaskMetricsResponse. */
+        class GetTaskMetricsResponse implements IGetTaskMetricsResponse {
+
+            /**
+             * Constructs a new GetTaskMetricsResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskMetricsResponse);
+
+            /** GetTaskMetricsResponse results. */
+            public results: flyteidl.core.IExecutionMetricResult[];
+
+            /**
+             * Creates a new GetTaskMetricsResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskMetricsResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskMetricsResponse): flyteidl.connector.GetTaskMetricsResponse;
+
+            /**
+             * Encodes the specified GetTaskMetricsResponse message. Does not implicitly {@link flyteidl.connector.GetTaskMetricsResponse.verify|verify} messages.
+             * @param message GetTaskMetricsResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskMetricsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskMetricsResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskMetricsResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskMetricsResponse;
+
+            /**
+             * Verifies a GetTaskMetricsResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskLogsRequest. */
+        interface IGetTaskLogsRequest {
+
+            /** GetTaskLogsRequest taskType */
+            taskType?: (string|null);
+
+            /** GetTaskLogsRequest resourceMeta */
+            resourceMeta?: (Uint8Array|null);
+
+            /** GetTaskLogsRequest lines */
+            lines?: (Long|null);
+
+            /** GetTaskLogsRequest token */
+            token?: (string|null);
+
+            /** GetTaskLogsRequest taskCategory */
+            taskCategory?: (flyteidl.connector.ITaskCategory|null);
+        }
+
+        /** Represents a GetTaskLogsRequest. */
+        class GetTaskLogsRequest implements IGetTaskLogsRequest {
+
+            /**
+             * Constructs a new GetTaskLogsRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskLogsRequest);
+
+            /** GetTaskLogsRequest taskType. */
+            public taskType: string;
+
+            /** GetTaskLogsRequest resourceMeta. */
+            public resourceMeta: Uint8Array;
+
+            /** GetTaskLogsRequest lines. */
+            public lines: Long;
+
+            /** GetTaskLogsRequest token. */
+            public token: string;
+
+            /** GetTaskLogsRequest taskCategory. */
+            public taskCategory?: (flyteidl.connector.ITaskCategory|null);
+
+            /**
+             * Creates a new GetTaskLogsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskLogsRequest instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskLogsRequest): flyteidl.connector.GetTaskLogsRequest;
+
+            /**
+             * Encodes the specified GetTaskLogsRequest message. Does not implicitly {@link flyteidl.connector.GetTaskLogsRequest.verify|verify} messages.
+             * @param message GetTaskLogsRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskLogsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskLogsRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskLogsRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskLogsRequest;
+
+            /**
+             * Verifies a GetTaskLogsRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskLogsResponseHeader. */
+        interface IGetTaskLogsResponseHeader {
+
+            /** GetTaskLogsResponseHeader token */
+            token?: (string|null);
+        }
+
+        /** Represents a GetTaskLogsResponseHeader. */
+        class GetTaskLogsResponseHeader implements IGetTaskLogsResponseHeader {
+
+            /**
+             * Constructs a new GetTaskLogsResponseHeader.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskLogsResponseHeader);
+
+            /** GetTaskLogsResponseHeader token. */
+            public token: string;
+
+            /**
+             * Creates a new GetTaskLogsResponseHeader instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskLogsResponseHeader instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskLogsResponseHeader): flyteidl.connector.GetTaskLogsResponseHeader;
+
+            /**
+             * Encodes the specified GetTaskLogsResponseHeader message. Does not implicitly {@link flyteidl.connector.GetTaskLogsResponseHeader.verify|verify} messages.
+             * @param message GetTaskLogsResponseHeader message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskLogsResponseHeader, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskLogsResponseHeader message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskLogsResponseHeader
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskLogsResponseHeader;
+
+            /**
+             * Verifies a GetTaskLogsResponseHeader message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskLogsResponseBody. */
+        interface IGetTaskLogsResponseBody {
+
+            /** GetTaskLogsResponseBody results */
+            results?: (string[]|null);
+        }
+
+        /** Represents a GetTaskLogsResponseBody. */
+        class GetTaskLogsResponseBody implements IGetTaskLogsResponseBody {
+
+            /**
+             * Constructs a new GetTaskLogsResponseBody.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskLogsResponseBody);
+
+            /** GetTaskLogsResponseBody results. */
+            public results: string[];
+
+            /**
+             * Creates a new GetTaskLogsResponseBody instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskLogsResponseBody instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskLogsResponseBody): flyteidl.connector.GetTaskLogsResponseBody;
+
+            /**
+             * Encodes the specified GetTaskLogsResponseBody message. Does not implicitly {@link flyteidl.connector.GetTaskLogsResponseBody.verify|verify} messages.
+             * @param message GetTaskLogsResponseBody message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskLogsResponseBody, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskLogsResponseBody message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskLogsResponseBody
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskLogsResponseBody;
+
+            /**
+             * Verifies a GetTaskLogsResponseBody message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetTaskLogsResponse. */
+        interface IGetTaskLogsResponse {
+
+            /** GetTaskLogsResponse header */
+            header?: (flyteidl.connector.IGetTaskLogsResponseHeader|null);
+
+            /** GetTaskLogsResponse body */
+            body?: (flyteidl.connector.IGetTaskLogsResponseBody|null);
+        }
+
+        /** Represents a GetTaskLogsResponse. */
+        class GetTaskLogsResponse implements IGetTaskLogsResponse {
+
+            /**
+             * Constructs a new GetTaskLogsResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IGetTaskLogsResponse);
+
+            /** GetTaskLogsResponse header. */
+            public header?: (flyteidl.connector.IGetTaskLogsResponseHeader|null);
+
+            /** GetTaskLogsResponse body. */
+            public body?: (flyteidl.connector.IGetTaskLogsResponseBody|null);
+
+            /** GetTaskLogsResponse part. */
+            public part?: ("header"|"body");
+
+            /**
+             * Creates a new GetTaskLogsResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetTaskLogsResponse instance
+             */
+            public static create(properties?: flyteidl.connector.IGetTaskLogsResponse): flyteidl.connector.GetTaskLogsResponse;
+
+            /**
+             * Encodes the specified GetTaskLogsResponse message. Does not implicitly {@link flyteidl.connector.GetTaskLogsResponse.verify|verify} messages.
+             * @param message GetTaskLogsResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IGetTaskLogsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetTaskLogsResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetTaskLogsResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.GetTaskLogsResponse;
+
+            /**
+             * Verifies a GetTaskLogsResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ConnectorError. */
+        interface IConnectorError {
+
+            /** ConnectorError code */
+            code?: (string|null);
+
+            /** ConnectorError kind */
+            kind?: (flyteidl.connector.ConnectorError.Kind|null);
+
+            /** ConnectorError origin */
+            origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+        }
+
+        /** Represents a ConnectorError. */
+        class ConnectorError implements IConnectorError {
+
+            /**
+             * Constructs a new ConnectorError.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.connector.IConnectorError);
+
+            /** ConnectorError code. */
+            public code: string;
+
+            /** ConnectorError kind. */
+            public kind: flyteidl.connector.ConnectorError.Kind;
+
+            /** ConnectorError origin. */
+            public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /**
+             * Creates a new ConnectorError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ConnectorError instance
+             */
+            public static create(properties?: flyteidl.connector.IConnectorError): flyteidl.connector.ConnectorError;
+
+            /**
+             * Encodes the specified ConnectorError message. Does not implicitly {@link flyteidl.connector.ConnectorError.verify|verify} messages.
+             * @param message ConnectorError message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.connector.IConnectorError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ConnectorError message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ConnectorError
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.connector.ConnectorError;
+
+            /**
+             * Verifies a ConnectorError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace ConnectorError {
+
+            /** Kind enum. */
+            enum Kind {
+                NON_RECOVERABLE = 0,
+                RECOVERABLE = 1
+            }
         }
     }
 }

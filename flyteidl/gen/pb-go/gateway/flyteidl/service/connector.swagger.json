@@ -1,18 +1,18 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl/service/agent.proto",
+    "title": "flyteidl/service/connector.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "SyncAgentService"
+      "name": "SyncConnectorService"
     },
     {
-      "name": "AsyncAgentService"
+      "name": "AsyncConnectorService"
     },
     {
-      "name": "AgentMetadataService"
+      "name": "ConnectorMetadataService"
     }
   ],
   "consumes": [
@@ -22,15 +22,15 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/agent/task": {
+    "/api/v1/connector/task": {
       "post": {
-        "summary": "CreateTask sends a task create request to the agent service.",
-        "operationId": "AsyncAgentService_CreateTask",
+        "summary": "CreateTask sends a task create request to the connector service.",
+        "operationId": "AsyncConnectorService_CreateTask",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/flyteidladminCreateTaskResponse"
+              "$ref": "#/definitions/flyteidlconnectorCreateTaskResponse"
             }
           },
           "default": {
@@ -47,19 +47,19 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/flyteidladminCreateTaskRequest"
+              "$ref": "#/definitions/flyteidlconnectorCreateTaskRequest"
             }
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "AsyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}": {
+    "/api/v1/connector/task/logs/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "GetTaskLogs returns task execution logs, if available.",
-        "operationId": "AsyncAgentService_GetTaskLogs",
+        "operationId": "AsyncConnectorService_GetTaskLogs",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -67,13 +67,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/flyteidladminGetTaskLogsResponse"
+                  "$ref": "#/definitions/flyteidlconnectorGetTaskLogsResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/googlerpcStatus"
                 }
               },
-              "title": "Stream result of flyteidladminGetTaskLogsResponse"
+              "title": "Stream result of flyteidlconnectorGetTaskLogsResponse"
             }
           },
           "default": {
@@ -101,7 +101,7 @@
           },
           {
             "name": "resource_meta",
-            "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).",
+            "description": "Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).",
             "in": "path",
             "required": true,
             "type": "string",
@@ -131,20 +131,20 @@
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "AsyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}": {
+    "/api/v1/connector/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "GetTaskMetrics returns one or more task execution metrics, if available.",
         "description": "Errors include\n * OutOfRange if metrics are not available for the specified task time range\n * various other errors",
-        "operationId": "AsyncAgentService_GetTaskMetrics",
+        "operationId": "AsyncConnectorService_GetTaskMetrics",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/flyteidladminGetTaskMetricsResponse"
+              "$ref": "#/definitions/flyteidlconnectorGetTaskMetricsResponse"
             }
           },
           "default": {
@@ -172,7 +172,7 @@
           },
           {
             "name": "resource_meta",
-            "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).",
+            "description": "Metadata is created by the connector. It could be a string (jobId) or a dict (more complex metadata).",
             "in": "path",
             "required": true,
             "type": "string",
@@ -221,14 +221,14 @@
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "AsyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/task/stream": {
+    "/api/v1/connector/task/stream": {
       "post": {
-        "summary": "ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.",
-        "operationId": "SyncAgentService_ExecuteTaskSync",
+        "summary": "ExecuteTaskSync streams the create request and inputs to the connector service and streams the outputs back.",
+        "operationId": "SyncConnectorService_ExecuteTaskSync",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -236,13 +236,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/flyteidladminExecuteTaskSyncResponse"
+                  "$ref": "#/definitions/flyteidlconnectorExecuteTaskSyncResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/googlerpcStatus"
                 }
               },
-              "title": "Stream result of flyteidladminExecuteTaskSyncResponse"
+              "title": "Stream result of flyteidlconnectorExecuteTaskSyncResponse"
             }
           },
           "default": {
@@ -259,24 +259,24 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/flyteidladminExecuteTaskSyncRequest"
+              "$ref": "#/definitions/flyteidlconnectorExecuteTaskSyncRequest"
             }
           }
         ],
         "tags": [
-          "SyncAgentService"
+          "SyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}": {
+    "/api/v1/connector/task/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "Get job status.",
-        "operationId": "AsyncAgentService_GetTask",
+        "operationId": "AsyncConnectorService_GetTask",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/flyteidladminGetTaskResponse"
+              "$ref": "#/definitions/flyteidlconnectorGetTaskResponse"
             }
           },
           "default": {
@@ -304,7 +304,7 @@
           },
           {
             "name": "resource_meta",
-            "description": "Metadata about the resource to be pass to the agent.",
+            "description": "Metadata about the resource to be pass to the connector.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -326,19 +326,19 @@
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "AsyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}": {
+    "/api/v1/connector/task_executions/{task_category.name}/{task_category.version}/{resource_meta}": {
       "delete": {
         "summary": "Delete the task resource.",
-        "operationId": "AsyncAgentService_DeleteTask",
+        "operationId": "AsyncConnectorService_DeleteTask",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/flyteidladminDeleteTaskResponse"
+              "$ref": "#/definitions/flyteidlconnectorDeleteTaskResponse"
             }
           },
           "default": {
@@ -366,7 +366,7 @@
           },
           {
             "name": "resource_meta",
-            "description": "Metadata about the resource to be pass to the agent.",
+            "description": "Metadata about the resource to be pass to the connector.",
             "in": "path",
             "required": true,
             "type": "string",
@@ -381,19 +381,19 @@
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "AsyncConnectorService"
         ]
       }
     },
-    "/api/v1/agent/{name}": {
+    "/api/v1/connector/{name}": {
       "get": {
-        "summary": "Fetch a :ref:`ref_flyteidl.admin.Agent` definition.",
-        "operationId": "AgentMetadataService_GetAgent",
+        "summary": "Fetch a :ref:`ref_flyteidl.connector.Connector` definition.",
+        "operationId": "ConnectorMetadataService_GetConnector",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminGetAgentResponse"
+              "$ref": "#/definitions/connectorGetConnectorResponse"
             }
           },
           "default": {
@@ -406,26 +406,26 @@
         "parameters": [
           {
             "name": "name",
-            "description": "The name of the agent.",
+            "description": "The name of the connector.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "AgentMetadataService"
+          "ConnectorMetadataService"
         ]
       }
     },
-    "/api/v1/agents": {
+    "/api/v1/connectors": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.",
-        "operationId": "AgentMetadataService_ListAgents",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.connector.Connector` definitions.",
+        "operationId": "ConnectorMetadataService_ListConnectors",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminListAgentsResponse"
+              "$ref": "#/definitions/connectorListConnectorsResponse"
             }
           },
           "default": {
@@ -436,7 +436,7 @@
           }
         },
         "tags": [
-          "AgentMetadataService"
+          "ConnectorMetadataService"
         ]
       }
     }
@@ -608,36 +608,36 @@
       ],
       "default": "UNKNOWN"
     },
-    "adminAgent": {
+    "connectorConnector": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name is the developer-assigned name of the agent."
+          "description": "Name is the developer-assigned name of the connector."
         },
         "supported_task_types": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+          "description": "SupportedTaskTypes are the types of the tasks that the connector can handle."
         },
         "is_sync": {
           "type": "boolean",
-          "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their\nresults synchronously when called by propeller. Given that sync agents can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async agent, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
+          "description": "IsSync indicates whether this connector is a sync connector. Sync connectors are expected to return their\nresults synchronously when called by propeller. Given that sync connectors can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async connector, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
         },
         "supported_task_categories": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flyteidladminTaskCategory"
+            "$ref": "#/definitions/flyteidlconnectorTaskCategory"
           },
-          "description": "Supported_task_categories are the categories of the tasks that the agent can handle."
+          "description": "Supported_task_categories are the categories of the tasks that the connector can handle."
         }
       },
-      "description": "A message containing the agent metadata."
+      "description": "A message containing the connector metadata."
     },
-    "adminAgentError": {
+    "connectorConnectorError": {
       "type": "object",
       "properties": {
         "code": {
@@ -645,7 +645,7 @@
           "description": "A simplified code for errors, so that we can provide a glossary of all possible errors."
         },
         "kind": {
-          "$ref": "#/definitions/adminAgentErrorKind",
+          "$ref": "#/definitions/connectorConnectorErrorKind",
           "description": "An abstract error kind for this error. Defaults to Non_Recoverable if not specified."
         },
         "origin": {
@@ -653,9 +653,9 @@
           "description": "Defines the origin of the error (system, user, unknown)."
         }
       },
-      "description": "Error message to propagate detailed errors from agent executions to the execution\nengine."
+      "description": "Error message to propagate detailed errors from connector executions to the execution\nengine."
     },
-    "adminAgentErrorKind": {
+    "connectorConnectorErrorKind": {
       "type": "string",
       "enum": [
         "NON_RECOVERABLE",
@@ -664,27 +664,27 @@
       "default": "NON_RECOVERABLE",
       "description": "Defines a generic error type that dictates the behavior of the retry strategy."
     },
-    "adminGetAgentResponse": {
+    "connectorGetConnectorResponse": {
       "type": "object",
       "properties": {
-        "agent": {
-          "$ref": "#/definitions/adminAgent"
+        "connector": {
+          "$ref": "#/definitions/connectorConnector"
         }
       },
-      "description": "A response containing an agent."
+      "description": "A response containing an connector."
     },
-    "adminListAgentsResponse": {
+    "connectorListConnectorsResponse": {
       "type": "object",
       "properties": {
-        "agents": {
+        "connectors": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/adminAgent"
+            "$ref": "#/definitions/connectorConnector"
           }
         }
       },
-      "description": "A response containing a list of agents."
+      "description": "A response containing a list of connectors."
     },
     "coreArtifactBindingData": {
       "type": "object",
@@ -1931,7 +1931,7 @@
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
     },
-    "flyteidladminCreateRequestHeader": {
+    "flyteidlconnectorCreateRequestHeader": {
       "type": "object",
       "properties": {
         "template": {
@@ -1943,7 +1943,7 @@
           "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
         },
         "task_execution_metadata": {
-          "$ref": "#/definitions/flyteidladminTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidlconnectorTaskExecutionMetadata",
           "description": "subset of runtime task execution metadata."
         },
         "max_dataset_size_bytes": {
@@ -1953,7 +1953,7 @@
         }
       }
     },
-    "flyteidladminCreateTaskRequest": {
+    "flyteidlconnectorCreateTaskRequest": {
       "type": "object",
       "properties": {
         "inputs": {
@@ -1969,70 +1969,70 @@
           "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
         },
         "task_execution_metadata": {
-          "$ref": "#/definitions/flyteidladminTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidlconnectorTaskExecutionMetadata",
           "description": "subset of runtime task execution metadata."
         }
       },
       "description": "Represents a request structure to create task."
     },
-    "flyteidladminCreateTaskResponse": {
+    "flyteidlconnectorCreateTaskResponse": {
       "type": "object",
       "properties": {
         "resource_meta": {
           "type": "string",
           "format": "byte",
-          "description": "ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
+          "description": "ResourceMeta is created by the connector. It could be a string (jobId) or a dict (more complex metadata)."
         }
       },
       "description": "Represents a create response structure."
     },
-    "flyteidladminDeleteTaskResponse": {
+    "flyteidlconnectorDeleteTaskResponse": {
       "type": "object",
       "description": "Response to delete a task."
     },
-    "flyteidladminExecuteTaskSyncRequest": {
+    "flyteidlconnectorExecuteTaskSyncRequest": {
       "type": "object",
       "properties": {
         "header": {
-          "$ref": "#/definitions/flyteidladminCreateRequestHeader"
+          "$ref": "#/definitions/flyteidlconnectorCreateRequestHeader"
         },
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap"
         }
       }
     },
-    "flyteidladminExecuteTaskSyncResponse": {
+    "flyteidlconnectorExecuteTaskSyncResponse": {
       "type": "object",
       "properties": {
         "header": {
-          "$ref": "#/definitions/flyteidladminExecuteTaskSyncResponseHeader"
+          "$ref": "#/definitions/flyteidlconnectorExecuteTaskSyncResponseHeader"
         },
         "outputs": {
           "$ref": "#/definitions/coreLiteralMap"
         }
       }
     },
-    "flyteidladminExecuteTaskSyncResponseHeader": {
+    "flyteidlconnectorExecuteTaskSyncResponseHeader": {
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/flyteidladminResource"
+          "$ref": "#/definitions/flyteidlconnectorResource"
         }
       }
     },
-    "flyteidladminGetTaskLogsResponse": {
+    "flyteidlconnectorGetTaskLogsResponse": {
       "type": "object",
       "properties": {
         "header": {
-          "$ref": "#/definitions/flyteidladminGetTaskLogsResponseHeader"
+          "$ref": "#/definitions/flyteidlconnectorGetTaskLogsResponseHeader"
         },
         "body": {
-          "$ref": "#/definitions/flyteidladminGetTaskLogsResponseBody"
+          "$ref": "#/definitions/flyteidlconnectorGetTaskLogsResponseBody"
         }
       },
       "description": "A response containing the logs for a task execution."
     },
-    "flyteidladminGetTaskLogsResponseBody": {
+    "flyteidlconnectorGetTaskLogsResponseBody": {
       "type": "object",
       "properties": {
         "results": {
@@ -2044,7 +2044,7 @@
         }
       }
     },
-    "flyteidladminGetTaskLogsResponseHeader": {
+    "flyteidlconnectorGetTaskLogsResponseHeader": {
       "type": "object",
       "properties": {
         "token": {
@@ -2053,7 +2053,7 @@
         }
       }
     },
-    "flyteidladminGetTaskMetricsResponse": {
+    "flyteidlconnectorGetTaskMetricsResponse": {
       "type": "object",
       "properties": {
         "results": {
@@ -2067,25 +2067,25 @@
       },
       "description": "A response containing a list of metrics for a task execution."
     },
-    "flyteidladminGetTaskResponse": {
+    "flyteidlconnectorGetTaskResponse": {
       "type": "object",
       "properties": {
         "resource": {
-          "$ref": "#/definitions/flyteidladminResource"
+          "$ref": "#/definitions/flyteidlconnectorResource"
         }
       },
       "description": "Response to get an individual task resource."
     },
-    "flyteidladminResource": {
+    "flyteidlconnectorResource": {
       "type": "object",
       "properties": {
         "state": {
-          "$ref": "#/definitions/flyteidladminState",
+          "$ref": "#/definitions/flyteidlconnectorState",
           "description": "DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI."
         },
         "outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
+          "title": "The outputs of the execution. It's typically used by sql task. Connector service will create a\nStructured dataset pointing to the query result table.\n+optional"
         },
         "message": {
           "type": "string",
@@ -2105,15 +2105,15 @@
         },
         "custom_info": {
           "type": "object",
-          "description": "Custom data specific to the agent."
+          "description": "Custom data specific to the connector."
         },
-        "agent_error": {
-          "$ref": "#/definitions/adminAgentError",
+        "connector_error": {
+          "$ref": "#/definitions/connectorConnectorError",
           "title": "The error raised during execution"
         }
       }
     },
-    "flyteidladminState": {
+    "flyteidlconnectorState": {
       "type": "string",
       "enum": [
         "RETRYABLE_FAILURE",
@@ -2125,7 +2125,7 @@
       "default": "RETRYABLE_FAILURE",
       "description": "The state of the execution is used to control its visibility in the UI/CLI."
     },
-    "flyteidladminTaskCategory": {
+    "flyteidlconnectorTaskCategory": {
       "type": "object",
       "properties": {
         "name": {
@@ -2139,7 +2139,7 @@
         }
       }
     },
-    "flyteidladminTaskExecutionMetadata": {
+    "flyteidlconnectorTaskExecutionMetadata": {
       "type": "object",
       "properties": {
         "task_execution_id": {
