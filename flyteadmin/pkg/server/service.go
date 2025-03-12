@@ -29,6 +29,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/authzserver"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interceptors"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/dataproxy"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -106,8 +107,8 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
 	if cfg.Security.UseAuth {
 		logger.Infof(ctx, "Creating gRPC server with authentication")
-		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+
+		interceptorsToLoad := []grpc.UnaryServerInterceptor{
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
 			grpcprometheus.UnaryServerInterceptor,
@@ -115,8 +116,21 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
 			auth.AuthenticationLoggingInterceptor,
-			middlewareInterceptors,
-		)
+		}
+
+		if authCtx.Options().Rbac.Enabled {
+			logger.Infof(ctx, "Creating gRPC server with RBAC")
+			rbacInterceptor, err := interceptors.NewRbacInterceptor(authCtx)
+			if err != nil {
+				return nil, fmt.Errorf("creating rbac interceptor: %w", err)
+			}
+			interceptorsToLoad = append(interceptorsToLoad, rbacInterceptor.UnaryInterceptor())
+		}
+
+		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
+		interceptorsToLoad = append(interceptorsToLoad, middlewareInterceptors)
+
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(interceptorsToLoad...)
 	} else {
 		logger.Infof(ctx, "Creating gRPC server without authentication")
 		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(

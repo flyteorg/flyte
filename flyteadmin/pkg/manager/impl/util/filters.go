@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
@@ -317,4 +318,89 @@ func GetNodeExecutionIdentifierFilters(
 			nodeExecutionIdentifier.GetNodeId(), nodeExecutionIdentifier)
 	}
 	return append(workflowExecutionIdentifierFilters, nodeIDFilter), nil
+}
+
+// GetIsolationFilter takes in a target resource depth, a user's resource scopes, and the resource's columns and generates
+// appropriate where clauses to filter resources based on a user's isolation context.
+func GetIsolationFilter(ctx context.Context, resourceDepth isolation.TargetResourceScopeDepth, columns common.ResourceColumns) common.IsolationFilter {
+	authzCtx := isolation.IsolationContextFromContext(ctx)
+	resourceScopes := authzCtx.GetResourceScopes()
+
+	// authz is disabled or has been bypassed
+	if len(resourceScopes) == 0 {
+		return nil
+	}
+
+	adjustedResourceScopes := []isolation.ResourceScope{}
+
+	for _, resourceScope := range resourceScopes {
+		if resourceScope.Project == "" {
+			// User has wildcard access
+			return nil
+		}
+
+		tempResourceScope := isolation.ResourceScope{
+			Project: resourceScope.Project,
+		}
+
+		if resourceDepth == isolation.ProjectTargetResourceScopeDepth {
+			// truncate user's resource scope to project level
+			adjustedResourceScopes = append(adjustedResourceScopes, tempResourceScope)
+			continue
+		}
+
+		if resourceScope.Domain != "" {
+			tempResourceScope.Domain = resourceScope.Domain
+		}
+
+		if resourceDepth == isolation.DomainTargetResourceScopeDepth {
+			// truncate user's resource scope to domain level
+			adjustedResourceScopes = append(adjustedResourceScopes, tempResourceScope)
+			continue
+		}
+	}
+
+	return common.NewResourceIsolationFilter(adjustedResourceScopes, columns)
+}
+
+// FilterResourceMutation is a helper function to determine whether a use can create/modify/delete a target resource.
+func FilterResourceMutation(ctx context.Context, targetProject string, targetDomain string) error {
+	authzCtx := isolation.IsolationContextFromContext(ctx)
+	resourceScopes := authzCtx.GetResourceScopes()
+
+	if len(resourceScopes) == 0 {
+		// If there are no resource scopes rbac is likely disabled or the request has been whitelisted. Allow it.
+		return nil
+	}
+
+	for _, resourceScope := range resourceScopes {
+		if targetProject != "" {
+			if resourceScope.Project == "" {
+				// user has wildcard scope
+				return nil
+			}
+
+			if resourceScope.Project != targetProject {
+				// Project depth doesn't match
+				continue
+			}
+		}
+
+		if targetDomain != "" {
+			if resourceScope.Domain == "" {
+				// user has wildcard scope
+				return nil
+			}
+
+			if resourceScope.Domain != targetDomain {
+				// Domain depth doesn't match
+				continue
+			}
+		}
+
+		// Exact match all the way, allow it.
+		return nil
+	}
+
+	return errors.NewFlyteAdminErrorf(codes.NotFound, "project or domain not found")
 }

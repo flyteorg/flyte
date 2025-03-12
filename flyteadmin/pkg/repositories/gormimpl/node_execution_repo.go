@@ -6,12 +6,18 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	nodeExecutionColumnNames = common.ResourceColumns{Project: "node_executions.execution_project", Domain: "node_executions.execution_domain"}
 )
 
 // Implementation of NodeExecutionInterface.
@@ -22,6 +28,9 @@ type NodeExecutionRepo struct {
 }
 
 func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeExecution) error {
+	if err := util.FilterResourceMutation(ctx, execution.Project, execution.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&execution)
 	timer.Stop()
@@ -32,6 +41,7 @@ func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeEx
 }
 
 func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, nodeExecutionColumnNames)
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
@@ -43,7 +53,12 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
-	}).Take(&nodeExecution)
+	})
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&nodeExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -64,6 +79,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 }
 
 func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, nodeExecutionColumnNames)
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
@@ -75,7 +91,12 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 				Name:    input.NodeExecutionIdentifier.GetExecutionId().GetName(),
 			},
 		},
-	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
+	}).Preload("ChildNodeExecutions")
+	if isolationFilter != nil {
+		cleanSession := tx.Session(&gorm.Session{NewDB: true})
+		tx = tx.Where(cleanSession.Scopes(isolationFilter.GetScopes()...))
+	}
+	tx = tx.Take(&nodeExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -96,6 +117,9 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 }
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
+	if err := util.FilterResourceMutation(ctx, nodeExecution.Project, nodeExecution.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Where(getIDFilter(nodeExecution.ID)).Updates(nodeExecution)
 	timer.Stop()
@@ -119,7 +143,8 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, nodeExecutionColumnNames)
+	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.NodeExecutionCollectionOutput{}, err
 	}
@@ -169,7 +194,8 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, nodeExecutionColumnNames)
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return 0, err
 	}

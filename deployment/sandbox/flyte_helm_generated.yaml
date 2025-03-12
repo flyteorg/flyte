@@ -276,6 +276,28 @@ data:
       - https://localhost:30081
       - http://flyteadmin:80
       - http://flyteadmin.flyte.svc.cluster.local:80
+      rbac:
+        bypassMethodPatterns:
+        - /grpc.health.v1.Health/.*
+        - /flyteidl.service.AuthMetadataService/.*
+        enabled: false
+        policies:
+        - role: admin
+          rules:
+          - methodPattern: .*
+            name: Admin allow all
+        - role: flytesnacks-engineer
+          rules:
+          - domain: development
+            methodPattern: .*
+            name: Flytesnacks engineer dev write access
+            project: flytesnacks
+          - domain: production
+            methodPattern: List.*|Get.*
+            name: Flytesnacks engineer prod read access
+            project: flytesnacks
+        tokenScopeRoleResolver:
+          enabled: true
       userAuth:
         openId:
           baseUrl: https://accounts.google.com
@@ -6696,7 +6718,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f2d2bbea27b58cc5a73da30eb8aeb56fc41863f4eba2bfe407da2e97a6372e8"
+        configChecksum: "aed279976feb8cc5f4d9baed5fb6f613ddc36756d2c86ff0085856ffcce3ba5"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -7089,7 +7111,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f2d2bbea27b58cc5a73da30eb8aeb56fc41863f4eba2bfe407da2e97a6372e8"
+        configChecksum: "aed279976feb8cc5f4d9baed5fb6f613ddc36756d2c86ff0085856ffcce3ba5"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

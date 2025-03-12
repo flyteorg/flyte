@@ -6,7 +6,9 @@ import (
 	"fmt"
 
 	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -388,4 +390,63 @@ func NewWithDefaultValueFilter(defaultValue interface{}, filter InlineFilter) (I
 		inlineFilterImpl: *inlineFilter,
 		defaultValue:     defaultValue,
 	}, nil
+}
+
+// ResourceColumns is a struct to indicate which columns in a query represent the flyte project and domain
+type ResourceColumns struct {
+	Project string
+	Domain  string
+}
+
+// IsolationFilter is an interface for filtering data based on authorization rules
+type IsolationFilter interface {
+	GetScopes() []func(tx *gorm.DB) *gorm.DB
+}
+
+// ResourceIsolationFilter is an implementation of IsolationFilter that provides db scopes for filtering resources.
+type ResourceIsolationFilter struct {
+	resourceScopes []isolation.ResourceScope
+	columns        ResourceColumns
+}
+
+// NewResourceIsolationFilter creates a new ResourceIsolationFilter
+func NewResourceIsolationFilter(resourceScopes []isolation.ResourceScope, columns ResourceColumns) *ResourceIsolationFilter {
+	return &ResourceIsolationFilter{resourceScopes: resourceScopes, columns: columns}
+}
+
+// GetScopes gets a list of functions that mutates a query to apply filtering where clauses
+func (a *ResourceIsolationFilter) GetScopes() []func(tx *gorm.DB) *gorm.DB {
+	scopes := []func(tx *gorm.DB) *gorm.DB{}
+
+	for tempIndex, tempResourceScope := range a.resourceScopes {
+		// Copy to avoid issues
+		index := tempIndex
+		resourceScope := tempResourceScope
+		scopes = append(scopes, func(tx *gorm.DB) *gorm.DB {
+			// We must start of with a where clause, then after that we can chain each resource scope with OR
+			if index == 0 {
+				return tx.Where(tx.Scopes(a.toDbScopes(resourceScope)))
+			}
+			return tx.Or(tx.Scopes(a.toDbScopes(resourceScope)))
+		})
+	}
+
+	return scopes
+}
+
+func (a *ResourceIsolationFilter) toDbScopes(resourceScope isolation.ResourceScope) func(db *gorm.DB) *gorm.DB {
+	return func(tx *gorm.DB) *gorm.DB {
+
+		// Filter resource by project
+		if resourceScope.Project != "" {
+			tx = tx.Where(fmt.Sprintf("%s = ?", a.columns.Project), resourceScope.Project)
+		}
+
+		// Filter resource by domain
+		if resourceScope.Domain != "" {
+			tx = tx.Where(fmt.Sprintf("%s = ?", a.columns.Domain), resourceScope.Domain)
+		}
+
+		return tx
+	}
 }

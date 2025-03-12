@@ -7,13 +7,19 @@ import (
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/isolation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+)
+
+var (
+	namedEntityResourceColumns = common.ResourceColumns{Project: "entities.project", Domain: "entities.domain"}
 )
 
 const innerJoinTableAlias = "entities"
@@ -112,6 +118,9 @@ type NamedEntityRepo struct {
 }
 
 func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) error {
+	if err := util.FilterResourceMutation(ctx, input.Project, input.Domain); err != nil {
+		return err
+	}
 	timer := r.metrics.UpdateDuration.Start()
 	var metadata models.NamedEntityMetadata
 	tx := r.db.WithContext(ctx).Where(&models.NamedEntityMetadata{
@@ -146,7 +155,8 @@ func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEnti
 	tx := r.db.WithContext(ctx).Table(tableName).Joins(joinString)
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, filters, nil)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, namedEntityResourceColumns)
+	tx, err = applyScopedFilters(tx, filters, nil, isolationFilter)
 	if err != nil {
 		return models.NamedEntity{}, err
 	}
@@ -185,7 +195,8 @@ func (r *NamedEntityRepo) List(ctx context.Context, input interfaces.ListNamedEn
 	tx := getSubQueryJoin(r.db.WithContext(ctx), tableName, input)
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	isolationFilter := util.GetIsolationFilter(ctx, isolation.DomainTargetResourceScopeDepth, namedEntityResourceColumns)
+	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters, isolationFilter)
 	if err != nil {
 		return interfaces.NamedEntityCollectionOutput{}, err
 	}
