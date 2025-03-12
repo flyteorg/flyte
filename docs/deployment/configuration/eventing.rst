@@ -27,19 +27,39 @@ Configuration
 
 To turn on, add the following to your FlyteAdmin:
 
-.. code:: yaml
 
-  external_events.yaml: |
-    externalEvents:
-      enable: true
-      aws:
-        region: us-east-2
-      eventsPublisher:
-        eventTypes:
-        - all
-        topicName: arn:aws:sns:us-east-2:123456:123-my-topic
-      type: aws
+.. tabs::
 
+   .. tab:: AWS SNS
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             aws:
+               region: us-east-2
+             eventsPublisher:
+               eventTypes:
+               - all # or node, task, workflow
+               topicName: arn:aws:sns:us-east-2:123456:123-my-topic
+             type: aws
+   
+   .. tab:: GCP Pub/Sub
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             gcp:
+               projectId: my-project-id
+             eventsPublisher:
+               eventTypes:
+               - all # or node, task, workflow
+               topicName: my-topic
+             type: gcp
+   
 Helm
 ====
 
