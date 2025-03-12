@@ -15111,6 +15111,116 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionPhaseDeleteRequest. */
+        interface IExecutionPhaseDeleteRequest {
+
+            /** ExecutionPhaseDeleteRequest id */
+            id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionPhaseDeleteRequest phase */
+            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
+        }
+
+        /** Represents an ExecutionPhaseDeleteRequest. */
+        class ExecutionPhaseDeleteRequest implements IExecutionPhaseDeleteRequest {
+
+            /**
+             * Constructs a new ExecutionPhaseDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionPhaseDeleteRequest);
+
+            /** ExecutionPhaseDeleteRequest id. */
+            public id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionPhaseDeleteRequest phase. */
+            public phase: flyteidl.core.WorkflowExecution.Phase;
+
+            /**
+             * Creates a new ExecutionPhaseDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionPhaseDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionPhaseDeleteRequest): flyteidl.admin.ExecutionPhaseDeleteRequest;
+
+            /**
+             * Encodes the specified ExecutionPhaseDeleteRequest message. Does not implicitly {@link flyteidl.admin.ExecutionPhaseDeleteRequest.verify|verify} messages.
+             * @param message ExecutionPhaseDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionPhaseDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionPhaseDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionPhaseDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionPhaseDeleteRequest;
+
+            /**
+             * Verifies an ExecutionPhaseDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionPhaseDeleteResponse. */
+        interface IExecutionPhaseDeleteResponse {
+
+            /** ExecutionPhaseDeleteResponse message */
+            message?: (string|null);
+        }
+
+        /** Represents an ExecutionPhaseDeleteResponse. */
+        class ExecutionPhaseDeleteResponse implements IExecutionPhaseDeleteResponse {
+
+            /**
+             * Constructs a new ExecutionPhaseDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionPhaseDeleteResponse);
+
+            /** ExecutionPhaseDeleteResponse message. */
+            public message: string;
+
+            /**
+             * Creates a new ExecutionPhaseDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionPhaseDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionPhaseDeleteResponse): flyteidl.admin.ExecutionPhaseDeleteResponse;
+
+            /**
+             * Encodes the specified ExecutionPhaseDeleteResponse message. Does not implicitly {@link flyteidl.admin.ExecutionPhaseDeleteResponse.verify|verify} messages.
+             * @param message ExecutionPhaseDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionPhaseDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionPhaseDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionPhaseDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionPhaseDeleteResponse;
+
+            /**
+             * Verifies an ExecutionPhaseDeleteResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** MatchableResource enum. */
         enum MatchableResource {
             TASK_RESOURCE = 0,
@@ -22609,6 +22719,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getExecutionMetrics(request: flyteidl.admin.IWorkflowExecutionGetMetricsRequest): Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>;
+
+            /**
+             * Calls DeleteExecutionPhase.
+             * @param request ExecutionPhaseDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ExecutionPhaseDeleteResponse
+             */
+            public deleteExecutionPhase(request: flyteidl.admin.IExecutionPhaseDeleteRequest, callback: flyteidl.service.AdminService.DeleteExecutionPhaseCallback): void;
+
+            /**
+             * Calls DeleteExecutionPhase.
+             * @param request ExecutionPhaseDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteExecutionPhase(request: flyteidl.admin.IExecutionPhaseDeleteRequest): Promise<flyteidl.admin.ExecutionPhaseDeleteResponse>;
         }
 
         namespace AdminService {
@@ -23004,6 +23128,13 @@ export namespace flyteidl {
              * @param [response] WorkflowExecutionGetMetricsResponse
              */
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#deleteExecutionPhase}.
+             * @param error Error, if any
+             * @param [response] ExecutionPhaseDeleteResponse
+             */
+            type DeleteExecutionPhaseCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionPhaseDeleteResponse) => void;
         }
 
         /** Represents a SyncAgentService */

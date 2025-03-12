@@ -37,6 +37,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
@@ -6027,5 +6028,70 @@ func TestQueryTemplate(t *testing.T) {
 
 		_, err := m.fillInTemplateArgs(ctx, q, otherInputs.GetLiterals())
 		assert.Error(t, err)
+	})
+}
+
+func TestDeleteExecutionPhase(t *testing.T) {
+	t.Run("successful deletion", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+
+		deleteExecutionPhaseFunc := func(ctx context.Context, input repositoryInterfaces.ExecutionPhaseDeleteInput) error {
+			assert.Equal(t, "project", input.Project)
+			assert.Equal(t, "domain", input.Domain)
+			assert.Equal(t, core.WorkflowExecution_SUCCEEDED, input.ExecutionPhase)
+			return nil
+		}
+
+		mockExecutionRepo := repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo)
+		mockExecutionRepo.SetDeleteCallback(deleteExecutionPhaseFunc)
+
+		r := plugins.NewRegistry()
+		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(),
+			getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(),
+			mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil,
+			&eventWriterMocks.WorkflowExecutionEventWriter{})
+
+		resp, err := execManager.DeleteExecutionPhase(context.Background(), &admin.ExecutionPhaseDeleteRequest{
+			Id: &core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+			},
+			Phase: core.WorkflowExecution_SUCCEEDED,
+		})
+
+		assert.NoError(t, err)
+		assert.NotNil(t, resp)
+	})
+
+	t.Run("failed deletion", func(t *testing.T) {
+		repository := repositoryMocks.NewMockRepository()
+
+		deleteExecutionPhaseFunc := func(ctx context.Context, input repositoryInterfaces.ExecutionPhaseDeleteInput) error {
+			assert.Equal(t, "project", input.Project)
+			assert.Equal(t, core.WorkflowExecution_SUCCEEDED, input.ExecutionPhase)
+			return nil
+		}
+
+		mockExecutionRepo := repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo)
+		mockExecutionRepo.SetDeleteCallback(deleteExecutionPhaseFunc)
+
+		r := plugins.NewRegistry()
+		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(),
+			getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(),
+			mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil,
+			&eventWriterMocks.WorkflowExecutionEventWriter{})
+
+		resp, err := execManager.DeleteExecutionPhase(context.Background(), &admin.ExecutionPhaseDeleteRequest{
+			Id: &core.WorkflowExecutionIdentifier{
+				Project: "project",
+			},
+			Phase: core.WorkflowExecution_SUCCEEDED,
+		})
+
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+		assert.Contains(t, err.Error(), "workflow execution identifier must have project, domain")
 	})
 }

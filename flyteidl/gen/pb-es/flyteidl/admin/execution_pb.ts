@@ -1599,3 +1599,83 @@ export class WorkflowExecutionGetMetricsResponse extends Message<WorkflowExecuti
   }
 }
 
+/**
+ * @generated from message flyteidl.admin.ExecutionPhaseDeleteRequest
+ */
+export class ExecutionPhaseDeleteRequest extends Message<ExecutionPhaseDeleteRequest> {
+  /**
+   * @generated from field: flyteidl.core.WorkflowExecutionIdentifier id = 1;
+   */
+  id?: WorkflowExecutionIdentifier;
+
+  /**
+   * @generated from field: flyteidl.core.WorkflowExecution.Phase phase = 2;
+   */
+  phase = WorkflowExecution_Phase.UNDEFINED;
+
+  constructor(data?: PartialMessage<ExecutionPhaseDeleteRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionPhaseDeleteRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "message", T: WorkflowExecutionIdentifier },
+    { no: 2, name: "phase", kind: "enum", T: proto3.getEnumType(WorkflowExecution_Phase) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionPhaseDeleteRequest {
+    return new ExecutionPhaseDeleteRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionPhaseDeleteRequest {
+    return new ExecutionPhaseDeleteRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionPhaseDeleteRequest {
+    return new ExecutionPhaseDeleteRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionPhaseDeleteRequest | PlainMessage<ExecutionPhaseDeleteRequest> | undefined, b: ExecutionPhaseDeleteRequest | PlainMessage<ExecutionPhaseDeleteRequest> | undefined): boolean {
+    return proto3.util.equals(ExecutionPhaseDeleteRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ExecutionPhaseDeleteResponse
+ */
+export class ExecutionPhaseDeleteResponse extends Message<ExecutionPhaseDeleteResponse> {
+  /**
+   * @generated from field: string message = 1;
+   */
+  message = "";
+
+  constructor(data?: PartialMessage<ExecutionPhaseDeleteResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionPhaseDeleteResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionPhaseDeleteResponse {
+    return new ExecutionPhaseDeleteResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionPhaseDeleteResponse {
+    return new ExecutionPhaseDeleteResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionPhaseDeleteResponse {
+    return new ExecutionPhaseDeleteResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionPhaseDeleteResponse | PlainMessage<ExecutionPhaseDeleteResponse> | undefined, b: ExecutionPhaseDeleteResponse | PlainMessage<ExecutionPhaseDeleteResponse> | undefined): boolean {
+    return proto3.util.equals(ExecutionPhaseDeleteResponse, a, b);
+  }
+}
+

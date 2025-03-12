@@ -76,6 +76,7 @@ const (
 	AdminService_GetDescriptionEntity_FullMethodName          = "/flyteidl.service.AdminService/GetDescriptionEntity"
 	AdminService_ListDescriptionEntities_FullMethodName       = "/flyteidl.service.AdminService/ListDescriptionEntities"
 	AdminService_GetExecutionMetrics_FullMethodName           = "/flyteidl.service.AdminService/GetExecutionMetrics"
+	AdminService_DeleteExecutionPhase_FullMethodName          = "/flyteidl.service.AdminService/DeleteExecutionPhase"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -198,6 +199,7 @@ type AdminServiceClient interface {
 	ListDescriptionEntities(ctx context.Context, in *admin.DescriptionEntityListRequest, opts ...grpc.CallOption) (*admin.DescriptionEntityList, error)
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(ctx context.Context, in *admin.WorkflowExecutionGetMetricsRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionGetMetricsResponse, error)
+	DeleteExecutionPhase(ctx context.Context, in *admin.ExecutionPhaseDeleteRequest, opts ...grpc.CallOption) (*admin.ExecutionPhaseDeleteResponse, error)
 }
 
 type adminServiceClient struct {
@@ -712,6 +714,15 @@ func (c *adminServiceClient) GetExecutionMetrics(ctx context.Context, in *admin.
 	return out, nil
 }
 
+func (c *adminServiceClient) DeleteExecutionPhase(ctx context.Context, in *admin.ExecutionPhaseDeleteRequest, opts ...grpc.CallOption) (*admin.ExecutionPhaseDeleteResponse, error) {
+	out := new(admin.ExecutionPhaseDeleteResponse)
+	err := c.cc.Invoke(ctx, AdminService_DeleteExecutionPhase_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations should embed UnimplementedAdminServiceServer
 // for forward compatibility
@@ -832,6 +843,7 @@ type AdminServiceServer interface {
 	ListDescriptionEntities(context.Context, *admin.DescriptionEntityListRequest) (*admin.DescriptionEntityList, error)
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error)
+	DeleteExecutionPhase(context.Context, *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error)
 }
 
 // UnimplementedAdminServiceServer should be embedded to have forward compatible implementations.
@@ -1005,6 +1017,9 @@ func (UnimplementedAdminServiceServer) ListDescriptionEntities(context.Context, 
 }
 func (UnimplementedAdminServiceServer) GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExecutionMetrics not implemented")
+}
+func (UnimplementedAdminServiceServer) DeleteExecutionPhase(context.Context, *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteExecutionPhase not implemented")
 }
 
 // UnsafeAdminServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -2026,6 +2041,24 @@ func _AdminService_GetExecutionMetrics_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_DeleteExecutionPhase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ExecutionPhaseDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).DeleteExecutionPhase(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_DeleteExecutionPhase_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).DeleteExecutionPhase(ctx, req.(*admin.ExecutionPhaseDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2256,6 +2289,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetExecutionMetrics",
 			Handler:    _AdminService_GetExecutionMetrics_Handler,
+		},
+		{
+			MethodName: "DeleteExecutionPhase",
+			Handler:    _AdminService_DeleteExecutionPhase_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

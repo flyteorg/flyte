@@ -13,6 +13,7 @@ type GetExecutionFunc func(ctx context.Context, input interfaces.Identifier) (mo
 type ListExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error)
 type CountExecutionFunc func(ctx context.Context, input interfaces.CountResourceInput) (int64, error)
+type DeleteExecutionFunc func(ctx context.Context, input interfaces.ExecutionPhaseDeleteInput) error
 
 type MockExecutionRepo struct {
 	createFunction CreateExecutionFunc
@@ -20,6 +21,7 @@ type MockExecutionRepo struct {
 	getFunction    GetExecutionFunc
 	listFunction   ListExecutionFunc
 	countFunction  CountExecutionFunc
+	deleteFunction DeleteExecutionFunc
 }
 
 func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
@@ -80,4 +82,15 @@ func (r *MockExecutionRepo) SetCountCallback(countFunction CountExecutionFunc) {
 
 func NewMockExecutionRepo() interfaces.ExecutionRepoInterface {
 	return &MockExecutionRepo{}
+}
+
+func (r *MockExecutionRepo) Delete(ctx context.Context, input interfaces.ExecutionPhaseDeleteInput) error {
+	if r.deleteFunction != nil {
+		return r.deleteFunction(ctx, input)
+	}
+	return nil
+}
+
+func (r *MockExecutionRepo) SetDeleteCallback(deleteFunction func(context.Context, interfaces.ExecutionPhaseDeleteInput) error) {
+	r.deleteFunction = deleteFunction
 }

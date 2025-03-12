@@ -144,6 +144,65 @@ func (_c *ExecutionInterface_CreateWorkflowEvent_Call) RunAndReturn(run func(con
 	return _c
 }
 
+// DeleteExecutionPhase provides a mock function with given fields: ctx, request
+func (_m *ExecutionInterface) DeleteExecutionPhase(ctx context.Context, request *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteExecutionPhase")
+	}
+
+	var r0 *admin.ExecutionPhaseDeleteResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error)); ok {
+		return rf(ctx, request)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionPhaseDeleteRequest) *admin.ExecutionPhaseDeleteResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionPhaseDeleteResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionPhaseDeleteRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ExecutionInterface_DeleteExecutionPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteExecutionPhase'
+type ExecutionInterface_DeleteExecutionPhase_Call struct {
+	*mock.Call
+}
+
+// DeleteExecutionPhase is a helper method to define mock.On call
+//   - ctx context.Context
+//   - request *admin.ExecutionPhaseDeleteRequest
+func (_e *ExecutionInterface_Expecter) DeleteExecutionPhase(ctx interface{}, request interface{}) *ExecutionInterface_DeleteExecutionPhase_Call {
+	return &ExecutionInterface_DeleteExecutionPhase_Call{Call: _e.mock.On("DeleteExecutionPhase", ctx, request)}
+}
+
+func (_c *ExecutionInterface_DeleteExecutionPhase_Call) Run(run func(ctx context.Context, request *admin.ExecutionPhaseDeleteRequest)) *ExecutionInterface_DeleteExecutionPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*admin.ExecutionPhaseDeleteRequest))
+	})
+	return _c
+}
+
+func (_c *ExecutionInterface_DeleteExecutionPhase_Call) Return(_a0 *admin.ExecutionPhaseDeleteResponse, _a1 error) *ExecutionInterface_DeleteExecutionPhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ExecutionInterface_DeleteExecutionPhase_Call) RunAndReturn(run func(context.Context, *admin.ExecutionPhaseDeleteRequest) (*admin.ExecutionPhaseDeleteResponse, error)) *ExecutionInterface_DeleteExecutionPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetExecution provides a mock function with given fields: ctx, request
 func (_m *ExecutionInterface) GetExecution(ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
 	ret := _m.Called(ctx, request)

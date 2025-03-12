@@ -1861,6 +1861,20 @@ pub struct WorkflowExecutionGetMetricsResponse {
     #[prost(message, optional, tag="1")]
     pub span: ::core::option::Option<super::core::Span>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionPhaseDeleteRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(enumeration="super::core::workflow_execution::Phase", tag="2")]
+    pub phase: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionPhaseDeleteResponse {
+    #[prost(string, tag="1")]
+    pub message: ::prost::alloc::string::String,
+}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

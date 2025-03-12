@@ -506,6 +506,54 @@ func (_m *AdminServiceClient) CreateWorkflowEvent(ctx context.Context, in *admin
 	return r0, r1
 }
 
+type AdminServiceClient_DeleteExecutionPhase struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_DeleteExecutionPhase) Return(_a0 *admin.ExecutionPhaseDeleteResponse, _a1 error) *AdminServiceClient_DeleteExecutionPhase {
+	return &AdminServiceClient_DeleteExecutionPhase{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnDeleteExecutionPhase(ctx context.Context, in *admin.ExecutionPhaseDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteExecutionPhase {
+	c_call := _m.On("DeleteExecutionPhase", ctx, in, opts)
+	return &AdminServiceClient_DeleteExecutionPhase{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnDeleteExecutionPhaseMatch(matchers ...interface{}) *AdminServiceClient_DeleteExecutionPhase {
+	c_call := _m.On("DeleteExecutionPhase", matchers...)
+	return &AdminServiceClient_DeleteExecutionPhase{Call: c_call}
+}
+
+// DeleteExecutionPhase provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) DeleteExecutionPhase(ctx context.Context, in *admin.ExecutionPhaseDeleteRequest, opts ...grpc.CallOption) (*admin.ExecutionPhaseDeleteResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ExecutionPhaseDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionPhaseDeleteRequest, ...grpc.CallOption) *admin.ExecutionPhaseDeleteResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionPhaseDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionPhaseDeleteRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // AdminServiceClient_CreateWorkflowEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkflowEvent'
 type AdminServiceClient_CreateWorkflowEvent_Call struct {
 	*mock.Call

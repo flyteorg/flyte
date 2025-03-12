@@ -537,6 +537,78 @@
         ]
       }
     },
+    "/api/v1/delete_execution_phase/{id.project}/{id.domain}": {
+      "delete": {
+        "description": "Delete a execution phase",
+        "operationId": "AdminService_DeleteExecutionPhase",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionPhaseDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "phase",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "QUEUED",
+              "RUNNING",
+              "SUCCEEDING",
+              "SUCCEEDED",
+              "FAILING",
+              "FAILED",
+              "ABORTED",
+              "TIMED_OUT",
+              "ABORTING"
+            ],
+            "default": "UNDEFINED"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
@@ -4936,6 +5008,14 @@
       ],
       "default": "MANUAL",
       "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system"
+    },
+    "adminExecutionPhaseDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "adminExecutionQueueAttributes": {
       "type": "object",
