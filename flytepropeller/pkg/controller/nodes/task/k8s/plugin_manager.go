@@ -331,7 +331,7 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		// mark the task as a retryable failure.  We've seen this happen when a kubelet disappears - all pods running on
 		// the node are marked with a deletionTimestamp, but our finalizers prevent the pod from being deleted.
 		// This can also happen when a user deletes a Pod directly.
-		failureReason := fmt.Sprintf("object [%s] terminated in the background, manually", nsName.String())
+		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
 		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
 	}
 
