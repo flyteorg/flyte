@@ -823,6 +823,7 @@ type: Opaque
 apiVersion: v1
 data:
   haSharedSecret: bklRYVF4QlVkS3hoM2FXTA==
+  haSharedSecret: eWxGa2xCYkw2ZGFtamlaMA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret

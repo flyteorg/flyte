@@ -20,6 +20,53 @@ func (_m *ExecutableArrayNode) EXPECT() *ExecutableArrayNode_Expecter {
 	return &ExecutableArrayNode_Expecter{mock: &_m.Mock}
 }
 
+// GetBoundInputs provides a mock function with given fields:
+func (_m *ExecutableArrayNode) GetBoundInputs() []string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBoundInputs")
+	}
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	return r0
+}
+
+// ExecutableArrayNode_GetBoundInputs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBoundInputs'
+type ExecutableArrayNode_GetBoundInputs_Call struct {
+	*mock.Call
+}
+
+// GetBoundInputs is a helper method to define mock.On call
+func (_e *ExecutableArrayNode_Expecter) GetBoundInputs() *ExecutableArrayNode_GetBoundInputs_Call {
+	return &ExecutableArrayNode_GetBoundInputs_Call{Call: _e.mock.On("GetBoundInputs")}
+}
+
+func (_c *ExecutableArrayNode_GetBoundInputs_Call) Run(run func()) *ExecutableArrayNode_GetBoundInputs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutableArrayNode_GetBoundInputs_Call) Return(_a0 []string) *ExecutableArrayNode_GetBoundInputs_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ExecutableArrayNode_GetBoundInputs_Call) RunAndReturn(run func() []string) *ExecutableArrayNode_GetBoundInputs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetMinSuccessRatio provides a mock function with given fields:
 func (_m *ExecutableArrayNode) GetMinSuccessRatio() *float32 {
 	ret := _m.Called()

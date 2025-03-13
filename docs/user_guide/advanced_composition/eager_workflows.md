@@ -189,6 +189,8 @@ block.
 This is a current limitation in the `@eager` workflow implementation.
 ````
 
+(eager_workflows_remote)=
+
 ### Setting up remote Flyte cluster access
 
 Under the hood, `@eager` workflows use the {py:class}`~flytekit.remote.remote.FlyteRemote`
