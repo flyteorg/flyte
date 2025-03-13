@@ -3,6 +3,7 @@ package tasklog
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -212,7 +213,9 @@ func getDynamicLogLinkTypes(input Input) []string {
 	if linkType == "" {
 		return dynamicLogLinkTypes
 	}
-	return append(strings.Split(linkType, ","), dynamicLogLinkTypes...)
+	logLinkTypes := append(strings.Split(linkType, ","), dynamicLogLinkTypes...)
+	slices.Sort(logLinkTypes)
+	return slices.Compact(logLinkTypes)
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {

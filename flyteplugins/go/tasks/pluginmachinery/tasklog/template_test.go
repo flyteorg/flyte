@@ -611,7 +611,22 @@ func TestGetDynamicLogLinkTypes(t *testing.T) {
 
 	linkTypes = getDynamicLogLinkTypes(Input{
 		EnableVscode: true,
-		TaskTemplate: &core.TaskTemplate{},
+		TaskTemplate: &core.TaskTemplate{
+			Config: map[string]string{
+				"link_type": vscode,
+				"port":      "8080",
+			},
+		},
+	})
+	assert.Equal(t, []string{vscode}, linkTypes)
+
+	linkTypes = getDynamicLogLinkTypes(Input{
+		EnableVscode: true,
+		TaskTemplate: &core.TaskTemplate{
+			Config: map[string]string{
+				"link_type": "vscode,vscode",
+			},
+		},
 	})
 	assert.Equal(t, []string{vscode}, linkTypes)
 
@@ -635,5 +650,5 @@ func TestGetDynamicLogLinkTypes(t *testing.T) {
 		},
 		EnableVscode: true,
 	})
-	assert.Equal(t, []string{"wandb", vscode}, linkTypes)
+	assert.Equal(t, []string{vscode, "wandb"}, linkTypes)
 }
