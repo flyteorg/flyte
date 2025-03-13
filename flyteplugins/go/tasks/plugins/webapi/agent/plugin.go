@@ -27,7 +27,7 @@ import (
 
 const ID = "agent-service"
 
-type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+type Registry map[string]map[string]map[int32]*Agent // map[domain][taskTypeName][taskTypeVersion] => Agent
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -57,6 +57,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
+	Domain            string
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -109,7 +110,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
+	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg, taskTemplate.Id.Domain)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
@@ -142,6 +143,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
+		Domain:            taskTemplate.Id.Domain,
 	}, nil, nil
 }
 
@@ -356,11 +358,11 @@ func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentServic
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, domain string) (*Deployment, bool) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if agent, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
+	if agent, exists := p.registry[domain][taskCategory.GetName()][taskCategory.GetVersion()]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
 	return &cfg.DefaultAgent, false

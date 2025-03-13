@@ -93,6 +93,9 @@ type Deployment struct {
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
 	DefaultTimeout config.Duration `json:"defaultTimeout"`
+
+	// The tasks in this domain will be handled by this agent
+	Domain string `json:"domain"`
 }
 
 func GetConfig() *Config {
