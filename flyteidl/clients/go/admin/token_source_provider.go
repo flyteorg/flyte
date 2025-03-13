@@ -17,7 +17,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/deviceflow"
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/externalprocess"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
@@ -120,23 +119,8 @@ func NewExternalTokenSourceProvider(command []string) (TokenSourceProvider, erro
 }
 
 func (e ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	return &externalCommandTokenSource{
+	return &ExternalCommandTokenSource{
 		command: e.command,
-	}, nil
-}
-
-type externalCommandTokenSource struct {
-	command []string
-}
-
-func (s *externalCommandTokenSource) Token() (*oauth2.Token, error) {
-	output, err := externalprocess.Execute(s.command)
-	if err != nil {
-		return nil, err
-	}
-	return &oauth2.Token{
-		AccessToken: strings.Trim(string(output), "\t \n"),
-		TokenType:   "bearer",
 	}, nil
 }
 
