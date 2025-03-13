@@ -47,10 +47,12 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry, onOOMConfig pl
 					}
 
 					// Multiply the value by the multiplier
+					// Note: this does not update the string in resource.Quantity
 					v.AsDec().Mul(v.AsDec(), multiplier_quantity.AsDec())
 
-					// Convert the value to a string and parse it to quantity
-					v, err := resource.ParseQuantity(v.AsDec().String())
+					// Convert the new value to a string and parse it to quantity
+					// Create a new resource.Quantity to have matching string and numerical value
+					v, err = resource.ParseQuantity(v.AsDec().String())
 					if err != nil {
 						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
 					}
