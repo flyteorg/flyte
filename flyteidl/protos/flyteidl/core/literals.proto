@@ -197,8 +197,32 @@ message KeyValuePair {
     string value = 2;
 }
 
+// If specified, enables exponential backoff, upto max retries and max interval
+message ExponentialBackoff {
+    // maximum number of increasing retries
+    uint32 max_exponent = 1;
+    
+    // maximum interval between retries
+    google.protobuf.Duration max = 2;
+}
+
+// Algorithm => new_memory = min(old_memory * factor, mem_limit)
+message RetryOnOOM {
+    // Factor to use to increase the memory by - new_memory = prev_memory * factor
+    float factor = 1;
+
+    // this should be a resource quantity and specifies the max memory limit that becomes the ceil
+    string limit = 2;
+
+    // Optional. Default exponent should be 1
+    ExponentialBackoff backoff = 3;
+}
+
 // Retry strategy associated with an executable unit.
 message RetryStrategy {
+    // +optional. If specified, the system will update the memory limit on OOM.
+    RetryOnOOM on_oom = 1;
+
     // Number of retries. Retries will be consumed when the job fails with a recoverable error.
     // The number of retries must be less than or equals to 10.
     uint32 retries = 5;
