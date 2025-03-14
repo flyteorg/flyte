@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+	"fmt"
 
 	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
@@ -60,12 +61,14 @@ func updateClusterResourceAttributesFunc(ctx context.Context, args []string, cmd
 
 	clustrResourceAttrFileConfig := clusterresourceattribute.AttrFileConfig{}
 	if updateConfig.AttrFile != "" {
-        if err := sconfig.ReadConfigFromFile(&clustrResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
-            return err
-        }
-    } else {
-        clustrResourceAttrFileConfig = *clusterresourceattribute.DefaultAttrFileConfig
-    }
+		if err := sconfig.ReadConfigFromFile(&clustrResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
+			return err
+		}
+	} else if *clusterresourceattribute.DefaultAttrFileConfig == (clusterresourceattribute.AttrFileConfig{}) {
+		return fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute")
+	} else {
+		clustrResourceAttrFileConfig = *clusterresourceattribute.DefaultAttrFileConfig
+	}
 
 	// Get project domain workflow name from the read file.
 	project := clustrResourceAttrFileConfig.Project
