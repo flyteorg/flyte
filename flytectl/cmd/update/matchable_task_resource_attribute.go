@@ -70,7 +70,7 @@ func updateTaskResourceAttributesFunc(ctx context.Context, args []string, cmdCtx
         if err := sconfig.ReadConfigFromFile(&taskResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
             return err
         }
-    } else if *taskresourceattribute.DefaultTaskResourceAttrFileConfig == (taskresourceattribute.TaskResourceAttrFileConfig{}) {
+    } else if *taskresourceattribute.DefaultTaskResourceAttrFileConfig == taskResourceAttrFileConfig {
 		return fmt.Errorf("attrFile is mandatory while calling update for task resource attribute")
     } else {
         taskResourceAttrFileConfig = *taskresourceattribute.DefaultTaskResourceAttrFileConfig
