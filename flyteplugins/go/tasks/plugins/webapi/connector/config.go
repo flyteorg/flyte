@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	defaultConnectorConfig = ConnectorConfig{
+	defaultConfig = Config{
 		WebAPI: webapi.PluginConfig{
 			ResourceQuotas: map[core.ResourceNamespace]int{
 				"default": 1000,
@@ -47,39 +47,15 @@ var (
 		},
 		ConnectorDeployments:  map[string]*Deployment{},
 		ConnectorForTaskTypes: map[string]string{},
-		SupportedTaskTypes:    []string{"task_type_3", "task_type_4"},
+		SupportedTaskTypes:    []string{"task_type_1", "task_type_2"},
 		PollInterval:          config.Duration{Duration: 10 * time.Second},
 	}
 
-	connectorConfigSection = pluginsConfig.MustRegisterSubSection("connector-service", &defaultConnectorConfig)
+	configSection = pluginsConfig.MustRegisterSubSection("connector-service", &defaultConfig)
 )
 
 // Config is config for 'connector' plugin
 type Config struct {
-	// WebAPI defines config for the base WebAPI plugin
-	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
-
-	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
-	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
-
-	// The default connector if there does not exist a more specific matching against task types
-	DefaultConnector Deployment `json:"defaultConnector" pflag:",The default connector."`
-
-	// The connectors used to match against specific task types. {connectorDeploymentID: ConnectorDeployment}
-	ConnectorDeployments map[string]*Deployment `json:"connectors" pflag:",The connectors."`
-
-	// Maps task types to their connectors. {TaskType: connectorDeploymentID}
-	ConnectorForTaskTypes map[string]string `json:"connectorForTaskTypes" pflag:"-,"`
-
-	// SupportedTaskTypes is a list of task types that are supported by this plugin.
-	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
-
-	// PollInterval is the interval at which the plugin should poll the connector for metadata updates
-	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the connector for metadata updates."`
-}
-
-// ConnectorConfig is config for 'connector' plugin
-type ConnectorConfig struct {
 	// WebAPI defines config for the base WebAPI plugin
 	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
 
@@ -119,10 +95,10 @@ type Deployment struct {
 	DefaultTimeout config.Duration `json:"defaultTimeout"`
 }
 
-func GetConfig() *ConnectorConfig {
-	return connectorConfigSection.GetConfig().(*ConnectorConfig)
+func GetConfig() *Config {
+	return configSection.GetConfig().(*Config)
 }
 
-func SetConfig(cfg *ConnectorConfig) error {
-	return connectorConfigSection.SetConfig(cfg)
+func SetConfig(cfg *Config) error {
+	return configSection.SetConfig(cfg)
 }
