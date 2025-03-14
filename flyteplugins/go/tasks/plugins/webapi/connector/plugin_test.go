@@ -349,7 +349,7 @@ func TestInitializeConnectorRegistry(t *testing.T) {
 
 	connectorRegistry := getConnectorRegistry(context.Background(), cs)
 	connectorRegistryKeys := maps.Keys(connectorRegistry)
-	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
+	expectedKeys := []string{"task1", "task2", "task3", "task_type_3", "task_type_4"}
 
 	for _, key := range expectedKeys {
 		assert.Contains(t, connectorRegistryKeys, key)

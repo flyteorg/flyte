@@ -47,7 +47,7 @@ var (
 		},
 		ConnectorDeployments:  map[string]*Deployment{},
 		ConnectorForTaskTypes: map[string]string{},
-		SupportedTaskTypes:    []string{"task_type_1", "task_type_2"},
+		SupportedTaskTypes:    []string{"task_type_3", "task_type_4"},
 		PollInterval:          config.Duration{Duration: 10 * time.Second},
 	}
 
