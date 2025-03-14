@@ -404,12 +404,12 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		return p, nil
 	}
 
-	if t.connectorService.ContainTaskType(ttype) {
+	if t.connectorService != nil && t.connectorService.ContainTaskType(ttype) {
 		return t.connectorService.CorePlugin, nil
 	}
 
 	// The agent service plugin is deprecated and will be removed in the future
-	if t.agentService.ContainTaskType(ttype) {
+	if t.agentService != nil && t.agentService.ContainTaskType(ttype) {
 		return t.agentService.CorePlugin, nil
 	}
 

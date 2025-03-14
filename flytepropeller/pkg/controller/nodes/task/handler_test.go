@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -30,6 +28,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
