@@ -433,14 +433,15 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		}
 	}()
 
-	// Gracefully shutdown the servers
+	// Gracefully shut down the servers
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
-	time.Sleep(1 * time.Second)
 
 	// force to shut down servers after 10 seconds
-	timer := time.AfterFunc(10 * time.Second, func() {
+	logger.Infof(ctx, "Shutting down server... timeout: %d seconds", cfg.GracefulShutdownTimeoutSeconds)
+	shutdownTimeout := cfg.GracefulShutdownTimeoutSeconds
+	timer := time.AfterFunc(time.Duration(shutdownTimeout) * time.Second, func() {
 		logger.Infof(ctx, "Server couldn't stop gracefully in time. Doing force stop.")
 		server.Close()
 		grpcServer.Stop()
@@ -574,7 +575,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 	<-sigCh
 
 	// Create a context with timeout for the shutdown process
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.GracefulShutdownTimeoutSeconds)*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {

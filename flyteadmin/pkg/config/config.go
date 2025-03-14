@@ -28,6 +28,7 @@ type ServerConfig struct {
 	DataProxy                DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
 	ReadHeaderTimeoutSeconds int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
 	KubeClientConfig         KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client"`
+	GracefulShutdownTimeoutSeconds int `json:"gracefulShutdownTimeoutSeconds" pflag:",Number of seconds to wait for graceful shutdown before forcefully terminating the server"`
 }
 
 type DataProxyConfig struct {
@@ -119,6 +120,7 @@ var defaultServerConfig = &ServerConfig{
 		Burst:   25,
 		Timeout: config.Duration{Duration: 30 * time.Second},
 	},
+	GracefulShutdownTimeoutSeconds: 10,
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
 
