@@ -68,7 +68,7 @@ func updateExecutionQueueAttributesFunc(ctx context.Context, args []string, cmdC
         if err := sconfig.ReadConfigFromFile(&executionQueueAttrFileConfig, updateConfig.AttrFile); err != nil {
             return err
         }
-    } else if *executionqueueattribute.DefaultAttrFileConfig == (executionqueueattribute.AttrFileConfig{}) {
+    } else if *executionqueueattribute.DefaultAttrFileConfig == executionQueueAttrFileConfig {
         return fmt.Errorf("attrFile is mandatory while calling update for execution queue attribute")
     } else {
         executionQueueAttrFileConfig = *executionqueueattribute.DefaultAttrFileConfig

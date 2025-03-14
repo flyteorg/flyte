@@ -64,7 +64,7 @@ func updateClusterResourceAttributesFunc(ctx context.Context, args []string, cmd
 		if err := sconfig.ReadConfigFromFile(&clustrResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
 			return err
 		}
-	} else if *clusterresourceattribute.DefaultAttrFileConfig == (clusterresourceattribute.AttrFileConfig{}) {
+	} else if *clusterresourceattribute.DefaultAttrFileConfig == clustrResourceAttrFileConfig {
 		return fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute")
 	} else {
 		clustrResourceAttrFileConfig = *clusterresourceattribute.DefaultAttrFileConfig

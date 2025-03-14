@@ -66,7 +66,7 @@ func updateWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCt
         if err := sconfig.ReadConfigFromFile(&workflowExecutionConfigFileConfig, updateConfig.AttrFile); err != nil {
             return err
         }
-    } else if *workflowexecutionconfig.DefaultFileConfig == (workflowexecutionconfig.FileConfig{}) {
+    } else if *workflowexecutionconfig.DefaultFileConfig == workflowExecutionConfigFileConfig {
         return fmt.Errorf("attrFile is mandatory while calling update for execution queue attribute")
     } else {
         workflowExecutionConfigFileConfig = *workflowexecutionconfig.DefaultFileConfig
