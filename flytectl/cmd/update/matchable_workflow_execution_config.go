@@ -2,6 +2,7 @@ package update
 
 import (
 	"context"
+    "fmt"
 
 	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
@@ -65,11 +66,14 @@ func updateWorkflowExecutionConfigFunc(ctx context.Context, args []string, cmdCt
         if err := sconfig.ReadConfigFromFile(&workflowExecutionConfigFileConfig, updateConfig.AttrFile); err != nil {
             return err
         }
+    } else if *workflowexecutionconfig.DefaultFileConfig == (workflowexecutionconfig.FileConfig{}) {
+        return fmt.Errorf("attrFile is mandatory while calling update for execution queue attribute")
     } else {
         workflowExecutionConfigFileConfig = *workflowexecutionconfig.DefaultFileConfig
     }
 
-	// Get project domain workflow name from the read file.
+
+	// Get project domain workflow name from the read file. 
 	project := workflowExecutionConfigFileConfig.Project
 	domain := workflowExecutionConfigFileConfig.Domain
 	workflowName := workflowExecutionConfigFileConfig.Workflow
