@@ -250,8 +250,8 @@ type Handler struct {
 	pluginScope      promutils.Scope
 	eventConfig      *controllerConfig.EventConfig
 	clusterID        string
-	agentService     *pluginCore.AgentService
-	connectorService *pluginCore.ConnectorService
+	agentService     *agent.AgentService
+	connectorService *connector.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -1049,7 +1049,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		cfg:              cfg,
 		eventConfig:      eventConfig,
 		clusterID:        clusterID,
-		agentService:     &pluginCore.AgentService{},
-		connectorService: &pluginCore.ConnectorService{},
+		agentService:     &agent.AgentService{},
+		connectorService: &connector.ConnectorService{},
 	}, nil
 }
