@@ -70,8 +70,9 @@ var configStructMap = map[string]interface{}{
 	"execution":                  execution.UConfig,
 	"task-meta":                  namedEntityConfig,
 	"workflow-meta":              namedEntityConfig,
-	"task-resource-attribute":    taskresourceattribute.DefaultUpdateConfig,    // TODO
-	"cluster-resource-attribute": clusterresourceattribute.DefaultUpdateConfig, // TODO
+
+	"task-resource-attribute":    taskresourceattribute.DefaultTaskResourceAttrFileConfig,
+	"cluster-resource-attribute": clusterresourceattribute.DefaultAttrFileConfig,
 	"execution-queue-attribute":  executionqueueattribute.DefaultUpdateConfig,  // TODO
 	"execution-cluster-label":    executionclusterlabel.DefaultUpdateConfig,    // TODO
 	"plugin-override":            pluginoverride.DefaultUpdateConfig,           // TODO
