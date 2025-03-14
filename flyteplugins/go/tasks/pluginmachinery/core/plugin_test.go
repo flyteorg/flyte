@@ -2,13 +2,13 @@ package core_test
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	"testing"
 
 	"gotest.tools/assert"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 )
 
 func TestLoadPlugin(t *testing.T) {

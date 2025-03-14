@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -348,10 +349,11 @@ func Test_task_ResolvePlugin(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tk := Handler{
-				defaultPlugins: tt.fields.plugins,
-				defaultPlugin:  tt.fields.defaultPlugin,
-				pluginsForType: tt.fields.pluginsForType,
-				agentService:   &agent.AgentService{},
+				defaultPlugins:   tt.fields.plugins,
+				defaultPlugin:    tt.fields.defaultPlugin,
+				pluginsForType:   tt.fields.pluginsForType,
+				agentService:     &agent.AgentService{},
+				connectorService: &connector.ConnectorService{},
 			}
 			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {

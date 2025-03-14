@@ -3,7 +3,6 @@ package connector
 import (
 	"context"
 	"crypto/x509"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"strings"
 	"unsafe"
 
@@ -15,6 +14,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
