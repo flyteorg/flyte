@@ -74,7 +74,7 @@ var configStructMap = map[string]interface{}{
 	"task-resource-attribute":    taskresourceattribute.DefaultTaskResourceAttrFileConfig,
 	"cluster-resource-attribute": clusterresourceattribute.DefaultAttrFileConfig,
 	"execution-queue-attribute":  executionqueueattribute.DefaultAttrFileConfig,
-	"execution-cluster-label":    executionclusterlabel.DefaultUpdateConfig,    // TODO
+	"execution-cluster-label":    executionclusterlabel.DefaultFileConfig,
 	"plugin-override":            pluginoverride.DefaultUpdateConfig,           // TODO
 	"workflow-execution-config":  workflowexecutionconfig.DefaultFileConfig,
 }
