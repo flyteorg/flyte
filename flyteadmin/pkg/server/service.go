@@ -441,7 +441,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	// force to shut down servers after 10 seconds
 	logger.Infof(ctx, "Shutting down server... timeout: %d seconds", cfg.GracefulShutdownTimeoutSeconds)
 	shutdownTimeout := cfg.GracefulShutdownTimeoutSeconds
-	timer := time.AfterFunc(time.Duration(shutdownTimeout) * time.Second, func() {
+	timer := time.AfterFunc(time.Duration(shutdownTimeout)*time.Second, func() {
 		logger.Infof(ctx, "Server couldn't stop gracefully in time. Doing force stop.")
 		server.Close()
 		grpcServer.Stop()

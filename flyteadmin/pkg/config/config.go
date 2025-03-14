@@ -25,10 +25,10 @@ type ServerConfig struct {
 	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
 	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
 
-	DataProxy                DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
-	ReadHeaderTimeoutSeconds int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
-	KubeClientConfig         KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client"`
-	GracefulShutdownTimeoutSeconds int `json:"gracefulShutdownTimeoutSeconds" pflag:",Number of seconds to wait for graceful shutdown before forcefully terminating the server"`
+	DataProxy                      DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
+	ReadHeaderTimeoutSeconds       int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
+	KubeClientConfig               KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client"`
+	GracefulShutdownTimeoutSeconds int              `json:"gracefulShutdownTimeoutSeconds" pflag:",Number of seconds to wait for graceful shutdown before forcefully terminating the server"`
 }
 
 type DataProxyConfig struct {
