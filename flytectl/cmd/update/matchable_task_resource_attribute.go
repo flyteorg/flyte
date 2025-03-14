@@ -2,7 +2,6 @@ package update
 
 import (
 	"context"
-	"fmt"
 
 	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
@@ -64,14 +63,15 @@ Usage
 
 func updateTaskResourceAttributesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := taskresourceattribute.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for task resource attribute")
-	}
 
 	taskResourceAttrFileConfig := taskresourceattribute.TaskResourceAttrFileConfig{}
-	if err := sconfig.ReadConfigFromFile(&taskResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
-		return err
-	}
+	if updateConfig.AttrFile != "" {
+        if err := sconfig.ReadConfigFromFile(&taskResourceAttrFileConfig, updateConfig.AttrFile); err != nil {
+            return err
+        }
+    } else {
+        taskResourceAttrFileConfig = *taskresourceattribute.DefaultTaskResourceAttrFileConfig
+    }
 
 	// Get project domain workflow name from the read file.
 	project := taskResourceAttrFileConfig.Project
