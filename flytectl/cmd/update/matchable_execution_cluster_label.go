@@ -51,14 +51,17 @@ Usage
 
 func updateExecutionClusterLabelFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := executionclusterlabel.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for execution cluster label")
-	}
 
 	executionClusterLabelFileConfig := executionclusterlabel.FileConfig{}
-	if err := sconfig.ReadConfigFromFile(&executionClusterLabelFileConfig, updateConfig.AttrFile); err != nil {
-		return err
-	}
+    if updateConfig.AttrFile != "" {
+        if err := sconfig.ReadConfigFromFile(&executionClusterLabelFileConfig, updateConfig.AttrFile); err != nil {
+            return err
+        }
+    } else if *executionclusterlabel.DefaultFileConfig == (executionclusterlabel.FileConfig{}) {
+		return fmt.Errorf("attrFile is mandatory while calling update for execution cluster label")
+    } else {
+        executionClusterLabelFileConfig = *executionclusterlabel.DefaultFileConfig
+    }
 
 	// Get project domain workflow name from the read file.
 	project := executionClusterLabelFileConfig.Project
