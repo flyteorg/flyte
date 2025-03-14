@@ -390,7 +390,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			logger.Fatalf(ctx, "Failed to create GRPC Server, Err: ", err)
+			logger.Fatalf(ctx, "Failed to create GRPC Server, Err: %v", err)
 		}
 	}()
 
@@ -437,22 +437,21 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
+	time.Sleep(1 * time.Second)
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	// force to shut down servers after 10 seconds
+	timer := time.AfterFunc(10 * time.Second, func() {
+		logger.Infof(ctx, "Server couldn't stop gracefully in time. Doing force stop.")
+		server.Close()
+		grpcServer.Stop()
+	})
+	defer timer.Stop()
 
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		logger.Errorf(ctx, "Failed to shutdown HTTP server: %v", err)
+	grpcServer.GracefulStop()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Errorf(ctx, "Failed to gracefully shutdown HTTP server: %v", err)
 	}
-
-	grpcShutdownCtx, grpcCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer grpcCancel()
-
-	go func() {
-		grpcServer.GracefulStop()
-		grpcCancel()
-	}()
-	<-grpcShutdownCtx.Done()
 
 	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
