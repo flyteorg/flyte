@@ -278,9 +278,9 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
-	connectorOnce.Do(func() { connector.RegisterConnectorPlugin(t.connectorService) })
+	once.Do(func() { connector.RegisterConnectorPlugin(t.connectorService) })
 	// The agent service plugin is deprecated and will be removed in the future
-	agentOnce.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
+	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
 
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
