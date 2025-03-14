@@ -158,9 +158,9 @@ func validateConfig(cfg webapi.PluginConfig) error {
 	errs.Append(validateRangeInt("workers count", minWorkers, maxWorkers, cfg.Caching.Workers))
 	errs.Append(validateRangeFloat64("resync interval", minSyncDuration.Seconds(), maxSyncDuration.Seconds(), cfg.Caching.ResyncInterval.Seconds()))
 	errs.Append(validateRangeInt("read burst", minBurst, maxBurst, cfg.ReadRateLimiter.Burst))
-	errs.Append(validateRangeInt("read qps", minQPS, maxQPS, cfg.ReadRateLimiter.QPS))
+	errs.Append(validateRangeFloat64("read qps", minQPS, maxQPS, cfg.ReadRateLimiter.QPS))
 	errs.Append(validateRangeInt("write burst", minBurst, maxBurst, cfg.WriteRateLimiter.Burst))
-	errs.Append(validateRangeInt("write qps", minQPS, maxQPS, cfg.WriteRateLimiter.QPS))
+	errs.Append(validateRangeFloat64("write qps", minQPS, maxQPS, cfg.WriteRateLimiter.QPS))
 
 	return errs.ErrorOrDefault()
 }
