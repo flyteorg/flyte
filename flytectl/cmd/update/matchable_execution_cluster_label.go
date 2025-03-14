@@ -57,7 +57,7 @@ func updateExecutionClusterLabelFunc(ctx context.Context, args []string, cmdCtx 
         if err := sconfig.ReadConfigFromFile(&executionClusterLabelFileConfig, updateConfig.AttrFile); err != nil {
             return err
         }
-    } else if *executionclusterlabel.DefaultFileConfig == (executionclusterlabel.FileConfig{}) {
+    } else if *executionclusterlabel.DefaultFileConfig == executionClusterLabelFileConfig {
 		return fmt.Errorf("attrFile is mandatory while calling update for execution cluster label")
     } else {
         executionClusterLabelFileConfig = *executionclusterlabel.DefaultFileConfig
