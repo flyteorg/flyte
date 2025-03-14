@@ -21,7 +21,7 @@ To update the documentation, follow these steps:
 ==================
 
 1. Run ``make compile`` in the root directory to compile the code.
-2. Set up a local cluster by running ``./bin/flytectl sandbox start`` in the root directory.
+2. Set up a local cluster by running ``./bin/flytectl demo start`` in the root directory.
 3. Run ``flytectl get project`` to see if things are working.
 4. Run the command you want to test in the terminal.
 5. If you want to update the command (add additional options, change existing options, etc.):

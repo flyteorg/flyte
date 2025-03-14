@@ -127,6 +127,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_grpcMaxRecvMsgSizeMBs", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("grpcMaxRecvMsgSizeMBs", testValue)
+			if vInt, err := cmdFlags.GetInt("grpcMaxRecvMsgSizeMBs"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.GrpcMaxRecvMsgSizeMBs)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_httpPort", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

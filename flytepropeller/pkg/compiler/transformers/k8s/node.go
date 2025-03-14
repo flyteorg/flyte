@@ -203,6 +203,8 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		case *core.ArrayNode_MinSuccessRatio:
 			nodeSpec.ArrayNode.MinSuccessRatio = &successCriteria.MinSuccessRatio
 		}
+
+		nodeSpec.ArrayNode.BoundInputs = arrayNode.GetBoundInputs()
 	default:
 		if n.GetId() == v1alpha1.StartNodeID {
 			nodeSpec.Kind = v1alpha1.NodeKindStart

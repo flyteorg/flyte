@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 )
 
-//go:generate mockery-v2 --name=ReservationRepo --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=ReservationRepo --output=../mocks --case=underscore --with-expecter
 
 // Interface to interact with Reservation Table
 type ReservationRepo interface {

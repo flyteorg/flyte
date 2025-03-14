@@ -13,7 +13,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 type Docker interface {
 	ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *ocispec.Platform, containerName string) (container.CreateResponse, error)

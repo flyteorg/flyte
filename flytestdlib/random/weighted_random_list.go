@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 // Interface to use the Weighted Random
 type WeightedRandomList interface {

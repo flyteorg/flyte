@@ -25,6 +25,7 @@ Chart for basic single Flyte executable deployment
 | configuration.agentService.defaultAgent.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
 | configuration.agentService.defaultAgent.insecure | bool | `true` |  |
 | configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
+| configuration.agentService.defaultAgent.timeouts.ListAgents | string | `"3s"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |

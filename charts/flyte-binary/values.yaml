@@ -175,6 +175,7 @@ configuration:
       insecure: true
       timeouts:
         GetTask: 10s
+        ListAgents: 3s
       defaultTimeout: 10s
   # propeller Specify configuration for Flyte Propeller
   propeller:

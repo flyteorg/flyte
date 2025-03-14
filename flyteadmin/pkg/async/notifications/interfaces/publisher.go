@@ -6,7 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-//go:generate mockery-v2 --name=Publisher --output=../mocks --case=underscore --with-expecter
+//go:generate mockery --name=Publisher --output=../mocks --case=underscore --with-expecter
 
 // Note on Notifications
 

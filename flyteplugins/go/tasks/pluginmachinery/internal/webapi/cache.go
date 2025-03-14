@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 const (
 	BadReturnCodeError stdErrors.ErrorCode = "RETURNED_UNKNOWN"

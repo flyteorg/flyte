@@ -5,6 +5,7 @@ type ArrayNodeSpec struct {
 	Parallelism     *uint32
 	MinSuccesses    *uint32
 	MinSuccessRatio *float32
+	BoundInputs     []string
 }
 
 func (a *ArrayNodeSpec) GetSubNodeSpec() *NodeSpec {
@@ -21,4 +22,8 @@ func (a *ArrayNodeSpec) GetMinSuccesses() *uint32 {
 
 func (a *ArrayNodeSpec) GetMinSuccessRatio() *float32 {
 	return a.MinSuccessRatio
+}
+
+func (a *ArrayNodeSpec) GetBoundInputs() []string {
+	return a.BoundInputs
 }

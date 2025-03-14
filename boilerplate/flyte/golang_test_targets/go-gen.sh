@@ -4,7 +4,7 @@ set -ex
 
 echo "Running go generate"
 go generate ./...
-
+go mod tidy
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)

@@ -16,12 +16,17 @@ func TestAWSSecretManagerInjector_Inject(t *testing.T) {
 	injector := NewAWSSecretManagerInjector(config.DefaultConfig.AWSSecretManagerConfig)
 	p := &corev1.Pod{
 		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{},
+			Containers: []corev1.Container{
+				{
+					Name: "container1",
+				},
+			},
 		},
 	}
 	inputSecret := &core.Secret{
-		Group: "arn",
-		Key:   "name",
+		Group:  "arn",
+		Key:    "name",
+		EnvVar: "MY_SECRET_VAR",
 	}
 
 	expected := &corev1.Pod{
@@ -58,6 +63,10 @@ func TestAWSSecretManagerInjector_Inject(t *testing.T) {
 							Name:  "FLYTE_SECRETS_FILE_PREFIX",
 							Value: "",
 						},
+						{
+							Name:  "MY_SECRET_VAR",
+							Value: "/etc/flyte/secrets/arn/name",
+						},
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
@@ -68,7 +77,32 @@ func TestAWSSecretManagerInjector_Inject(t *testing.T) {
 					Resources: config.DefaultConfig.AWSSecretManagerConfig.Resources,
 				},
 			},
-			Containers: []corev1.Container{},
+			Containers: []corev1.Container{
+				{
+					Name: "container1",
+					Env: []corev1.EnvVar{
+						{
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
+						},
+						{
+							Name:  "FLYTE_SECRETS_FILE_PREFIX",
+							Value: "",
+						},
+						{
+							Name:  "MY_SECRET_VAR",
+							Value: "/etc/flyte/secrets/arn/name",
+						},
+					},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "aws-secret-vol",
+							MountPath: "/etc/flyte/secrets",
+							ReadOnly:  true,
+						},
+					},
+				},
+			},
 		},
 	}
 

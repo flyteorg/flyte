@@ -42,7 +42,7 @@ var (
 		DefaultAgent: Deployment{
 			Endpoint:             "",
 			Insecure:             true,
-			DefaultTimeout:       config.Duration{Duration: 10 * time.Second},
+			DefaultTimeout:       config.Duration{Duration: 3 * time.Second},
 			DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
 		},
 		// AsyncPlugin should be registered to at least one task type.

@@ -13,7 +13,7 @@ const (
 	ErrNotFound errors.ErrorCode = "NOT_FOUND"
 )
 
-//go:generate mockery-v2 --all --with-expecter
+//go:generate mockery --all --with-expecter
 
 // AutoRefresh with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.

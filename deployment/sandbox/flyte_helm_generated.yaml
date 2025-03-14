@@ -492,6 +492,7 @@ data:
       show-source: true
   server.yaml: | 
     application:
+      grpcMaxRecvMsgSizeMBs: 6
       grpcPort: 8089
       grpcServerReflection: true
       httpPort: 8080
@@ -6998,7 +6999,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0df67e720160bb897fcb950f39eede7efbd668c770872d171469df8dc1dd70f"
+        configChecksum: "09741ff6c767aced89645ffb4806eaa65224703f84ee03677062dc624664c1e"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte

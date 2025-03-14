@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery-v2 --all --case=underscore --with-expecter
+//go:generate mockery --all --case=underscore --with-expecter
 
 // InputFilePaths contains the different ways available for downstream systems to retrieve inputs.
 // If using Files for IO with tasks, then the input will be written to this path. All the files are always created in a

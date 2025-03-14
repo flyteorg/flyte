@@ -168,20 +168,23 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 		isErr           bool
 		expectedPhase   handler.EPhase
 		childPhase      v1alpha1.NodePhase
+		hasOutputs      bool
 		upstreamNodeID  string
 	}{
 		{"upstreamNodeExists", interfaces.NodeStatusPending, nil,
-			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, "n2"},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, true, "n2"},
 		{"childNodeError", interfaces.NodeStatusUndefined, fmt.Errorf("err"),
-			bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, ""},
+			bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, true, ""},
 		{"childPending", interfaces.NodeStatusPending, nil,
-			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, ""},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, true, ""},
 		{"childStillRunning", interfaces.NodeStatusRunning, nil,
-			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, ""},
+			bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, true, ""},
 		{"childFailure", interfaces.NodeStatusFailed(expectedError), nil,
-			bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, ""},
+			bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, true, ""},
 		{"childComplete", interfaces.NodeStatusComplete, nil,
-			bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, ""},
+			bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, true, ""},
+		{"childCompleteNoOutputs", interfaces.NodeStatusComplete, nil,
+			bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, false, ""},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -227,7 +230,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			childNodeStatus.On("SetDataDir", storage.DataReference("/output-dir/child")).Once()
 			childNodeStatus.On("SetOutputDir", storage.DataReference("/output-dir/child/0")).Once()
 			mockNodeLookup.EXPECT().GetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
-			if test.childPhase == v1alpha1.NodePhaseSucceeded {
+			if test.childPhase == v1alpha1.NodePhaseSucceeded && test.hasOutputs {
 				_ = nCtx.DataStore().WriteRaw(ctx, storage.DataReference("/output-dir/child/0/outputs.pb"), 0, storage.Options{}, bytes.NewReader([]byte{}))
 			}
 

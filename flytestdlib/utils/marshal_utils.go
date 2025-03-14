@@ -75,7 +75,7 @@ func MarshalPbToBytes(msg proto.Message) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), err
+	return buf.Bytes(), nil
 }
 
 // UnmarshalBytesToPb unmarshals a byte slice to a proto message

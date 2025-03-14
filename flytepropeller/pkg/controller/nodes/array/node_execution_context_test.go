@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 )
 
 var (
@@ -36,13 +38,49 @@ var (
 			},
 		},
 	}
+	collectionLiteral = &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{
+					literalOne,
+				},
+			},
+		},
+	}
+	collectionLiteralTwo = &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{
+					literalTwo,
+				},
+			},
+		},
+	}
+	collectionOfCollectionLiteral = &core.Literal{
+		Value: &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: []*core.Literal{
+					collectionLiteral,
+					collectionLiteralTwo,
+				},
+			},
+		},
+	}
 )
 
 func TestConstructLiteralMap(t *testing.T) {
+
+	mockArrayNode := mocks.ExecutableArrayNode{}
+	mockArrayNode.On("GetBoundInputs").Return([]string{})
+
+	boundInputsArrayNode := mocks.ExecutableArrayNode{}
+	boundInputsArrayNode.On("GetBoundInputs").Return([]string{"bar"})
+
 	tests := []struct {
 		name                string
 		inputLiteralMaps    *core.LiteralMap
 		expectedLiteralMaps []*core.LiteralMap
+		arrayNode           v1alpha1.ExecutableArrayNode
 	}{
 		{
 			"SingleList",
@@ -72,6 +110,7 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
+			&mockArrayNode,
 		},
 		{
 			"MultiList",
@@ -113,6 +152,7 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
+			&mockArrayNode,
 		},
 		{
 			"Partial",
@@ -145,15 +185,58 @@ func TestConstructLiteralMap(t *testing.T) {
 					},
 				},
 			},
+			&mockArrayNode,
+		},
+		{
+			"Bound inputs - scalar",
+			&core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionLiteralTwo,
+					"bar": literalTwo,
+				},
+			},
+			[]*core.LiteralMap{
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": literalTwo,
+						"bar": literalTwo,
+					},
+				},
+			},
+			&boundInputsArrayNode,
+		},
+		{
+			"Bound inputs - collection",
+			&core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": collectionOfCollectionLiteral,
+					"bar": collectionLiteralTwo,
+				},
+			},
+			[]*core.LiteralMap{
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": collectionLiteral,
+						"bar": collectionLiteralTwo,
+					},
+				},
+				&core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"foo": collectionLiteralTwo,
+						"bar": collectionLiteralTwo,
+					},
+				},
+			},
+			&boundInputsArrayNode,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			for i := 0; i < len(test.expectedLiteralMaps); i++ {
-				outputLiteralMap, err := constructLiteralMap(test.inputLiteralMaps, i)
+				inputLiteralMap, err := constructLiteralMap(test.inputLiteralMaps, i, test.arrayNode)
 				assert.NoError(t, err)
-				assert.True(t, proto.Equal(test.expectedLiteralMaps[i], outputLiteralMap))
+				assert.True(t, proto.Equal(test.expectedLiteralMaps[i], inputLiteralMap))
 			}
 		})
 	}

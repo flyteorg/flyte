@@ -416,15 +416,18 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 
 	tests := []struct {
 		name                           string
-		inputValues                    map[string][]int64
+		inputMap                       *idlcore.LiteralMap
 		expectedArrayNodePhase         v1alpha1.ArrayNodePhase
 		expectedTransitionPhase        handler.EPhase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
+		boundInputs                    []string
 	}{
 		{
 			name: "Success",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
 			expectedTransitionPhase:        handler.EPhaseRunning,
@@ -432,9 +435,11 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		},
 		{
 			name: "SuccessMultipleInputs",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2, 3},
-				"bar": []int64{4, 5, 6},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": convertListToLiterals([]int64{4, 5, 6}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
 			expectedTransitionPhase:        handler.EPhaseRunning,
@@ -442,13 +447,53 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		},
 		{
 			name: "FailureDifferentInputListLengths",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2},
-				"bar": []int64{3},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2}),
+					"bar": convertListToLiterals([]int64{3}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseNone,
 			expectedTransitionPhase:        handler.EPhaseFailed,
 			expectedExternalResourcePhases: nil,
+		},
+		{
+			name: "boundInputs",
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": {
+						Value: &idlcore.Literal_Scalar{
+							Scalar: &idlcore.Scalar{
+								Value: &idlcore.Scalar_Primitive{
+									Primitive: &idlcore.Primitive{
+										Value: &idlcore.Primitive_Integer{
+											Integer: 1,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:                    []string{"bar"},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED},
+		},
+		{
+			name: "All boundInputs",
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": convertListToLiterals([]int64{1, 2, 3}),
+				},
+			},
+			boundInputs:                    []string{"foo", "bar"},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_UNDEFINED},
 		},
 	}
 
@@ -456,11 +501,11 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
-			literalMap := convertMapToArrayLiterals(test.inputValues)
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
 			}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			arrayNodeSpec.ArrayNode.BoundInputs = test.boundInputs
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, test.inputMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
@@ -1438,5 +1483,31 @@ func convertMapToArrayLiterals(values map[string][]int64) *idlcore.LiteralMap {
 
 	return &idlcore.LiteralMap{
 		Literals: literalMap,
+	}
+}
+
+func convertListToLiterals(values []int64) *idlcore.Literal {
+	literalList := make([]*idlcore.Literal, 0, len(values))
+	for _, x := range values {
+		literalList = append(literalList, &idlcore.Literal{
+			Value: &idlcore.Literal_Scalar{
+				Scalar: &idlcore.Scalar{
+					Value: &idlcore.Scalar_Primitive{
+						Primitive: &idlcore.Primitive{
+							Value: &idlcore.Primitive_Integer{
+								Integer: x,
+							},
+						},
+					},
+				},
+			},
+		})
+	}
+	return &idlcore.Literal{
+		Value: &idlcore.Literal_Collection{
+			Collection: &idlcore.LiteralCollection{
+				Literals: literalList,
+			},
+		},
 	}
 }

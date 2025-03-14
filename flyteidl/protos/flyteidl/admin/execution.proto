@@ -189,6 +189,8 @@ message ExecutionClosure {
 
     // Provides the details of the last stage change
     ExecutionStateChangeDetails state_change_details = 14;
+
+    reserved 15;
 }
 
 // Represents system, rather than user-facing, metadata about an execution.
@@ -342,6 +344,8 @@ message ExecutionSpec {
 
     // Execution environment assignments to be set for the execution.
     repeated core.ExecutionEnvAssignment execution_env_assignments = 26;
+
+    reserved 27;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

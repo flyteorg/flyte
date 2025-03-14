@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery-v2 --all --with-expecter
+//go:generate mockery --all --with-expecter
 
 type PriorityClass int
 

@@ -53,5 +53,5 @@ func ComputeHashString(ctx context.Context, pb proto.Message) (string, error) {
 		return "", err
 	}
 
-	return base64.StdEncoding.EncodeToString(hashBytes), err
+	return base64.StdEncoding.EncodeToString(hashBytes), nil
 }
