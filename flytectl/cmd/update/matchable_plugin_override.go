@@ -64,14 +64,17 @@ Usage
 
 func updatePluginOverridesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := pluginoverride.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for plugin override")
-	}
 
 	pluginOverrideFileConfig := pluginoverride.FileConfig{}
-	if err := sconfig.ReadConfigFromFile(&pluginOverrideFileConfig, updateConfig.AttrFile); err != nil {
-		return err
-	}
+    if updateConfig.AttrFile != "" {
+        if err := sconfig.ReadConfigFromFile(&pluginOverrideFileConfig, updateConfig.AttrFile); err != nil {
+            return err
+        }
+    } else if *pluginoverride.DefaultFileConfig == pluginOverrideFileConfig {
+        return fmt.Errorf("attrFile is mandatory while calling update for plugin override")
+    } else {
+        pluginOverrideFileConfig = *pluginoverride.DefaultFileConfig
+    }
 
 	// Get project domain workflow name from the read file.
 	project := pluginOverrideFileConfig.Project
