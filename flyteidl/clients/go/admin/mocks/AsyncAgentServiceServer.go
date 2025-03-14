@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -26,27 +26,27 @@ func (_m *AsyncAgentServiceServer) EXPECT() *AsyncAgentServiceServer_Expecter {
 }
 
 // CreateTask provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) CreateTask(_a0 context.Context, _a1 *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error) {
+func (_m *AsyncAgentServiceServer) CreateTask(_a0 context.Context, _a1 *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateTask")
 	}
 
-	var r0 *admin.CreateTaskResponse
+	var r0 *connector.CreateTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateTaskRequest) *admin.CreateTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.CreateTaskRequest) *connector.CreateTaskResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.CreateTaskResponse)
+			r0 = ret.Get(0).(*connector.CreateTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.CreateTaskRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.CreateTaskRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -62,50 +62,50 @@ type AsyncAgentServiceServer_CreateTask_Call struct {
 
 // CreateTask is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.CreateTaskRequest
+//   - _a1 *connector.CreateTaskRequest
 func (_e *AsyncAgentServiceServer_Expecter) CreateTask(_a0 interface{}, _a1 interface{}) *AsyncAgentServiceServer_CreateTask_Call {
 	return &AsyncAgentServiceServer_CreateTask_Call{Call: _e.mock.On("CreateTask", _a0, _a1)}
 }
 
-func (_c *AsyncAgentServiceServer_CreateTask_Call) Run(run func(_a0 context.Context, _a1 *admin.CreateTaskRequest)) *AsyncAgentServiceServer_CreateTask_Call {
+func (_c *AsyncAgentServiceServer_CreateTask_Call) Run(run func(_a0 context.Context, _a1 *connector.CreateTaskRequest)) *AsyncAgentServiceServer_CreateTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.CreateTaskRequest))
+		run(args[0].(context.Context), args[1].(*connector.CreateTaskRequest))
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_CreateTask_Call) Return(_a0 *admin.CreateTaskResponse, _a1 error) *AsyncAgentServiceServer_CreateTask_Call {
+func (_c *AsyncAgentServiceServer_CreateTask_Call) Return(_a0 *connector.CreateTaskResponse, _a1 error) *AsyncAgentServiceServer_CreateTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_CreateTask_Call) RunAndReturn(run func(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error)) *AsyncAgentServiceServer_CreateTask_Call {
+func (_c *AsyncAgentServiceServer_CreateTask_Call) RunAndReturn(run func(context.Context, *connector.CreateTaskRequest) (*connector.CreateTaskResponse, error)) *AsyncAgentServiceServer_CreateTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DeleteTask provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) DeleteTask(_a0 context.Context, _a1 *admin.DeleteTaskRequest) (*admin.DeleteTaskResponse, error) {
+func (_m *AsyncAgentServiceServer) DeleteTask(_a0 context.Context, _a1 *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteTask")
 	}
 
-	var r0 *admin.DeleteTaskResponse
+	var r0 *connector.DeleteTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DeleteTaskRequest) (*admin.DeleteTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DeleteTaskRequest) *admin.DeleteTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.DeleteTaskRequest) *connector.DeleteTaskResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.DeleteTaskResponse)
+			r0 = ret.Get(0).(*connector.DeleteTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.DeleteTaskRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.DeleteTaskRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -121,50 +121,50 @@ type AsyncAgentServiceServer_DeleteTask_Call struct {
 
 // DeleteTask is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.DeleteTaskRequest
+//   - _a1 *connector.DeleteTaskRequest
 func (_e *AsyncAgentServiceServer_Expecter) DeleteTask(_a0 interface{}, _a1 interface{}) *AsyncAgentServiceServer_DeleteTask_Call {
 	return &AsyncAgentServiceServer_DeleteTask_Call{Call: _e.mock.On("DeleteTask", _a0, _a1)}
 }
 
-func (_c *AsyncAgentServiceServer_DeleteTask_Call) Run(run func(_a0 context.Context, _a1 *admin.DeleteTaskRequest)) *AsyncAgentServiceServer_DeleteTask_Call {
+func (_c *AsyncAgentServiceServer_DeleteTask_Call) Run(run func(_a0 context.Context, _a1 *connector.DeleteTaskRequest)) *AsyncAgentServiceServer_DeleteTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.DeleteTaskRequest))
+		run(args[0].(context.Context), args[1].(*connector.DeleteTaskRequest))
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_DeleteTask_Call) Return(_a0 *admin.DeleteTaskResponse, _a1 error) *AsyncAgentServiceServer_DeleteTask_Call {
+func (_c *AsyncAgentServiceServer_DeleteTask_Call) Return(_a0 *connector.DeleteTaskResponse, _a1 error) *AsyncAgentServiceServer_DeleteTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_DeleteTask_Call) RunAndReturn(run func(context.Context, *admin.DeleteTaskRequest) (*admin.DeleteTaskResponse, error)) *AsyncAgentServiceServer_DeleteTask_Call {
+func (_c *AsyncAgentServiceServer_DeleteTask_Call) RunAndReturn(run func(context.Context, *connector.DeleteTaskRequest) (*connector.DeleteTaskResponse, error)) *AsyncAgentServiceServer_DeleteTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTask provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) GetTask(_a0 context.Context, _a1 *admin.GetTaskRequest) (*admin.GetTaskResponse, error) {
+func (_m *AsyncAgentServiceServer) GetTask(_a0 context.Context, _a1 *connector.GetTaskRequest) (*connector.GetTaskResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetTask")
 	}
 
-	var r0 *admin.GetTaskResponse
+	var r0 *connector.GetTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskRequest) (*admin.GetTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskRequest) (*connector.GetTaskResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskRequest) *admin.GetTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskRequest) *connector.GetTaskResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetTaskResponse)
+			r0 = ret.Get(0).(*connector.GetTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetTaskRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -180,30 +180,30 @@ type AsyncAgentServiceServer_GetTask_Call struct {
 
 // GetTask is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.GetTaskRequest
+//   - _a1 *connector.GetTaskRequest
 func (_e *AsyncAgentServiceServer_Expecter) GetTask(_a0 interface{}, _a1 interface{}) *AsyncAgentServiceServer_GetTask_Call {
 	return &AsyncAgentServiceServer_GetTask_Call{Call: _e.mock.On("GetTask", _a0, _a1)}
 }
 
-func (_c *AsyncAgentServiceServer_GetTask_Call) Run(run func(_a0 context.Context, _a1 *admin.GetTaskRequest)) *AsyncAgentServiceServer_GetTask_Call {
+func (_c *AsyncAgentServiceServer_GetTask_Call) Run(run func(_a0 context.Context, _a1 *connector.GetTaskRequest)) *AsyncAgentServiceServer_GetTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.GetTaskRequest))
+		run(args[0].(context.Context), args[1].(*connector.GetTaskRequest))
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_GetTask_Call) Return(_a0 *admin.GetTaskResponse, _a1 error) *AsyncAgentServiceServer_GetTask_Call {
+func (_c *AsyncAgentServiceServer_GetTask_Call) Return(_a0 *connector.GetTaskResponse, _a1 error) *AsyncAgentServiceServer_GetTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_GetTask_Call) RunAndReturn(run func(context.Context, *admin.GetTaskRequest) (*admin.GetTaskResponse, error)) *AsyncAgentServiceServer_GetTask_Call {
+func (_c *AsyncAgentServiceServer_GetTask_Call) RunAndReturn(run func(context.Context, *connector.GetTaskRequest) (*connector.GetTaskResponse, error)) *AsyncAgentServiceServer_GetTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTaskLogs provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) GetTaskLogs(_a0 *admin.GetTaskLogsRequest, _a1 service.AsyncAgentService_GetTaskLogsServer) error {
+func (_m *AsyncAgentServiceServer) GetTaskLogs(_a0 *connector.GetTaskLogsRequest, _a1 service.AsyncAgentService_GetTaskLogsServer) error {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
@@ -211,7 +211,7 @@ func (_m *AsyncAgentServiceServer) GetTaskLogs(_a0 *admin.GetTaskLogsRequest, _a
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*admin.GetTaskLogsRequest, service.AsyncAgentService_GetTaskLogsServer) error); ok {
+	if rf, ok := ret.Get(0).(func(*connector.GetTaskLogsRequest, service.AsyncAgentService_GetTaskLogsServer) error); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
@@ -226,15 +226,15 @@ type AsyncAgentServiceServer_GetTaskLogs_Call struct {
 }
 
 // GetTaskLogs is a helper method to define mock.On call
-//   - _a0 *admin.GetTaskLogsRequest
+//   - _a0 *connector.GetTaskLogsRequest
 //   - _a1 service.AsyncAgentService_GetTaskLogsServer
 func (_e *AsyncAgentServiceServer_Expecter) GetTaskLogs(_a0 interface{}, _a1 interface{}) *AsyncAgentServiceServer_GetTaskLogs_Call {
 	return &AsyncAgentServiceServer_GetTaskLogs_Call{Call: _e.mock.On("GetTaskLogs", _a0, _a1)}
 }
 
-func (_c *AsyncAgentServiceServer_GetTaskLogs_Call) Run(run func(_a0 *admin.GetTaskLogsRequest, _a1 service.AsyncAgentService_GetTaskLogsServer)) *AsyncAgentServiceServer_GetTaskLogs_Call {
+func (_c *AsyncAgentServiceServer_GetTaskLogs_Call) Run(run func(_a0 *connector.GetTaskLogsRequest, _a1 service.AsyncAgentService_GetTaskLogsServer)) *AsyncAgentServiceServer_GetTaskLogs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*admin.GetTaskLogsRequest), args[1].(service.AsyncAgentService_GetTaskLogsServer))
+		run(args[0].(*connector.GetTaskLogsRequest), args[1].(service.AsyncAgentService_GetTaskLogsServer))
 	})
 	return _c
 }
@@ -244,33 +244,33 @@ func (_c *AsyncAgentServiceServer_GetTaskLogs_Call) Return(_a0 error) *AsyncAgen
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_GetTaskLogs_Call) RunAndReturn(run func(*admin.GetTaskLogsRequest, service.AsyncAgentService_GetTaskLogsServer) error) *AsyncAgentServiceServer_GetTaskLogs_Call {
+func (_c *AsyncAgentServiceServer_GetTaskLogs_Call) RunAndReturn(run func(*connector.GetTaskLogsRequest, service.AsyncAgentService_GetTaskLogsServer) error) *AsyncAgentServiceServer_GetTaskLogs_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTaskMetrics provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) GetTaskMetrics(_a0 context.Context, _a1 *admin.GetTaskMetricsRequest) (*admin.GetTaskMetricsResponse, error) {
+func (_m *AsyncAgentServiceServer) GetTaskMetrics(_a0 context.Context, _a1 *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetTaskMetrics")
 	}
 
-	var r0 *admin.GetTaskMetricsResponse
+	var r0 *connector.GetTaskMetricsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskMetricsRequest) (*admin.GetTaskMetricsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskMetricsRequest) *admin.GetTaskMetricsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskMetricsRequest) *connector.GetTaskMetricsResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetTaskMetricsResponse)
+			r0 = ret.Get(0).(*connector.GetTaskMetricsResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskMetricsRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetTaskMetricsRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -286,24 +286,24 @@ type AsyncAgentServiceServer_GetTaskMetrics_Call struct {
 
 // GetTaskMetrics is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 *admin.GetTaskMetricsRequest
+//   - _a1 *connector.GetTaskMetricsRequest
 func (_e *AsyncAgentServiceServer_Expecter) GetTaskMetrics(_a0 interface{}, _a1 interface{}) *AsyncAgentServiceServer_GetTaskMetrics_Call {
 	return &AsyncAgentServiceServer_GetTaskMetrics_Call{Call: _e.mock.On("GetTaskMetrics", _a0, _a1)}
 }
 
-func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) Run(run func(_a0 context.Context, _a1 *admin.GetTaskMetricsRequest)) *AsyncAgentServiceServer_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) Run(run func(_a0 context.Context, _a1 *connector.GetTaskMetricsRequest)) *AsyncAgentServiceServer_GetTaskMetrics_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*admin.GetTaskMetricsRequest))
+		run(args[0].(context.Context), args[1].(*connector.GetTaskMetricsRequest))
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) Return(_a0 *admin.GetTaskMetricsResponse, _a1 error) *AsyncAgentServiceServer_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) Return(_a0 *connector.GetTaskMetricsResponse, _a1 error) *AsyncAgentServiceServer_GetTaskMetrics_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) RunAndReturn(run func(context.Context, *admin.GetTaskMetricsRequest) (*admin.GetTaskMetricsResponse, error)) *AsyncAgentServiceServer_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceServer_GetTaskMetrics_Call) RunAndReturn(run func(context.Context, *connector.GetTaskMetricsRequest) (*connector.GetTaskMetricsResponse, error)) *AsyncAgentServiceServer_GetTaskMetrics_Call {
 	_c.Call.Return(run)
 	return _c
 }

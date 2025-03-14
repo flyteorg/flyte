@@ -15,7 +15,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-var once sync.Once
+var (
+	connectorOnce sync.Once
+	// The agent service plugin is deprecated and will be removed in the future
+	agentOnce sync.Once
+)
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,
 	kubeClientset kubernetes.Interface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {

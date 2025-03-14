@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package flyteidl.admin;
-option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
+package flyteidl.connector;
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector";
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
@@ -26,9 +26,8 @@ enum State {
 
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
 message TaskExecutionMetadata {
-  option deprecated = true;
   // ID of the task execution
-  
+
   core.TaskExecutionIdentifier task_execution_id = 1;
   // k8s namespace where the task is executed in
   string namespace = 2;
@@ -59,7 +58,6 @@ message TaskExecutionMetadata {
 
 // Represents a request structure to create task.
 message CreateTaskRequest {
-  option deprecated = true;
   // The inputs required to start the execution. All required inputs must be
   // included in this map. If not required and not provided, defaults apply.
   // +optional
@@ -74,13 +72,11 @@ message CreateTaskRequest {
 
 // Represents a create response structure.
 message CreateTaskResponse {
-  option deprecated = true;
   // ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 1;
 }
 
 message CreateRequestHeader {
-  option deprecated = true;
   // Template of the task that encapsulates all the metadata of the task.
   core.TaskTemplate template = 1;
   // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
@@ -93,7 +89,6 @@ message CreateRequestHeader {
 
 
 message ExecuteTaskSyncRequest {
-  option deprecated = true;
   oneof part {
     CreateRequestHeader header = 1;
     core.LiteralMap inputs = 2;
@@ -101,12 +96,10 @@ message ExecuteTaskSyncRequest {
 }
 
 message ExecuteTaskSyncResponseHeader {
-  option deprecated = true;
   Resource resource = 1;
 }
 
 message ExecuteTaskSyncResponse {
-  option deprecated = true;
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
   // Resource is for synchronous task execution.
   oneof res {
@@ -117,7 +110,6 @@ message ExecuteTaskSyncResponse {
 
 // A message used to fetch a job resource from flyte agent server.
 message GetTaskRequest {
-  option deprecated = true;
   reserved 5;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
@@ -131,12 +123,10 @@ message GetTaskRequest {
 
 // Response to get an individual task resource.
 message GetTaskResponse {
-  option deprecated = true;
   Resource resource = 1;
 }
 
 message Resource {
-  option deprecated = true;
   // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
   State state = 1 [deprecated = true];
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -157,7 +147,6 @@ message Resource {
 
 // A message used to delete a task.
 message DeleteTaskRequest {
-  option deprecated = true;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
   // Metadata about the resource to be pass to the agent.
@@ -167,16 +156,13 @@ message DeleteTaskRequest {
 }
 
 // Response to delete a task.
-message DeleteTaskResponse {
-  option deprecated = true;
-}
+message DeleteTaskResponse {}
 
 // A message containing the agent metadata.
 message Agent {
-  option deprecated = true;
   // Name is the developer-assigned name of the agent.
   string name = 1;
-  
+
   // SupportedTaskTypes are the types of the tasks that the agent can handle.
   repeated string supported_task_types = 2 [deprecated = true];
 
@@ -192,7 +178,6 @@ message Agent {
 }
 
 message TaskCategory {
-  option deprecated = true;
   // The name of the task type.
   string name = 1;
   // The version of the task type.
@@ -201,31 +186,25 @@ message TaskCategory {
 
 // A request to get an agent.
 message GetAgentRequest {
-  option deprecated = true;
   // The name of the agent.
   string name = 1;
 }
 
 // A response containing an agent.
 message GetAgentResponse {
-  option deprecated = true;
   Agent agent = 1;
 }
 
 // A request to list all agents.
-message ListAgentsRequest {
-  option deprecated = true;
-}
+message ListAgentsRequest {}
 
 // A response containing a list of agents.
 message ListAgentsResponse {
-  option deprecated = true;
   repeated Agent agents = 1;
 }
 
 // A request to get the metrics from a task execution.
 message GetTaskMetricsRequest {
-  option deprecated = true;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
@@ -245,14 +224,12 @@ message GetTaskMetricsRequest {
 
 // A response containing a list of metrics for a task execution.
 message GetTaskMetricsResponse {
-  option deprecated = true;
   // The execution metric results.
   repeated core.ExecutionMetricResult results = 1;
 }
 
 // A request to get the log from a task execution.
 message GetTaskLogsRequest {
-  option deprecated = true;
   // A predefined yet extensible Task type identifier.
   string task_type = 1 [deprecated = true];
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
@@ -267,21 +244,18 @@ message GetTaskLogsRequest {
 }
 
 message GetTaskLogsResponseHeader {
-  option deprecated = true;
   // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
   // in a query. If there are no more results, this value will be empty.
   string token = 1;
 }
 
-message GetTaskLogsResponseBody { 
-  option deprecated = true;
+message GetTaskLogsResponseBody {
   // The execution log results.
   repeated string results = 1;
 }
 
 // A response containing the logs for a task execution.
 message GetTaskLogsResponse {
-  option deprecated = true;
   oneof part {
     GetTaskLogsResponseHeader header = 1;
     GetTaskLogsResponseBody body = 2;
@@ -291,13 +265,11 @@ message GetTaskLogsResponse {
 // Error message to propagate detailed errors from agent executions to the execution
 // engine.
 message AgentError {
-  option deprecated = true;
   // A simplified code for errors, so that we can provide a glossary of all possible errors.
   string code = 1;
 
   // Defines a generic error type that dictates the behavior of the retry strategy.
   enum Kind {
-    option deprecated = true;
     NON_RECOVERABLE = 0;
     RECOVERABLE = 1;
   }

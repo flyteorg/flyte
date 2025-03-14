@@ -5400,11 +5400,11 @@ pub mod sync_agent_service_client {
         pub async fn execute_task_sync(
             &mut self,
             request: impl tonic::IntoStreamingRequest<
-                Message = super::super::admin::ExecuteTaskSyncRequest,
+                Message = super::super::connector::ExecuteTaskSyncRequest,
             >,
         ) -> std::result::Result<
             tonic::Response<
-                tonic::codec::Streaming<super::super::admin::ExecuteTaskSyncResponse>,
+                tonic::codec::Streaming<super::super::connector::ExecuteTaskSyncResponse>,
             >,
             tonic::Status,
         > {
@@ -5443,7 +5443,7 @@ pub mod sync_agent_service_server {
         /// Server streaming response type for the ExecuteTaskSync method.
         type ExecuteTaskSyncStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<
-                    super::super::admin::ExecuteTaskSyncResponse,
+                    super::super::connector::ExecuteTaskSyncResponse,
                     tonic::Status,
                 >,
             >
@@ -5454,7 +5454,7 @@ pub mod sync_agent_service_server {
         async fn execute_task_sync(
             &self,
             request: tonic::Request<
-                tonic::Streaming<super::super::admin::ExecuteTaskSyncRequest>,
+                tonic::Streaming<super::super::connector::ExecuteTaskSyncRequest>,
             >,
         ) -> std::result::Result<
             tonic::Response<Self::ExecuteTaskSyncStream>,
@@ -5546,9 +5546,9 @@ pub mod sync_agent_service_server {
                     impl<
                         T: SyncAgentService,
                     > tonic::server::StreamingService<
-                        super::super::admin::ExecuteTaskSyncRequest,
+                        super::super::connector::ExecuteTaskSyncRequest,
                     > for ExecuteTaskSyncSvc<T> {
-                        type Response = super::super::admin::ExecuteTaskSyncResponse;
+                        type Response = super::super::connector::ExecuteTaskSyncResponse;
                         type ResponseStream = T::ExecuteTaskSyncStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
@@ -5558,7 +5558,7 @@ pub mod sync_agent_service_server {
                             &mut self,
                             request: tonic::Request<
                                 tonic::Streaming<
-                                    super::super::admin::ExecuteTaskSyncRequest,
+                                    super::super::connector::ExecuteTaskSyncRequest,
                                 >,
                             >,
                         ) -> Self::Future {
@@ -5725,9 +5725,9 @@ pub mod async_agent_service_client {
 */
         pub async fn create_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::CreateTaskRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::CreateTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::CreateTaskResponse>,
+            tonic::Response<super::super::connector::CreateTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -5754,9 +5754,9 @@ pub mod async_agent_service_client {
 */
         pub async fn get_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::GetTaskRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::GetTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetTaskResponse>,
+            tonic::Response<super::super::connector::GetTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -5783,9 +5783,9 @@ pub mod async_agent_service_client {
 */
         pub async fn delete_task(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::DeleteTaskRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::DeleteTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::DeleteTaskResponse>,
+            tonic::Response<super::super::connector::DeleteTaskResponse>,
             tonic::Status,
         > {
             self.inner
@@ -5816,9 +5816,11 @@ pub mod async_agent_service_client {
 */
         pub async fn get_task_metrics(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::GetTaskMetricsRequest>,
+            request: impl tonic::IntoRequest<
+                super::super::connector::GetTaskMetricsRequest,
+            >,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetTaskMetricsResponse>,
+            tonic::Response<super::super::connector::GetTaskMetricsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -5848,10 +5850,10 @@ pub mod async_agent_service_client {
 */
         pub async fn get_task_logs(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::GetTaskLogsRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::GetTaskLogsRequest>,
         ) -> std::result::Result<
             tonic::Response<
-                tonic::codec::Streaming<super::super::admin::GetTaskLogsResponse>,
+                tonic::codec::Streaming<super::super::connector::GetTaskLogsResponse>,
             >,
             tonic::Status,
         > {
@@ -5888,27 +5890,27 @@ pub mod async_agent_service_server {
 */
         async fn create_task(
             &self,
-            request: tonic::Request<super::super::admin::CreateTaskRequest>,
+            request: tonic::Request<super::super::connector::CreateTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::CreateTaskResponse>,
+            tonic::Response<super::super::connector::CreateTaskResponse>,
             tonic::Status,
         >;
         /** Get job status.
 */
         async fn get_task(
             &self,
-            request: tonic::Request<super::super::admin::GetTaskRequest>,
+            request: tonic::Request<super::super::connector::GetTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetTaskResponse>,
+            tonic::Response<super::super::connector::GetTaskResponse>,
             tonic::Status,
         >;
         /** Delete the task resource.
 */
         async fn delete_task(
             &self,
-            request: tonic::Request<super::super::admin::DeleteTaskRequest>,
+            request: tonic::Request<super::super::connector::DeleteTaskRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::DeleteTaskResponse>,
+            tonic::Response<super::super::connector::DeleteTaskResponse>,
             tonic::Status,
         >;
         /** GetTaskMetrics returns one or more task execution metrics, if available.
@@ -5919,15 +5921,15 @@ pub mod async_agent_service_server {
 */
         async fn get_task_metrics(
             &self,
-            request: tonic::Request<super::super::admin::GetTaskMetricsRequest>,
+            request: tonic::Request<super::super::connector::GetTaskMetricsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetTaskMetricsResponse>,
+            tonic::Response<super::super::connector::GetTaskMetricsResponse>,
             tonic::Status,
         >;
         /// Server streaming response type for the GetTaskLogs method.
         type GetTaskLogsStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<
-                    super::super::admin::GetTaskLogsResponse,
+                    super::super::connector::GetTaskLogsResponse,
                     tonic::Status,
                 >,
             >
@@ -5937,7 +5939,7 @@ pub mod async_agent_service_server {
 */
         async fn get_task_logs(
             &self,
-            request: tonic::Request<super::super::admin::GetTaskLogsRequest>,
+            request: tonic::Request<super::super::connector::GetTaskLogsRequest>,
         ) -> std::result::Result<
             tonic::Response<Self::GetTaskLogsStream>,
             tonic::Status,
@@ -6029,9 +6031,10 @@ pub mod async_agent_service_server {
                     struct CreateTaskSvc<T: AsyncAgentService>(pub Arc<T>);
                     impl<
                         T: AsyncAgentService,
-                    > tonic::server::UnaryService<super::super::admin::CreateTaskRequest>
-                    for CreateTaskSvc<T> {
-                        type Response = super::super::admin::CreateTaskResponse;
+                    > tonic::server::UnaryService<
+                        super::super::connector::CreateTaskRequest,
+                    > for CreateTaskSvc<T> {
+                        type Response = super::super::connector::CreateTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6039,7 +6042,7 @@ pub mod async_agent_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::admin::CreateTaskRequest,
+                                super::super::connector::CreateTaskRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
@@ -6077,16 +6080,19 @@ pub mod async_agent_service_server {
                     struct GetTaskSvc<T: AsyncAgentService>(pub Arc<T>);
                     impl<
                         T: AsyncAgentService,
-                    > tonic::server::UnaryService<super::super::admin::GetTaskRequest>
-                    for GetTaskSvc<T> {
-                        type Response = super::super::admin::GetTaskResponse;
+                    > tonic::server::UnaryService<
+                        super::super::connector::GetTaskRequest,
+                    > for GetTaskSvc<T> {
+                        type Response = super::super::connector::GetTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::super::admin::GetTaskRequest>,
+                            request: tonic::Request<
+                                super::super::connector::GetTaskRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -6123,9 +6129,10 @@ pub mod async_agent_service_server {
                     struct DeleteTaskSvc<T: AsyncAgentService>(pub Arc<T>);
                     impl<
                         T: AsyncAgentService,
-                    > tonic::server::UnaryService<super::super::admin::DeleteTaskRequest>
-                    for DeleteTaskSvc<T> {
-                        type Response = super::super::admin::DeleteTaskResponse;
+                    > tonic::server::UnaryService<
+                        super::super::connector::DeleteTaskRequest,
+                    > for DeleteTaskSvc<T> {
+                        type Response = super::super::connector::DeleteTaskResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6133,7 +6140,7 @@ pub mod async_agent_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::admin::DeleteTaskRequest,
+                                super::super::connector::DeleteTaskRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
@@ -6172,9 +6179,9 @@ pub mod async_agent_service_server {
                     impl<
                         T: AsyncAgentService,
                     > tonic::server::UnaryService<
-                        super::super::admin::GetTaskMetricsRequest,
+                        super::super::connector::GetTaskMetricsRequest,
                     > for GetTaskMetricsSvc<T> {
-                        type Response = super::super::admin::GetTaskMetricsResponse;
+                        type Response = super::super::connector::GetTaskMetricsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6182,7 +6189,7 @@ pub mod async_agent_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::admin::GetTaskMetricsRequest,
+                                super::super::connector::GetTaskMetricsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
@@ -6222,9 +6229,9 @@ pub mod async_agent_service_server {
                     impl<
                         T: AsyncAgentService,
                     > tonic::server::ServerStreamingService<
-                        super::super::admin::GetTaskLogsRequest,
+                        super::super::connector::GetTaskLogsRequest,
                     > for GetTaskLogsSvc<T> {
-                        type Response = super::super::admin::GetTaskLogsResponse;
+                        type Response = super::super::connector::GetTaskLogsResponse;
                         type ResponseStream = T::GetTaskLogsStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
@@ -6233,7 +6240,7 @@ pub mod async_agent_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::admin::GetTaskLogsRequest,
+                                super::super::connector::GetTaskLogsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
@@ -6397,13 +6404,13 @@ pub mod agent_metadata_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /** Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+        /** Fetch a :ref:`ref_connector.Agent` definition.
 */
         pub async fn get_agent(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::GetAgentRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::GetAgentRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetAgentResponse>,
+            tonic::Response<super::super::connector::GetAgentResponse>,
             tonic::Status,
         > {
             self.inner
@@ -6426,13 +6433,13 @@ pub mod agent_metadata_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        /** Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+        /** Fetch a list of :ref:`ref_connector.Agent` definitions.
 */
         pub async fn list_agents(
             &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::ListAgentsRequest>,
+            request: impl tonic::IntoRequest<super::super::connector::ListAgentsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::ListAgentsResponse>,
+            tonic::Response<super::super::connector::ListAgentsResponse>,
             tonic::Status,
         > {
             self.inner
@@ -6467,22 +6474,22 @@ pub mod agent_metadata_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with AgentMetadataServiceServer.
     #[async_trait]
     pub trait AgentMetadataService: Send + Sync + 'static {
-        /** Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+        /** Fetch a :ref:`ref_connector.Agent` definition.
 */
         async fn get_agent(
             &self,
-            request: tonic::Request<super::super::admin::GetAgentRequest>,
+            request: tonic::Request<super::super::connector::GetAgentRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::GetAgentResponse>,
+            tonic::Response<super::super::connector::GetAgentResponse>,
             tonic::Status,
         >;
-        /** Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+        /** Fetch a list of :ref:`ref_connector.Agent` definitions.
 */
         async fn list_agents(
             &self,
-            request: tonic::Request<super::super::admin::ListAgentsRequest>,
+            request: tonic::Request<super::super::connector::ListAgentsRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::super::admin::ListAgentsResponse>,
+            tonic::Response<super::super::connector::ListAgentsResponse>,
             tonic::Status,
         >;
     }
@@ -6574,16 +6581,19 @@ pub mod agent_metadata_service_server {
                     struct GetAgentSvc<T: AgentMetadataService>(pub Arc<T>);
                     impl<
                         T: AgentMetadataService,
-                    > tonic::server::UnaryService<super::super::admin::GetAgentRequest>
-                    for GetAgentSvc<T> {
-                        type Response = super::super::admin::GetAgentResponse;
+                    > tonic::server::UnaryService<
+                        super::super::connector::GetAgentRequest,
+                    > for GetAgentSvc<T> {
+                        type Response = super::super::connector::GetAgentResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::super::admin::GetAgentRequest>,
+                            request: tonic::Request<
+                                super::super::connector::GetAgentRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
@@ -6621,9 +6631,10 @@ pub mod agent_metadata_service_server {
                     struct ListAgentsSvc<T: AgentMetadataService>(pub Arc<T>);
                     impl<
                         T: AgentMetadataService,
-                    > tonic::server::UnaryService<super::super::admin::ListAgentsRequest>
-                    for ListAgentsSvc<T> {
-                        type Response = super::super::admin::ListAgentsResponse;
+                    > tonic::server::UnaryService<
+                        super::super::connector::ListAgentsRequest,
+                    > for ListAgentsSvc<T> {
+                        type Response = super::super::connector::ListAgentsResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -6631,7 +6642,7 @@ pub mod agent_metadata_service_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                super::super::admin::ListAgentsRequest,
+                                super::super::connector::ListAgentsRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);

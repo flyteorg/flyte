@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	grpc "google.golang.org/grpc"
 
@@ -28,7 +28,7 @@ func (_m *AsyncAgentServiceClient) EXPECT() *AsyncAgentServiceClient_Expecter {
 }
 
 // CreateTask provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) CreateTask(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+func (_m *AsyncAgentServiceClient) CreateTask(ctx context.Context, in *connector.CreateTaskRequest, opts ...grpc.CallOption) (*connector.CreateTaskResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -42,20 +42,20 @@ func (_m *AsyncAgentServiceClient) CreateTask(ctx context.Context, in *admin.Cre
 		panic("no return value specified for CreateTask")
 	}
 
-	var r0 *admin.CreateTaskResponse
+	var r0 *connector.CreateTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateTaskRequest, ...grpc.CallOption) (*admin.CreateTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.CreateTaskRequest, ...grpc.CallOption) (*connector.CreateTaskResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateTaskRequest, ...grpc.CallOption) *admin.CreateTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.CreateTaskRequest, ...grpc.CallOption) *connector.CreateTaskResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.CreateTaskResponse)
+			r0 = ret.Get(0).(*connector.CreateTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.CreateTaskRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.CreateTaskRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -71,14 +71,14 @@ type AsyncAgentServiceClient_CreateTask_Call struct {
 
 // CreateTask is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *admin.CreateTaskRequest
+//   - in *connector.CreateTaskRequest
 //   - opts ...grpc.CallOption
 func (_e *AsyncAgentServiceClient_Expecter) CreateTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncAgentServiceClient_CreateTask_Call {
 	return &AsyncAgentServiceClient_CreateTask_Call{Call: _e.mock.On("CreateTask",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AsyncAgentServiceClient_CreateTask_Call) Run(run func(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_CreateTask_Call {
+func (_c *AsyncAgentServiceClient_CreateTask_Call) Run(run func(ctx context.Context, in *connector.CreateTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_CreateTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -86,23 +86,23 @@ func (_c *AsyncAgentServiceClient_CreateTask_Call) Run(run func(ctx context.Cont
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*admin.CreateTaskRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.CreateTaskRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_CreateTask_Call) Return(_a0 *admin.CreateTaskResponse, _a1 error) *AsyncAgentServiceClient_CreateTask_Call {
+func (_c *AsyncAgentServiceClient_CreateTask_Call) Return(_a0 *connector.CreateTaskResponse, _a1 error) *AsyncAgentServiceClient_CreateTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_CreateTask_Call) RunAndReturn(run func(context.Context, *admin.CreateTaskRequest, ...grpc.CallOption) (*admin.CreateTaskResponse, error)) *AsyncAgentServiceClient_CreateTask_Call {
+func (_c *AsyncAgentServiceClient_CreateTask_Call) RunAndReturn(run func(context.Context, *connector.CreateTaskRequest, ...grpc.CallOption) (*connector.CreateTaskResponse, error)) *AsyncAgentServiceClient_CreateTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DeleteTask provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) DeleteTask(ctx context.Context, in *admin.DeleteTaskRequest, opts ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+func (_m *AsyncAgentServiceClient) DeleteTask(ctx context.Context, in *connector.DeleteTaskRequest, opts ...grpc.CallOption) (*connector.DeleteTaskResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -116,20 +116,20 @@ func (_m *AsyncAgentServiceClient) DeleteTask(ctx context.Context, in *admin.Del
 		panic("no return value specified for DeleteTask")
 	}
 
-	var r0 *admin.DeleteTaskResponse
+	var r0 *connector.DeleteTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DeleteTaskRequest, ...grpc.CallOption) (*admin.DeleteTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.DeleteTaskRequest, ...grpc.CallOption) (*connector.DeleteTaskResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DeleteTaskRequest, ...grpc.CallOption) *admin.DeleteTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.DeleteTaskRequest, ...grpc.CallOption) *connector.DeleteTaskResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.DeleteTaskResponse)
+			r0 = ret.Get(0).(*connector.DeleteTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.DeleteTaskRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.DeleteTaskRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -145,14 +145,14 @@ type AsyncAgentServiceClient_DeleteTask_Call struct {
 
 // DeleteTask is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *admin.DeleteTaskRequest
+//   - in *connector.DeleteTaskRequest
 //   - opts ...grpc.CallOption
 func (_e *AsyncAgentServiceClient_Expecter) DeleteTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncAgentServiceClient_DeleteTask_Call {
 	return &AsyncAgentServiceClient_DeleteTask_Call{Call: _e.mock.On("DeleteTask",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AsyncAgentServiceClient_DeleteTask_Call) Run(run func(ctx context.Context, in *admin.DeleteTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_DeleteTask_Call {
+func (_c *AsyncAgentServiceClient_DeleteTask_Call) Run(run func(ctx context.Context, in *connector.DeleteTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_DeleteTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -160,23 +160,23 @@ func (_c *AsyncAgentServiceClient_DeleteTask_Call) Run(run func(ctx context.Cont
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*admin.DeleteTaskRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.DeleteTaskRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_DeleteTask_Call) Return(_a0 *admin.DeleteTaskResponse, _a1 error) *AsyncAgentServiceClient_DeleteTask_Call {
+func (_c *AsyncAgentServiceClient_DeleteTask_Call) Return(_a0 *connector.DeleteTaskResponse, _a1 error) *AsyncAgentServiceClient_DeleteTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_DeleteTask_Call) RunAndReturn(run func(context.Context, *admin.DeleteTaskRequest, ...grpc.CallOption) (*admin.DeleteTaskResponse, error)) *AsyncAgentServiceClient_DeleteTask_Call {
+func (_c *AsyncAgentServiceClient_DeleteTask_Call) RunAndReturn(run func(context.Context, *connector.DeleteTaskRequest, ...grpc.CallOption) (*connector.DeleteTaskResponse, error)) *AsyncAgentServiceClient_DeleteTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTask provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) GetTask(ctx context.Context, in *admin.GetTaskRequest, opts ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+func (_m *AsyncAgentServiceClient) GetTask(ctx context.Context, in *connector.GetTaskRequest, opts ...grpc.CallOption) (*connector.GetTaskResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -190,20 +190,20 @@ func (_m *AsyncAgentServiceClient) GetTask(ctx context.Context, in *admin.GetTas
 		panic("no return value specified for GetTask")
 	}
 
-	var r0 *admin.GetTaskResponse
+	var r0 *connector.GetTaskResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskRequest, ...grpc.CallOption) (*admin.GetTaskResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskRequest, ...grpc.CallOption) (*connector.GetTaskResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskRequest, ...grpc.CallOption) *admin.GetTaskResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskRequest, ...grpc.CallOption) *connector.GetTaskResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetTaskResponse)
+			r0 = ret.Get(0).(*connector.GetTaskResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetTaskRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -219,14 +219,14 @@ type AsyncAgentServiceClient_GetTask_Call struct {
 
 // GetTask is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *admin.GetTaskRequest
+//   - in *connector.GetTaskRequest
 //   - opts ...grpc.CallOption
 func (_e *AsyncAgentServiceClient_Expecter) GetTask(ctx interface{}, in interface{}, opts ...interface{}) *AsyncAgentServiceClient_GetTask_Call {
 	return &AsyncAgentServiceClient_GetTask_Call{Call: _e.mock.On("GetTask",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AsyncAgentServiceClient_GetTask_Call) Run(run func(ctx context.Context, in *admin.GetTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTask_Call {
+func (_c *AsyncAgentServiceClient_GetTask_Call) Run(run func(ctx context.Context, in *connector.GetTaskRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTask_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -234,23 +234,23 @@ func (_c *AsyncAgentServiceClient_GetTask_Call) Run(run func(ctx context.Context
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*admin.GetTaskRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.GetTaskRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_GetTask_Call) Return(_a0 *admin.GetTaskResponse, _a1 error) *AsyncAgentServiceClient_GetTask_Call {
+func (_c *AsyncAgentServiceClient_GetTask_Call) Return(_a0 *connector.GetTaskResponse, _a1 error) *AsyncAgentServiceClient_GetTask_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_GetTask_Call) RunAndReturn(run func(context.Context, *admin.GetTaskRequest, ...grpc.CallOption) (*admin.GetTaskResponse, error)) *AsyncAgentServiceClient_GetTask_Call {
+func (_c *AsyncAgentServiceClient_GetTask_Call) RunAndReturn(run func(context.Context, *connector.GetTaskRequest, ...grpc.CallOption) (*connector.GetTaskResponse, error)) *AsyncAgentServiceClient_GetTask_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTaskLogs provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error) {
+func (_m *AsyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *connector.GetTaskLogsRequest, opts ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -266,10 +266,10 @@ func (_m *AsyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.Ge
 
 	var r0 service.AsyncAgentService_GetTaskLogsClient
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskLogsRequest, ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) service.AsyncAgentService_GetTaskLogsClient); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskLogsRequest, ...grpc.CallOption) service.AsyncAgentService_GetTaskLogsClient); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
@@ -277,7 +277,7 @@ func (_m *AsyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.Ge
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetTaskLogsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -293,14 +293,14 @@ type AsyncAgentServiceClient_GetTaskLogs_Call struct {
 
 // GetTaskLogs is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *admin.GetTaskLogsRequest
+//   - in *connector.GetTaskLogsRequest
 //   - opts ...grpc.CallOption
 func (_e *AsyncAgentServiceClient_Expecter) GetTaskLogs(ctx interface{}, in interface{}, opts ...interface{}) *AsyncAgentServiceClient_GetTaskLogs_Call {
 	return &AsyncAgentServiceClient_GetTaskLogs_Call{Call: _e.mock.On("GetTaskLogs",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) Run(run func(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTaskLogs_Call {
+func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) Run(run func(ctx context.Context, in *connector.GetTaskLogsRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTaskLogs_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -308,7 +308,7 @@ func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) Run(run func(ctx context.Con
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*admin.GetTaskLogsRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.GetTaskLogsRequest), variadicArgs...)
 	})
 	return _c
 }
@@ -318,13 +318,13 @@ func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) Return(_a0 service.AsyncAgen
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) RunAndReturn(run func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error)) *AsyncAgentServiceClient_GetTaskLogs_Call {
+func (_c *AsyncAgentServiceClient_GetTaskLogs_Call) RunAndReturn(run func(context.Context, *connector.GetTaskLogsRequest, ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error)) *AsyncAgentServiceClient_GetTaskLogs_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetTaskMetrics provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
+func (_m *AsyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *connector.GetTaskMetricsRequest, opts ...grpc.CallOption) (*connector.GetTaskMetricsResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -338,20 +338,20 @@ func (_m *AsyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *admin
 		panic("no return value specified for GetTaskMetrics")
 	}
 
-	var r0 *admin.GetTaskMetricsResponse
+	var r0 *connector.GetTaskMetricsResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskMetricsRequest, ...grpc.CallOption) (*connector.GetTaskMetricsResponse, error)); ok {
 		return rf(ctx, in, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) *admin.GetTaskMetricsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *connector.GetTaskMetricsRequest, ...grpc.CallOption) *connector.GetTaskMetricsResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.GetTaskMetricsResponse)
+			r0 = ret.Get(0).(*connector.GetTaskMetricsResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *connector.GetTaskMetricsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -367,14 +367,14 @@ type AsyncAgentServiceClient_GetTaskMetrics_Call struct {
 
 // GetTaskMetrics is a helper method to define mock.On call
 //   - ctx context.Context
-//   - in *admin.GetTaskMetricsRequest
+//   - in *connector.GetTaskMetricsRequest
 //   - opts ...grpc.CallOption
 func (_e *AsyncAgentServiceClient_Expecter) GetTaskMetrics(ctx interface{}, in interface{}, opts ...interface{}) *AsyncAgentServiceClient_GetTaskMetrics_Call {
 	return &AsyncAgentServiceClient_GetTaskMetrics_Call{Call: _e.mock.On("GetTaskMetrics",
 		append([]interface{}{ctx, in}, opts...)...)}
 }
 
-func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) Run(run func(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) Run(run func(ctx context.Context, in *connector.GetTaskMetricsRequest, opts ...grpc.CallOption)) *AsyncAgentServiceClient_GetTaskMetrics_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]grpc.CallOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -382,17 +382,17 @@ func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) Run(run func(ctx context.
 				variadicArgs[i] = a.(grpc.CallOption)
 			}
 		}
-		run(args[0].(context.Context), args[1].(*admin.GetTaskMetricsRequest), variadicArgs...)
+		run(args[0].(context.Context), args[1].(*connector.GetTaskMetricsRequest), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) Return(_a0 *admin.GetTaskMetricsResponse, _a1 error) *AsyncAgentServiceClient_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) Return(_a0 *connector.GetTaskMetricsResponse, _a1 error) *AsyncAgentServiceClient_GetTaskMetrics_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) RunAndReturn(run func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error)) *AsyncAgentServiceClient_GetTaskMetrics_Call {
+func (_c *AsyncAgentServiceClient_GetTaskMetrics_Call) RunAndReturn(run func(context.Context, *connector.GetTaskMetricsRequest, ...grpc.CallOption) (*connector.GetTaskMetricsResponse, error)) *AsyncAgentServiceClient_GetTaskMetrics_Call {
 	_c.Call.Return(run)
 	return _c
 }

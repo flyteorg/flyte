@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	connector "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 
 	metadata "google.golang.org/grpc/metadata"
 
@@ -119,7 +119,7 @@ func (_c *AsyncAgentService_GetTaskLogsServer_RecvMsg_Call) RunAndReturn(run fun
 }
 
 // Send provides a mock function with given fields: _a0
-func (_m *AsyncAgentService_GetTaskLogsServer) Send(_a0 *admin.GetTaskLogsResponse) error {
+func (_m *AsyncAgentService_GetTaskLogsServer) Send(_a0 *connector.GetTaskLogsResponse) error {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
@@ -127,7 +127,7 @@ func (_m *AsyncAgentService_GetTaskLogsServer) Send(_a0 *admin.GetTaskLogsRespon
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*admin.GetTaskLogsResponse) error); ok {
+	if rf, ok := ret.Get(0).(func(*connector.GetTaskLogsResponse) error); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)
@@ -142,14 +142,14 @@ type AsyncAgentService_GetTaskLogsServer_Send_Call struct {
 }
 
 // Send is a helper method to define mock.On call
-//   - _a0 *admin.GetTaskLogsResponse
+//   - _a0 *connector.GetTaskLogsResponse
 func (_e *AsyncAgentService_GetTaskLogsServer_Expecter) Send(_a0 interface{}) *AsyncAgentService_GetTaskLogsServer_Send_Call {
 	return &AsyncAgentService_GetTaskLogsServer_Send_Call{Call: _e.mock.On("Send", _a0)}
 }
 
-func (_c *AsyncAgentService_GetTaskLogsServer_Send_Call) Run(run func(_a0 *admin.GetTaskLogsResponse)) *AsyncAgentService_GetTaskLogsServer_Send_Call {
+func (_c *AsyncAgentService_GetTaskLogsServer_Send_Call) Run(run func(_a0 *connector.GetTaskLogsResponse)) *AsyncAgentService_GetTaskLogsServer_Send_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*admin.GetTaskLogsResponse))
+		run(args[0].(*connector.GetTaskLogsResponse))
 	})
 	return _c
 }
@@ -159,7 +159,7 @@ func (_c *AsyncAgentService_GetTaskLogsServer_Send_Call) Return(_a0 error) *Asyn
 	return _c
 }
 
-func (_c *AsyncAgentService_GetTaskLogsServer_Send_Call) RunAndReturn(run func(*admin.GetTaskLogsResponse) error) *AsyncAgentService_GetTaskLogsServer_Send_Call {
+func (_c *AsyncAgentService_GetTaskLogsServer_Send_Call) RunAndReturn(run func(*connector.GetTaskLogsResponse) error) *AsyncAgentService_GetTaskLogsServer_Send_Call {
 	_c.Call.Return(run)
 	return _c
 }
