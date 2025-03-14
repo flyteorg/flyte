@@ -2,6 +2,7 @@ package core_test
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	"testing"
 
 	"gotest.tools/assert"
@@ -95,7 +96,7 @@ func TestLoadPlugin(t *testing.T) {
 }
 
 func TestAgentService(t *testing.T) {
-	agentService := core.AgentService{}
+	agentService := agent.AgentService{}
 	taskTypes := []core.TaskType{"sensor", "chatgpt"}
 
 	for _, taskType := range taskTypes {
