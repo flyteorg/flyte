@@ -250,8 +250,8 @@ type Handler struct {
 	pluginScope      promutils.Scope
 	eventConfig      *controllerConfig.EventConfig
 	clusterID        string
-	agentService     *pluginCore.AgentService
-	connectorService *pluginCore.ConnectorService
+	agentService     *agent.AgentService
+	connectorService *connector.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -278,9 +278,9 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
-	connectorOnce.Do(func() { connector.RegisterConnectorPlugin(t.connectorService) })
+	once.Do(func() { connector.RegisterConnectorPlugin(t.connectorService) })
 	// The agent service plugin is deprecated and will be removed in the future
-	agentOnce.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
+	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
 
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
@@ -404,12 +404,12 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		return p, nil
 	}
 
-	if t.connectorService.ContainTaskType(ttype) {
+	if t.connectorService != nil && t.connectorService.ContainTaskType(ttype) {
 		return t.connectorService.CorePlugin, nil
 	}
 
 	// The agent service plugin is deprecated and will be removed in the future
-	if t.agentService.ContainTaskType(ttype) {
+	if t.agentService != nil && t.agentService.ContainTaskType(ttype) {
 		return t.agentService.CorePlugin, nil
 	}
 
@@ -1049,7 +1049,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		cfg:              cfg,
 		eventConfig:      eventConfig,
 		clusterID:        clusterID,
-		agentService:     &pluginCore.AgentService{},
-		connectorService: &pluginCore.ConnectorService{},
+		agentService:     &agent.AgentService{},
+		connectorService: &connector.ConnectorService{},
 	}, nil
 }

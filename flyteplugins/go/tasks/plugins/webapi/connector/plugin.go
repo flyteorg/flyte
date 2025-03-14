@@ -4,13 +4,16 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
+	"unsafe"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	connectorIDL "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
@@ -26,6 +29,26 @@ import (
 )
 
 const ID = "connector-service"
+
+type ConnectorService struct {
+	mu                 sync.RWMutex
+	supportedTaskTypes []string
+	CorePlugin         core.Plugin
+}
+
+// ContainTaskType check if connector supports this task type.
+func (p *ConnectorService) ContainTaskType(taskType string) bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return slices.Contains(p.supportedTaskTypes, taskType)
+}
+
+// SetSupportedTaskType set supportTaskType in the connector service.
+func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.supportedTaskTypes = taskTypes
+}
 
 type Registry map[string]map[int32]*Connector // map[taskTypeName][taskTypeVersion] => Connector
 
@@ -133,7 +156,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		return nil, nil, err
 	}
 	request := &connectorIDL.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
-	res, err := client.CreateTask(finalCtx, request)
+	res, err := client.CreateTask(finalCtx, (*admin.CreateTaskRequest)(unsafe.Pointer(&request)))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create task from connector with %v", err)
 	}
@@ -147,7 +170,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 
 func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
-	client service.SyncConnectorServiceClient,
+	client service.SyncAgentServiceClient,
 	header *connectorIDL.CreateRequestHeader,
 	inputs *flyteIdl.LiteralMap,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
@@ -163,7 +186,7 @@ func (p *Plugin) ExecuteTaskSync(
 		},
 	}
 
-	err = stream.Send(headerProto)
+	err = stream.Send((*admin.ExecuteTaskSyncRequest)(unsafe.Pointer(&headerProto)))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
 	}
@@ -172,7 +195,7 @@ func (p *Plugin) ExecuteTaskSync(
 			Inputs: inputs,
 		},
 	}
-	err = stream.Send(inputsProto)
+	err = stream.Send((*admin.ExecuteTaskSyncRequest)(unsafe.Pointer(&inputsProto)))
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
@@ -202,7 +225,7 @@ func (p *Plugin) ExecuteTaskSync(
 		Message:        resource.GetMessage(),
 		LogLinks:       resource.GetLogLinks(),
 		CustomInfo:     resource.GetCustomInfo(),
-		ConnectorError: resource.GetConnectorError(),
+		ConnectorError: (*connectorIDL.ConnectorError)(unsafe.Pointer(resource.GetAgentError())),
 	}, nil
 }
 
@@ -223,14 +246,13 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		ResourceMeta: metadata.ConnectorResourceMeta,
 		OutputPrefix: metadata.OutputPrefix,
 	}
-	res, err := client.GetTask(finalCtx, request)
+	res, err := client.GetTask(finalCtx, (*admin.GetTaskRequest)(unsafe.Pointer(&request)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get task from connector with %v", err)
 	}
 
 	return ResourceWrapper{
 		Phase:      res.GetResource().GetPhase(),
-		State:      res.GetResource().GetState(),
 		Outputs:    res.GetResource().GetOutputs(),
 		Message:    res.GetResource().GetMessage(),
 		LogLinks:   res.GetResource().GetLogLinks(),
@@ -257,7 +279,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.ConnectorResourceMeta,
 	}
-	_, err = client.DeleteTask(finalCtx, request)
+	_, err = client.DeleteTask(finalCtx, (*admin.DeleteTaskRequest)(unsafe.Pointer(&request)))
 	if err != nil {
 		return fmt.Errorf("failed to delete task from connector with %v", err)
 	}
@@ -319,33 +341,33 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p *Plugin) getSyncConnectorClient(ctx context.Context, connector *Deployment) (service.SyncConnectorServiceClient, error) {
+func (p *Plugin) getSyncConnectorClient(ctx context.Context, connector *Deployment) (service.SyncAgentServiceClient, error) {
 	client, ok := p.cs.syncConnectorClients[connector.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, connector)
 		if err != nil {
 			return nil, err
 		}
-		client = service.NewSyncConnectorServiceClient(conn)
+		client = service.NewSyncAgentServiceClient(conn)
 		p.cs.syncConnectorClients[connector.Endpoint] = client
 	}
 	return client, nil
 }
 
-func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (service.AsyncConnectorServiceClient, error) {
+func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deployment) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncConnectorClients[connector.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, connector)
 		if err != nil {
 			return nil, err
 		}
-		client = service.NewAsyncConnectorServiceClient(conn)
+		client = service.NewAsyncAgentServiceClient(conn)
 		p.cs.asyncConnectorClients[connector.Endpoint] = client
 	}
 	return client, nil
 }
 
-func (p *Plugin) watchConnectors(ctx context.Context, connectorService *core.ConnectorService) {
+func (p *Plugin) watchConnectors(ctx context.Context, connectorService *ConnectorService) {
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -402,7 +424,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEntry {
+func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
@@ -429,7 +451,7 @@ func newConnectorPlugin(connectorService *core.ConnectorService) webapi.PluginEn
 	}
 }
 
-func RegisterConnectorPlugin(connectorService *core.ConnectorService) {
+func RegisterConnectorPlugin(connectorService *ConnectorService) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newConnectorPlugin(connectorService))

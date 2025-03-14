@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"strings"
+	"unsafe"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/connector"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -34,9 +36,9 @@ type Connector struct {
 
 // ClientSet contains the clients exposed to communicate with various connector services.
 type ClientSet struct {
-	asyncConnectorClients    map[string]service.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient
-	syncConnectorClients     map[string]service.SyncConnectorServiceClient     // map[endpoint] => SyncConnectorServiceClient
-	connectorMetadataClients map[string]service.ConnectorMetadataServiceClient // map[endpoint] => ConnectorMetadataServiceClient
+	asyncConnectorClients    map[string]service.AsyncAgentServiceClient    // map[endpoint] => AsyncConnectorServiceClient
+	syncConnectorClients     map[string]service.SyncAgentServiceClient     // map[endpoint] => SyncConnectorServiceClient
+	connectorMetadataClients map[string]service.AgentMetadataServiceClient // map[endpoint] => ConnectorMetadataServiceClient
 }
 
 func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.ClientConn, error) {
@@ -110,7 +112,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListConnectors", connectorDeployment)
 		defer cancel()
 
-		res, err := client.ListConnectors(finalCtx, &connector.ListConnectorsRequest{})
+		res, err := client.ListAgents(finalCtx, (*admin.ListAgentsRequest)(unsafe.Pointer(&connector.ListConnectorsRequest{})))
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
@@ -129,7 +131,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 
 		connectorSupportedTaskCategories := make(map[string]struct{})
-		for _, connector := range res.GetConnectors() {
+		for _, connector := range res.GetAgents() {
 			deprecatedSupportedTaskTypes := connector.GetSupportedTaskTypes()
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
 				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
@@ -173,9 +175,9 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 
 func getConnectorClientSets(ctx context.Context) *ClientSet {
 	clientSet := &ClientSet{
-		asyncConnectorClients:    make(map[string]service.AsyncConnectorServiceClient),
-		syncConnectorClients:     make(map[string]service.SyncConnectorServiceClient),
-		connectorMetadataClients: make(map[string]service.ConnectorMetadataServiceClient),
+		asyncConnectorClients:    make(map[string]service.AsyncAgentServiceClient),
+		syncConnectorClients:     make(map[string]service.SyncAgentServiceClient),
+		connectorMetadataClients: make(map[string]service.AgentMetadataServiceClient),
 	}
 
 	var connectorDeployments []*Deployment
@@ -195,9 +197,9 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 			logger.Errorf(ctx, "failed to create connection to connector: [%v] with error: [%v]", connectorDeployment, err)
 			continue
 		}
-		clientSet.syncConnectorClients[connectorDeployment.Endpoint] = service.NewSyncConnectorServiceClient(conn)
-		clientSet.asyncConnectorClients[connectorDeployment.Endpoint] = service.NewAsyncConnectorServiceClient(conn)
-		clientSet.connectorMetadataClients[connectorDeployment.Endpoint] = service.NewConnectorMetadataServiceClient(conn)
+		clientSet.syncConnectorClients[connectorDeployment.Endpoint] = service.NewSyncAgentServiceClient(conn)
+		clientSet.asyncConnectorClients[connectorDeployment.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		clientSet.connectorMetadataClients[connectorDeployment.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
 	return clientSet
 }
