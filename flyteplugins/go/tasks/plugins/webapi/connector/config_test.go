@@ -50,7 +50,7 @@ func TestDefaultAgentConfig(t *testing.T) {
 
 	assert.Empty(t, cfg.DefaultConnector.Timeouts)
 
-	expectedTaskTypes := []string{"task_type_1", "task_type_2"}
+	expectedTaskTypes := []string{"task_type_3", "task_type_4"}
 	assert.Equal(t, expectedTaskTypes, cfg.SupportedTaskTypes)
 
 	assert.Empty(t, cfg.ConnectorDeployments)
