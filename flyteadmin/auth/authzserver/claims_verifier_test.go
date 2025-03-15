@@ -79,12 +79,12 @@ func Test_verifyClaims(t *testing.T) {
 		identityCtx, err := verifyClaims(sets.NewString("https://myserver", "https://myserver2"),
 			map[string]interface{}{
 				"aud": []string{"https://myserver"},
-				"scp": "all",
+				"scp": "my-scope",
 			})
 
 		assert.NoError(t, err)
 		assert.Equal(t, "https://myserver", identityCtx.Audience())
-		assert.Equal(t, sets.NewString("all"), identityCtx.Scopes())
+		assert.Equal(t, sets.NewString("my-scope"), identityCtx.Scopes())
 	})
 	t.Run("unknown scope", func(t *testing.T) {
 		identityCtx, err := verifyClaims(sets.NewString("https://myserver", "https://myserver2"),
