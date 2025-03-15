@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -64,13 +65,7 @@ var updateResourcesFuncs = map[string]cmdCore.CommandEntry{
 }
 
 var configStructMap = map[string]interface{}{
-	"launchplan":                 launchplan.UConfig,
-	"launchplan-meta":            namedEntityConfig,
 	"project":                    project.DefaultProjectConfig,
-	"execution":                  execution.UConfig,
-	"task-meta":                  namedEntityConfig,
-	"workflow-meta":              namedEntityConfig,
-
 	"task-resource-attribute":    taskresourceattribute.DefaultTaskResourceAttrFileConfig,
 	"cluster-resource-attribute": clusterresourceattribute.DefaultAttrFileConfig,
 	"execution-queue-attribute":  executionqueueattribute.DefaultAttrFileConfig,
@@ -100,6 +95,7 @@ func CreateUpdateCommand() *cobra.Command {
 }
 
 func runUpdateFiles(cmd *cobra.Command, args []string) error {
+	ctx := cmd.Context()
 	var updateConfig = config.DefaultUpdateConfig
 	if len(updateConfig.AttrFile) == 0 {
 		return fmt.Errorf("file is mandatory while calling update")
@@ -132,7 +128,8 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			// Find the corresponding subcommand
 			cmdStruct, found := configStructMap[kind]
 			if !found {
-				return fmt.Errorf("subcommand not found for kind %s", kind)
+				logger.Warningf(ctx, "Cannot poss config to subcommand '%s' with file", kind)
+                continue
 			}
 			subCmd, found := subCmdMap[kind]
 			if !found {
