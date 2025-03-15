@@ -144,7 +144,7 @@ func TestRunUpdateFiles(t *testing.T) {
 
 	// Capture logs
 	var logBuffer bytes.Buffer
-    logrus.SetOutput(&logBuffer)
+	logrus.SetOutput(&logBuffer)
 
 	// Run the function
 	cmd := &cobra.Command{}
@@ -152,7 +152,7 @@ func TestRunUpdateFiles(t *testing.T) {
 	err = runUpdateFiles(cmd, []string{})
 	assert.NoError(t, err)
 
-    logrus.SetOutput(os.Stderr)  // Restore logger output
+	logrus.SetOutput(os.Stderr) // Restore logger output
 
 	// Verify that the subcommand functions were called
 	for _, mockCmd := range mockCmds {
