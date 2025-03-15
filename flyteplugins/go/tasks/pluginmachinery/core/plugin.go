@@ -3,9 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"sync"
-
-	"k8s.io/utils/strings/slices"
 )
 
 //go:generate mockery --all --case=underscore --with-expecter
@@ -56,26 +53,6 @@ type Plugin interface {
 	Abort(ctx context.Context, tCtx TaskExecutionContext) error
 	// Finalize is always called, after Handle or Abort. Finalize should be an idempotent operation
 	Finalize(ctx context.Context, tCtx TaskExecutionContext) error
-}
-
-type AgentService struct {
-	mu                 sync.RWMutex
-	supportedTaskTypes []TaskType
-	CorePlugin         Plugin
-}
-
-// ContainTaskType check if agent supports this task type.
-func (p *AgentService) ContainTaskType(taskType TaskType) bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return slices.Contains(p.supportedTaskTypes, taskType)
-}
-
-// SetSupportedTaskType set supportTaskType in the agent service.
-func (p *AgentService) SetSupportedTaskType(taskTypes []TaskType) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.supportedTaskTypes = taskTypes
 }
 
 // LoadPlugin Loads and validates a plugin.

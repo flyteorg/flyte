@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -233,23 +234,24 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog         catalog.Client
-	asyncCatalog    catalog.AsyncClient
-	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap  map[MetricKey]*taskMetrics
-	defaultPlugin   pluginCore.Plugin
-	metrics         *metrics
-	pluginRegistry  PluginRegistryIface
-	kubeClient      pluginCore.KubeClient
-	kubeClientset   kubernetes.Interface
-	secretManager   pluginCore.SecretManager
-	resourceManager resourcemanager.BaseResourceManager
-	cfg             *config.Config
-	pluginScope     promutils.Scope
-	eventConfig     *controllerConfig.EventConfig
-	clusterID       string
-	agentService    *pluginCore.AgentService
+	catalog          catalog.Client
+	asyncCatalog     catalog.AsyncClient
+	defaultPlugins   map[pluginCore.TaskType]pluginCore.Plugin
+	pluginsForType   map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap   map[MetricKey]*taskMetrics
+	defaultPlugin    pluginCore.Plugin
+	metrics          *metrics
+	pluginRegistry   PluginRegistryIface
+	kubeClient       pluginCore.KubeClient
+	kubeClientset    kubernetes.Interface
+	secretManager    pluginCore.SecretManager
+	resourceManager  resourcemanager.BaseResourceManager
+	cfg              *config.Config
+	pluginScope      promutils.Scope
+	eventConfig      *controllerConfig.EventConfig
+	clusterID        string
+	agentService     *agent.AgentService
+	connectorService *connector.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -276,7 +278,12 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
-	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
+	once.Do(func() {
+		// The agent service plugin is deprecated and will be removed in the future
+		agent.RegisterAgentPlugin(t.agentService)
+		connector.RegisterConnectorPlugin(t.connectorService)
+	})
+
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
@@ -301,6 +308,11 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
 
+		if cp.GetID() == connector.ID {
+			t.connectorService.CorePlugin = cp
+		}
+
+		// The agent service plugin is deprecated and will be removed in the future
 		if cp.GetID() == agent.ID {
 			t.agentService.CorePlugin = cp
 		}
@@ -394,7 +406,12 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		return p, nil
 	}
 
-	if t.agentService.ContainTaskType(ttype) {
+	if t.connectorService != nil && t.connectorService.ContainTaskType(ttype) {
+		return t.connectorService.CorePlugin, nil
+	}
+
+	// The agent service plugin is deprecated and will be removed in the future
+	if t.agentService != nil && t.agentService.ContainTaskType(ttype) {
 		return t.agentService.CorePlugin, nil
 	}
 
@@ -1024,16 +1041,17 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
 			scope:                  scope,
 		},
-		pluginScope:     scope.NewSubScope("plugin"),
-		kubeClient:      kubeClient,
-		kubeClientset:   kubeClientset,
-		catalog:         client,
-		asyncCatalog:    async,
-		resourceManager: nil,
-		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		cfg:             cfg,
-		eventConfig:     eventConfig,
-		clusterID:       clusterID,
-		agentService:    &pluginCore.AgentService{},
+		pluginScope:      scope.NewSubScope("plugin"),
+		kubeClient:       kubeClient,
+		kubeClientset:    kubeClientset,
+		catalog:          client,
+		asyncCatalog:     async,
+		resourceManager:  nil,
+		secretManager:    secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		cfg:              cfg,
+		eventConfig:      eventConfig,
+		clusterID:        clusterID,
+		agentService:     &agent.AgentService{},
+		connectorService: &connector.ConnectorService{},
 	}, nil
 }
