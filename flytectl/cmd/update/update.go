@@ -129,7 +129,7 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			cmdStruct, found := configStructMap[kind]
 			if !found {
 				logger.Warningf(ctx, "Cannot poss config to subcommand '%s' with file", kind)
-                continue
+				continue
 			}
 			subCmd, found := subCmdMap[kind]
 			if !found {
