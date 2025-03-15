@@ -3,7 +3,6 @@ package update
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
 	"os"
 	"sort"
 	"testing"
