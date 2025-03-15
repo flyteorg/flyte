@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
@@ -64,6 +64,7 @@ var updateResourcesFuncs = map[string]cmdCore.CommandEntry{
 		Short: workflowExecutionConfigShort, Long: workflowExecutionConfigLong, ProjectDomainNotRequired: true},
 }
 
+// This includes the subcommands that support configured through file
 var configStructMap = map[string]interface{}{
 	"project":                    project.DefaultProjectConfig,
 	"task-resource-attribute":    taskresourceattribute.DefaultTaskResourceAttrFileConfig,
@@ -104,7 +105,7 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 	type generic map[string]interface{}
 
 	for _, file := range updateConfig.AttrFile {
-		yamlFile, err := ioutil.ReadFile(file)
+		yamlFile, err := os.ReadFile(file)
 		if err != nil {
 			return err
 		}

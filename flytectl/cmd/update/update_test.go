@@ -154,7 +154,7 @@ func TestRunUpdateFiles(t *testing.T) {
 
 	logrus.SetOutput(os.Stderr) // Restore logger output
 
-	// Verify that the subcommand functions were called
+	// Verify that the subcommand functions were called for supported commands in configStructMap
 	for _, mockCmd := range mockCmds {
 		mockCmd.AssertCalled(t, "RunE", mock.Anything, mock.Anything)
 	}
