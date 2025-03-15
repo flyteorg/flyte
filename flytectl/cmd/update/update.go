@@ -128,7 +128,7 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			// Find the corresponding subcommand
 			cmdStruct, found := configStructMap[kind]
 			if !found {
-				logger.Warningf(ctx, "Cannot poss config to subcommand '%s' with file", kind)
+				logger.Warningf(ctx, "Cannot pass config to subcommand '%s' with file", kind)
 				continue
 			}
 			subCmd, found := subCmdMap[kind]
@@ -141,7 +141,6 @@ func runUpdateFiles(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				return err
 			}
-
 			if err := json.Unmarshal(data, cmdStruct); err != nil {
 				return err
 			}
