@@ -23,11 +23,20 @@ class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PENDING: _ClassVar[State]
     RUNNING: _ClassVar[State]
     SUCCEEDED: _ClassVar[State]
+
+class LogLineOriginator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    UNKNOWN: _ClassVar[LogLineOriginator]
+    USER: _ClassVar[LogLineOriginator]
+    SYSTEM: _ClassVar[LogLineOriginator]
 RETRYABLE_FAILURE: State
 PERMANENT_FAILURE: State
 PENDING: State
 RUNNING: State
 SUCCEEDED: State
+UNKNOWN: LogLineOriginator
+USER: LogLineOriginator
+SYSTEM: LogLineOriginator
 
 class TaskExecutionMetadata(_message.Message):
     __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides", "identity"]
@@ -264,11 +273,23 @@ class GetTaskLogsResponseHeader(_message.Message):
     token: str
     def __init__(self, token: _Optional[str] = ...) -> None: ...
 
+class LogLine(_message.Message):
+    __slots__ = ["timestamp", "message", "originator"]
+    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    ORIGINATOR_FIELD_NUMBER: _ClassVar[int]
+    timestamp: _timestamp_pb2.Timestamp
+    message: str
+    originator: LogLineOriginator
+    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ...) -> None: ...
+
 class GetTaskLogsResponseBody(_message.Message):
-    __slots__ = ["results"]
+    __slots__ = ["results", "structured_lines"]
     RESULTS_FIELD_NUMBER: _ClassVar[int]
+    STRUCTURED_LINES_FIELD_NUMBER: _ClassVar[int]
     results: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, results: _Optional[_Iterable[str]] = ...) -> None: ...
+    structured_lines: _containers.RepeatedCompositeFieldContainer[LogLine]
+    def __init__(self, results: _Optional[_Iterable[str]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ...) -> None: ...
 
 class GetTaskLogsResponse(_message.Message):
     __slots__ = ["header", "body"]
