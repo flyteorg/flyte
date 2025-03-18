@@ -231,7 +231,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg, metadata.Domain)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -266,7 +266,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg, metadata.Domain)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
