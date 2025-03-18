@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 )
 
 func TestLoadPlugin(t *testing.T) {
@@ -95,7 +96,7 @@ func TestLoadPlugin(t *testing.T) {
 }
 
 func TestAgentService(t *testing.T) {
-	agentService := core.AgentService{}
+	agentService := agent.AgentService{}
 	taskTypes := []core.TaskType{"sensor", "chatgpt"}
 
 	for _, taskType := range taskTypes {
