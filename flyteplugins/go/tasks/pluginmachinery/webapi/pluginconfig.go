@@ -31,7 +31,7 @@ var (
 // The plugin manager automatically queries the remote API
 type RateLimiterConfig struct {
 	// Queries per second from one process to the remote service
-	QPS int `json:"qps" pflag:",Defines the max rate of calls per second."`
+	QPS float64 `json:"qps" pflag:",Defines the max rate of calls per second."`
 
 	// Maximum burst size
 	Burst int `json:"burst" pflag:",Defines the maximum burst size."`

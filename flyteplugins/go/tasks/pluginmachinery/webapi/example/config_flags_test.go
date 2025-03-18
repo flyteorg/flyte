@@ -105,7 +105,7 @@ func TestConfig_SetFlags(t *testing.T) {
 			testValue := "1"
 
 			cmdFlags.Set("webApi.readRateLimiter.qps", testValue)
-			if vInt, err := cmdFlags.GetInt("webApi.readRateLimiter.qps"); err == nil {
+			if vInt, err := cmdFlags.GetFloat64("webApi.readRateLimiter.qps"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.ReadRateLimiter.QPS)
 
 			} else {
