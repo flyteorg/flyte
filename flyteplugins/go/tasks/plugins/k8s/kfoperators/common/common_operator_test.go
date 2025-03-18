@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
@@ -29,15 +29,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestExtractCurrentCondition(t *testing.T) {
-	jobCreated := commonOp.JobCondition{
-		Type:   commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type:   kubeflowv1.JobCreated,
 		Status: corev1.ConditionTrue,
 	}
-	jobRunningActive := commonOp.JobCondition{
-		Type:   commonOp.JobRunning,
+	jobRunningActive := kubeflowv1.JobCondition{
+		Type:   kubeflowv1.JobRunning,
 		Status: corev1.ConditionFalse,
 	}
-	jobConditions := []commonOp.JobCondition{
+	jobConditions := []kubeflowv1.JobCondition{
 		jobCreated,
 		jobRunningActive,
 	}
@@ -48,30 +48,30 @@ func TestExtractCurrentCondition(t *testing.T) {
 	jobConditions = nil
 	currentCondition, err = ExtractCurrentCondition(jobConditions)
 	assert.NoError(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 
 	currentCondition, err = ExtractCurrentCondition(nil)
 	assert.NoError(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 
-	jobUnknown := commonOp.JobCondition{Type: "unknown"}
-	jobConditions = []commonOp.JobCondition{jobUnknown}
+	jobUnknown := kubeflowv1.JobCondition{Type: "unknown"}
+	jobConditions = []kubeflowv1.JobCondition{jobUnknown}
 	currentCondition, err = ExtractCurrentCondition(jobConditions)
 	assert.Error(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 	assert.Equal(t, err, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions))
 }
 
 func TestGetPhaseInfo(t *testing.T) {
-	jobCreating := commonOp.JobCondition{}
+	jobCreating := kubeflowv1.JobCondition{}
 	taskPhase, err := GetPhaseInfo(jobCreating, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobCreated := commonOp.JobCondition{
-		Type: commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobCreated,
 	}
 	taskPhase, err = GetPhaseInfo(jobCreated, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -79,8 +79,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobSucceeded := commonOp.JobCondition{
-		Type: commonOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSucceeded,
 	}
 	taskPhase, err = GetPhaseInfo(jobSucceeded, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -88,8 +88,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobFailed := commonOp.JobCondition{
-		Type: commonOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobFailed,
 	}
 	taskPhase, err = GetPhaseInfo(jobFailed, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -97,8 +97,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting := commonOp.JobCondition{
-		Type: commonOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRestarting,
 	}
 	taskPhase, err = GetPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -106,8 +106,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting = commonOp.JobCondition{
-		Type: commonOp.JobRunning,
+	jobRestarting = kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRunning,
 	}
 	taskPhase, err = GetPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -117,8 +117,8 @@ func TestGetPhaseInfo(t *testing.T) {
 }
 
 func TestGetMPIPhaseInfo(t *testing.T) {
-	jobCreated := commonOp.JobCondition{
-		Type: commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobCreated,
 	}
 	taskPhase, err := GetMPIPhaseInfo(jobCreated, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -126,8 +126,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobSucceeded := commonOp.JobCondition{
-		Type: commonOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSucceeded,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobSucceeded, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -135,8 +135,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobFailed := commonOp.JobCondition{
-		Type: commonOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobFailed,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobFailed, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -144,8 +144,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting := commonOp.JobCondition{
-		Type: commonOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRestarting,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -153,8 +153,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting = commonOp.JobCondition{
-		Type: commonOp.JobRunning,
+	jobRestarting = kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRunning,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
