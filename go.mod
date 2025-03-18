@@ -7,7 +7,7 @@ require (
 	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.2.4
 	github.com/prometheus/client_golang v1.19.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -72,7 +72,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.1.1 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect

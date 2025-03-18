@@ -45,7 +45,7 @@ func TestDefaultAgentConfig(t *testing.T) {
 
 	assert.Equal(t, "", cfg.DefaultAgent.Endpoint)
 	assert.True(t, cfg.DefaultAgent.Insecure)
-	assert.Equal(t, 10*time.Second, cfg.DefaultAgent.DefaultTimeout.Duration)
+	assert.Equal(t, 3*time.Second, cfg.DefaultAgent.DefaultTimeout.Duration)
 	assert.Equal(t, `{"loadBalancingConfig": [{"round_robin":{}}]}`, cfg.DefaultAgent.DefaultServiceConfig)
 
 	assert.Empty(t, cfg.DefaultAgent.Timeouts)
