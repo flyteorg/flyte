@@ -1,3 +1,4 @@
+from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -26,3 +27,11 @@ class CommonReplicaSpec(_message.Message):
     resources: _tasks_pb2.Resources
     restart_policy: RestartPolicy
     def __init__(self, replicas: _Optional[int] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., restart_policy: _Optional[_Union[RestartPolicy, str]] = ...) -> None: ...
+
+class JobObjectMeta(_message.Message):
+    __slots__ = ["annotations", "labels"]
+    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
+    annotations: _common_pb2.Annotations
+    labels: _common_pb2.Labels
+    def __init__(self, annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ...) -> None: ...

@@ -33,6 +33,7 @@ var RestartPolicy_name = plugins.RestartPolicy_name
 var RestartPolicy_value = plugins.RestartPolicy_value
 
 type CommonReplicaSpec = plugins.CommonReplicaSpec
+type JobObjectMeta = plugins.JobObjectMeta
 
 type CleanPodPolicy int32
 
