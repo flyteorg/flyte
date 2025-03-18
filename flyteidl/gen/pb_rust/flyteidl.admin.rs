@@ -1641,6 +1641,8 @@ pub mod execution_metadata {
         Recovered = 5,
         /// Execution was kicked off by the artifact trigger system
         Trigger = 6,
+        /// Execution was kicked off by an eager task
+        EagerChild = 8,
     }
     impl ExecutionMode {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -1656,6 +1658,7 @@ pub mod execution_metadata {
                 ExecutionMode::ChildWorkflow => "CHILD_WORKFLOW",
                 ExecutionMode::Recovered => "RECOVERED",
                 ExecutionMode::Trigger => "TRIGGER",
+                ExecutionMode::EagerChild => "EAGER_CHILD",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1668,6 +1671,7 @@ pub mod execution_metadata {
                 "CHILD_WORKFLOW" => Some(Self::ChildWorkflow),
                 "RECOVERED" => Some(Self::Recovered),
                 "TRIGGER" => Some(Self::Trigger),
+                "EAGER_CHILD" => Some(Self::EagerChild),
                 _ => None,
             }
         }

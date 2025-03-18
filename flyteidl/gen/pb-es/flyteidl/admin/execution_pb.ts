@@ -923,6 +923,13 @@ export enum ExecutionMetadata_ExecutionMode {
    * @generated from enum value: TRIGGER = 6;
    */
   TRIGGER = 6,
+
+  /**
+   * Execution was kicked off by an eager task
+   *
+   * @generated from enum value: EAGER_CHILD = 8;
+   */
+  EAGER_CHILD = 8,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ExecutionMetadata_ExecutionMode)
 proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.ExecutionMetadata.ExecutionMode", [
@@ -933,6 +940,7 @@ proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.Executi
   { no: 4, name: "CHILD_WORKFLOW" },
   { no: 5, name: "RECOVERED" },
   { no: 6, name: "TRIGGER" },
+  { no: 8, name: "EAGER_CHILD" },
 ]);
 
 /**
