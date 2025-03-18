@@ -57,25 +57,28 @@ var (
 // Config is config for 'connector' plugin
 type Config struct {
 	// WebAPI defines config for the base WebAPI plugin
-	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
+	WebAPI webapi.PluginConfig `json:"webApi,omitempty" yaml:"webApi,omitempty" pflag:",Defines config for the base WebAPI plugin."`
 
 	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
-	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
+	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints,omitempty" yaml:"resourceConstraints,omitempty" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
 	// The default connector if there does not exist a more specific matching against task types
-	DefaultConnector Deployment `json:"defaultConnector" pflag:",The default connector."`
+	DefaultConnector Deployment `json:"defaultConnector,omitempty" yaml:"defaultConnector,omitempty" pflag:",The default connector."`
 
 	// The connectors used to match against specific task types. {connectorDeploymentID: ConnectorDeployment}
-	ConnectorDeployments map[string]*Deployment `json:"connectors" pflag:",The connectors."`
+	ConnectorDeployments map[string]*Deployment `json:"connectors,omitempty" yaml:"connectors,omitempty" pflag:",The connectors."`
+
+	// The connectors deployed as connector apps. {connectorDeploymentID: ConnectorDeployment}
+	ConnectorApps map[string]*Deployment `json:"connectorApps,omitempty" yaml:"connectorApps,omitempty" pflag:",The connectors."`
 
 	// Maps task types to their connectors. {TaskType: connectorDeploymentID}
-	ConnectorForTaskTypes map[string]string `json:"connectorForTaskTypes" pflag:"-,"`
+	ConnectorForTaskTypes map[string]string `json:"connectorForTaskTypes,omitempty" yaml:"connectorForTaskTypes,omitempty" pflag:"-,"`
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
-	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
+	SupportedTaskTypes []string `json:"supportedTaskTypes,omitempty" yaml:"supportedTaskTypes,omitempty" pflag:"-,Defines a list of task types that are supported by this plugin."`
 
 	// PollInterval is the interval at which the plugin should poll the connector for metadata updates
-	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the connector for metadata updates."`
+	PollInterval config.Duration `json:"pollInterval,omitempty" yaml:"pollInterval,omitempty" pflag:",The interval at which the plugin should poll the connector for metadata updates."`
 }
 
 type Deployment struct {
@@ -86,13 +89,13 @@ type Deployment struct {
 	Insecure bool `json:"insecure"`
 
 	// DefaultServiceConfig sets default gRPC service config; check https://github.com/grpc/grpc/blob/master/doc/service_config.md for more details
-	DefaultServiceConfig string `json:"defaultServiceConfig"`
+	DefaultServiceConfig string `json:"defaultServiceConfig,omitempty" yaml:"defaultServiceConfig,omitempty"`
 
 	// Timeouts defines various RPC timeout values for different plugin operations: CreateTask, GetTask, DeleteTask; if not configured, defaults to DefaultTimeout
-	Timeouts map[string]config.Duration `json:"timeouts"`
+	Timeouts map[string]config.Duration `json:"timeouts,omitempty" yaml:"timeouts,omitempty"`
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
-	DefaultTimeout config.Duration `json:"defaultTimeout"`
+	DefaultTimeout config.Duration `json:"defaultTimeout,omitempty" yaml:"defaultTimeout,omitempty"`
 }
 
 func GetConfig() *Config {

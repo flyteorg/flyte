@@ -65,4 +65,12 @@ data:
 {{- /* Intentionally not using with .Values.configmap.plugins since
        we want to be able to render empty plugins.yaml */}}
   plugins.yaml: | {{ tpl (toYaml .Values.configmap.plugins) $ | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connector-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data: {}
 {{- end }}

@@ -53,6 +53,8 @@ spec:
         {{- end }}
         - --config
         - {{ .Values.flytepropeller.configPath }}
+        - --config
+        - {{ .Values.flytepropeller.connectorConfigPath }}
         {{- with .Values.flytepropeller.clusterName }}
         - --propeller.cluster-id
         - {{ tpl (toYaml .) $ }}
@@ -87,6 +89,8 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: connector-config-volume
+          mountPath: /etc/flyte/connector-config
         {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
@@ -105,6 +109,9 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
+      - configMap:
+          name: connector-config
+        name: connector-config-volume
       {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:

@@ -100,6 +100,7 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
+	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentApps)...)
 	for _, agentDeployment := range agentDeployments {
 		client, ok := cs.agentMetadataClients[agentDeployment.Endpoint]
 		if !ok {
@@ -110,6 +111,7 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListAgents", agentDeployment)
 		defer cancel()
 
+		logger.Infof(ctx, "Calling ListAgents on agent: [%v]", agentDeployment.Endpoint)
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
@@ -186,6 +188,7 @@ func getAgentClientSets(ctx context.Context) *ClientSet {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
+	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentApps)...)
 	for _, agentDeployment := range agentDeployments {
 		if _, ok := clientSet.agentMetadataClients[agentDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Agent client already initialized for [%v]", agentDeployment.Endpoint)

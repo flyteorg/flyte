@@ -100,6 +100,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
 	}
 	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
+	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorApps)...)
 	for _, connectorDeployment := range connectorDeployments {
 		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
 		if !ok {
@@ -110,6 +111,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListConnectors", connectorDeployment)
 		defer cancel()
 
+		logger.Infof(ctx, "Calling ListAgents on connector: [%v]", connectorDeployment.Endpoint)
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
@@ -185,6 +187,7 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
 	}
 	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
+	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorApps)...)
 	for _, connectorDeployment := range connectorDeployments {
 		if _, ok := clientSet.connectorMetadataClients[connectorDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)

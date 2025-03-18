@@ -57,25 +57,28 @@ var (
 // Config is config for 'agent' plugin
 type Config struct {
 	// WebAPI defines config for the base WebAPI plugin
-	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
+	WebAPI webapi.PluginConfig `json:"webApi,omitempty" yaml:"webApi,omitempty" pflag:",Defines config for the base WebAPI plugin."`
 
 	// ResourceConstraints defines resource constraints on how many executions to be created per project/overall at any given time
-	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
+	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints,omitempty" yaml:"resourceConstraints,omitempty" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
 	// The default agent if there does not exist a more specific matching against task types
-	DefaultAgent Deployment `json:"defaultAgent" pflag:",The default agent."`
+	DefaultAgent Deployment `json:"defaultAgent,omitempty" yaml:"defaultAgent,omitempty" pflag:",The default agent."`
 
 	// The agents used to match against specific task types. {agentDeploymentID: AgentDeployment}
-	AgentDeployments map[string]*Deployment `json:"agents" pflag:",The agents."`
+	AgentDeployments map[string]*Deployment `json:"agents,omitempty" yaml:"agents,omitempty" pflag:",The agents."`
+
+	// The agents deployed as connector apps. {agentDeploymentID: Deployment}
+	AgentApps map[string]*Deployment `json:"AgentApps,omitempty" yaml:"AgentApps,omitempty" pflag:",The agents."`
 
 	// Maps task types to their agents. {TaskType: agentDeploymentID}
-	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
+	AgentForTaskTypes map[string]string `json:"agentForTaskTypes,omitempty" yaml:"agentForTaskTypes,omitempty" pflag:"-,"`
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
-	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
+	SupportedTaskTypes []string `json:"supportedTaskTypes,omitempty" yaml:"supportedTaskTypes,omitempty" pflag:"-,Defines a list of task types that are supported by this plugin."`
 
 	// PollInterval is the interval at which the plugin should poll the agent for metadata updates
-	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
+	PollInterval config.Duration `json:"pollInterval,omitempty" yaml:"pollInterval,omitempty" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
 }
 
 type Deployment struct {
@@ -86,13 +89,13 @@ type Deployment struct {
 	Insecure bool `json:"insecure"`
 
 	// DefaultServiceConfig sets default gRPC service config; check https://github.com/grpc/grpc/blob/master/doc/service_config.md for more details
-	DefaultServiceConfig string `json:"defaultServiceConfig"`
+	DefaultServiceConfig string `json:"defaultServiceConfig,omitempty" yaml:"defaultServiceConfig,omitempty"`
 
 	// Timeouts defines various RPC timeout values for different plugin operations: CreateTask, GetTask, DeleteTask; if not configured, defaults to DefaultTimeout
-	Timeouts map[string]config.Duration `json:"timeouts"`
+	Timeouts map[string]config.Duration `json:"timeouts,omitempty" yaml:"timeouts,omitempty"`
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
-	DefaultTimeout config.Duration `json:"defaultTimeout"`
+	DefaultTimeout config.Duration `json:"defaultTimeout,omitempty" yaml:"defaultTimeout,omitempty"`
 }
 
 func GetConfig() *Config {

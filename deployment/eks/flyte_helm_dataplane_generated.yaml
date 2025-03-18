@@ -547,7 +547,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
+        configChecksum: "a8d392849edbe9a523f3c49a20f34de3bfbff4b6f4d776b157974a8227b5625"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -566,6 +566,8 @@ spec:
         - flytepropeller
         - --config
         - /etc/flyte/config/*.yaml
+        - --config
+        - /etc/flyte/connector-config/*.yaml
         env:
         - name: POD_NAME
           valueFrom:
@@ -592,6 +594,8 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: connector-config-volume
+          mountPath: /etc/flyte/connector-config
         - name: auth
           mountPath: /etc/secrets/
         terminationMessagePolicy: "FallbackToLogsOnError"
@@ -600,6 +604,9 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
+      - configMap:
+          name: connector-config
+        name: connector-config-volume
       - name: auth
         secret:
           secretName: flyte-secret-auth
@@ -631,7 +638,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.3
       annotations:
-        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
+        configChecksum: "a8d392849edbe9a523f3c49a20f34de3bfbff4b6f4d776b157974a8227b5625"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

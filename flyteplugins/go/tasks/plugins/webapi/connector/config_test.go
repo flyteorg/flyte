@@ -34,6 +34,13 @@ func TestGetAndSetConfig(t *testing.T) {
 			Timeouts:             cfg.DefaultConnector.Timeouts,
 		},
 	}
+	cfg.ConnectorApps = map[string]*Deployment{
+		"connector_app": {
+			Insecure:             cfg.DefaultConnector.Insecure,
+			DefaultServiceConfig: cfg.DefaultConnector.DefaultServiceConfig,
+			Timeouts:             cfg.DefaultConnector.Timeouts,
+		},
+	}
 	cfg.ConnectorForTaskTypes = map[string]string{"task_type_1": "agent_1"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)

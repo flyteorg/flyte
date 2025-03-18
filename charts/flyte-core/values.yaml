@@ -394,6 +394,7 @@ flytepropeller:
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
+  connectorConfigPath: /etc/flyte/connector-config/*.yaml
 
   # -- Configuration for service accounts for FlytePropeller
   serviceAccount:
