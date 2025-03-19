@@ -1282,6 +1282,28 @@ var UnionMigrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS parent_cluster").Error
 		},
 	},
+	{
+		ID: "2025-03-13-backfill-has-trigger-named-entity-metadata",
+		Migrate: func(tx *gorm.DB) error {
+			if err := tx.AutoMigrate(&models.NamedEntityMetadata{}); err != nil {
+				return err
+			}
+
+			launchPlanVal := int(core.ResourceType_LAUNCH_PLAN)
+			query := fmt.Sprintf(`
+			INSERT INTO named_entity_metadata (resource_type, project, domain, name, org, has_trigger)
+			SELECT DISTINCT %d, lp.project, lp.domain, lp.name, lp.org, true
+			FROM launch_plans lp
+			WHERE lp.launch_condition_type IN ('ARTIFACT', 'SCHED')
+			ON CONFLICT (resource_type, project, domain, name, org) DO UPDATE
+			SET has_trigger = EXCLUDED.has_trigger;
+			`, launchPlanVal)
+			return tx.Exec(query).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&models.NamedEntityMetadata{}).Migrator().DropColumn(&models.NamedEntityMetadata{}, "has_trigger")
+		},
+	},
 }
 
 // ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we

@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { BoolValue, Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { Identifier, ResourceType } from "../core/identifier_pb.js";
 import { WorkflowExecution_Phase } from "../core/execution_pb.js";
 import { KeyValuePair } from "../core/literals_pb.js";
@@ -144,6 +144,16 @@ export class NamedEntityMetadata extends Message<NamedEntityMetadata> {
    */
   state = NamedEntityState.NAMED_ENTITY_ACTIVE;
 
+  /**
+   * Indicates whether a launch_plan has an associated trigger.
+   * This field is optional and should only be set for launch_plan resources,
+   * not for other entity types such as tasks or workflows.
+   * +optional
+   *
+   * @generated from field: google.protobuf.BoolValue has_trigger = 3;
+   */
+  hasTrigger?: boolean;
+
   constructor(data?: PartialMessage<NamedEntityMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -154,6 +164,7 @@ export class NamedEntityMetadata extends Message<NamedEntityMetadata> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "state", kind: "enum", T: proto3.getEnumType(NamedEntityState) },
+    { no: 3, name: "has_trigger", kind: "message", T: BoolValue },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NamedEntityMetadata {

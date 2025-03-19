@@ -65,9 +65,9 @@ var resourceTypeToMetadataJoin = map[core.ResourceType]string{
 	core.ResourceType_TASK:        leftJoinTaskNameToMetadata,
 }
 
-var getGroupByForNamedEntity = fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
+var getGroupByForNamedEntity = fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
 	innerJoinTableAlias, Project, innerJoinTableAlias, Domain, innerJoinTableAlias, Name, innerJoinTableAlias, Org, namedEntityMetadataTableName,
-	Description, namedEntityMetadataTableName, State)
+	Description, namedEntityMetadataTableName, State, namedEntityMetadataTableName, HasTrigger)
 
 func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) []string {
 	return []string{
@@ -78,6 +78,7 @@ func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) [
 		fmt.Sprintf("'%d' AS %s", resourceType, ResourceType),
 		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, Description),
 		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, State),
+		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, HasTrigger),
 	}
 }
 
@@ -120,8 +121,25 @@ type NamedEntityRepo struct {
 
 func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) error {
 	timer := r.metrics.UpdateDuration.Start()
+	defer timer.Stop()
+
+	tx := r.db.WithContext(ctx).Begin()
+
+	if err := updateWithinTransaction(tx, input, r.errorTransformer); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
+	}
+
+	return nil
+}
+
+func updateWithinTransaction(tx *gorm.DB, input models.NamedEntity, errorTransformer errors.ErrorTransformer) error {
 	var metadata models.NamedEntityMetadata
-	tx := r.db.WithContext(ctx).Where(&models.NamedEntityMetadata{
+	result := tx.Where(&models.NamedEntityMetadata{
 		NamedEntityMetadataKey: models.NamedEntityMetadataKey{
 			ResourceType: input.ResourceType,
 			Project:      input.Project,
@@ -130,10 +148,11 @@ func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) 
 			Org:          input.Org,
 		},
 	}).Assign(input.NamedEntityMetadataFields).Omit("id").FirstOrCreate(&metadata)
-	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+
+	if result.Error != nil {
+		return errorTransformer.ToFlyteAdminError(result.Error)
 	}
+
 	return nil
 }
 

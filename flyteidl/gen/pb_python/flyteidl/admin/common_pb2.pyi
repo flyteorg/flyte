@@ -2,6 +2,7 @@ from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -34,12 +35,14 @@ class NamedEntityIdentifier(_message.Message):
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class NamedEntityMetadata(_message.Message):
-    __slots__ = ["description", "state"]
+    __slots__ = ["description", "state", "has_trigger"]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    HAS_TRIGGER_FIELD_NUMBER: _ClassVar[int]
     description: str
     state: NamedEntityState
-    def __init__(self, description: _Optional[str] = ..., state: _Optional[_Union[NamedEntityState, str]] = ...) -> None: ...
+    has_trigger: _wrappers_pb2.BoolValue
+    def __init__(self, description: _Optional[str] = ..., state: _Optional[_Union[NamedEntityState, str]] = ..., has_trigger: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ...) -> None: ...
 
 class NamedEntity(_message.Message):
     __slots__ = ["resource_type", "id", "metadata"]

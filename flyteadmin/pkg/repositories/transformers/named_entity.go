@@ -1,12 +1,20 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/wrapperspb"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.NamedEntity {
 	stateInt := int32(request.Metadata.State)
+
+	var hasTrigger *bool
+	if request.Metadata.HasTrigger != nil {
+		hasTrigger = &request.Metadata.HasTrigger.Value
+	}
+
 	return models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
 			ResourceType: request.ResourceType,
@@ -18,6 +26,7 @@ func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.Name
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: request.Metadata.Description,
 			State:       &stateInt,
+			HasTrigger:  hasTrigger,
 		},
 	}
 }
@@ -33,6 +42,12 @@ func FromNamedEntityModel(model models.NamedEntity) admin.NamedEntity {
 	if model.State != nil {
 		entityState = *model.State
 	}
+
+	var hasTrigger *wrapperspb.BoolValue
+	if model.HasTrigger != nil {
+		hasTrigger = wrapperspb.Bool(*model.HasTrigger)
+	}
+
 	return admin.NamedEntity{
 		ResourceType: model.ResourceType,
 		Id: &admin.NamedEntityIdentifier{
@@ -44,6 +59,7 @@ func FromNamedEntityModel(model models.NamedEntity) admin.NamedEntity {
 		Metadata: &admin.NamedEntityMetadata{
 			Description: model.Description,
 			State:       admin.NamedEntityState(entityState),
+			HasTrigger:  hasTrigger,
 		},
 	}
 }

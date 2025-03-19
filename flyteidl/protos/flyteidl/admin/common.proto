@@ -7,6 +7,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 // Encapsulation of fields that identifies a Flyte resource.
 // A Flyte resource can be a task, workflow or launch plan.
@@ -51,6 +52,12 @@ message NamedEntityMetadata {
     // Shared state across all version of the entity
     // At this point in time, only workflow entities can have their state archived.
     NamedEntityState state = 2;
+
+    // Indicates whether a launch_plan has an associated trigger.
+    // This field is optional and should only be set for launch_plan resources,
+    // not for other entity types such as tasks or workflows.
+    // +optional
+    google.protobuf.BoolValue has_trigger = 3;
 }
 
 // Encapsulates information common to a NamedEntity, a Flyte resource such as a task,

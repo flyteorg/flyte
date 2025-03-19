@@ -449,6 +449,12 @@ pub struct NamedEntityMetadata {
     /// At this point in time, only workflow entities can have their state archived.
     #[prost(enumeration="NamedEntityState", tag="2")]
     pub state: i32,
+    /// Indicates whether a launch_plan has an associated trigger.
+    /// This field is optional and should only be set for launch_plan resources,
+    /// not for other entity types such as tasks or workflows.
+    /// +optional
+    #[prost(message, optional, tag="3")]
+    pub has_trigger: ::core::option::Option<bool>,
 }
 /// Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
 /// workflow or launch plan. A NamedEntity is exclusively identified by its resource type

@@ -11796,6 +11796,10 @@
         "state": {
           "$ref": "#/definitions/adminNamedEntityState",
           "description": "Shared state across all version of the entity\nAt this point in time, only workflow entities can have their state archived."
+        },
+        "has_trigger": {
+          "type": "boolean",
+          "title": "Indicates whether a launch_plan has an associated trigger.\nThis field is optional and should only be set for launch_plan resources,\nnot for other entity types such as tasks or workflows.\n+optional"
         }
       },
       "description": "Additional metadata around a named entity."

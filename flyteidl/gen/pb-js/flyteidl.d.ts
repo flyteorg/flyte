@@ -11489,6 +11489,9 @@ export namespace flyteidl {
 
             /** NamedEntityMetadata state */
             state?: (flyteidl.admin.NamedEntityState|null);
+
+            /** NamedEntityMetadata hasTrigger */
+            hasTrigger?: (google.protobuf.IBoolValue|null);
         }
 
         /** Represents a NamedEntityMetadata. */
@@ -11505,6 +11508,9 @@ export namespace flyteidl {
 
             /** NamedEntityMetadata state. */
             public state: flyteidl.admin.NamedEntityState;
+
+            /** NamedEntityMetadata hasTrigger. */
+            public hasTrigger?: (google.protobuf.IBoolValue|null);
 
             /**
              * Creates a new NamedEntityMetadata instance using the specified properties.

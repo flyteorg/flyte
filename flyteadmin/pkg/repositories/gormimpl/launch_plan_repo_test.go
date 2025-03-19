@@ -3,16 +3,19 @@ package gormimpl
 import (
 	"context"
 	"database/sql/driver"
+	"errors"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -23,21 +26,99 @@ var launchPlanClosure = []byte{3, 4}
 var inactive = int32(admin.LaunchPlanState_INACTIVE)
 var active = int32(admin.LaunchPlanState_ACTIVE)
 
+type MockNamedEntityUpdater struct {
+	Updated             bool
+	InputtedNamedEntity models.NamedEntity
+	ReturnError         bool
+}
+
+func (m *MockNamedEntityUpdater) Update(ctx context.Context, tx *gorm.DB, namedEntity models.NamedEntity, errTransformer adminErrors.ErrorTransformer) error {
+	m.Updated = true
+	m.InputtedNamedEntity = namedEntity
+	if m.ReturnError {
+		return errors.New("injected error")
+	}
+	return nil
+}
+
 func TestCreateLaunchPlan(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := launchPlanRepo.Create(context.Background(), models.LaunchPlan{
-		LaunchPlanKey: models.LaunchPlanKey{
-			Project: project,
-			Domain:  domain,
-			Name:    name,
-			Version: version,
+
+	trueVal := true
+	falseVal := false
+	tests := []struct {
+		name                    string
+		launchPlanCondition     models.LaunchConditionType
+		updateNamedEntityError  bool
+		expectNamedEntityUpdate bool
+		hasTrigger              *bool
+	}{
+		{
+			name:                    "create with launch condition type ARTIFACT",
+			launchPlanCondition:     models.LaunchConditionTypeARTIFACT,
+			expectNamedEntityUpdate: true,
+			hasTrigger:              &trueVal,
 		},
-		Spec:       launchPlanSpec,
-		WorkflowID: workflowID,
-		Closure:    launchPlanClosure,
-		State:      &inactive,
-	})
-	assert.NoError(t, err)
+		{
+			name:                    "create with launch condition type SCHEDULE",
+			launchPlanCondition:     models.LaunchConditionTypeSCHED,
+			expectNamedEntityUpdate: true,
+			hasTrigger:              &trueVal,
+		},
+		{
+			name:                    "create without launch condition",
+			expectNamedEntityUpdate: true,
+			hasTrigger:              &falseVal,
+		},
+		{
+			name:                   "error with updating named entity",
+			launchPlanCondition:    models.LaunchConditionTypeSCHED,
+			updateNamedEntityError: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mockUpdater := &MockNamedEntityUpdater{ReturnError: test.updateNamedEntityError}
+			launchPlanRepo := &LaunchPlanRepo{
+				db:                 GetDbForTest(t),
+				errorTransformer:   adminErrors.NewTestErrorTransformer(),
+				metrics:            newMetrics(mockScope.NewTestScope()),
+				launchPlanMetrics:  launchPlanMetrics{},
+				namedEntityUpdater: mockUpdater,
+			}
+
+			err := launchPlanRepo.Create(context.Background(), models.LaunchPlan{
+				LaunchPlanKey: models.LaunchPlanKey{
+					Project: project,
+					Domain:  domain,
+					Name:    name,
+					Version: version,
+					Org:     Org,
+				},
+				Spec:                launchPlanSpec,
+				WorkflowID:          workflowID,
+				Closure:             launchPlanClosure,
+				State:               &inactive,
+				LaunchConditionType: &test.launchPlanCondition, // #nosec G601
+			})
+			if test.updateNamedEntityError {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+			if test.expectNamedEntityUpdate {
+				assert.True(t, mockUpdater.Updated)
+				assert.Equal(t, test.hasTrigger, mockUpdater.InputtedNamedEntity.HasTrigger)
+				assert.Equal(t, core.ResourceType_LAUNCH_PLAN, mockUpdater.InputtedNamedEntity.ResourceType)
+				assert.Equal(t, project, mockUpdater.InputtedNamedEntity.Project)
+				assert.Equal(t, domain, mockUpdater.InputtedNamedEntity.Domain)
+				assert.Equal(t, name, mockUpdater.InputtedNamedEntity.Name)
+				assert.Equal(t, Org, mockUpdater.InputtedNamedEntity.Org)
+			} else {
+				assert.False(t, mockUpdater.Updated)
+			}
+		})
+	}
 }
 
 func getMockLaunchPlanResponseFromDb(expected models.LaunchPlan) map[string]interface{} {
@@ -55,7 +136,7 @@ func getMockLaunchPlanResponseFromDb(expected models.LaunchPlan) map[string]inte
 }
 
 func TestGetLaunchPlan(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	launchPlan := getMockLaunchPlanResponseFromDb(models.LaunchPlan{
@@ -92,7 +173,7 @@ func TestGetLaunchPlan(t *testing.T) {
 }
 
 func TestSetInactiveLaunchPlan(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
@@ -123,7 +204,7 @@ func TestSetInactiveLaunchPlan(t *testing.T) {
 }
 
 func TestSetActiveLaunchPlan(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
@@ -166,7 +247,7 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 }
 
 func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
@@ -196,7 +277,7 @@ func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 }
 
 func TestListLaunchPlans(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	versions := []string{"ABC", "XYZ"}
@@ -242,7 +323,7 @@ func TestListLaunchPlans(t *testing.T) {
 }
 
 func TestListLaunchPlans_Pagination(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	versions := []string{"ABC", "DEF"}
@@ -296,7 +377,7 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 }
 
 func TestListLaunchPlans_Filters(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	launchPlan := getMockLaunchPlanResponseFromDb(models.LaunchPlan{
@@ -344,7 +425,7 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 }
 
 func TestListLaunchPlans_Order(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	launchPlans := make([]map[string]interface{}, 0)
 
 	GlobalMock := mocket.Catcher.Reset()
@@ -372,7 +453,7 @@ func TestListLaunchPlans_Order(t *testing.T) {
 }
 
 func TestListLaunchPlans_MissingParameters(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	_, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
 			getEqualityFilter(common.LaunchPlan, "project", project),
@@ -390,7 +471,7 @@ func TestListLaunchPlans_MissingParameters(t *testing.T) {
 }
 
 func TestListLaunchPlansForWorkflow(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	launchPlan := getMockLaunchPlanResponseFromDb(models.LaunchPlan{
@@ -445,7 +526,7 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 }
 
 func TestListLaunchPlanIds(t *testing.T) {
-	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	launchPlans := make([]map[string]interface{}, 0)
 	versions := []string{"ABC", "XYZ"}
@@ -504,7 +585,7 @@ func TestListLaunchPlanIds(t *testing.T) {
 }
 
 func TestCountLaunchPlans(t *testing.T) {
-	executionRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	executionRepo := NewLaunchPlanRepo(GetDbForTest(t), adminErrors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(

@@ -20,6 +20,7 @@ const Version = "version"
 const Description = "description"
 const ResourceType = "resource_type"
 const State = "state"
+const HasTrigger = "has_trigger"
 const ID = "id"
 
 const executionTableName = "executions"

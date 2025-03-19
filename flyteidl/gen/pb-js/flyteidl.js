@@ -28188,6 +28188,7 @@
                  * @interface INamedEntityMetadata
                  * @property {string|null} [description] NamedEntityMetadata description
                  * @property {flyteidl.admin.NamedEntityState|null} [state] NamedEntityMetadata state
+                 * @property {google.protobuf.IBoolValue|null} [hasTrigger] NamedEntityMetadata hasTrigger
                  */
     
                 /**
@@ -28222,6 +28223,14 @@
                 NamedEntityMetadata.prototype.state = 0;
     
                 /**
+                 * NamedEntityMetadata hasTrigger.
+                 * @member {google.protobuf.IBoolValue|null|undefined} hasTrigger
+                 * @memberof flyteidl.admin.NamedEntityMetadata
+                 * @instance
+                 */
+                NamedEntityMetadata.prototype.hasTrigger = null;
+    
+                /**
                  * Creates a new NamedEntityMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NamedEntityMetadata
@@ -28249,6 +28258,8 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.description);
                     if (message.state != null && message.hasOwnProperty("state"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.state);
+                    if (message.hasTrigger != null && message.hasOwnProperty("hasTrigger"))
+                        $root.google.protobuf.BoolValue.encode(message.hasTrigger, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -28275,6 +28286,9 @@
                             break;
                         case 2:
                             message.state = reader.int32();
+                            break;
+                        case 3:
+                            message.hasTrigger = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -28308,6 +28322,11 @@
                         case 3:
                             break;
                         }
+                    if (message.hasTrigger != null && message.hasOwnProperty("hasTrigger")) {
+                        var error = $root.google.protobuf.BoolValue.verify(message.hasTrigger);
+                        if (error)
+                            return "hasTrigger." + error;
+                    }
                     return null;
                 };
     

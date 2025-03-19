@@ -21,21 +21,74 @@ type launchPlanMetrics struct {
 	SetActiveDuration promutils.StopWatch
 }
 
+type NamedEntityUpdater interface {
+	Update(ctx context.Context, tx *gorm.DB, namedEntity models.NamedEntity, errTransformer adminErrors.ErrorTransformer) error
+}
+
+type DefaultNamedEntityUpdater struct{}
+
+func (d DefaultNamedEntityUpdater) Update(ctx context.Context, tx *gorm.DB, namedEntity models.NamedEntity, errTransformer adminErrors.ErrorTransformer) error {
+	return updateWithinTransaction(tx, namedEntity, errTransformer)
+}
+
 // Implementation of LaunchPlanRepoInterface.
 type LaunchPlanRepo struct {
-	db                *gorm.DB
-	errorTransformer  adminErrors.ErrorTransformer
-	metrics           gormMetrics
-	launchPlanMetrics launchPlanMetrics
+	db                 *gorm.DB
+	errorTransformer   adminErrors.ErrorTransformer
+	metrics            gormMetrics
+	launchPlanMetrics  launchPlanMetrics
+	namedEntityUpdater NamedEntityUpdater
+}
+
+func (r *LaunchPlanRepo) updateNamedEntity(ctx context.Context, tx *gorm.DB, input models.LaunchPlan) error {
+	hasTrigger := false
+	if input.LaunchConditionType != nil {
+		hasTrigger = *input.LaunchConditionType == models.LaunchConditionTypeARTIFACT ||
+			*input.LaunchConditionType == models.LaunchConditionTypeSCHED
+	}
+
+	namedEntity := models.NamedEntity{
+		NamedEntityKey: models.NamedEntityKey{
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+			Project:      input.Project,
+			Domain:       input.Domain,
+			Name:         input.Name,
+			Org:          input.Org,
+		},
+		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+			HasTrigger: &hasTrigger,
+		},
+	}
+
+	if err := r.namedEntityUpdater.Update(ctx, tx, namedEntity, r.errorTransformer); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
-	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	defer timer.Stop()
+
+	// Use a transaction to guarantee no partial updates.
+	tx := r.db.WithContext(ctx).Begin()
+
+	if err := tx.Omit("id").Create(&input).Error; err != nil {
+		tx.Rollback()
+		return r.errorTransformer.ToFlyteAdminError(err)
 	}
+
+	err := r.updateNamedEntity(ctx, tx, input)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
+	}
+
 	return nil
 }
 
@@ -214,9 +267,10 @@ func NewLaunchPlanRepo(
 	}
 
 	return &LaunchPlanRepo{
-		db:                db,
-		errorTransformer:  errorTransformer,
-		metrics:           metrics,
-		launchPlanMetrics: launchPlanMetrics,
+		db:                 db,
+		errorTransformer:   errorTransformer,
+		metrics:            metrics,
+		launchPlanMetrics:  launchPlanMetrics,
+		namedEntityUpdater: DefaultNamedEntityUpdater{},
 	}
 }
