@@ -249,9 +249,36 @@ message GetTaskLogsResponseHeader {
   string token = 1;
 }
 
+enum LogLineOriginator {
+  // The originator of the log line is unknown.
+  UNKNOWN = 0;
+
+  // The originator of the log line is the user application.
+  USER = 1;
+
+  // The originator of the log line is the system.
+  SYSTEM = 2;
+}
+
+message LogLine {
+  google.protobuf.Timestamp timestamp = 1;
+
+  // Each line is separated by either CRLF, CR or LF, which are included
+  // at the ends of the lines. This lets clients know whether log emitter
+  // wanted to overwrite the previous line (LF) or append a new line (CRLF).
+  string message = 2;
+
+  LogLineOriginator originator = 3;
+}
+
 message GetTaskLogsResponseBody {
   // The execution log results.
-  repeated string results = 1;
+  repeated string results = 1 [deprecated = true];
+
+  // Each line is separated by either CRLF, CR or LF, which are included
+  // at the ends of the lines. This lets clients know whether log emitter
+  // wanted to overwrite the previous line (LF) or append a new line (CRLF).
+  repeated LogLine structured_lines = 2;
 }
 
 // A response containing the logs for a task execution.

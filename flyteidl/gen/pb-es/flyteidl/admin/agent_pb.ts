@@ -55,6 +55,38 @@ proto3.util.setEnumType(State, "flyteidl.admin.State", [
 ]);
 
 /**
+ * @generated from enum flyteidl.admin.LogLineOriginator
+ */
+export enum LogLineOriginator {
+  /**
+   * The originator of the log line is unknown.
+   *
+   * @generated from enum value: UNKNOWN = 0;
+   */
+  UNKNOWN = 0,
+
+  /**
+   * The originator of the log line is the user application.
+   *
+   * @generated from enum value: USER = 1;
+   */
+  USER = 1,
+
+  /**
+   * The originator of the log line is the system.
+   *
+   * @generated from enum value: SYSTEM = 2;
+   */
+  SYSTEM = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(LogLineOriginator)
+proto3.util.setEnumType(LogLineOriginator, "flyteidl.admin.LogLineOriginator", [
+  { no: 0, name: "UNKNOWN" },
+  { no: 1, name: "USER" },
+  { no: 2, name: "SYSTEM" },
+]);
+
+/**
  * Represents a subset of runtime task execution metadata that are relevant to external plugins.
  *
  * ID of the task execution
@@ -1294,15 +1326,78 @@ export class GetTaskLogsResponseHeader extends Message<GetTaskLogsResponseHeader
 }
 
 /**
+ * @generated from message flyteidl.admin.LogLine
+ */
+export class LogLine extends Message<LogLine> {
+  /**
+   * @generated from field: google.protobuf.Timestamp timestamp = 1;
+   */
+  timestamp?: Timestamp;
+
+  /**
+   * Each line is separated by either CRLF, CR or LF, which are included
+   * at the ends of the lines. This lets clients know whether log emitter
+   * wanted to overwrite the previous line (LF) or append a new line (CRLF).
+   *
+   * @generated from field: string message = 2;
+   */
+  message = "";
+
+  /**
+   * @generated from field: flyteidl.admin.LogLineOriginator originator = 3;
+   */
+  originator = LogLineOriginator.UNKNOWN;
+
+  constructor(data?: PartialMessage<LogLine>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.LogLine";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "timestamp", kind: "message", T: Timestamp },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "originator", kind: "enum", T: proto3.getEnumType(LogLineOriginator) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LogLine {
+    return new LogLine().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LogLine {
+    return new LogLine().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LogLine {
+    return new LogLine().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LogLine | PlainMessage<LogLine> | undefined, b: LogLine | PlainMessage<LogLine> | undefined): boolean {
+    return proto3.util.equals(LogLine, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.admin.GetTaskLogsResponseBody
  */
 export class GetTaskLogsResponseBody extends Message<GetTaskLogsResponseBody> {
   /**
    * The execution log results.
    *
-   * @generated from field: repeated string results = 1;
+   * @generated from field: repeated string results = 1 [deprecated = true];
+   * @deprecated
    */
   results: string[] = [];
+
+  /**
+   * Each line is separated by either CRLF, CR or LF, which are included
+   * at the ends of the lines. This lets clients know whether log emitter
+   * wanted to overwrite the previous line (LF) or append a new line (CRLF).
+   *
+   * @generated from field: repeated flyteidl.admin.LogLine structured_lines = 2;
+   */
+  structuredLines: LogLine[] = [];
 
   constructor(data?: PartialMessage<GetTaskLogsResponseBody>) {
     super();
@@ -1313,6 +1408,7 @@ export class GetTaskLogsResponseBody extends Message<GetTaskLogsResponseBody> {
   static readonly typeName = "flyteidl.admin.GetTaskLogsResponseBody";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "results", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 2, name: "structured_lines", kind: "message", T: LogLine, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsResponseBody {
