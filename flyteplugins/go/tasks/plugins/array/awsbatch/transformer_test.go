@@ -161,6 +161,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	tMetadata.EXPECT().GetTaskExecutionID().Return(id)
 	tMetadata.EXPECT().GetOverrides().Return(to)
 	tMetadata.EXPECT().GetPlatformResources().Return(&v12.ResourceRequirements{})
+	tMetadata.EXPECT().GetOnOOMConfig().Return(nil)
 
 	ir := &mocks2.InputReader{}
 	ir.EXPECT().GetInputPath().Return("inputs.pb")
