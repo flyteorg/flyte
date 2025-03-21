@@ -471,6 +471,12 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			assert.Equal(t, principal, spec.GetMetadata().GetPrincipal())
 			assert.Equal(t, executionClusterLabel, spec.GetExecutionClusterLabel().GetValue())
 			assert.Equal(t, principal, input.User)
+
+			assert.NotNil(t, spec.GetEnvs())
+			assert.Equal(t, 1, len(spec.GetEnvs().GetValues()))
+			assert.Equal(t, "FOO", spec.GetEnvs().GetValues()[0].GetKey())
+			assert.Equal(t, "bar", spec.GetEnvs().GetValues()[0].GetValue())
+
 			return nil
 		},
 	)
@@ -489,6 +495,15 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
 		ParentNodeExecution: parentNodeExecutionID,
 	}
+	request.Spec.Envs = &admin.Envs{
+		Values: []*core.KeyValuePair{
+			{
+				Key:   "FOO",
+				Value: "bar",
+			},
+		},
+	}
+
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, getNodeExecutionCalled)
