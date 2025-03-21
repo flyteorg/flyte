@@ -788,6 +788,21 @@ data:
         kubernetes-enabled: true
         kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
 ---
+# Source: flyte/charts/flyte/templates/propeller/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connector-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  connector.yaml: | 
+    plugins: {}
+---
 # Source: flyte/charts/kubernetes-dashboard/templates/configmap.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
@@ -7406,7 +7421,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b853b10a17257175ac99ea3763153e6ed30cdd7abcd67abb780c0613f58eefe"
+        configChecksum: "731e87039e19cc7364d88ee9f295571fb3560cd90a4e8faf4015c257c7e8b98"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7489,7 +7504,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.3
       annotations:
-        configChecksum: "b853b10a17257175ac99ea3763153e6ed30cdd7abcd67abb780c0613f58eefe"
+        configChecksum: "731e87039e19cc7364d88ee9f295571fb3560cd90a4e8faf4015c257c7e8b98"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

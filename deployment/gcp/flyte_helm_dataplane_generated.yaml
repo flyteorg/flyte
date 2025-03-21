@@ -322,6 +322,21 @@ data:
         stackdriver-enabled: true
         stackdriver-logresourcename: k8s_container
 ---
+# Source: flyte-core/templates/propeller/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connector-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  connector.yaml: | 
+    plugins: {}
+---
 # Source: flyte-core/templates/propeller/crds/flyteworkflow.yaml
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -563,7 +578,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0933cd0a46f18f3423ba145e084c5ebfe6bd526c35c3c6970fb6b215c38eed7"
+        configChecksum: "dec20d33aadf30f871d361449d1c5d1a6aae428c16061517d90ac6165b3bfe7"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -653,7 +668,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.3
       annotations:
-        configChecksum: "0933cd0a46f18f3423ba145e084c5ebfe6bd526c35c3c6970fb6b215c38eed7"
+        configChecksum: "dec20d33aadf30f871d361449d1c5d1a6aae428c16061517d90ac6165b3bfe7"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

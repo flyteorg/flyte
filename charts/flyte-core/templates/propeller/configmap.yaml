@@ -65,6 +65,7 @@ data:
 {{- /* Intentionally not using with .Values.configmap.plugins since
        we want to be able to render empty plugins.yaml */}}
   plugins.yaml: | {{ tpl (toYaml .Values.configmap.plugins) $ | nindent 4 }}
+{{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -75,5 +76,4 @@ metadata:
 data:
 {{- with .Values.connector.plugin_config }}
   connector.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
-{{- end }}
 {{- end }}
