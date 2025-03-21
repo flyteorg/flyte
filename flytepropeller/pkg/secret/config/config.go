@@ -164,6 +164,7 @@ const (
 	EmbeddedSecretManagerTypeAWS EmbeddedSecretManagerType = iota
 	EmbeddedSecretManagerTypeGCP
 	EmbeddedSecretManagerTypeAzure
+	EmbeddedSecretManagerTypeK8s
 )
 
 type EmbeddedSecretManagerConfig struct {
@@ -171,6 +172,7 @@ type EmbeddedSecretManagerConfig struct {
 	AWSConfig              AWSConfig                    `json:"awsConfig" pflag:",Config for AWS settings"`
 	GCPConfig              GCPConfig                    `json:"gcpConfig" pflag:",Config for GCP settings"`
 	AzureConfig            AzureConfig                  `json:"azureConfig" pflag:",Config for Azure settings"`
+	K8sConfig              K8sConfig                    `json:"k8sConfig" pflag:",Config for K8s settings"`
 	FileMountInitContainer FileMountInitContainerConfig `json:"fileMountInitContainer" pflag:",Init container configuration to use for mounting secrets as files."`
 }
 
@@ -184,6 +186,10 @@ type GCPConfig struct {
 
 type AzureConfig struct {
 	VaultURI string `json:"vaultURI" pflag:",Azure Vault URI"`
+}
+
+type K8sConfig struct {
+	Namespace string `json:"namespace" pflag:",K8s namespace to be used for storing union secrets"`
 }
 
 type FileMountInitContainerConfig struct {

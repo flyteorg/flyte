@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-const _EmbeddedSecretManagerTypeName = "AWSGCPAzure"
+const _EmbeddedSecretManagerTypeName = "AWSGCPAzureK8s"
 
-var _EmbeddedSecretManagerTypeIndex = [...]uint8{0, 3, 6, 11}
+var _EmbeddedSecretManagerTypeIndex = [...]uint8{0, 3, 6, 11, 14}
 
 func (i EmbeddedSecretManagerType) String() string {
 	if i >= EmbeddedSecretManagerType(len(_EmbeddedSecretManagerTypeIndex)-1) {
@@ -18,12 +18,13 @@ func (i EmbeddedSecretManagerType) String() string {
 	return _EmbeddedSecretManagerTypeName[_EmbeddedSecretManagerTypeIndex[i]:_EmbeddedSecretManagerTypeIndex[i+1]]
 }
 
-var _EmbeddedSecretManagerTypeValues = []EmbeddedSecretManagerType{0, 1, 2}
+var _EmbeddedSecretManagerTypeValues = []EmbeddedSecretManagerType{0, 1, 2, 3}
 
 var _EmbeddedSecretManagerTypeNameToValueMap = map[string]EmbeddedSecretManagerType{
-	_EmbeddedSecretManagerTypeName[0:3]:  0,
-	_EmbeddedSecretManagerTypeName[3:6]:  1,
-	_EmbeddedSecretManagerTypeName[6:11]: 2,
+	_EmbeddedSecretManagerTypeName[0:3]:   0,
+	_EmbeddedSecretManagerTypeName[3:6]:   1,
+	_EmbeddedSecretManagerTypeName[6:11]:  2,
+	_EmbeddedSecretManagerTypeName[11:14]: 3,
 }
 
 // EmbeddedSecretManagerTypeString retrieves an enum value from the enum constants string name.

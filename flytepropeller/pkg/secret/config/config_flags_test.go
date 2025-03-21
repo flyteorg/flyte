@@ -295,6 +295,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_embeddedSecretManagerConfig.k8sConfig.namespace", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.k8sConfig.namespace", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.k8sConfig.namespace"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.K8sConfig.Namespace)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_embeddedSecretManagerConfig.fileMountInitContainer.image", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
