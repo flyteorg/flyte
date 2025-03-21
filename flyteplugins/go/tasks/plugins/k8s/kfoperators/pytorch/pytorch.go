@@ -145,16 +145,17 @@ func (p pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskC
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.GetTaskTypeVersion())
 	}
 
-	if *workerReplicaSpec.Replicas <= 0 {
-		return nil, fmt.Errorf("number of workers must be greater than 0")
+	jobSpec := kubeflowv1.PyTorchJobSpec{}
+	replicaSpecs := map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+		kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
+	}
+	if *workerReplicaSpec.Replicas > 0 {
+		replicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker] = workerReplicaSpec
 	}
 
-	jobSpec := kubeflowv1.PyTorchJobSpec{
-		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
-			kubeflowv1.PyTorchJobReplicaTypeWorker: workerReplicaSpec,
-		},
-		RunPolicy: runPolicy,
+	jobSpec = kubeflowv1.PyTorchJobSpec{
+		PyTorchReplicaSpecs: replicaSpecs,
+		RunPolicy:           runPolicy,
 	}
 
 	if elasticPolicy != nil {
@@ -203,7 +204,7 @@ func ParseElasticConfig(elasticConfig ElasticConfig) *kubeflowv1.ElasticPolicy {
 // Analyses the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	app, ok := resource.(*kubeflowv1.PyTorchJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
@@ -217,7 +218,12 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 
 	workersCount := common.GetReplicaCount(app.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
 
-	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, hasMaster, *workersCount, 0, 0, 0)
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, taskTemplate, hasMaster, *workersCount, 0, 0, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

@@ -3,7 +3,6 @@ module github.com/flyteorg/boilerplate
 go 1.22.1
 
 require (
-	github.com/EngHabu/mockery v0.0.0-20220916190332-dde70e38baba
 	github.com/alvaroloes/enumer v1.1.2
 	github.com/flyteorg/flyte/flytestdlib v1.11.0
 	github.com/golangci/golangci-lint v1.61.0
@@ -246,7 +245,7 @@ require (
 	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240314144324-c7f7c6466f7f // indirect
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect

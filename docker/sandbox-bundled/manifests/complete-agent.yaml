@@ -431,8 +431,6 @@ data:
       level: 5
     propeller:
       create-flyteworkflow-crd: true
-      literal-offloading-config:
-        enabled: true
     webhook:
       certDir: /var/run/flyte/certs
       localCert: true
@@ -475,7 +473,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.0"
       k8s-array:
         logs:
           config:
@@ -490,6 +488,7 @@ data:
           insecure: true
           timeouts:
             GetTask: 10s
+            ListAgents: 3s
   002-database.yaml: |
     database:
       postgres:
@@ -823,7 +822,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: QW5aNWlUNmxVWEpxUUV4ZQ==
+  haSharedSecret: QmI4MXpvM09oS3llTGdqUA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1254,7 +1253,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 7841a55b7d0bd6a6d44f37ccf05297fb7c3338c1ebd9c2608d499e4f8c817383
+        checksum/configuration: b533618121828e0b225f6495c59e279a9d937cec325d2bc7de88c41611d2b06e
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1420,7 +1419,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: bbd233a0f62bc60cc8937296e0ba5a8fd30953cb6a67883ee6f687add14e3de7
+        checksum/secret: 4b662157a726a9258a5d99962d949e97a3e107d9fbfee3662d79a1f475493e46
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1763,7 +1762,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.14.2
+        image: cr.flyte.org/flyteorg/flyteagent:1.15.0
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

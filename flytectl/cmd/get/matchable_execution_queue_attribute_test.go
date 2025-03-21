@@ -51,7 +51,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 
 		getExecutionQueueAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionQueueAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -65,7 +65,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		getExecutionQueueAttributeSetup()
 		executionqueueattribute.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionQueueAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -79,7 +79,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		getExecutionQueueAttributeSetup()
 		executionqueueattribute.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getExecutionQueueAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -93,7 +93,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 
 		getExecutionQueueAttributeSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getExecutionQueueAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -107,7 +107,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 
 		getExecutionQueueAttributeSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(workflowResp, nil)
 		err := getExecutionQueueAttributes(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -121,7 +121,7 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 
 		getExecutionQueueAttributeSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getExecutionQueueAttributes(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)

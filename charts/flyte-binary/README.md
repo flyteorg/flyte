@@ -25,6 +25,7 @@ Chart for basic single Flyte executable deployment
 | configuration.agentService.defaultAgent.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
 | configuration.agentService.defaultAgent.insecure | bool | `true` |  |
 | configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
+| configuration.agentService.defaultAgent.timeouts.ListAgents | string | `"3s"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
@@ -41,7 +42,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.14.1"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.15.0"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -64,7 +65,7 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.stackdriver.enabled | bool | `false` |  |
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
 | configuration.propeller.createCRDs | bool | `true` |  |
-| configuration.propeller.literalOffloadingConfigEnabled | bool | `true` |  |
+| configuration.propeller.literalOffloadingConfigEnabled | bool | `false` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
 | configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |

@@ -6,7 +6,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.2.4
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
@@ -19,7 +19,7 @@ require (
 	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/net v0.27.0
+	golang.org/x/net v0.33.0
 	golang.org/x/oauth2 v0.18.0
 	google.golang.org/api v0.155.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80

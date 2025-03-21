@@ -11008,6 +11008,7 @@
                  * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  * @property {google.protobuf.IBoolValue|null} [isOriginalSubNodeInterface] ArrayNode isOriginalSubNodeInterface
                  * @property {flyteidl.core.ArrayNode.DataMode|null} [dataMode] ArrayNode dataMode
+                 * @property {Array.<string>|null} [boundInputs] ArrayNode boundInputs
                  */
     
                 /**
@@ -11019,6 +11020,7 @@
                  * @param {flyteidl.core.IArrayNode=} [properties] Properties to set
                  */
                 function ArrayNode(properties) {
+                    this.boundInputs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -11080,6 +11082,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.dataMode = 0;
+    
+                /**
+                 * ArrayNode boundInputs.
+                 * @member {Array.<string>} boundInputs
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.boundInputs = $util.emptyArray;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -11144,6 +11154,9 @@
                         $root.google.protobuf.BoolValue.encode(message.isOriginalSubNodeInterface, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     if (message.dataMode != null && message.hasOwnProperty("dataMode"))
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.dataMode);
+                    if (message.boundInputs != null && message.boundInputs.length)
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            writer.uint32(/* id 8, wireType 2 =*/66).string(message.boundInputs[i]);
                     return writer;
                 };
     
@@ -11185,6 +11198,11 @@
                             break;
                         case 7:
                             message.dataMode = reader.int32();
+                            break;
+                        case 8:
+                            if (!(message.boundInputs && message.boundInputs.length))
+                                message.boundInputs = [];
+                            message.boundInputs.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11249,6 +11267,13 @@
                         case 1:
                             break;
                         }
+                    if (message.boundInputs != null && message.hasOwnProperty("boundInputs")) {
+                        if (!Array.isArray(message.boundInputs))
+                            return "boundInputs: array expected";
+                        for (var i = 0; i < message.boundInputs.length; ++i)
+                            if (!$util.isString(message.boundInputs[i]))
+                                return "boundInputs: string[] expected";
+                    }
                     return null;
                 };
     
@@ -12590,6 +12615,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+                 * @property {flyteidl.core.IK8sPod|null} [podTemplate] TaskNodeOverrides podTemplate
                  */
     
                 /**
@@ -12632,6 +12658,14 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
+                 * TaskNodeOverrides podTemplate.
+                 * @member {flyteidl.core.IK8sPod|null|undefined} podTemplate
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.podTemplate = null;
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12661,6 +12695,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
+                        $root.flyteidl.core.K8sPod.encode(message.podTemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12690,6 +12726,9 @@
                             break;
                         case 3:
                             message.containerImage = reader.string();
+                            break;
+                        case 4:
+                            message.podTemplate = $root.flyteidl.core.K8sPod.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12723,6 +12762,11 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate")) {
+                        var error = $root.flyteidl.core.K8sPod.verify(message.podTemplate);
+                        if (error)
+                            return "podTemplate." + error;
+                    }
                     return null;
                 };
     
@@ -15117,6 +15161,150 @@
                 return GPUAccelerator;
             })();
     
+            core.SharedMemory = (function() {
+    
+                /**
+                 * Properties of a SharedMemory.
+                 * @memberof flyteidl.core
+                 * @interface ISharedMemory
+                 * @property {string|null} [mountPath] SharedMemory mountPath
+                 * @property {string|null} [mountName] SharedMemory mountName
+                 * @property {string|null} [sizeLimit] SharedMemory sizeLimit
+                 */
+    
+                /**
+                 * Constructs a new SharedMemory.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a SharedMemory.
+                 * @implements ISharedMemory
+                 * @constructor
+                 * @param {flyteidl.core.ISharedMemory=} [properties] Properties to set
+                 */
+                function SharedMemory(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * SharedMemory mountPath.
+                 * @member {string} mountPath
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.mountPath = "";
+    
+                /**
+                 * SharedMemory mountName.
+                 * @member {string} mountName
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.mountName = "";
+    
+                /**
+                 * SharedMemory sizeLimit.
+                 * @member {string} sizeLimit
+                 * @memberof flyteidl.core.SharedMemory
+                 * @instance
+                 */
+                SharedMemory.prototype.sizeLimit = "";
+    
+                /**
+                 * Creates a new SharedMemory instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {flyteidl.core.ISharedMemory=} [properties] Properties to set
+                 * @returns {flyteidl.core.SharedMemory} SharedMemory instance
+                 */
+                SharedMemory.create = function create(properties) {
+                    return new SharedMemory(properties);
+                };
+    
+                /**
+                 * Encodes the specified SharedMemory message. Does not implicitly {@link flyteidl.core.SharedMemory.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {flyteidl.core.ISharedMemory} message SharedMemory message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                SharedMemory.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.mountPath != null && message.hasOwnProperty("mountPath"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.mountPath);
+                    if (message.mountName != null && message.hasOwnProperty("mountName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.mountName);
+                    if (message.sizeLimit != null && message.hasOwnProperty("sizeLimit"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.sizeLimit);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a SharedMemory message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.SharedMemory} SharedMemory
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                SharedMemory.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SharedMemory();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.mountPath = reader.string();
+                            break;
+                        case 2:
+                            message.mountName = reader.string();
+                            break;
+                        case 3:
+                            message.sizeLimit = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a SharedMemory message.
+                 * @function verify
+                 * @memberof flyteidl.core.SharedMemory
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                SharedMemory.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.mountPath != null && message.hasOwnProperty("mountPath"))
+                        if (!$util.isString(message.mountPath))
+                            return "mountPath: string expected";
+                    if (message.mountName != null && message.hasOwnProperty("mountName"))
+                        if (!$util.isString(message.mountName))
+                            return "mountName: string expected";
+                    if (message.sizeLimit != null && message.hasOwnProperty("sizeLimit"))
+                        if (!$util.isString(message.sizeLimit))
+                            return "sizeLimit: string expected";
+                    return null;
+                };
+    
+                return SharedMemory;
+            })();
+    
             core.ExtendedResources = (function() {
     
                 /**
@@ -15124,6 +15312,7 @@
                  * @memberof flyteidl.core
                  * @interface IExtendedResources
                  * @property {flyteidl.core.IGPUAccelerator|null} [gpuAccelerator] ExtendedResources gpuAccelerator
+                 * @property {flyteidl.core.ISharedMemory|null} [sharedMemory] ExtendedResources sharedMemory
                  */
     
                 /**
@@ -15148,6 +15337,14 @@
                  * @instance
                  */
                 ExtendedResources.prototype.gpuAccelerator = null;
+    
+                /**
+                 * ExtendedResources sharedMemory.
+                 * @member {flyteidl.core.ISharedMemory|null|undefined} sharedMemory
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @instance
+                 */
+                ExtendedResources.prototype.sharedMemory = null;
     
                 /**
                  * Creates a new ExtendedResources instance using the specified properties.
@@ -15175,6 +15372,8 @@
                         writer = $Writer.create();
                     if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator"))
                         $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.sharedMemory != null && message.hasOwnProperty("sharedMemory"))
+                        $root.flyteidl.core.SharedMemory.encode(message.sharedMemory, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -15199,6 +15398,9 @@
                         case 1:
                             message.gpuAccelerator = $root.flyteidl.core.GPUAccelerator.decode(reader, reader.uint32());
                             break;
+                        case 2:
+                            message.sharedMemory = $root.flyteidl.core.SharedMemory.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -15222,6 +15424,11 @@
                         var error = $root.flyteidl.core.GPUAccelerator.verify(message.gpuAccelerator);
                         if (error)
                             return "gpuAccelerator." + error;
+                    }
+                    if (message.sharedMemory != null && message.hasOwnProperty("sharedMemory")) {
+                        var error = $root.flyteidl.core.SharedMemory.verify(message.sharedMemory);
+                        if (error)
+                            return "sharedMemory." + error;
                     }
                     return null;
                 };
@@ -16939,6 +17146,7 @@
                  * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] K8sPod metadata
                  * @property {google.protobuf.IStruct|null} [podSpec] K8sPod podSpec
                  * @property {flyteidl.core.IDataLoadingConfig|null} [dataConfig] K8sPod dataConfig
+                 * @property {string|null} [primaryContainerName] K8sPod primaryContainerName
                  */
     
                 /**
@@ -16981,6 +17189,14 @@
                 K8sPod.prototype.dataConfig = null;
     
                 /**
+                 * K8sPod primaryContainerName.
+                 * @member {string} primaryContainerName
+                 * @memberof flyteidl.core.K8sPod
+                 * @instance
+                 */
+                K8sPod.prototype.primaryContainerName = "";
+    
+                /**
                  * Creates a new K8sPod instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.K8sPod
@@ -17010,6 +17226,8 @@
                         $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.dataConfig != null && message.hasOwnProperty("dataConfig"))
                         $root.flyteidl.core.DataLoadingConfig.encode(message.dataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.primaryContainerName);
                     return writer;
                 };
     
@@ -17039,6 +17257,9 @@
                             break;
                         case 3:
                             message.dataConfig = $root.flyteidl.core.DataLoadingConfig.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.primaryContainerName = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17074,6 +17295,9 @@
                         if (error)
                             return "dataConfig." + error;
                     }
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        if (!$util.isString(message.primaryContainerName))
+                            return "primaryContainerName: string expected";
                     return null;
                 };
     
@@ -24605,6 +24829,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {string|null} [outputPrefix] GetTaskRequest outputPrefix
                  */
     
                 /**
@@ -24647,6 +24872,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest outputPrefix.
+                 * @member {string} outputPrefix
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.outputPrefix = "";
+    
+                /**
                  * Creates a new GetTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -24676,6 +24909,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.outputPrefix);
                     return writer;
                 };
     
@@ -24705,6 +24940,9 @@
                             break;
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.outputPrefix = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24736,6 +24974,9 @@
                         if (error)
                             return "taskCategory." + error;
                     }
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        if (!$util.isString(message.outputPrefix))
+                            return "outputPrefix: string expected";
                     return null;
                 };
     
@@ -26719,6 +26960,174 @@
                 return GetTaskLogsResponseHeader;
             })();
     
+            /**
+             * LogLineOriginator enum.
+             * @name flyteidl.admin.LogLineOriginator
+             * @enum {string}
+             * @property {number} UNKNOWN=0 UNKNOWN value
+             * @property {number} USER=1 USER value
+             * @property {number} SYSTEM=2 SYSTEM value
+             */
+            admin.LogLineOriginator = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNKNOWN"] = 0;
+                values[valuesById[1] = "USER"] = 1;
+                values[valuesById[2] = "SYSTEM"] = 2;
+                return values;
+            })();
+    
+            admin.LogLine = (function() {
+    
+                /**
+                 * Properties of a LogLine.
+                 * @memberof flyteidl.admin
+                 * @interface ILogLine
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] LogLine timestamp
+                 * @property {string|null} [message] LogLine message
+                 * @property {flyteidl.admin.LogLineOriginator|null} [originator] LogLine originator
+                 */
+    
+                /**
+                 * Constructs a new LogLine.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a LogLine.
+                 * @implements ILogLine
+                 * @constructor
+                 * @param {flyteidl.admin.ILogLine=} [properties] Properties to set
+                 */
+                function LogLine(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * LogLine timestamp.
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
+                 * @memberof flyteidl.admin.LogLine
+                 * @instance
+                 */
+                LogLine.prototype.timestamp = null;
+    
+                /**
+                 * LogLine message.
+                 * @member {string} message
+                 * @memberof flyteidl.admin.LogLine
+                 * @instance
+                 */
+                LogLine.prototype.message = "";
+    
+                /**
+                 * LogLine originator.
+                 * @member {flyteidl.admin.LogLineOriginator} originator
+                 * @memberof flyteidl.admin.LogLine
+                 * @instance
+                 */
+                LogLine.prototype.originator = 0;
+    
+                /**
+                 * Creates a new LogLine instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.LogLine
+                 * @static
+                 * @param {flyteidl.admin.ILogLine=} [properties] Properties to set
+                 * @returns {flyteidl.admin.LogLine} LogLine instance
+                 */
+                LogLine.create = function create(properties) {
+                    return new LogLine(properties);
+                };
+    
+                /**
+                 * Encodes the specified LogLine message. Does not implicitly {@link flyteidl.admin.LogLine.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.LogLine
+                 * @static
+                 * @param {flyteidl.admin.ILogLine} message LogLine message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                LogLine.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
+                    if (message.originator != null && message.hasOwnProperty("originator"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).int32(message.originator);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a LogLine message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.LogLine
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.LogLine} LogLine
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                LogLine.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.LogLine();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.message = reader.string();
+                            break;
+                        case 3:
+                            message.originator = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a LogLine message.
+                 * @function verify
+                 * @memberof flyteidl.admin.LogLine
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                LogLine.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
+                    if (message.originator != null && message.hasOwnProperty("originator"))
+                        switch (message.originator) {
+                        default:
+                            return "originator: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                            break;
+                        }
+                    return null;
+                };
+    
+                return LogLine;
+            })();
+    
             admin.GetTaskLogsResponseBody = (function() {
     
                 /**
@@ -26726,6 +27135,7 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskLogsResponseBody
                  * @property {Array.<string>|null} [results] GetTaskLogsResponseBody results
+                 * @property {Array.<flyteidl.admin.ILogLine>|null} [structuredLines] GetTaskLogsResponseBody structuredLines
                  */
     
                 /**
@@ -26738,6 +27148,7 @@
                  */
                 function GetTaskLogsResponseBody(properties) {
                     this.results = [];
+                    this.structuredLines = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -26751,6 +27162,14 @@
                  * @instance
                  */
                 GetTaskLogsResponseBody.prototype.results = $util.emptyArray;
+    
+                /**
+                 * GetTaskLogsResponseBody structuredLines.
+                 * @member {Array.<flyteidl.admin.ILogLine>} structuredLines
+                 * @memberof flyteidl.admin.GetTaskLogsResponseBody
+                 * @instance
+                 */
+                GetTaskLogsResponseBody.prototype.structuredLines = $util.emptyArray;
     
                 /**
                  * Creates a new GetTaskLogsResponseBody instance using the specified properties.
@@ -26779,6 +27198,9 @@
                     if (message.results != null && message.results.length)
                         for (var i = 0; i < message.results.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.results[i]);
+                    if (message.structuredLines != null && message.structuredLines.length)
+                        for (var i = 0; i < message.structuredLines.length; ++i)
+                            $root.flyteidl.admin.LogLine.encode(message.structuredLines[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -26805,6 +27227,11 @@
                                 message.results = [];
                             message.results.push(reader.string());
                             break;
+                        case 2:
+                            if (!(message.structuredLines && message.structuredLines.length))
+                                message.structuredLines = [];
+                            message.structuredLines.push($root.flyteidl.admin.LogLine.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -26830,6 +27257,15 @@
                         for (var i = 0; i < message.results.length; ++i)
                             if (!$util.isString(message.results[i]))
                                 return "results: string[] expected";
+                    }
+                    if (message.structuredLines != null && message.hasOwnProperty("structuredLines")) {
+                        if (!Array.isArray(message.structuredLines))
+                            return "structuredLines: array expected";
+                        for (var i = 0; i < message.structuredLines.length; ++i) {
+                            var error = $root.flyteidl.admin.LogLine.verify(message.structuredLines[i]);
+                            if (error)
+                                return "structuredLines." + error;
+                        }
                     }
                     return null;
                 };
@@ -29296,6 +29732,7 @@
                  * @memberof flyteidl.admin
                  * @interface IEmailNotification
                  * @property {Array.<string>|null} [recipientsEmail] EmailNotification recipientsEmail
+                 * @property {string|null} [template] EmailNotification template
                  */
     
                 /**
@@ -29321,6 +29758,14 @@
                  * @instance
                  */
                 EmailNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * EmailNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.EmailNotification
+                 * @instance
+                 */
+                EmailNotification.prototype.template = "";
     
                 /**
                  * Creates a new EmailNotification instance using the specified properties.
@@ -29349,6 +29794,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29374,6 +29821,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29401,6 +29851,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29414,6 +29867,7 @@
                  * @memberof flyteidl.admin
                  * @interface IPagerDutyNotification
                  * @property {Array.<string>|null} [recipientsEmail] PagerDutyNotification recipientsEmail
+                 * @property {string|null} [template] PagerDutyNotification template
                  */
     
                 /**
@@ -29439,6 +29893,14 @@
                  * @instance
                  */
                 PagerDutyNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * PagerDutyNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.PagerDutyNotification
+                 * @instance
+                 */
+                PagerDutyNotification.prototype.template = "";
     
                 /**
                  * Creates a new PagerDutyNotification instance using the specified properties.
@@ -29467,6 +29929,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29492,6 +29956,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29519,6 +29986,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     
@@ -29532,6 +30002,7 @@
                  * @memberof flyteidl.admin
                  * @interface ISlackNotification
                  * @property {Array.<string>|null} [recipientsEmail] SlackNotification recipientsEmail
+                 * @property {string|null} [template] SlackNotification template
                  */
     
                 /**
@@ -29557,6 +30028,14 @@
                  * @instance
                  */
                 SlackNotification.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * SlackNotification template.
+                 * @member {string} template
+                 * @memberof flyteidl.admin.SlackNotification
+                 * @instance
+                 */
+                SlackNotification.prototype.template = "";
     
                 /**
                  * Creates a new SlackNotification instance using the specified properties.
@@ -29585,6 +30064,8 @@
                     if (message.recipientsEmail != null && message.recipientsEmail.length)
                         for (var i = 0; i < message.recipientsEmail.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.template);
                     return writer;
                 };
     
@@ -29610,6 +30091,9 @@
                             if (!(message.recipientsEmail && message.recipientsEmail.length))
                                 message.recipientsEmail = [];
                             message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.template = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29637,6 +30121,9 @@
                             if (!$util.isString(message.recipientsEmail[i]))
                                 return "recipientsEmail: string[] expected";
                     }
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        if (!$util.isString(message.template))
+                            return "template: string expected";
                     return null;
                 };
     

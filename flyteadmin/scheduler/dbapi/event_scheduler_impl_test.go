@@ -48,7 +48,7 @@ func TestRemoveSchedule(t *testing.T) {
 	eventScheduler := setupEventScheduler()
 
 	scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-	scheduleEntitiesRepo.OnDeactivateMatch(mock.Anything, mock.Anything).Return(nil)
+	scheduleEntitiesRepo.EXPECT().Deactivate(mock.Anything, mock.Anything).Return(nil)
 
 	err := eventScheduler.RemoveSchedule(context.Background(), interfaces.RemoveScheduleInput{
 		Identifier: &core.Identifier{
@@ -75,7 +75,7 @@ func TestAddSchedule(t *testing.T) {
 		}
 
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
+		scheduleEntitiesRepo.EXPECT().Activate(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
 			Identifier: &core.Identifier{
@@ -101,7 +101,7 @@ func TestAddSchedule(t *testing.T) {
 		}
 
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
+		scheduleEntitiesRepo.EXPECT().Activate(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
 			Identifier: &core.Identifier{
@@ -125,7 +125,7 @@ func TestAddSchedule(t *testing.T) {
 		}
 
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
+		scheduleEntitiesRepo.EXPECT().Activate(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
 			Identifier: &core.Identifier{

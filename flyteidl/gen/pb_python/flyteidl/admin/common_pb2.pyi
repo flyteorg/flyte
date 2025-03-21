@@ -160,22 +160,28 @@ class ResourceListRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[NamedEntityIdentifier, _Mapping]] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., filters: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ...) -> None: ...
 
 class EmailNotification(_message.Message):
-    __slots__ = ["recipients_email"]
+    __slots__ = ["recipients_email", "template"]
     RECIPIENTS_EMAIL_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     recipients_email: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ...) -> None: ...
+    template: str
+    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ..., template: _Optional[str] = ...) -> None: ...
 
 class PagerDutyNotification(_message.Message):
-    __slots__ = ["recipients_email"]
+    __slots__ = ["recipients_email", "template"]
     RECIPIENTS_EMAIL_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     recipients_email: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ...) -> None: ...
+    template: str
+    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ..., template: _Optional[str] = ...) -> None: ...
 
 class SlackNotification(_message.Message):
-    __slots__ = ["recipients_email"]
+    __slots__ = ["recipients_email", "template"]
     RECIPIENTS_EMAIL_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     recipients_email: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ...) -> None: ...
+    template: str
+    def __init__(self, recipients_email: _Optional[_Iterable[str]] = ..., template: _Optional[str] = ...) -> None: ...
 
 class Notification(_message.Message):
     __slots__ = ["phases", "email", "pager_duty", "slack"]

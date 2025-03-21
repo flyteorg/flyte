@@ -513,14 +513,14 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 
 	h := &nodemocks.NodeHandler{}
-	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-	h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-	h.OnFinalizeRequired().Return(false)
+	h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	h.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+	h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+	h.EXPECT().FinalizeRequired().Return(false)
 
 	handlerFactory := &nodemocks.HandlerFactory{}
-	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
+	handlerFactory.EXPECT().Setup(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	handlerFactory.EXPECT().GetHandler(mock.Anything).Return(h, nil)
 
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
 		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
@@ -688,13 +688,13 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	h := &nodemocks.NodeHandler{}
-	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
-	h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-	h.OnFinalizeRequired().Return(false)
+	h.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	h.EXPECT().Handle(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
+	h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+	h.EXPECT().FinalizeRequired().Return(false)
 	handlerFactory := &nodemocks.HandlerFactory{}
-	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
+	handlerFactory.EXPECT().Setup(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	handlerFactory.EXPECT().GetHandler(mock.Anything).Return(h, nil)
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient,
 		"s3://bucket", fakeKubeClient, catalogClient, recoveryClient, config.LiteralOffloadingConfig{}, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -792,7 +792,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 			metrics:      newMetrics(promutils.NewTestScope()),
 		}
 
-		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+		nodeExec.EXPECT().AbortHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 
 		w := &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -833,7 +833,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 			clusterID: testClusterID,
 		}
 
-		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		nodeExec.EXPECT().AbortHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		w := &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -860,7 +860,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		var evs []*event.WorkflowExecutionEvent
 		nodeExec := &nodemocks.Node{}
 		wfRecorder := &eventMocks.WorkflowEventRecorder{}
-		wfRecorder.OnRecordWorkflowEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
+		wfRecorder.EXPECT().RecordWorkflowEvent(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
 			assert.Equal(t, testClusterID, ev.GetProducerId())
 			evs = append(evs, ev)
 			return true
@@ -875,7 +875,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 			clusterID: testClusterID,
 		}
 
-		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		nodeExec.EXPECT().AbortHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		w := &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -901,7 +901,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 		var evs []*event.WorkflowExecutionEvent
 		nodeExec := &nodemocks.Node{}
 		wfRecorder := &eventMocks.WorkflowEventRecorder{}
-		wfRecorder.OnRecordWorkflowEventMatch(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
+		wfRecorder.EXPECT().RecordWorkflowEvent(mock.Anything, mock.MatchedBy(func(ev *event.WorkflowExecutionEvent) bool {
 			assert.Equal(t, testClusterID, ev.GetProducerId())
 			evs = append(evs, ev)
 			return true
@@ -916,7 +916,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 			clusterID: testClusterID,
 		}
 
-		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		nodeExec.EXPECT().AbortHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		w := &v1alpha1.FlyteWorkflow{
 			Status: v1alpha1.WorkflowStatus{
@@ -943,7 +943,7 @@ func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
 			metrics:      newMetrics(promutils.NewTestScope()),
 		}
 
-		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		nodeExec.EXPECT().AbortHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 
 		w := &v1alpha1.FlyteWorkflow{
 			Status: v1alpha1.WorkflowStatus{

@@ -52,6 +52,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpcPort"), defaultConfig.GrpcPort, "On which grpc port to serve Catalog")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpcServerReflection"), defaultConfig.GrpcServerReflection, "Enable GRPC Server Reflection")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpcMaxRecvMsgSizeMBs"), defaultConfig.GrpcMaxRecvMsgSizeMBs, "The max receive message size; if unset defaults to gRPC server default value")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "httpPort"), defaultConfig.HTTPPort, "On which http port to serve Catalog")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "secure"), defaultConfig.Secure, "Whether to run Catalog in secure mode or not")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "readHeaderTimeoutSeconds"), defaultConfig.ReadHeaderTimeoutSeconds, "The amount of time allowed to read request headers.")

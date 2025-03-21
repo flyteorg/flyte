@@ -11,7 +11,7 @@ import { Identifier } from "./identifier_pb.js";
 import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
-import { ExtendedResources, Resources } from "./tasks_pb.js";
+import { ExtendedResources, K8sPod, Resources } from "./tasks_pb.js";
 
 /**
  * Defines a condition and the execution unit that should be executed if the condition is satisfied.
@@ -568,6 +568,13 @@ export class ArrayNode extends Message<ArrayNode> {
    */
   dataMode = ArrayNode_DataMode.SINGLE_INPUT_FILE;
 
+  /**
+   * +optional. Specifies input bindings that are not mapped over for the node.
+   *
+   * @generated from field: repeated string bound_inputs = 8;
+   */
+  boundInputs: string[] = [];
+
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
     proto3.util.initPartial(data, this);
@@ -583,6 +590,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
     { no: 6, name: "is_original_sub_node_interface", kind: "message", T: BoolValue },
     { no: 7, name: "data_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_DataMode) },
+    { no: 8, name: "bound_inputs", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -1222,6 +1230,14 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
    */
   containerImage = "";
 
+  /**
+   * Override for the pod template used by task pods
+   * +optional
+   *
+   * @generated from field: flyteidl.core.K8sPod pod_template = 4;
+   */
+  podTemplate?: K8sPod;
+
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1233,6 +1249,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
     { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "pod_template", kind: "message", T: K8sPod },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {

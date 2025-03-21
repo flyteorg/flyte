@@ -765,6 +765,19 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			}
 
 			if nodeInputs != nil {
+				// Resolve error input if current node is an on failure node
+				failureNodeLookup, ok := nCtx.ContextualNodeLookup().(executors.FailureNodeLookup)
+				if ok {
+					originalErr, err := failureNodeLookup.GetOriginalError()
+					if err != nil {
+						return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "FailureNodeError", err.Error(), nil), nil
+					} else if originalErr != nil {
+						err = ResolveOnFailureNodeInput(ctx, nodeInputs, node.GetID(), originalErr)
+						if err != nil {
+							return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "FailureNodeInputResolvingError", err.Error(), nil), nil
+						}
+					}
+				}
 				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.GetLiterals(), node, c.literalOffloadingConfig)
 				if p != nil {
 					return *p, nil
@@ -964,7 +977,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	}
 
 	var cacheStatus *catalog.Status
-	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && p.GetPhase() != handler.EPhaseFailed && ok {
 		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())

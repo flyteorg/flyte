@@ -370,7 +370,7 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 	// Inject a sidecar for capturing and exposing Ray job logs
 	injectLogsSidecar(primaryContainer, basePodSpec)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
+	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -382,8 +382,8 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodSpe
 		ObjectMeta: *objectMeta,
 	}
 	cfg := config.GetK8sPluginConfig()
-	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
-	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 	return podTemplateSpec, nil
 }
 
@@ -500,7 +500,7 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 	}
 	primaryContainer.Ports = append(primaryContainer.Ports, ports...)
 
-	basePodSpec, err := mergeCustomPodSpec(primaryContainer, basePodSpec, spec.GetK8SPod())
+	basePodSpec, err := mergeCustomPodSpec(basePodSpec, spec.GetK8SPod())
 	if err != nil {
 		return v1.PodTemplateSpec{}, err
 	}
@@ -512,13 +512,13 @@ func buildWorkerPodTemplate(primaryContainer *v1.Container, basePodSpec *v1.PodS
 		Spec:       *basePodSpec,
 		ObjectMeta: *objectMetadata,
 	}
-	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
-	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	podTemplateSpec.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()), spec.GetK8SPod().GetMetadata().GetLabels()))
+	podTemplateSpec.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()), spec.GetK8SPod().GetMetadata().GetAnnotations()))
 	return podTemplateSpec, nil
 }
 
 // Merges a ray head/worker node custom pod specs onto task's generated pod spec
-func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, error) {
+func mergeCustomPodSpec(podSpec *v1.PodSpec, k8sPod *core.K8SPod) (*v1.PodSpec, error) {
 	if k8sPod == nil {
 		return podSpec, nil
 	}
@@ -535,15 +535,9 @@ func mergeCustomPodSpec(primaryContainer *v1.Container, podSpec *v1.PodSpec, k8s
 			"Unable to unmarshal pod spec [%v], Err: [%v]", k8sPod.GetPodSpec(), err.Error())
 	}
 
-	for _, container := range customPodSpec.Containers {
-		if container.Name != primaryContainer.Name { // Only support the primary container for now
-			continue
-		}
-
-		// Just handle resources for now
-		if len(container.Resources.Requests) > 0 || len(container.Resources.Limits) > 0 {
-			primaryContainer.Resources = container.Resources
-		}
+	podSpec, err = flytek8s.MergeOverlayPodSpecOntoBase(podSpec, customPodSpec)
+	if err != nil {
+		return nil, err
 	}
 
 	return podSpec, nil

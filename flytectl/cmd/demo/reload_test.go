@@ -34,7 +34,7 @@ var fakePod = corev1.Pod{
 func sandboxSetup(ctx context.Context, legacy bool) {
 	mockDocker := &mocks.Docker{}
 	docker.Client = mockDocker
-	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
+	mockDocker.EXPECT().ContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{
@@ -49,7 +49,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 	if legacy {
 		checkLegacySandboxExecExitCode = 1
 	}
-	mockDocker.OnContainerExecCreateMatch(
+	mockDocker.EXPECT().ContainerExecCreate(
 		ctx,
 		docker.FlyteSandboxClusterName,
 		types.ExecConfig{
@@ -60,15 +60,15 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 			Cmd:          []string{"sh", "-c", fmt.Sprintf("which %s > /dev/null", internalBootstrapAgent)},
 		},
 	).Return(types.IDResponse{ID: "0"}, nil)
-	mockDocker.OnContainerExecAttachMatch(ctx, "0", types.ExecStartCheck{}).Return(types.HijackedResponse{
+	mockDocker.EXPECT().ContainerExecAttach(ctx, "0", types.ExecStartCheck{}).Return(types.HijackedResponse{
 		Reader: bufio.NewReader(bytes.NewReader([]byte{})),
 	}, nil)
-	mockDocker.OnContainerExecInspectMatch(ctx, "0").Return(types.ContainerExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
+	mockDocker.EXPECT().ContainerExecInspect(ctx, "0").Return(types.ContainerExecInspect{ExitCode: checkLegacySandboxExecExitCode}, nil)
 
 	// Register additional mocks for the actual execution of the bootstrap agent
 	// in non-legacy sandboxes
 	if !legacy {
-		mockDocker.OnContainerExecCreateMatch(
+		mockDocker.EXPECT().ContainerExecCreate(
 			ctx,
 			docker.FlyteSandboxClusterName,
 			types.ExecConfig{
@@ -79,7 +79,7 @@ func sandboxSetup(ctx context.Context, legacy bool) {
 				Cmd:          []string{internalBootstrapAgent},
 			},
 		).Return(types.IDResponse{ID: "1"}, nil)
-		mockDocker.OnContainerExecAttachMatch(ctx, "1", types.ExecStartCheck{}).Return(types.HijackedResponse{
+		mockDocker.EXPECT().ContainerExecAttach(ctx, "1", types.ExecStartCheck{}).Return(types.HijackedResponse{
 			Reader: bufio.NewReader(bytes.NewReader([]byte{})),
 		}, nil)
 	}

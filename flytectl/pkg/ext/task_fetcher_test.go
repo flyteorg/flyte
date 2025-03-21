@@ -91,21 +91,21 @@ func getTaskFetcherSetup() {
 
 func TestFetchAllVerOfTask(t *testing.T) {
 	getTaskFetcherSetup()
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(taskListResponse, nil)
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(taskListResponse, nil)
 	_, err := adminFetcherExt.FetchAllVerOfTask(ctx, "taskName", "project", "domain", taskFilter)
 	assert.Nil(t, err)
 }
 
 func TestFetchTaskVersion(t *testing.T) {
 	getTaskFetcherSetup()
-	adminClient.OnGetTaskMatch(mock.Anything, mock.Anything).Return(task1, nil)
+	adminClient.EXPECT().GetTask(mock.Anything, mock.Anything).Return(task1, nil)
 	_, err := adminFetcherExt.FetchTaskVersion(ctx, "task1", "v1", "project", "domain")
 	assert.Nil(t, err)
 }
 
 func TestFetchAllVerOfTaskError(t *testing.T) {
 	getTaskFetcherSetup()
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	_, err := adminFetcherExt.FetchAllVerOfTask(ctx, "taskName", "project", "domain", taskFilter)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
@@ -115,7 +115,7 @@ func TestFetchAllVerOfTaskFilterError(t *testing.T) {
 	taskFilter = filters.Filters{
 		FieldSelector: "hello=",
 	}
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 	_, err := adminFetcherExt.FetchAllVerOfTask(ctx, "taskName", "project", "domain", taskFilter)
 	assert.NotNil(t, err)
 }
@@ -126,14 +126,14 @@ func TestFetchAllVerOfTaskEmptyResponse(t *testing.T) {
 	taskFilter = filters.Filters{
 		FieldSelector: "",
 	}
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(taskListResponse, nil)
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(taskListResponse, nil)
 	_, err := adminFetcherExt.FetchAllVerOfTask(ctx, "taskName", "project", "domain", taskFilter)
 	assert.Equal(t, fmt.Errorf("no tasks retrieved for taskName"), err)
 }
 
 func TestFetchTaskLatestVersion(t *testing.T) {
 	getTaskFetcherSetup()
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(taskListResponse, nil)
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(taskListResponse, nil)
 	_, err := adminFetcherExt.FetchTaskLatestVersion(ctx, "taskName", "project", "domain", taskFilter)
 	assert.Nil(t, err)
 }
@@ -141,7 +141,7 @@ func TestFetchTaskLatestVersion(t *testing.T) {
 func TestFetchTaskLatestVersionError(t *testing.T) {
 	taskListResponse := &admin.TaskList{}
 	getTaskFetcherSetup()
-	adminClient.OnListTasksMatch(mock.Anything, mock.Anything).Return(taskListResponse, nil)
+	adminClient.EXPECT().ListTasks(mock.Anything, mock.Anything).Return(taskListResponse, nil)
 	_, err := adminFetcherExt.FetchTaskLatestVersion(ctx, "taskName", "project", "domain", taskFilter)
 	assert.Equal(t, fmt.Errorf("no tasks retrieved for taskName"), err)
 }

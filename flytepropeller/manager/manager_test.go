@@ -53,9 +53,9 @@ var (
 
 func createShardStrategy(podCount int) shardstrategy.ShardStrategy {
 	shardStrategy := mocks.ShardStrategy{}
-	shardStrategy.OnGetPodCount().Return(podCount)
-	shardStrategy.OnHashCode().Return(0, nil)
-	shardStrategy.OnUpdatePodSpecMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	shardStrategy.EXPECT().GetPodCount().Return(podCount)
+	shardStrategy.EXPECT().HashCode().Return(0, nil)
+	shardStrategy.EXPECT().UpdatePodSpec(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	return &shardStrategy
 }

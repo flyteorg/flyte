@@ -57,23 +57,23 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
 	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnIsInterruptible().Return(true)
+	nodeExecutionMetadata.EXPECT().IsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-	mockExecContext.OnGetParentInfo().Return(nil)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+	mockExecContext.EXPECT().GetParentInfo().Return(nil)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"
-	tID.OnGetGeneratedName().Return(generatedName)
-	tID.OnGetID().Return(*id)
-	tID.OnGetUniqueNodeID().Return("unique-node-id")
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
+	tID.EXPECT().GetID().Return(*id)
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	resourcePoolInfo := []*event.ResourcePoolInfo{
 		{
 			Namespace:       "ns",
@@ -156,7 +156,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, testClusterID, tev.GetProducerId())
 
 	defaultNodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	defaultNodeExecutionMetadata.OnIsInterruptible().Return(false)
+	defaultNodeExecutionMetadata.EXPECT().IsInterruptible().Return(false)
 	tev, err = ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 		TaskExecContext: tCtx,
 		InputReader:     in,
@@ -249,26 +249,26 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
 	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnIsInterruptible().Return(true)
+	nodeExecutionMetadata.EXPECT().IsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 	mockParentInfo := &mocks2.ImmutableParentInfo{}
-	mockParentInfo.OnGetUniqueID().Return("np1")
-	mockParentInfo.OnCurrentAttempt().Return(uint32(2))
-	mockExecContext.OnGetParentInfo().Return(mockParentInfo)
+	mockParentInfo.EXPECT().GetUniqueID().Return("np1")
+	mockParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+	mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"
-	tID.OnGetGeneratedName().Return(generatedName)
-	tID.OnGetID().Return(*id)
-	tID.OnGetUniqueNodeID().Return("unique-node-id")
+	tID.EXPECT().GetGeneratedName().Return(generatedName)
+	tID.EXPECT().GetID().Return(*id)
+	tID.EXPECT().GetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &pluginMocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 	resourcePoolInfo := []*event.ResourcePoolInfo{
 		{
 			Namespace:       "ns",

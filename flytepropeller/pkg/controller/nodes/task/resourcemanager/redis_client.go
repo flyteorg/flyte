@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery -name RedisClient -case=underscore
+//go:generate mockery --name RedisClient --case=underscore --with-expecter
 
 type RedisClient interface {
 	// A pass-through method. Getting the cardinality of the Redis set

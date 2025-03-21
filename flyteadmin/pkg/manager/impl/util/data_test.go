@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -118,11 +119,11 @@ func TestGetInputs(t *testing.T) {
 		Bytes: 1000,
 	}
 
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
+	mockRemoteURL := &urlMocks.RemoteURLInterface{}
+	mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		assert.Equal(t, inputsURI, uri)
 		return expectedURLBlob, nil
-	}
+	})
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
 	}
@@ -162,11 +163,11 @@ func TestGetOutputs(t *testing.T) {
 		Bytes: 1000,
 	}
 
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
+	mockRemoteURL := &urlMocks.RemoteURLInterface{}
+	mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		assert.Equal(t, testOutputsURI, uri)
 		return expectedURLBlob, nil
-	}
+	})
 
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
@@ -205,11 +206,11 @@ func TestGetOutputs(t *testing.T) {
 		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
-		mockRemoteURL := urlMocks.NewMockRemoteURL()
-		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
+		mockRemoteURL := &urlMocks.RemoteURLInterface{}
+		mockRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 			t.Fatal("Should not fetch a remote URL for outputs stored inline for an execution model")
 			return &admin.UrlBlob{}, nil
-		}
+		})
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 2000
 

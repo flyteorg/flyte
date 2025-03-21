@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -63,7 +64,7 @@ var taskEventRequest = &admin.TaskExecutionEventRequest{
 	},
 }
 
-var mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
+var mockTaskExecutionRemoteURL = &dataMocks.RemoteURLInterface{}
 
 var retryAttemptValue = uint32(1)
 
@@ -1070,8 +1071,8 @@ func TestGetTaskExecutionData(t *testing.T) {
 				Closure:   closureBytes,
 			}, nil
 		})
-	mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
-	mockTaskExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
+	mockTaskExecutionRemoteURL = &dataMocks.RemoteURLInterface{}
+	mockTaskExecutionRemoteURL.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == "input-uri.pb" {
 			return &admin.UrlBlob{
 				Url:   "inputs",
@@ -1085,7 +1086,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 		}
 
 		return &admin.UrlBlob{}, errors.New("unexpected input")
-	}
+	})
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{

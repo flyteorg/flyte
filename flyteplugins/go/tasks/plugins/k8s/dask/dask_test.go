@@ -7,6 +7,7 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -48,16 +49,23 @@ var (
 	testLabels            = map[string]string{"label-1": "val1"}
 	testPlatformResources = v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			v1.ResourceCPU: resource.MustParse("4"),
+			v1.ResourceCPU:    resource.MustParse("4"),
+			v1.ResourceMemory: resource.MustParse("10G"),
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse("5"),
-			v1.ResourceMemory: resource.MustParse("17G"),
+			v1.ResourceCPU:    resource.MustParse("10"),
+			v1.ResourceMemory: resource.MustParse("24G"),
 		},
 	}
 	defaultResources = v1.ResourceRequirements{
-		Requests: testPlatformResources.Requests,
-		Limits:   testPlatformResources.Requests,
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("2"),
+			v1.ResourceMemory: resource.MustParse("8G"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("8"),
+			v1.ResourceMemory: resource.MustParse("17G"),
+		},
 	}
 	podTemplate = &v1.PodTemplate{
 		ObjectMeta: metav1.ObjectMeta{
@@ -152,25 +160,25 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 	taskCtx.On("OutputWriter").Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -183,21 +191,22 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetAnnotations().Return(testAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(testLabels)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
-	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
-	taskExecutionMetadata.OnIsInterruptible().Return(isInterruptible)
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
-	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(testAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(testLabels)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&testPlatformResources)
+	taskExecutionMetadata.EXPECT().GetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(isInterruptible)
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(defaultServiceAccountName)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return(defaultNamespace)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return("")
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetPodTemplate().Return(nil)
+	overrides.EXPECT().GetContainerImage().Return("")
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
@@ -210,7 +219,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 			return nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
@@ -317,9 +326,9 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 		"--name",
 		"$(DASK_WORKER_NAME)",
 		"--nthreads",
-		"4",
+		"8",
 		"--memory-limit",
-		"1Gi",
+		"17G",
 	}, workerSpec.Containers[0].Args)
 	assert.Equal(t, workerSpec.RestartPolicy, v1.RestartPolicyAlways)
 }
@@ -386,6 +395,55 @@ func TestBuildResourceDaskDefaultResoureRequirements(t *testing.T) {
 	assert.Contains(t, workerSpec.Containers[0].Args, "2G")
 }
 
+func TestBuildResourceDaskAdjustResoureRequirements(t *testing.T) {
+	flyteWorkflowResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("16"), // Higher than platform limits
+			// Unset memory should be defaulted to from the request
+		},
+	}
+
+	daskResourceHandler := daskResourceHandler{}
+	taskTemplate := dummyDaskTaskTemplate("", nil, "")
+	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, nil, false, k8s.PluginState{})
+	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
+	assert.Nil(t, err)
+	assert.NotNil(t, r)
+	daskJob, ok := r.(*daskAPI.DaskJob)
+	assert.True(t, ok)
+
+	expectedResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    testPlatformResources.Limits[v1.ResourceCPU],
+			v1.ResourceMemory: flyteWorkflowResources.Requests[v1.ResourceMemory],
+		},
+	}
+
+	// Job
+	jobSpec := daskJob.Spec.Job.Spec
+	assert.Equal(t, expectedResources, jobSpec.Containers[0].Resources)
+
+	// Scheduler
+	schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec
+	assert.Equal(t, expectedResources, schedulerSpec.Containers[0].Resources)
+
+	// Default Workers
+	workerSpec := daskJob.Spec.Cluster.Spec.Worker.Spec
+	assert.Equal(t, expectedResources, workerSpec.Containers[0].Resources)
+	assert.Contains(t, workerSpec.Containers[0].Args, "--nthreads")
+	assert.Contains(t, workerSpec.Containers[0].Args, "10") // from the adjusted, platform limits
+	assert.Contains(t, workerSpec.Containers[0].Args, "--memory-limit")
+	assert.Contains(t, workerSpec.Containers[0].Args, "2G")
+}
+
 func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 	protobufResources := core.Resources{
 		Requests: []*core.Resources_ResourceEntry{
@@ -405,7 +463,13 @@ func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 			},
 		},
 	}
-	expectedResources, _ := flytek8s.ToK8sResourceRequirements(&protobufResources)
+	expectedPbResources := proto.Clone(&protobufResources).(*core.Resources)
+	// We expect the unset memory request to come from the set memory limit
+	expectedPbResources.Requests = append(expectedPbResources.Requests, &core.Resources_ResourceEntry{
+		Name:  core.Resources_MEMORY,
+		Value: "15G",
+	})
+	expectedResources, _ := flytek8s.ToK8sResourceRequirements(expectedPbResources)
 
 	flyteWorkflowResources := v1.ResourceRequirements{
 		Requests: v1.ResourceList{

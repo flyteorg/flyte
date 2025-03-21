@@ -113,9 +113,9 @@ func TestSendEmail(t *testing.T) {
 	t.Run("exhaust all retry attempts", func(t *testing.T) {
 		sendgridClient := &mocks.SendgridClient{}
 		expectedEmail := getSendgridEmail(emailNotification)
-		sendgridClient.OnSendMatch(expectedEmail).
+		sendgridClient.EXPECT().Send(expectedEmail).
 			Return(nil, expectedErr).Times(3)
-		sendgridClient.OnSendMatch(expectedEmail).
+		sendgridClient.EXPECT().Send(expectedEmail).
 			Return(&rest.Response{Body: "email body"}, nil).Once()
 		scope := promutils.NewScope("bademailer")
 		emailerMetrics := newEmailMetrics(scope)
@@ -141,9 +141,9 @@ func TestSendEmail(t *testing.T) {
 		ctx := context.TODO()
 		sendgridClient := &mocks.SendgridClient{}
 		expectedEmail := getSendgridEmail(emailNotification)
-		sendgridClient.OnSendMatch(expectedEmail).
+		sendgridClient.EXPECT().Send(expectedEmail).
 			Return(nil, expectedErr).Once()
-		sendgridClient.OnSendMatch(expectedEmail).
+		sendgridClient.EXPECT().Send(expectedEmail).
 			Return(&rest.Response{Body: "email body"}, nil).Once()
 		scope := promutils.NewScope("goodemailer")
 		emailerMetrics := newEmailMetrics(scope)

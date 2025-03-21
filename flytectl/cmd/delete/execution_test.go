@@ -37,8 +37,8 @@ func TestTerminateExecutionFunc(t *testing.T) {
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
 	err := terminateExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])
@@ -51,8 +51,8 @@ func TestTerminateExecutionFuncWithError(t *testing.T) {
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(nil, errors.New("failed to terminate"))
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[0]).Return(nil, errors.New("failed to terminate"))
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
 	err := terminateExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])
@@ -65,8 +65,8 @@ func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
-	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[1]).Return(nil, errors.New("failed to terminate"))
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
+	s.MockAdminClient.EXPECT().TerminateExecution(s.Ctx, terminateExecRequests[1]).Return(nil, errors.New("failed to terminate"))
 	err := terminateExecutionFunc(s.Ctx, args, s.CmdCtx)
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])

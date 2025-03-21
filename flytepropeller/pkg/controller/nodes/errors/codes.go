@@ -28,4 +28,5 @@ const (
 	InvalidArrayLength                 ErrorCode = "InvalidArrayLength"
 	PromiseAttributeResolveError       ErrorCode = "PromiseAttributeResolveError"
 	IDLNotFoundErr                     ErrorCode = "IDLNotFoundErr"
+	InvalidPrimitiveType               ErrorCode = "InvalidPrimitiveType"
 )

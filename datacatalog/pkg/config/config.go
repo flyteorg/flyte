@@ -13,15 +13,17 @@ const SectionKey = "application"
 type Config struct {
 	GrpcPort                 int  `json:"grpcPort" pflag:",On which grpc port to serve Catalog"`
 	GrpcServerReflection     bool `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
+	GrpcMaxRecvMsgSizeMBs    int  `json:"grpcMaxRecvMsgSizeMBs" pflag:",The max receive message size; if unset defaults to gRPC server default value"`
 	HTTPPort                 int  `json:"httpPort" pflag:",On which http port to serve Catalog"`
 	Secure                   bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
 	ReadHeaderTimeoutSeconds int  `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
 }
 
 var defaultConfig = &Config{
-	GrpcPort:             8081,
-	HTTPPort:             8080,
-	GrpcServerReflection: true,
+	GrpcPort:              8081,
+	HTTPPort:              8080,
+	GrpcServerReflection:  true,
+	GrpcMaxRecvMsgSizeMBs: 0,
 	// Set the HTTP timeout to avoid security vulnerabilities with expired, inactive connections:
 	// https://deepsource.io/directory/analyzers/go/issues/GO-S2114
 	// just shy of requestTimeoutUpperBound

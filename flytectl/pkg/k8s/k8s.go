@@ -16,7 +16,7 @@ type K8s interface {
 	CoreV1() corev1.CoreV1Interface
 }
 
-//go:generate mockery -name=ContextOps -case=underscore
+//go:generate mockery --name=ContextOps --case=underscore --with-expecter
 type ContextOps interface {
 	CheckConfig() error
 	CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName, targetNamespace string) error

@@ -27,15 +27,15 @@ import (
 func TestLaunchSubTasks(t *testing.T) {
 	ctx := context.Background()
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(&core.TaskTemplate{
+	tr.EXPECT().Read(ctx).Return(&core.TaskTemplate{
 		Target: &core.TaskTemplate_Container{
 			Container: createSampleContainerTask(),
 		},
 	}, nil)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("notfound")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("notfound")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      "a",
@@ -55,37 +55,37 @@ func TestLaunchSubTasks(t *testing.T) {
 	})
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfig().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
-	overrides.OnGetResources().Return(&v1.ResourceRequirements{
+	overrides.EXPECT().GetResources().Return(&v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU: resource.MustParse("10"),
 		},
 	})
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
-	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	tMeta.OnGetNamespace().Return("my-namespace")
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
+	tMeta.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	tMeta.EXPECT().GetNamespace().Return("my-namespace")
 
 	ow := &mocks3.OutputWriter{}
-	ow.OnGetOutputPrefixPath().Return("/prefix/")
-	ow.OnGetRawOutputPrefix().Return("s3://")
-	ow.OnGetCheckpointPrefix().Return("/checkpoint")
-	ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	ow.EXPECT().GetOutputPrefixPath().Return("/prefix/")
+	ow.EXPECT().GetRawOutputPrefix().Return("s3://")
+	ow.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	ow.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	ir := &mocks3.InputReader{}
-	ir.OnGetInputPrefixPath().Return("/prefix/")
-	ir.OnGetInputPath().Return("/prefix/inputs.pb")
-	ir.OnGetMatch(mock.Anything).Return(nil, nil)
+	ir.EXPECT().GetInputPrefixPath().Return("/prefix/")
+	ir.EXPECT().GetInputPath().Return("/prefix/inputs.pb")
+	ir.EXPECT().Get(mock.Anything).Return(nil, nil)
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
-	tCtx.OnOutputWriter().Return(ow)
-	tCtx.OnInputReader().Return(ir)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().OutputWriter().Return(ow)
+	tCtx.EXPECT().InputReader().Return(ir)
 
 	batchClient := NewCustomBatchClient(mocks2.NewMockAwsBatchClient(), "", "",
 		utils.NewRateLimiter("", 10, 20),
@@ -135,16 +135,16 @@ func TestLaunchSubTasks(t *testing.T) {
 func TestTerminateSubTasks(t *testing.T) {
 	ctx := context.Background()
 	pStateReader := &mocks.PluginStateReader{}
-	pStateReader.OnGetMatch(mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
-		s := args.Get(0).(*State)
+	pStateReader.EXPECT().Get(mock.Anything).Return(0, nil).Run(func(t interface{}) {
+		s := t.(*State)
 		s.ExternalJobID = refStr("abc-123")
 	})
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnPluginStateReader().Return(pStateReader)
+	tCtx.EXPECT().PluginStateReader().Return(pStateReader)
 
 	batchClient := &mocks2.Client{}
-	batchClient.OnTerminateJob(ctx, "abc-123", "Test terminate").Return(nil).Once()
+	batchClient.EXPECT().TerminateJob(ctx, "abc-123", "Test terminate").Return(nil).Once()
 
 	t.Run("Simple", func(t *testing.T) {
 		assert.NoError(t, TerminateSubTasks(ctx, tCtx, batchClient, "Test terminate", getAwsBatchExecutorMetrics(promutils.NewTestScope())))

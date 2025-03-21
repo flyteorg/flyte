@@ -30,12 +30,12 @@ func TestPodMutator_Mutate(t *testing.T) {
 	}
 
 	successMutator := &mocks.Mutator{}
-	successMutator.OnID().Return("SucceedingMutator")
-	successMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, nil)
+	successMutator.EXPECT().ID().Return("SucceedingMutator")
+	successMutator.EXPECT().Mutate(mock.Anything, mock.Anything).Return(nil, false, nil)
 
 	failedMutator := &mocks.Mutator{}
-	failedMutator.OnID().Return("FailingMutator")
-	failedMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, fmt.Errorf("failing mock"))
+	failedMutator.EXPECT().ID().Return("FailingMutator")
+	failedMutator.EXPECT().Mutate(mock.Anything, mock.Anything).Return(nil, false, fmt.Errorf("failing mock"))
 
 	t.Run("Required Mutator Succeeded", func(t *testing.T) {
 		pm := &PodMutator{

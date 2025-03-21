@@ -55,12 +55,12 @@ func TestGetPluginLogs(t *testing.T) {
 
 	// create NodeExecutionContext
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnCurrentAttempt().Return(uint32(0))
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(0))
 
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetParentInfo().Return(nil)
-	executionContext.OnGetTaskMatch(taskRef).Return(
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
+	executionContext.EXPECT().GetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Id: &idlcore.Identifier{
@@ -74,13 +74,13 @@ func TestGetPluginLogs(t *testing.T) {
 		},
 		nil,
 	)
-	nCtx.OnExecutionContext().Return(executionContext)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
-	nCtx.OnNode().Return(&arrayNodeSpec)
+	nCtx.EXPECT().Node().Return(&arrayNodeSpec)
 
 	nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnGetNamespace().Return("node_namespace")
-	nodeExecutionMetadata.OnGetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
+	nodeExecutionMetadata.EXPECT().GetNamespace().Return("node_namespace")
+	nodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
 		NodeId: "node_id",
 		ExecutionId: &idlcore.WorkflowExecutionIdentifier{
 			Project: "node_project",
@@ -88,13 +88,13 @@ func TestGetPluginLogs(t *testing.T) {
 			Name:    "node_name",
 		},
 	})
-	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	nodeExecutionMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "wf_namespace",
 		Name:      "wf_name",
 	})
-	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nodeExecutionMetadata)
 
-	nCtx.OnNodeID().Return("foo")
+	nCtx.EXPECT().NodeID().Return("foo")
 
 	// call `getPluginLogs`
 	logs, err := getPluginLogs(mapLogPlugin, nCtx, 1, 0)

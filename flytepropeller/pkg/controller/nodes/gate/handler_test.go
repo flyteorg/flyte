@@ -90,39 +90,39 @@ func createNodeExecutionContext(gateNode *v1alpha1.GateNodeSpec) *nodeMocks.Node
 	}
 
 	n := &flyteMocks.ExecutableNode{}
-	n.OnGetGateNode().Return(gateNode)
+	n.EXPECT().GetGateNode().Return(gateNode)
 
 	nm := &nodeMocks.NodeExecutionMetadata{}
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-	ns.OnGetOutputDir().Return(storage.DataReference("data-dir"))
+	ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+	ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
 
 	t := v1.NewTime(time.Now())
-	ns.OnGetLastAttemptStartedAt().Return(&t)
+	ns.EXPECT().GetLastAttemptStartedAt().Return(&t)
 
 	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 
 	eCtx := &executormocks.ExecutionContext{}
-	eCtx.OnGetExecutionID().Return(wfExecID)
+	eCtx.EXPECT().GetExecutionID().Return(wfExecID)
 
 	nCtx := &nodeMocks.NodeExecutionContext{}
-	nCtx.OnNodeExecutionMetadata().Return(nm)
-	nCtx.OnNode().Return(n)
-	nCtx.OnNodeStatus().Return(ns)
-	nCtx.OnDataStore().Return(dataStore)
-	nCtx.OnExecutionContext().Return(eCtx)
-	nCtx.OnInputReader().Return(inputReader)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+	nCtx.EXPECT().Node().Return(n)
+	nCtx.EXPECT().NodeStatus().Return(ns)
+	nCtx.EXPECT().DataStore().Return(dataStore)
+	nCtx.EXPECT().ExecutionContext().Return(eCtx)
+	nCtx.EXPECT().InputReader().Return(inputReader)
 
 	r := &nodeMocks.NodeStateReader{}
-	r.OnGetGateNodeState().Return(handler.GateNodeState{})
-	nCtx.OnNodeStateReader().Return(r)
+	r.EXPECT().GetGateNodeState().Return(handler.GateNodeState{})
+	nCtx.EXPECT().NodeStateReader().Return(r)
 
 	w := &nodeMocks.NodeStateWriter{}
-	w.OnPutGateNodeStateMatch(mock.Anything).Return(nil)
-	nCtx.OnNodeStateWriter().Return(w)
+	w.EXPECT().PutGateNodeState(mock.Anything).Return(nil)
+	nCtx.EXPECT().NodeStateWriter().Return(w)
 	return nCtx
 }
 
@@ -153,7 +153,7 @@ func TestHandle(t *testing.T) {
 	t.Run("ApproveCheck", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(approveGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
 
 		gateNodeHandler := New(eventConfig, &signalClient, scope)
 
@@ -165,7 +165,7 @@ func TestHandle(t *testing.T) {
 	t.Run("ApproveComplete", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(approveGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{
 			Value: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
@@ -191,7 +191,7 @@ func TestHandle(t *testing.T) {
 	t.Run("ApproveRejected", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(approveGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{
 			Value: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
@@ -217,7 +217,7 @@ func TestHandle(t *testing.T) {
 	t.Run("ApproveError", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(approveGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{}, errors.New("foo"))
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{}, errors.New("foo"))
 
 		gateNodeHandler := New(eventConfig, &signalClient, scope)
 
@@ -229,7 +229,7 @@ func TestHandle(t *testing.T) {
 	t.Run("SignalCheck", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(signalGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
 
 		gateNodeHandler := New(eventConfig, &signalClient, scope)
 
@@ -241,7 +241,7 @@ func TestHandle(t *testing.T) {
 	t.Run("SignalComplete", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(signalGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{
 			Value: &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
@@ -267,7 +267,7 @@ func TestHandle(t *testing.T) {
 	t.Run("SignalError", func(t *testing.T) {
 		nCtx := createNodeExecutionContext(signalGateNode)
 		signalClient := mocks.SignalServiceClient{}
-		signalClient.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{}, errors.New("foo"))
+		signalClient.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{}, errors.New("foo"))
 
 		gateNodeHandler := New(eventConfig, &signalClient, scope)
 

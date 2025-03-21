@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
@@ -34,8 +35,8 @@ func addTimestamp(ts *timestamp.Timestamp, seconds int64) *timestamp.Timestamp {
 }
 
 func getMockExecutionManager(execution *admin.Execution) interfaces.ExecutionInterface {
-	mockExecutionManager := mocks.MockExecutionManager{}
-	mockExecutionManager.SetGetCallback(
+	mockExecutionManager := mocks.ExecutionInterface{}
+	mockExecutionManager.EXPECT().GetExecution(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
 			return execution, nil
 		})
@@ -46,14 +47,14 @@ func getMockExecutionManager(execution *admin.Execution) interfaces.ExecutionInt
 func getMockNodeExecutionManager(nodeExecutions []*admin.NodeExecution,
 	dynamicWorkflow *admin.DynamicWorkflowNodeMetadata) interfaces.NodeExecutionInterface {
 
-	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
-	mockNodeExecutionManager.SetListNodeExecutionsFunc(
+	mockNodeExecutionManager := mocks.NodeExecutionInterface{}
+	mockNodeExecutionManager.EXPECT().ListNodeExecutions(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 			return &admin.NodeExecutionList{
 				NodeExecutions: nodeExecutions,
 			}, nil
 		})
-	mockNodeExecutionManager.SetGetNodeExecutionDataFunc(
+	mockNodeExecutionManager.EXPECT().GetNodeExecutionData(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 			return &admin.NodeExecutionGetDataResponse{
 				DynamicWorkflow: dynamicWorkflow,
@@ -64,8 +65,8 @@ func getMockNodeExecutionManager(nodeExecutions []*admin.NodeExecution,
 }
 
 func getMockTaskExecutionManager(taskExecutions []*admin.TaskExecution) interfaces.TaskExecutionInterface {
-	mockTaskExecutionManager := mocks.MockTaskExecutionManager{}
-	mockTaskExecutionManager.SetListTaskExecutionsCallback(
+	mockTaskExecutionManager := mocks.TaskExecutionInterface{}
+	mockTaskExecutionManager.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return &admin.TaskExecutionList{
 				TaskExecutions: taskExecutions,
@@ -76,8 +77,8 @@ func getMockTaskExecutionManager(taskExecutions []*admin.TaskExecution) interfac
 }
 
 func getMockWorkflowManager(workflow *admin.Workflow) interfaces.WorkflowInterface {
-	mockWorkflowManager := mocks.MockWorkflowManager{}
-	mockWorkflowManager.SetGetCallback(
+	mockWorkflowManager := mocks.WorkflowInterface{}
+	mockWorkflowManager.EXPECT().GetWorkflow(mock.Anything, mock.Anything).RunAndReturn(
 		func(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 			return workflow, nil
 		})
