@@ -305,8 +305,8 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 		requestSpec.Metadata.Nesting = 1
 	}
 
-	if len(sourceExecution.GetSpec().Envs.GetValues()) > 0 {
-		requestSpec.Envs = sourceExecution.GetSpec().Envs
+	if len(sourceExecution.GetSpec().GetEnvs().GetValues()) > 0 {
+		requestSpec.Envs = sourceExecution.GetSpec().GetEnvs()
 	}
 
 	// If the source execution has a cluster label, inherit it.
