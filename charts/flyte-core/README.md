@@ -146,6 +146,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `false` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"500Mi"},"limits":{"cpu":2,"gpu":1,"memory":"1Gi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
 | configmap.task_resource_defaults.task_resources | object | `{"defaults":{"cpu":"100m","memory":"500Mi"},"limits":{"cpu":2,"gpu":1,"memory":"1Gi"}}` | Task default resources parameters |
+| connector.plugin_config.plugins | object | `{}` |  |
 | daskoperator | object | `{"enabled":false}` | Optional: Dask Plugin using the Dask Operator |
 | daskoperator.enabled | bool | `false` | - enable or disable the dask operator deployment installation |
 | databricks | object | `{"enabled":false,"plugin_config":{"plugins":{"databricks":{"databricksInstance":"dbc-a53b7a3c-614c","entrypointFile":"dbfs:///FileStore/tables/entrypoint.py"}}}}` | Optional: Databricks Plugin allows us to run the spark job on the Databricks platform. |

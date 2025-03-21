@@ -72,5 +72,8 @@ metadata:
   name: connector-config
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
-data: {}
+data:
+{{- with .Values.connector.plugin_config }}
+  connector.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- end }}

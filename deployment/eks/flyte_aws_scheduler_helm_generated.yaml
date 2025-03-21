@@ -1493,7 +1493,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a8d392849edbe9a523f3c49a20f34de3bfbff4b6f4d776b157974a8227b5625"
+        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1584,7 +1584,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.3
       annotations:
-        configChecksum: "a8d392849edbe9a523f3c49a20f34de3bfbff4b6f4d776b157974a8227b5625"
+        configChecksum: "433f77b938bc91a2175639203e87c586476f95de5bbac4071c7ad3a2d4dcd15"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

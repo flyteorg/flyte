@@ -1180,3 +1180,7 @@ databricks:
         entrypointFile: dbfs:///FileStore/tables/entrypoint.py
         # Databricks account
         databricksInstance: dbc-a53b7a3c-614c
+
+connector:
+  plugin_config:
+    plugins: {}
