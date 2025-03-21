@@ -14459,7 +14459,8 @@ export namespace flyteidl {
                 RELAUNCH = 3,
                 CHILD_WORKFLOW = 4,
                 RECOVERED = 5,
-                TRIGGER = 6
+                TRIGGER = 6,
+                EAGER_CHILD = 8
             }
         }
 

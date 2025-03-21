@@ -35155,6 +35155,7 @@
                         case 4:
                         case 5:
                         case 6:
+                        case 8:
                             break;
                         }
                     if (message.principal != null && message.hasOwnProperty("principal"))
@@ -35206,6 +35207,7 @@
                  * @property {number} CHILD_WORKFLOW=4 CHILD_WORKFLOW value
                  * @property {number} RECOVERED=5 RECOVERED value
                  * @property {number} TRIGGER=6 TRIGGER value
+                 * @property {number} EAGER_CHILD=8 EAGER_CHILD value
                  */
                 ExecutionMetadata.ExecutionMode = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -35216,6 +35218,7 @@
                     values[valuesById[4] = "CHILD_WORKFLOW"] = 4;
                     values[valuesById[5] = "RECOVERED"] = 5;
                     values[valuesById[6] = "TRIGGER"] = 6;
+                    values[valuesById[8] = "EAGER_CHILD"] = 8;
                     return values;
                 })();
     
