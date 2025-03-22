@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/update"
 	"github.com/flyteorg/flyte/flytectl/cmd/upgrade"
 	"github.com/flyteorg/flyte/flytectl/cmd/version"
+	"github.com/flyteorg/flyte/flytectl/docgen"
 	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
@@ -75,6 +76,8 @@ func newRootCmd() *cobra.Command {
 	// Added upgrade command
 	upgradeCmd := upgrade.SelfUpgrade(rootCmd)
 	cmdCore.AddCommands(rootCmd, upgradeCmd)
+
+	cmdCore.AddCommands(rootCmd, docgen.GetDocgenCmd(rootCmd))
 
 	config.GetConfig()
 
