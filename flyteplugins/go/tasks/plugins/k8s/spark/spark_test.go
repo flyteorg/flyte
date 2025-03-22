@@ -10,12 +10,6 @@ import (
 
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/structpb"
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
@@ -27,6 +21,11 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/structpb"
+	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const sparkMainClass = "MainClass"
@@ -1133,6 +1132,108 @@ func TestBuildResourceCustomK8SPod(t *testing.T) {
 			},
 		},
 	}, sparkApp.Spec.Executor.Affinity.NodeAffinity)
+	cores, _ = strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
+	instances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
+	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
+	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
+	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+}
+
+// Ensure setting different primary name for driver and executor works
+func TestBuildResourceCustomK8SPodChangePrimaryContainerName(t *testing.T) {
+
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+
+	basePodSpec := dummyPodSpec()
+	basePodSpec.NodeSelector = map[string]string{"x/custom": "foo"}
+
+	// pod for driver and executor
+	driverPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:  "driver-primary",
+				Image: testImage,
+				Args:  testArgs,
+				Env:   dummyEnvVarsWithSecretRef,
+			},
+		},
+	}
+	executorPodSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:  "executor-primary",
+				Image: testImage,
+				Args:  testArgs,
+				Env:   dummyEnvVarsWithSecretRef,
+			},
+		},
+	}
+
+	driverK8SPod := &core.K8SPod{
+		PodSpec:              transformStructToStructPB(t, driverPodSpec),
+		PrimaryContainerName: "driver-primary",
+	}
+	executorK8SPod := &core.K8SPod{
+		PodSpec:              transformStructToStructPB(t, executorPodSpec),
+		PrimaryContainerName: "executor-primary",
+	}
+
+	taskTemplate := dummySparkTaskTemplateDriverExecutor("blah-1", dummySparkConf, driverK8SPod, executorK8SPod, basePodSpec)
+	sparkResourceHandler := sparkResourceHandler{}
+
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sj.SparkApplication)
+	assert.True(t, ok)
+
+	// Application
+	assert.Equal(t, v1.TypeMeta{
+		Kind:       KindSparkApplication,
+		APIVersion: sparkOp.SchemeGroupVersion.String(),
+	}, sparkApp.TypeMeta)
+
+	// Application spec
+	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.ServiceAccount)
+	assert.Equal(t, sparkOp.PythonApplicationType, sparkApp.Spec.Type)
+	assert.Equal(t, testImage, *sparkApp.Spec.Image)
+	assert.Equal(t, append(testArgs, testArgs...), sparkApp.Spec.Arguments)
+	assert.Equal(t, sparkOp.RestartPolicy{
+		Type:                       sparkOp.OnFailure,
+		OnSubmissionFailureRetries: intPtr(int32(14)),
+	}, sparkApp.Spec.RestartPolicy)
+	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
+	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
+
+	// Driver
+	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
+	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
+	assert.Equal(t, 11, len(sparkApp.Spec.Driver.Env))
+	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
+	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Driver.DNSConfig)
+	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Driver.HostNetwork)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Driver.SchedulerName)
+	cores, _ := strconv.ParseInt(dummySparkConf["spark.driver.cores"], 10, 32)
+	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Driver.Cores)
+	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
+
+	// Executor
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
+	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
+	assert.Equal(t, 11, len(sparkApp.Spec.Executor.Env))
+	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
+	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Executor.HostNetwork)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Executor.SchedulerName)
 	cores, _ = strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
 	instances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
 	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
