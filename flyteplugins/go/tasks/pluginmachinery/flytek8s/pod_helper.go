@@ -799,20 +799,20 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 					return nil, err
 				}
 			}
-		}
+		} else {
+			// Check for any name matching template containers
+			for _, templateInitContainer := range templatePodSpec.InitContainers {
+				if templateInitContainer.Name != initContainer.Name {
+					continue
+				}
 
-		// Check for any name matching template containers
-		for _, templateInitContainer := range templatePodSpec.InitContainers {
-			if templateInitContainer.Name != initContainer.Name {
-				continue
-			}
-
-			if mergedInitContainer == nil {
-				mergedInitContainer = &templateInitContainer
-			} else {
-				err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
-				if err != nil {
-					return nil, err
+				if mergedInitContainer == nil {
+					mergedInitContainer = &templateInitContainer
+				} else {
+					err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+					if err != nil {
+						return nil, err
+					}
 				}
 			}
 		}
