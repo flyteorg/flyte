@@ -74,7 +74,7 @@ image_spec = ImageSpec(
 )
 ```
 
-## Import modules only in a specify imageSpec environment
+## Import modules only in a specific imageSpec environment
 
 `is_container()` is used to determine whether the task is utilizing the image constructed from the `ImageSpec`.
 If the task is indeed using the image built from the `ImageSpec`, it will return true.
