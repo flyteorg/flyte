@@ -105,6 +105,7 @@ Never print secret values! The example above is just for demonstration purposes.
 - In case Flyte fails to access the secret, an error is raised.
 - The `Secret` group and key are required parameters during declaration
   and usage. Failure to specify will cause a {py:class}`ValueError`.
+- You need set environment variable and get the secret by `env_var`, `group` or `key` when you run tasks locally.
 :::
 
 ### Multiple keys grouped into one secret
