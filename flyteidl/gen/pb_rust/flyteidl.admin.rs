@@ -145,6 +145,9 @@ pub struct GetTaskRequest {
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="3")]
     pub task_category: ::core::option::Option<TaskCategory>,
+    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+    #[prost(string, tag="4")]
+    pub output_prefix: ::prost::alloc::string::String,
 }
 /// Response to get an individual task resource.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -328,10 +331,29 @@ pub struct GetTaskLogsResponseHeader {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogLine {
+    #[prost(message, optional, tag="1")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
+    /// Each line is separated by either CRLF, CR or LF, which are included
+    /// at the ends of the lines. This lets clients know whether log emitter
+    /// wanted to overwrite the previous line (LF) or append a new line (CRLF).
+    #[prost(string, tag="2")]
+    pub message: ::prost::alloc::string::String,
+    #[prost(enumeration="LogLineOriginator", tag="3")]
+    pub originator: i32,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetTaskLogsResponseBody {
     /// The execution log results.
+    #[deprecated]
     #[prost(string, repeated, tag="1")]
     pub results: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Each line is separated by either CRLF, CR or LF, which are included
+    /// at the ends of the lines. This lets clients know whether log emitter
+    /// wanted to overwrite the previous line (LF) or append a new line (CRLF).
+    #[prost(message, repeated, tag="2")]
+    pub structured_lines: ::prost::alloc::vec::Vec<LogLine>,
 }
 /// A response containing the logs for a task execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -428,6 +450,38 @@ impl State {
             "PENDING" => Some(Self::Pending),
             "RUNNING" => Some(Self::Running),
             "SUCCEEDED" => Some(Self::Succeeded),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum LogLineOriginator {
+    /// The originator of the log line is unknown.
+    Unknown = 0,
+    /// The originator of the log line is the user application.
+    User = 1,
+    /// The originator of the log line is the system.
+    System = 2,
+}
+impl LogLineOriginator {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            LogLineOriginator::Unknown => "UNKNOWN",
+            LogLineOriginator::User => "USER",
+            LogLineOriginator::System => "SYSTEM",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "UNKNOWN" => Some(Self::Unknown),
+            "USER" => Some(Self::User),
+            "SYSTEM" => Some(Self::System),
             _ => None,
         }
     }
@@ -706,6 +760,10 @@ pub struct EmailNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a pager duty notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -715,6 +773,10 @@ pub struct PagerDutyNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Defines a slack notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -724,6 +786,10 @@ pub struct SlackNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The template to use for this notification.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub template: ::prost::alloc::string::String,
 }
 /// Represents a structure for notifications based on execution status.
 /// The notification content is configured within flyte admin but can be templatized.

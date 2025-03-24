@@ -978,7 +978,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	}
 
 	var cacheStatus *catalog.Status
-	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && p.GetPhase() != handler.EPhaseFailed && ok {
 		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())

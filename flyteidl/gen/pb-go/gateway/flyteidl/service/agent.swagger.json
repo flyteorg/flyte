@@ -316,6 +316,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "output_prefix",
+            "description": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -776,6 +783,14 @@
             "type": "string"
           },
           "description": "The execution log results."
+        },
+        "structured_lines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminLogLine"
+          },
+          "description": "Each line is separated by either CRLF, CR or LF, which are included\nat the ends of the lines. This lets clients know whether log emitter\nwanted to overwrite the previous line (LF) or append a new line (CRLF)."
         }
       }
     },
@@ -823,6 +838,32 @@
         }
       },
       "description": "A response containing a list of agents."
+    },
+    "adminLogLine": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "description": "Each line is separated by either CRLF, CR or LF, which are included\nat the ends of the lines. This lets clients know whether log emitter\nwanted to overwrite the previous line (LF) or append a new line (CRLF)."
+        },
+        "originator": {
+          "$ref": "#/definitions/adminLogLineOriginator"
+        }
+      }
+    },
+    "adminLogLineOriginator": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "SYSTEM"
+      ],
+      "default": "UNKNOWN",
+      "description": " - UNKNOWN: The originator of the log line is unknown.\n - USER: The originator of the log line is the user application.\n - SYSTEM: The originator of the log line is the system."
     },
     "adminResource": {
       "type": "object",

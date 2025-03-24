@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"slices"
 	"strconv"
 	"time"
 
@@ -207,6 +208,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		for key, variable := range literalMap.GetLiterals() {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
+
+			if slices.Contains(arrayNode.GetBoundInputs(), key) {
+				continue
+			}
+
 			if err != nil {
 				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
@@ -238,9 +244,14 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		if size == -1 {
-			return handler.DoTransition(handler.TransitionTypeEphemeral,
-				handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength, "no input array provided", nil),
-			), nil
+			// handles case where all inputs are bound
+			if len(arrayNode.GetBoundInputs()) == len(literalMap.GetLiterals()) {
+				size = 1
+			} else {
+				return handler.DoTransition(handler.TransitionTypeEphemeral,
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength, "no input array provided", nil),
+				), nil
+			}
 		}
 
 		// initialize ArrayNode state
@@ -769,7 +780,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex)
+	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex, arrayNode)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
