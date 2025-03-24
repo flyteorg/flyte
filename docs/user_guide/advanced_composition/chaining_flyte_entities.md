@@ -39,27 +39,26 @@ Like subworkflows, you can chain {ref}`launch plans <Launch plans>`.
 
 ```{literalinclude} /examples/advanced_composition/advanced_composition/chain_entities.py
 :caption: advanced_composition/chain_entities.py
-:lines: 53-58
+:lines: 55-60
 ```
 
 To run the provided workflows on the Flyte cluster, use the following commands:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/chain_entities.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/ab2e8e84362c5b06d2eea0d1d6e29ea7fe460608/examples/advanced_composition/advanced_composition/chain_entities.py \
   chain_tasks_wf
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/chain_entities.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/ab2e8e84362c5b06d2eea0d1d6e29ea7fe460608/examples/advanced_composition/advanced_composition/chain_entities.py \
   chain_workflows_wf
 ```
 
-TODO: update commit hash after PR in flytesnacks is merged
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/chain_entities.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/ab2e8e84362c5b06d2eea0d1d6e29ea7fe460608/examples/advanced_composition/advanced_composition/chain_entities.py \
   chain_launchplans_wf
 ```
 
