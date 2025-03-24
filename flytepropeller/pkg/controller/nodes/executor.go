@@ -1214,7 +1214,6 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 			c.metrics.SystemErrorDuration.Observe(ctx, startTime, endTime)
 		} else if execErr.GetKind() == core.ExecutionError_USER {
 			if execErr.GetCode() == flytek8s.OOMKilled {
-				// This is for VPA
 				nodeStatus.IncrementOOMFailures()
 			}
 			c.metrics.UserErrorDuration.Observe(ctx, startTime, endTime)

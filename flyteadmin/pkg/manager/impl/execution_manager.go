@@ -173,8 +173,9 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 	return nil, nil
 }
 
-// This function is responsible for setting the default resources for a task. It will first check if the task has
-// resources set and if not, it will set the resources to the platform defaults.
+// adjustRetryStrategyLimits ensures that the retry strategy's OOM memory limit does not exceed the platform's memory limit.
+// If the OOM limit is greater than the platform limit, it will be adjusted down to match the platform limit.
+// This prevents tasks from requesting more memory during retries than what is allowed by the platform.
 func (m *ExecutionManager) adjustRetryStrategyLimits(ctx context.Context, retryStrategy *core.RetryStrategy,
 	platformTaskResources workflowengineInterfaces.TaskResources) {
 	if retryStrategy.GetOnOom() != nil {

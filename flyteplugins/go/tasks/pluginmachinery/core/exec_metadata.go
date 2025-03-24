@@ -37,7 +37,8 @@ type TaskExecutionID interface {
 	GetUniqueNodeID() string
 }
 
-// OnOOMConfig is a simple interface to expose the configuration for handling OOM events
+// OnOOMConfig exposes configuration for handling Out-Of-Memory (OOM) events, including
+// memory scaling factor, upper limit, and exponential backoff settings.
 type OnOOMConfig interface {
 	GetFactor() float32
 	GetLimit() string
