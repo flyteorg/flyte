@@ -391,7 +391,7 @@ func TestGenerateOnOOMConfig(t *testing.T) {
 		assert.Equal(t, onOOMConfig.Exponent, uint32(0))
 	})
 
-	t.Run("retry strategy with OnOOM but no backoff", func(t *testing.T) {
+	t.Run("retry strategy with OnOOM", func(t *testing.T) {
 		retryStrategy := &v1alpha1.RetryStrategy{
 			OnOOM: &v1alpha1.RetryOnOOM{
 				Factor: 1.5,
@@ -404,49 +404,11 @@ func TestGenerateOnOOMConfig(t *testing.T) {
 		assert.Equal(t, onOOMConfig.Exponent, uint32(2))
 	})
 
-	t.Run("retry strategy with OnOOM and backoff, oomFailures less than MaxExponent", func(t *testing.T) {
-		maxExponent := uint32(2)
-		retryStrategy := &v1alpha1.RetryStrategy{
-			OnOOM: &v1alpha1.RetryOnOOM{
-				Factor: 2.0,
-				Limit:  "4Gi",
-				Backoff: &v1alpha1.ExponentialBackoff{
-					MaxExponent: maxExponent,
-				},
-			},
-		}
-		onOOMConfig := generateOnOOMConfig(retryStrategy, 3)
-		assert.Equal(t, onOOMConfig.Factor, float32(2.0))
-		assert.Equal(t, onOOMConfig.Limit, "4Gi")
-		assert.Equal(t, onOOMConfig.Exponent, uint32(2))
-	})
-
-	t.Run("retry strategy with OnOOM and backoff, oomFailures greater than MaxExponent", func(t *testing.T) {
-		maxExponent := uint32(5)
-		retryStrategy := &v1alpha1.RetryStrategy{
-			OnOOM: &v1alpha1.RetryOnOOM{
-				Factor: 2.0,
-				Limit:  "4Gi",
-				Backoff: &v1alpha1.ExponentialBackoff{
-					MaxExponent: maxExponent,
-				},
-			},
-		}
-		onOOMConfig := generateOnOOMConfig(retryStrategy, 7)
-		assert.Equal(t, onOOMConfig.Factor, float32(2.0))
-		assert.Equal(t, onOOMConfig.Limit, "4Gi")
-		assert.Equal(t, onOOMConfig.Exponent, maxExponent)
-	})
-
 	t.Run("retry strategy with OnOOM and backoff with MaxExponent 0", func(t *testing.T) {
-		maxExponent := uint32(0)
 		retryStrategy := &v1alpha1.RetryStrategy{
 			OnOOM: &v1alpha1.RetryOnOOM{
 				Factor: 2.0,
 				Limit:  "4Gi",
-				Backoff: &v1alpha1.ExponentialBackoff{
-					MaxExponent: maxExponent,
-				},
 			},
 		}
 		onOOMConfig := generateOnOOMConfig(retryStrategy, 3)

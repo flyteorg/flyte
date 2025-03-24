@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -301,9 +300,6 @@ func TestRetryStrategyHandling(t *testing.T) {
 			retries := request.GetSpec().GetTemplate().GetNodes()[0].GetMetadata().GetRetries()
 			assert.Equal(t, uint32(3), retries.GetRetries())
 			assert.NotNil(t, retries.GetOnOom())
-			assert.NotNil(t, retries.GetOnOom().GetBackoff())
-			assert.Equal(t, uint32(1), retries.GetOnOom().GetBackoff().GetMaxExponent())
-			assert.Equal(t, int64(0), retries.GetOnOom().GetBackoff().GetMax().GetSeconds())
 			return &admin.WorkflowCreateResponse{}, nil
 		})
 
@@ -342,9 +338,6 @@ func TestRetryStrategyHandling(t *testing.T) {
 			retries := request.GetSpec().GetTemplate().GetNodes()[0].GetMetadata().GetRetries()
 			assert.Equal(t, uint32(5), retries.GetRetries())
 			assert.NotNil(t, retries.GetOnOom())
-			assert.NotNil(t, retries.GetOnOom().GetBackoff())
-			assert.Equal(t, uint32(1), retries.GetOnOom().GetBackoff().GetMaxExponent())
-			assert.Equal(t, int64(0), retries.GetOnOom().GetBackoff().GetMax().GetSeconds())
 			return &admin.WorkflowCreateResponse{}, nil
 		})
 
@@ -389,9 +382,6 @@ func TestRetryStrategyHandling(t *testing.T) {
 			assert.NotNil(t, retries.GetOnOom())
 			assert.Equal(t, float32(1.5), retries.GetOnOom().GetFactor())
 			assert.Equal(t, "2Gi", retries.GetOnOom().GetLimit())
-			assert.NotNil(t, retries.GetOnOom().GetBackoff())
-			assert.Equal(t, uint32(1), retries.GetOnOom().GetBackoff().GetMaxExponent())
-			assert.Equal(t, int64(0), retries.GetOnOom().GetBackoff().GetMax().GetSeconds())
 			return &admin.WorkflowCreateResponse{}, nil
 		})
 
@@ -440,18 +430,8 @@ func TestRetryStrategyHandling(t *testing.T) {
 			assert.NotNil(t, retries.GetOnOom())
 			assert.Equal(t, float32(2.0), retries.GetOnOom().GetFactor())
 			assert.Equal(t, "4Gi", retries.GetOnOom().GetLimit())
-			assert.NotNil(t, retries.GetOnOom().GetBackoff())
-			assert.Equal(t, uint32(2), retries.GetOnOom().GetBackoff().GetMaxExponent())
-			assert.Equal(t, int64(30), retries.GetOnOom().GetBackoff().GetMax().GetSeconds())
 			return &admin.WorkflowCreateResponse{}, nil
 		})
-
-		customBackoff := &core.ExponentialBackoff{
-			MaxExponent: 2,
-			Max: &durationpb.Duration{
-				Seconds: 30,
-			},
-		}
 
 		task := &admin.Task{
 			Id: taskIdentifier,
@@ -467,9 +447,8 @@ func TestRetryStrategyHandling(t *testing.T) {
 							Retries: &core.RetryStrategy{
 								Retries: 6,
 								OnOom: &core.RetryOnOOM{
-									Factor:  2.0,
-									Limit:   "4Gi",
-									Backoff: customBackoff,
+									Factor: 2.0,
+									Limit:  "4Gi",
 								},
 							},
 						},

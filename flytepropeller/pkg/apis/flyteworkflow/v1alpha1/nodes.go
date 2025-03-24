@@ -50,19 +50,9 @@ func (in *Binding) DeepCopyInto(out *Binding) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
-type ExponentialBackoff struct {
-	MaxExponent uint32       `json:"maxExponent"`
-	Max         *v1.Duration `json:"max"`
-}
-
 type RetryOnOOM struct {
-	Factor  float32             `json:"factor"`
-	Limit   string              `json:"limit"`
-	Backoff *ExponentialBackoff `json:"backoff,omitempty"`
-}
-
-func (ro *RetryOnOOM) GetBackoff() *ExponentialBackoff {
-	return ro.Backoff
+	Factor float32 `json:"factor"`
+	Limit  string  `json:"limit"`
 }
 
 // Strategy to be used to Retry a node that is in RetryableFailure state

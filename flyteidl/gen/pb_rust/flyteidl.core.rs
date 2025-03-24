@@ -618,36 +618,23 @@ pub struct KeyValuePair {
     #[prost(string, tag="2")]
     pub value: ::prost::alloc::string::String,
 }
-/// If specified, enables exponential backoff, upto max retries and max interval
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
-pub struct ExponentialBackoff {
-    /// maximum number of increasing retries
-    #[prost(uint32, tag="1")]
-    pub max_exponent: u32,
-    /// maximum interval between retries
-    #[prost(message, optional, tag="2")]
-    pub max: ::core::option::Option<::prost_types::Duration>,
-}
-/// Algorithm => new_memory = min(old_memory * factor, mem_limit)
+/// RetryOnOOM defines memory scaling behavior for out-of-memory errors.
+/// New memory = min(previous_memory * factor, limit)
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RetryOnOom {
-    /// Factor to use to increase the memory by - new_memory = prev_memory * factor
+    /// Factor to multiply previous memory by (e.g. 2.0 doubles memory)
     #[prost(float, tag="1")]
     pub factor: f32,
-    /// this should be a resource quantity and specifies the max memory limit that becomes the ceil
+    /// Maximum memory limit as resource quantity (e.g. "2Gi")
     #[prost(string, tag="2")]
     pub limit: ::prost::alloc::string::String,
-    /// Optional. Default exponent should be 1
-    #[prost(message, optional, tag="3")]
-    pub backoff: ::core::option::Option<ExponentialBackoff>,
 }
-/// Retry strategy associated with an executable unit.
+/// RetryStrategy configures task execution retry behavior
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RetryStrategy {
-    /// +optional. If specified, the system will update the memory limit on OOM.
+    /// Optional memory scaling config for OOM errors
     #[prost(message, optional, tag="1")]
     pub on_oom: ::core::option::Option<RetryOnOom>,
     /// Number of retries. Retries will be consumed when the job fails with a recoverable error.

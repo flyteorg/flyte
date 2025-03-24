@@ -7206,21 +7206,6 @@
       },
       "description": "Represents the error message from the execution."
     },
-    "coreExponentialBackoff": {
-      "type": "object",
-      "properties": {
-        "max_exponent": {
-          "type": "integer",
-          "format": "int64",
-          "title": "maximum number of increasing retries"
-        },
-        "max": {
-          "type": "string",
-          "title": "maximum interval between retries"
-        }
-      },
-      "title": "If specified, enables exponential backoff, upto max retries and max interval"
-    },
     "coreExtendedResources": {
       "type": "object",
       "properties": {
@@ -7963,25 +7948,21 @@
         "factor": {
           "type": "number",
           "format": "float",
-          "title": "Factor to use to increase the memory by - new_memory = prev_memory * factor"
+          "title": "Factor to multiply previous memory by (e.g. 2.0 doubles memory)"
         },
         "limit": {
           "type": "string",
-          "title": "this should be a resource quantity and specifies the max memory limit that becomes the ceil"
-        },
-        "backoff": {
-          "$ref": "#/definitions/coreExponentialBackoff",
-          "title": "Optional. Default exponent should be 1"
+          "title": "Maximum memory limit as resource quantity (e.g. \"2Gi\")"
         }
       },
-      "title": "Algorithm =\u003e new_memory = min(old_memory * factor, mem_limit)"
+      "title": "RetryOnOOM defines memory scaling behavior for out-of-memory errors.\nNew memory = min(previous_memory * factor, limit)"
     },
     "coreRetryStrategy": {
       "type": "object",
       "properties": {
         "on_oom": {
           "$ref": "#/definitions/coreRetryOnOOM",
-          "description": "+optional. If specified, the system will update the memory limit on OOM."
+          "title": "Optional memory scaling config for OOM errors"
         },
         "retries": {
           "type": "integer",
@@ -7989,7 +7970,7 @@
           "description": "Number of retries. Retries will be consumed when the job fails with a recoverable error.\nThe number of retries must be less than or equals to 10."
         }
       },
-      "description": "Retry strategy associated with an executable unit."
+      "title": "RetryStrategy configures task execution retry behavior"
     },
     "coreRuntimeBinding": {
       "type": "object"

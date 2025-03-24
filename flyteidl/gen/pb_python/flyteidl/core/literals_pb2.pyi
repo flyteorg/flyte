@@ -212,23 +212,13 @@ class KeyValuePair(_message.Message):
     value: str
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
-class ExponentialBackoff(_message.Message):
-    __slots__ = ["max_exponent", "max"]
-    MAX_EXPONENT_FIELD_NUMBER: _ClassVar[int]
-    MAX_FIELD_NUMBER: _ClassVar[int]
-    max_exponent: int
-    max: _duration_pb2.Duration
-    def __init__(self, max_exponent: _Optional[int] = ..., max: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
-
 class RetryOnOOM(_message.Message):
-    __slots__ = ["factor", "limit", "backoff"]
+    __slots__ = ["factor", "limit"]
     FACTOR_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
-    BACKOFF_FIELD_NUMBER: _ClassVar[int]
     factor: float
     limit: str
-    backoff: ExponentialBackoff
-    def __init__(self, factor: _Optional[float] = ..., limit: _Optional[str] = ..., backoff: _Optional[_Union[ExponentialBackoff, _Mapping]] = ...) -> None: ...
+    def __init__(self, factor: _Optional[float] = ..., limit: _Optional[str] = ...) -> None: ...
 
 class RetryStrategy(_message.Message):
     __slots__ = ["on_oom", "retries"]

@@ -223,9 +223,6 @@ func generateOnOOMConfig(retryStrategy *v1alpha1.RetryStrategy, oomFailures uint
 		}
 	}
 	onOOM := retryStrategy.GetOnOOM()
-	if onOOM.GetBackoff() != nil && onOOM.GetBackoff().MaxExponent > 0 {
-		oomFailures = min(oomFailures, onOOM.GetBackoff().MaxExponent)
-	}
 	return onOOMConfig{
 		Factor:   onOOM.Factor,
 		Limit:    onOOM.Limit,

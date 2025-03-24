@@ -7,7 +7,6 @@ import (
 	"unicode"
 
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -23,17 +22,9 @@ import (
 
 const maxNodeIDLength = 63
 
-var defaultRetryStrategyOnOOMBackoff = &core.ExponentialBackoff{
-	MaxExponent: 1,
-	Max: &durationpb.Duration{
-		Seconds: 0,
-	},
-}
-
 var defaultRetryStrategyOnOOM = &core.RetryOnOOM{
-	Backoff: defaultRetryStrategyOnOOMBackoff,
-	Factor:  0,
-	Limit:   "",
+	Factor: 0,
+	Limit:  "",
 }
 
 var defaultRetryStrategy = core.RetryStrategy{
@@ -105,9 +96,6 @@ func CreateOrGetWorkflowModel(
 		retryStrategy = task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries()
 		if retryStrategy.GetOnOom() == nil {
 			retryStrategy.OnOom = defaultRetryStrategyOnOOM
-		}
-		if retryStrategy.GetOnOom().GetBackoff() == nil {
-			retryStrategy.OnOom.Backoff = defaultRetryStrategyOnOOMBackoff
 		}
 	} else {
 		retryStrategy = &defaultRetryStrategy

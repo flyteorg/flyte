@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/protobuf/types/known/durationpb"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -19,33 +18,14 @@ func refStr(s string) *string {
 	return &s
 }
 
-func getDurationFromPb(duration *durationpb.Duration) *v1.Duration {
-	if duration == nil {
-		return nil
-	}
-	return &v1.Duration{Duration: duration.AsDuration()}
-}
-
-func computeBackoff(backoff *core.ExponentialBackoff) *v1alpha1.ExponentialBackoff {
-	if backoff == nil {
-		return nil
-	}
-
-	return &v1alpha1.ExponentialBackoff{
-		MaxExponent: backoff.GetMaxExponent(),
-		Max:         getDurationFromPb(backoff.GetMax()),
-	}
-}
-
 func computeOnOOM(onOOM *core.RetryOnOOM) *v1alpha1.RetryOnOOM {
 	if onOOM == nil {
 		return nil
 	}
 
 	return &v1alpha1.RetryOnOOM{
-		Backoff: computeBackoff(onOOM.GetBackoff()),
-		Factor:  onOOM.GetFactor(),
-		Limit:   onOOM.GetLimit(),
+		Factor: onOOM.GetFactor(),
+		Limit:  onOOM.GetLimit(),
 	}
 }
 
