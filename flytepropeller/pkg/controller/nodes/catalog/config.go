@@ -7,8 +7,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
+	CatalogInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -75,7 +75,7 @@ func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
 
-func NewCatalogClient(ctx context.Context, authOpt ...grpc.DialOption) (catalog.Client, error) {
+func NewCatalogClient(ctx context.Context, authOpt ...grpc.DialOption) (CatalogInterfaces.CatalogClient, error) {
 	catalogConfig := GetConfig()
 
 	switch catalogConfig.Type {

@@ -6,10 +6,12 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	CatalogInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -34,20 +36,38 @@ type TaskNodeHandler interface {
 }
 
 type metrics struct {
-	buildDynamicWorkflow   labeled.StopWatch
-	retrieveDynamicJobSpec labeled.StopWatch
-	CacheHit               labeled.StopWatch
-	CacheError             labeled.Counter
-	CacheMiss              labeled.Counter
+	buildDynamicWorkflow           labeled.StopWatch
+	retrieveDynamicJobSpec         labeled.StopWatch
+	CacheHit                       labeled.StopWatch
+	CacheError                     labeled.Counter
+	CacheMiss                      labeled.Counter
+	catalogHitCount                labeled.Counter
+	catalogPutSuccessCount         labeled.Counter
+	catalogGetFailureCount         labeled.Counter
+	catalogSkipCount               labeled.Counter
+	catalogMissCount               labeled.Counter
+	reservationGetFailureCount     labeled.Counter
+	reservationGetSuccessCount     labeled.Counter
+	reservationReleaseFailureCount labeled.Counter
+	reservationReleaseSuccessCount labeled.Counter
 }
 
 func newMetrics(scope promutils.Scope) metrics {
 	return metrics{
-		buildDynamicWorkflow:   labeled.NewStopWatch("build_dynamic_workflow", "Overhead for building a dynamic workflow in memory.", time.Microsecond, scope),
-		retrieveDynamicJobSpec: labeled.NewStopWatch("retrieve_dynamic_spec", "Overhead of downloading and un-marshaling dynamic job spec", time.Microsecond, scope),
-		CacheHit:               labeled.NewStopWatch("dynamic_workflow_cache_hit", "A dynamic workflow was loaded from store.", time.Microsecond, scope),
-		CacheError:             labeled.NewCounter("cache_err", "A dynamic workflow failed to store or load from data store.", scope),
-		CacheMiss:              labeled.NewCounter("cache_miss", "A dynamic workflow did not already exist in the data store.", scope),
+		buildDynamicWorkflow:           labeled.NewStopWatch("build_dynamic_workflow", "Overhead for building a dynamic workflow in memory.", time.Microsecond, scope),
+		retrieveDynamicJobSpec:         labeled.NewStopWatch("retrieve_dynamic_spec", "Overhead of downloading and un-marshaling dynamic job spec", time.Microsecond, scope),
+		CacheHit:                       labeled.NewStopWatch("dynamic_workflow_cache_hit", "A dynamic workflow was loaded from store.", time.Microsecond, scope),
+		CacheError:                     labeled.NewCounter("cache_err", "A dynamic workflow failed to store or load from data store.", scope),
+		CacheMiss:                      labeled.NewCounter("cache_miss", "A dynamic workflow did not already exist in the data store.", scope),
+		catalogHitCount:                labeled.NewCounter("future_cache_hit", "A future.pb cache hit successfully.", scope),
+		catalogPutSuccessCount:         labeled.NewCounter("future_put_success", "A future.pb was successfully cached.", scope),
+		catalogGetFailureCount:         labeled.NewCounter("future_get_failed", "A future.pb cache retrieve failed.", scope),
+		catalogSkipCount:               labeled.NewCounter("future_cache_skip", "A future.pb cache skipped.", scope),
+		catalogMissCount:               labeled.NewCounter("future_cache_miss", "A future.pb cache miss.", scope),
+		reservationGetFailureCount:     labeled.NewCounter("future_reservation_get_failed", "A future cache reservation retreived failed.", scope),
+		reservationGetSuccessCount:     labeled.NewCounter("future_reservation_get_success", "A future cache reservation retreived successfully.", scope),
+		reservationReleaseFailureCount: labeled.NewCounter("future_reservation_release_failed", "A future cache reservation release failed.", scope),
+		reservationReleaseSuccessCount: labeled.NewCounter("future_reservation_release_success", "A future cache reservation release successfully.", scope),
 	}
 }
 
@@ -55,38 +75,140 @@ type dynamicNodeTaskNodeHandler struct {
 	TaskNodeHandler
 	metrics      metrics
 	nodeExecutor interfaces.Node
+	catalog      CatalogInterfaces.CatalogClient
 	lpReader     launchplan.Reader
 	eventConfig  *config.EventConfig
 }
 
-func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx interfaces.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
-	// It seems parent node is still running, lets call handle for parent node
-	trns, err := d.TaskNodeHandler.Handle(ctx, nCtx)
+func (d dynamicNodeTaskNodeHandler) produceCacheHitTransition() handler.Transition {
+	execInfo := &handler.ExecutionInfo{
+		TaskNodeInfo: &handler.TaskNodeInfo{},
+	}
+	return handler.Transition{}.WithInfo(handler.PhaseInfoRunning(execInfo))
+}
+
+// isDynamic check whether node belongs to Dynamic parent node
+func (d dynamicNodeTaskNodeHandler) isDynamic(ctx context.Context, nCtx interfaces.NodeExecutionContext) (bool, error) {
+	tt, err := nCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return trns, prevState, err
+		return false, err
+	}
+	em := tt.GetMetadata().GetMode()
+	return em == core.TaskMetadata_DYNAMIC, nil
+}
+
+func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx interfaces.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
+	// we must check if the handling node belongs to Dynamic Parent node
+	// if the handling node belongs to Dynamic Parent node, check if future cached already first
+	isDynamic, err := d.isDynamic(ctx, nCtx)
+	if err != nil {
+		logger.Errorf(ctx, "failed to check execution mode")
 	}
 
-	if trns.Info().GetPhase() == handler.EPhaseSuccess {
-		f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
+	var cacheStatus *catalog.Status
+	var trns *handler.Transition
+	cacheHandler, cacheHandlerOk := d.TaskNodeHandler.(interfaces.CacheableNodeHandler)
+	if isDynamic && cacheHandlerOk {
+		// check future cache exists or not
+		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			return handler.UnknownTransition, prevState, err
 		}
-		// If the node succeeded, check if it generated a futures.pb file to execute.
+		if cacheable {
+			cs, err := d.CheckFutureCache(ctx, nCtx, cacheHandler)
+			if err != nil {
+				logger.Errorf(ctx, "failed to check future cache")
+				return handler.UnknownTransition, prevState, err
+			}
+			cacheStatus = cs
+			// we must acquire or extend reservation if cache is not hit and cache overwrite is not required
+			if !nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache &&
+				(cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) {
+				entry, err := d.GetOrExtendCatalogReservation(ctx, nCtx, cacheHandler, config.GetConfig().WorkflowReEval.Duration)
+				if err != nil {
+					logger.Errorf(ctx, "failed to acquire reservation with err '%s'", err.Error())
+					return handler.UnknownTransition, prevState, err
+				}
+				rStatus := entry.GetStatus()
+				if rStatus == core.CatalogReservation_RESERVATION_ACQUIRED {
+					logger.Debug(ctx, "Reservation acquired")
+				} else if rStatus == core.CatalogReservation_RESERVATION_EXISTS {
+					// if reservation is held by another owner we keep the same state for next handle call
+					logger.Debug(ctx, "Reservation not acquired")
+					return handler.UnknownTransition, prevState, nil
+				}
+			}
+		}
+	}
+
+	// we need to call Handler Handle in 3 cases:
+	// 1. For regular nodes(!isDynamic) - always run Handle
+	// 2. For Dynamic nodes where cache status is nil - indicating the parent node is not cacheable
+	// 3. For Dynamic nodes where cache status is not a cache hit
+	startTime := time.Now()
+	if !isDynamic || cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT {
+		var err error
+		taskTrns, err := d.TaskNodeHandler.Handle(ctx, nCtx)
+		trns = &taskTrns
+		if err != nil {
+			logger.Debug(ctx, "Failed to compile dynamic workflow")
+			return *trns, prevState, err
+		}
+	}
+	if isDynamic {
+		duration := time.Since(startTime)
+		logger.Infof(ctx, "Dynamic node compilation took %v", duration)
+	}
+
+	// we should check future file either future cache hit or Handler handle successfully
+	// if future file exists, we counld assume that current node is a Dynamic parent node
+	// if future file does not exists, it's just a regular node
+	if (cacheStatus != nil && cacheStatus.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT) || (trns != nil && trns.Info().GetPhase() == handler.EPhaseSuccess) {
+		f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
+		if err != nil {
+			logger.Debug(ctx, "Failed to init FutureFileReader")
+			return handler.UnknownTransition, prevState, err
+		}
+		// node succeeded or cache hit, check if a futures.pb file was generated.
 		ok, err := f.Exists(ctx)
 		if err != nil {
+			logger.Debug(ctx, "Failed to retrieve future file")
 			return handler.UnknownTransition, prevState, err
 		}
 		if ok {
-			// Mark the node that parent node has completed and a dynamic node executing its child nodes. Next time check node status is called, it'll go
-			// directly to record, and then progress the dynamically generated workflow.
-			logger.Infof(ctx, "future file detected, assuming dynamic node")
-			// There is a futures file, so we need to continue running the node with the modified state
-			return trns.WithInfo(handler.PhaseInfoRunning(trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing}, nil
+			// write future.pb file location into artifact_data if future compiled for the first time
+			if trns != nil && trns.Info().GetPhase() == handler.EPhaseSuccess {
+				if cacheHandlerOk {
+					cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
+					if err != nil {
+						return handler.UnknownTransition, prevState, err
+					}
+					if cacheable && (cacheStatus == nil || cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT) {
+						_, err = d.WriteFutureCache(ctx, nCtx, cacheHandler)
+						if err != nil {
+							// ignore future cache write error
+							logger.Warnf(ctx, "failed to write future cache with err '%s'", err.Error())
+						}
+						_, err = d.ReleaseCatalogReservation(ctx, nCtx, cacheHandler)
+						if err != nil {
+							// ignore release reservation error
+							logger.Warnf(ctx, "failed to release future cache reservation with err '%s'", err.Error())
+						}
+					}
+				}
+				logger.Infof(ctx, "future file detected, assuming dynamic node")
+				// There is a futures file, so we need to continue running the node with the modified state
+				return trns.WithInfo(handler.PhaseInfoRunning(trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing}, nil
+			} else {
+				// in case future cache hit, just return new transition and state
+				logger.Infof(ctx, "cached future file detected, skipped compiling future.pb, assuming dynamic node")
+				newTrns := d.produceCacheHitTransition()
+				return newTrns, handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing}, nil
+			}
 		}
 	}
-
 	logger.Infof(ctx, "regular node detected, (no future file found)")
-	return trns, prevState, nil
+	return *trns, prevState, nil
 }
 
 func (d dynamicNodeTaskNodeHandler) produceDynamicWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext) (
@@ -302,7 +424,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx interface
 	return nil
 }
 
-func New(underlying TaskNodeHandler, nodeExecutor interfaces.Node, launchPlanReader launchplan.Reader, eventConfig *config.EventConfig, scope promutils.Scope) interfaces.NodeHandler {
+func New(underlying TaskNodeHandler, nodeExecutor interfaces.Node, launchPlanReader launchplan.Reader, eventConfig *config.EventConfig, scope promutils.Scope, catalog CatalogInterfaces.CatalogClient) interfaces.NodeHandler {
 
 	return &dynamicNodeTaskNodeHandler{
 		TaskNodeHandler: underlying,
@@ -310,5 +432,6 @@ func New(underlying TaskNodeHandler, nodeExecutor interfaces.Node, launchPlanRea
 		nodeExecutor:    nodeExecutor,
 		lpReader:        launchPlanReader,
 		eventConfig:     eventConfig,
+		catalog:         catalog,
 	}
 }

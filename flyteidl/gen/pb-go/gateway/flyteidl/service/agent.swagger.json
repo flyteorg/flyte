@@ -1892,9 +1892,21 @@
         "generates_deck": {
           "type": "boolean",
           "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
+        },
+        "mode": {
+          "$ref": "#/definitions/coreTaskMetadataExecutionMode",
+          "title": "Indicates whether the execution mode is Dynamic or not"
         }
       },
       "title": "Task Metadata"
+    },
+    "coreTaskMetadataExecutionMode": {
+      "type": "string",
+      "enum": [
+        "DEFAULT",
+        "DYNAMIC"
+      ],
+      "default": "DEFAULT"
     },
     "coreTaskNodeOverrides": {
       "type": "object",

@@ -6510,6 +6510,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck */
             generatesDeck?: (google.protobuf.IBoolValue|null);
+
+            /** TaskMetadata mode */
+            mode?: (flyteidl.core.TaskMetadata.ExecutionMode|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6560,6 +6563,9 @@ export namespace flyteidl {
             /** TaskMetadata generatesDeck. */
             public generatesDeck?: (google.protobuf.IBoolValue|null);
 
+            /** TaskMetadata mode. */
+            public mode: flyteidl.core.TaskMetadata.ExecutionMode;
+
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
 
@@ -6594,6 +6600,15 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace TaskMetadata {
+
+            /** ExecutionMode enum. */
+            enum ExecutionMode {
+                DEFAULT = 0,
+                DYNAMIC = 1
+            }
         }
 
         /** Properties of a TaskTemplate. */

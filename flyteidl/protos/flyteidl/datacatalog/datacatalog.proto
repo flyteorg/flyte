@@ -28,6 +28,15 @@ service DataCatalog {
     // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
     rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
 
+    // Create future artifact data.
+    rpc CreateFutureArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
+
+    // Retrieve a future artifact by an identifying handle. This returns an artifact along with the artifact data.
+    rpc GetFutureArtifact (GetArtifactRequest) returns (GetArtifactResponse);
+
+    // Updates an existing future artifact, overwriting the stored artifact data in the underlying blob storage.
+    rpc UpdateFutureArtifact (UpdateArtifactRequest) returns (UpdateArtifactResponse);
+
     // Associate a tag with an artifact. Tags are unique within a Dataset.
     rpc AddTag (AddTagRequest) returns (AddTagResponse);
 

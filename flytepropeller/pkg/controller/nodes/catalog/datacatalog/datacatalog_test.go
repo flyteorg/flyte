@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -19,8 +20,10 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	inputReaderMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	futureFileReaderMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
@@ -1024,5 +1027,854 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 		err := catalogClient.ReleaseReservation(ctx, newKey, currentOwner)
 
 		assertGrpcErr(t, err, codes.NotFound)
+	})
+}
+
+func TestGetFutureArtifactByTag(t *testing.T) {
+	ctx := context.Background()
+	mockClient := &mocks.DataCatalogClient{}
+
+	dataset := &datacatalog.Dataset{
+		Id: &datacatalog.DatasetID{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+			Version: "version",
+		},
+	}
+
+	tagName := "test-tag"
+
+	t.Run("Successfully retrieve non-expired artifact", func(t *testing.T) {
+		createdAt, _ := ptypes.TimestampProto(time.Now().Add(-10 * time.Minute))
+		expectedArtifact := &datacatalog.Artifact{
+			Id:        "test-artifact",
+			CreatedAt: createdAt,
+		}
+
+		mockClient.On("GetFutureArtifact", ctx, &datacatalog.GetArtifactRequest{
+			Dataset: dataset.GetId(),
+			QueryHandle: &datacatalog.GetArtifactRequest_TagName{
+				TagName: tagName,
+			},
+		}).Return(&datacatalog.GetArtifactResponse{
+			Artifact: expectedArtifact,
+		}, nil).Once()
+
+		catalogClient := &CatalogClient{
+			client:      mockClient,
+			maxCacheAge: 1 * time.Hour,
+		}
+
+		artifact, err := catalogClient.GetFutureArtifactByTag(ctx, tagName, dataset)
+
+		assert.NoError(t, err)
+		assert.Equal(t, expectedArtifact, artifact)
+	})
+
+	t.Run("Expired artifact should return NotFound error", func(t *testing.T) {
+		// Create timestamp from 2 hours ago
+		createdAt, _ := ptypes.TimestampProto(time.Now().Add(-2 * time.Hour))
+		expiredArtifact := &datacatalog.Artifact{
+			Id:        "expired-artifact",
+			CreatedAt: createdAt,
+		}
+
+		mockClient.On("GetFutureArtifact", ctx, &datacatalog.GetArtifactRequest{
+			Dataset: dataset.GetId(),
+			QueryHandle: &datacatalog.GetArtifactRequest_TagName{
+				TagName: tagName,
+			},
+		}).Return(&datacatalog.GetArtifactResponse{
+			Artifact: expiredArtifact,
+		}, nil).Once()
+
+		catalogClient := &CatalogClient{
+			client:      mockClient,
+			maxCacheAge: 1 * time.Hour,
+		}
+
+		artifact, err := catalogClient.GetFutureArtifactByTag(ctx, tagName, dataset)
+
+		assert.Error(t, err)
+		assert.Nil(t, artifact)
+		assert.Equal(t, codes.NotFound, status.Code(err))
+		assert.Contains(t, err.Error(), "Artifact over age limit")
+	})
+
+	t.Run("Invalid createdAt timestamp should return error", func(t *testing.T) {
+		invalidArtifact := &datacatalog.Artifact{
+			Id: "invalid-artifact",
+			CreatedAt: &timestamp.Timestamp{
+				Seconds: -1,
+				Nanos:   0,
+			},
+		}
+
+		mockClient.On("GetFutureArtifact", ctx, &datacatalog.GetArtifactRequest{
+			Dataset: dataset.GetId(),
+			QueryHandle: &datacatalog.GetArtifactRequest_TagName{
+				TagName: tagName,
+			},
+		}).Return(&datacatalog.GetArtifactResponse{
+			Artifact: invalidArtifact,
+		}, nil).Once()
+
+		catalogClient := &CatalogClient{
+			client:      mockClient,
+			maxCacheAge: 1 * time.Hour,
+		}
+
+		artifact, err := catalogClient.GetFutureArtifactByTag(ctx, tagName, dataset)
+
+		assert.Error(t, err)
+		assert.Nil(t, artifact)
+	})
+
+	t.Run("Should return error when client returns error", func(t *testing.T) {
+		expectedError := status.Error(codes.Internal, "internal error")
+
+		mockClient.On("GetFutureArtifact", ctx, &datacatalog.GetArtifactRequest{
+			Dataset: dataset.GetId(),
+			QueryHandle: &datacatalog.GetArtifactRequest_TagName{
+				TagName: tagName,
+			},
+		}).Return((*datacatalog.GetArtifactResponse)(nil), expectedError).Once()
+
+		catalogClient := &CatalogClient{
+			client:      mockClient,
+			maxCacheAge: 1 * time.Hour,
+		}
+
+		artifact, err := catalogClient.GetFutureArtifactByTag(ctx, tagName, dataset)
+
+		assert.Error(t, err)
+		assert.Equal(t, expectedError, err)
+		assert.Nil(t, artifact)
+	})
+}
+
+func TestCatalog_GetFuture(t *testing.T) {
+	ctx := context.Background()
+
+	sampleArtifactData := &datacatalog.ArtifactData{
+		Name:  "future",
+		Value: newStringLiteral("output1-stringval"),
+	}
+
+	t.Run("No results, no Dataset", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(newStringLiteral("output"), nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+		mockClient.On("GetDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.GetDataset().String())
+				return true
+			}),
+		).Return(nil, status.Error(codes.NotFound, "test not found"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		future, err := catalogClient.GetFuture(ctx, newKey)
+		assert.NotNil(t, future)
+
+		resp := future
+		assert.Error(t, err)
+		assertGrpcErr(t, err, codes.NotFound)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
+	})
+
+	t.Run("Found with tag name", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
+				Version:      "ver",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "n",
+			},
+			RetryAttempt: 1,
+		}
+		sampleDataSet := &datacatalog.Dataset{
+			Id:       datasetID,
+			Metadata: GetDatasetMetadataForSource(taskID),
+		}
+
+		mockClient.On("GetDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
+				assert.EqualValues(t, datasetID, o.GetDataset())
+				return true
+			}),
+		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
+
+		sampleArtifact := &datacatalog.Artifact{
+			Id:       "test-artifact",
+			Dataset:  sampleDataSet.GetId(),
+			Data:     []*datacatalog.ArtifactData{sampleArtifactData},
+			Metadata: GetArtifactMetadataForSource(taskID),
+		}
+
+		mockClient.On("GetFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
+				assert.EqualValues(t, datasetID, o.GetDataset())
+				assert.Equal(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTagName())
+				return true
+			}),
+		).Return(&datacatalog.GetArtifactResponse{Artifact: sampleArtifact}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		future, err := catalogClient.GetFuture(ctx, newKey)
+		assert.NoError(t, err)
+		assert.NotNil(t, future)
+
+		resp := future
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT.String(), resp.GetStatus().GetCacheStatus().String())
+		assert.NotNil(t, resp.GetStatus().GetMetadata().GetDatasetId())
+	})
+
+	t.Run("Found expired artifact", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client:      mockClient,
+			maxCacheAge: time.Hour,
+		}
+
+		sampleDataSet := &datacatalog.Dataset{
+			Id: datasetID,
+		}
+
+		mockClient.On("GetDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
+				assert.EqualValues(t, datasetID, o.GetDataset())
+				return true
+			}),
+		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
+
+		createdAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -70))
+		assert.NoError(t, err)
+
+		sampleArtifact := &datacatalog.Artifact{
+			Id:        "test-artifact",
+			Dataset:   sampleDataSet.GetId(),
+			Data:      []*datacatalog.ArtifactData{sampleArtifactData},
+			CreatedAt: createdAt,
+		}
+
+		mockClient.On("GetFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.GetArtifactResponse{Artifact: sampleArtifact}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		future, err := catalogClient.GetFuture(ctx, newKey)
+		assert.NotNil(t, future)
+
+		resp := future
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
+	})
+}
+
+func TestCatalogClient_prepareInputsAndFuture(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Success case - With input variables", func(t *testing.T) {
+		// Prepare test data
+		mockInputReader := &inputReaderMocks.InputReader{}
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		expectedInputs := &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"test": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 42,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		expectedFuture := &core.DynamicJobSpec{
+			Tasks: []*core.TaskTemplate{
+				{
+					Id: &core.Identifier{
+						Name: "test_task",
+					},
+				},
+			},
+		}
+
+		mockInputReader.On("Get", mock.Anything).Return(expectedInputs, nil)
+		mockFutureReader.On("Read", mock.Anything).Return(expectedFuture, nil)
+
+		key := catalog.Key{
+			TypedInterface: core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"test": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+			InputReader: mockInputReader,
+		}
+
+		// Execute test
+		inputs, future, err := (&CatalogClient{}).prepareInputsAndFuture(ctx, key, mockFutureReader)
+
+		// Verify results
+		assert.NoError(t, err)
+		assert.Equal(t, expectedInputs, inputs)
+		assert.Equal(t, expectedFuture, future)
+		mockInputReader.AssertExpectations(t)
+		mockFutureReader.AssertExpectations(t)
+	})
+
+	t.Run("Success case - No input variables", func(t *testing.T) {
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		expectedFuture := &core.DynamicJobSpec{
+			Tasks: []*core.TaskTemplate{
+				{
+					Id: &core.Identifier{
+						Name: "test_task",
+					},
+				},
+			},
+		}
+
+		mockFutureReader.On("Read", mock.Anything).Return(expectedFuture, nil)
+
+		key := catalog.Key{
+			TypedInterface: core.TypedInterface{},
+		}
+
+		inputs, future, err := (&CatalogClient{}).prepareInputsAndFuture(ctx, key, mockFutureReader)
+
+		assert.NoError(t, err)
+		assert.Equal(t, &core.LiteralMap{}, inputs)
+		assert.Equal(t, expectedFuture, future)
+		mockFutureReader.AssertExpectations(t)
+	})
+
+	t.Run("Error case - InputReader.Get fails", func(t *testing.T) {
+		mockInputReader := &inputReaderMocks.InputReader{}
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		expectedError := errors.New("input reader error")
+
+		// Fix: Use On() instead of OnGetMatch()
+		mockInputReader.On("Get", ctx).Return(nil, expectedError)
+
+		key := catalog.Key{
+			TypedInterface: core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"test": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+			InputReader: mockInputReader,
+		}
+
+		inputs, future, err := (&CatalogClient{}).prepareInputsAndFuture(ctx, key, mockFutureReader)
+
+		assert.Error(t, err)
+		assert.Equal(t, expectedError, err)
+		assert.Nil(t, inputs)
+		assert.Nil(t, future)
+		mockInputReader.AssertExpectations(t)
+	})
+}
+
+func TestCatalog_PutFuture(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Create new cached future execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		sampleDJSpec := &core.DynamicJobSpec{
+			Tasks: []*core.TaskTemplate{
+				{
+					Id: &core.Identifier{
+						Name: "task1",
+					},
+				},
+			},
+		}
+		mockFutureReader.On("Read", mock.Anything).Return(sampleDJSpec, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("CreateFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
+				assert.NoError(t, parseErr)
+				assert.EqualValues(t, 1, len(o.GetArtifact().GetData()))
+				assert.EqualValues(t, "future", o.GetArtifact().GetData()[0].GetName())
+				// 验证序列化的DynamicJobSpec
+				binary := o.GetArtifact().GetData()[0].GetValue().GetScalar().GetBinary().GetValue()
+				var djSpec core.DynamicJobSpec
+				err := proto.Unmarshal(binary, &djSpec)
+				assert.NoError(t, err)
+				assert.True(t, proto.Equal(sampleDJSpec, &djSpec))
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, nil)
+
+		mockClient.On("AddTag",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
+				assert.EqualValues(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
+				return true
+			}),
+		).Return(&datacatalog.AddTagResponse{}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		s, err := discovery.PutFuture(ctx, newKey, mockFutureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().GetArtifactTag().GetName())
+	})
+
+	t.Run("Create dataset fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		mockFutureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		s, err := discovery.PutFuture(ctx, newKey, mockFutureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Create future artifact fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		mockFutureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("CreateFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		s, err := discovery.PutFuture(ctx, newKey, mockFutureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Create new cached future execution with existing dataset", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockFutureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		sampleDJSpec := &core.DynamicJobSpec{
+			Tasks: []*core.TaskTemplate{
+				{
+					Id: &core.Identifier{
+						Name: "task1",
+					},
+				},
+			},
+		}
+		mockFutureReader.On("Read", mock.Anything).Return(sampleDJSpec, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		createDatasetCalled := false
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(_ *datacatalog.CreateDatasetRequest) bool {
+				createDatasetCalled = true
+				return true
+			}),
+		).Return(nil, status.Error(codes.AlreadyExists, "test dataset already exists"))
+
+		createFutureArtifactCalled := false
+		mockClient.On("CreateFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
+				assert.NoError(t, parseErr)
+				createFutureArtifactCalled = true
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, nil)
+
+		addTagCalled := false
+		mockClient.On("AddTag",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
+				assert.EqualValues(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
+				addTagCalled = true
+				return true
+			}),
+		).Return(&datacatalog.AddTagResponse{}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		s, err := discovery.PutFuture(ctx, newKey, mockFutureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.NoError(t, err)
+		assert.True(t, createDatasetCalled)
+		assert.True(t, createFutureArtifactCalled)
+		assert.True(t, addTagCalled)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+}
+
+func TestCatalog_UpdateFuture(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Overwrite existing future cache", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("UpdateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.UpdateArtifactRequest) bool {
+				assert.True(t, proto.Equal(o.GetDataset(), datasetID))
+				assert.IsType(t, &datacatalog.UpdateArtifactRequest_TagName{}, o.GetQueryHandle())
+				return true
+			}),
+		).Return(&datacatalog.UpdateArtifactResponse{ArtifactId: "test-artifact"}, nil)
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown",
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		futureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		futureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		s, err := discovery.UpdateFuture(ctx, newKey, futureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.GetNodeExecutionId().GetExecutionId().GetName(),
+				Domain:  taskID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Project: taskID.GetNodeExecutionId().GetExecutionId().GetProject(),
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.GetNodeExecutionId(),
+				RetryAttempt:    0,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().GetArtifactTag().GetName())
+		sourceTID := s.GetMetadata().GetSourceTaskExecution()
+		assert.Equal(t, taskID.GetTaskId().String(), sourceTID.GetTaskId().String())
+		assert.Equal(t, taskID.GetRetryAttempt(), sourceTID.GetRetryAttempt())
+		assert.Equal(t, taskID.GetNodeExecutionId().String(), sourceTID.GetNodeExecutionId().String())
+	})
+
+	t.Run("Overwrite non-existing future execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		createDatasetCalled := false
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				assert.True(t, proto.Equal(o.GetDataset().GetId(), datasetID))
+				createDatasetCalled = true
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		updateArtifactCalled := false
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Run(func(args mock.Arguments) {
+			updateArtifactCalled = true
+		}).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		createArtifactCalled := false
+		mockClient.On("CreateFutureArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				_, parseErr := uuid.Parse(o.GetArtifact().GetId())
+				assert.NoError(t, parseErr)
+				assert.True(t, proto.Equal(o.GetArtifact().GetDataset(), datasetID))
+				createArtifactCalled = true
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, nil)
+
+		addTagCalled := false
+		mockClient.On("AddTag",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
+				assert.EqualValues(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTag().GetName())
+				addTagCalled = true
+				return true
+			}),
+		).Return(&datacatalog.AddTagResponse{}, nil)
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.GetName(),
+				Project:      sampleKey.Identifier.GetProject(),
+				Domain:       sampleKey.Identifier.GetDomain(),
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown",
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		futureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		futureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		s, err := discovery.UpdateFuture(ctx, newKey, futureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.GetNodeExecutionId().GetExecutionId().GetName(),
+				Domain:  taskID.GetNodeExecutionId().GetExecutionId().GetDomain(),
+				Project: taskID.GetNodeExecutionId().GetExecutionId().GetProject(),
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.GetNodeExecutionId(),
+				RetryAttempt:    0,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, "flyte_cached_future-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().GetArtifactTag().GetName())
+		assert.Nil(t, s.GetMetadata().GetSourceTaskExecution())
+		assert.True(t, createDatasetCalled)
+		assert.True(t, updateArtifactCalled)
+		assert.True(t, createArtifactCalled)
+		assert.True(t, addTagCalled)
+	})
+
+	t.Run("Error when creating dataset", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		futureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		futureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		s, err := discovery.UpdateFuture(ctx, newKey, futureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Error when overwriting execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		genericErr := errors.New("generic error")
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Return(nil, genericErr)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		futureReader := &futureFileReaderMocks.FutureFileReaderInterface{}
+		futureReader.On("Read", mock.Anything).Return(&core.DynamicJobSpec{}, nil)
+
+		s, err := discovery.UpdateFuture(ctx, newKey, futureReader, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, genericErr, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 }

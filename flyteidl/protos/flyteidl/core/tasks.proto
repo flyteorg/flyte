@@ -159,6 +159,14 @@ message TaskMetadata {
     // - true: The task will generate a deck.
     // - false: The task will not generate a deck.
     google.protobuf.BoolValue generates_deck = 15;
+
+    enum ExecutionMode {
+        DEFAULT = 0;
+        DYNAMIC = 1;
+    }
+
+    // Indicates whether the execution mode is Dynamic or not
+    ExecutionMode mode = 16;
 }
 
 // A Task structure that uniquely identifies a task in the system

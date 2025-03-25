@@ -8,6 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	futureFileReaderInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/interfaces"
 )
 
 var (
@@ -37,4 +38,16 @@ func (n NOOPCatalog) GetOrExtendReservation(_ context.Context, _ catalog.Key, _ 
 
 func (n NOOPCatalog) ReleaseReservation(_ context.Context, _ catalog.Key, _ string) error {
 	return nil
+}
+
+func (n NOOPCatalog) GetFuture(_ context.Context, _ catalog.Key) (catalog.Entry, error) {
+	return catalog.NewCatalogEntry(nil, disabledStatus), nil
+}
+
+func (n NOOPCatalog) PutFuture(_ context.Context, _ catalog.Key, _ futureFileReaderInterfaces.FutureFileReaderInterface, _ catalog.Metadata) (catalog.Status, error) {
+	return disabledStatus, nil
+}
+
+func (n NOOPCatalog) UpdateFuture(_ context.Context, _ catalog.Key, _ futureFileReaderInterfaces.FutureFileReaderInterface, _ catalog.Metadata) (catalog.Status, error) {
+	return disabledStatus, nil
 }

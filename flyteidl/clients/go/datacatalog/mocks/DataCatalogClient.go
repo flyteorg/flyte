@@ -160,6 +160,54 @@ func (_m *DataCatalogClient) CreateDataset(ctx context.Context, in *datacatalog.
 	return r0, r1
 }
 
+type DataCatalogClient_CreateFutureArtifact struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_CreateFutureArtifact) Return(_a0 *datacatalog.CreateArtifactResponse, _a1 error) *DataCatalogClient_CreateFutureArtifact {
+	return &DataCatalogClient_CreateFutureArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnCreateFutureArtifact(ctx context.Context, in *datacatalog.CreateArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_CreateFutureArtifact {
+	c_call := _m.On("CreateFutureArtifact", ctx, in, opts)
+	return &DataCatalogClient_CreateFutureArtifact{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnCreateFutureArtifactMatch(matchers ...interface{}) *DataCatalogClient_CreateFutureArtifact {
+	c_call := _m.On("CreateFutureArtifact", matchers...)
+	return &DataCatalogClient_CreateFutureArtifact{Call: c_call}
+}
+
+// CreateFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) CreateFutureArtifact(ctx context.Context, in *datacatalog.CreateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.CreateArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.CreateArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) *datacatalog.CreateArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.CreateArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type DataCatalogClient_GetArtifact struct {
 	*mock.Call
 }
@@ -248,6 +296,54 @@ func (_m *DataCatalogClient) GetDataset(ctx context.Context, in *datacatalog.Get
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.GetDatasetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type DataCatalogClient_GetFutureArtifact struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_GetFutureArtifact) Return(_a0 *datacatalog.GetArtifactResponse, _a1 error) *DataCatalogClient_GetFutureArtifact {
+	return &DataCatalogClient_GetFutureArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnGetFutureArtifact(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_GetFutureArtifact {
+	c_call := _m.On("GetFutureArtifact", ctx, in, opts)
+	return &DataCatalogClient_GetFutureArtifact{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnGetFutureArtifactMatch(matchers ...interface{}) *DataCatalogClient_GetFutureArtifact {
+	c_call := _m.On("GetFutureArtifact", matchers...)
+	return &DataCatalogClient_GetFutureArtifact{Call: c_call}
+}
+
+// GetFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) GetFutureArtifact(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption) (*datacatalog.GetArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.GetArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) *datacatalog.GetArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.GetArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -468,6 +564,54 @@ func (_m *DataCatalogClient) OnUpdateArtifactMatch(matchers ...interface{}) *Dat
 
 // UpdateArtifact provides a mock function with given fields: ctx, in, opts
 func (_m *DataCatalogClient) UpdateArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *datacatalog.UpdateArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) *datacatalog.UpdateArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.UpdateArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type DataCatalogClient_UpdateFutureArtifact struct {
+	*mock.Call
+}
+
+func (_m DataCatalogClient_UpdateFutureArtifact) Return(_a0 *datacatalog.UpdateArtifactResponse, _a1 error) *DataCatalogClient_UpdateFutureArtifact {
+	return &DataCatalogClient_UpdateFutureArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *DataCatalogClient) OnUpdateFutureArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) *DataCatalogClient_UpdateFutureArtifact {
+	c_call := _m.On("UpdateFutureArtifact", ctx, in, opts)
+	return &DataCatalogClient_UpdateFutureArtifact{Call: c_call}
+}
+
+func (_m *DataCatalogClient) OnUpdateFutureArtifactMatch(matchers ...interface{}) *DataCatalogClient_UpdateFutureArtifact {
+	c_call := _m.On("UpdateFutureArtifact", matchers...)
+	return &DataCatalogClient_UpdateFutureArtifact{Call: c_call}
+}
+
+// UpdateFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) UpdateFutureArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
