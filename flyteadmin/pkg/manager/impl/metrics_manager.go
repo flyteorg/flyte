@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -427,7 +428,8 @@ func (m *MetricsManager) parseNodeExecution(ctx context.Context, nodeExecution *
 				err = fmt.Errorf("failed to identify workflow node type for node: %+v", target)
 			}
 		default:
-			err = fmt.Errorf("failed to identify node type for node: %+v", target)
+			logger.Warnf(ctx, "unsupported node type")
+			// We don't error out here so that users can still get metrics of other nodes
 		}
 
 		if err != nil {
@@ -501,7 +503,7 @@ func (m *MetricsManager) parseNodeExecutions(ctx context.Context, nodeExecutions
 	return nil
 }
 
-// parseSubworkflowNodeExecutions partitions the SubworkflowNode execution into a collection of Categorical and
+// parseSubworkflowNodeExecution partitions the SubworkflowNode execution into a collection of Categorical and
 // Reference Spans which are appended to the provided spans argument.
 func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 	nodeExecution *admin.NodeExecution, identifier *core.Identifier, spans *[]*core.Span, depth int) error {
@@ -606,7 +608,7 @@ func parseTaskExecutions(taskExecutions []*admin.TaskExecution, spans *[]*core.S
 	}
 }
 
-// parseTaskNodeExecutions partitions the TaskNode execution into a collection of Categorical and Reference Spans which
+// parseTaskNodeExecution partitions the TaskNode execution into a collection of Categorical and Reference Spans which
 // are appended to the provided spans argument.
 func (m *MetricsManager) parseTaskNodeExecution(ctx context.Context, nodeExecution *admin.NodeExecution, spans *[]*core.Span, depth int) error {
 	// retrieve task executions

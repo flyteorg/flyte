@@ -117,7 +117,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 
 func TestGetServiceAccountNameFromTaskExecutionMetadata(t *testing.T) {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
-	mockTaskExecMetadata.OnGetSecurityContext().Return(core.SecurityContext{
+	mockTaskExecMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: "service-account"},
 	})
 	result := GetServiceAccountNameFromTaskExecutionMetadata(&mockTaskExecMetadata)
@@ -126,8 +126,8 @@ func TestGetServiceAccountNameFromTaskExecutionMetadata(t *testing.T) {
 
 func TestGetServiceAccountNameFromServiceAccount(t *testing.T) {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
-	mockTaskExecMetadata.OnGetSecurityContext().Return(core.SecurityContext{})
-	mockTaskExecMetadata.OnGetK8sServiceAccount().Return("service-account")
+	mockTaskExecMetadata.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+	mockTaskExecMetadata.EXPECT().GetK8sServiceAccount().Return("service-account")
 	result := GetServiceAccountNameFromTaskExecutionMetadata(&mockTaskExecMetadata)
 	assert.Equal(t, "service-account", result)
 }

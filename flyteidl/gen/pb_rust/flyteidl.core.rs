@@ -2508,6 +2508,9 @@ pub struct ArrayNode {
     /// data_mode determines how input data is passed to the sub-nodes
     #[prost(enumeration="array_node::DataMode", tag="7")]
     pub data_mode: i32,
+    /// +optional. Specifies input bindings that are not mapped over for the node.
+    #[prost(string, repeated, tag="8")]
+    pub bound_inputs: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]

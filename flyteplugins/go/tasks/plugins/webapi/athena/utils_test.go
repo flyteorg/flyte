@@ -23,10 +23,10 @@ func Test_writeOutput(t *testing.T) {
 	ctx := context.Background()
 	t.Run("No Outputs", func(t *testing.T) {
 		taskReader := &mocks2.TaskReader{}
-		taskReader.OnRead(ctx).Return(&core.TaskTemplate{}, nil)
+		taskReader.EXPECT().Read(ctx).Return(&core.TaskTemplate{}, nil)
 
 		statusContext := &mocks.StatusContext{}
-		statusContext.OnTaskReader().Return(taskReader)
+		statusContext.EXPECT().TaskReader().Return(taskReader)
 
 		err := writeOutput(context.Background(), statusContext, "s3://my-external-bucket/key")
 		assert.NoError(t, err)
@@ -34,7 +34,7 @@ func Test_writeOutput(t *testing.T) {
 
 	t.Run("No Output named results", func(t *testing.T) {
 		taskReader := &mocks2.TaskReader{}
-		taskReader.OnRead(ctx).Return(&core.TaskTemplate{
+		taskReader.EXPECT().Read(ctx).Return(&core.TaskTemplate{
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -45,7 +45,7 @@ func Test_writeOutput(t *testing.T) {
 		}, nil)
 
 		statusContext := &mocks.StatusContext{}
-		statusContext.OnTaskReader().Return(taskReader)
+		statusContext.EXPECT().TaskReader().Return(taskReader)
 
 		err := writeOutput(context.Background(), statusContext, "s3://my-external-bucket/key")
 		assert.NoError(t, err)
@@ -66,7 +66,7 @@ func Test_writeOutput(t *testing.T) {
 			assert.FailNowf(t, "expected to be able to marshal", "")
 		}
 
-		taskReader.OnRead(ctx).Return(&core.TaskTemplate{
+		taskReader.EXPECT().Read(ctx).Return(&core.TaskTemplate{
 			Interface: &core.TypedInterface{
 				Outputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -85,11 +85,11 @@ func Test_writeOutput(t *testing.T) {
 			Custom: st,
 		}, nil)
 
-		statusContext.OnTaskReader().Return(taskReader)
+		statusContext.EXPECT().TaskReader().Return(taskReader)
 
 		ow := &mocks3.OutputWriter{}
 		externalLocation := "s3://my-external-bucket/key"
-		ow.OnPut(ctx, ioutils.NewInMemoryOutputReader(
+		ow.EXPECT().Put(ctx, ioutils.NewInMemoryOutputReader(
 			&pb.LiteralMap{
 				Literals: map[string]*pb.Literal{
 					"results": {
@@ -108,7 +108,7 @@ func Test_writeOutput(t *testing.T) {
 					},
 				},
 			}, nil, nil)).Return(nil)
-		statusContext.OnOutputWriter().Return(ow)
+		statusContext.EXPECT().OutputWriter().Return(ow)
 
 		err = writeOutput(context.Background(), statusContext, externalLocation)
 		assert.NoError(t, err)
@@ -150,7 +150,7 @@ func Test_ExtractQueryInfo(t *testing.T) {
 				assert.FailNowf(t, "expected to be able to marshal", "")
 			}
 
-			taskReader.OnRead(ctx).Return(&core.TaskTemplate{
+			taskReader.EXPECT().Read(ctx).Return(&core.TaskTemplate{
 				Type: validProto.taskType,
 				Interface: &core.TypedInterface{
 					Outputs: &core.VariableMap{
@@ -170,29 +170,29 @@ func Test_ExtractQueryInfo(t *testing.T) {
 				Custom: st,
 			}, nil)
 
-			tCtx.OnTaskReader().Return(taskReader)
+			tCtx.EXPECT().TaskReader().Return(taskReader)
 
 			tMeta := &mocks2.TaskExecutionMetadata{}
-			tCtx.OnTaskExecutionMetadata().Return(tMeta)
+			tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 			tID := &mocks2.TaskExecutionID{}
-			tMeta.OnGetTaskExecutionID().Return(tID)
-			tMeta.OnGetNamespace().Return("my-namespace")
+			tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+			tMeta.EXPECT().GetNamespace().Return("my-namespace")
 
-			tID.OnGetGeneratedName().Return("generated-name")
+			tID.EXPECT().GetGeneratedName().Return("generated-name")
 
 			ow := &mocks3.OutputWriter{}
-			tCtx.OnOutputWriter().Return(ow)
-			ow.OnGetOutputPrefixPath().Return("s3://another")
-			ow.OnGetRawOutputPrefix().Return("s3://another/output")
-			ow.OnGetCheckpointPrefix().Return("/checkpoint")
-			ow.OnGetPreviousCheckpointsPrefix().Return("/prev")
+			tCtx.EXPECT().OutputWriter().Return(ow)
+			ow.EXPECT().GetOutputPrefixPath().Return("s3://another")
+			ow.EXPECT().GetRawOutputPrefix().Return("s3://another/output")
+			ow.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+			ow.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 			ir := &mocks3.InputReader{}
-			tCtx.OnInputReader().Return(ir)
-			ir.OnGetInputPath().Return(storage.DataReference("s3://something"))
-			ir.OnGetInputPrefixPath().Return(storage.DataReference("s3://something/2"))
-			ir.OnGet(ctx).Return(nil, nil)
+			tCtx.EXPECT().InputReader().Return(ir)
+			ir.EXPECT().GetInputPath().Return(storage.DataReference("s3://something"))
+			ir.EXPECT().GetInputPrefixPath().Return(storage.DataReference("s3://something/2"))
+			ir.EXPECT().Get(ctx).Return(nil, nil)
 
 			q, err := extractQueryInfo(ctx, tCtx)
 			assert.NoError(t, err)

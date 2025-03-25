@@ -24,7 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 const dynamicNodeID = "dynamic-node"
 

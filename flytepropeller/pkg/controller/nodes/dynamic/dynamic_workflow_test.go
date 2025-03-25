@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -40,13 +41,13 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		nodeID := "n1"
 		nm := &mocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{ExecutionId: wfExecID, NodeId: nodeID})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{ExecutionId: wfExecID, NodeId: nodeID})
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -73,13 +74,13 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			},
 		}
 		tr := &mocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
-		tr.OnReadMatch(mock.Anything).Return(tk, nil)
+		tr.EXPECT().GetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskType().Return(ttype)
+		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		n := &mocks2.ExecutableNode{}
 		tID := "dyn-task-1"
-		n.OnGetTaskID().Return(&tID)
+		n.EXPECT().GetTaskID().Return(&tID)
 
 		if dataStore == nil {
 			var err error
@@ -89,54 +90,54 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		ir := &mocks3.InputReader{}
 		nCtx := &mocks.NodeExecutionContext{}
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeID().Return("n1")
-		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
-		nCtx.OnDataStore().Return(dataStore)
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeID().Return("n1")
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(func() error { return nil })
+		nCtx.EXPECT().DataStore().Return(dataStore)
 
 		endNodeStatus := &mocks2.ExecutableNodeStatus{}
-		endNodeStatus.OnGetDataDir().Return("end-node")
-		endNodeStatus.OnGetOutputDir().Return("end-node")
+		endNodeStatus.EXPECT().GetDataDir().Return("end-node")
+		endNodeStatus.EXPECT().GetOutputDir().Return("end-node")
 
 		subNs := &mocks2.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
 		subNs.On("SetOutputDir", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
-		subNs.OnGetOutputDir().Return(finalOutput)
+		subNs.EXPECT().GetOutputDir().Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
 		subNs.On("SetParentNodeID", mock.Anything).Return()
-		subNs.OnGetAttempts().Return(0)
+		subNs.EXPECT().GetAttempts().Return(0)
 
 		dynamicNS := &mocks2.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.On("SetParentNodeID", mock.Anything).Return()
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
-		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
+		dynamicNS.EXPECT().GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &mocks2.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-		ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
-		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
-		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
-		nCtx.OnNodeStatus().Return(ns)
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetOutputDir().Return(storage.DataReference("output-dir"))
+		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		ns.EXPECT().GetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		nCtx.EXPECT().NodeStatus().Return(ns)
 
 		w := &mocks2.ExecutableWorkflow{}
 		ws := &mocks2.ExecutableWorkflowStatus{}
-		ws.OnGetNodeExecutionStatus(ctx, "n1").Return(ns)
-		w.OnGetExecutionStatus().Return(ws)
+		ws.EXPECT().GetNodeExecutionStatus(ctx, "n1").Return(ns)
+		w.EXPECT().GetExecutionStatus().Return(ws)
 
 		r := &mocks.NodeStateReader{}
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{
 			Phase: v1alpha1.DynamicNodePhaseExecuting,
 		})
-		nCtx.OnNodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateReader().Return(r)
 		return nCtx
 	}
 
@@ -152,14 +153,14 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		finalOutput := storage.DataReference("/subnode")
 		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
-		nCtx.OnNodeStateWriter().Return(s)
+		nCtx.EXPECT().NodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
 
 		mockLPLauncher := &mocks5.Reader{}
 		var callsAdmin = false
-		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+		mockLPLauncher.EXPECT().GetLaunchPlan(ctx, lpID).Run(func(ctx context.Context, launchPlanRef *core.Identifier) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
 			callsAdmin = true
 		}).Return(&admin.LaunchPlan{
@@ -191,11 +192,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		execContext := &mocks4.ExecutionContext{}
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
-		immutableParentInfo.OnGetUniqueID().Return("c1")
-		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
-		nCtx.OnExecutionContext().Return(execContext)
+		immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+		immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.NoError(t, err)
@@ -231,7 +232,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		mockLPLauncher := &mocks5.Reader{}
 		var callsAdmin = false
-		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+		mockLPLauncher.EXPECT().GetLaunchPlan(ctx, lpID).Run(func(ctx context.Context, launchPlanRef *core.Identifier) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
 			callsAdmin = true
 		}).Return(&admin.LaunchPlan{
@@ -262,9 +263,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 
 		execContext := &mocks4.ExecutionContext{}
-		execContext.OnGetParentInfo().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-		nCtx.OnExecutionContext().Return(execContext)
+		execContext.EXPECT().GetParentInfo().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.NoError(t, err)
@@ -293,14 +294,14 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		finalOutput := storage.DataReference("/subnode")
 		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
-		nCtx.OnNodeStateWriter().Return(s)
+		nCtx.EXPECT().NodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
 
 		mockLPLauncher := &mocks5.Reader{}
 		var callsAdmin = false
-		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+		mockLPLauncher.EXPECT().GetLaunchPlan(ctx, lpID).Run(func(ctx context.Context, launchPlanRef *core.Identifier) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
 			callsAdmin = true
 		}).Return(&admin.LaunchPlan{
@@ -330,9 +331,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			metrics:         newMetrics(promutils.NewTestScope()),
 		}
 		execContext := &mocks4.ExecutionContext{}
-		execContext.OnGetParentInfo().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-		nCtx.OnExecutionContext().Return(execContext)
+		execContext.EXPECT().GetParentInfo().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		_, err = d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.Error(t, err)
@@ -382,7 +383,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		mockLPLauncher := &mocks5.Reader{}
 		var callsAdmin = false
-		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+		mockLPLauncher.EXPECT().GetLaunchPlan(ctx, lpID).Run(func(ctx context.Context, launchPlanRef *core.Identifier) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP.
 			// However in the cached case no such call should be necessary.
 			callsAdmin = true
@@ -415,11 +416,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		execContext := &mocks4.ExecutionContext{}
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
-		immutableParentInfo.OnGetUniqueID().Return("c1")
-		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
-		nCtx.OnExecutionContext().Return(execContext)
+		immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+		immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.NoError(t, err)
@@ -455,7 +456,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 
 		nCtx := createNodeContext("test", finalOutput, dataStore)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
 		mockLPLauncher := &mocks5.Reader{}
 
 		h := &mocks6.TaskNodeHandler{}
@@ -469,11 +470,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		execContext := &mocks4.ExecutionContext{}
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
-		immutableParentInfo.OnGetUniqueID().Return("c1")
-		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
-		nCtx.OnExecutionContext().Return(execContext)
+		immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+		immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		_, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.EqualError(t, err, "[system] Failed to do HEAD on compiled workflow files., caused by: Failed to do HEAD on futures file.: foo")
@@ -484,22 +485,22 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		metadata := existsMetadata{}
 		composedPBStore := storageMocks.ComposedProtobufStore{}
-		composedPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
+		composedPBStore.EXPECT().Head(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
 			Return(&metadata, nil)
 
 		djSpec := createDynamicJobSpecWithLaunchPlans()
-		composedPBStore.OnReadProtobufMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), &core.DynamicJobSpec{}).Return(nil).Run(func(args mock.Arguments) {
-			djSpecPtr := args.Get(2).(*core.DynamicJobSpec)
+		composedPBStore.EXPECT().ReadProtobuf(mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), &core.DynamicJobSpec{}).Return(nil).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
+			djSpecPtr := msg.(*core.DynamicJobSpec)
 			*djSpecPtr = *djSpec
 		})
-		composedPBStore.OnWriteRawMatch(
+		composedPBStore.EXPECT().WriteRaw(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"),
 			int64(1501),
 			storage.Options{},
 			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
-		composedPBStore.OnWriteProtobufMatch(
+		composedPBStore.EXPECT().WriteProtobuf(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			storage.DataReference("s3://my-s3-bucket/foo/bar/dynamic_compiled.pb"),
 			storage.Options{},
@@ -522,7 +523,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 
 		nCtx := createNodeContext("test", finalOutput, dataStore)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
 
 		lpID := &core.Identifier{
 			ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -531,7 +532,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			Domain:       "d",
 		}
 		mockLPLauncher := &mocks5.Reader{}
-		mockLPLauncher.OnGetLaunchPlanMatch(mock.Anything, mock.MatchedBy(func(id *core.Identifier) bool {
+		mockLPLauncher.EXPECT().GetLaunchPlan(mock.Anything, mock.MatchedBy(func(id *core.Identifier) bool {
 			return lpID.GetName() == id.GetName() && lpID.GetDomain() == id.GetDomain() && lpID.GetProject() == id.GetProject() && lpID.GetResourceType() == id.GetResourceType()
 		})).Return(&admin.LaunchPlan{
 			Id: lpID,
@@ -563,14 +564,14 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		execContext := &mocks4.ExecutionContext{}
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
-		immutableParentInfo.OnGetUniqueID().Return("c1")
-		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
-		execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+		immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{},
 		})
-		nCtx.OnExecutionContext().Return(execContext)
+		nCtx.EXPECT().ExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.NoError(t, err)

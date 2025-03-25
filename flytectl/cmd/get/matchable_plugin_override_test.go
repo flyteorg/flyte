@@ -63,7 +63,7 @@ func TestGetPluginOverride(t *testing.T) {
 
 		getPluginOverrideSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getPluginOverridesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -77,7 +77,7 @@ func TestGetPluginOverride(t *testing.T) {
 		getPluginOverrideSetup()
 		pluginoverride.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getPluginOverridesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -91,7 +91,7 @@ func TestGetPluginOverride(t *testing.T) {
 		getPluginOverrideSetup()
 		pluginoverride.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(projectDomainResp, nil)
 		err := getPluginOverridesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -105,7 +105,7 @@ func TestGetPluginOverride(t *testing.T) {
 
 		getPluginOverrideSetup()
 		// No args implying project domain attribute deletion
-		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getPluginOverridesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -119,7 +119,7 @@ func TestGetPluginOverride(t *testing.T) {
 
 		getPluginOverrideSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(workflowResp, nil)
 		err := getPluginOverridesFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -132,7 +132,7 @@ func TestGetPluginOverride(t *testing.T) {
 
 		getPluginOverrideSetup()
 		args := []string{"workflow"}
-		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.FetcherExt.EXPECT().FetchWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to fetch response"))
 		err := getPluginOverridesFunc(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)

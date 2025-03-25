@@ -571,6 +571,7 @@ configmap:
       grpcPort: 8089
       httpPort: 8080
       grpcServerReflection: true
+      grpcMaxRecvMsgSizeMBs: 6
 
   # -- Task default resources configuration
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).

@@ -3,6 +3,7 @@ package array
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -27,14 +28,17 @@ func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) 
 	}
 }
 
-func constructLiteralMap(inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
+func constructLiteralMap(inputs *core.LiteralMap, index int, arrayNode v1alpha1.ExecutableArrayNode) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
 	for name, literal := range inputs.GetLiterals() {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
-			if index >= len(literalCollection.GetLiterals()) {
+			if slices.Contains(arrayNode.GetBoundInputs(), name) {
+				literals[name] = literal
+			} else if index >= len(literalCollection.GetLiterals()) {
 				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
+			} else {
+				literals[name] = literalCollection.GetLiterals()[index]
 			}
-			literals[name] = literalCollection.GetLiterals()[index]
 		} else {
 			literals[name] = literal
 		}

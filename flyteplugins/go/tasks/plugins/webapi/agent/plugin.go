@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -26,6 +27,26 @@ import (
 )
 
 const ID = "agent-service"
+
+type AgentService struct {
+	mu                 sync.RWMutex
+	supportedTaskTypes []string
+	CorePlugin         core.Plugin
+}
+
+// ContainTaskType check if agent supports this task type.
+func (p *AgentService) ContainTaskType(taskType string) bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return slices.Contains(p.supportedTaskTypes, taskType)
+}
+
+// SetSupportedTaskType set supportTaskType in the agent service.
+func (p *AgentService) SetSupportedTaskType(taskTypes []string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.supportedTaskTypes = taskTypes
+}
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 
@@ -221,6 +242,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		TaskType:     metadata.TaskCategory.GetName(),
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		OutputPrefix: metadata.OutputPrefix,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -257,7 +279,10 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		ResourceMeta: metadata.AgentResourceMeta,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
-	return fmt.Errorf("failed to delete task from agent with %v", err)
+	if err != nil {
+		return fmt.Errorf("failed to delete task from agent with %v", err)
+	}
+	return nil
 }
 
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
@@ -341,7 +366,7 @@ func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (se
 	return client, nil
 }
 
-func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
+func (p *Plugin) watchAgents(ctx context.Context, agentService *AgentService) {
 	go wait.Until(func() {
 		childCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -398,7 +423,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
+func newAgentPlugin(agentService *AgentService) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 	clientSet := getAgentClientSets(ctx)
@@ -421,7 +446,7 @@ func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
 	}
 }
 
-func RegisterAgentPlugin(agentService *core.AgentService) {
+func RegisterAgentPlugin(agentService *AgentService) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(agentService))

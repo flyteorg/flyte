@@ -377,40 +377,40 @@ func TestToK8sContainer(t *testing.T) {
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
 
 	inputReader := &mocks2.InputReader{}
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 
 	outputWriter := &mocks2.OutputWriter{}
-	outputWriter.OnGetOutputPrefixPath().Return("")
-	outputWriter.OnGetRawOutputPrefix().Return("")
-	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.EXPECT().GetOutputPrefixPath().Return("")
+	outputWriter.EXPECT().GetRawOutputPrefix().Return("")
+	outputWriter.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputWriter.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskOverrides := mocks.TaskOverrides{}
-	mockTaskOverrides.OnGetResources().Return(&v1.ResourceRequirements{
+	mockTaskOverrides.EXPECT().GetResources().Return(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: resource.MustParse("1024Mi"),
 		},
 	})
-	mockTaskExecMetadata.OnGetOverrides().Return(&mockTaskOverrides)
+	mockTaskExecMetadata.EXPECT().GetOverrides().Return(&mockTaskOverrides)
 	mockTaskExecutionID := mocks.TaskExecutionID{}
-	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{})
-	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
-	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
-	mockTaskExecMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
-	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(map[string]string{
+	mockTaskExecutionID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{})
+	mockTaskExecutionID.EXPECT().GetGeneratedName().Return("gen_name")
+	mockTaskExecMetadata.EXPECT().GetTaskExecutionID().Return(&mockTaskExecutionID)
+	mockTaskExecMetadata.EXPECT().GetPlatformResources().Return(&v1.ResourceRequirements{})
+	mockTaskExecMetadata.EXPECT().GetEnvironmentVariables().Return(map[string]string{
 		"foo": "bar",
 	})
-	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
-	mockTaskExecMetadata.OnGetConsoleURL().Return("")
+	mockTaskExecMetadata.EXPECT().GetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.EXPECT().GetConsoleURL().Return("")
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
-	tCtx.OnInputReader().Return(inputReader)
-	tCtx.OnTaskReader().Return(taskReader)
-	tCtx.OnOutputWriter().Return(outputWriter)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(&mockTaskExecMetadata)
+	tCtx.EXPECT().InputReader().Return(inputReader)
+	tCtx.EXPECT().TaskReader().Return(taskReader)
+	tCtx.EXPECT().OutputWriter().Return(outputWriter)
 
 	cfg := config.GetK8sPluginConfig()
 	allow := false
@@ -451,9 +451,9 @@ func TestToK8sContainer(t *testing.T) {
 func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements, includeConsoleURL bool, consoleURL string) template.Parameters {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskExecutionID := mocks.TaskExecutionID{}
-	mockTaskExecutionID.OnGetUniqueNodeID().Return("unique_node_id")
-	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
-	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{
+	mockTaskExecutionID.EXPECT().GetUniqueNodeID().Return("unique_node_id")
+	mockTaskExecutionID.EXPECT().GetGeneratedName().Return("gen_name")
+	mockTaskExecutionID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      "p1",
@@ -471,28 +471,28 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 		},
 		RetryAttempt: 1,
 	})
-	mockTaskExecMetadata.OnGetTaskExecutionID().Return(&mockTaskExecutionID)
+	mockTaskExecMetadata.EXPECT().GetTaskExecutionID().Return(&mockTaskExecutionID)
 
 	mockOverrides := mocks.TaskOverrides{}
-	mockOverrides.OnGetResources().Return(resourceRequirements)
-	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
-	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
-	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
-	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
-	mockTaskExecMetadata.OnGetConsoleURL().Return(consoleURL)
+	mockOverrides.EXPECT().GetResources().Return(resourceRequirements)
+	mockTaskExecMetadata.EXPECT().GetOverrides().Return(&mockOverrides)
+	mockTaskExecMetadata.EXPECT().GetPlatformResources().Return(platformResources)
+	mockTaskExecMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	mockTaskExecMetadata.EXPECT().GetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.EXPECT().GetConsoleURL().Return(consoleURL)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
-	mockInputReader.OnGetInputPath().Return(mockInputPath)
-	mockInputReader.OnGetInputPrefixPath().Return(mockInputPath)
+	mockInputReader.EXPECT().GetInputPath().Return(mockInputPath)
+	mockInputReader.EXPECT().GetInputPrefixPath().Return(mockInputPath)
 	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
 
 	mockOutputPath := mocks2.OutputFilePaths{}
 	mockOutputPathPrefix := storage.DataReference("s3://output/path")
-	mockOutputPath.OnGetRawOutputPrefix().Return(mockOutputPathPrefix)
-	mockOutputPath.OnGetOutputPrefixPath().Return(mockOutputPathPrefix)
-	mockOutputPath.OnGetCheckpointPrefix().Return("/checkpoint")
-	mockOutputPath.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	mockOutputPath.EXPECT().GetRawOutputPrefix().Return(mockOutputPathPrefix)
+	mockOutputPath.EXPECT().GetOutputPrefixPath().Return(mockOutputPathPrefix)
+	mockOutputPath.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	mockOutputPath.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
 
 	return template.Parameters{
 		TaskExecMetadata:  &mockTaskExecMetadata,

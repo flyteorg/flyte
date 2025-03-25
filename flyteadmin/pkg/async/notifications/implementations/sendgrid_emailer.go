@@ -19,7 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-//go:generate mockery -all -case=underscore -output=../mocks -case=underscore
+//go:generate mockery --all --case=underscore --output=../mocks --case=underscore --with-expecter
 
 type SendgridClient interface {
 	Send(email *mail.SGMailV3) (*rest.Response, error)

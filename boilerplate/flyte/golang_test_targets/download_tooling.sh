@@ -16,7 +16,6 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
-	"github.com/EngHabu/mockery/cmd/mockery"
 	"github.com/vektra/mockery/v2@v2.40.3"
 	"github.com/golangci/golangci-lint/cmd/golangci-lint"
 	"github.com/daixiang0/gci"
@@ -25,33 +24,19 @@ tools=(
 )
 
 # This ensures pflags are up to date.
-make -C $REPO_ROOT/flytestdlib compile
-cp $REPO_ROOT/flytestdlib/bin/pflags $(go env GOPATH)/bin
+make -C "${REPO_ROOT}/flytestdlib" compile
+GO_BIN="$(go env GOPATH)/bin"
+mkdir -p "${GO_BIN}"
+cp "${REPO_ROOT}/flytestdlib/bin/pflags" "${GO_BIN}"
 
-tmp_dir=$(mktemp -d -t gotooling-XXX)
+tmp_dir="$(mktemp -d -t gotooling-XXX)"
 echo "Using temp directory ${tmp_dir}"
-cp -R ../boilerplate/flyte/golang_support_tools/* $tmp_dir
-pushd "$tmp_dir"
+cp -R ../boilerplate/flyte/golang_support_tools/* "${tmp_dir}"
+pushd "${tmp_dir}"
 
 for tool in "${tools[@]}"; do
 	echo "Installing ${tool}"
-	GO111MODULE=on go install $tool
-	# If tool is our mockery fork, we need to rename the binary to mockery-fork
-	if [[ $tool == "github.com/EngHabu/mockery/cmd/mockery" ]]; then
-		echo "Renaming mockery to mockery-fork"
-		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-fork
-	fi
-	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-v2
-	if [[ $tool == "github.com/vektra/mockery/v2@v2.40.3" ]]; then
-		echo "Renaming mockery to mockery-v2"
-		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v2
-	fi
+	GO111MODULE=on go install "${tool}"
 done
-
-# Rename the mockery-fork binary to mockery to maintain compatibility with the existing uses
-if [ -f $(go env GOPATH)/bin/mockery-fork ]; then
-	echo "Renaming mockery-fork to mockery"
-	mv $(go env GOPATH)/bin/mockery-fork $(go env GOPATH)/bin/mockery
-fi
 
 popd

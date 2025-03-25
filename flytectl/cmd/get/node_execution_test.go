@@ -212,12 +212,12 @@ func TestGetExecutionDetails(t *testing.T) {
 			},
 		}
 
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "n2").Return(&admin.NodeExecutionList{}, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "n2").Return(&admin.NodeExecutionList{}, nil)
+		mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
 		}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionData(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
 
 		nodeExecWrappers, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
 		assert.Nil(t, err)
@@ -277,11 +277,11 @@ func TestGetExecutionDetails(t *testing.T) {
 			},
 		}
 
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(&admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{taskExec1, taskExec2},
 		}, nil)
-		mockFetcherExt.OnFetchNodeExecutionDataMatch(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
+		mockFetcherExt.EXPECT().FetchNodeExecutionData(ctx, mock.Anything, dummyExec, dummyProject, dummyDomain).Return(dataResp, nil)
 
 		nodeExecWrappers, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "n0", mockCmdCtx)
 		assert.Nil(t, err)
@@ -307,8 +307,8 @@ func TestGetExecutionDetails(t *testing.T) {
 		nodeExecutions := []*admin.NodeExecution{nodeExec1}
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 
-		mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
-		mockFetcherExt.OnFetchTaskExecutionsOnNodeMatch(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch task exec details"))
+		mockFetcherExt.EXPECT().FetchNodeExecutionDetails(ctx, dummyExec, dummyProject, dummyDomain, "").Return(nodeExecList, nil)
+		mockFetcherExt.EXPECT().FetchTaskExecutionsOnNode(ctx, "n0", dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch task exec details"))
 		_, err := getExecutionDetails(ctx, dummyProject, dummyDomain, dummyExec, "", mockCmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to fetch task exec details"), err)

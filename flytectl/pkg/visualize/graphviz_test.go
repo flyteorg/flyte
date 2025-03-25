@@ -45,8 +45,8 @@ func TestAddBranchSubNodeEdge(t *testing.T) {
 
 		mockGraph := &mocks.Graphvizer{}
 		// Verify the attributes
-		mockGraph.OnAddEdgeMatch(mock.Anything, mock.Anything, mock.Anything, attrs).Return(nil)
-		mockGraph.OnGetEdgeMatch(mock.Anything, mock.Anything).Return(&graphviz.Edge{})
+		mockGraph.EXPECT().AddEdge(mock.Anything, mock.Anything, mock.Anything, attrs).Return(nil)
+		mockGraph.EXPECT().GetEdge(mock.Anything, mock.Anything).Return(&graphviz.Edge{})
 		err := gb.addBranchSubNodeEdge(mockGraph, parentNode, n, "label")
 		assert.NoError(t, err)
 	})
@@ -59,7 +59,7 @@ func TestAddBranchSubNodeEdge(t *testing.T) {
 
 		mockGraph := &mocks.Graphvizer{}
 		// Verify the attributes
-		mockGraph.OnAddEdgeMatch(mock.Anything, mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("error adding edge"))
+		mockGraph.EXPECT().AddEdge(mock.Anything, mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("error adding edge"))
 		err := gb.addBranchSubNodeEdge(mockGraph, parentNode, n, "label")
 		assert.NotNil(t, err)
 	})
@@ -78,8 +78,8 @@ func TestConstructBranchNode(t *testing.T) {
 				"shape": "diamond"},
 		}
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(nil)
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(expectedGraphvizNode)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(nil)
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(expectedGraphvizNode)
 		flyteNode := &core.Node{
 			Id: "id",
 			Metadata: &core.NodeMetadata{
@@ -99,8 +99,8 @@ func TestConstructBranchNode(t *testing.T) {
 		gb := newGraphBuilder()
 		mockGraph := &mocks.Graphvizer{}
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(nil)
 		flyteNode := &core.Node{
 			Id: "id",
 			Metadata: &core.NodeMetadata{
@@ -123,9 +123,9 @@ func TestConstructBranchNode(t *testing.T) {
 		attrs[ShapeType] = DiamondShape
 
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, "branchName_id", attrs).Return(nil)
-		mockGraph.OnAddNodeMatch(mock.Anything, "branchName_start_node", mock.Anything).Return(fmt.Errorf("unable to add node"))
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, "branchName_id", attrs).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, "branchName_start_node", mock.Anything).Return(fmt.Errorf("unable to add node"))
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(nil)
 		flyteNode := &core.Node{
 			Id: "id",
 			Metadata: &core.NodeMetadata{
@@ -160,11 +160,11 @@ func TestConstructBranchNode(t *testing.T) {
 		parentNode := &graphviz.Node{Name: "parentNode", Attrs: nil}
 		thenBranchStartNode := &graphviz.Node{Name: "branchName_start_node", Attrs: nil}
 
-		mockGraph.OnAddNodeMatch(mock.Anything, "branchName_id", attrs).Return(nil)
-		mockGraph.OnAddNodeMatch(mock.Anything, "branchName_start_node", mock.Anything).Return(nil)
-		mockGraph.OnGetNodeMatch("branchName_id").Return(parentNode)
-		mockGraph.OnGetNodeMatch("branchName_start_node").Return(thenBranchStartNode)
-		mockGraph.OnAddEdgeMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add edge"))
+		mockGraph.EXPECT().AddNode(mock.Anything, "branchName_id", attrs).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, "branchName_start_node", mock.Anything).Return(nil)
+		mockGraph.EXPECT().GetNode("branchName_id").Return(parentNode)
+		mockGraph.EXPECT().GetNode("branchName_start_node").Return(thenBranchStartNode)
+		mockGraph.EXPECT().AddEdge(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add edge"))
 		flyteNode := &core.Node{
 			Id: "id",
 			Metadata: &core.NodeMetadata{
@@ -228,8 +228,8 @@ func TestConstructNode(t *testing.T) {
 			Attrs: map[graphviz.Attr]string{"label": "start", "shape": "doublecircle", "color": "green"},
 		}
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(nil)
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(expectedGraphvizNode)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(nil)
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(expectedGraphvizNode)
 		flyteNode := &core.Node{
 			Id: "start-node",
 		}
@@ -251,8 +251,8 @@ func TestConstructNode(t *testing.T) {
 			Attrs: map[graphviz.Attr]string{"label": "end", "shape": "doublecircle", "color": "red"},
 		}
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(nil)
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(expectedGraphvizNode)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(nil)
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(expectedGraphvizNode)
 		flyteNode := &core.Node{
 			Id: "end-node",
 		}
@@ -294,7 +294,7 @@ func TestConstructNode(t *testing.T) {
 		gb := newGraphBuilder()
 		mockGraph := &mocks.Graphvizer{}
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch("", SubgraphPrefix+"nodeMetadata",
+		mockGraph.EXPECT().AddSubGraph("", SubgraphPrefix+"nodeMetadata",
 			mock.Anything).Return(fmt.Errorf("unable to create subgraph"))
 		flyteNode := &core.Node{
 			Id: "id",
@@ -319,9 +319,9 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch(mock.Anything, SubgraphPrefix+"nodeMetadata", mock.Anything).Return(nil)
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddSubGraph(mock.Anything, SubgraphPrefix+"nodeMetadata", mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(nil)
 
 		flyteNode := &core.Node{
 			Id: "id",
@@ -344,8 +344,8 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, attrs).Return(fmt.Errorf("unable to add node"))
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(nil)
 
 		flyteNode := &core.Node{
 			Id: "id",
@@ -375,7 +375,7 @@ func TestConstructNode(t *testing.T) {
 		gb := newGraphBuilder()
 		mockGraph := &mocks.Graphvizer{}
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch("", SubgraphPrefix+"id",
+		mockGraph.EXPECT().AddSubGraph("", SubgraphPrefix+"id",
 			mock.Anything).Return(fmt.Errorf("unable to create subgraph"))
 		flyteNode := &core.Node{
 			Id: "id",
@@ -396,7 +396,7 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddSubGraph(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
 
 		flyteNode := &core.Node{
 			Id: "id",
@@ -427,9 +427,9 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
-		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add node"))
-		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddSubGraph(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
+		mockGraph.EXPECT().AddNode(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add node"))
+		mockGraph.EXPECT().GetNode(mock.Anything).Return(nil)
 
 		gb.subWf = make(map[string]*core.CompiledWorkflow)
 		subwfNode := &core.Node{

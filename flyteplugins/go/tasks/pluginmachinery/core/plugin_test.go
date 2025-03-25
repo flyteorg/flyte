@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 )
 
 func TestLoadPlugin(t *testing.T) {
@@ -16,7 +17,7 @@ func TestLoadPlugin(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
 		corePlugin.On("GetID").Return(corePluginType)
-		corePlugin.OnGetProperties().Return(core.PluginProperties{})
+		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{})
 
 		corePluginEntry := core.PluginEntry{
 			ID:                  corePluginType,
@@ -35,7 +36,7 @@ func TestLoadPlugin(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
 		corePlugin.On("GetID").Return(corePluginType)
 		length := 10
-		corePlugin.OnGetProperties().Return(core.PluginProperties{
+		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
 		})
 
@@ -56,7 +57,7 @@ func TestLoadPlugin(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
 		corePlugin.On("GetID").Return(corePluginType)
 		length := 10
-		corePlugin.OnGetProperties().Return(core.PluginProperties{
+		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
 		})
 
@@ -76,7 +77,7 @@ func TestLoadPlugin(t *testing.T) {
 		corePlugin := &mocks.Plugin{}
 		corePlugin.On("GetID").Return(corePluginType)
 		length := 5
-		corePlugin.OnGetProperties().Return(core.PluginProperties{
+		corePlugin.EXPECT().GetProperties().Return(core.PluginProperties{
 			GeneratedNameMaxLength: &length,
 		})
 
@@ -95,7 +96,7 @@ func TestLoadPlugin(t *testing.T) {
 }
 
 func TestAgentService(t *testing.T) {
-	agentService := core.AgentService{}
+	agentService := agent.AgentService{}
 	taskTypes := []core.TaskType{"sensor", "chatgpt"}
 
 	for _, taskType := range taskTypes {

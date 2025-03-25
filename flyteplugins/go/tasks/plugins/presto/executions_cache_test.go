@@ -40,8 +40,8 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := p.SyncPrestoQuery(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		mockCache := &cacheMocks.AutoRefresh{}
 		mockPresto := &prestoMocks.PrestoClient{}
 		mockSecretManager := &mocks.SecretManager{}
-		mockSecretManager.OnGetMatch(mock.Anything, mock.Anything).Return("fake key", nil)
+		mockSecretManager.EXPECT().Get(mock.Anything, mock.Anything).Return("fake key", nil)
 
 		testScope := promutils.NewTestScope()
 
@@ -72,13 +72,13 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 			ExecutionState: state,
 			Identifier:     "some-id",
 		}
-		mockPresto.OnGetCommandStatusMatch(mock.Anything, mock.MatchedBy(func(commandId string) bool {
+		mockPresto.EXPECT().GetCommandStatus(mock.Anything, mock.MatchedBy(func(commandId string) bool {
 			return commandId == state.CommandID
-		}), mock.Anything).Return(client.PrestoStatusFinished, nil)
+		})).Return(client.PrestoStatusFinished, nil)
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := p.SyncPrestoQuery(ctx, []cache.ItemWrapper{iw})
 		newExecutionState := newCacheItem[0].Item.(ExecutionStateCacheItem)

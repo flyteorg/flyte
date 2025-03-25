@@ -39,7 +39,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 	ctx := context.Background()
 
 	tReader := &mocks.TaskReader{}
-	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
+	tReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{
 		Interface: &core.TypedInterface{
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
@@ -51,21 +51,21 @@ func TestEnsureJobDefinition(t *testing.T) {
 	}, nil)
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfig().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("found")
+	tID.EXPECT().GetGeneratedName().Return("found")
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
-	tMeta.OnGetAnnotations().Return(map[string]string{})
-	tMeta.OnGetSecurityContext().Return(core.SecurityContext{})
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
+	tMeta.EXPECT().GetAnnotations().Return(map[string]string{})
+	tMeta.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tReader)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskReader().Return(tReader)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 	cfg := &config.Config{}
 	batchClient := NewCustomBatchClient(batchMocks.NewMockAwsBatchClient(), "", "",
@@ -109,7 +109,7 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 	ctx := context.Background()
 
 	tReader := &mocks.TaskReader{}
-	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
+	tReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{
 		Interface: &core.TypedInterface{
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
@@ -122,23 +122,23 @@ func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
 	}, nil)
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+	overrides.EXPECT().GetConfig().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("found")
+	tID.EXPECT().GetGeneratedName().Return("found")
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
-	tMeta.OnGetOverrides().Return(overrides)
-	tMeta.OnGetAnnotations().Return(map[string]string{})
-	tMeta.OnGetSecurityContext().Return(core.SecurityContext{
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetOverrides().Return(overrides)
+	tMeta.EXPECT().GetAnnotations().Return(map[string]string{})
+	tMeta.EXPECT().GetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{IamRole: "new-role"},
 	})
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tReader)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskReader().Return(tReader)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 	cfg := &config.Config{}
 	batchClient := NewCustomBatchClient(batchMocks.NewMockAwsBatchClient(), "", "",

@@ -156,7 +156,7 @@ func TestExecute(t *testing.T) {
 			},
 		},
 	}
-	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
+	mockBuilder.EXPECT().Build(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
 		return proto.Equal(wfClosure, &workflowClosure)
 	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
 		return proto.Equal(inputs, testInputs)
@@ -208,7 +208,7 @@ func TestExecute_AlreadyExists(t *testing.T) {
 	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
 
 	mockBuilder := mocks.FlyteWorkflowBuilder{}
-	mockBuilder.OnBuildMatch(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
+	mockBuilder.EXPECT().Build(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
 	executor := K8sWorkflowExecutor{
 		config:           mockRuntime,
 		workflowBuilder:  &mockBuilder,
@@ -252,7 +252,7 @@ func TestExecute_MiscError(t *testing.T) {
 	mockRuntime := runtimeMocks.NewMockConfigurationProvider(&mockApplicationConfig, nil, nil, nil, nil, nil)
 
 	mockBuilder := mocks.FlyteWorkflowBuilder{}
-	mockBuilder.OnBuildMatch(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
+	mockBuilder.EXPECT().Build(mock.Anything, mock.Anything, mock.Anything, namespace).Return(flyteWf, nil)
 	executor := K8sWorkflowExecutor{
 		config:           mockRuntime,
 		workflowBuilder:  &mockBuilder,
@@ -376,7 +376,7 @@ func TestExecute_OffloadWorkflowClosure(t *testing.T) {
 		SubWorkflows: []*core.CompiledWorkflow{},
 		Tasks:        []*core.CompiledTask{},
 	}
-	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
+	mockBuilder.EXPECT().Build(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
 		return proto.Equal(wfClosure, &workflowClosure)
 	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
 		return proto.Equal(inputs, testInputs)
@@ -449,7 +449,7 @@ func TestExecute_OffloadInputs(t *testing.T) {
 			},
 		},
 	}
-	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
+	mockBuilder.EXPECT().Build(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
 		return proto.Equal(wfClosure, &workflowClosure)
 	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
 		return proto.Equal(inputs, testInputs)

@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -64,7 +65,7 @@ func TestPropeller_Handle(t *testing.T) {
 		s := &mocks.FlyteWorkflow{}
 		exec := &mockExecutor{}
 		p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrStaleWorkflowError, "stale")).Once()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrStaleWorkflowError, "stale")).Once()
 		assert.NoError(t, p.Handle(ctx, namespace, name))
 	})
 
@@ -768,8 +769,8 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 				ID: "w1",
 			},
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -789,8 +790,8 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 				ID: "w1",
 			},
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -814,7 +815,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseRunning, "done", nil)
 			return nil
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
 			return w.Status.Phase == v1alpha1.WorkflowPhaseFailing
@@ -841,7 +842,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", nil)
 			return nil
 		}
-		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
 			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !controllerutil.ContainsFinalizer(w, Finalizer) && HasCompletedLabel(w)
@@ -880,9 +881,9 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, msg protoiface.MessageV1) {
 			// populate mock CompiledWorkflowClosure that satisfies just enough to compile
-			wfClosure := args.Get(2)
+			wfClosure := msg
 			assert.NotNil(t, wfClosure)
 			casted := wfClosure.(*admin.WorkflowClosure)
 			casted.CompiledWorkflow = &core.CompiledWorkflowClosure{
@@ -913,7 +914,7 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
 		dataStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, protoStore)
 		p := NewPropellerHandler(ctx, cfg, dataStore, s, exec, scope)
 
@@ -925,7 +926,7 @@ func TestPropellerHandler_OffloadedWorkflowClosure(t *testing.T) {
 		scope := promutils.NewTestScope()
 
 		protoStore := &storagemocks.ComposedProtobufStore{}
-		protoStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
+		protoStore.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("foo"))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
 			return fmt.Errorf("foo")
 		}

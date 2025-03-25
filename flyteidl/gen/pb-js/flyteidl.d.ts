@@ -4598,6 +4598,9 @@ export namespace flyteidl {
 
             /** ArrayNode dataMode */
             dataMode?: (flyteidl.core.ArrayNode.DataMode|null);
+
+            /** ArrayNode boundInputs */
+            boundInputs?: (string[]|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4629,6 +4632,9 @@ export namespace flyteidl {
 
             /** ArrayNode dataMode. */
             public dataMode: flyteidl.core.ArrayNode.DataMode;
+
+            /** ArrayNode boundInputs. */
+            public boundInputs: string[];
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -10075,6 +10081,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
         }
 
         /** Represents a GetTaskRequest. */
@@ -10094,6 +10103,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest outputPrefix. */
+            public outputPrefix: string;
 
             /**
              * Creates a new GetTaskRequest instance using the specified properties.
@@ -10976,11 +10988,85 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** LogLineOriginator enum. */
+        enum LogLineOriginator {
+            UNKNOWN = 0,
+            USER = 1,
+            SYSTEM = 2
+        }
+
+        /** Properties of a LogLine. */
+        interface ILogLine {
+
+            /** LogLine timestamp */
+            timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** LogLine message */
+            message?: (string|null);
+
+            /** LogLine originator */
+            originator?: (flyteidl.admin.LogLineOriginator|null);
+        }
+
+        /** Represents a LogLine. */
+        class LogLine implements ILogLine {
+
+            /**
+             * Constructs a new LogLine.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ILogLine);
+
+            /** LogLine timestamp. */
+            public timestamp?: (google.protobuf.ITimestamp|null);
+
+            /** LogLine message. */
+            public message: string;
+
+            /** LogLine originator. */
+            public originator: flyteidl.admin.LogLineOriginator;
+
+            /**
+             * Creates a new LogLine instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LogLine instance
+             */
+            public static create(properties?: flyteidl.admin.ILogLine): flyteidl.admin.LogLine;
+
+            /**
+             * Encodes the specified LogLine message. Does not implicitly {@link flyteidl.admin.LogLine.verify|verify} messages.
+             * @param message LogLine message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ILogLine, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LogLine message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LogLine
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.LogLine;
+
+            /**
+             * Verifies a LogLine message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a GetTaskLogsResponseBody. */
         interface IGetTaskLogsResponseBody {
 
             /** GetTaskLogsResponseBody results */
             results?: (string[]|null);
+
+            /** GetTaskLogsResponseBody structuredLines */
+            structuredLines?: (flyteidl.admin.ILogLine[]|null);
         }
 
         /** Represents a GetTaskLogsResponseBody. */
@@ -10994,6 +11080,9 @@ export namespace flyteidl {
 
             /** GetTaskLogsResponseBody results. */
             public results: string[];
+
+            /** GetTaskLogsResponseBody structuredLines. */
+            public structuredLines: flyteidl.admin.ILogLine[];
 
             /**
              * Creates a new GetTaskLogsResponseBody instance using the specified properties.
@@ -12079,6 +12168,9 @@ export namespace flyteidl {
 
             /** EmailNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** EmailNotification template */
+            template?: (string|null);
         }
 
         /** Represents an EmailNotification. */
@@ -12092,6 +12184,9 @@ export namespace flyteidl {
 
             /** EmailNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** EmailNotification template. */
+            public template: string;
 
             /**
              * Creates a new EmailNotification instance using the specified properties.
@@ -12131,6 +12226,9 @@ export namespace flyteidl {
 
             /** PagerDutyNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** PagerDutyNotification template */
+            template?: (string|null);
         }
 
         /** Represents a PagerDutyNotification. */
@@ -12144,6 +12242,9 @@ export namespace flyteidl {
 
             /** PagerDutyNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** PagerDutyNotification template. */
+            public template: string;
 
             /**
              * Creates a new PagerDutyNotification instance using the specified properties.
@@ -12183,6 +12284,9 @@ export namespace flyteidl {
 
             /** SlackNotification recipientsEmail */
             recipientsEmail?: (string[]|null);
+
+            /** SlackNotification template */
+            template?: (string|null);
         }
 
         /** Represents a SlackNotification. */
@@ -12196,6 +12300,9 @@ export namespace flyteidl {
 
             /** SlackNotification recipientsEmail. */
             public recipientsEmail: string[];
+
+            /** SlackNotification template. */
+            public template: string;
 
             /**
              * Creates a new SlackNotification instance using the specified properties.

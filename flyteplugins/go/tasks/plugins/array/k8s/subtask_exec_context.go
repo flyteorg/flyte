@@ -67,7 +67,7 @@ func (s SubTaskExecutionContext) PluginStateReader() pluginsCore.PluginStateRead
 	return pluginStateReader{}
 }
 
-// NewSubtaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
+// NewSubTaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
 func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
 	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
 
