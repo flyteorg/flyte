@@ -128,9 +128,10 @@ var (
 			VolumePath:      "/mnt/k8s-disks/0/union-persistent-data",
 		},
 		ArrayNode: ArrayNodeConfig{
-			EventVersion:               0,
-			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
-			UseMapPluginLogs:           false,
+			EventVersion:                0,
+			DefaultParallelismBehavior:  ParallelismBehaviorUnlimited,
+			UseMapPluginLogs:            false,
+			MaxTaskPhaseVersionAttempts: 3,
 		},
 		LiteralOffloadingConfig: LiteralOffloadingConfig{
 			Enabled: false, // Default keep this disabled and we will followup when flytekit is released with the offloaded changes.
@@ -363,9 +364,10 @@ const (
 )
 
 type ArrayNodeConfig struct {
-	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
-	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
-	UseMapPluginLogs           bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
+	EventVersion                int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
+	DefaultParallelismBehavior  ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
+	UseMapPluginLogs            bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
+	MaxTaskPhaseVersionAttempts int                 `json:"max-task-phase-version-attempts" pflag:",Maximum number of attempts for incrementing the task phase version on events to bypass the already exists error"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.
