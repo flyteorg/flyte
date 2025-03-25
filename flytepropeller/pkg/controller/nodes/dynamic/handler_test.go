@@ -27,7 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
-	futureCatalogMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/mocks"
+	catalogMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/dynamic/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
@@ -197,7 +197,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 			}
 			h := &mocks.TaskNodeHandler{}
-			h.OnIsCacheableMatch(mock.Anything, mock.Anything).Return(false, false, nil)
+			h.EXPECT().IsCacheable(mock.Anything, mock.Anything).Return(false, false, nil)
 			mockLPLauncher := &lpMocks.Reader{}
 			n := &nodeMocks.Node{}
 			if tt.args.isErr {
@@ -205,7 +205,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			} else {
 				h.EXPECT().Handle(mock.Anything, mock.Anything).Return(tt.args.trns, nil)
 			}
-			c := futureCatalogMocks.FutureCatalogClient{}
+			c := catalogMocks.CatalogClient{}
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), &c)
 			got, err := d.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.isErr {
@@ -325,20 +325,20 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 
 		res := &v12.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
-		n.OnGetResources().Return(res)
-		n.OnGetID().Return("n1")
+		n.EXPECT().GetResources().Return(res)
+		n.EXPECT().GetID().Return("n1")
 
 		nm := &nodeMocks.NodeExecutionMetadata{}
-		nm.OnGetAnnotations().Return(map[string]string{})
-		nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		nm.EXPECT().GetAnnotations().Return(map[string]string{})
+		nm.EXPECT().GetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
 			ExecutionId: wfExecID,
 			NodeId:      n.GetID(),
 		})
-		nm.OnGetK8sServiceAccount().Return("service-account")
-		nm.OnGetLabels().Return(map[string]string{})
-		nm.OnGetNamespace().Return("namespace")
-		nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-		nm.OnGetOwnerReference().Return(v1.OwnerReference{
+		nm.EXPECT().GetK8sServiceAccount().Return("service-account")
+		nm.EXPECT().GetLabels().Return(map[string]string{})
+		nm.EXPECT().GetNamespace().Return("namespace")
+		nm.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 			Kind: "sample",
 			Name: "name",
 		})
@@ -366,39 +366,39 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 			},
 		}
 		tr := &nodeMocks.TaskReader{}
-		tr.OnGetTaskID().Return(taskID)
-		tr.OnGetTaskType().Return(ttype)
-		tr.OnReadMatch(mock.Anything).Return(tk, nil)
+		tr.EXPECT().GetTaskID().Return(taskID)
+		tr.EXPECT().GetTaskType().Return(ttype)
+		tr.EXPECT().Read(mock.Anything).Return(tk, nil)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
-		ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
-		ns.OnGetOutputDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetDataDir().Return(storage.DataReference("data-dir"))
+		ns.EXPECT().GetOutputDir().Return(storage.DataReference("data-dir"))
 
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		execContext := executorMocks.ExecutionContext{}
 		immutableParentInfo := executorMocks.ImmutableParentInfo{}
-		immutableParentInfo.OnGetUniqueID().Return("c1")
-		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		nCtx.OnNodeExecutionMetadata().Return(nm)
-		nCtx.OnNode().Return(n)
-		nCtx.OnInputReader().Return(ir)
-		nCtx.OnCurrentAttempt().Return(uint32(1))
-		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnNodeStatus().Return(ns)
-		nCtx.OnNodeID().Return("n1")
-		nCtx.OnEnqueueOwnerFunc().Return(nil)
-		nCtx.OnDataStore().Return(dataStore)
-		nCtx.OnExecutionContext().Return(&execContext)
+		immutableParentInfo.EXPECT().GetUniqueID().Return("c1")
+		immutableParentInfo.EXPECT().CurrentAttempt().Return(uint32(2))
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		nCtx.EXPECT().NodeExecutionMetadata().Return(nm)
+		nCtx.EXPECT().Node().Return(n)
+		nCtx.EXPECT().InputReader().Return(ir)
+		nCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		nCtx.EXPECT().TaskReader().Return(tr)
+		nCtx.EXPECT().NodeStatus().Return(ns)
+		nCtx.EXPECT().NodeID().Return("n1")
+		nCtx.EXPECT().EnqueueOwnerFunc().Return(nil)
+		nCtx.EXPECT().DataStore().Return(dataStore)
+		nCtx.EXPECT().ExecutionContext().Return(&execContext)
 
 		r := &nodeMocks.NodeStateReader{}
 		w := &nodeMocks.NodeStateWriter{}
-		w.OnPutDynamicNodeStateMatch(mock.Anything).Return(nil)
-		r.OnGetDynamicNodeState().Return(handler.DynamicNodeState{})
-		nCtx.OnNodeStateReader().Return(r)
-		nCtx.OnNodeStateWriter().Return(w)
+		w.EXPECT().PutDynamicNodeState(mock.Anything).Return(nil)
+		r.EXPECT().GetDynamicNodeState().Return(handler.DynamicNodeState{})
+		nCtx.EXPECT().NodeStateReader().Return(r)
+		nCtx.EXPECT().NodeStateWriter().Return(w)
 
 		return nCtx
 	}
@@ -406,17 +406,17 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 	t.Run("Test cache hit skipping task node handler handle", func(t *testing.T) {
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &catalogMocks.CatalogClient{}
 		nCtx := createNodeContext("test")
 
 		h := &mocks.TaskNodeHandler{}
-		h.OnIsCacheableMatch(mock.Anything, mock.Anything).Return(true, true, nil)
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
+		h.EXPECT().IsCacheable(mock.Anything, mock.Anything).Return(true, true, nil)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 
 		mockFutureArtifactLiteralMap, err := datacatalog.GenerateFutureLiteralMapFromArtifact(core.Identifier{}, getTestFutureArtifact())
 		assert.NoError(t, err)
 		mockOutputReader := &outputReaderMock.OutputReader{}
-		mockOutputReader.OnReadMatch(mock.Anything).Return(mockFutureArtifactLiteralMap, nil, nil)
+		mockOutputReader.EXPECT().Read(mock.Anything).Return(mockFutureArtifactLiteralMap, nil, nil)
 		mockEntry := catalog.NewCatalogEntry(mockOutputReader, catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{}))
 		mockFutureCatalog.On("GetFuture", mock.Anything, mock.Anything).Return(mockEntry, nil)
 
@@ -435,7 +435,7 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 	t.Run("Test cache miss task handler do handle", func(t *testing.T) {
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &catalogMocks.CatalogClient{}
 		nCtx := createNodeContext("test")
 
 		mockOutputReader := &outputReaderMock.OutputReader{}
@@ -450,8 +450,8 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 		mockFutureCatalog.On("ReleaseReservation", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		h := &mocks.TaskNodeHandler{}
-		h.OnIsCacheableMatch(mock.Anything, mock.Anything).Return(true, true, nil)
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
+		h.EXPECT().IsCacheable(mock.Anything, mock.Anything).Return(true, true, nil)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 		execInfo := &handler.ExecutionInfo{
 			TaskNodeInfo: &handler.TaskNodeInfo{},
 		}
@@ -479,7 +479,7 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 	t.Run("test return unknown transition if cache reservation already acquired", func(t *testing.T) {
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &catalogMocks.CatalogClient{}
 		nCtx := createNodeContext("test")
 
 		mockOutputReader := &outputReaderMock.OutputReader{}
@@ -489,8 +489,8 @@ func Test_dynamicNodeHandler_Handle_Parent_Cache_behaviour(t *testing.T) {
 		mockFutureCatalog.On("GetOrExtendReservation", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(notExistedReservation, nil)
 
 		h := &mocks.TaskNodeHandler{}
-		h.OnIsCacheableMatch(mock.Anything, mock.Anything).Return(true, true, nil)
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
+		h.EXPECT().IsCacheable(mock.Anything, mock.Anything).Return(true, true, nil)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, nil)
 
 		d := New(h, mockNodeExecutor, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockFutureCatalog)
 		trns, err := d.Handle(context.TODO(), nCtx)
@@ -585,6 +585,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 
 	t.Run("parent-finalize-success", func(t *testing.T) {
 		nCtx := createNodeContext("test")
+		mockCatalog := &catalogMocks.CatalogClient{}
 		s := &dynamicNodeStateHolder{
 			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
 		}
@@ -597,7 +598,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 		got, err := d.Handle(context.TODO(), nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning.String(), got.Info().GetPhase().String())
@@ -605,6 +606,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 
 	t.Run("parent-finalize-error", func(t *testing.T) {
 		nCtx := createNodeContext("test")
+		mockCatalog := &catalogMocks.CatalogClient{}
 		s := &dynamicNodeStateHolder{
 			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
 		}
@@ -617,7 +619,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
 		h.EXPECT().Finalize(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
-		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 		_, err = d.Handle(context.TODO(), nCtx)
 		assert.Error(t, err)
 	})
@@ -876,7 +878,8 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
 			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.EXPECT().ExecutionContext().Return(&execContext)
-			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+			mockCatalog := &catalogMocks.CatalogClient{}
+			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
 				assert.Error(t, err)
@@ -1063,7 +1066,8 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			execContext.EXPECT().GetParentInfo().Return(nil)
 			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.EXPECT().ExecutionContext().Return(&execContext)
-			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+			mockCatalog := &catalogMocks.CatalogClient{}
+			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 			got, err := d.Handle(context.TODO(), nCtx)
 			if tt.want.isErr {
 				assert.Error(t, err)
@@ -1264,7 +1268,8 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.EXPECT().Finalize(ctx, nCtx).Return(nil)
 		n := &nodeMocks.Node{}
 		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+		mockCatalog := &catalogMocks.CatalogClient{}
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 		assert.NoError(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
@@ -1285,7 +1290,8 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.EXPECT().Finalize(ctx, nCtx).Return(fmt.Errorf("err"))
 		n := &nodeMocks.Node{}
 		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
-		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+		mockCatalog := &catalogMocks.CatalogClient{}
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
@@ -1306,7 +1312,8 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		h.EXPECT().Finalize(ctx, nCtx).Return(nil)
 		n := &nodeMocks.Node{}
 		n.EXPECT().FinalizeHandler(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
-		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
+		mockCatalog := &catalogMocks.CatalogClient{}
+		d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockCatalog)
 		assert.Error(t, d.Finalize(ctx, nCtx))
 		assert.NotZero(t, len(h.ExpectedCalls))
 		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)

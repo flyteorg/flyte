@@ -246,6 +246,80 @@ func (_c *DataCatalogClient_CreateDataset_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
+// CreateFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) CreateFutureArtifact(ctx context.Context, in *datacatalog.CreateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.CreateArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateFutureArtifact")
+	}
+
+	var r0 *datacatalog.CreateArtifactResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) (*datacatalog.CreateArtifactResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) *datacatalog.CreateArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.CreateArtifactResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DataCatalogClient_CreateFutureArtifact_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateFutureArtifact'
+type DataCatalogClient_CreateFutureArtifact_Call struct {
+	*mock.Call
+}
+
+// CreateFutureArtifact is a helper method to define mock.On call
+//   - ctx context.Context
+//   - in *datacatalog.CreateArtifactRequest
+//   - opts ...grpc.CallOption
+func (_e *DataCatalogClient_Expecter) CreateFutureArtifact(ctx interface{}, in interface{}, opts ...interface{}) *DataCatalogClient_CreateFutureArtifact_Call {
+	return &DataCatalogClient_CreateFutureArtifact_Call{Call: _e.mock.On("CreateFutureArtifact",
+		append([]interface{}{ctx, in}, opts...)...)}
+}
+
+func (_c *DataCatalogClient_CreateFutureArtifact_Call) Run(run func(ctx context.Context, in *datacatalog.CreateArtifactRequest, opts ...grpc.CallOption)) *DataCatalogClient_CreateFutureArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]grpc.CallOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(grpc.CallOption)
+			}
+		}
+		run(args[0].(context.Context), args[1].(*datacatalog.CreateArtifactRequest), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *DataCatalogClient_CreateFutureArtifact_Call) Return(_a0 *datacatalog.CreateArtifactResponse, _a1 error) *DataCatalogClient_CreateFutureArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DataCatalogClient_CreateFutureArtifact_Call) RunAndReturn(run func(context.Context, *datacatalog.CreateArtifactRequest, ...grpc.CallOption) (*datacatalog.CreateArtifactResponse, error)) *DataCatalogClient_CreateFutureArtifact_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetArtifact provides a mock function with given fields: ctx, in, opts
 func (_m *DataCatalogClient) GetArtifact(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption) (*datacatalog.GetArtifactResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -390,6 +464,80 @@ func (_c *DataCatalogClient_GetDataset_Call) Return(_a0 *datacatalog.GetDatasetR
 }
 
 func (_c *DataCatalogClient_GetDataset_Call) RunAndReturn(run func(context.Context, *datacatalog.GetDatasetRequest, ...grpc.CallOption) (*datacatalog.GetDatasetResponse, error)) *DataCatalogClient_GetDataset_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) GetFutureArtifact(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption) (*datacatalog.GetArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFutureArtifact")
+	}
+
+	var r0 *datacatalog.GetArtifactResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) (*datacatalog.GetArtifactResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) *datacatalog.GetArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.GetArtifactResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DataCatalogClient_GetFutureArtifact_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFutureArtifact'
+type DataCatalogClient_GetFutureArtifact_Call struct {
+	*mock.Call
+}
+
+// GetFutureArtifact is a helper method to define mock.On call
+//   - ctx context.Context
+//   - in *datacatalog.GetArtifactRequest
+//   - opts ...grpc.CallOption
+func (_e *DataCatalogClient_Expecter) GetFutureArtifact(ctx interface{}, in interface{}, opts ...interface{}) *DataCatalogClient_GetFutureArtifact_Call {
+	return &DataCatalogClient_GetFutureArtifact_Call{Call: _e.mock.On("GetFutureArtifact",
+		append([]interface{}{ctx, in}, opts...)...)}
+}
+
+func (_c *DataCatalogClient_GetFutureArtifact_Call) Run(run func(ctx context.Context, in *datacatalog.GetArtifactRequest, opts ...grpc.CallOption)) *DataCatalogClient_GetFutureArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]grpc.CallOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(grpc.CallOption)
+			}
+		}
+		run(args[0].(context.Context), args[1].(*datacatalog.GetArtifactRequest), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *DataCatalogClient_GetFutureArtifact_Call) Return(_a0 *datacatalog.GetArtifactResponse, _a1 error) *DataCatalogClient_GetFutureArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DataCatalogClient_GetFutureArtifact_Call) RunAndReturn(run func(context.Context, *datacatalog.GetArtifactRequest, ...grpc.CallOption) (*datacatalog.GetArtifactResponse, error)) *DataCatalogClient_GetFutureArtifact_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -760,6 +908,80 @@ func (_c *DataCatalogClient_UpdateArtifact_Call) Return(_a0 *datacatalog.UpdateA
 }
 
 func (_c *DataCatalogClient_UpdateArtifact_Call) RunAndReturn(run func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error)) *DataCatalogClient_UpdateArtifact_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateFutureArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *DataCatalogClient) UpdateFutureArtifact(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateFutureArtifact")
+	}
+
+	var r0 *datacatalog.UpdateArtifactResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) *datacatalog.UpdateArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.UpdateArtifactResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DataCatalogClient_UpdateFutureArtifact_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateFutureArtifact'
+type DataCatalogClient_UpdateFutureArtifact_Call struct {
+	*mock.Call
+}
+
+// UpdateFutureArtifact is a helper method to define mock.On call
+//   - ctx context.Context
+//   - in *datacatalog.UpdateArtifactRequest
+//   - opts ...grpc.CallOption
+func (_e *DataCatalogClient_Expecter) UpdateFutureArtifact(ctx interface{}, in interface{}, opts ...interface{}) *DataCatalogClient_UpdateFutureArtifact_Call {
+	return &DataCatalogClient_UpdateFutureArtifact_Call{Call: _e.mock.On("UpdateFutureArtifact",
+		append([]interface{}{ctx, in}, opts...)...)}
+}
+
+func (_c *DataCatalogClient_UpdateFutureArtifact_Call) Run(run func(ctx context.Context, in *datacatalog.UpdateArtifactRequest, opts ...grpc.CallOption)) *DataCatalogClient_UpdateFutureArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]grpc.CallOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(grpc.CallOption)
+			}
+		}
+		run(args[0].(context.Context), args[1].(*datacatalog.UpdateArtifactRequest), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *DataCatalogClient_UpdateFutureArtifact_Call) Return(_a0 *datacatalog.UpdateArtifactResponse, _a1 error) *DataCatalogClient_UpdateFutureArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *DataCatalogClient_UpdateFutureArtifact_Call) RunAndReturn(run func(context.Context, *datacatalog.UpdateArtifactRequest, ...grpc.CallOption) (*datacatalog.UpdateArtifactResponse, error)) *DataCatalogClient_UpdateFutureArtifact_Call {
 	_c.Call.Return(run)
 	return _c
 }

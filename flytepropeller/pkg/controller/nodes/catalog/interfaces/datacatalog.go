@@ -7,7 +7,7 @@ import (
 	futureFileReaderInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/interfaces"
 )
 
-//go:generate mockery-v2 --name FutureCatalogClient --output ../mocks --case=snake --with-expecter
+//go:generate mockery-v2 --name CatalogClient --output ../mocks --case=snake --with-expecter
 
 // FutureClient extends Client interface to support asynchronous operations
 type CatalogClient interface {

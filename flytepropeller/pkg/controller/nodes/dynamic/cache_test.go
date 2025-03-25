@@ -22,7 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-	futureCatalogMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/mocks"
+	CatalogMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/mocks"
 	dynamicHandlerMock "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/dynamic/mocks"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	lpMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
@@ -37,22 +37,22 @@ func TestComputeCatalogReservationOwnerID(t *testing.T) {
 		mockCtx := &nodeMocks.NodeExecutionContext{}
 		mockExecContext := &executorMocks.ExecutionContext{}
 		mockNodeExecMetadata := &nodeMocks.NodeExecutionMetadata{}
-		mockNodeExecMetadata.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		mockNodeExecMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
 
 		// Set mock expectations
 		mockParentInfo := &executorMocks.ImmutableParentInfo{}
-		mockParentInfo.OnGetUniqueID().Return("id")
-		mockParentInfo.OnCurrentAttempt().Return(1)
+		mockParentInfo.EXPECT().GetUniqueID().Return("id")
+		mockParentInfo.EXPECT().CurrentAttempt().Return(1)
 		mockParentInfo.On("GetExecutionID").Return(&core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
 		})
-		mockExecContext.OnGetParentInfo().Return(mockParentInfo)
-		mockCtx.OnExecutionContext().Return(mockExecContext)
-		mockCtx.OnNodeID().Return("node-1")
-		mockCtx.OnCurrentAttempt().Return(uint32(1))
-		mockCtx.OnNodeExecutionMetadata().Return(mockNodeExecMetadata)
+		mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
+		mockCtx.EXPECT().ExecutionContext().Return(mockExecContext)
+		mockCtx.EXPECT().NodeID().Return("node-1")
+		mockCtx.EXPECT().CurrentAttempt().Return(uint32(1))
+		mockCtx.EXPECT().NodeExecutionMetadata().Return(mockNodeExecMetadata)
 
 		// Execute test
 		ownerID, err := computeCatalogReservationOwnerID(mockCtx)
@@ -69,11 +69,11 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 	t.Run("getFutureCatalogEntry returns error", func(t *testing.T) {
 		h := &dynamicHandlerMock.TaskNodeHandler{}
 		expectedErr := errors.New("catalog entry error")
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalog.Key{}, expectedErr)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalog.Key{}, expectedErr)
 
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &CatalogMocks.CatalogClient{}
 
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		d := New(h, mockNodeExecutor, mockLPLauncher, eventConfig, promutils.NewTestScope(), mockFutureCatalog)
@@ -89,7 +89,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 		h := &dynamicHandlerMock.TaskNodeHandler{}
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &CatalogMocks.CatalogClient{}
 		scope := promutils.NewTestScope()
 
 		nCtx := &nodeMocks.NodeExecutionContext{}
@@ -102,7 +102,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 			},
 			TypedInterface: core.TypedInterface{},
 		}
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalogKey, nil)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalogKey, nil)
 
 		expectedErr := errors.New("catalog get error")
 		mockFutureCatalog.EXPECT().GetFuture(mock.Anything, mock.Anything).Return(catalog.Entry{}, expectedErr)
@@ -119,7 +119,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 		h := &dynamicHandlerMock.TaskNodeHandler{}
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &CatalogMocks.CatalogClient{}
 		scope := promutils.NewTestScope()
 
 		nCtx := &nodeMocks.NodeExecutionContext{}
@@ -132,7 +132,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 			},
 			TypedInterface: core.TypedInterface{},
 		}
-		h.OnGetCatalogKeyMatch(mock.Anything, mock.Anything).Return(catalogKey, nil)
+		h.EXPECT().GetCatalogKey(mock.Anything, mock.Anything).Return(catalogKey, nil)
 
 		expectedErr := status.Error(codes.NotFound, "catalog entry not found")
 		mockFutureCatalog.EXPECT().GetFuture(mock.Anything, mock.Anything).Return(catalog.Entry{}, expectedErr)
@@ -218,7 +218,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 				},
 			},
 		}
-		mockReader.OnReadMatch(mock.Anything).Return(djSpecLiteralMap, nil, nil)
+		mockReader.EXPECT().Read(mock.Anything).Return(djSpecLiteralMap, nil, nil)
 
 		status := catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{})
 		entry := catalog.NewCatalogEntry(mockReader, status)
@@ -226,7 +226,7 @@ func TestCheckCatalogFutureCache(t *testing.T) {
 		h := &dynamicHandlerMock.TaskNodeHandler{}
 		mockNodeExecutor := &nodeMocks.Node{}
 		mockLPLauncher := &lpMocks.Reader{}
-		mockFutureCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockFutureCatalog := &CatalogMocks.CatalogClient{}
 		scope := promutils.NewTestScope()
 
 		d := New(h, mockNodeExecutor, mockLPLauncher, eventConfig, scope, mockFutureCatalog)
@@ -246,10 +246,10 @@ func setupMockExecutionContext(t *testing.T) (*nodeMocks.NodeExecutionContext, *
 	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	mockCtx.OnNodeID().Return("test-node-id")
+	mockCtx.EXPECT().NodeID().Return("test-node-id")
 
 	mockNodeExecMetadata := &nodeMocks.NodeExecutionMetadata{}
-	mockNodeExecMetadata.OnGetOwnerID().Return(types.NamespacedName{Namespace: "test-namespace", Name: "test-name"})
+	mockNodeExecMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{Namespace: "test-namespace", Name: "test-name"})
 
 	nodeExecutionID := &core.NodeExecutionIdentifier{
 		ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -259,12 +259,12 @@ func setupMockExecutionContext(t *testing.T) (*nodeMocks.NodeExecutionContext, *
 		},
 		NodeId: "node-1",
 	}
-	mockNodeExecMetadata.OnGetNodeExecutionID().Return(nodeExecutionID)
-	mockCtx.OnNodeExecutionMetadata().Return(mockNodeExecMetadata)
+	mockNodeExecMetadata.EXPECT().GetNodeExecutionID().Return(nodeExecutionID)
+	mockCtx.EXPECT().NodeExecutionMetadata().Return(mockNodeExecMetadata)
 
 	mockTaskReader := &nodeMocks.TaskReader{}
-	mockCtx.OnTaskReader().Return(mockTaskReader)
-	mockCtx.OnCurrentAttempt().Return(1)
+	mockCtx.EXPECT().TaskReader().Return(mockTaskReader)
+	mockCtx.EXPECT().CurrentAttempt().Return(1)
 
 	taskID := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
@@ -274,15 +274,15 @@ func setupMockExecutionContext(t *testing.T) (*nodeMocks.NodeExecutionContext, *
 		Version:      "version",
 	}
 
-	mockTaskReader.OnGetTaskID().Return(taskID)
-	mockTaskReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
+	mockTaskReader.EXPECT().GetTaskID().Return(taskID)
+	mockTaskReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{
 		Id: taskID,
 	}, nil)
 
-	mockCtx.OnExecutionContext().Return(mockExecContext)
-	mockCtx.OnNodeStatus().Return(mockNodeStatus)
-	mockNodeStatus.OnGetOutputDir().Return(storage.DataReference("test-output-dir"))
-	mockCtx.OnDataStore().Return(dataStore)
+	mockCtx.EXPECT().ExecutionContext().Return(mockExecContext)
+	mockCtx.EXPECT().NodeStatus().Return(mockNodeStatus)
+	mockNodeStatus.EXPECT().GetOutputDir().Return(storage.DataReference("test-output-dir"))
+	mockCtx.EXPECT().DataStore().Return(dataStore)
 
 	return mockCtx, mockExecContext
 }
@@ -291,7 +291,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("success with overwrite cache", func(t *testing.T) {
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		mockCtx, mockExecContext := setupMockExecutionContext(t)
@@ -312,7 +312,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 			mockCtx,
 		).Return(expectedCatalogKey, nil)
 
-		mockExecContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: true})
+		mockExecContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: true})
 
 		mockCatalog.On("UpdateFuture",
 			mock.Anything,
@@ -337,7 +337,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 	t.Run("success without overwrite cache", func(t *testing.T) {
 		mockCtx, mockExecContext := setupMockExecutionContext(t)
 
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		expectedCatalogKey := catalog.Key{
@@ -356,7 +356,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 			mockCtx,
 		).Return(expectedCatalogKey, nil)
 
-		mockExecContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: false})
+		mockExecContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: false})
 
 		mockCatalog.On("PutFuture",
 			mock.Anything,
@@ -381,7 +381,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 	t.Run("get catalog key error", func(t *testing.T) {
 		mockCtx, _ := setupMockExecutionContext(t)
 
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		expectedError := errors.New("catalog key error")
@@ -403,7 +403,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 	})
 
 	t.Run("catalog write error", func(t *testing.T) {
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		mockCtx, mockExecContext := setupMockExecutionContext(t)
@@ -424,7 +424,7 @@ func TestDynamicNodeTaskNodeHandler_WriteCatalogFutureCache(t *testing.T) {
 			mockCtx,
 		).Return(expectedCatalogKey, nil)
 
-		mockExecContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: false})
+		mockExecContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{OverwriteCache: false})
 
 		mockCatalog.On("PutFuture",
 			mock.Anything,
@@ -462,15 +462,15 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		setup          func() (*nodeMocks.NodeExecutionContext, *futureCatalogMocks.FutureCatalogClient, *dynamicHandlerMock.TaskNodeHandler)
+		setup          func() (*nodeMocks.NodeExecutionContext, *CatalogMocks.CatalogClient, *dynamicHandlerMock.TaskNodeHandler)
 		expectedError  error
 		expectedStatus core.CatalogReservation_Status
 	}{
 		{
 			name: "Successfully get reservation - new reservation",
-			setup: func() (*nodeMocks.NodeExecutionContext, *futureCatalogMocks.FutureCatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
+			setup: func() (*nodeMocks.NodeExecutionContext, *CatalogMocks.CatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
 				mockNodeExecutionContext, mockExecContext := setupMockExecutionContext(t)
-				mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+				mockCatalog := &CatalogMocks.CatalogClient{}
 				mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 				mockParentInfo := &executorMocks.ImmutableParentInfo{}
@@ -481,7 +481,7 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 					Domain:  "test-domain",
 					Name:    "test-name",
 				})
-				mockExecContext.OnGetParentInfo().Return(mockParentInfo)
+				mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
 
 				mockCacheHandler.On("GetCatalogKey", mock.Anything, mockNodeExecutionContext).Return(testCatalogKey, nil)
 
@@ -517,9 +517,9 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 		},
 		{
 			name: "Failed to get reservation - GetCatalogKey error",
-			setup: func() (*nodeMocks.NodeExecutionContext, *futureCatalogMocks.FutureCatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
+			setup: func() (*nodeMocks.NodeExecutionContext, *CatalogMocks.CatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
 				mockNodeExecutionContext, mockExecContext := setupMockExecutionContext(t)
-				mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+				mockCatalog := &CatalogMocks.CatalogClient{}
 				mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 				mockParentInfo := &executorMocks.ImmutableParentInfo{}
@@ -530,7 +530,7 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 					Domain:  "test-domain",
 					Name:    "test-name",
 				})
-				mockExecContext.OnGetParentInfo().Return(mockParentInfo)
+				mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
 				mockCacheHandler.On("GetCatalogKey", mock.Anything, mockNodeExecutionContext).Return(
 					catalog.Key{}, errors.New("catalog key error"),
 				)
@@ -542,9 +542,9 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 		},
 		{
 			name: "Failed to get reservation - GetOrExtendReservation error",
-			setup: func() (*nodeMocks.NodeExecutionContext, *futureCatalogMocks.FutureCatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
+			setup: func() (*nodeMocks.NodeExecutionContext, *CatalogMocks.CatalogClient, *dynamicHandlerMock.TaskNodeHandler) {
 				mockNodeExecutionContext, mockExecContext := setupMockExecutionContext(t)
-				mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+				mockCatalog := &CatalogMocks.CatalogClient{}
 				mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 				mockParentInfo := &executorMocks.ImmutableParentInfo{}
@@ -602,7 +602,7 @@ func TestDynamicNodeTaskNodeHandler_ReleaseCatalogReservation(t *testing.T) {
 
 	t.Run("Failed to get catalogKey", func(t *testing.T) {
 		mockNodeExecContext, _ := setupMockExecutionContext(t)
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		h := &dynamicNodeTaskNodeHandler{
@@ -611,7 +611,7 @@ func TestDynamicNodeTaskNodeHandler_ReleaseCatalogReservation(t *testing.T) {
 		}
 
 		expectedErr := errors.New("catalogKey error")
-		mockCacheHandler.OnGetCatalogKeyMatch(ctx, mockNodeExecContext).Return(catalog.Key{}, expectedErr)
+		mockCacheHandler.EXPECT().GetCatalogKey(ctx, mockNodeExecContext).Return(catalog.Key{}, expectedErr)
 
 		entry, err := h.ReleaseCatalogReservation(ctx, mockNodeExecContext, mockCacheHandler)
 
@@ -622,19 +622,19 @@ func TestDynamicNodeTaskNodeHandler_ReleaseCatalogReservation(t *testing.T) {
 
 	t.Run("Failed to release reservation", func(t *testing.T) {
 		mockNodeExecContext, mockExecContext := setupMockExecutionContext(t)
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		mockParentInfo := &executorMocks.ImmutableParentInfo{}
-		mockParentInfo.OnGetUniqueID().Return("test-unique-id")
-		mockParentInfo.OnCurrentAttempt().Return(uint32(1))
+		mockParentInfo.EXPECT().GetUniqueID().Return("test-unique-id")
+		mockParentInfo.EXPECT().CurrentAttempt().Return(uint32(1))
 		mockParentInfo.On("GetExecutionID").Return(&core.WorkflowExecutionIdentifier{
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-name",
 		})
-		mockExecContext.OnGetParentInfo().Return(mockParentInfo)
-		mockNodeExecContext.OnExecutionContext().Return(mockExecContext)
+		mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
+		mockNodeExecContext.EXPECT().ExecutionContext().Return(mockExecContext)
 
 		h := &dynamicNodeTaskNodeHandler{
 			catalog: mockCatalog,
@@ -642,7 +642,7 @@ func TestDynamicNodeTaskNodeHandler_ReleaseCatalogReservation(t *testing.T) {
 		}
 
 		catalogKey := catalog.Key{}
-		mockCacheHandler.OnGetCatalogKeyMatch(ctx, mockNodeExecContext).Return(catalogKey, nil)
+		mockCacheHandler.EXPECT().GetCatalogKey(ctx, mockNodeExecContext).Return(catalogKey, nil)
 
 		expectedErr := errors.New("release error")
 		mockCatalog.EXPECT().ReleaseReservation(ctx, catalogKey, mock.Anything).Return(expectedErr)
@@ -656,7 +656,7 @@ func TestDynamicNodeTaskNodeHandler_ReleaseCatalogReservation(t *testing.T) {
 
 	t.Run("Successfully released reservation", func(t *testing.T) {
 		mockNodeExecContext, mockExecContext := setupMockExecutionContext(t)
-		mockCatalog := &futureCatalogMocks.FutureCatalogClient{}
+		mockCatalog := &CatalogMocks.CatalogClient{}
 		mockCacheHandler := &dynamicHandlerMock.TaskNodeHandler{}
 
 		mockParentInfo := &executorMocks.ImmutableParentInfo{}
@@ -693,7 +693,7 @@ func TestCheckFutureCache_WithOverwriteCache(t *testing.T) {
 	}
 
 	mockNodeExecContext, mockExecContext := setupMockExecutionContext(t)
-	mockExecContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	mockExecContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		OverwriteCache: true,
 	})
 

@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-//go:generate mockery -name FutureFileReaderInterface -case=underscore
+//go:generate mockery-v2 --name FutureFileReaderInterface --output ../mocks --case=snake --with-expecter
 
 type FutureFileReaderInterface interface {
 	GetLoc() storage.DataReference
