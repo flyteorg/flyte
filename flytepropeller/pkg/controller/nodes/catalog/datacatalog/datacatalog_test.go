@@ -23,7 +23,7 @@ import (
 	inputReaderMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	futureFileReaderMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/interfaces/mocks"
+	futureFileReaderMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
