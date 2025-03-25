@@ -64,8 +64,8 @@ func newMetrics(scope promutils.Scope) metrics {
 		catalogGetFailureCount:         labeled.NewCounter("future_get_failed", "A future.pb cache retrieve failed.", scope),
 		catalogSkipCount:               labeled.NewCounter("future_cache_skip", "A future.pb cache skipped.", scope),
 		catalogMissCount:               labeled.NewCounter("future_cache_miss", "A future.pb cache miss.", scope),
-		reservationGetFailureCount:     labeled.NewCounter("future_reservation_get_failed", "A future cache reservation retreived failed.", scope),
-		reservationGetSuccessCount:     labeled.NewCounter("future_reservation_get_success", "A future cache reservation retreived successfully.", scope),
+		reservationGetFailureCount:     labeled.NewCounter("future_reservation_get_failed", "A future cache reservation retrieved failed.", scope),
+		reservationGetSuccessCount:     labeled.NewCounter("future_reservation_get_success", "A future cache reservation retrieved successfully.", scope),
 		reservationReleaseFailureCount: labeled.NewCounter("future_reservation_release_failed", "A future cache reservation release failed.", scope),
 		reservationReleaseSuccessCount: labeled.NewCounter("future_reservation_release_success", "A future cache reservation release successfully.", scope),
 	}
@@ -161,7 +161,7 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 	}
 
 	// we should check future file either future cache hit or Handler handle successfully
-	// if future file exists, we counld assume that current node is a Dynamic parent node
+	// if future file exists, we could assume that current node is a Dynamic parent node
 	// if future file does not exists, it's just a regular node
 	if (cacheStatus != nil && cacheStatus.GetCacheStatus() == core.CatalogCacheStatus_CACHE_HIT) || (trns != nil && trns.Info().GetPhase() == handler.EPhaseSuccess) {
 		f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
