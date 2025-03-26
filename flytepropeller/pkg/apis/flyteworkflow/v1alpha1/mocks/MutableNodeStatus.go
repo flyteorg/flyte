@@ -28,6 +28,11 @@ func (_m *MutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
 }
 
+// ClearExecutionError provides a mock function with given fields:
+func (_m *MutableNodeStatus) ClearExecutionError() {
+	_m.Called()
+}
+
 // ClearGateNodeStatus provides a mock function with given fields:
 func (_m *MutableNodeStatus) ClearGateNodeStatus() {
 	_m.Called()

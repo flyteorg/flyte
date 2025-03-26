@@ -57,6 +57,10 @@ func (f *fullStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailu
 func (f *fullStateStore) persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int) {
 	f.arrayNodeStateCopy.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
 
+	if subNodeStatus.GetExecutionError() != nil {
+		subNodeStatus.ClearExecutionError()
+	}
+
 	subNodeStatusAddress := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, getSubNodeID(index)).(*v1alpha1.NodeStatus)
 	*subNodeStatusAddress = *subNodeStatus
 }
