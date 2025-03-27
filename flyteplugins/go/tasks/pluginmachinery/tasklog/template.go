@@ -46,6 +46,8 @@ type templateRegexes struct {
 	ExecutionDomain      *regexp.Regexp
 	ExecutionOrg         *regexp.Regexp
 	GeneratedName        *regexp.Regexp
+	AgentID              *regexp.Regexp
+	ConnectorID          *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -73,6 +75,8 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionDomain"),
 		MustCreateRegex("executionOrg"),
 		MustCreateRegex("generatedName"),
+		MustCreateRegex("agentID"),
+		MustCreateRegex("connectorID"),
 	}
 }
 
@@ -113,6 +117,14 @@ func (input Input) templateVars() []TemplateVar {
 		TemplateVar{defaultRegexes.ContainerID, containerID},
 		TemplateVar{defaultRegexes.Hostname, input.HostName},
 	)
+
+	if input.AgentID != "" {
+		vars = append(vars, TemplateVar{defaultRegexes.AgentID, input.AgentID})
+	}
+	if input.ConnectorID != "" {
+		vars = append(vars, TemplateVar{defaultRegexes.ConnectorID, input.ConnectorID})
+	}
+
 	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
 		vars = append(
@@ -224,7 +236,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:              replaceAll(templateURI, templateVars),
-			Name:             p.DisplayName + input.LogName,
+			Name:             replaceAll(p.DisplayName, templateVars) + replaceAll(input.LogName, templateVars),
 			MessageFormat:    p.MessageFormat,
 			ShowWhilePending: p.ShowWhilePending,
 			HideOnceFinished: p.HideOnceFinished,

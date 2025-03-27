@@ -16,11 +16,13 @@ import (
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -61,11 +63,13 @@ type Plugin struct {
 type ResourceWrapper struct {
 	Phase flyteIdl.TaskExecution_Phase
 	// Deprecated: Please Use Phase instead.
-	State      admin.State
-	Outputs    *flyteIdl.LiteralMap
-	Message    string
-	LogLinks   []*flyteIdl.TaskLog
-	CustomInfo *structpb.Struct
+	State          admin.State
+	Outputs        *flyteIdl.LiteralMap
+	Message        string
+	LogLinks       []*flyteIdl.TaskLog
+	CustomInfo     *structpb.Struct
+	ConnectorID    string
+	IsConnectorApp bool
 }
 
 // IsTerminal is used to avoid making network calls to the connector service if the resource is already in a terminal state.
@@ -129,26 +133,20 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	connector, isSync := p.getFinalConnector(&taskCategory, p.cfg)
+	connector := p.getFinalConnector(&taskCategory, p.cfg)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
-	if isSync {
-		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", connector)
-		defer cancel()
-		client, err := p.getSyncConnectorClient(ctx, connector)
-		if err != nil {
-			return nil, nil, err
-		}
+	if connector.IsSync {
 		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
-		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
+		return p.ExecuteTaskSync(ctx, header, inputs, connector)
 	}
 
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", connector)
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", connector.ConnectorDeployment)
 	defer cancel()
 
 	// Use async connector client
-	client, err := p.getAsyncConnectorClient(ctx, connector)
+	client, err := p.getAsyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -167,13 +165,21 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 
 func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
-	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
 	inputs *flyteIdl.LiteralMap,
+	connector *Connector,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
-	stream, err := client.ExecuteTaskSync(ctx)
+	client, err := p.getSyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
-		logger.Errorf(ctx, "failed to execute task from connector with %v", err)
+		return nil, nil, err
+	}
+
+	finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", connector.ConnectorDeployment)
+	defer cancel()
+
+	stream, err := client.ExecuteTaskSync(finalCtx)
+	if err != nil {
+		logger.Errorf(finalCtx, "failed to execute task from connector with %v", err)
 		return nil, nil, fmt.Errorf("failed to execute task from connector with %v", err)
 	}
 
@@ -200,13 +206,13 @@ func (p *Plugin) ExecuteTaskSync(
 
 	// Client is done with sending
 	if err := stream.CloseSend(); err != nil {
-		logger.Errorf(ctx, "failed to close stream with err %s", err.Error())
+		logger.Errorf(finalCtx, "failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
 	in, err := stream.Recv()
 	if err != nil {
-		logger.Errorf(ctx, "failed to receive stream from server %s", err.Error())
+		logger.Errorf(finalCtx, "failed to receive stream from server %s", err.Error())
 		return nil, nil, fmt.Errorf("failed to receive stream from server %w", err)
 	}
 	if in.GetHeader() == nil {
@@ -217,23 +223,25 @@ func (p *Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	return nil, ResourceWrapper{
-		Phase:      resource.GetPhase(),
-		Outputs:    resource.GetOutputs(),
-		Message:    resource.GetMessage(),
-		LogLinks:   resource.GetLogLinks(),
-		CustomInfo: resource.GetCustomInfo(),
+		Phase:          resource.GetPhase(),
+		Outputs:        resource.GetOutputs(),
+		Message:        resource.GetMessage(),
+		LogLinks:       resource.GetLogLinks(),
+		CustomInfo:     resource.GetCustomInfo(),
+		ConnectorID:    connector.ConnectorID,
+		IsConnectorApp: connector.IsConnectorApp,
 	}, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncConnectorClient(ctx, connector)
+	client, err := p.getAsyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
 		return nil, err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "GetTask", connector)
+	finalCtx, cancel := getFinalContext(ctx, "GetTask", connector.ConnectorDeployment)
 	defer cancel()
 
 	request := &admin.GetTaskRequest{
@@ -248,12 +256,14 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 
 	return ResourceWrapper{
-		Phase:      res.GetResource().GetPhase(),
-		State:      res.GetResource().GetState(),
-		Outputs:    res.GetResource().GetOutputs(),
-		Message:    res.GetResource().GetMessage(),
-		LogLinks:   res.GetResource().GetLogLinks(),
-		CustomInfo: res.GetResource().GetCustomInfo(),
+		Phase:          res.GetResource().GetPhase(),
+		State:          res.GetResource().GetState(),
+		Outputs:        res.GetResource().GetOutputs(),
+		Message:        res.GetResource().GetMessage(),
+		LogLinks:       res.GetResource().GetLogLinks(),
+		CustomInfo:     res.GetResource().GetCustomInfo(),
+		ConnectorID:    connector.ConnectorID,
+		IsConnectorApp: connector.IsConnectorApp,
 	}, nil
 }
 
@@ -262,13 +272,13 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector, _ := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncConnectorClient(ctx, connector)
+	client, err := p.getAsyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
 		return err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", connector)
+	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", connector.ConnectorDeployment)
 	defer cancel()
 
 	request := &admin.DeleteTaskRequest{
@@ -283,9 +293,41 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	return nil
 }
 
+func (p *Plugin) getEventInfoForConnectorApp(taskCtx webapi.StatusContext, resource ResourceWrapper) ([]*flyteIdl.TaskLog, error) {
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize log plugins with error: %v", err)
+	}
+	taskLogs := resource.LogLinks
+
+	if taskCtx.TaskExecutionMetadata().GetTaskExecutionID() == nil || !resource.IsConnectorApp {
+		return taskLogs, nil
+	}
+
+	in := tasklog.Input{
+		TaskExecutionID: taskCtx.TaskExecutionMetadata().GetTaskExecutionID(),
+		ConnectorID:     resource.ConnectorID,
+	}
+
+	logs, err := logPlugin.GetTaskLogs(in)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get task logs with error: %v", err)
+	}
+
+	taskLogs = append(taskLogs, logs.TaskLogs...)
+
+	return taskLogs, nil
+}
+
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
+
+	logLinks, err := p.getEventInfoForConnectorApp(taskCtx, resource)
+	if err != nil {
+		return core.PhaseInfoUndefined, err
+	}
+
+	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
 	errorCode := pluginErrors.TaskFailedWithError
 
 	switch resource.Phase {
@@ -372,14 +414,20 @@ func (p *Plugin) watchConnectors(ctx context.Context, connectorService *Connecto
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalConnector(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+func (p *Plugin) getFinalConnector(taskCategory *admin.TaskCategory, cfg *Config) *Connector {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if connector, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
-		return connector.ConnectorDeployment, connector.IsSync
+		return connector
 	}
-	return &cfg.DefaultConnector, false
+
+	return &Connector{
+		ConnectorDeployment: &cfg.DefaultConnector,
+		IsSync:              false,
+		ConnectorID:         "defaultConnector",
+		IsConnectorApp:      false,
+	}
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {

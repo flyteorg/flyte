@@ -4,6 +4,7 @@ import (
 	"time"
 
 	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -79,6 +80,9 @@ type Config struct {
 
 	// PollInterval is the interval at which the plugin should poll the agent for metadata updates
 	PollInterval config.Duration `json:"pollInterval,omitempty" yaml:"pollInterval,omitempty" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
+
+	// Agent App Logs
+	Logs logs.LogConfig `json:"logs,omitempty" pflag:",Log configuration for agent tasks"`
 }
 
 type Deployment struct {

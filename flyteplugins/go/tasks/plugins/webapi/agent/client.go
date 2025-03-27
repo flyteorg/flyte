@@ -30,6 +30,10 @@ type Agent struct {
 	IsSync bool
 	// AgentDeployment is the agent deployment where this agent is running.
 	AgentDeployment *Deployment
+	// AgentID is the ID of the agent.
+	AgentID string
+	// IsAgentApp indicates whether this agent is a agent app.
+	IsAgentApp bool
 }
 
 // ClientSet contains the clients exposed to communicate with various agent services.
@@ -91,17 +95,14 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
-	newAgentRegistry := make(Registry)
-	cfg := GetConfig()
-	var agentDeployments []*Deployment
-
-	if len(cfg.DefaultAgent.Endpoint) != 0 {
-		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
-	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
-	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentApps)...)
-	for _, agentDeployment := range agentDeployments {
+func updateRegistry(
+	ctx context.Context,
+	cs *ClientSet,
+	newAgentRegistry Registry,
+	agentDeployments map[string]*Deployment,
+	isAgentApp bool,
+) {
+	for agentID, agentDeployment := range agentDeployments {
 		client, ok := cs.agentMetadataClients[agentDeployment.Endpoint]
 		if !ok {
 			logger.Warningf(ctx, "Agent client not found in the clientSet for the endpoint: %v", agentDeployment.Endpoint)
@@ -111,7 +112,6 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListAgents", agentDeployment)
 		defer cancel()
 
-		logger.Infof(ctx, "Calling ListAgents on agent: [%v]", agentDeployment.Endpoint)
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
@@ -134,29 +134,61 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		for _, agent := range res.GetAgents() {
 			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agent := &Agent{
+					AgentDeployment: agentDeployment,
+					IsSync:          agent.IsSync,
+					AgentID:         agentID,
+					IsAgentApp:      isAgentApp,
+				}
 				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 				agentSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
 			supportedTaskCategories := agent.SupportedTaskCategories
 			for _, supportedCategory := range supportedTaskCategories {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agent := &Agent{
+					AgentDeployment: agentDeployment,
+					IsSync:          agent.IsSync,
+					AgentID:         agentID,
+					IsAgentApp:      isAgentApp,
+				}
 				supportedCategoryName := supportedCategory.GetName()
 				newAgentRegistry[supportedCategoryName] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 				agentSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
-
 		}
 		logger.Infof(ctx, "AgentDeployment [%v] supports the following task types: [%v]", agentDeployment.Endpoint,
 			strings.Join(maps.Keys(agentSupportedTaskCategories), ", "))
 	}
+}
+
+func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
+	newAgentRegistry := make(Registry)
+	cfg := GetConfig()
+
+	agentDeployments := make(map[string]*Deployment)
+
+	if len(cfg.DefaultAgent.Endpoint) != 0 {
+		agentDeployments["defaultAgent"] = &cfg.DefaultAgent
+	}
+
+	for agentID, deployment := range cfg.AgentDeployments {
+		agentDeployments[agentID] = deployment
+	}
+
+	// Update registry with regular agents
+	updateRegistry(ctx, cs, newAgentRegistry, agentDeployments, false)
 
 	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
 		if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
 			if _, ok := newAgentRegistry[taskType]; !ok {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
+				agent := &Agent{
+					AgentDeployment: agentDeployment,
+					IsSync:          false,
+					AgentID:         agentDeploymentID,
+					IsAgentApp:      false,
+				}
 				newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 			}
 		}
@@ -165,10 +197,18 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
 		if _, ok := newAgentRegistry[taskType]; !ok {
-			agent := &Agent{AgentDeployment: &cfg.DefaultAgent, IsSync: false}
+			agent := &Agent{
+				AgentDeployment: &cfg.DefaultAgent,
+				IsSync:          false,
+				AgentID:         "defaultAgent",
+				IsAgentApp:      false,
+			}
 			newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 		}
 	}
+
+	// Update registry with agent apps
+	updateRegistry(ctx, cs, newAgentRegistry, cfg.AgentApps, true)
 
 	logger.Infof(ctx, "AgentDeployments support the following task types: [%v]", strings.Join(maps.Keys(newAgentRegistry), ", "))
 	return newAgentRegistry
@@ -187,8 +227,15 @@ func getAgentClientSets(ctx context.Context) *ClientSet {
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
-	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentApps)...)
+
+	for _, deployment := range cfg.AgentDeployments {
+		agentDeployments = append(agentDeployments, deployment)
+	}
+
+	for _, deployment := range cfg.AgentApps {
+		agentDeployments = append(agentDeployments, deployment)
+	}
+
 	for _, agentDeployment := range agentDeployments {
 		if _, ok := clientSet.agentMetadataClients[agentDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Agent client already initialized for [%v]", agentDeployment.Endpoint)

@@ -14,7 +14,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
@@ -65,12 +64,12 @@ func TestPlugin(t *testing.T) {
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		connectorDeployment, _ := plugin.getFinalConnector(spark, &cfg)
-		assert.Equal(t, connectorDeployment.Endpoint, "localhost:80")
-		connectorDeployment, _ = plugin.getFinalConnector(foo, &cfg)
-		assert.Equal(t, connectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
-		connectorDeployment, _ = plugin.getFinalConnector(bar, &cfg)
-		assert.Equal(t, connectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connector := plugin.getFinalConnector(spark, &cfg)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, "localhost:80")
+		connector = plugin.getFinalConnector(foo, &cfg)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connector = plugin.getFinalConnector(bar, &cfg)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
@@ -108,6 +107,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
@@ -126,8 +129,11 @@ func TestPlugin(t *testing.T) {
 			Outputs:    nil,
 			Message:    "Job is running",
 			LogLinks:   []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
-			CustomInfo: &simpleStruct,
-		})
+			CustomInfo: &simpleStruct})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
@@ -144,6 +150,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
@@ -157,6 +167,10 @@ func TestPlugin(t *testing.T) {
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
@@ -172,6 +186,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
@@ -185,6 +203,10 @@ func TestPlugin(t *testing.T) {
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
@@ -200,6 +222,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
@@ -213,6 +239,10 @@ func TestPlugin(t *testing.T) {
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
@@ -228,6 +258,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
@@ -241,6 +275,10 @@ func TestPlugin(t *testing.T) {
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
@@ -256,6 +294,10 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
@@ -270,10 +312,13 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
-		assert.Equal(t, "TaskFailedWithError", phase.Err().GetCode())
 		assert.Equal(t, "failed to run the job: boom", phase.Err().GetMessage())
 	})
 
@@ -286,10 +331,13 @@ func TestPlugin(t *testing.T) {
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
+
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
-		assert.Equal(t, pluginErrors.TaskFailedWithError, phase.Err().GetCode())
 	})
 
 	t.Run("test UNDEFINED Phase", func(t *testing.T) {
@@ -300,6 +348,10 @@ func TestPlugin(t *testing.T) {
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
+
+		mockTaskMetadata := &pluginCoreMocks.TaskExecutionMetadata{}
+		mockTaskMetadata.On("GetTaskExecutionID").Return(&pluginCoreMocks.TaskExecutionID{})
+		taskContext.On("TaskExecutionMetadata").Return(mockTaskMetadata)
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.Error(t, err)

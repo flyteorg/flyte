@@ -18,11 +18,13 @@ import (
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -69,6 +71,8 @@ type ResourceWrapper struct {
 	Message    string
 	LogLinks   []*flyteIdl.TaskLog
 	CustomInfo *structpb.Struct
+	AgentID    string
+	IsAgentApp bool
 }
 
 // IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
@@ -133,7 +137,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
+	agent := p.getFinalAgent(&taskCategory, p.cfg)
 
 	connection := flyteIdl.Connection{}
 	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
@@ -171,27 +175,22 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
-	if isSync {
-		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", agent)
-		defer cancel()
-		client, err := p.getSyncAgentClient(ctx, agent)
-		if err != nil {
-			return nil, nil, err
-		}
+	if agent.IsSync {
+
 		header := &admin.CreateRequestHeader{
 			Template:              taskTemplate,
 			OutputPrefix:          outputPrefix,
 			TaskExecutionMetadata: &taskExecutionMetadata,
 			Connection:            &connection,
 		}
-		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
+		return p.ExecuteTaskSync(ctx, header, inputs, agent)
 	}
 
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent.AgentDeployment)
 	defer cancel()
 
 	// Use async agent client
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	client, err := p.getAsyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -217,13 +216,21 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 
 func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
-	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
 	inputs *flyteIdl.LiteralMap,
+	agent *Agent,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
-	stream, err := client.ExecuteTaskSync(ctx)
+	client, err := p.getSyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
-		logger.Errorf(ctx, "failed to execute task from agent with %v", err)
+		return nil, nil, err
+	}
+
+	finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", agent.AgentDeployment)
+	defer cancel()
+
+	stream, err := client.ExecuteTaskSync(finalCtx)
+	if err != nil {
+		logger.Errorf(finalCtx, "failed to execute task from agent with %v", err)
 		return nil, nil, fmt.Errorf("failed to execute task from agent with %v", err)
 	}
 
@@ -250,7 +257,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
-		logger.Errorf(ctx, "failed to receive stream from server %s", err.Error())
+		logger.Errorf(finalCtx, "failed to receive stream from server %s", err.Error())
 		return nil, nil, fmt.Errorf("failed to receive stream from server %w", err)
 	}
 	if in.GetHeader() == nil {
@@ -261,28 +268,31 @@ func (p *Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	if err := stream.CloseSend(); err != nil {
-		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
+		logger.Errorf(finalCtx, "Failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
 	return nil, ResourceWrapper{
-		Phase:      resource.GetPhase(),
+		Phase:      flyteIdl.TaskExecution_SUCCEEDED,
+		State:      admin.State_SUCCEEDED,
 		Outputs:    resource.GetOutputs(),
 		Message:    resource.GetMessage(),
 		LogLinks:   resource.GetLogLinks(),
 		CustomInfo: resource.GetCustomInfo(),
+		AgentID:    agent.AgentID,
+		IsAgentApp: agent.IsAgentApp,
 	}, nil
 }
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	client, err := p.getAsyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
 		return nil, err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent.AgentDeployment)
 	defer cancel()
 
 	request := &admin.GetTaskRequest{
@@ -298,12 +308,14 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 
 	return ResourceWrapper{
-		Phase:      res.Resource.Phase,
-		State:      res.Resource.State,
-		Outputs:    res.Resource.Outputs,
-		Message:    res.Resource.Message,
-		LogLinks:   res.Resource.LogLinks,
-		CustomInfo: res.Resource.CustomInfo,
+		Phase:      res.GetResource().GetPhase(),
+		State:      res.GetResource().GetState(),
+		Outputs:    res.GetResource().GetOutputs(),
+		Message:    res.GetResource().GetMessage(),
+		LogLinks:   res.GetResource().GetLogLinks(),
+		CustomInfo: res.GetResource().GetCustomInfo(),
+		AgentID:    agent.AgentID,
+		IsAgentApp: agent.IsAgentApp,
 	}, nil
 }
 
@@ -312,13 +324,13 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
 
-	client, err := p.getAsyncAgentClient(ctx, agent)
+	client, err := p.getAsyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
 		return err
 	}
-	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent.AgentDeployment)
 	defer cancel()
 
 	request := &admin.DeleteTaskRequest{
@@ -334,9 +346,41 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 	return nil
 }
 
+func (p *Plugin) getEventInfoForAgentApp(taskCtx webapi.StatusContext, resource ResourceWrapper) ([]*flyteIdl.TaskLog, error) {
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize log plugins with error: %v", err)
+	}
+	taskLogs := resource.LogLinks
+
+	if taskCtx.TaskExecutionMetadata().GetTaskExecutionID() == nil || !resource.IsAgentApp {
+		return taskLogs, nil
+	}
+
+	in := tasklog.Input{
+		TaskExecutionID: taskCtx.TaskExecutionMetadata().GetTaskExecutionID(),
+		AgentID:         resource.AgentID,
+	}
+
+	logs, err := logPlugin.GetTaskLogs(in)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get task logs with error: %v", err)
+	}
+
+	taskLogs = append(taskLogs, logs.TaskLogs...)
+
+	return taskLogs, nil
+}
+
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
+
+	logLinks, err := p.getEventInfoForAgentApp(taskCtx, resource)
+	if err != nil {
+		return core.PhaseInfoUndefined, err
+	}
+
+	taskInfo := &core.TaskInfo{Logs: logLinks, CustomInfo: resource.CustomInfo}
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
@@ -423,14 +467,19 @@ func (p *Plugin) watchAgents(ctx context.Context, agentService *AgentService) {
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) *Agent {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if agent, exists := p.registry[taskCategory.Name][taskCategory.Version]; exists {
-		return agent.AgentDeployment, agent.IsSync
+	if agent, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
+		return agent
 	}
-	return &cfg.DefaultAgent, false
+
+	return &Agent{
+		AgentDeployment: &cfg.DefaultAgent,
+		IsSync:          false,
+		AgentID:         "defaultAgent",
+	}
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {

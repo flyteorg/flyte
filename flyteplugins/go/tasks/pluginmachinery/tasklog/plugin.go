@@ -42,6 +42,8 @@ type Input struct {
 	ExtraTemplateVars    []TemplateVar
 	TaskTemplate         *core.TaskTemplate
 	EnableVscode         bool
+	AgentID              string
+	ConnectorID          string
 }
 
 // Output contains all task logs a plugin generates for a given Input.

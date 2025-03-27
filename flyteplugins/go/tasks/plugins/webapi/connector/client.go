@@ -30,6 +30,10 @@ type Connector struct {
 	IsSync bool
 	// ConnectorDeployment is the connector deployment where this connector is running.
 	ConnectorDeployment *Deployment
+	// ConnectorID is the ID of the connector.
+	ConnectorID string
+	// IsConnectorApp indicates whether this connector is a connector app.
+	IsConnectorApp bool
 }
 
 // ClientSet contains the clients exposed to communicate with various connector services.
@@ -91,17 +95,14 @@ func getFinalContext(ctx context.Context, operation string, connector *Deploymen
 	return context.WithTimeout(ctx, timeout)
 }
 
-func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
-	newConnectorRegistry := make(Registry)
-	cfg := GetConfig()
-	var connectorDeployments []*Deployment
-
-	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
-	}
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorApps)...)
-	for _, connectorDeployment := range connectorDeployments {
+func updateRegistry(
+	ctx context.Context,
+	cs *ClientSet,
+	newConnectorRegistry Registry,
+	connectorDeployments map[string]*Deployment,
+	isConnectorApp bool,
+) {
+	for connectorID, connectorDeployment := range connectorDeployments {
 		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
 		if !ok {
 			logger.Warningf(ctx, "Connector client not found in the clientSet for the endpoint: %v", connectorDeployment.Endpoint)
@@ -111,7 +112,6 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		finalCtx, cancel := getFinalContext(ctx, "ListConnectors", connectorDeployment)
 		defer cancel()
 
-		logger.Infof(ctx, "Calling ListAgents on connector: [%v]", connectorDeployment.Endpoint)
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
@@ -131,17 +131,27 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 
 		connectorSupportedTaskCategories := make(map[string]struct{})
-		for _, connector := range res.GetAgents() {
-			deprecatedSupportedTaskTypes := connector.GetSupportedTaskTypes()
+		for _, agent := range res.GetAgents() {
+			deprecatedSupportedTaskTypes := agent.GetSupportedTaskTypes()
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
+				connector := &Connector{
+					ConnectorDeployment: connectorDeployment,
+					IsSync:              agent.GetIsSync(),
+					ConnectorID:         connectorID,
+					IsConnectorApp:      isConnectorApp,
+				}
 				newConnectorRegistry[supportedTaskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
 				connectorSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
-			supportedTaskCategories := connector.GetSupportedTaskCategories()
+			supportedTaskCategories := agent.GetSupportedTaskCategories()
 			for _, supportedCategory := range supportedTaskCategories {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
+				connector := &Connector{
+					ConnectorDeployment: connectorDeployment,
+					IsSync:              agent.GetIsSync(),
+					ConnectorID:         connectorID,
+					IsConnectorApp:      isConnectorApp,
+				}
 				supportedCategoryName := supportedCategory.GetName()
 				newConnectorRegistry[supportedCategoryName] = map[int32]*Connector{supportedCategory.GetVersion(): connector}
 				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
@@ -150,12 +160,35 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 		logger.Infof(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
 			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
+}
+
+func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
+	newConnectorRegistry := make(Registry)
+	cfg := GetConfig()
+
+	connectorDeployments := make(map[string]*Deployment)
+
+	if len(cfg.DefaultConnector.Endpoint) != 0 {
+		connectorDeployments["defaultConnector"] = &cfg.DefaultConnector
+	}
+
+	for connectorID, deployment := range cfg.ConnectorDeployments {
+		connectorDeployments[connectorID] = deployment
+	}
+
+	// Update registry with regular connectors
+	updateRegistry(ctx, cs, newConnectorRegistry, connectorDeployments, false)
 
 	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
 			if _, ok := newConnectorRegistry[taskType]; !ok {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: false}
+				connector := &Connector{
+					ConnectorDeployment: connectorDeployment,
+					IsSync:              false,
+					ConnectorID:         connectorDeploymentID,
+					IsConnectorApp:      false,
+				}
 				newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
 			}
 		}
@@ -164,10 +197,18 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
 		if _, ok := newConnectorRegistry[taskType]; !ok {
-			connector := &Connector{ConnectorDeployment: &cfg.DefaultConnector, IsSync: false}
+			connector := &Connector{
+				ConnectorDeployment: &cfg.DefaultConnector,
+				IsSync:              false,
+				ConnectorID:         "defaultConnector",
+				IsConnectorApp:      false,
+			}
 			newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
 		}
 	}
+
+	// Update registry with connector apps
+	updateRegistry(ctx, cs, newConnectorRegistry, cfg.ConnectorApps, true)
 
 	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(maps.Keys(newConnectorRegistry), ", "))
 	return newConnectorRegistry
@@ -186,8 +227,15 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
 		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
 	}
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorApps)...)
+
+	for _, deployment := range cfg.ConnectorDeployments {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+
+	for _, deployment := range cfg.ConnectorApps {
+		connectorDeployments = append(connectorDeployments, deployment)
+	}
+
 	for _, connectorDeployment := range connectorDeployments {
 		if _, ok := clientSet.connectorMetadataClients[connectorDeployment.Endpoint]; ok {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)
