@@ -152,7 +152,7 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 		wid := fmt.Sprintf("%v%v%v", withSeparatorIfNotEmpty(wfID.GetProject()), withSeparatorIfNotEmpty(wfID.GetDomain()), wfID.GetName())
 
 		// TODO: this is a hack until we figure out how to restrict generated names. K8s has a limitation of 63 chars
-		wid = wid[:minInt(32, len(wid))]
+		wid = wid[:min(32, len(wid))]
 		return "", fmt.Sprintf("%v-", wid), wid, wfID.GetProject(), wfID.GetDomain(), nil
 	} else {
 		return "", "", "", "", "", fmt.Errorf("expected param not set. wfID or execID must be non-nil values")

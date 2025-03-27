@@ -52,21 +52,5 @@ func ComputeKeyRange(keyspaceSize, podCount, podIndex int) (int, int) {
 }
 
 func computeStartKey(keysPerPod, keysRemainder, podIndex int) int {
-	return (intMin(podIndex, keysRemainder) * (keysPerPod + 1)) + (intMax(0, podIndex-keysRemainder) * keysPerPod)
-}
-
-func intMin(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
-func intMax(a, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
+	return (min(podIndex, keysRemainder) * (keysPerPod + 1)) + (max(0, podIndex-keysRemainder) * keysPerPod)
 }

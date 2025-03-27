@@ -74,10 +74,6 @@ func toBindingValueArray(bindings []*core.Binding) []*v1alpha1.Binding {
 	return res
 }
 
-func minInt(i, j int) int {
-	return int(math.Min(float64(i), float64(j)))
-}
-
 // StripTypeMetadata strips the type metadata from the given type.
 func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 	if t == nil {
