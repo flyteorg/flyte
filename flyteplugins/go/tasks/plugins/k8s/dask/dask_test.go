@@ -378,17 +378,28 @@ func TestBuildResourceDaskDefaultResoureRequirements(t *testing.T) {
 	daskJob, ok := r.(*daskAPI.DaskJob)
 	assert.True(t, ok)
 
+	expectedResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("2"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+	}
+
 	// Job
 	jobSpec := daskJob.Spec.Job.Spec
-	assert.Equal(t, flyteWorkflowResources, jobSpec.Containers[0].Resources)
+	assert.Equal(t, expectedResources, jobSpec.Containers[0].Resources)
 
 	// Scheduler
 	schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec
-	assert.Equal(t, flyteWorkflowResources, schedulerSpec.Containers[0].Resources)
+	assert.Equal(t, expectedResources, schedulerSpec.Containers[0].Resources)
 
 	// Default Workers
 	workerSpec := daskJob.Spec.Cluster.Spec.Worker.Spec
-	assert.Equal(t, flyteWorkflowResources, workerSpec.Containers[0].Resources)
+	assert.Equal(t, expectedResources, workerSpec.Containers[0].Resources)
 	assert.Contains(t, workerSpec.Containers[0].Args, "--nthreads")
 	assert.Contains(t, workerSpec.Containers[0].Args, "2")
 	assert.Contains(t, workerSpec.Containers[0].Args, "--memory-limit")
@@ -490,9 +501,20 @@ func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 	daskJob, ok := r.(*daskAPI.DaskJob)
 	assert.True(t, ok)
 
+	expectedJobResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("1"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:    resource.MustParse("2"),
+			v1.ResourceMemory: resource.MustParse("2G"),
+		},
+	}
+
 	// Job
 	jobSpec := daskJob.Spec.Job.Spec
-	assert.Equal(t, flyteWorkflowResources, jobSpec.Containers[0].Resources)
+	assert.Equal(t, expectedJobResources, jobSpec.Containers[0].Resources)
 
 	// Scheduler
 	schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec
