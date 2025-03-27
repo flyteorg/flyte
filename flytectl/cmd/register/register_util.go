@@ -861,7 +861,8 @@ func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader, add
 		return err
 	}
 
-	if res.StatusCode != http.StatusOK {
+	// Azure blob store returns 201 Created for chunked uploads.
+	if !(res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated) {
 		raw, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("received response code [%v]. Failed to read response body. Error: %w", res.StatusCode, err)
