@@ -36,7 +36,7 @@
 * fix: Ensure $(go env GOPATH)/bin exists by @honnix in https://github.com/flyteorg/flyte/pull/6314
 * Bump jinja2 from 3.1.5 to 3.1.6 in /flytectl/docs by @dependabot in https://github.com/flyteorg/flyte/pull/6310
 * RFC: Add workflow execution concurrency by @katrogan in https://github.com/flyteorg/flyte/pull/5659
-* Add aws secret mamager support to env_var by @thomasjpfan in https://github.com/flyteorg/flyte/pull/6316
+* Add aws secret manager support to env_var by @thomasjpfan in https://github.com/flyteorg/flyte/pull/6316
 * Document AWS SM by @bra-fsn in https://github.com/flyteorg/flyte/pull/6287
 * Pin flytekit to 1.15.0 to unblock functional tests by @eapolinario in https://github.com/flyteorg/flyte/pull/6330
 * Fix: fastcache should not cache lookup on failed node by @fg91 in https://github.com/flyteorg/flyte/pull/6318
