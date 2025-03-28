@@ -82,6 +82,58 @@ func (State) EnumDescriptor() ([]byte, []int) {
 	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{0}
 }
 
+type LogLineOriginator int32
+
+const (
+	// The originator of the log line is unknown.
+	LogLineOriginator_UNKNOWN LogLineOriginator = 0
+	// The originator of the log line is the user application.
+	LogLineOriginator_USER LogLineOriginator = 1
+	// The originator of the log line is the system.
+	LogLineOriginator_SYSTEM LogLineOriginator = 2
+)
+
+// Enum value maps for LogLineOriginator.
+var (
+	LogLineOriginator_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "USER",
+		2: "SYSTEM",
+	}
+	LogLineOriginator_value = map[string]int32{
+		"UNKNOWN": 0,
+		"USER":    1,
+		"SYSTEM":  2,
+	}
+)
+
+func (x LogLineOriginator) Enum() *LogLineOriginator {
+	p := new(LogLineOriginator)
+	*p = x
+	return p
+}
+
+func (x LogLineOriginator) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LogLineOriginator) Descriptor() protoreflect.EnumDescriptor {
+	return file_flyteidl_admin_agent_proto_enumTypes[1].Descriptor()
+}
+
+func (LogLineOriginator) Type() protoreflect.EnumType {
+	return &file_flyteidl_admin_agent_proto_enumTypes[1]
+}
+
+func (x LogLineOriginator) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LogLineOriginator.Descriptor instead.
+func (LogLineOriginator) EnumDescriptor() ([]byte, []int) {
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{1}
+}
+
 // Defines a generic error type that dictates the behavior of the retry strategy.
 type AgentError_Kind int32
 
@@ -113,11 +165,11 @@ func (x AgentError_Kind) String() string {
 }
 
 func (AgentError_Kind) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl_admin_agent_proto_enumTypes[1].Descriptor()
+	return file_flyteidl_admin_agent_proto_enumTypes[2].Descriptor()
 }
 
 func (AgentError_Kind) Type() protoreflect.EnumType {
-	return &file_flyteidl_admin_agent_proto_enumTypes[1]
+	return &file_flyteidl_admin_agent_proto_enumTypes[2]
 }
 
 func (x AgentError_Kind) Number() protoreflect.EnumNumber {
@@ -126,7 +178,7 @@ func (x AgentError_Kind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AgentError_Kind.Descriptor instead.
 func (AgentError_Kind) EnumDescriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{24, 0}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{25, 0}
 }
 
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
@@ -1647,19 +1699,91 @@ func (x *GetTaskLogsResponseHeader) GetToken() string {
 	return ""
 }
 
+type LogLine struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Each line is separated by either CRLF, CR or LF, which are included
+	// at the ends of the lines. This lets clients know whether log emitter
+	// wanted to overwrite the previous line (LF) or append a new line (CRLF).
+	Message    string            `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Originator LogLineOriginator `protobuf:"varint,3,opt,name=originator,proto3,enum=flyteidl.admin.LogLineOriginator" json:"originator,omitempty"`
+}
+
+func (x *LogLine) Reset() {
+	*x = LogLine{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LogLine) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogLine) ProtoMessage() {}
+
+func (x *LogLine) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogLine.ProtoReflect.Descriptor instead.
+func (*LogLine) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *LogLine) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *LogLine) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *LogLine) GetOriginator() LogLineOriginator {
+	if x != nil {
+		return x.Originator
+	}
+	return LogLineOriginator_UNKNOWN
+}
+
 type GetTaskLogsResponseBody struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// The execution log results.
+	//
+	// Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
 	Results []string `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`
+	// Each line is separated by either CRLF, CR or LF, which are included
+	// at the ends of the lines. This lets clients know whether log emitter
+	// wanted to overwrite the previous line (LF) or append a new line (CRLF).
+	StructuredLines []*LogLine `protobuf:"bytes,2,rep,name=structured_lines,json=structuredLines,proto3" json:"structured_lines,omitempty"`
 }
 
 func (x *GetTaskLogsResponseBody) Reset() {
 	*x = GetTaskLogsResponseBody{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1672,7 +1796,7 @@ func (x *GetTaskLogsResponseBody) String() string {
 func (*GetTaskLogsResponseBody) ProtoMessage() {}
 
 func (x *GetTaskLogsResponseBody) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1685,12 +1809,20 @@ func (x *GetTaskLogsResponseBody) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsResponseBody.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsResponseBody) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{22}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{23}
 }
 
+// Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
 func (x *GetTaskLogsResponseBody) GetResults() []string {
 	if x != nil {
 		return x.Results
+	}
+	return nil
+}
+
+func (x *GetTaskLogsResponseBody) GetStructuredLines() []*LogLine {
+	if x != nil {
+		return x.StructuredLines
 	}
 	return nil
 }
@@ -1711,7 +1843,7 @@ type GetTaskLogsResponse struct {
 func (x *GetTaskLogsResponse) Reset() {
 	*x = GetTaskLogsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1724,7 +1856,7 @@ func (x *GetTaskLogsResponse) String() string {
 func (*GetTaskLogsResponse) ProtoMessage() {}
 
 func (x *GetTaskLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1737,7 +1869,7 @@ func (x *GetTaskLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{23}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{24}
 }
 
 func (m *GetTaskLogsResponse) GetPart() isGetTaskLogsResponse_Part {
@@ -1795,7 +1927,7 @@ type AgentError struct {
 func (x *AgentError) Reset() {
 	*x = AgentError{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1808,7 +1940,7 @@ func (x *AgentError) String() string {
 func (*AgentError) ProtoMessage() {}
 
 func (x *AgentError) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1821,7 +1953,7 @@ func (x *AgentError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentError.ProtoReflect.Descriptor instead.
 func (*AgentError) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{24}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AgentError) GetCode() string {
@@ -2113,51 +2245,69 @@ var file_flyteidl_admin_agent_proto_rawDesc = []byte{
 	0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b,
 	0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22,
-	0x33, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x6f, 0x64, 0x79, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65,
-	0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x73,
-	0x75, 0x6c, 0x74, 0x73, 0x22, 0xa1, 0x01, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b,
-	0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x06,
-	0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x29, 0x2e, 0x66,
-	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x47, 0x65,
-	0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x48, 0x00, 0x52, 0x06, 0x68, 0x65, 0x61, 0x64, 0x65,
-	0x72, 0x12, 0x3d, 0x0a, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x27, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e,
-	0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x42, 0x6f, 0x64, 0x79, 0x48, 0x00, 0x52, 0x04, 0x62, 0x6f, 0x64, 0x79,
-	0x42, 0x06, 0x0a, 0x04, 0x70, 0x61, 0x72, 0x74, 0x22, 0xc4, 0x01, 0x0a, 0x0a, 0x41, 0x67, 0x65,
-	0x6e, 0x74, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x33, 0x0a, 0x04, 0x6b,
-	0x69, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1f, 0x2e, 0x66, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x74,
-	0x45, 0x72, 0x72, 0x6f, 0x72, 0x2e, 0x4b, 0x69, 0x6e, 0x64, 0x52, 0x04, 0x6b, 0x69, 0x6e, 0x64,
-	0x12, 0x3f, 0x0a, 0x06, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0e,
-	0x32, 0x27, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65,
-	0x2e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x2e,
-	0x45, 0x72, 0x72, 0x6f, 0x72, 0x4b, 0x69, 0x6e, 0x64, 0x52, 0x06, 0x6f, 0x72, 0x69, 0x67, 0x69,
-	0x6e, 0x22, 0x2c, 0x0a, 0x04, 0x4b, 0x69, 0x6e, 0x64, 0x12, 0x13, 0x0a, 0x0f, 0x4e, 0x4f, 0x4e,
-	0x5f, 0x52, 0x45, 0x43, 0x4f, 0x56, 0x45, 0x52, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x00, 0x12, 0x0f,
-	0x0a, 0x0b, 0x52, 0x45, 0x43, 0x4f, 0x56, 0x45, 0x52, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x01, 0x2a,
-	0x62, 0x0a, 0x05, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x15, 0x0a, 0x11, 0x52, 0x45, 0x54, 0x52,
-	0x59, 0x41, 0x42, 0x4c, 0x45, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x00, 0x12,
-	0x15, 0x0a, 0x11, 0x50, 0x45, 0x52, 0x4d, 0x41, 0x4e, 0x45, 0x4e, 0x54, 0x5f, 0x46, 0x41, 0x49,
-	0x4c, 0x55, 0x52, 0x45, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x50, 0x45, 0x4e, 0x44, 0x49, 0x4e,
-	0x47, 0x10, 0x02, 0x12, 0x0b, 0x0a, 0x07, 0x52, 0x55, 0x4e, 0x4e, 0x49, 0x4e, 0x47, 0x10, 0x03,
-	0x12, 0x0d, 0x0a, 0x09, 0x53, 0x55, 0x43, 0x43, 0x45, 0x45, 0x44, 0x45, 0x44, 0x10, 0x04, 0x1a,
-	0x02, 0x18, 0x01, 0x42, 0xb6, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x42, 0x0a, 0x41, 0x67, 0x65, 0x6e,
-	0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c,
-	0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e,
-	0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f,
-	0x61, 0x64, 0x6d, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c,
-	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xca, 0x02, 0x0e, 0x46,
-	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xe2, 0x02, 0x1a,
-	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0xa0, 0x01, 0x0a, 0x07, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x6e, 0x65, 0x12, 0x38, 0x0a, 0x09, 0x74,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12,
+	0x41, 0x0a, 0x0a, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x21, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61,
+	0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x6e, 0x65, 0x4f, 0x72, 0x69, 0x67,
+	0x69, 0x6e, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x0a, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x61, 0x74,
+	0x6f, 0x72, 0x22, 0x7b, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x6f, 0x64, 0x79, 0x12, 0x1c, 0x0a,
+	0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x42, 0x02,
+	0x18, 0x01, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x12, 0x42, 0x0a, 0x10, 0x73,
+	0x74, 0x72, 0x75, 0x63, 0x74, 0x75, 0x72, 0x65, 0x64, 0x5f, 0x6c, 0x69, 0x6e, 0x65, 0x73, 0x18,
+	0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x6e, 0x65, 0x52, 0x0f,
+	0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x75, 0x72, 0x65, 0x64, 0x4c, 0x69, 0x6e, 0x65, 0x73, 0x22,
+	0xa1, 0x01, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x06, 0x68, 0x65, 0x61, 0x64, 0x65,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x29, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x73, 0x6b,
+	0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x65, 0x61, 0x64,
+	0x65, 0x72, 0x48, 0x00, 0x52, 0x06, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12, 0x3d, 0x0a, 0x04,
+	0x62, 0x6f, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x47, 0x65, 0x74, 0x54,
+	0x61, 0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42,
+	0x6f, 0x64, 0x79, 0x48, 0x00, 0x52, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x42, 0x06, 0x0a, 0x04, 0x70,
+	0x61, 0x72, 0x74, 0x22, 0xc4, 0x01, 0x0a, 0x0a, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x45, 0x72, 0x72,
+	0x6f, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x33, 0x0a, 0x04, 0x6b, 0x69, 0x6e, 0x64, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x1f, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e,
+	0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x45, 0x72, 0x72, 0x6f, 0x72,
+	0x2e, 0x4b, 0x69, 0x6e, 0x64, 0x52, 0x04, 0x6b, 0x69, 0x6e, 0x64, 0x12, 0x3f, 0x0a, 0x06, 0x6f,
+	0x72, 0x69, 0x67, 0x69, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x27, 0x2e, 0x66, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x45, 0x78, 0x65, 0x63,
+	0x75, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x2e, 0x45, 0x72, 0x72, 0x6f, 0x72,
+	0x4b, 0x69, 0x6e, 0x64, 0x52, 0x06, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x22, 0x2c, 0x0a, 0x04,
+	0x4b, 0x69, 0x6e, 0x64, 0x12, 0x13, 0x0a, 0x0f, 0x4e, 0x4f, 0x4e, 0x5f, 0x52, 0x45, 0x43, 0x4f,
+	0x56, 0x45, 0x52, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x00, 0x12, 0x0f, 0x0a, 0x0b, 0x52, 0x45, 0x43,
+	0x4f, 0x56, 0x45, 0x52, 0x41, 0x42, 0x4c, 0x45, 0x10, 0x01, 0x2a, 0x62, 0x0a, 0x05, 0x53, 0x74,
+	0x61, 0x74, 0x65, 0x12, 0x15, 0x0a, 0x11, 0x52, 0x45, 0x54, 0x52, 0x59, 0x41, 0x42, 0x4c, 0x45,
+	0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x00, 0x12, 0x15, 0x0a, 0x11, 0x50, 0x45,
+	0x52, 0x4d, 0x41, 0x4e, 0x45, 0x4e, 0x54, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10,
+	0x01, 0x12, 0x0b, 0x0a, 0x07, 0x50, 0x45, 0x4e, 0x44, 0x49, 0x4e, 0x47, 0x10, 0x02, 0x12, 0x0b,
+	0x0a, 0x07, 0x52, 0x55, 0x4e, 0x4e, 0x49, 0x4e, 0x47, 0x10, 0x03, 0x12, 0x0d, 0x0a, 0x09, 0x53,
+	0x55, 0x43, 0x43, 0x45, 0x45, 0x44, 0x45, 0x44, 0x10, 0x04, 0x1a, 0x02, 0x18, 0x01, 0x2a, 0x36,
+	0x0a, 0x11, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x6e, 0x65, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x61,
+	0x74, 0x6f, 0x72, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00,
+	0x12, 0x08, 0x0a, 0x04, 0x55, 0x53, 0x45, 0x52, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x59,
+	0x53, 0x54, 0x45, 0x4d, 0x10, 0x02, 0x42, 0xb6, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x42, 0x0a, 0x41,
+	0x67, 0x65, 0x6e, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67,
+	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f,
+	0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x2f, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58, 0xaa, 0x02,
+	0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xca,
+	0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e,
+	0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69,
+	0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f,
+	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2172,96 +2322,101 @@ func file_flyteidl_admin_agent_proto_rawDescGZIP() []byte {
 	return file_flyteidl_admin_agent_proto_rawDescData
 }
 
-var file_flyteidl_admin_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_flyteidl_admin_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_flyteidl_admin_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_flyteidl_admin_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_flyteidl_admin_agent_proto_goTypes = []interface{}{
 	(State)(0),                            // 0: flyteidl.admin.State
-	(AgentError_Kind)(0),                  // 1: flyteidl.admin.AgentError.Kind
-	(*TaskExecutionMetadata)(nil),         // 2: flyteidl.admin.TaskExecutionMetadata
-	(*CreateTaskRequest)(nil),             // 3: flyteidl.admin.CreateTaskRequest
-	(*CreateTaskResponse)(nil),            // 4: flyteidl.admin.CreateTaskResponse
-	(*CreateRequestHeader)(nil),           // 5: flyteidl.admin.CreateRequestHeader
-	(*ExecuteTaskSyncRequest)(nil),        // 6: flyteidl.admin.ExecuteTaskSyncRequest
-	(*ExecuteTaskSyncResponseHeader)(nil), // 7: flyteidl.admin.ExecuteTaskSyncResponseHeader
-	(*ExecuteTaskSyncResponse)(nil),       // 8: flyteidl.admin.ExecuteTaskSyncResponse
-	(*GetTaskRequest)(nil),                // 9: flyteidl.admin.GetTaskRequest
-	(*GetTaskResponse)(nil),               // 10: flyteidl.admin.GetTaskResponse
-	(*Resource)(nil),                      // 11: flyteidl.admin.Resource
-	(*DeleteTaskRequest)(nil),             // 12: flyteidl.admin.DeleteTaskRequest
-	(*DeleteTaskResponse)(nil),            // 13: flyteidl.admin.DeleteTaskResponse
-	(*Agent)(nil),                         // 14: flyteidl.admin.Agent
-	(*TaskCategory)(nil),                  // 15: flyteidl.admin.TaskCategory
-	(*GetAgentRequest)(nil),               // 16: flyteidl.admin.GetAgentRequest
-	(*GetAgentResponse)(nil),              // 17: flyteidl.admin.GetAgentResponse
-	(*ListAgentsRequest)(nil),             // 18: flyteidl.admin.ListAgentsRequest
-	(*ListAgentsResponse)(nil),            // 19: flyteidl.admin.ListAgentsResponse
-	(*GetTaskMetricsRequest)(nil),         // 20: flyteidl.admin.GetTaskMetricsRequest
-	(*GetTaskMetricsResponse)(nil),        // 21: flyteidl.admin.GetTaskMetricsResponse
-	(*GetTaskLogsRequest)(nil),            // 22: flyteidl.admin.GetTaskLogsRequest
-	(*GetTaskLogsResponseHeader)(nil),     // 23: flyteidl.admin.GetTaskLogsResponseHeader
-	(*GetTaskLogsResponseBody)(nil),       // 24: flyteidl.admin.GetTaskLogsResponseBody
-	(*GetTaskLogsResponse)(nil),           // 25: flyteidl.admin.GetTaskLogsResponse
-	(*AgentError)(nil),                    // 26: flyteidl.admin.AgentError
-	nil,                                   // 27: flyteidl.admin.TaskExecutionMetadata.LabelsEntry
-	nil,                                   // 28: flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
-	nil,                                   // 29: flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
-	(*core.TaskExecutionIdentifier)(nil),  // 30: flyteidl.core.TaskExecutionIdentifier
-	(*core.TaskNodeOverrides)(nil),        // 31: flyteidl.core.TaskNodeOverrides
-	(*core.Identity)(nil),                 // 32: flyteidl.core.Identity
-	(*core.LiteralMap)(nil),               // 33: flyteidl.core.LiteralMap
-	(*core.TaskTemplate)(nil),             // 34: flyteidl.core.TaskTemplate
-	(*core.TaskLog)(nil),                  // 35: flyteidl.core.TaskLog
-	(core.TaskExecution_Phase)(0),         // 36: flyteidl.core.TaskExecution.Phase
-	(*structpb.Struct)(nil),               // 37: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),         // 38: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),           // 39: google.protobuf.Duration
-	(*core.ExecutionMetricResult)(nil),    // 40: flyteidl.core.ExecutionMetricResult
-	(core.ExecutionError_ErrorKind)(0),    // 41: flyteidl.core.ExecutionError.ErrorKind
+	(LogLineOriginator)(0),                // 1: flyteidl.admin.LogLineOriginator
+	(AgentError_Kind)(0),                  // 2: flyteidl.admin.AgentError.Kind
+	(*TaskExecutionMetadata)(nil),         // 3: flyteidl.admin.TaskExecutionMetadata
+	(*CreateTaskRequest)(nil),             // 4: flyteidl.admin.CreateTaskRequest
+	(*CreateTaskResponse)(nil),            // 5: flyteidl.admin.CreateTaskResponse
+	(*CreateRequestHeader)(nil),           // 6: flyteidl.admin.CreateRequestHeader
+	(*ExecuteTaskSyncRequest)(nil),        // 7: flyteidl.admin.ExecuteTaskSyncRequest
+	(*ExecuteTaskSyncResponseHeader)(nil), // 8: flyteidl.admin.ExecuteTaskSyncResponseHeader
+	(*ExecuteTaskSyncResponse)(nil),       // 9: flyteidl.admin.ExecuteTaskSyncResponse
+	(*GetTaskRequest)(nil),                // 10: flyteidl.admin.GetTaskRequest
+	(*GetTaskResponse)(nil),               // 11: flyteidl.admin.GetTaskResponse
+	(*Resource)(nil),                      // 12: flyteidl.admin.Resource
+	(*DeleteTaskRequest)(nil),             // 13: flyteidl.admin.DeleteTaskRequest
+	(*DeleteTaskResponse)(nil),            // 14: flyteidl.admin.DeleteTaskResponse
+	(*Agent)(nil),                         // 15: flyteidl.admin.Agent
+	(*TaskCategory)(nil),                  // 16: flyteidl.admin.TaskCategory
+	(*GetAgentRequest)(nil),               // 17: flyteidl.admin.GetAgentRequest
+	(*GetAgentResponse)(nil),              // 18: flyteidl.admin.GetAgentResponse
+	(*ListAgentsRequest)(nil),             // 19: flyteidl.admin.ListAgentsRequest
+	(*ListAgentsResponse)(nil),            // 20: flyteidl.admin.ListAgentsResponse
+	(*GetTaskMetricsRequest)(nil),         // 21: flyteidl.admin.GetTaskMetricsRequest
+	(*GetTaskMetricsResponse)(nil),        // 22: flyteidl.admin.GetTaskMetricsResponse
+	(*GetTaskLogsRequest)(nil),            // 23: flyteidl.admin.GetTaskLogsRequest
+	(*GetTaskLogsResponseHeader)(nil),     // 24: flyteidl.admin.GetTaskLogsResponseHeader
+	(*LogLine)(nil),                       // 25: flyteidl.admin.LogLine
+	(*GetTaskLogsResponseBody)(nil),       // 26: flyteidl.admin.GetTaskLogsResponseBody
+	(*GetTaskLogsResponse)(nil),           // 27: flyteidl.admin.GetTaskLogsResponse
+	(*AgentError)(nil),                    // 28: flyteidl.admin.AgentError
+	nil,                                   // 29: flyteidl.admin.TaskExecutionMetadata.LabelsEntry
+	nil,                                   // 30: flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
+	nil,                                   // 31: flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
+	(*core.TaskExecutionIdentifier)(nil),  // 32: flyteidl.core.TaskExecutionIdentifier
+	(*core.TaskNodeOverrides)(nil),        // 33: flyteidl.core.TaskNodeOverrides
+	(*core.Identity)(nil),                 // 34: flyteidl.core.Identity
+	(*core.LiteralMap)(nil),               // 35: flyteidl.core.LiteralMap
+	(*core.TaskTemplate)(nil),             // 36: flyteidl.core.TaskTemplate
+	(*core.TaskLog)(nil),                  // 37: flyteidl.core.TaskLog
+	(core.TaskExecution_Phase)(0),         // 38: flyteidl.core.TaskExecution.Phase
+	(*structpb.Struct)(nil),               // 39: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),         // 40: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),           // 41: google.protobuf.Duration
+	(*core.ExecutionMetricResult)(nil),    // 42: flyteidl.core.ExecutionMetricResult
+	(core.ExecutionError_ErrorKind)(0),    // 43: flyteidl.core.ExecutionError.ErrorKind
 }
 var file_flyteidl_admin_agent_proto_depIdxs = []int32{
-	30, // 0: flyteidl.admin.TaskExecutionMetadata.task_execution_id:type_name -> flyteidl.core.TaskExecutionIdentifier
-	27, // 1: flyteidl.admin.TaskExecutionMetadata.labels:type_name -> flyteidl.admin.TaskExecutionMetadata.LabelsEntry
-	28, // 2: flyteidl.admin.TaskExecutionMetadata.annotations:type_name -> flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
-	29, // 3: flyteidl.admin.TaskExecutionMetadata.environment_variables:type_name -> flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
-	31, // 4: flyteidl.admin.TaskExecutionMetadata.overrides:type_name -> flyteidl.core.TaskNodeOverrides
-	32, // 5: flyteidl.admin.TaskExecutionMetadata.identity:type_name -> flyteidl.core.Identity
-	33, // 6: flyteidl.admin.CreateTaskRequest.inputs:type_name -> flyteidl.core.LiteralMap
-	34, // 7: flyteidl.admin.CreateTaskRequest.template:type_name -> flyteidl.core.TaskTemplate
-	2,  // 8: flyteidl.admin.CreateTaskRequest.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
-	34, // 9: flyteidl.admin.CreateRequestHeader.template:type_name -> flyteidl.core.TaskTemplate
-	2,  // 10: flyteidl.admin.CreateRequestHeader.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
-	5,  // 11: flyteidl.admin.ExecuteTaskSyncRequest.header:type_name -> flyteidl.admin.CreateRequestHeader
-	33, // 12: flyteidl.admin.ExecuteTaskSyncRequest.inputs:type_name -> flyteidl.core.LiteralMap
-	11, // 13: flyteidl.admin.ExecuteTaskSyncResponseHeader.resource:type_name -> flyteidl.admin.Resource
-	7,  // 14: flyteidl.admin.ExecuteTaskSyncResponse.header:type_name -> flyteidl.admin.ExecuteTaskSyncResponseHeader
-	33, // 15: flyteidl.admin.ExecuteTaskSyncResponse.outputs:type_name -> flyteidl.core.LiteralMap
-	15, // 16: flyteidl.admin.GetTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	11, // 17: flyteidl.admin.GetTaskResponse.resource:type_name -> flyteidl.admin.Resource
+	32, // 0: flyteidl.admin.TaskExecutionMetadata.task_execution_id:type_name -> flyteidl.core.TaskExecutionIdentifier
+	29, // 1: flyteidl.admin.TaskExecutionMetadata.labels:type_name -> flyteidl.admin.TaskExecutionMetadata.LabelsEntry
+	30, // 2: flyteidl.admin.TaskExecutionMetadata.annotations:type_name -> flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
+	31, // 3: flyteidl.admin.TaskExecutionMetadata.environment_variables:type_name -> flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
+	33, // 4: flyteidl.admin.TaskExecutionMetadata.overrides:type_name -> flyteidl.core.TaskNodeOverrides
+	34, // 5: flyteidl.admin.TaskExecutionMetadata.identity:type_name -> flyteidl.core.Identity
+	35, // 6: flyteidl.admin.CreateTaskRequest.inputs:type_name -> flyteidl.core.LiteralMap
+	36, // 7: flyteidl.admin.CreateTaskRequest.template:type_name -> flyteidl.core.TaskTemplate
+	3,  // 8: flyteidl.admin.CreateTaskRequest.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
+	36, // 9: flyteidl.admin.CreateRequestHeader.template:type_name -> flyteidl.core.TaskTemplate
+	3,  // 10: flyteidl.admin.CreateRequestHeader.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
+	6,  // 11: flyteidl.admin.ExecuteTaskSyncRequest.header:type_name -> flyteidl.admin.CreateRequestHeader
+	35, // 12: flyteidl.admin.ExecuteTaskSyncRequest.inputs:type_name -> flyteidl.core.LiteralMap
+	12, // 13: flyteidl.admin.ExecuteTaskSyncResponseHeader.resource:type_name -> flyteidl.admin.Resource
+	8,  // 14: flyteidl.admin.ExecuteTaskSyncResponse.header:type_name -> flyteidl.admin.ExecuteTaskSyncResponseHeader
+	35, // 15: flyteidl.admin.ExecuteTaskSyncResponse.outputs:type_name -> flyteidl.core.LiteralMap
+	16, // 16: flyteidl.admin.GetTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	12, // 17: flyteidl.admin.GetTaskResponse.resource:type_name -> flyteidl.admin.Resource
 	0,  // 18: flyteidl.admin.Resource.state:type_name -> flyteidl.admin.State
-	33, // 19: flyteidl.admin.Resource.outputs:type_name -> flyteidl.core.LiteralMap
-	35, // 20: flyteidl.admin.Resource.log_links:type_name -> flyteidl.core.TaskLog
-	36, // 21: flyteidl.admin.Resource.phase:type_name -> flyteidl.core.TaskExecution.Phase
-	37, // 22: flyteidl.admin.Resource.custom_info:type_name -> google.protobuf.Struct
-	26, // 23: flyteidl.admin.Resource.agent_error:type_name -> flyteidl.admin.AgentError
-	15, // 24: flyteidl.admin.DeleteTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	15, // 25: flyteidl.admin.Agent.supported_task_categories:type_name -> flyteidl.admin.TaskCategory
-	14, // 26: flyteidl.admin.GetAgentResponse.agent:type_name -> flyteidl.admin.Agent
-	14, // 27: flyteidl.admin.ListAgentsResponse.agents:type_name -> flyteidl.admin.Agent
-	38, // 28: flyteidl.admin.GetTaskMetricsRequest.start_time:type_name -> google.protobuf.Timestamp
-	38, // 29: flyteidl.admin.GetTaskMetricsRequest.end_time:type_name -> google.protobuf.Timestamp
-	39, // 30: flyteidl.admin.GetTaskMetricsRequest.step:type_name -> google.protobuf.Duration
-	15, // 31: flyteidl.admin.GetTaskMetricsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	40, // 32: flyteidl.admin.GetTaskMetricsResponse.results:type_name -> flyteidl.core.ExecutionMetricResult
-	15, // 33: flyteidl.admin.GetTaskLogsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	23, // 34: flyteidl.admin.GetTaskLogsResponse.header:type_name -> flyteidl.admin.GetTaskLogsResponseHeader
-	24, // 35: flyteidl.admin.GetTaskLogsResponse.body:type_name -> flyteidl.admin.GetTaskLogsResponseBody
-	1,  // 36: flyteidl.admin.AgentError.kind:type_name -> flyteidl.admin.AgentError.Kind
-	41, // 37: flyteidl.admin.AgentError.origin:type_name -> flyteidl.core.ExecutionError.ErrorKind
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	35, // 19: flyteidl.admin.Resource.outputs:type_name -> flyteidl.core.LiteralMap
+	37, // 20: flyteidl.admin.Resource.log_links:type_name -> flyteidl.core.TaskLog
+	38, // 21: flyteidl.admin.Resource.phase:type_name -> flyteidl.core.TaskExecution.Phase
+	39, // 22: flyteidl.admin.Resource.custom_info:type_name -> google.protobuf.Struct
+	28, // 23: flyteidl.admin.Resource.agent_error:type_name -> flyteidl.admin.AgentError
+	16, // 24: flyteidl.admin.DeleteTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	16, // 25: flyteidl.admin.Agent.supported_task_categories:type_name -> flyteidl.admin.TaskCategory
+	15, // 26: flyteidl.admin.GetAgentResponse.agent:type_name -> flyteidl.admin.Agent
+	15, // 27: flyteidl.admin.ListAgentsResponse.agents:type_name -> flyteidl.admin.Agent
+	40, // 28: flyteidl.admin.GetTaskMetricsRequest.start_time:type_name -> google.protobuf.Timestamp
+	40, // 29: flyteidl.admin.GetTaskMetricsRequest.end_time:type_name -> google.protobuf.Timestamp
+	41, // 30: flyteidl.admin.GetTaskMetricsRequest.step:type_name -> google.protobuf.Duration
+	16, // 31: flyteidl.admin.GetTaskMetricsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	42, // 32: flyteidl.admin.GetTaskMetricsResponse.results:type_name -> flyteidl.core.ExecutionMetricResult
+	16, // 33: flyteidl.admin.GetTaskLogsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	40, // 34: flyteidl.admin.LogLine.timestamp:type_name -> google.protobuf.Timestamp
+	1,  // 35: flyteidl.admin.LogLine.originator:type_name -> flyteidl.admin.LogLineOriginator
+	25, // 36: flyteidl.admin.GetTaskLogsResponseBody.structured_lines:type_name -> flyteidl.admin.LogLine
+	24, // 37: flyteidl.admin.GetTaskLogsResponse.header:type_name -> flyteidl.admin.GetTaskLogsResponseHeader
+	26, // 38: flyteidl.admin.GetTaskLogsResponse.body:type_name -> flyteidl.admin.GetTaskLogsResponseBody
+	2,  // 39: flyteidl.admin.AgentError.kind:type_name -> flyteidl.admin.AgentError.Kind
+	43, // 40: flyteidl.admin.AgentError.origin:type_name -> flyteidl.core.ExecutionError.ErrorKind
+	41, // [41:41] is the sub-list for method output_type
+	41, // [41:41] is the sub-list for method input_type
+	41, // [41:41] is the sub-list for extension type_name
+	41, // [41:41] is the sub-list for extension extendee
+	0,  // [0:41] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_admin_agent_proto_init() }
@@ -2535,7 +2690,7 @@ func file_flyteidl_admin_agent_proto_init() {
 			}
 		}
 		file_flyteidl_admin_agent_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTaskLogsResponseBody); i {
+			switch v := v.(*LogLine); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2547,7 +2702,7 @@ func file_flyteidl_admin_agent_proto_init() {
 			}
 		}
 		file_flyteidl_admin_agent_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTaskLogsResponse); i {
+			switch v := v.(*GetTaskLogsResponseBody); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2559,6 +2714,18 @@ func file_flyteidl_admin_agent_proto_init() {
 			}
 		}
 		file_flyteidl_admin_agent_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTaskLogsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_admin_agent_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AgentError); i {
 			case 0:
 				return &v.state
@@ -2579,7 +2746,7 @@ func file_flyteidl_admin_agent_proto_init() {
 		(*ExecuteTaskSyncResponse_Header)(nil),
 		(*ExecuteTaskSyncResponse_Outputs)(nil),
 	}
-	file_flyteidl_admin_agent_proto_msgTypes[23].OneofWrappers = []interface{}{
+	file_flyteidl_admin_agent_proto_msgTypes[24].OneofWrappers = []interface{}{
 		(*GetTaskLogsResponse_Header)(nil),
 		(*GetTaskLogsResponse_Body)(nil),
 	}
@@ -2588,8 +2755,8 @@ func file_flyteidl_admin_agent_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_admin_agent_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   28,
+			NumEnums:      3,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

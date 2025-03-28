@@ -66,7 +66,7 @@ To turn on, add the following to your FlyteAdmin:
            cloudEvents:
              enable: true
              gcp:
-               region: us-east-2
+               projectId: my-project-id
              eventsPublisher:
                eventTypes:
                - all # or node, task, workflow
