@@ -43,6 +43,18 @@ Enable GRPC Server Reflection
   "true"
   
 
+grpcMaxRecvMsgSizeMBs (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max receive message size; if unset defaults to gRPC server default value
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 httpPort (int)
 ------------------------------------------------------------------------------------------------------------------------
 
