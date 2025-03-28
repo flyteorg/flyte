@@ -5,7 +5,7 @@
 
 - AWS Secret Manager Integration: Environment variables can now reference secrets stored in AWS Secrets Manager (#[6316](https://github.com/flyteorg/flyte/pull/6316)).
 
-- Dynamic Pod Configuration: Improved merging of head/worker node pod templates (#6232, #6262) and resource limits for Kubernetes plugins (Dask, Kubeflow) (#[6264](https://github.com/flyteorg/flyte/pull/6264)).
+- Dynamic Pod Configuration: Improved merging of Ray head/worker node pod templates ([#6232](https://github.com/flyteorg/flyte/pull/6232)) and resource limits for Kubernetes plugins (Dask, Kubeflow) (#[6264](https://github.com/flyteorg/flyte/pull/6264)).
 
 - Array Node Improvements: Added support for bound inputs ([#6276](https://github.com/flyteorg/flyte/pull/6276)) and preemption handling ([#6259](https://github.com/flyteorg/flyte/pull/6259)).
 
