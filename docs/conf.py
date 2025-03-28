@@ -37,7 +37,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.15.0"
+release = "1.15.1"
 
 # -- General configuration ---------------------------------------------------
 
