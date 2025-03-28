@@ -1,4 +1,50 @@
-## What's Changed
+# Flyte 1.15.1 release notes
+
+## New Features & Enhancements
+- Per-Launch Plan Notifications: Added support for custom notification templates tied to specific launch plans ([#6064](https://github.com/flyteorg/flyte/pull/6064)).
+
+- AWS Secret Manager Integration: Environment variables can now reference secrets stored in AWS Secrets Manager (#[6316](https://github.com/flyteorg/flyte/pull/6316)).
+
+- Dynamic Pod Configuration: Improved merging of head/worker node pod templates (#6232, #6262) and resource limits for Kubernetes plugins (Dask, Kubeflow) (#[6264](https://github.com/flyteorg/flyte/pull/6264)).
+
+- Array Node Improvements: Added support for bound inputs ([#6276](https://github.com/flyteorg/flyte/pull/6276)) and preemption handling ([#6259](https://github.com/flyteorg/flyte/pull/6259)).
+
+- Agent Enhancements: Added structured logging for agents ([#6344](https://github.com/flyteorg/flyte/pull/6344)) and reserved fields in execution payloads ([#6321](https://github.com/flyteorg/flyte/pull/6321)).
+
+- Connector Plugin: Introduced a new Connector plugin framework for extensibility ([#6332](https://github.com/flyteorg/flyte/pull/6332)).
+
+## Bug Fixes
+- Error Handling: Fixed critical errors in delete operations ([#6269](https://github.com/flyteorg/flyte/pull/6269)), array node metrics ([#6291](https://github.com/flyteorg/flyte/pull/6291)), and fastcache handling for failed nodes ([#6318](https://github.com/flyteorg/flyte/pull/6318)).
+
+- Dynamic Log Links: Enabled dynamic log links for Kubeflow plugins to improve debugging ([#6284](https://github.com/flyteorg/flyte/pull/6284)).
+
+- Preemption Handling: Addressed edge cases in pod preemption logic for worker nodes ([#6259](https://github.com/flyteorg/flyte/pull/6259)).
+
+## Security Patches
+
+- Updated dependencies to address CVEs (e.g., glog ([#6301](https://github.com/flyteorg/flyte/pull/6301)), go-jose ([#6281](https://github.com/flyteorg/flyte/pull/6281)), jwt ([#6361](https://github.com/flyteorg/flyte/pull/6361), [#6365](https://github.com/flyteorg/flyte/pull/6365))).
+
+## Documentation Updates
+- Streaming Decks: Added documentation for streaming deck visualization in Flyte fundamentals ([#6251](https://github.com/flyteorg/flyte/pull/6251), [#6272](https://github.com/flyteorg/flyte/pull/6272)).
+
+- Slurm GPU Clusters: New guides for setting up Slurm agent ([#6231](https://github.com/flyteorg/flyte/pull/6231)) and GPU clusters ([#6273](https://github.com/flyteorg/flyte/pull/6273)).
+
+- Dynamic Log Links: Documented usage for Kubernetes-based task plugins ([#6285](https://github.com/flyteorg/flyte/pull/6285)).
+
+- Launch Plan Chaining: Explained how to chain launch plans effectively ([#6317](https://github.com/flyteorg/flyte/pull/6317)).
+
+## Other Improvements & Maintenance
+
+- CI/CD: Aligned Go versions in CI with go.mod ([#5736](https://github.com/flyteorg/flyte/pull/5736)), removed mockery fork ([#6280](https://github.com/flyteorg/flyte/pull/6280), [#6288](https://github.com/flyteorg/flyte/pull/6288)), and improved codecov reporting ([#6299](https://github.com/flyteorg/flyte/pull/6064)).
+
+## Contributor Experience
+
+- Updated contribution docs for flytectl ([#6290](https://github.com/flyteorg/flyte/pull/6290)) and streamlined development workflows.
+
+## New Contributors
+A warm welcome to first-time contributors:
+@rustco, @mwaylonis, @sjtucoder, @bra-fsn, @CtfChan, @vlada-dudr, @jamestwebber, @0yukali0 🎉
+## Full changelog
 * [Docs] Streaming Decks by @Future-Outlier in https://github.com/flyteorg/flyte/pull/6251
 * Upgrade gh actions/cache to v4 by @eapolinario in https://github.com/flyteorg/flyte/pull/6256
 * auto-update contributors by @flyte-bot in https://github.com/flyteorg/flyte/pull/6252
