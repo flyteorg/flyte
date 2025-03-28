@@ -996,7 +996,7 @@ agent-service (`agent.Config`_)
   agents: null
   defaultAgent:
     defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
-    defaultTimeout: 10s
+    defaultTimeout: 3s
     endpoint: ""
     insecure: true
     timeouts: null
@@ -1124,6 +1124,47 @@ catalogcache (`catalog.Config`_)
     maxItems: 10000
     maxRetries: 3
     workers: 10
+  
+
+connector-service (`connector.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  connectorForTaskTypes: {}
+  connectors: {}
+  defaultConnector:
+    defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+    defaultTimeout: 10s
+    endpoint: ""
+    insecure: true
+    timeouts: null
+  pollInterval: 10s
+  resourceConstraints:
+    NamespaceScopeResourceConstraint:
+      Value: 50
+    ProjectScopeResourceConstraint:
+      Value: 100
+  supportedTaskTypes:
+  - task_type_3
+  - task_type_4
+  webApi:
+    caching:
+      maxSystemFailures: 5
+      resyncInterval: 30s
+      size: 500000
+      workers: 10
+    readRateLimiter:
+      burst: 100
+      qps: 10
+    resourceMeta: null
+    resourceQuotas:
+      default: 1000
+    writeRateLimiter:
+      burst: 100
+      qps: 10
   
 
 dask (`dask.Config`_)
@@ -1560,7 +1601,7 @@ The default agent.
 .. code-block:: yaml
 
   defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
-  defaultTimeout: 10s
+  defaultTimeout: 3s
   endpoint: ""
   insecure: true
   timeouts: null
@@ -1661,7 +1702,7 @@ defaultTimeout (`config.Duration`_)
 
 .. code-block:: yaml
 
-  10s
+  3s
   
 
 core.ResourceConstraintsSpec
@@ -2998,6 +3039,161 @@ scale (int32)
 .. code-block:: yaml
 
   "0"
+  
+
+connector.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+webApi (`webapi.PluginConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Defines config for the base WebAPI plugin.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  caching:
+    maxSystemFailures: 5
+    resyncInterval: 30s
+    size: 500000
+    workers: 10
+  readRateLimiter:
+    burst: 100
+    qps: 10
+  resourceMeta: null
+  resourceQuotas:
+    default: 1000
+  writeRateLimiter:
+    burst: 100
+    qps: 10
+  
+
+resourceConstraints (`core.ResourceConstraintsSpec`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  NamespaceScopeResourceConstraint:
+    Value: 50
+  ProjectScopeResourceConstraint:
+    Value: 100
+  
+
+defaultConnector (`connector.Deployment`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The default connector.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+  defaultTimeout: 10s
+  endpoint: ""
+  insecure: true
+  timeouts: null
+  
+
+connectors (map[string]*connector.Deployment)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The connectors.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
+connectorForTaskTypes (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_3
+  - task_type_4
+  
+
+pollInterval (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The interval at which the plugin should poll the connector for metadata updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
+  
+
+connector.Deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+insecure (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+defaultServiceConfig (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  '{"loadBalancingConfig": [{"round_robin":{}}]}'
+  
+
+timeouts (map[string]config.Duration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+defaultTimeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
   
 
 dask.Config
