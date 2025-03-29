@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -23,23 +24,6 @@ type workflowExecutorMetrics struct {
 	successfulExecutions prometheus.Counter
 	failedExecutions     prometheus.Counter
 	abortedExecutions    prometheus.Counter
-}
-
-// NewWorkflowExecutor creates a new WorkflowExecutor
-func NewWorkflowExecutor(
-	executionManager interfaces.ExecutionInterface,
-	scope promutils.Scope,
-) *WorkflowExecutor {
-	executorScope := scope.NewSubScope("workflow_executor")
-	return &WorkflowExecutor{
-		executionManager: executionManager,
-		scope:            executorScope,
-		metrics: &workflowExecutorMetrics{
-			successfulExecutions: executorScope.MustNewCounter("successful_executions", "Count of successful execution creations"),
-			failedExecutions:     executorScope.MustNewCounter("failed_executions", "Count of failed execution creations"),
-			abortedExecutions:    executorScope.MustNewCounter("aborted_executions", "Count of aborted executions"),
-		},
-	}
 }
 
 // CreateExecution creates a workflow execution in the system
@@ -69,7 +53,7 @@ func (w *WorkflowExecutor) CreateExecution(ctx context.Context, execution models
 	}
 
 	// Create the workflow execution
-	_, err := w.executionManager.CreateExecution(ctx, executionRequest, nil)
+	_, err := w.executionManager.CreateExecution(ctx, executionRequest, time.Now())
 	if err != nil {
 		w.metrics.failedExecutions.Inc()
 		logger.Errorf(ctx, "Failed to create execution: %v", err)

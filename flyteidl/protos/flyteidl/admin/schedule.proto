@@ -50,6 +50,9 @@ message SchedulerPolicy {
 
     // Defines how to handle the execution when the max concurrency is reached.
     ConcurrencyPolicy policy = 2;
+
+    // Defines the granularity to apply the concurrency policy to
+    ConcurrencyLevel level = 3;
 }
 
 enum ConcurrencyPolicy {

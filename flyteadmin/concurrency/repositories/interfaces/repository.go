@@ -32,4 +32,7 @@ type ConcurrencyRepoInterface interface {
 
 	// GetExecutionByID returns an execution when given an executionID
 	GetExecutionByID(ctx context.Context, executionID core.WorkflowExecutionIdentifier) (*models.Execution, error)
+
+	// GetLaunchPlanByID retrieves a launch plan by its database ID and returns its core.Identifier
+	GetLaunchPlanByID(ctx context.Context, launchPlanID uint) (*core.Identifier, error)
 }

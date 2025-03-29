@@ -63,9 +63,11 @@ class Schedule(_message.Message):
     def __init__(self, cron_expression: _Optional[str] = ..., rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_schedule: _Optional[_Union[CronSchedule, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ..., scheduler_policy: _Optional[_Union[SchedulerPolicy, _Mapping]] = ...) -> None: ...
 
 class SchedulerPolicy(_message.Message):
-    __slots__ = ["max", "policy"]
+    __slots__ = ["max", "policy", "level"]
     MAX_FIELD_NUMBER: _ClassVar[int]
     POLICY_FIELD_NUMBER: _ClassVar[int]
+    LEVEL_FIELD_NUMBER: _ClassVar[int]
     max: int
     policy: ConcurrencyPolicy
-    def __init__(self, max: _Optional[int] = ..., policy: _Optional[_Union[ConcurrencyPolicy, str]] = ...) -> None: ...
+    level: ConcurrencyLevel
+    def __init__(self, max: _Optional[int] = ..., policy: _Optional[_Union[ConcurrencyPolicy, str]] = ..., level: _Optional[_Union[ConcurrencyLevel, str]] = ...) -> None: ...

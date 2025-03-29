@@ -4580,6 +4580,15 @@
         }
       }
     },
+    "adminConcurrencyLevel": {
+      "type": "string",
+      "enum": [
+        "LAUNCH_PLAN",
+        "LAUNCH_PLAN_VERSION"
+      ],
+      "default": "LAUNCH_PLAN",
+      "title": "- LAUNCH_PLAN: Applies concurrency limits across all launch plan versions.\n - LAUNCH_PLAN_VERSION: Applies concurrency at the versioned launch plan level"
+    },
     "adminConcurrencyPolicy": {
       "type": "string",
       "enum": [
@@ -6022,6 +6031,10 @@
         "policy": {
           "$ref": "#/definitions/adminConcurrencyPolicy",
           "description": "Defines how to handle the execution when the max concurrency is reached."
+        },
+        "level": {
+          "$ref": "#/definitions/adminConcurrencyLevel",
+          "title": "Defines the granularity to apply the concurrency policy to"
         }
       }
     },

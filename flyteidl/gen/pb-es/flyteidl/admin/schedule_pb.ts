@@ -288,6 +288,13 @@ export class SchedulerPolicy extends Message<SchedulerPolicy> {
    */
   policy = ConcurrencyPolicy.UNSPECIFIED;
 
+  /**
+   * Defines the granularity to apply the concurrency policy to
+   *
+   * @generated from field: flyteidl.admin.ConcurrencyLevel level = 3;
+   */
+  level = ConcurrencyLevel.LAUNCH_PLAN;
+
   constructor(data?: PartialMessage<SchedulerPolicy>) {
     super();
     proto3.util.initPartial(data, this);
@@ -298,6 +305,7 @@ export class SchedulerPolicy extends Message<SchedulerPolicy> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "max", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 2, name: "policy", kind: "enum", T: proto3.getEnumType(ConcurrencyPolicy) },
+    { no: 3, name: "level", kind: "enum", T: proto3.getEnumType(ConcurrencyLevel) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SchedulerPolicy {

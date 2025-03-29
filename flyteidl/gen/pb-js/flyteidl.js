@@ -41187,6 +41187,7 @@
                  * @interface ISchedulerPolicy
                  * @property {number|null} [max] SchedulerPolicy max
                  * @property {flyteidl.admin.ConcurrencyPolicy|null} [policy] SchedulerPolicy policy
+                 * @property {flyteidl.admin.ConcurrencyLevel|null} [level] SchedulerPolicy level
                  */
     
                 /**
@@ -41221,6 +41222,14 @@
                 SchedulerPolicy.prototype.policy = 0;
     
                 /**
+                 * SchedulerPolicy level.
+                 * @member {flyteidl.admin.ConcurrencyLevel} level
+                 * @memberof flyteidl.admin.SchedulerPolicy
+                 * @instance
+                 */
+                SchedulerPolicy.prototype.level = 0;
+    
+                /**
                  * Creates a new SchedulerPolicy instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.SchedulerPolicy
@@ -41248,6 +41257,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.max);
                     if (message.policy != null && message.hasOwnProperty("policy"))
                         writer.uint32(/* id 2, wireType 0 =*/16).int32(message.policy);
+                    if (message.level != null && message.hasOwnProperty("level"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).int32(message.level);
                     return writer;
                 };
     
@@ -41274,6 +41285,9 @@
                             break;
                         case 2:
                             message.policy = reader.int32();
+                            break;
+                        case 3:
+                            message.level = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -41305,6 +41319,14 @@
                         case 1:
                         case 2:
                         case 3:
+                            break;
+                        }
+                    if (message.level != null && message.hasOwnProperty("level"))
+                        switch (message.level) {
+                        default:
+                            return "level: enum value expected";
+                        case 0:
+                        case 1:
                             break;
                         }
                     return null;

@@ -287,8 +287,16 @@ func (c *ConcurrencyController) processExecution(ctx context.Context, executionK
 		return nil
 	}
 
-	// Get the launch plan ID
-	launchPlanID := execution.LaunchPlanID
+	// // Get the launch plan ID
+	launchPlan, err := c.repo.GetLaunchPlanByID(ctx, execution.LaunchPlanID)
+	if err != nil {
+		return err
+	}
+	launchPlanID := idlCore.Identifier{
+		Project: launchPlan.Project,
+		Domain:  launchPlan.Domain,
+		Name:    launchPlan.Name,
+	}
 
 	// Get the concurrency policy for the launch plan
 	policy, err := c.launchPlanInformer.GetPolicy(ctx, launchPlanID)
@@ -308,7 +316,7 @@ func (c *ConcurrencyController) processExecution(ctx context.Context, executionK
 	}
 
 	// Check if the execution can proceed based on concurrency policy
-	canExecute, reason, err := c.policyEvaluator.CanExecute(ctx, *execution, policy, runningCount)
+	canExecute, _, err := c.policyEvaluator.CanExecute(ctx, *execution, policy, runningCount)
 	if err != nil {
 		return err
 	}
@@ -376,7 +384,20 @@ func (c *ConcurrencyController) allowExecution(ctx context.Context, execution *m
 		return err
 	}
 
-	err = c.TrackExecution(ctx, *execution, execution.LaunchPlanID)
+	// Get the launch plan from the repository
+	launchPlan, err := c.repo.GetLaunchPlanByID(ctx, execution.LaunchPlanID)
+	if err != nil {
+		return err
+	}
+
+	// Create an identifier from the launch plan data
+	launchPlanID := idlCore.Identifier{
+		Project: launchPlan.Project,
+		Domain:  launchPlan.Domain,
+		Name:    launchPlan.Name,
+	}
+
+	err = c.TrackExecution(ctx, *execution, launchPlanID)
 	if err != nil {
 		return err
 	}
@@ -487,12 +508,10 @@ func (c *ConcurrencyController) Close() error {
 	return nil
 }
 
-// RecordPendingExecutions implements core.ConcurrencyMetrics
 func (c *ConcurrencyController) RecordPendingExecutions(count int64) {
 	c.metrics.pendingExecutions.Set(float64(count))
 }
 
-// RecordProcessedExecution implements core.ConcurrencyMetrics
 func (c *ConcurrencyController) RecordProcessedExecution(policy string, allowed bool) {
 	if allowed {
 		c.metrics.executionsAllowedCount.Inc()
@@ -501,41 +520,21 @@ func (c *ConcurrencyController) RecordProcessedExecution(policy string, allowed 
 	}
 }
 
-// RecordLatency implements core.ConcurrencyMetrics
 func (c *ConcurrencyController) RecordLatency(operation string, startTime time.Time) {
 	switch operation {
 	case "processing":
-		c.metrics.processingLatency.Observe(startTime)
+		c.metrics.processingLatency.Observe(startTime, c.clock.Now())
 	}
 }
 
-// Helper functions
-
-// getLaunchPlanKey generates a unique string key for a launch plan
 func getLaunchPlanKey(project, domain, name string) string {
 	return fmt.Sprintf("lp:%s:%s:%s", project, domain, name)
 }
 
-// getNamedEntityKey converts a NamedEntityIdentifier to a string key
-func getNamedEntityKey(nei admin.NamedEntityIdentifier) string {
-	return getLaunchPlanKey(nei.Project, nei.Domain, nei.Name)
-}
-
-// getExecutionKey generates a unique string key for an execution
 func getExecutionKey(project, domain, name string) string {
 	return fmt.Sprintf("exec:%s:%s:%s", project, domain, name)
 }
 
-// parseNamedEntityKey converts a string key back to components
-func parseNamedEntityKey(key string) (string, string, string, error) {
-	parts := strings.Split(key, ":")
-	if len(parts) != 4 || parts[0] != "lp" {
-		return "", "", "", fmt.Errorf("invalid launch plan key format: %s", key)
-	}
-	return parts[1], parts[2], parts[3], nil
-}
-
-// splitExecutionKey splits an execution key into its components
 func splitExecutionKey(key string) []string {
 	return strings.Split(key, ":")
 }

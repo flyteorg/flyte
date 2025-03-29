@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"fmt"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"gorm.io/gorm"
@@ -181,8 +182,7 @@ func (r *GormConcurrencyRepo) GetOldestRunningExecution(
 func (r *GormConcurrencyRepo) GetAllLaunchPlansWithConcurrency(ctx context.Context) ([]models.LaunchPlan, error) {
 	var launchPlans []models.LaunchPlan
 
-	// Get all launch plans with concurrency settings
-	tx := r.db.Where("scheduler_policy IS NOT NULL").Find(&launchPlans)
+	tx := r.db.Where("spec LIKE ?", "%scheduler_policy%").Find(&launchPlans)
 
 	if tx.Error != nil {
 		return nil, fmt.Errorf("failed to get launch plans with concurrency: %w", tx.Error)
@@ -204,4 +204,20 @@ func (r *GormConcurrencyRepo) GetExecutionByID(ctx context.Context, executionID 
 	}
 
 	return &execution, nil
+}
+
+// GetLaunchPlanByID retrieves a launch plan by its database ID and returns its core.Identifier
+func (r *GormConcurrencyRepo) GetLaunchPlanByID(ctx context.Context, launchPlanID uint) (*core.Identifier, error) {
+	var launchPlan models.LaunchPlan
+
+	tx := r.db.Model(&models.LaunchPlan{}).Where("id = ?", launchPlanID).First(&launchPlan)
+	if tx.Error != nil {
+		return nil, fmt.Errorf("failed to get launch plan by ID: %w", tx.Error)
+	}
+
+	return &core.Identifier{
+		Project: launchPlan.Project,
+		Domain:  launchPlan.Domain,
+		Name:    launchPlan.Name,
+	}, nil
 }

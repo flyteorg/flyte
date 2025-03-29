@@ -16942,6 +16942,9 @@ export namespace flyteidl {
 
             /** SchedulerPolicy policy */
             policy?: (flyteidl.admin.ConcurrencyPolicy|null);
+
+            /** SchedulerPolicy level */
+            level?: (flyteidl.admin.ConcurrencyLevel|null);
         }
 
         /** Represents a SchedulerPolicy. */
@@ -16958,6 +16961,9 @@ export namespace flyteidl {
 
             /** SchedulerPolicy policy. */
             public policy: flyteidl.admin.ConcurrencyPolicy;
+
+            /** SchedulerPolicy level. */
+            public level: flyteidl.admin.ConcurrencyLevel;
 
             /**
              * Creates a new SchedulerPolicy instance using the specified properties.

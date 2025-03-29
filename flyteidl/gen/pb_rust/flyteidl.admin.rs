@@ -1937,6 +1937,9 @@ pub struct SchedulerPolicy {
     /// Defines how to handle the execution when the max concurrency is reached.
     #[prost(enumeration="ConcurrencyPolicy", tag="2")]
     pub policy: i32,
+    /// Defines the granularity to apply the concurrency policy to
+    #[prost(enumeration="ConcurrencyLevel", tag="3")]
+    pub level: i32,
 }
 /// Represents a frequency at which to run a schedule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

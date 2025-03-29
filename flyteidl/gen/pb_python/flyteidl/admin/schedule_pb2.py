@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"T\n\tFixedRate\x12\x14\n\x05value\x18\x01 \x01(\rR\x05value\x12\x31\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnitR\x04unit\"B\n\x0c\x43ronSchedule\x12\x1a\n\x08schedule\x18\x01 \x01(\tR\x08schedule\x12\x16\n\x06offset\x18\x02 \x01(\tR\x06offset\"\xc6\x02\n\x08Schedule\x12-\n\x0f\x63ron_expression\x18\x01 \x01(\tB\x02\x18\x01H\x00R\x0e\x63ronExpression\x12/\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00R\x04rate\x12\x43\n\rcron_schedule\x18\x04 \x01(\x0b\x32\x1c.flyteidl.admin.CronScheduleH\x00R\x0c\x63ronSchedule\x12\x33\n\x16kickoff_time_input_arg\x18\x03 \x01(\tR\x13kickoffTimeInputArg\x12J\n\x10scheduler_policy\x18\x05 \x01(\x0b\x32\x1f.flyteidl.admin.SchedulerPolicyR\x0fschedulerPolicyB\x14\n\x12ScheduleExpression\"^\n\x0fSchedulerPolicy\x12\x10\n\x03max\x18\x01 \x01(\rR\x03max\x12\x39\n\x06policy\x18\x02 \x01(\x0e\x32!.flyteidl.admin.ConcurrencyPolicyR\x06policy*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02*F\n\x11\x43oncurrencyPolicy\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x08\n\x04WAIT\x10\x01\x12\t\n\x05\x41\x42ORT\x10\x02\x12\x0b\n\x07REPLACE\x10\x03*<\n\x10\x43oncurrencyLevel\x12\x0f\n\x0bLAUNCH_PLAN\x10\x00\x12\x17\n\x13LAUNCH_PLAN_VERSION\x10\x01\x42\xb9\x01\n\x12\x63om.flyteidl.adminB\rScheduleProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"T\n\tFixedRate\x12\x14\n\x05value\x18\x01 \x01(\rR\x05value\x12\x31\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnitR\x04unit\"B\n\x0c\x43ronSchedule\x12\x1a\n\x08schedule\x18\x01 \x01(\tR\x08schedule\x12\x16\n\x06offset\x18\x02 \x01(\tR\x06offset\"\xc6\x02\n\x08Schedule\x12-\n\x0f\x63ron_expression\x18\x01 \x01(\tB\x02\x18\x01H\x00R\x0e\x63ronExpression\x12/\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00R\x04rate\x12\x43\n\rcron_schedule\x18\x04 \x01(\x0b\x32\x1c.flyteidl.admin.CronScheduleH\x00R\x0c\x63ronSchedule\x12\x33\n\x16kickoff_time_input_arg\x18\x03 \x01(\tR\x13kickoffTimeInputArg\x12J\n\x10scheduler_policy\x18\x05 \x01(\x0b\x32\x1f.flyteidl.admin.SchedulerPolicyR\x0fschedulerPolicyB\x14\n\x12ScheduleExpression\"\x96\x01\n\x0fSchedulerPolicy\x12\x10\n\x03max\x18\x01 \x01(\rR\x03max\x12\x39\n\x06policy\x18\x02 \x01(\x0e\x32!.flyteidl.admin.ConcurrencyPolicyR\x06policy\x12\x36\n\x05level\x18\x03 \x01(\x0e\x32 .flyteidl.admin.ConcurrencyLevelR\x05level*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02*F\n\x11\x43oncurrencyPolicy\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x08\n\x04WAIT\x10\x01\x12\t\n\x05\x41\x42ORT\x10\x02\x12\x0b\n\x07REPLACE\x10\x03*<\n\x10\x43oncurrencyLevel\x12\x0f\n\x0bLAUNCH_PLAN\x10\x00\x12\x17\n\x13LAUNCH_PLAN_VERSION\x10\x01\x42\xb9\x01\n\x12\x63om.flyteidl.adminB\rScheduleProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,18 +24,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl.adminB\rScheduleProtoP\001Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\242\002\003FAX\252\002\016Flyteidl.Admin\312\002\016Flyteidl\\Admin\342\002\032Flyteidl\\Admin\\GPBMetadata\352\002\017Flyteidl::Admin'
   _SCHEDULE.fields_by_name['cron_expression']._options = None
   _SCHEDULE.fields_by_name['cron_expression']._serialized_options = b'\030\001'
-  _globals['_FIXEDRATEUNIT']._serialized_start=628
-  _globals['_FIXEDRATEUNIT']._serialized_end=674
-  _globals['_CONCURRENCYPOLICY']._serialized_start=676
-  _globals['_CONCURRENCYPOLICY']._serialized_end=746
-  _globals['_CONCURRENCYLEVEL']._serialized_start=748
-  _globals['_CONCURRENCYLEVEL']._serialized_end=808
+  _globals['_FIXEDRATEUNIT']._serialized_start=685
+  _globals['_FIXEDRATEUNIT']._serialized_end=731
+  _globals['_CONCURRENCYPOLICY']._serialized_start=733
+  _globals['_CONCURRENCYPOLICY']._serialized_end=803
+  _globals['_CONCURRENCYLEVEL']._serialized_start=805
+  _globals['_CONCURRENCYLEVEL']._serialized_end=865
   _globals['_FIXEDRATE']._serialized_start=49
   _globals['_FIXEDRATE']._serialized_end=133
   _globals['_CRONSCHEDULE']._serialized_start=135
   _globals['_CRONSCHEDULE']._serialized_end=201
   _globals['_SCHEDULE']._serialized_start=204
   _globals['_SCHEDULE']._serialized_end=530
-  _globals['_SCHEDULERPOLICY']._serialized_start=532
-  _globals['_SCHEDULERPOLICY']._serialized_end=626
+  _globals['_SCHEDULERPOLICY']._serialized_start=533
+  _globals['_SCHEDULERPOLICY']._serialized_end=683
 # @@protoc_insertion_point(module_scope)

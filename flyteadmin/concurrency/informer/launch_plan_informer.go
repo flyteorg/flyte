@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteadmin/concurrency/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -89,14 +91,18 @@ func (l *LaunchPlanInformer) Refresh(ctx context.Context) error {
 
 	newLaunchPlans := make(map[string]*admin.SchedulerPolicy)
 	for _, lp := range launchPlans {
-		if lp.SchedulerPolicy != nil {
+		var spec admin.LaunchPlanSpec
+		if err := proto.Unmarshal(lp.Spec, &spec); err != nil {
+			logger.Errorf(ctx, "Failed to unmarshal launch plan spec: %v", err)
+			continue
+		}
+
+		if spec.EntityMetadata != nil &&
+			spec.EntityMetadata.Schedule != nil &&
+			spec.EntityMetadata.Schedule.SchedulerPolicy != nil {
+
 			lpID := getLaunchPlanKey(lp.Project, lp.Domain, lp.Name)
-			policy := &admin.SchedulerPolicy{
-				Max:    lp.SchedulerPolicy.MaxConcurrent,
-				Policy: admin.ConcurrencyPolicy(lp.SchedulerPolicy.Policy),
-				Level:  admin.ConcurrencyLevel(lp.SchedulerPolicy.Level),
-			}
-			newLaunchPlans[lpID] = policy
+			newLaunchPlans[lpID] = spec.EntityMetadata.Schedule.SchedulerPolicy
 		}
 	}
 
@@ -123,12 +129,19 @@ func (l *LaunchPlanInformer) GetPolicy(ctx context.Context, id core.Identifier) 
 			return nil, err
 		}
 
-		if lp != nil && lp.SchedulerPolicy != nil {
-			return &admin.SchedulerPolicy{
-				Max:    lp.SchedulerPolicy.MaxConcurrent,
-				Policy: admin.ConcurrencyPolicy(lp.SchedulerPolicy.Policy),
-				Level:  admin.ConcurrencyLevel(lp.SchedulerPolicy.Level),
-			}, nil
+		if lp != nil {
+			var spec admin.LaunchPlanSpec
+			if err := proto.Unmarshal(lp.Spec, &spec); err != nil {
+				logger.Errorf(ctx, "Failed to unmarshal launch plan spec: %v", err)
+				return nil, err
+			}
+
+			if spec.EntityMetadata != nil &&
+				spec.EntityMetadata.Schedule != nil &&
+				spec.EntityMetadata.Schedule.SchedulerPolicy != nil {
+
+				return spec.EntityMetadata.Schedule.SchedulerPolicy, nil
+			}
 		}
 		return nil, nil
 	}
