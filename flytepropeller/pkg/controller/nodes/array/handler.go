@@ -665,7 +665,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.TaskPhaseVersion++
 		}
 
-		const maxRetries = 3
+		maxRetries := config.GetConfig().ArrayNode.MaxTaskPhaseVersionAttempts
 		retries := 0
 		for retries <= maxRetries {
 			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
