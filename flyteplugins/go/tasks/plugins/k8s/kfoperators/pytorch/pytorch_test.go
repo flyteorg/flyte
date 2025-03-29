@@ -180,6 +180,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetOnOOMConfig().Return(nil)
 	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
