@@ -5,6 +5,12 @@ metadata:
   name: {{ template "datacatalog.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "datacatalog.labels" . | nindent 4 }}
+  {{- if .Values.datacatalog.annotations }}
+  annotations:
+    {{- with .Values.datacatalog.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.datacatalog.replicaCount }}
   selector:
