@@ -38,6 +38,21 @@ class DataCatalogStub(object):
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.FromString,
                 )
+        self.CreateFutureArtifact = channel.unary_unary(
+                '/datacatalog.DataCatalog/CreateFutureArtifact',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactResponse.FromString,
+                )
+        self.GetFutureArtifact = channel.unary_unary(
+                '/datacatalog.DataCatalog/GetFutureArtifact',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.FromString,
+                )
+        self.UpdateFutureArtifact = channel.unary_unary(
+                '/datacatalog.DataCatalog/UpdateFutureArtifact',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
+                )
         self.AddTag = channel.unary_unary(
                 '/datacatalog.DataCatalog/AddTag',
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.AddTagRequest.SerializeToString,
@@ -102,6 +117,27 @@ class DataCatalogServicer(object):
 
     def GetArtifact(self, request, context):
         """Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateFutureArtifact(self, request, context):
+        """Create future artifact data.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFutureArtifact(self, request, context):
+        """Retrieve a future artifact by an identifying handle. This returns an artifact along with the artifact data.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateFutureArtifact(self, request, context):
+        """Updates an existing future artifact, overwriting the stored artifact data in the underlying blob storage.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -182,6 +218,21 @@ def add_DataCatalogServicer_to_server(servicer, server):
                     servicer.GetArtifact,
                     request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.FromString,
                     response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.SerializeToString,
+            ),
+            'CreateFutureArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateFutureArtifact,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactResponse.SerializeToString,
+            ),
+            'GetFutureArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFutureArtifact,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.SerializeToString,
+            ),
+            'UpdateFutureArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateFutureArtifact,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.SerializeToString,
             ),
             'AddTag': grpc.unary_unary_rpc_method_handler(
                     servicer.AddTag,
@@ -292,6 +343,57 @@ class DataCatalog(object):
         return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/GetArtifact',
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.SerializeToString,
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateFutureArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/CreateFutureArtifact',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetFutureArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/GetFutureArtifact',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateFutureArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/UpdateFutureArtifact',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

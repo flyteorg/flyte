@@ -7,12 +7,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/array"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/branch"
+	CatalogInterfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/dynamic"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/end"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate"
@@ -32,7 +32,7 @@ type handlerFactory struct {
 	launchPlanReader        launchplan.Reader
 	kubeClient              executors.Client
 	kubeClientset           kubernetes.Interface
-	catalogClient           catalog.Client
+	catalogClient           CatalogInterfaces.CatalogClient
 	recoveryClient          recovery.Client
 	eventConfig             *config.EventConfig
 	literalOffloadingConfig config.LiteralOffloadingConfig
@@ -62,7 +62,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 
 	f.handlers = map[v1alpha1.NodeKind]interfaces.NodeHandler{
 		v1alpha1.NodeKindBranch:   branch.New(executor, f.eventConfig, f.scope),
-		v1alpha1.NodeKindTask:     dynamic.New(t, executor, f.launchPlanReader, f.eventConfig, f.scope),
+		v1alpha1.NodeKindTask:     dynamic.New(t, executor, f.launchPlanReader, f.eventConfig, f.scope, f.catalogClient),
 		v1alpha1.NodeKindWorkflow: subworkflow.New(executor, f.workflowLauncher, f.recoveryClient, f.eventConfig, f.scope),
 		v1alpha1.NodeKindGate:     gate.New(f.eventConfig, f.signalClient, f.scope),
 		v1alpha1.NodeKindArray:    arrayHandler,
@@ -79,7 +79,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 }
 
 func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader,
-	kubeClient executors.Client, kubeClientset kubernetes.Interface, catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
+	kubeClient executors.Client, kubeClientset kubernetes.Interface, catalogClient CatalogInterfaces.CatalogClient, recoveryClient recovery.Client, eventConfig *config.EventConfig,
 	literalOffloadingConfig config.LiteralOffloadingConfig,
 	clusterID string, signalClient service.SignalServiceClient, scope promutils.Scope) (interfaces.HandlerFactory, error) {
 
