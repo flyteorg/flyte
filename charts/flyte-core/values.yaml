@@ -96,6 +96,8 @@ flyteadmin:
       # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
       verbs:
         - "*"
+  # -- Annotations for Flyteadmin deployment
+  annotations: {}
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- Labels for Flyteadmin pods
@@ -172,6 +174,8 @@ flytescheduler:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Flytescheduler deployment
+  annotations: {}
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
   # -- Additional Flytescheduler container environment variables
@@ -244,6 +248,8 @@ datacatalog:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Datacatalog deployment
+  annotations: {}
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
   # -- Additional Datacatalog container environment variables
@@ -347,6 +353,8 @@ flytepropeller:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Flytepropeller deployment
+  annotations: {}
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
   # -- Additional Flytepropeller container environment variables
@@ -426,6 +434,8 @@ flyteconsole:
       enabled: false
     annotations: {}
     type: ClusterIP
+  # -- Annotations for Flyteconsole deployment
+  annotations: {}
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
   # -- Additional Flyteconsole container environment variables
@@ -511,6 +521,8 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook deployment
+  annotations: {}
   # -- Annotations for webhook pods
   podAnnotations: {}
   # -- Additional webhook container environment variables
@@ -1020,6 +1032,8 @@ cluster_resource_manager:
   standaloneDeployment: false
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Annotations for ClusterResource deployment
+  annotations: {}
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
   # -- Additional ClusterResource container environment variables

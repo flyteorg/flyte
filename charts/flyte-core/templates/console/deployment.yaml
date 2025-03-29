@@ -5,6 +5,12 @@ metadata:
   name: {{ template "flyteconsole.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+  {{- if .Values.flyteconsole.annotations }}
+  annotations:
+    {{- with .Values.flyteconsole.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.flyteconsole.replicaCount }}
   selector:
