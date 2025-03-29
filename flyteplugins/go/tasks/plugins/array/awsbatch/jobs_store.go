@@ -200,19 +200,11 @@ func createAttemptFromJobDetail(ctx context.Context, source *batch.JobDetail) (a
 	return a, exitReason
 }
 
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
 func toRanges(totalSize, chunkSize int) (startIdx, endIdx []int) {
 	startIdx = make([]int, 0, totalSize/chunkSize+1)
 	endIdx = make([]int, 0, totalSize/chunkSize+1)
 	for i := 0; i < totalSize; i += chunkSize {
-		endI := minInt(chunkSize+i, totalSize)
+		endI := min(chunkSize+i, totalSize)
 		startIdx = append(startIdx, i)
 		endIdx = append(endIdx, endI)
 	}
