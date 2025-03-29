@@ -545,6 +545,25 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	// Training operator did not modify the job even though it is not suspended
+	mpiJob := dummyMPIJobResourceCreator(kubeflowv1.JobCreated)
+	mpiJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	mpiJob.Status.StartTime = nil
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, mpiJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	mpiJobSuspended := dummyMPIJobResourceCreator(kubeflowv1.JobCreated)
+	mpiJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	mpiJobSuspended.Status.StartTime = nil
+	suspend := true
+	mpiJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, mpiJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
