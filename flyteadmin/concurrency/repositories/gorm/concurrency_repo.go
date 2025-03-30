@@ -182,7 +182,8 @@ func (r *GormConcurrencyRepo) GetOldestRunningExecution(
 func (r *GormConcurrencyRepo) GetAllLaunchPlansWithConcurrency(ctx context.Context) ([]models.LaunchPlan, error) {
 	var launchPlans []models.LaunchPlan
 
-	tx := r.db.Where("spec LIKE ?", "%scheduler_policy%").Find(&launchPlans)
+	// Get all launch plans with concurrency settings
+	tx := r.db.Where("scheduler_policy IS NOT NULL").Find(&launchPlans)
 
 	if tx.Error != nil {
 		return nil, fmt.Errorf("failed to get launch plans with concurrency: %w", tx.Error)

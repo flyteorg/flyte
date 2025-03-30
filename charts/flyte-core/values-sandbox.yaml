@@ -122,6 +122,25 @@ concurrency_controller:
   enabled: true
   type: native
 
+# -- Configuration for the concurrency controller - disable simulation mode
+flyteconcurrency:
+  simulationMode: false
+  runPrecheck: true
+  image:
+    repository: flyte-binary
+    tag: sandbox
+    pullPolicy: Never
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/flyte/config/*.yaml
+
 workflow_notifications:
   enabled: false
   config: {}

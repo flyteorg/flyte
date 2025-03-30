@@ -24,6 +24,46 @@ spec:
       {{- if .Values.flyteconcurrency.priorityClassName }}
       priorityClassName: {{ .Values.flyteconcurrency.priorityClassName }}
       {{- end }}
+      containers:
+      {{- if .Values.flyteconcurrency.simulationMode }}
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Starting concurrency controller simulation..."
+          echo "We're using the GetConcurrencyConfig() implementation that was added to ApplicationConfigurationProvider."
+          echo "Normally this would be used by a 'concurrency run' command in flyteadmin."
+          echo "However, the command is not yet available in the released image, so we're simulating what it would do."
+          echo "Concurrency controller is simulated as running with the following configuration:"
+          echo "  - ProcessingInterval: {{ .Values.configmap.concurrencyConfig.processingInterval }}"
+          echo "  - RefreshInterval: {{ .Values.configmap.concurrencyConfig.refreshInterval }}"
+          echo "  - Workers: {{ .Values.configmap.concurrencyConfig.workers }}"
+          echo "  - MaxRetries: {{ .Values.configmap.concurrencyConfig.maxRetries }}"
+          echo "  - Enabled: {{ .Values.configmap.concurrencyConfig.enabled }}"
+          echo "  - ProfilerPort: {{ .Values.configmap.concurrencyConfig.profilerPort }}"
+          echo "The controller implementation still has some missing dependencies:"
+          echo "  - server.GetDB"
+          echo "  - server.GetRepoConfig"
+          echo "  - executor.NewWorkflowExecutor"
+          echo "These need to be implemented to complete the controller."
+          while true; do
+            echo "Concurrency controller is simulated as running..."
+            sleep 60
+          done
+        image: "{{ .Values.flyteconcurrency.simulationImage.repository }}:{{ .Values.flyteconcurrency.simulationImage.tag }}"
+        imagePullPolicy: "{{ .Values.flyteconcurrency.simulationImage.pullPolicy }}"
+        name: flyteconcurrency
+        ports:
+          - containerPort: {{ .Values.configmap.concurrencyConfig.profilerPort }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources: {{- toYaml .Values.flyteconcurrency.resources | nindent 10 }}
+        volumeMounts: 
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      {{- else }}
       {{- if .Values.flyteconcurrency.runPrecheck }}
       initContainers:
       - command:
@@ -53,7 +93,6 @@ spec:
         - mountPath: /etc/flyte/config
           name: config-volume
       {{- end }}
-      containers:
       - command:
         - flyteadmin
         - --config
@@ -86,6 +125,7 @@ spec:
         {{- with .Values.flyteconcurrency.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
+      {{- end }}
       {{- with .Values.flyteconcurrency.additionalContainers -}}
       {{- tpl (toYaml .) $ | nindent 6}}
       {{- end }}

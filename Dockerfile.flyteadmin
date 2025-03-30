@@ -36,6 +36,9 @@ COPY flytestdlib ../flytestdlib
 # The main entrypoint should be compiled to /artifacts/flyteadmin
 RUN make linux_compile
 
+# Also compile the concurrency controller binary
+RUN go build -o /artifacts/flyteconcurrency -ldflags="-s -w" ./cmd/concurrency
+
 # update the PATH to include the /artifacts directory
 ENV PATH="/artifacts:${PATH}"
 

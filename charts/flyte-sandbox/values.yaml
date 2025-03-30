@@ -102,6 +102,25 @@ configmap:
     enabled: true
     profilerPort: 10255
 
+# Update flyteconcurrency configuration to disable simulation mode
+flyteconcurrency:
+  simulationMode: false
+  runPrecheck: true
+  image:
+    repository: flyte-binary
+    tag: sandbox
+    pullPolicy: Never
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/flyte/config/*.yaml
+
 kubernetes-dashboard:
   enabled: true
   image:

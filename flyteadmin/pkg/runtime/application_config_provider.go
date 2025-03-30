@@ -15,6 +15,7 @@ const notifications = "notifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
+const concurrency = "concurrencyConfig"
 const metricPort = 10254
 
 const KB = 1024
@@ -85,6 +86,15 @@ var cloudEventsConfig = config.MustRegisterSection(cloudEvents, &interfaces.Clou
 	Type: common.Local,
 })
 
+var concurrencyConfig = config.MustRegisterSection(concurrency, &interfaces.ConcurrencyConfig{
+	ProcessingInterval: config.Duration{Duration: 10000000000}, // 10s
+	RefreshInterval:    config.Duration{Duration: 30000000000}, // 30s
+	Workers:            5,
+	MaxRetries:         3,
+	Enabled:            true,
+	ProfilerPort:       config.Port{Port: 10255},
+})
+
 // Implementation of an interfaces.ApplicationConfiguration
 type ApplicationConfigurationProvider struct{}
 
@@ -118,6 +128,10 @@ func (p *ApplicationConfigurationProvider) GetExternalEventsConfig() *interfaces
 
 func (p *ApplicationConfigurationProvider) GetCloudEventsConfig() *interfaces.CloudEventsConfig {
 	return cloudEventsConfig.GetConfig().(*interfaces.CloudEventsConfig)
+}
+
+func (p *ApplicationConfigurationProvider) GetConcurrencyConfig() *interfaces.ConcurrencyConfig {
+	return concurrencyConfig.GetConfig().(*interfaces.ConcurrencyConfig)
 }
 
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {

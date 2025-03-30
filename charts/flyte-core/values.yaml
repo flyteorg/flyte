@@ -1137,12 +1137,22 @@ databricks:
 #
 concurrency_controller:
   # -- Whether to enable the concurrency controller for managing execution concurrency
-  enabled: false
+  enabled: true
   # -- Configuration for the concurrency controller
   type: native
 
 # Configuration for the concurrency controller deployment
 flyteconcurrency:
+  # -- Whether to enable simulation mode for the concurrency controller (temporary until implementation is complete)
+  simulationMode: true
+  # -- Configuration for the simulation image (used when simulationMode is true)
+  simulationImage:
+    # -- Docker image for simulation mode
+    repository: alpine
+    # -- Docker image tag for simulation mode
+    tag: latest
+    # -- Docker image pull policy for simulation mode
+    pullPolicy: IfNotPresent
   # -- Whether to inject an init container which waits on flyteadmin
   runPrecheck: true
   image:

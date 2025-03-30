@@ -100,3 +100,12 @@ task_resources:
   limits:
     cpu: 4
     memory: 4Gi
+
+concurrency:
+  enable: true
+  processingInterval: "10s"
+  refreshInterval: "30s" 
+  workers: 5
+  maxRetries: 3
+  profilerPort:
+    port: 10255

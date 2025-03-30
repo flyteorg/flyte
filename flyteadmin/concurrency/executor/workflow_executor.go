@@ -26,6 +26,26 @@ type workflowExecutorMetrics struct {
 	abortedExecutions    prometheus.Counter
 }
 
+// NewWorkflowExecutor creates a new WorkflowExecutor instance
+func NewWorkflowExecutor(
+	executionManager interfaces.ExecutionInterface,
+	scope promutils.Scope,
+) *WorkflowExecutor {
+	metricsScope := scope.NewSubScope("workflow_executor")
+
+	metrics := &workflowExecutorMetrics{
+		successfulExecutions: metricsScope.MustNewCounter("successful_executions", "Count of successful executions"),
+		failedExecutions:     metricsScope.MustNewCounter("failed_executions", "Count of failed executions"),
+		abortedExecutions:    metricsScope.MustNewCounter("aborted_executions", "Count of aborted executions"),
+	}
+
+	return &WorkflowExecutor{
+		executionManager: executionManager,
+		scope:            scope,
+		metrics:          metrics,
+	}
+}
+
 // CreateExecution creates a workflow execution in the system
 func (w *WorkflowExecutor) CreateExecution(ctx context.Context, execution models.Execution) error {
 	// Ensure we have the proper identifier
