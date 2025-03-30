@@ -117,6 +117,33 @@ flyte:
     affinity: {}
     secrets: {}
 
+  # -- Enable concurrency controller for execution concurrency management
+  concurrency_controller:
+    enabled: true
+    type: native
+
+  # -- Configuration for concurrency controller
+  flyteconcurrency:
+    image:
+      # -- Docker image for Flyteconcurrency controller
+      repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
+      # -- Docker image tag
+      tag: v1.15.0  # FLYTEADMIN_TAG
+      # -- Docker image pull policy
+      pullPolicy: IfNotPresent
+    # -- Default resources requests and limits for Flyteconcurrency deployment
+    resources:
+      limits:
+        cpu: 250m
+        ephemeral-storage: 100Mi
+        memory: 500Mi
+      requests:
+        cpu: 10m
+        ephemeral-storage: 50Mi
+        memory: 50Mi
+    # -- Default regex string for searching configuration files
+    configPath: /etc/flyte/config/*.yaml
+
   #
   # DATACATALOG SETTINGS
   #
@@ -557,7 +584,16 @@ flyte:
     logger:
       logger:
         show-source: true
-        level: 5
+        level: 1
+
+    # -- Concurrency configuration
+    concurrencyConfig:
+      processingInterval: "10s"
+      refreshInterval: "30s"
+      workers: 5
+      maxRetries: 3
+      enabled: true
+      profilerPort: 10255
 
     remoteData:
       remoteData:

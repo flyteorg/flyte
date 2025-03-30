@@ -47,13 +47,21 @@ helm template flyte -n flyte ${DIR}/../charts/flyteagent/ ${HELM_CAPABILITIES} -
 
 echo "Generating helm docs"
 if command -v helm-docs &>/dev/null; then
-	rm $(which helm-docs)
+	# rm $(which helm-docs)
+	echo "Using existing helm-docs"
+else
+	# TODO: (https://github.com/flyteorg/flyte/issues/4994) Unpin when moving past go 1.21
+	GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.12.0
 fi
 
-# TODO: (https://github.com/flyteorg/flyte/issues/4994) Unpin when moving past go 1.21
-GO111MODULE=on go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.12.0
+# Update the path to look for helm-docs in the correct location
+HELM_DOCS_PATH=${GOPATH:-~/go}/bin/helm-docs
+if [ ! -f "$HELM_DOCS_PATH" ]; then
+    # Check alternative location based on Go 1.23.4 structure
+    HELM_DOCS_PATH=${GOPATH:-~/go}/1.23.4/bin/helm-docs
+fi
 
-${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
+$HELM_DOCS_PATH -c ${DIR}/../charts/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then

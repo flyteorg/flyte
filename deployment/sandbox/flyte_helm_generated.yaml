@@ -51,6 +51,18 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte/charts/flyte/templates/flyteconcurrency/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-flyteconcurrency
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyte-flyteconcurrency
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte/charts/flyte/templates/flytescheduler/sa.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -260,7 +272,7 @@ data:
       name: production
   logger.yaml: | 
     logger:
-      level: 5
+      level: 1
       show-source: true
   server.yaml: | 
     auth:
@@ -313,27 +325,21 @@ data:
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
-    storage:
-      type: minio
-      container: "my-s3-bucket"
-      stow:
-        kind: s3
-        config:
-          access_key_id: minio
-          auth_type: accesskey
-          secret_key: miniostorage
-          disable_ssl: true
-          endpoint: http://minio.flyte.svc.cluster.local:9000
-          region: us-east-1
-      signedUrl:
-        stowConfigOverride:
-          endpoint: http://minio.flyte.svc.cluster.local:9000
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 0
-        target_gc_percent: 70
+    bucketName: my-s3-bucket
+    cache:
+      maxSizeMBs: 0
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    gcs: null
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: us-east-1
+      secretKey: ""
+    type: sandbox
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -367,6 +373,48 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  admin.yaml: | 
+    admin:
+      clientId: 'flytepropeller'
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  remoteData.yaml: | 
+    remoteData:
+      region: us-east-1
+      scheme: local
+      signedUrls:
+        durationMinutes: 3
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: postgres
+      port: 5432
+      username: postgres
+  storage.yaml: | 
+    bucketName: my-s3-bucket
+    cache:
+      maxSizeMBs: 0
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    gcs: null
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: us-east-1
+      secretKey: ""
+    type: sandbox
+  resource_manager.yaml: | 
+    propeller:
+      resourcemanager:
+        type: noop
 ---
 # Source: flyte/charts/flyte/templates/clusterresourcesync/cluster_resource_configmap.yaml
 apiVersion: v1
@@ -488,7 +536,7 @@ data:
       username: postgres
   logger.yaml: | 
     logger:
-      level: 5
+      level: 1
       show-source: true
   server.yaml: | 
     application:
@@ -524,6 +572,46 @@ data:
         max_size_mbs: 0
         target_gc_percent: 70
 ---
+# Source: flyte/charts/flyte/templates/flyteconcurrency/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-concurrency-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyte-flyteconcurrency
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+data:
+  admin.yaml: | 
+    admin:
+      clientId: 'flytepropeller'
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: postgres
+      port: 5432
+      username: postgres
+  server.yaml: | 
+    enabled: true
+    maxRetries: 3
+    processingInterval: 10s
+    profilerPort: 10255
+    refreshInterval: 30s
+    workers: 5
+  logger.yaml: | 
+    logger:
+      level: 1
+      show-source: true
+---
 # Source: flyte/charts/flyte/templates/flytescheduler/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -558,7 +646,7 @@ data:
       profilerPort: 10254
   logger.yaml: | 
     logger:
-      level: 5
+      level: 1
       show-source: true
 ---
 # Source: flyte/charts/flyte/templates/propeller/configmap.yaml
@@ -665,7 +753,7 @@ data:
         default-memory: 200Mi
   logger.yaml: | 
     logger:
-      level: 5
+      level: 1
       show-source: true
   resource_manager.yaml: | 
     propeller:
@@ -6696,7 +6784,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f2d2bbea27b58cc5a73da30eb8aeb56fc41863f4eba2bfe407da2e97a6372e8"
+        configChecksum: "a4f6d9f6509954575002be061177a7a15c047f2af101b0106f531f5481e7bfd"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -6998,7 +7086,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0df67e720160bb897fcb950f39eede7efbd668c770872d171469df8dc1dd70f"
+        configChecksum: "e3d961cea6936872295af65d5c9de075b27d42c30ad771fbaf15fbb898140f4"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -7069,6 +7157,109 @@ spec:
           name: datacatalog-config
         name: config-volume
 ---
+# Source: flyte/charts/flyte/templates/flyteconcurrency/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-flyteconcurrency
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyte-flyteconcurrency
+    helm.sh/chart: flyte-v0.1.10
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyte-flyteconcurrency
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "a4f6d9f6509954575002be061177a7a15c047f2af101b0106f531f5481e7bfd"
+      labels: 
+        app.kubernetes.io/name: flyte-flyteconcurrency
+        app.kubernetes.io/instance: flyte
+    spec:
+      initContainers:
+      - command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - concurrency
+        - precheck
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: flyteconcurrency-check
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      containers:
+      - command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - concurrency
+        - run
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.0"
+        imagePullPolicy: "IfNotPresent"
+        name: flyteconcurrency
+        ports:
+          - containerPort: 10255
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          limits:
+            cpu: 250m
+            ephemeral-storage: 100Mi
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            ephemeral-storage: 50Mi
+            memory: 50Mi
+        volumeMounts:
+        
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - name: auth
+          mountPath: /etc/secrets/
+      serviceAccountName: flyte-flyteconcurrency
+      volumes:
+      
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-concurrency-config
+        name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+---
 # Source: flyte/charts/flyte/templates/flytescheduler/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -7089,7 +7280,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f2d2bbea27b58cc5a73da30eb8aeb56fc41863f4eba2bfe407da2e97a6372e8"
+        configChecksum: "a4f6d9f6509954575002be061177a7a15c047f2af101b0106f531f5481e7bfd"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -7184,7 +7375,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fa039787d25c28ed3b30c5fb06154f6f411bf23a2ab0e12a881db8d13dc1f59"
+        configChecksum: "e60a61351a998c1926068b1cea4de7ebf943757bcd96c5dc7541106ad26c58d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7260,7 +7451,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.15.0
       annotations:
-        configChecksum: "fa039787d25c28ed3b30c5fb06154f6f411bf23a2ab0e12a881db8d13dc1f59"
+        configChecksum: "e60a61351a998c1926068b1cea4de7ebf943757bcd96c5dc7541106ad26c58d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

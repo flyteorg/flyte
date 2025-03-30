@@ -116,6 +116,9 @@ type ApplicationConfig struct {
 
 	// Enabling this will instruct operator to use storage (s3/gcs/etc) to offload workflow execution inputs instead of storing them inline in the CRD.
 	UseOffloadedInputs bool `json:"useOffloadedInputs" pflag:",Use offloaded inputs for workflows."`
+
+	// Configuration for the concurrency controller
+	ConcurrencyConfig ConcurrencyConfig `json:"concurrencyConfig" pflag:",Configuration for the concurrency controller"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -226,6 +229,10 @@ func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() *admin.WorkflowExecut
 	}
 
 	return wec
+}
+
+func (c *ApplicationConfig) GetConcurrencyConfig() *ConcurrencyConfig {
+	return &c.ConcurrencyConfig
 }
 
 // This section holds common config for AWS
@@ -398,6 +405,26 @@ func (a *AWSSchedulerConfig) GetScheduleNamePrefix() string {
 
 // FlyteSchedulerConfig is the config for native or default flyte scheduler
 type FlyteSchedulerConfig struct {
+}
+
+type ConcurrencyConfig struct {
+	// The interval at which to process pending executions
+	ProcessingInterval config.Duration `json:"processingInterval" pflag:",The interval at which to process pending executions"`
+
+	// The interval at which to refresh the launch plan cache
+	RefreshInterval config.Duration `json:"refreshInterval" pflag:",The interval at which to refresh the launch plan cache"`
+
+	// The number of worker goroutines to use for processing executions
+	Workers int `json:"workers" pflag:",The number of worker goroutines to use for processing executions"`
+
+	// The maximum number of retries for processing an execution
+	MaxRetries int `json:"maxRetries" pflag:",The maximum number of retries for processing an execution"`
+
+	// Whether the concurrency controller is enabled
+	Enabled bool `json:"enabled" pflag:",Whether the concurrency controller is enabled"`
+
+	// Port for profiling data
+	ProfilerPort config.Port `json:"profilerPort" pflag:",Port for profiling data"`
 }
 
 // This section holds configuration for the executor that processes workflow scheduled events fired.
@@ -689,4 +716,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
+	GetConcurrencyConfig() *ConcurrencyConfig
 }

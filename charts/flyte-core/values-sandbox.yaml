@@ -1,4 +1,3 @@
-
 flyteadmin:
   serviceMonitor:
     enabled: false
@@ -100,11 +99,26 @@ configmap:
         # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
         cloudwatch-enabled: false
 
+  # -- Concurrency controller configuration
+  concurrencyConfig:
+    processingInterval: "10s"
+    refreshInterval: "30s"
+    workers: 5
+    maxRetries: 3
+    enabled: true
+    profilerPort: 10255
+
 # -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 # by default aws use flyte native scheduler i.e flytescheduler
 # To use aws native scheduler please override the eks values
 workflow_scheduler:
+  enabled: true
+  type: native
+
+# -- # Concurrency controller configuration for managing execution concurrency 
+# based on launch plan limits. This is an optional component.
+concurrency_controller:
   enabled: true
   type: native
 

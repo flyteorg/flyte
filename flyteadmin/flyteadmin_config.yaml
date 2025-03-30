@@ -85,6 +85,14 @@ scheduler:
     region: "my-region"
     scheduleQueueName: "won't-work-locally"
     accountId: "abc123"
+concurrency:
+  processingInterval: 30s
+  refreshInterval: 60s
+  workers: 10
+  maxRetries: 5
+  enabled: true
+  profilerPort:
+    port: 10255
 remoteData:
   region: "my-region"
   scheme: local

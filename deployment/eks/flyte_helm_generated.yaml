@@ -192,18 +192,20 @@ data:
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
-    storage:
-      type: s3
-      container: "<METADATA_BUCKET_NAME>"
-      connection:
-        auth-type: iam
-        region: <AWS_REGION>
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 1024
-        target_gc_percent: 70
+    bucketName: '<METADATA_BUCKET_NAME>'
+    cache:
+      maxSizeMBs: 1024
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: '<AWS_REGION>'
+      secretKey: ""
+    type: s3
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -242,6 +244,48 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  admin.yaml: | 
+    admin:
+      clientId: 'flytepropeller'
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  remoteData.yaml: | 
+    remoteData:
+      region: us-east-1
+      scheme: local
+      signedUrls:
+        durationMinutes: 3
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<RDS_HOST>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
+  storage.yaml: | 
+    bucketName: '<METADATA_BUCKET_NAME>'
+    cache:
+      maxSizeMBs: 1024
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: '<AWS_REGION>'
+      secretKey: ""
+    type: s3
+  resource_manager.yaml: | 
+    propeller:
+      resourcemanager:
+        type: noop
 ---
 # Source: flyte-core/templates/clusterresourcesync/cluster_resource_configmap.yaml
 apiVersion: v1
@@ -889,7 +933,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
+        configChecksum: "438ec5c8d3bf13e3e29beff749fc499974140468852121aaefc43c8a2a18391"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1311,7 +1355,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
+        configChecksum: "438ec5c8d3bf13e3e29beff749fc499974140468852121aaefc43c8a2a18391"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

@@ -101,6 +101,9 @@ helm install gateway bitnami/contour -n flyte
 | common.ingress.separateGrpcIngressAnnotations | object | `{"nginx.ingress.kubernetes.io/backend-protocol":"GRPC"}` | - Extra Ingress annotations applied only to the GRPC ingress. Only makes sense if `separateGrpcIngress` is enabled. |
 | common.ingress.tls | object | `{"enabled":false}` | - Ingress hostname host: |
 | common.ingress.webpackHMR | bool | `false` | - Enable or disable HMR route to flyteconsole. This is useful only for frontend development. |
+| concurrencyConfig | object | `{"enabled":true,"maxRetries":3,"processingInterval":"10s","profilerPort":10255,"refreshInterval":"30s","workers":10}` | Concurrency Controller Configuration |
+| concurrency_controller.enabled | bool | `false` | Whether to enable the concurrency controller for managing execution concurrency |
+| concurrency_controller.type | string | `"native"` | Configuration for the concurrency controller |
 | configmap.admin | object | `{"admin":{"clientId":"{{ .Values.secrets.adminOauthClientCredentials.clientId }}","clientSecretLocation":"/etc/secrets/client_secret","endpoint":"flyteadmin:81","insecure":true},"event":{"capacity":1000,"rate":500,"type":"admin"}}` | Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig) |
 | configmap.adminServer | object | `{"auth":{"appAuth":{"thirdPartyConfig":{"flyteClient":{"clientId":"flytectl","redirectUri":"http://localhost:53593/callback","scopes":["offline","all"]}}},"authorizedUris":["https://localhost:30081","http://flyteadmin:80","http://flyteadmin.flyte.svc.cluster.local:80"],"userAuth":{"openId":{"baseUrl":"https://accounts.google.com","clientId":"657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com","scopes":["profile","openid"]}}},"flyteadmin":{"eventVersion":2,"metadataStoragePrefix":["metadata","admin"],"metricsScope":"flyte:","profilerPort":10254,"roleNameKey":"iam.amazonaws.com/role","testing":{"host":"http://flyteadmin"}},"server":{"grpc":{"port":8089},"httpPort":8088,"security":{"allowCors":true,"allowedHeaders":["Content-Type","flyte-authorization"],"allowedOrigins":["*"],"secure":false,"useAuth":false}}}` | FlyteAdmin server configuration |
 | configmap.adminServer.auth | object | `{"appAuth":{"thirdPartyConfig":{"flyteClient":{"clientId":"flytectl","redirectUri":"http://localhost:53593/callback","scopes":["offline","all"]}}},"authorizedUris":["https://localhost:30081","http://flyteadmin:80","http://flyteadmin.flyte.svc.cluster.local:80"],"userAuth":{"openId":{"baseUrl":"https://accounts.google.com","clientId":"657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com","scopes":["profile","openid"]}}}` | Authentication configuration |
@@ -217,6 +220,28 @@ helm install gateway bitnami/contour -n flyte
 | flyteagent.plugin_config.plugins.agent-service.defaultAgent.insecure | bool | `true` | Whether the connection from propeller to the agent service should use TLS. |
 | flyteagent.plugin_config.plugins.agent-service.supportedTaskTypes | list | `[]` | The task types supported by the default agent. As of #5460 these are discovered automatically and don't need to be configured. |
 | flyteagent.podLabels | object | `{}` | Labels for flyteagent pods |
+| flyteconcurrency.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| flyteconcurrency.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| flyteconcurrency.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| flyteconcurrency.affinity | object | `{}` | affinity for Flyteconcurrency deployment |
+| flyteconcurrency.configPath | string | `"/etc/flyte/config/*.yaml"` |  |
+| flyteconcurrency.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| flyteconcurrency.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteconcurrency deployment |
+| flyteconcurrency.image.tag | string | `"v1.15.0"` | Docker image tag |
+| flyteconcurrency.nodeSelector | object | `{}` | nodeSelector for Flyteconcurrency deployment |
+| flyteconcurrency.podAnnotations | object | `{}` | Annotations for Flyteconcurrency pods |
+| flyteconcurrency.podEnv | object | `{}` | Additional Flyteconcurrency container environment variables |
+| flyteconcurrency.podLabels | object | `{}` | Labels for Flyteconcurrency pods |
+| flyteconcurrency.priorityClassName | string | `""` | Sets priorityClassName for flyte concurrency pod(s). |
+| flyteconcurrency.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteconcurrency deployment |
+| flyteconcurrency.runPrecheck | bool | `true` | Whether to inject an init container which waits on flyteadmin |
+| flyteconcurrency.secrets | object | `{}` |  |
+| flyteconcurrency.securityContext | object | `{}` | Sets securityContext for flyteconcurrency pod(s). |
+| flyteconcurrency.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Flyteconcurrency |
+| flyteconcurrency.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flyteconcurrency pods |
+| flyteconcurrency.serviceAccount.create | bool | `true` | Should a service account be created for Flyteconcurrency |
+| flyteconcurrency.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flyteconcurrency.tolerations | list | `[]` | tolerations for Flyteconcurrency deployment |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
@@ -301,6 +326,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
 | flytescheduler.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
+| logger | object | `{"level":5,"show-source":true}` | Logger Configuration |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
 | secrets.adminOauthClientCredentials.clientSecret | string | `"foobar"` |  |
 | secrets.adminOauthClientCredentials.enabled | bool | `true` |  |

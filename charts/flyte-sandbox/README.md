@@ -18,6 +18,14 @@ A Helm chart for the Flyte local sandbox
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| concurrency_controller.enabled | bool | `true` |  |
+| concurrency_controller.type | string | `"native"` |  |
+| configmap.concurrencyConfig.enabled | bool | `true` |  |
+| configmap.concurrencyConfig.maxRetries | int | `3` |  |
+| configmap.concurrencyConfig.processingInterval | string | `"10s"` |  |
+| configmap.concurrencyConfig.profilerPort | int | `10255` |  |
+| configmap.concurrencyConfig.refreshInterval | string | `"30s"` |  |
+| configmap.concurrencyConfig.workers | int | `5` |  |
 | docker-registry.enabled | bool | `true` |  |
 | docker-registry.image.pullPolicy | string | `"Never"` |  |
 | docker-registry.image.tag | string | `"sandbox"` |  |

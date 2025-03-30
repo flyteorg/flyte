@@ -40,7 +40,9 @@ data:
 {{- with .Values.configmap.clusterpool_config }}
   clusterpool_config.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
+{{- with .Values.storage }}
+  storage.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
@@ -94,5 +96,40 @@ data:
   {{- with .Values.workflow_scheduler.config }}
   scheduler.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
+{{- end }}
+{{- with .Values.configmap.admin }}
+  admin.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.remoteData }}
+  remoteData.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.db.admin }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.storage }}
+  storage.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.server }}
+  server.yaml: |
+    application:
+      grpcPort: {{ .grpc.port }}
+      httpPort: {{ .http.port }}
+      {{- if .grpcServerReflection }}
+      grpcServerReflection: {{ .grpcServerReflection }}
+      {{- end }}
+    {{- if .security }}
+    security: {{ tpl (toYaml .security) $ | nindent 6 }}
+    {{- end }}
+    {{- if .auth }}
+    auth: {{ tpl (toYaml .auth) $ | nindent 6 }}
+    {{- end }}
+    
+    {{- if $.Values.configmap.concurrencyConfig }}
+    concurrency: {{ toYaml $.Values.configmap.concurrencyConfig | nindent 6 }}
+    {{- end }}
+
+{{- end }}
+{{- with .Values.configmap.resource_manager }}
+  resource_manager.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}

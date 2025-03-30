@@ -1131,3 +1131,81 @@ databricks:
         entrypointFile: dbfs:///FileStore/tables/entrypoint.py
         # Databricks account
         databricksInstance: dbc-a53b7a3c-614c
+
+#
+# CONCURRENCY CONTROLLER SETTINGS
+#
+concurrency_controller:
+  # -- Whether to enable the concurrency controller for managing execution concurrency
+  enabled: false
+  # -- Configuration for the concurrency controller
+  type: native
+
+# Configuration for the concurrency controller deployment
+flyteconcurrency:
+  # -- Whether to inject an init container which waits on flyteadmin
+  runPrecheck: true
+  image:
+    # -- Docker image for Flyteconcurrency deployment
+    repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
+    # -- Docker image tag
+    tag: v1.15.0  # FLYTEADMIN_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Flyteconcurrency deployment
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/flyte/config/*.yaml
+
+  # -- Configuration for service accounts for Flyteconcurrency
+  serviceAccount:
+    # -- Should a service account be created for Flyteconcurrency
+    create: true
+    # -- Annotations for ServiceAccount attached to Flyteconcurrency pods
+    annotations: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
+  # -- Annotations for Flyteconcurrency pods
+  podAnnotations: {}
+  # -- Additional Flyteconcurrency container environment variables
+  podEnv: {}
+  # -- Labels for Flyteconcurrency pods
+  podLabels: {}
+  # -- nodeSelector for Flyteconcurrency deployment
+  nodeSelector: {}
+  # -- tolerations for Flyteconcurrency deployment
+  tolerations: []
+  # -- affinity for Flyteconcurrency deployment
+  affinity: {}
+  secrets: {}
+  # -- Appends additional volumes to the deployment spec. May include template values.
+  additionalVolumes: []
+  # -- Appends additional volume mounts to the main container's spec. May include template values.
+  additionalVolumeMounts: []
+  # -- Appends additional containers to the deployment spec. May include template values.
+  additionalContainers: []
+  # -- Sets priorityClassName for flyte concurrency pod(s).
+  priorityClassName: ""
+  # -- Sets securityContext for flyteconcurrency pod(s).
+  securityContext: {}
+
+# -- Concurrency Controller Configuration
+concurrencyConfig:
+  processingInterval: "10s"
+  refreshInterval: "30s"
+  workers: 10
+  maxRetries: 3
+  enabled: true
+  profilerPort: 10255
+
+# -- Logger Configuration
+logger:
+  show-source: true
+  level: 5

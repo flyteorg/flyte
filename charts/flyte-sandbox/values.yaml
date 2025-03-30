@@ -87,6 +87,21 @@ flyte-binary:
         verbs:
         - '*'
 
+# Enable concurrency controller
+concurrency_controller:
+  enabled: true
+  type: native
+
+# Concurrency configuration
+configmap:
+  concurrencyConfig:
+    processingInterval: "10s"
+    refreshInterval: "30s"
+    workers: 5
+    maxRetries: 3
+    enabled: true
+    profilerPort: 10255
+
 kubernetes-dashboard:
   enabled: true
   image:

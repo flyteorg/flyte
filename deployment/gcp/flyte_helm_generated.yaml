@@ -194,21 +194,22 @@ data:
     namespace_mapping:
       template: '{{ domain }}'
   storage.yaml: | 
-    storage:
-      type: stow
-      stow:
-        kind: google
-        config:
-          json: ""
-          project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<METADATA_BUCKET_NAME>"
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 0
-        target_gc_percent: 70
+    bucketName: '<METADATA_BUCKET_NAME>'
+    cache:
+      maxSizeMBs: 0
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    gcs:
+      projectId: '<PROJECT-ID>'
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: us-east-1
+      secretKey: ""
+    type: gcs
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -247,6 +248,49 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  admin.yaml: | 
+    admin:
+      clientId: 'flytepropeller'
+      clientSecretLocation: /etc/secrets/client_secret
+      endpoint: flyteadmin:81
+      insecure: true
+    event:
+      capacity: 1000
+      rate: 500
+      type: admin
+  remoteData.yaml: | 
+    remoteData:
+      scheme: gcs
+      signedUrls:
+        durationMinutes: 3
+  db.yaml: | 
+    database:
+      dbname: flyteadmin
+      host: '<CLOUD-SQL-IP>'
+      passwordPath: /etc/db/pass.txt
+      port: 5432
+      username: flyteadmin
+  storage.yaml: | 
+    bucketName: '<METADATA_BUCKET_NAME>'
+    cache:
+      maxSizeMBs: 0
+      targetGCPercent: 70
+    custom: {}
+    enableMultiContainer: false
+    gcs:
+      projectId: '<PROJECT-ID>'
+    limits:
+      maxDownloadMBs: 10
+    s3:
+      accessKey: ""
+      authType: iam
+      region: us-east-1
+      secretKey: ""
+    type: gcs
+  resource_manager.yaml: | 
+    propeller:
+      resourcemanager:
+        type: noop
 ---
 # Source: flyte-core/templates/clusterresourcesync/cluster_resource_configmap.yaml
 apiVersion: v1
@@ -912,7 +956,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
+        configChecksum: "3ca007b152dba0c345479a692ab8c6a0a2e7afa843f992e468c1f439d19a750"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1334,7 +1378,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
+        configChecksum: "3ca007b152dba0c345479a692ab8c6a0a2e7afa843f992e468c1f439d19a750"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

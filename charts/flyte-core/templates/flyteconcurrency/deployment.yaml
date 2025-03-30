@@ -1,0 +1,116 @@
+{{- if .Values.concurrency_controller.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyteconcurrency.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconcurrency.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "flyteconcurrency.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/admin/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteconcurrency.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flyteconcurrency.podLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.flyteconcurrency.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- if .Values.flyteconcurrency.priorityClassName }}
+      priorityClassName: {{ .Values.flyteconcurrency.priorityClassName }}
+      {{- end }}
+      {{- if .Values.flyteconcurrency.runPrecheck }}
+      initContainers:
+      - command:
+        - flyteadmin
+        - --config
+        - {{ .Values.flyteconcurrency.configPath }}
+        - concurrency
+        - precheck
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: "{{ .Values.flyteconcurrency.image.repository }}:{{ .Values.flyteconcurrency.image.tag }}"
+        imagePullPolicy: "{{ .Values.flyteconcurrency.image.pullPolicy }}"
+        name: flyteconcurrency-check
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources: {{- toYaml .Values.flyteconcurrency.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      {{- end }}
+      containers:
+      - command:
+        - flyteadmin
+        - --config
+        - {{ .Values.flyteconcurrency.configPath }}
+        - concurrency
+        - run
+        {{- if .Values.flyteconcurrency.podEnv }}
+        env:
+          {{- with .Values.flyteconcurrency.podEnv -}}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
+        image: "{{ .Values.flyteconcurrency.image.repository }}:{{ .Values.flyteconcurrency.image.tag }}"
+        imagePullPolicy: "{{ .Values.flyteconcurrency.image.pullPolicy }}"
+        name: flyteconcurrency
+        ports:
+          - containerPort: {{ .Values.configmap.concurrencyConfig.profilerPort }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources: {{- toYaml .Values.flyteconcurrency.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
+        - name: auth
+          mountPath: /etc/secrets/
+        {{- end }}
+        {{- with .Values.flyteconcurrency.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.flyteconcurrency.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
+      serviceAccountName: {{ template "flyteconcurrency.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-concurrency-config
+        name: config-volume
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+      {{- end }}
+      {{- with .Values.flyteconcurrency.additionalVolumes -}}
+      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{- end }}
+      {{- with .Values.flyteconcurrency.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconcurrency.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconcurrency.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }} 

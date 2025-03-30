@@ -384,13 +384,11 @@ func (c *ConcurrencyController) allowExecution(ctx context.Context, execution *m
 		return err
 	}
 
-	// Get the launch plan from the repository
+	// Get the launch plan from the DB
 	launchPlan, err := c.repo.GetLaunchPlanByID(ctx, execution.LaunchPlanID)
 	if err != nil {
 		return err
 	}
-
-	// Create an identifier from the launch plan data
 	launchPlanID := idlCore.Identifier{
 		Project: launchPlan.Project,
 		Domain:  launchPlan.Domain,
@@ -418,7 +416,6 @@ func (c *ConcurrencyController) CheckConcurrencyConstraints(ctx context.Context,
 		return true, nil
 	}
 
-	// Get current running executions count
 	runningCount, err := c.GetExecutionCounts(ctx, launchPlanID)
 	if err != nil {
 		return false, err

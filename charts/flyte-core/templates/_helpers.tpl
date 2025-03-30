@@ -241,3 +241,48 @@ storage:
     max_size_mbs: {{ .Values.storage.cache.maxSizeMBs }}
     target_gc_percent: {{ .Values.storage.cache.targetGCPercent }}
 {{- end }}
+
+{{- define "flyteconcurrency.name" -}}
+{{- if .Values.flyteconcurrency.nameOverride -}}
+{{- .Values.flyteconcurrency.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "flyteconcurrency" .Values.flyteconcurrency.name -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+
+{{- define "flyteconcurrency.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "flyteconcurrency.labels" -}}
+app.kubernetes.io/name: {{ include "flyteconcurrency.name" . }}
+helm.sh/chart: {{ include "flyteconcurrency.chart" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "flyteconcurrency.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "flyteconcurrency.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "flyteconcurrency.serviceAccountName" -}}
+{{- if .Values.flyteconcurrency.serviceAccount.create -}}
+    {{ default (include "flyteconcurrency.name" .) .Values.flyteconcurrency.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.flyteconcurrency.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "flyteconcurrency.podLabels" -}}
+{{ include "flyteconcurrency.selectorLabels" . }}
+{{- if .Values.flyteconcurrency.podLabels }}
+{{ toYaml .Values.flyteconcurrency.podLabels }}
+{{- end }}
+{{- end -}}
