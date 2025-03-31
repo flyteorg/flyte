@@ -591,6 +591,25 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	// Training operator did not modify the job even though it is not suspended
+	tfJob := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJob.Status.StartTime = nil
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, tfJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	tfJobSuspended := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJobSuspended.Status.StartTime = nil
+	suspend := true
+	tfJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, tfJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
