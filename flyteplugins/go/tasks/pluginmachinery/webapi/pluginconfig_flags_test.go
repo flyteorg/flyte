@@ -133,7 +133,7 @@ func TestPluginConfig_SetFlags(t *testing.T) {
 			testValue := "1"
 
 			cmdFlags.Set("writeRateLimiter.qps", testValue)
-			if vInt, err := cmdFlags.GetInt("writeRateLimiter.qps"); err == nil {
+			if vInt, err := cmdFlags.GetFloat64("writeRateLimiter.qps"); err == nil {
 				testDecodeJson_PluginConfig(t, fmt.Sprintf("%v", vInt), &actual.WriteRateLimiter.QPS)
 
 			} else {
