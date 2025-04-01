@@ -147,7 +147,7 @@ func TestConfig_SetFlags(t *testing.T) {
 			testValue := "1"
 
 			cmdFlags.Set("webApi.writeRateLimiter.burst", testValue)
-			if vInt, err := cmdFlags.GetInt("webApi.writeRateLimiter.burst"); err == nil {
+			if vInt, err := cmdFlags.GetFloat64("webApi.writeRateLimiter.burst"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.WriteRateLimiter.Burst)
 
 			} else {
