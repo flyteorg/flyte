@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/exp/maps"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -53,7 +52,22 @@ func (p *AgentService) SetSupportedTaskType(taskTypes []string) {
 	p.supportedTaskTypes = taskTypes
 }
 
-type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+type RegistryKey struct {
+	domain          string
+	taskTypeName    string
+	taskTypeVersion int32
+}
+
+type Registry map[RegistryKey]*Agent
+
+// getSupportedTaskTypes Get all the supported task types in the registry.
+func (r Registry) getSupportedTaskTypes() []string {
+	var taskTypes []string
+	for k := range r {
+		taskTypes = append(taskTypes, k.taskTypeName)
+	}
+	return taskTypes
+}
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -85,6 +99,7 @@ type ResourceMetaWrapper struct {
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
 	Connection        flyteIdl.Connection
+	Domain            string
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -137,7 +152,10 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent := p.getFinalAgent(&taskCategory, p.cfg)
+	agent, err := p.getFinalAgent(&taskCategory, p.cfg, taskTemplate.GetId().GetDomain())
+	if err != nil {
+		return nil, nil, err
+	}
 
 	connection := flyteIdl.Connection{}
 	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
@@ -211,6 +229,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
 		Connection:        connection,
+		Domain:            taskTemplate.GetId().GetDomain(),
 	}, nil, nil
 }
 
@@ -286,7 +305,11 @@ func (p *Plugin) ExecuteTaskSync(
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, err := p.getFinalAgent(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	if err != nil {
+		return nil, err
+
+	}
 
 	client, err := p.getAsyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
@@ -324,7 +347,10 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, err := p.getFinalAgent(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	if err != nil {
+		return err
+	}
 
 	client, err := p.getAsyncAgentClient(ctx, agent.AgentDeployment)
 	if err != nil {
@@ -463,23 +489,37 @@ func (p *Plugin) watchAgents(ctx context.Context, agentService *AgentService) {
 		clientSet := getAgentClientSets(childCtx)
 		agentRegistry := getAgentRegistry(childCtx, clientSet)
 		p.setRegistry(agentRegistry)
-		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
+		agentService.SetSupportedTaskType(agentRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) *Agent {
+func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, domain string) (*Agent, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if agent, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
-		return agent
+	registryKey := RegistryKey{domain: domain, taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	if agent, exists := p.registry[registryKey]; exists {
+		return agent, nil
+	}
+	logger.Debugf(context.Background(), "no agent found for task type [%s] and version [%d] in domain [%s]", taskCategory.GetName(), taskCategory.GetVersion(), domain)
+
+	// Use the agent that supports across all domains.
+	registryKey = RegistryKey{domain: "", taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	if agent, exists := p.registry[registryKey]; exists {
+		return agent, nil
+	}
+	logger.Debugf(context.Background(), "no agent found for task type [%s] and version [%d] in any domain", taskCategory.GetName(), taskCategory.GetVersion())
+
+	if len(cfg.DefaultAgent.Endpoint) != 0 {
+		return &Agent{
+			AgentDeployment: &cfg.DefaultAgent,
+			IsSync:          false,
+			AgentID:         "defaultAgent",
+		}, nil
 	}
 
-	return &Agent{
-		AgentDeployment: &cfg.DefaultAgent,
-		IsSync:          false,
-		AgentID:         "defaultAgent",
-	}
+	logger.Errorf(context.Background(), "no agent found for task type and version [%s:%d]", taskCategory.GetName(), taskCategory.GetVersion())
+	return nil, fmt.Errorf("no agent found for task type [%s] and version [%d]", taskCategory.GetName(), taskCategory.GetVersion())
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -523,7 +563,7 @@ func newAgentPlugin(agentService *AgentService) webapi.PluginEntry {
 	cfg := GetConfig()
 	clientSet := getAgentClientSets(ctx)
 	agentRegistry := getAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := maps.Keys(agentRegistry)
+	supportedTaskTypes := agentRegistry.getSupportedTaskTypes()
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",

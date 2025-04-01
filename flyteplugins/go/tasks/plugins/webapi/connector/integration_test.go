@@ -263,9 +263,8 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 
 func newMockAsyncConnectorPlugin() webapi.PluginEntry {
 	asyncConnectorClient := new(agentMocks.AsyncAgentServiceClient)
-	connectorRegistry := Registry{
-		"spark": {defaultTaskTypeVersion: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: false}},
-	}
+	registryKey := RegistryKey{domain: "", taskTypeName: "spark", taskTypeVersion: defaultTaskTypeVersion}
+	connectorRegistry := Registry{registryKey: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: false}}
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
@@ -305,9 +304,8 @@ func newMockAsyncConnectorPlugin() webapi.PluginEntry {
 }
 
 func newMockSyncConnectorPlugin() webapi.PluginEntry {
-	connectorRegistry := Registry{
-		"openai": {defaultTaskTypeVersion: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: true}},
-	}
+	registryKey := RegistryKey{domain: "", taskTypeName: "openai", taskTypeVersion: defaultTaskTypeVersion}
+	connectorRegistry := Registry{registryKey: {ConnectorDeployment: &Deployment{Endpoint: defaultConnectorEndpoint}, IsSync: true}}
 
 	syncConnectorClient := new(agentMocks.SyncAgentServiceClient)
 	output, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})

@@ -35,8 +35,11 @@ func TestPlugin(t *testing.T) {
 	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
-	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+	sparkAgent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	sparkKey := RegistryKey{taskTypeName: "spark", taskTypeVersion: defaultTaskTypeVersion}
+	rayAgent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	rayKey := RegistryKey{taskTypeName: "ray", taskTypeVersion: defaultTaskTypeVersion, domain: "production"}
+	agentRegistry := Registry{sparkKey: sparkAgent, rayKey: rayAgent}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
@@ -63,14 +66,22 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		ray := &admin.TaskCategory{Name: "ray", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment := plugin.getFinalAgent(spark, &cfg)
+		agentDeployment, err := plugin.getFinalAgent(spark, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, agentDeployment.AgentDeployment.Endpoint, "localhost:80")
-		agentDeployment = plugin.getFinalAgent(foo, &cfg)
+		agentDeployment, err = plugin.getFinalAgent(foo, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, agentDeployment.AgentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment = plugin.getFinalAgent(bar, &cfg)
+		agentDeployment, err = plugin.getFinalAgent(bar, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, agentDeployment.AgentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
+		agentDeployment, err = plugin.getFinalAgent(ray, &cfg, "production")
+		assert.NoError(t, err)
+		assert.Equal(t, agentDeployment.AgentDeployment.Endpoint, rayAgent.AgentDeployment.Endpoint)
+
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
@@ -381,7 +392,11 @@ func TestInitializeAgentRegistry(t *testing.T) {
 
 	agentRegistry := getAgentRegistry(context.Background(), cs)
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
+	supportTaskTypes := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
+	var expectedKeys []RegistryKey
+	for _, taskType := range supportTaskTypes {
+		expectedKeys = append(expectedKeys, RegistryKey{taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion})
+	}
 
 	for _, key := range expectedKeys {
 		assert.Contains(t, agentRegistryKeys, key)

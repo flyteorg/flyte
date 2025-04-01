@@ -34,8 +34,11 @@ func TestPlugin(t *testing.T) {
 	cfg.ConnectorDeployments = map[string]*Deployment{"spark_connector": {Endpoint: "localhost:80"}}
 	cfg.ConnectorForTaskTypes = map[string]string{"spark": "spark_connector", "bar": "bar_connector"}
 
-	connector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:80"}}
-	connectorRegistry := Registry{"spark": {defaultTaskTypeVersion: connector}}
+	sparkConnector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:80"}}
+	sparkKey := RegistryKey{domain: "", taskTypeName: "spark", taskTypeVersion: defaultTaskTypeVersion}
+	rayConnector := &Connector{ConnectorDeployment: &Deployment{Endpoint: "localhost:8080"}}
+	rayKey := RegistryKey{domain: "production", taskTypeName: "ray", taskTypeVersion: defaultTaskTypeVersion}
+	connectorRegistry := Registry{sparkKey: sparkConnector, rayKey: rayConnector}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
@@ -62,14 +65,21 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test getFinalConnector", func(t *testing.T) {
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		ray := &admin.TaskCategory{Name: "ray", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		connector := plugin.getFinalConnector(spark, &cfg)
+		connector, err := plugin.getFinalConnector(spark, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, "localhost:80")
-		connector = plugin.getFinalConnector(foo, &cfg)
+		connector, err = plugin.getFinalConnector(foo, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
-		connector = plugin.getFinalConnector(bar, &cfg)
+		connector, err = plugin.getFinalConnector(bar, &cfg, "")
+		assert.NoError(t, err)
 		assert.Equal(t, connector.ConnectorDeployment.Endpoint, cfg.DefaultConnector.Endpoint)
+		connector, err = plugin.getFinalConnector(ray, &cfg, "production")
+		assert.NoError(t, err)
+		assert.Equal(t, connector.ConnectorDeployment.Endpoint, rayConnector.ConnectorDeployment.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
@@ -398,7 +408,11 @@ func TestInitializeConnectorRegistry(t *testing.T) {
 
 	connectorRegistry := getConnectorRegistry(context.Background(), cs)
 	connectorRegistryKeys := maps.Keys(connectorRegistry)
-	expectedKeys := []string{"task1", "task2", "task3", "task_type_3", "task_type_4"}
+	supportTaskTypes := []string{"task1", "task2", "task3", "task_type_3", "task_type_4"}
+	var expectedKeys []RegistryKey
+	for _, taskType := range supportTaskTypes {
+		expectedKeys = append(expectedKeys, RegistryKey{taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion})
+	}
 
 	for _, key := range expectedKeys {
 		assert.Contains(t, connectorRegistryKeys, key)

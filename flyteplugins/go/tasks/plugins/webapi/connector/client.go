@@ -140,7 +140,8 @@ func updateRegistry(
 					ConnectorID:         connectorID,
 					IsConnectorApp:      isConnectorApp,
 				}
-				newConnectorRegistry[supportedTaskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+				registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: supportedTaskType, taskTypeVersion: defaultTaskTypeVersion}
+				newConnectorRegistry[registryKey] = connector
 				connectorSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
@@ -153,7 +154,8 @@ func updateRegistry(
 					IsConnectorApp:      isConnectorApp,
 				}
 				supportedCategoryName := supportedCategory.GetName()
-				newConnectorRegistry[supportedCategoryName] = map[int32]*Connector{supportedCategory.GetVersion(): connector}
+				registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
+				newConnectorRegistry[registryKey] = connector
 				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
 		}
@@ -182,35 +184,35 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			if _, ok := newConnectorRegistry[taskType]; !ok {
-				connector := &Connector{
-					ConnectorDeployment: connectorDeployment,
-					IsSync:              false,
-					ConnectorID:         connectorDeploymentID,
-					IsConnectorApp:      false,
-				}
-				newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+			registryKey := RegistryKey{domain: connectorDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+			connector := &Connector{
+				ConnectorDeployment: connectorDeployment,
+				IsSync:              false,
+				ConnectorID:         connectorDeploymentID,
+				IsConnectorApp:      false,
 			}
+			newConnectorRegistry[registryKey] = connector
 		}
 	}
 
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		if _, ok := newConnectorRegistry[taskType]; !ok {
+		registryKey := RegistryKey{domain: cfg.DefaultConnector.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+		if _, ok := newConnectorRegistry[registryKey]; !ok {
 			connector := &Connector{
 				ConnectorDeployment: &cfg.DefaultConnector,
 				IsSync:              false,
 				ConnectorID:         "defaultConnector",
 				IsConnectorApp:      false,
 			}
-			newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+			newConnectorRegistry[registryKey] = connector
 		}
 	}
 
 	// Update registry with connector apps
 	updateRegistry(ctx, cs, newConnectorRegistry, cfg.ConnectorApps, true)
 
-	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(maps.Keys(newConnectorRegistry), ", "))
+	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(newConnectorRegistry.getSupportedTaskTypes(), ", "))
 	return newConnectorRegistry
 }
 

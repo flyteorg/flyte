@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/exp/maps"
 	"google.golang.org/protobuf/types/known/structpb"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -50,7 +49,22 @@ func (p *ConnectorService) SetSupportedTaskType(taskTypes []string) {
 	p.supportedTaskTypes = taskTypes
 }
 
-type Registry map[string]map[int32]*Connector // map[taskTypeName][taskTypeVersion] => Connector
+type RegistryKey struct {
+	domain          string
+	taskTypeName    string
+	taskTypeVersion int32
+}
+
+type Registry map[RegistryKey]*Connector
+
+// getSupportedTaskTypes Get all the supported task types in the registry.
+func (r Registry) getSupportedTaskTypes() []string {
+	var taskTypes []string
+	for k := range r {
+		taskTypes = append(taskTypes, k.taskTypeName)
+	}
+	return taskTypes
+}
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -81,6 +95,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix          string
 	ConnectorResourceMeta []byte
 	TaskCategory          admin.TaskCategory
+	Domain                string
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -133,7 +148,10 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.GetType(), Version: taskTemplate.GetTaskTypeVersion()}
-	connector := p.getFinalConnector(&taskCategory, p.cfg)
+	connector, err := p.getFinalConnector(&taskCategory, p.cfg, taskTemplate.GetId().GetDomain())
+	if err != nil {
+		return nil, nil, err
+	}
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
@@ -160,6 +178,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		OutputPrefix:          outputPrefix,
 		ConnectorResourceMeta: res.GetResourceMeta(),
 		TaskCategory:          taskCategory,
+		Domain:                taskTemplate.GetId().GetDomain(),
 	}, nil, nil
 }
 
@@ -235,7 +254,10 @@ func (p *Plugin) ExecuteTaskSync(
 
 func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector, err := p.getFinalConnector(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	if err != nil {
+		return nil, err
+	}
 
 	client, err := p.getAsyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
@@ -272,7 +294,10 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	connector := p.getFinalConnector(&metadata.TaskCategory, p.cfg)
+	connector, err := p.getFinalConnector(&metadata.TaskCategory, p.cfg, metadata.Domain)
+	if err != nil {
+		return err
+	}
 
 	client, err := p.getAsyncConnectorClient(ctx, connector.ConnectorDeployment)
 	if err != nil {
@@ -410,24 +435,38 @@ func (p *Plugin) watchConnectors(ctx context.Context, connectorService *Connecto
 		clientSet := getConnectorClientSets(childCtx)
 		connectorRegistry := getConnectorRegistry(childCtx, clientSet)
 		p.setRegistry(connectorRegistry)
-		connectorService.SetSupportedTaskType(maps.Keys(connectorRegistry))
+		connectorService.SetSupportedTaskType(connectorRegistry.getSupportedTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
-func (p *Plugin) getFinalConnector(taskCategory *admin.TaskCategory, cfg *Config) *Connector {
+func (p *Plugin) getFinalConnector(taskCategory *admin.TaskCategory, cfg *Config, domain string) (*Connector, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if connector, exists := p.registry[taskCategory.GetName()][taskCategory.GetVersion()]; exists {
-		return connector
+	registryKey := RegistryKey{domain: domain, taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in domain [%s].", taskCategory.GetName(), taskCategory.GetVersion(), domain)
+
+	// Use the connector that supports across all domains.
+	registryKey = RegistryKey{domain: "", taskTypeName: taskCategory.GetName(), taskTypeVersion: taskCategory.GetVersion()}
+	if connector, exists := p.registry[registryKey]; exists {
+		return connector, nil
+	}
+	logger.Debugf(context.Background(), "No connector found for task type [%s] and version [%d] in any domain.", taskCategory.GetName(), taskCategory.GetVersion())
+
+	if len(cfg.DefaultConnector.Endpoint) != 0 {
+		return &Connector{
+			ConnectorDeployment: &cfg.DefaultConnector,
+			IsSync:              false,
+			ConnectorID:         "defaultConnector",
+			IsConnectorApp:      false,
+		}, nil
 	}
 
-	return &Connector{
-		ConnectorDeployment: &cfg.DefaultConnector,
-		IsSync:              false,
-		ConnectorID:         "defaultConnector",
-		IsConnectorApp:      false,
-	}
+	logger.Errorf(context.Background(), "No connector found for task type [%s] and version [%d]. Using default connector.", taskCategory.GetName(), taskCategory.GetVersion())
+	return nil, fmt.Errorf("no connector found for task type [%s] and version [%d]", taskCategory.GetName(), taskCategory.GetVersion())
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -473,7 +512,7 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 
 	clientSet := getConnectorClientSets(ctx)
 	connectorRegistry := getConnectorRegistry(ctx, clientSet)
-	supportedTaskTypes := maps.Keys(connectorRegistry)
+	supportedTaskTypes := connectorRegistry.getSupportedTaskTypes()
 	connectorService.SetSupportedTaskType(supportedTaskTypes)
 
 	plugin := &Plugin{

@@ -140,7 +140,8 @@ func updateRegistry(
 					AgentID:         agentID,
 					IsAgentApp:      isAgentApp,
 				}
-				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+				registryKey := RegistryKey{domain: agentDeployment.Domain, taskTypeName: supportedTaskType, taskTypeVersion: defaultTaskTypeVersion}
+				newAgentRegistry[registryKey] = agent
 				agentSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
@@ -153,7 +154,8 @@ func updateRegistry(
 					IsAgentApp:      isAgentApp,
 				}
 				supportedCategoryName := supportedCategory.GetName()
-				newAgentRegistry[supportedCategoryName] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
+				registryKey := RegistryKey{domain: agentDeployment.Domain, taskTypeName: supportedCategoryName, taskTypeVersion: supportedCategory.GetVersion()}
+				newAgentRegistry[registryKey] = agent
 				agentSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
 		}
@@ -182,35 +184,35 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
 	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
 		if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
-			if _, ok := newAgentRegistry[taskType]; !ok {
-				agent := &Agent{
-					AgentDeployment: agentDeployment,
-					IsSync:          false,
-					AgentID:         agentDeploymentID,
-					IsAgentApp:      false,
-				}
-				newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+			registryKey := RegistryKey{domain: agentDeployment.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+			agent := &Agent{
+				AgentDeployment: agentDeployment,
+				IsSync:          false,
+				AgentID:         agentDeploymentID,
+				IsAgentApp:      false,
 			}
+			newAgentRegistry[registryKey] = agent
 		}
 	}
 
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		if _, ok := newAgentRegistry[taskType]; !ok {
+		registryKey := RegistryKey{domain: cfg.DefaultAgent.Domain, taskTypeName: taskType, taskTypeVersion: defaultTaskTypeVersion}
+		if _, ok := newAgentRegistry[registryKey]; !ok {
 			agent := &Agent{
 				AgentDeployment: &cfg.DefaultAgent,
 				IsSync:          false,
 				AgentID:         "defaultAgent",
 				IsAgentApp:      false,
 			}
-			newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+			newAgentRegistry[registryKey] = agent
 		}
 	}
 
 	// Update registry with agent apps
 	updateRegistry(ctx, cs, newAgentRegistry, cfg.AgentApps, true)
 
-	logger.Infof(ctx, "AgentDeployments support the following task types: [%v]", strings.Join(maps.Keys(newAgentRegistry), ", "))
+	logger.Infof(ctx, "AgentDeployments support the following task types: [%v]", strings.Join(newAgentRegistry.getSupportedTaskTypes(), ", "))
 	return newAgentRegistry
 }
 
