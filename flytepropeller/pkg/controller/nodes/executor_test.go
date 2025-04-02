@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	pluginscatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
@@ -1580,6 +1581,57 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, handler.EPhaseRetryableFailure, phaseInfo.GetPhase())
 	assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.GetErr().GetKind())
+}
+
+func Test_nodeExecutor_OOMKilled_error(t *testing.T) {
+	// Create a phase info with an OOMKilled error (which is a USER error type)
+	phaseInfo := handler.PhaseInfoRetryableFailureErr(&core.ExecutionError{
+		Code:    flytek8s.OOMKilled, // Use the OOMKilled error code
+		Message: "container killed due to OOM",
+		Kind:    core.ExecutionError_USER, // OOM is classified as a user error
+	}, nil)
+
+	// Mock the node status
+	ns := &mocks.ExecutableNodeStatus{}
+	ns.EXPECT().GetAttempts().Return(0)
+	ns.EXPECT().GetSystemFailures().Return(0)
+	ns.On("GetQueuedAt").Return(&v1.Time{Time: time.Now()})
+	ns.On("GetLastAttemptStartedAt").Return(&v1.Time{Time: time.Now()})
+	ns.On("ClearLastAttemptStartedAt").Return()
+
+	// Create the node executor
+	c := &nodeExecutor{}
+
+	// Create and configure the mock handler
+	h := &nodemocks.NodeHandler{}
+	h.On("Handle",
+		mock.MatchedBy(func(ctx context.Context) bool { return true }),
+		mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
+	).Return(handler.DoTransition(handler.TransitionTypeEphemeral, phaseInfo), nil)
+	h.On("FinalizeRequired").Return(true)
+	h.On("Finalize", mock.Anything, mock.Anything).Return(nil)
+
+	// Configure retry settings
+	retries := 2
+
+	// Create and configure the mock node
+	mockNode := &mocks.ExecutableNode{}
+	mockNode.On("GetID").Return("node")
+	mockNode.On("GetActiveDeadline").Return(nil)
+	mockNode.On("GetExecutionDeadline").Return(nil)
+	mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
+
+	// Create the node execution context
+	nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
+
+	// Execute the node and verify the results
+	phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, handler.EPhaseRetryableFailure, phaseInfo.GetPhase())
+	assert.Equal(t, core.ExecutionError_USER, phaseInfo.GetErr().GetKind())
+	assert.Equal(t, flytek8s.OOMKilled, phaseInfo.GetErr().GetCode())
 }
 
 func Test_nodeExecutor_abort(t *testing.T) {
