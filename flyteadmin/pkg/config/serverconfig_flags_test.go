@@ -533,4 +533,18 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_gracefulShutdownTimeoutSeconds", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("gracefulShutdownTimeoutSeconds", testValue)
+			if vInt, err := cmdFlags.GetInt("gracefulShutdownTimeoutSeconds"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vInt), &actual.GracefulShutdownTimeoutSeconds)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
