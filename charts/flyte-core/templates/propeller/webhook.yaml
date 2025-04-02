@@ -16,6 +16,12 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels:
     app: {{ template "flyte-pod-webhook.name" . }}
+  {{- if .Values.webhook.annotations }}
+  annotations:
+    {{- with .Values.webhook.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
