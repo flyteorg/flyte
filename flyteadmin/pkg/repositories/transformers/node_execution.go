@@ -2,10 +2,10 @@ package transformers
 
 import (
 	"context"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -30,17 +30,10 @@ type ToNodeExecutionModelInput struct {
 
 func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
 	closure *admin.NodeExecutionClosure) error {
-	occurredAt, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal occurredAt with error: %v", err)
-	}
+	occurredAt := request.GetEvent().GetOccurredAt().AsTime()
 
 	nodeExecutionModel.StartedAt = &occurredAt
-	startedAtProto, err := ptypes.TimestampProto(occurredAt)
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal,
-			"failed to marshal occurredAt into a timestamp proto with error: %v", err)
-	}
+	startedAtProto := timestamppb.New(occurredAt)
 	closure.StartedAt = startedAtProto
 	closure.DeckUri = request.GetEvent().GetDeckUri()
 	return nil
@@ -53,13 +46,9 @@ func addTerminalState(
 	if closure.GetStartedAt() == nil {
 		logger.Warning(context.Background(), "node execution is missing StartedAt")
 	} else {
-		endTime, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
-		if err != nil {
-			return errors.NewFlyteAdminErrorf(
-				codes.Internal, "Failed to parse node execution occurred at timestamp: %v", err)
-		}
+		endTime := request.GetEvent().GetOccurredAt().AsTime()
 		nodeExecutionModel.Duration = endTime.Sub(*nodeExecutionModel.StartedAt)
-		closure.Duration = ptypes.DurationProto(nodeExecutionModel.Duration)
+		closure.Duration = durationpb.New(nodeExecutionModel.Duration)
 	}
 
 	// Serialize output results (if they exist)
@@ -176,15 +165,9 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 	}
 	nodeExecution.Closure = marshaledClosure
 	nodeExecution.NodeExecutionMetadata = marshaledNodeExecutionMetadata
-	nodeExecutionCreatedAt, err := ptypes.Timestamp(input.Request.GetEvent().GetOccurredAt())
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
-	}
+	nodeExecutionCreatedAt := input.Request.GetEvent().GetOccurredAt().AsTime()
 	nodeExecution.NodeExecutionCreatedAt = &nodeExecutionCreatedAt
-	nodeExecutionUpdatedAt, err := ptypes.Timestamp(reportedAt)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event reported_at timestamp")
-	}
+	nodeExecutionUpdatedAt := reportedAt.AsTime()
 	nodeExecution.NodeExecutionUpdatedAt = &nodeExecutionUpdatedAt
 	if input.Request.GetEvent().GetParentTaskMetadata() != nil {
 		nodeExecution.ParentTaskExecutionID = input.ParentTaskExecutionID
@@ -276,10 +259,7 @@ func UpdateNodeExecutionModel(
 	}
 
 	nodeExecutionModel.Closure = marshaledClosure
-	updatedAt, err := ptypes.Timestamp(reportedAt)
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to parse updated at timestamp")
-	}
+	updatedAt := reportedAt.AsTime()
 	nodeExecutionModel.NodeExecutionUpdatedAt = &updatedAt
 	nodeExecutionModel.DynamicWorkflowRemoteClosureReference = dynamicWorkflowRemoteClosure
 

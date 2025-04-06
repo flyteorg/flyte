@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
@@ -41,9 +41,9 @@ const (
 )
 
 var SupportedEvents = map[string]string{
-	Task:     proto.MessageName(&taskExecutionReq),
-	Node:     proto.MessageName(&nodeExecutionReq),
-	Workflow: proto.MessageName(&workflowExecutionReq),
+	Task:     string(proto.MessageName(&taskExecutionReq)),
+	Node:     string(proto.MessageName(&nodeExecutionReq)),
+	Workflow: string(proto.MessageName(&workflowExecutionReq)),
 }
 
 // The key is the notification type as defined as an enum.
@@ -57,7 +57,7 @@ func (p *EventPublisher) Publish(ctx context.Context, notificationType string, m
 	err := p.pub.Publish(ctx, notificationType, msg)
 	if err != nil {
 		p.systemMetrics.PublishError.Inc()
-		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%s] and error: %v", notificationType, msg.String(), err)
+		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%+v] and error: %v", notificationType, msg, err)
 	} else {
 		p.systemMetrics.PublishSuccess.Inc()
 	}

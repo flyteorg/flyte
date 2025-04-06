@@ -4,15 +4,13 @@ package pbhash
 import (
 	"context"
 	"encoding/base64"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
-
-var marshaller = &jsonpb.Marshaler{}
 
 func fromHashToByteArray(input [32]byte) []byte {
 	output := make([]byte, 32)
@@ -29,7 +27,7 @@ func ComputeHash(ctx context.Context, pb proto.Message) ([]byte, error) {
 	// - omitting empty values which supports backwards compatibility of old protobuf definitions
 	// We do not use protobuf marshalling because it does not guarantee stable output because of how it handles
 	// unknown fields and ordering of fields. https://github.com/protocolbuffers/protobuf/issues/2830
-	pbJSON, err := marshaller.MarshalToString(pb)
+	b, err := protojson.Marshal(pb)
 	if err != nil {
 		logger.Warning(ctx, "failed to marshal pb [%+v] to JSON with err %v", pb, err)
 		return nil, err
@@ -37,7 +35,7 @@ func ComputeHash(ctx context.Context, pb proto.Message) ([]byte, error) {
 
 	// Deterministically hash the JSON object to a byte array. The library will sort the map keys of the JSON object
 	// so that we do not run into the issues from pb marshalling.
-	hash, err := goObjectHash.CommonJSONHash(pbJSON)
+	hash, err := goObjectHash.CommonJSONHash(string(b))
 	if err != nil {
 		logger.Warning(ctx, "failed to hash JSON for pb [%+v] with err %v", pb, err)
 		return nil, err

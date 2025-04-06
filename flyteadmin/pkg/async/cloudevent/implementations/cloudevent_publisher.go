@@ -1,15 +1,14 @@
 package implementations
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
 	"reflect"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -85,16 +84,14 @@ func (p *Publisher) Publish(ctx context.Context, notificationType string, msg pr
 
 	// Explicitly jsonpb marshal the proto. Otherwise, event.SetData will use json.Marshal which doesn't work well
 	// with proto oneof fields.
-	marshaler := jsonpb.Marshaler{}
-	buf := bytes.NewBuffer([]byte{})
-	err := marshaler.Marshal(buf, msg)
+	b, err := protojson.Marshal(msg)
 	if err != nil {
 		p.systemMetrics.PublishError.Inc()
 		logger.Errorf(ctx, "Failed to jsonpb marshal [%v] with error: %v", msg, err)
 		return fmt.Errorf("failed to jsonpb marshal [%v] with error: %w", msg, err)
 	}
 
-	if err := event.SetData(cloudevents.ApplicationJSON, buf.Bytes()); err != nil {
+	if err := event.SetData(cloudevents.ApplicationJSON, b); err != nil {
 		p.systemMetrics.PublishError.Inc()
 		logger.Errorf(ctx, "Failed to encode message [%v] with error: %v", msg, err)
 		return err
@@ -430,9 +427,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 
 	// Explicitly jsonpb marshal the proto. Otherwise, event.SetData will use json.Marshal which doesn't work well
 	// with proto oneof fields.
-	marshaler := jsonpb.Marshaler{}
-	buf := bytes.NewBuffer([]byte{})
-	err = marshaler.Marshal(buf, finalMsg)
+	b, err := protojson.Marshal(finalMsg)
 	if err != nil {
 		c.systemMetrics.PublishError.Inc()
 		logger.Errorf(ctx, "Failed to jsonpb marshal [%v] with error: %v", msg, err)
@@ -451,7 +446,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 	// TODO: Fill this in after we can get auto-generation in buf.
 	cloudEvt.SetExtension(jsonSchemaURLKey, "")
 
-	if err := cloudEvt.SetData(cloudevents.ApplicationJSON, buf.Bytes()); err != nil {
+	if err := cloudEvt.SetData(cloudevents.ApplicationJSON, b); err != nil {
 		c.systemMetrics.PublishError.Inc()
 		logger.Errorf(ctx, "Failed to encode message [%v] with error: %v", msg, err)
 		return err

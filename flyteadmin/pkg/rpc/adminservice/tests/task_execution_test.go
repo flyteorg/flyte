@@ -3,13 +3,13 @@ package tests
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
@@ -38,7 +38,7 @@ func TestTaskExecution(t *testing.T) {
 	}
 
 	phase := core.TaskExecution_RUNNING
-	occurredAt := ptypes.TimestampNow()
+	occurredAt := timestamppb.Now()
 	retryAttempt := uint32(1)
 
 	const requestID = "request id"

@@ -1,12 +1,12 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -170,9 +170,9 @@ func TestFromLaunchPlanModel(t *testing.T) {
 	lpRequest := getRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
 	createdAt := time.Now()
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	updatedAt := createdAt.Add(time.Minute)
-	updatedAtProto, _ := ptypes.TimestampProto(updatedAt)
+	updatedAtProto := timestamppb.New(updatedAt)
 	closure := admin.LaunchPlanClosure{
 		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
 		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),
@@ -216,9 +216,9 @@ func TestFromLaunchPlanModels(t *testing.T) {
 	workflowRequest := testutils.GetWorkflowRequest()
 	state := int32(1)
 	createdAt := time.Now()
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	updatedAt := createdAt.Add(time.Minute)
-	updatedAtProto, _ := ptypes.TimestampProto(updatedAt)
+	updatedAtProto := timestamppb.New(updatedAt)
 	closure := admin.LaunchPlanClosure{
 		ExpectedInputs:  lpRequest.GetSpec().GetDefaultInputs(),
 		ExpectedOutputs: workflowRequest.GetSpec().GetTemplate().GetInterface().GetOutputs(),

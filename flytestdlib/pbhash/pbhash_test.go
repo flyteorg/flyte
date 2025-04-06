@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/ptypes"
+	"google.golang.org/protobuf/ptypes/duration"
+	"google.golang.org/protobuf/ptypes/timestamp"
 )
 
 // Mock a Protobuf generated GO object
@@ -52,7 +52,7 @@ func (m mockOlderProto) String() string {
 func (mockOlderProto) ProtoMessage() {
 }
 
-var sampleTime, _ = ptypes.TimestampProto(
+var sampleTime, _ = timestamppb.New(
 	time.Date(2019, 03, 29, 12, 0, 0, 0, time.UTC))
 
 func TestProtoHash(t *testing.T) {
@@ -62,7 +62,7 @@ func TestProtoHash(t *testing.T) {
 		StringValue: "lets test this",
 		Boolean:     true,
 		Datetime:    sampleTime,
-		Duration:    ptypes.DurationProto(time.Millisecond),
+		Duration:    durationpb.New(time.Millisecond),
 		MapValue: map[string]string{
 			"z": "last",
 			"a": "first",

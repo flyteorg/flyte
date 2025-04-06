@@ -3,12 +3,10 @@ package impl
 import (
 	"bytes"
 	"context"
-	"strconv"
-	"time"
-
-	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"strconv"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -78,11 +76,7 @@ func (t *TaskManager) CreateTask(
 		logger.Debugf(ctx, "Failed to compile task with id [%+v] with err %v", request.GetId(), err)
 		return nil, err
 	}
-	createdAt, err := ptypes.TimestampProto(time.Now())
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"Failed to serialize CreatedAt: %v when creating task: %+v", err, request.GetId())
-	}
+	createdAt := timestamppb.Now()
 	taskDigest, err := util.GetTaskDigest(ctx, compiledTask)
 	if err != nil {
 		logger.Errorf(ctx, "failed to compute task digest with err %v", err)

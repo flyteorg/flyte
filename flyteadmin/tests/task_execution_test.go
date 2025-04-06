@@ -9,13 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
+	ptypesStruct "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -77,7 +75,7 @@ func TestCreateTaskExecution(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 
 	createTaskAndNodeExecution(ctx, t, client, conn, occurredAtProto)
 
@@ -113,7 +111,7 @@ func TestCreateAndUpdateTaskExecution(t *testing.T) {
 	defer conn.Close()
 
 	beganAt := time.Now()
-	beganAtProto, _ := ptypes.TimestampProto(beganAt)
+	beganAtProto, _ := timestamppb.New(beganAt)
 
 	createTaskAndNodeExecution(ctx, t, client, conn, beganAtProto)
 
@@ -162,7 +160,7 @@ func TestCreateAndUpdateTaskExecution(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	endedAt := beganAt.Add(time.Minute)
-	endedAtProto, _ := ptypes.TimestampProto(endedAt)
+	endedAtProto, _ := timestamppb.New(endedAt)
 	_, err = client.CreateTaskEvent(ctx, &admin.TaskExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.TaskExecutionEvent{
@@ -199,7 +197,7 @@ func TestCreateAndUpdateTaskExecutionPhaseVersion(t *testing.T) {
 	defer conn.Close()
 
 	beganAt := time.Now()
-	beganAtProto, _ := ptypes.TimestampProto(beganAt)
+	beganAtProto, _ := timestamppb.New(beganAt)
 
 	createTaskAndNodeExecution(ctx, t, client, conn, beganAtProto)
 
@@ -275,7 +273,7 @@ func TestCreateAndListTaskExecution(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 
 	createTaskAndNodeExecution(ctx, t, client, conn, occurredAtProto)
 	_, err := client.CreateTaskEvent(ctx, &admin.TaskExecutionEventRequest{
@@ -387,7 +385,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 	}
 
 	beganAt := time.Now()
-	beganAtProto, _ := ptypes.TimestampProto(beganAt)
+	beganAtProto, _ := timestamppb.New(beganAt)
 
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()

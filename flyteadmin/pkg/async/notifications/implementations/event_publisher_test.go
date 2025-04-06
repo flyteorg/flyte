@@ -3,14 +3,14 @@ package implementations
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -40,7 +40,7 @@ var taskID = &core.Identifier{
 }
 
 var occurredAt = time.Now().UTC()
-var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
+var occurredAtProto = timestamppb.New(occurredAt)
 
 var taskPhase = core.TaskExecution_RUNNING
 
@@ -149,7 +149,7 @@ func TestNewEventsPublisher_EventTypes(t *testing.T) {
 				var currentEventPublisher = NewEventsPublisher(mockEventPublisher, promutils.NewTestScope(), test.eventTypes)
 				var cnt = 0
 				for id, event := range test.events {
-					assert.Nil(t, currentEventPublisher.Publish(context.Background(), proto.MessageName(event),
+					assert.Nil(t, currentEventPublisher.Publish(context.Background(), string(proto.MessageName(event)),
 						event))
 					if test.shouldSendEvent[id] {
 						assert.Equal(t, proto.MessageName(event), testEventPublisher.Published[cnt].Key)
@@ -171,5 +171,5 @@ func TestEventPublisher_PublishError(t *testing.T) {
 	var publishError = errors.New("publish() returns an error")
 	testEventPublisher.GivenError = publishError
 	assert.Equal(t, publishError, currentEventPublisher.Publish(context.Background(),
-		proto.MessageName(taskRequest), taskRequest))
+		string(proto.MessageName(taskRequest)), taskRequest))
 }

@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )

@@ -2,10 +2,10 @@ package executions
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -30,7 +30,7 @@ func getQualityOfServiceWithDuration(duration time.Duration) *core.QualityOfServ
 	return &core.QualityOfService{
 		Designation: &core.QualityOfService_Spec{
 			Spec: &core.QualityOfServiceSpec{
-				QueueingBudget: ptypes.DurationProto(duration),
+				QueueingBudget: durationpb.New(duration),
 			},
 		},
 	}
@@ -41,13 +41,13 @@ func getMockConfig() runtimeInterfaces.Configuration {
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
 	provider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
-			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+			QueueingBudget: durationpb.New(10 * time.Minute),
 		},
 		core.QualityOfService_MEDIUM: {
-			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+			QueueingBudget: durationpb.New(20 * time.Minute),
 		},
 		core.QualityOfService_LOW: {
-			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+			QueueingBudget: durationpb.New(30 * time.Minute),
 		},
 	})
 

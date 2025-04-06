@@ -3,12 +3,12 @@ package implementations
 import (
 	"context"
 	"encoding/base64"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/url"
 	"testing"
 	"time"
 
 	gcs "cloud.google.com/go/storage"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	gax "github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
 	credentialspb "google.golang.org/genproto/googleapis/iam/credentials/v1"
@@ -113,7 +113,7 @@ func TestGCPGet(t *testing.T) {
 func TestToken(t *testing.T) {
 	token := "token"
 	signingPrincipal := "principal@example.com"
-	timestamp := timestamp.Timestamp{Seconds: int64(42)}
+	timestamp := timestamppb.Timestamp{Seconds: int64(42)}
 
 	mockIAMCredentials := mockIAMCredentialsImpl{}
 	mockIAMCredentials.generateAccessTokenFunc = func(ctx context.Context, req *credentialspb.GenerateAccessTokenRequest, opts ...gax.CallOption) (*credentialspb.GenerateAccessTokenResponse, error) {

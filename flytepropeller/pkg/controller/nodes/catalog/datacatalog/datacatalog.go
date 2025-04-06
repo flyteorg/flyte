@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
@@ -74,11 +74,7 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 	// check artifact's age if the configuration specifies a max age
 	if m.maxCacheAge > time.Duration(0) {
 		artifact := response.GetArtifact()
-		createdAt, err := ptypes.Timestamp(artifact.GetCreatedAt())
-		if err != nil {
-			logger.Errorf(ctx, "DataCatalog Artifact has invalid createdAt %+v, err: %+v", artifact.GetCreatedAt(), err)
-			return nil, err
-		}
+		createdAt := artifact.GetCreatedAt().AsTime()
 
 		if time.Since(createdAt) > m.maxCacheAge {
 			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
@@ -401,7 +397,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 			TagName:   tag,
 		},
 		OwnerId:           ownerID,
-		HeartbeatInterval: ptypes.DurationProto(heartbeatInterval),
+		HeartbeatInterval: durationpb.New(heartbeatInterval),
 	}
 
 	response, err := m.client.GetOrExtendReservation(ctx, reservationQuery)

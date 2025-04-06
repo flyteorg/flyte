@@ -5,9 +5,9 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"

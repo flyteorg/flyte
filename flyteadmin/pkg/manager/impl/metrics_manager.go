@@ -3,12 +3,11 @@ package impl
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"reflect"
 	"sort"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -35,11 +34,11 @@ const (
 )
 
 var (
-	emptyDuration *duration.Duration = &duration.Duration{
+	emptyDuration = &durationpb.Duration{
 		Seconds: 0,
 		Nanos:   0,
 	}
-	emptyTimestamp *timestamp.Timestamp = &timestamp.Timestamp{
+	emptyTimestamp = &timestamppb.Timestamp{
 		Seconds: 0,
 		Nanos:   0,
 	}
@@ -59,7 +58,7 @@ type MetricsManager struct {
 }
 
 // createOperationSpan returns a Span defined by the provided arguments.
-func createOperationSpan(startTime, endTime *timestamp.Timestamp, operation string) *core.Span {
+func createOperationSpan(startTime, endTime *timestamppb.Timestamp, operation string) *core.Span {
 	return &core.Span{
 		StartTime: startTime,
 		EndTime:   endTime,

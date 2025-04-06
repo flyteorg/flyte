@@ -3,17 +3,10 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
-
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/structpb"
 )
-
-var jsonPbMarshaler = jsonpb.Marshaler{}
-var jsonPbUnmarshaler = &jsonpb.Unmarshaler{
-	AllowUnknownFields: true,
-}
 
 // Deprecated: Use flytestdlib/utils.UnmarshalStructToPb instead.
 func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
@@ -21,12 +14,12 @@ func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 		return fmt.Errorf("nil Struct Object passed")
 	}
 
-	jsonObj, err := jsonPbMarshaler.MarshalToString(structObj)
+	b, err := protojson.Marshal(structObj)
 	if err != nil {
 		return err
 	}
 
-	if err = jsonPbUnmarshaler.Unmarshal(strings.NewReader(jsonObj), msg); err != nil {
+	if err = protojson.Unmarshal(b, msg); err != nil {
 		return err
 	}
 
@@ -39,12 +32,12 @@ func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 		return fmt.Errorf("nil Struct Object passed")
 	}
 
-	jsonObj, err := jsonPbMarshaler.MarshalToString(in)
+	b, err := protojson.Marshal(in)
 	if err != nil {
 		return err
 	}
 
-	if err = jsonpb.UnmarshalString(jsonObj, out); err != nil {
+	if err = protojson.Unmarshal(b, out); err != nil {
 		return err
 	}
 
@@ -53,7 +46,8 @@ func MarshalStruct(in proto.Message, out *structpb.Struct) error {
 
 // Deprecated: Use flytestdlib/utils.MarshalToString instead.
 func MarshalToString(msg proto.Message) (string, error) {
-	return jsonPbMarshaler.MarshalToString(msg)
+	b, err := protojson.Marshal(msg)
+	return string(b), err
 }
 
 // Deprecated: Use flytestdlib/utils.MarshalObjToStruct instead.
@@ -66,7 +60,7 @@ func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 
 	// Turn JSON into a protobuf struct
 	structObj := &structpb.Struct{}
-	if err := jsonpb.UnmarshalString(string(b), structObj); err != nil {
+	if err := protojson.Unmarshal(b, structObj); err != nil {
 		return nil, err
 	}
 	return structObj, nil

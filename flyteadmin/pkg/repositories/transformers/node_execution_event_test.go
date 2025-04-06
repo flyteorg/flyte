@@ -1,10 +1,10 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -15,7 +15,7 @@ import (
 
 func TestCreateNodeExecutionEventModel(t *testing.T) {
 	occurredAt := time.Now().UTC()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 	request := &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{

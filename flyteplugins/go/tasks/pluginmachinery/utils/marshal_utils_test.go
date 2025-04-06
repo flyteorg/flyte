@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
 )
 

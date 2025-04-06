@@ -35,7 +35,7 @@ import (
 	"strings"
 
 	// #noSA1019
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"

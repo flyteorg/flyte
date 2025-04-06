@@ -1,12 +1,12 @@
 package impl
 
 import (
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -150,7 +150,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 	})
 	t.Run("interruptible", func(t *testing.T) {
 		workflowExecutionConfig := &admin.WorkflowExecutionConfig{
-			Interruptible: &wrappers.BoolValue{Value: true},
+			Interruptible: &wrapperspb.BoolValue{Value: true},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
 		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
@@ -208,7 +208,7 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			},
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				MaxParallelism: 50,
-				Interruptible:  &wrappers.BoolValue{Value: true},
+				Interruptible:  &wrapperspb.BoolValue{Value: true},
 				SecurityContext: &core.SecurityContext{
 					RunAs: &core.Identity{
 						IamRole:           testRoleSc,

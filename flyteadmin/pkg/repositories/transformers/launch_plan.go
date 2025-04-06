@@ -1,9 +1,9 @@
 package transformers
 
 import (
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -87,14 +87,8 @@ func FromLaunchPlanModel(model models.LaunchPlan) (*admin.LaunchPlan, error) {
 	if err != nil {
 		return nil, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal closure")
 	}
-	createdAt, err := ptypes.TimestampProto(model.CreatedAt)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read created at")
-	}
-	updatedAt, err := ptypes.TimestampProto(model.UpdatedAt)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read updated at")
-	}
+	createdAt := timestamppb.New(model.CreatedAt)
+	updatedAt := timestamppb.New(model.UpdatedAt)
 	if model.State != nil {
 		closure.State = admin.LaunchPlanState(*model.State)
 	}

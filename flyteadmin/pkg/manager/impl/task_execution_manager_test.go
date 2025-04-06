@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -30,7 +31,7 @@ import (
 )
 
 var taskStartedAt = time.Now().UTC()
-var sampleTaskEventOccurredAt, _ = ptypes.TimestampProto(taskStartedAt)
+var sampleTaskEventOccurredAt = timestamppb.New(taskStartedAt)
 
 var sampleTaskID = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
@@ -197,7 +198,7 @@ func TestCreateTaskEvent(t *testing.T) {
 
 func TestCreateTaskEvent_Update(t *testing.T) {
 	taskCompletedAt := taskStartedAt.Add(time.Minute)
-	taskEventCompletedAtProto, _ := ptypes.TimestampProto(taskCompletedAt)
+	taskEventCompletedAtProto := timestamppb.New(taskCompletedAt)
 
 	repository := repositoryMocks.NewMockRepository()
 	addGetWorkflowExecutionCallback(repository)
@@ -253,7 +254,7 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 		CreatedAt:    sampleTaskEventOccurredAt,
 		UpdatedAt:    taskEventCompletedAtProto,
 		Phase:        core.TaskExecution_SUCCEEDED,
-		Duration:     ptypes.DurationProto(time.Minute),
+		Duration:     durationpb.New(time.Minute),
 		OutputResult: expectedOutputResult,
 		Logs:         expectedLogs,
 	}
@@ -443,7 +444,7 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 
 func TestCreateTaskEvent_PhaseVersionChange(t *testing.T) {
 	taskUpdatedAt := taskStartedAt.Add(time.Minute)
-	taskEventUpdatedAtProto, _ := ptypes.TimestampProto(taskUpdatedAt)
+	taskEventUpdatedAtProto := timestamppb.New(taskUpdatedAt)
 
 	repository := repositoryMocks.NewMockRepository()
 	addGetWorkflowExecutionCallback(repository)
@@ -516,7 +517,7 @@ func TestGetTaskExecution(t *testing.T) {
 	expectedClosure := &admin.TaskExecutionClosure{
 		StartedAt:    sampleTaskEventOccurredAt,
 		Phase:        core.TaskExecution_SUCCEEDED,
-		Duration:     ptypes.DurationProto(time.Minute),
+		Duration:     durationpb.New(time.Minute),
 		OutputResult: expectedOutputResult,
 		Logs:         expectedLogs,
 	}
@@ -628,7 +629,7 @@ func TestListTaskExecutions(t *testing.T) {
 	expectedClosure := &admin.TaskExecutionClosure{
 		StartedAt:    sampleTaskEventOccurredAt,
 		Phase:        core.TaskExecution_SUCCEEDED,
-		Duration:     ptypes.DurationProto(time.Minute),
+		Duration:     durationpb.New(time.Minute),
 		OutputResult: expectedOutputResult,
 		Logs:         expectedLogs,
 	}
@@ -791,7 +792,7 @@ func TestListTaskExecutions_Filters(t *testing.T) {
 	expectedClosure := &admin.TaskExecutionClosure{
 		StartedAt:    sampleTaskEventOccurredAt,
 		Phase:        core.TaskExecution_SUCCEEDED,
-		Duration:     ptypes.DurationProto(time.Minute),
+		Duration:     durationpb.New(time.Minute),
 		OutputResult: expectedOutputResult,
 		Logs:         expectedLogs,
 	}

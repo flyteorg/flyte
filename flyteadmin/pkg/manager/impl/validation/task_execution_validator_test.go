@@ -1,10 +1,10 @@
 package validation
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -13,7 +13,7 @@ import (
 )
 
 var taskEventOccurredAt = time.Now()
-var taskEventOccurredAtProto, _ = ptypes.TimestampProto(taskEventOccurredAt)
+var taskEventOccurredAtProto = timestamppb.New(taskEventOccurredAt)
 var maxOutputSizeInBytes = int64(1000000)
 
 func TestValidateTaskExecutionRequest(t *testing.T) {

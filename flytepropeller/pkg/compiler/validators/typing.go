@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/santhosh-tekuri/jsonschema"
 	"github.com/wI2L/jsondiff"
 	jscmp "gitlab.com/yvesf/json-schema-compare"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

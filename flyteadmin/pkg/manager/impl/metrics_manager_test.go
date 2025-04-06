@@ -2,11 +2,11 @@ package impl
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"reflect"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -17,18 +17,18 @@ import (
 )
 
 var (
-	baseDuration = &duration.Duration{
+	baseDuration = &durationpb.Duration{
 		Seconds: 400,
 		Nanos:   0,
 	}
-	baseTimestamp = &timestamp.Timestamp{
+	baseTimestamp = &timestamppb.Timestamp{
 		Seconds: 643852800,
 		Nanos:   0,
 	}
 )
 
-func addTimestamp(ts *timestamp.Timestamp, seconds int64) *timestamp.Timestamp {
-	return &timestamp.Timestamp{
+func addTimestamp(ts *timestamppb.Timestamp, seconds int64) *timestamppb.Timestamp {
+	return &timestamppb.Timestamp{
 		Seconds: ts.GetSeconds() + seconds,
 		Nanos:   ts.GetNanos(),
 	}

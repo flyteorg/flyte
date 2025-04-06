@@ -3,7 +3,7 @@ package implementations
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -13,12 +13,12 @@ type SandboxPublisher struct {
 }
 
 func (p *SandboxPublisher) Publish(ctx context.Context, notificationType string, msg proto.Message) error {
-	logger.Debugf(ctx, "Publishing the following message [%s]", msg.String())
+	logger.Debugf(ctx, "Publishing the following message [%+v]", msg)
 
 	data, err := proto.Marshal(msg)
 
 	if err != nil {
-		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%s] and error: %v", notificationType, msg.String(), err)
+		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%+v] and error: %v", notificationType, msg, err)
 		return err
 	}
 

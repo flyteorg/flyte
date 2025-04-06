@@ -12,12 +12,16 @@ import (
 	"strconv"
 	"sync"
 
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/futures"
@@ -235,7 +239,6 @@ func (d Downloader) handleError(_ context.Context, b *core.Error, toFilePath str
 
 func (d Downloader) handleGeneric(ctx context.Context, b *structpb.Struct, toFilePath string, writeToFile bool) (interface{}, error) {
 	if writeToFile && b != nil {
-		m := jsonpb.Marshaler{}
 		writer, err := os.Create(toFilePath)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to open file at path %s", toFilePath)
@@ -246,7 +249,7 @@ func (d Downloader) handleGeneric(ctx context.Context, b *structpb.Struct, toFil
 				logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
 			}
 		}()
-		return b, m.Marshal(writer, b)
+		return protojson.Marshal(b)
 	}
 	return b, nil
 }
@@ -256,7 +259,6 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 
 	var toByteArray func() ([]byte, error)
 	var v interface{}
-	var err error
 
 	switch primitive.GetValue().(type) {
 	case *core.Primitive_StringValue:
@@ -280,20 +282,14 @@ func (d Downloader) handlePrimitive(primitive *core.Primitive, toFilePath string
 			return []byte(strconv.FormatFloat(primitive.GetFloatValue(), 'f', -1, 64)), nil
 		}
 	case *core.Primitive_Datetime:
-		v, err = ptypes.Timestamp(primitive.GetDatetime())
-		if err != nil {
-			return nil, err
-		}
+		v = timestamppb.New(primitive.GetDatetime().AsTime())
 		toByteArray = func() ([]byte, error) {
-			return []byte(ptypes.TimestampString(primitive.GetDatetime())), nil
+			return []byte(timestamppb.New(primitive.GetDatetime().AsTime()).String()), nil
 		}
 	case *core.Primitive_Duration:
-		v, err := ptypes.Duration(primitive.GetDuration())
-		if err != nil {
-			return nil, err
-		}
+		v = durationpb.New(primitive.GetDuration().AsDuration())
 		toByteArray = func() ([]byte, error) {
-			return []byte(v.String()), nil
+			return []byte(durationpb.New(primitive.GetDuration().AsDuration()).String()), nil
 		}
 	default:
 		v = nil

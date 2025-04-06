@@ -2,13 +2,14 @@ package transformers
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -24,7 +25,7 @@ import (
 )
 
 var occurredAt = time.Now().UTC()
-var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
+var occurredAtProto = timestamppb.New(occurredAt)
 var duration = time.Hour
 var closure = &admin.NodeExecutionClosure{
 	Phase: core.NodeExecution_SUCCEEDED,
@@ -32,7 +33,7 @@ var closure = &admin.NodeExecutionClosure{
 		OutputUri: "output uri",
 	},
 	StartedAt: occurredAtProto,
-	Duration:  ptypes.DurationProto(duration),
+	Duration:  durationpb.New(duration),
 }
 var closureBytes, _ = proto.Marshal(closure)
 var nodeExecutionMetadata = admin.NodeExecutionMetaData{
@@ -61,7 +62,7 @@ var testInputs = &core.LiteralMap{
 
 func TestAddRunningState(t *testing.T) {
 	var startedAt = time.Now().UTC()
-	var startedAtProto, _ = ptypes.TimestampProto(startedAt)
+	var startedAtProto = timestamppb.New(startedAt)
 	request := admin.NodeExecutionEventRequest{
 		Event: &event.NodeExecutionEvent{
 			Phase:      core.NodeExecution_RUNNING,
@@ -91,7 +92,7 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	nodeExecutionModel := models.NodeExecution{
 		StartedAt: &startedAt,
 	}
@@ -142,7 +143,7 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	nodeExecutionModel := models.NodeExecution{
 		StartedAt: &startedAt,
 	}
@@ -184,7 +185,7 @@ func TestAddTerminalState_Error(t *testing.T) {
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	nodeExecutionModel := models.NodeExecution{
 		StartedAt: &startedAt,
 	}
@@ -213,7 +214,7 @@ func TestAddTerminalState_DeckURIInFailedExecution(t *testing.T) {
 		},
 	}
 	startedAt := occurredAt.Add(-time.Minute)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	nodeExecutionModel := models.NodeExecution{
 		StartedAt: &startedAt,
 	}

@@ -2,16 +2,17 @@ package transformers
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"sort"
 	"strconv"
 
 	jsonpatch "github.com/evanphx/json-patch"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
+	_struct "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -35,10 +36,7 @@ type CreateTaskExecutionModelInput struct {
 
 func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
 	closure *admin.TaskExecutionClosure) error {
-	occurredAt, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal occurredAt with error: %v", err)
-	}
+	occurredAt := request.GetEvent().GetOccurredAt().AsTime()
 	//Updated the startedAt timestamp only if its not set.
 	// The task start event should already be updating this through addTaskStartedState
 	// This check makes sure any out of order
@@ -57,18 +55,10 @@ func addTaskTerminalState(
 	if taskExecutionModel.StartedAt == nil {
 		logger.Warning(context.Background(), "task execution is missing StartedAt")
 	} else {
-		endTime, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
-		if err != nil {
-			return errors.NewFlyteAdminErrorf(
-				codes.Internal, "Failed to parse task execution occurredAt timestamp: %v", err)
-		}
-		closure.StartedAt, err = ptypes.TimestampProto(*taskExecutionModel.StartedAt)
-		if err != nil {
-			return errors.NewFlyteAdminErrorf(
-				codes.Internal, "Failed to parse task execution startedAt timestamp: %v", err)
-		}
+		endTime := request.GetEvent().GetOccurredAt().AsTime()
+		closure.StartedAt = timestamppb.New(*taskExecutionModel.StartedAt)
 		taskExecutionModel.Duration = endTime.Sub(*taskExecutionModel.StartedAt)
-		closure.Duration = ptypes.DurationProto(taskExecutionModel.Duration)
+		closure.Duration = durationpb.New(taskExecutionModel.Duration)
 	}
 
 	if request.GetEvent().GetOutputUri() != "" {
@@ -202,15 +192,9 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 	}
 
 	taskExecution.Closure = marshaledClosure
-	taskExecutionCreatedAt, err := ptypes.Timestamp(input.Request.GetEvent().GetOccurredAt())
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
-	}
+	taskExecutionCreatedAt := input.Request.GetEvent().GetOccurredAt().AsTime()
 	taskExecution.TaskExecutionCreatedAt = &taskExecutionCreatedAt
-	taskExecutionUpdatedAt, err := ptypes.Timestamp(reportedAt)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event reported_at timestamp")
-	}
+	taskExecutionUpdatedAt := reportedAt.AsTime()
 	taskExecution.TaskExecutionUpdatedAt = &taskExecutionUpdatedAt
 
 	return taskExecution, nil
@@ -487,10 +471,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 			codes.Internal, "failed to marshal task execution closure with error: %v", err)
 	}
 	taskExecutionModel.Closure = marshaledClosure
-	updatedAt, err := ptypes.Timestamp(reportedAt)
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to parse updated at timestamp")
-	}
+	updatedAt := reportedAt.AsTime()
 	taskExecutionModel.TaskExecutionUpdatedAt = &updatedAt
 	return nil
 }

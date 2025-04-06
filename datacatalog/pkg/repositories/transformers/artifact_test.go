@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -145,7 +145,7 @@ func TestFromArtifactModel(t *testing.T) {
 	assert.Len(t, actual.GetTags(), 1)
 	assert.EqualValues(t, artifactModel.Tags[0].TagName, actual.GetTags()[0].GetName())
 
-	timestampProto, err := ptypes.TimestampProto(createdAt)
+	timestampProto, err := timestamppb.New(createdAt)
 	assert.NoError(t, err)
 	assert.Equal(t, actual.GetCreatedAt(), timestampProto)
 }

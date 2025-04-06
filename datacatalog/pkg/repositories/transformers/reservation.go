@@ -3,8 +3,8 @@ package transformers
 import (
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -24,12 +24,12 @@ func FromReservationID(reservationID *datacatalog.ReservationID) models.Reservat
 }
 
 func CreateReservation(reservation *models.Reservation, heartbeatInterval time.Duration) (datacatalog.Reservation, error) {
-	expiresAtPb, err := ptypes.TimestampProto(reservation.ExpiresAt)
+	expiresAtPb, err := timestamppb.New(reservation.ExpiresAt)
 	if err != nil {
 		return datacatalog.Reservation{}, errors.NewDataCatalogErrorf(codes.Internal, "failed to serialize expires at time")
 	}
 
-	heartbeatIntervalPb := ptypes.DurationProto(heartbeatInterval)
+	heartbeatIntervalPb := durationpb.New(heartbeatInterval)
 	return datacatalog.Reservation{
 		ReservationId: &datacatalog.ReservationID{
 			DatasetId: &datacatalog.DatasetID{

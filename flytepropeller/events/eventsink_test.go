@@ -9,15 +9,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 )
 
 func TestFileEvent(t *testing.T) {
-	now := ptypes.TimestampNow()
+	now := timestamppb.Now()
 	dir, err := ioutil.TempDir("", "eventstest")
 	if err != nil {
 		assert.FailNow(t, "test dir creation failed")

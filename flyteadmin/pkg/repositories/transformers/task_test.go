@@ -1,12 +1,12 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -31,7 +31,7 @@ func TestCreateTask(t *testing.T) {
 
 func TestFromTaskModel(t *testing.T) {
 	createdAt := time.Now()
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	taskModel := models.Task{
 		BaseModel: models.BaseModel{
 			CreatedAt: createdAt,
@@ -60,10 +60,10 @@ func TestFromTaskModel(t *testing.T) {
 
 func TestFromTaskModels(t *testing.T) {
 	createdAtA := time.Now()
-	createdAtAProto, _ := ptypes.TimestampProto(createdAtA)
+	createdAtAProto := timestamppb.New(createdAtA)
 
 	createdAtB := createdAtA.Add(time.Hour)
-	createdAtBProto, _ := ptypes.TimestampProto(createdAtB)
+	createdAtBProto := timestamppb.New(createdAtB)
 
 	taskModels := []models.Task{
 		{

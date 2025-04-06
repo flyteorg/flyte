@@ -1,10 +1,9 @@
 package shared
 
 import (
-	"github.com/golang/protobuf/ptypes/wrappers"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // WorkflowExecutionConfigInterface is used as common interface for capturing the common behavior catering to the needs
@@ -22,7 +21,7 @@ type WorkflowExecutionConfigInterface interface {
 	// GetLabels Custom labels to be applied to a triggered execution resource.
 	GetLabels() *admin.Labels
 	// GetInterruptible indicates a workflow should be flagged as interruptible for a single execution. If omitted, the workflow's default is used.
-	GetInterruptible() *wrappers.BoolValue
+	GetInterruptible() *wrapperspb.BoolValue
 	// GetOverwriteCache indicates a workflow should skip all its cached results and re-compute its output, overwriting any already stored data.
 	GetOverwriteCache() bool
 	// GetEnvs defines environment variables to be set for the execution.

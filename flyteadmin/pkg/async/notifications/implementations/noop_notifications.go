@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -27,7 +27,7 @@ func NewNoopEmail() interfaces.Emailer {
 type NoopPublish struct{}
 
 func (n *NoopPublish) Publish(ctx context.Context, notificationType string, msg proto.Message) error {
-	logger.Debugf(ctx, "call to noop publish with notification type [%s] and proto message [%s]", notificationType, msg.String())
+	logger.Debugf(ctx, "call to noop publish with notification type [%s] and proto message [%+v]", notificationType, msg)
 	return nil
 }
 

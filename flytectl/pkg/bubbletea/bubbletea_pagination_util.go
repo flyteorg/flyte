@@ -10,8 +10,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 )
 
 type DataCallback func(filter filters.Filters) ([]proto.Message, error)

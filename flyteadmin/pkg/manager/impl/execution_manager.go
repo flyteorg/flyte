@@ -3,17 +3,16 @@ package impl
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -1291,7 +1290,7 @@ func (m *ExecutionManager) RecoverExecution(
 }
 
 func (m *ExecutionManager) emitScheduledWorkflowMetrics(
-	ctx context.Context, executionModel *models.Execution, runningEventTimeProto *timestamp.Timestamp) {
+	ctx context.Context, executionModel *models.Execution, runningEventTimeProto *timestamppb.Timestamp) {
 	if executionModel == nil || runningEventTimeProto == nil {
 		logger.Warningf(context.Background(),
 			"tried to calculate scheduled workflow execution stats with a nil execution or event time")
@@ -1337,16 +1336,8 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 				"although one was expected", execution.GetId())
 		return
 	}
-	scheduledKickoffTime, err := ptypes.Timestamp(scheduledKickoffTimeProto.GetScalar().GetPrimitive().GetDatetime())
-	if err != nil {
-		// Timestamps are serialized by flyteadmin and should always be valid
-		return
-	}
-	runningEventTime, err := ptypes.Timestamp(runningEventTimeProto)
-	if err != nil {
-		// Timestamps are always sent from propeller and should always be valid
-		return
-	}
+	scheduledKickoffTime := scheduledKickoffTimeProto.GetScalar().GetPrimitive().GetDatetime().AsTime()
+	runningEventTime := runningEventTimeProto.AsTime()
 
 	projectKey := execution.GetId().GetProject()
 	val, ok := m.userMetrics.ScheduledExecutionDelays.Load(projectKey)
@@ -1379,7 +1370,7 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 }
 
 func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
-	executionModel *models.Execution, terminalEventTimeProto *timestamp.Timestamp) {
+	executionModel *models.Execution, terminalEventTimeProto *timestamppb.Timestamp) {
 	if executionModel == nil || terminalEventTimeProto == nil {
 		logger.Warningf(context.Background(),
 			"tried to calculate scheduled workflow execution stats with a nil execution or event time")
@@ -1414,11 +1405,7 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 
 	watch := watchVal.(*promutils.StopWatch)
 
-	terminalEventTime, err := ptypes.Timestamp(terminalEventTimeProto)
-	if err != nil {
-		// Timestamps are always sent from propeller and should always be valid
-		return
-	}
+	terminalEventTime := terminalEventTimeProto.AsTime()
 
 	if executionModel.ExecutionCreatedAt == nil {
 		logger.Warningf(context.Background(), "found execution with nil ExecutionCreatedAt: [%s/%s/%s]",
@@ -1524,14 +1511,14 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request *adm
 		}
 	}
 
-	if err := m.eventPublisher.Publish(ctx, proto.MessageName(request), request); err != nil {
+	if err := m.eventPublisher.Publish(ctx, string(proto.MessageName(request)), request); err != nil {
 		m.systemMetrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.GetRequestId(), err)
 	}
 
 	go func() {
 		ceCtx := context.TODO()
-		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
+		if err := m.cloudEventPublisher.Publish(ceCtx, string(proto.MessageName(request)), request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.GetRequestId(), err)
 		}
@@ -1790,7 +1777,7 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request *ad
 			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
-		if err = m.notificationClient.Publish(ctx, proto.MessageName(emailNotification), email); err != nil {
+		if err = m.notificationClient.Publish(ctx, string(proto.MessageName(emailNotification)), email); err != nil {
 			m.systemMetrics.PublishNotificationError.Inc()
 			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
 		}

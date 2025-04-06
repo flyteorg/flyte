@@ -3,10 +3,10 @@ package nodes
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -93,10 +93,7 @@ func ToNodeExecutionEvent(
 	if info.GetPhase() == handler.EPhaseUndefined {
 		return nil, fmt.Errorf("illegal state, undefined phase received for node [%s]", nodeExecID.GetNodeId())
 	}
-	occurredTime, err := ptypes.TimestampProto(info.GetOccurredAt())
-	if err != nil {
-		return nil, err
-	}
+	occurredTime := timestamppb.New(info.GetOccurredAt())
 
 	phase := ToNodeExecEventPhase(info.GetPhase())
 	if eventVersion < v1alpha1.EventVersion2 && phase == core.NodeExecution_DYNAMIC_RUNNING {
@@ -126,7 +123,7 @@ func ToNodeExecutionEvent(
 			OccurredAt:       occurredTime,
 			ProducerId:       clusterID,
 			EventVersion:     nodeExecutionEventVersion,
-			ReportedAt:       ptypes.TimestampNow(),
+			ReportedAt:       timestamppb.Now(),
 			TargetEntity:     targetEntity,
 			IsInDynamicChain: dynamicChain,
 		}
@@ -138,7 +135,7 @@ func ToNodeExecutionEvent(
 			OccurredAt:       occurredTime,
 			ProducerId:       clusterID,
 			EventVersion:     nodeExecutionEventVersion,
-			ReportedAt:       ptypes.TimestampNow(),
+			ReportedAt:       timestamppb.Now(),
 			TargetEntity:     targetEntity,
 			IsInDynamicChain: dynamicChain,
 		}

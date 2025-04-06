@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/option"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"

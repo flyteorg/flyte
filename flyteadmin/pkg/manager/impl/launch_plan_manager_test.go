@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
@@ -1157,9 +1157,9 @@ func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&closure)
 
 	createdAt := time.Now()
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	updatedAt := createdAt.Add(time.Second)
-	updatedAtProto, _ := ptypes.TimestampProto(updatedAt)
+	updatedAtProto := timestamppb.New(updatedAt)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (
 		interfaces.LaunchPlanCollectionOutput, error) {

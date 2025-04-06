@@ -2,10 +2,10 @@ package transformers
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -45,16 +45,13 @@ func FromWorkflowModel(workflowModel models.Workflow) (admin.Workflow, error) {
 		Name:         workflowModel.WorkflowKey.Name,
 		Version:      workflowModel.WorkflowKey.Version,
 	}
-	createdAt, err := ptypes.TimestampProto(workflowModel.CreatedAt)
-	if err != nil {
-		return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read created at timestamp")
-	}
+	createdAt := timestamppb.New(workflowModel.CreatedAt)
 
 	var workflowInterface core.TypedInterface
 	if len(workflowModel.TypedInterface) > 0 {
-		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
+		err := proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
 		if err != nil {
-			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, fmt.Sprintf("failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error()))  //nolint
+			return admin.Workflow{}, errors.NewFlyteAdminErrorf(codes.Internal, fmt.Sprintf("failed to unmarshal workflow %v interface. Error message: %v", workflowModel.ID, err.Error())) //nolint
 		}
 	}
 

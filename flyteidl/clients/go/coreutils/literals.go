@@ -11,11 +11,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/ptypes"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -45,17 +47,14 @@ func MakePrimitive(v interface{}) (*core.Primitive, error) {
 			},
 		}, nil
 	case time.Time:
-		t, err := ptypes.TimestampProto(p)
-		if err != nil {
-			return nil, err
-		}
+		t := timestamppb.New(p)
 		return &core.Primitive{
 			Value: &core.Primitive_Datetime{
 				Datetime: t,
 			},
 		}, nil
 	case time.Duration:
-		d := ptypes.DurationProto(p)
+		d := durationpb.New(p)
 		return &core.Primitive{
 			Value: &core.Primitive_Duration{
 				Duration: d,
@@ -360,16 +359,13 @@ func MakePrimitiveForType(t core.SimpleType, s string) (*core.Primitive, error) 
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse Duration, valid formats: e.g. 300ms, -1.5h, 2h45m")
 		}
-		p.Value = &core.Primitive_Duration{Duration: ptypes.DurationProto(v)}
+		p.Value = &core.Primitive_Duration{Duration: durationpb.New(v)}
 	case core.SimpleType_DATETIME:
 		v, err := time.Parse(time.RFC3339, s)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to parse Datetime in RFC3339 format")
 		}
-		ts, err := ptypes.TimestampProto(v)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to convert datetime to proto")
-		}
+		ts := timestamppb.New(v)
 		p.Value = &core.Primitive_Datetime{Datetime: ts}
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
@@ -383,8 +379,7 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	switch t {
 	case core.SimpleType_STRUCT:
 		st := &structpb.Struct{}
-		unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
-		err := unmarshaler.Unmarshal(strings.NewReader(s), st)
+		err := protojson.Unmarshal([]byte(s), st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to load generic type as json.")
 		}

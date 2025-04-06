@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/ptypes"
 
 	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	errors3 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
@@ -35,9 +35,9 @@ var reservationID = datacatalog.ReservationID{
 	TagName:   tagName,
 }
 var heartbeatInterval = time.Second * 5
-var heartbeatIntervalPb = ptypes.DurationProto(heartbeatInterval)
+var heartbeatIntervalPb = durationpb.New(heartbeatInterval)
 var maxHeartbeatInterval = time.Second * 10
-var maxHeartbeatIntervalPb = ptypes.DurationProto(maxHeartbeatInterval)
+var maxHeartbeatIntervalPb = durationpb.New(maxHeartbeatInterval)
 var heartbeatGracePeriodMultiplier = time.Second * 3
 var prevOwner = "prevOwner"
 var currentOwner = "currentOwner"
