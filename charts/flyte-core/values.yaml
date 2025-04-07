@@ -609,6 +609,8 @@ storage:
   bucketName: my-s3-bucket
   # -- settings for storage type s3
   s3:
+    # -- endpoint URL of s3-compatible service
+    endpoint: ""
     region: us-east-1
     # -- type of authentication to use for S3 buckets, can either be iam or accesskey
     authType: iam
