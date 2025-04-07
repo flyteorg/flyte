@@ -41,6 +41,17 @@ metadata:
 secrets:
 - name: flyte-sandbox-minio
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteagent
+    helm.sh/chart: flyteagent-v0.1.10
+  name: flyteagent
+  namespace: flyte
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -803,7 +814,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: NVFDTEFocWFGeDVsaExwMg==
+  haSharedSecret: MHgwVE5zSUp0SjFtelo4RQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -856,6 +867,15 @@ metadata:
     app.kubernetes.io/name: postgresql
     helm.sh/chart: postgresql-12.8.1
   name: flyte-sandbox-postgresql
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+data:
+  username: User
+kind: Secret
+metadata:
+  name: flyteagent
   namespace: flyte
 type: Opaque
 ---
@@ -1098,6 +1118,30 @@ spec:
   type: ClusterIP
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    projectcontour.io/upstream-protocol.h2c: grpc
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteagent
+    helm.sh/chart: flyteagent-v0.1.10
+  name: flyteagent
+  namespace: flyte
+spec:
+  ports:
+  - appProtocol: TCP
+    name: agent-grpc
+    port: 8000
+    protocol: TCP
+    targetPort: agent-grpc
+  selector:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyteagent
+  type: ClusterIP
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
@@ -1201,7 +1245,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 5fe62c9b0516e0ecb197c5739eb9ef5687c3ea2dd97ac0c2aa7c4e950be2798f
+        checksum/configuration: 05809a59cff9f58809def287a3e0d189d4893484168f235062588c07134f8d29
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1367,7 +1411,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 01f243df193398f4dc905bd0bebc79bf640f50270f677a78fe9c775d2ece04c4
+        checksum/secret: d09f61a6d971f120561be80a0068c8f3b11b3c37601de602e4900308c634f74c
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1673,6 +1717,68 @@ spec:
       - configMap:
           name: flyte-sandbox-proxy-config
         name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteagent
+    helm.sh/chart: flyteagent-v0.1.10
+  name: flyteagent
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flyte-sandbox
+      app.kubernetes.io/name: flyteagent
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app.kubernetes.io/instance: flyte-sandbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: flyteagent
+        helm.sh/chart: flyteagent-v0.1.10
+    spec:
+      containers:
+      - command:
+        - pyflyte
+        - serve
+        - agent
+        image: cr.flyte.org/flyteorg/flyteagent:1.15.3
+        imagePullPolicy: IfNotPresent
+        name: flyteagent
+        ports:
+        - containerPort: 8000
+          name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 300Mi
+          requests:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - mountPath: /etc/secrets
+          name: flyteagent
+      securityContext: {}
+      serviceAccountName: flyteagent
+      volumes:
+      - name: flyteagent
+        secret:
+          secretName: flyteagent
 ---
 apiVersion: apps/v1
 kind: StatefulSet
