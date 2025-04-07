@@ -120,7 +120,7 @@ flytepropeller:
 #
 # FLYTE_AGENT
 #
-flyteagent:
+flyteconnector:
   enabled: false
 
 #

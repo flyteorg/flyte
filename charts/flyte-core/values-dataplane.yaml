@@ -19,5 +19,5 @@ datacatalog:
 flyteconsole:
   enabled: false
 
-flyteagent:
+flyteconnector:
   enabled: false

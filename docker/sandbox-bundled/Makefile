@@ -26,7 +26,7 @@ flyte: create_builder
 
 .PHONY: dep_update
 dep_update:
-	helm dependency update ../../charts/flyteagent
+	helm dependency update ../../charts/flyteconnector
 	helm dependency update ../../charts/flyte-binary
 	helm dependency update ../../charts/flyte-sandbox
 

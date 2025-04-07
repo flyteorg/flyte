@@ -863,5 +863,5 @@ daskoperator:
   # --- enable or disable the dask operator deployment installation
   enabled: false
 
-flyteagent:
+flyteconnector:
   enabled: true
