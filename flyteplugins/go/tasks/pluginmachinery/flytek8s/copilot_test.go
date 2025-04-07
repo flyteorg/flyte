@@ -344,6 +344,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		CPU:                  "1024m",
 		Memory:               "1024Mi",
 	}
+	copilot, _ := FlyteCoPilotContainer("x", cfg, []string{"hello"})
 
 	t.Run("dataload-config-nil", func(t *testing.T) {
 		pilot := &core.DataLoadingConfig{}
@@ -360,7 +361,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		pilot := &core.DataLoadingConfig{Enabled: true}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, nil, pilot))
 		assertContainerHasVolumeMounts(t, cfg, pilot, nil, &c)
-		assertContainerHasPTrace(t, &c)
+		assertContainerHasPTrace(t, &copilot)
 	})
 
 	t.Run("happy-iface-empty-config", func(t *testing.T) {
@@ -381,7 +382,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		}
 		pilot := &core.DataLoadingConfig{Enabled: true}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, iface, pilot))
-		assertContainerHasPTrace(t, &c)
+		assertContainerHasPTrace(t, &copilot)
 		assertContainerHasVolumeMounts(t, cfg, pilot, iface, &c)
 	})
 
@@ -407,7 +408,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 			OutputPath: "out",
 		}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, iface, pilot))
-		assertContainerHasPTrace(t, &c)
+		assertContainerHasPTrace(t, &copilot)
 		assertContainerHasVolumeMounts(t, cfg, pilot, iface, &c)
 	})
 
@@ -428,7 +429,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 			OutputPath: "out",
 		}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, iface, pilot))
-		assertContainerHasPTrace(t, &c)
+		assertContainerHasPTrace(t, &copilot)
 		assertContainerHasVolumeMounts(t, cfg, pilot, iface, &c)
 	})
 
@@ -448,7 +449,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 			OutputPath: "out",
 		}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, iface, pilot))
-		assertContainerHasPTrace(t, &c)
+		assertContainerHasPTrace(t, &copilot)
 		assertContainerHasVolumeMounts(t, cfg, pilot, iface, &c)
 	})
 }
