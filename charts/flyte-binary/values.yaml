@@ -168,10 +168,10 @@ configuration:
       repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
       # tag CoPilot sidecar image tag
       tag: 1.15.1  # FLYTECOPILOT_TAG
-  # agentService Flyte Agent configuration
-  agentService:
+  # connectorService Flyte Connector configuration
+  connectorService:
     defaultAgent:
-      endpoint: "k8s://flyteagent.flyte:8000"
+      endpoint: "k8s://flyteconnector.flyte:8000"
       insecure: true
       timeouts:
         GetTask: 10s

@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/r
     go build -tags console -v -o dist/flyte cmd/main.go
 
 
-FROM debian:bookworm-slim
+FROM --platform=linux/amd64 debian:bookworm-slim
 
 ARG FLYTE_VERSION
 ENV FLYTE_VERSION="${FLYTE_VERSION}"
@@ -38,7 +38,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install --no-install-recommends --yes \
         ca-certificates \
         tini \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
 
 # Copy compiled executable into image
 COPY --from=flytebuilder /flyteorg/build/dist/flyte /usr/local/bin/
