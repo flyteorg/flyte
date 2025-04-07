@@ -8,7 +8,7 @@ A Helm chart for Flyte core
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyteagent | flyteagent(flyteagent) | v0.1.10 |
+| file://../flyteconnector | flyteconnector(flyteconnector) | v0.1.10 |
 
 ### Flyte INSTALLATION:
 - [Install helm 3](https://helm.sh/docs/intro/install/)
@@ -210,13 +210,13 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
 | flyteadmin.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
-| flyteagent.enabled | bool | `false` |  |
-| flyteagent.plugin_config.plugins.connector-service | object | `{"defaultConnector":{"endpoint":"k8s://flyteagent.flyte:8000","insecure":true},"supportedTaskTypes":[]}` | Agent service configuration for propeller. |
-| flyteagent.plugin_config.plugins.connector-service.defaultConnector | object | `{"endpoint":"k8s://flyteagent.flyte:8000","insecure":true}` | The default agent service to use for plugin tasks. |
-| flyteagent.plugin_config.plugins.connector-service.defaultConnector.endpoint | string | `"k8s://flyteagent.flyte:8000"` | The agent service endpoint propeller should connect to. |
-| flyteagent.plugin_config.plugins.connector-service.defaultConnector.insecure | bool | `true` | Whether the connection from propeller to the agent service should use TLS. |
-| flyteagent.plugin_config.plugins.connector-service.supportedTaskTypes | list | `[]` | The task types supported by the default agent. As of #5460 these are discovered automatically and don't need to be configured. |
-| flyteagent.podLabels | object | `{}` | Labels for flyteagent pods |
+| flyteconnector.enabled | bool | `false` |  |
+| flyteconnector.plugin_config.plugins.connector-service | object | `{"defaultConnector":{"endpoint":"k8s://flyteconnector.flyte:8000","insecure":true},"supportedTaskTypes":[]}` | Agent service configuration for propeller. |
+| flyteconnector.plugin_config.plugins.connector-service.defaultConnector | object | `{"endpoint":"k8s://flyteconnector.flyte:8000","insecure":true}` | The default agent service to use for plugin tasks. |
+| flyteconnector.plugin_config.plugins.connector-service.defaultConnector.endpoint | string | `"k8s://flyteconnector.flyte:8000"` | The agent service endpoint propeller should connect to. |
+| flyteconnector.plugin_config.plugins.connector-service.defaultConnector.insecure | bool | `true` | Whether the connection from propeller to the agent service should use TLS. |
+| flyteconnector.plugin_config.plugins.connector-service.supportedTaskTypes | list | `[]` | The task types supported by the default agent. As of #5460 these are discovered automatically and don't need to be configured. |
+| flyteconnector.podLabels | object | `{}` | Labels for flyteconnector pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |

@@ -8,7 +8,7 @@ Chart for basic single Flyte executable deployment
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../flyteagent | flyteagent(flyteagent) | v0.1.10 |
+| file://../flyteconnector | flyteconnector(flyteconnector) | v0.1.10 |
 
 ## Values
 
@@ -21,11 +21,6 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
-| configuration.agentService.defaultConnector.defaultTimeout | string | `"10s"` |  |
-| configuration.agentService.defaultConnector.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
-| configuration.agentService.defaultConnector.insecure | bool | `true` |  |
-| configuration.agentService.defaultConnector.timeouts.GetTask | string | `"10s"` |  |
-| configuration.agentService.defaultConnector.timeouts.ListAgents | string | `"3s"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
@@ -43,6 +38,11 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
 | configuration.co-pilot.image.tag | string | `"1.15.1"` |  |
+| configuration.connectorService.defaultConnector.defaultTimeout | string | `"10s"` |  |
+| configuration.connectorService.defaultConnector.endpoint | string | `"k8s://flyteconnector.flyte:8000"` |  |
+| configuration.connectorService.defaultConnector.insecure | bool | `true` |  |
+| configuration.connectorService.defaultConnector.timeouts.GetTask | string | `"10s"` |  |
+| configuration.connectorService.defaultConnector.timeouts.ListAgents | string | `"3s"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -128,7 +128,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |
-| flyteagent.enabled | bool | `false` |  |
+| flyteconnector.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

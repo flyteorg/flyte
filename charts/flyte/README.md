@@ -199,7 +199,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyte.webhook.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | flyte.workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | flyte.workflow_scheduler | object | `{"enabled":true,"type":"native"}` | **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |
-| flyteagent.enabled | bool | `true` |  |
+| flyteconnector.enabled | bool | `true` |  |
 | kubernetes-dashboard.enabled | bool | `true` |  |
 | kubernetes-dashboard.extraArgs[0] | string | `"--enable-skip-login"` |  |
 | kubernetes-dashboard.extraArgs[1] | string | `"--enable-insecure-login"` |  |
