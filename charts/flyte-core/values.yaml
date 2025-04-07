@@ -284,9 +284,9 @@ flyteagent:
   plugin_config:
     plugins:
       # -- Agent service configuration for propeller.
-      agent-service:
+      connector-service:
         # -- The default agent service to use for plugin tasks.
-        defaultAgent:
+        defaultConnector:
           # -- The agent service endpoint propeller should connect to.
           endpoint: "k8s://flyteagent.flyte:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
@@ -883,14 +883,14 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          - connector-service
           - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
           # -- Uncomment to enable task type that uses Flyte Agent
-          # bigquery_query_job_task: agent-service
+          # bigquery_query_job_task: connector-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:

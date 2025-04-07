@@ -87,7 +87,7 @@
 * add cache client read and write otel tracing by @pvditt in https://github.com/flyteorg/flyte/pull/5184
 * Fix FlyteIDL docs link by @neverett in https://github.com/flyteorg/flyte/pull/5199
 * [easy] [flyteagent] Add `ExecuteTaskSync` function timeout setting by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5209
-* [easy] [flyteagent]  Add `agent-service` endpoint settings for `flyte-core` deployment by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5208
+* [easy] [flyteagent]  Add `connector-service` endpoint settings for `flyte-core` deployment by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5208
 * Update Monitoring documentation by @davidmirror-ops in https://github.com/flyteorg/flyte/pull/5206
 * chore: remove obsolete flyte config files by @pingsutw in https://github.com/flyteorg/flyte/pull/5196
 * Generate rust grpc using tonic by @eapolinario in https://github.com/flyteorg/flyte/pull/5187

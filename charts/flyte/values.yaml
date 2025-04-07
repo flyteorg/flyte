@@ -530,13 +530,13 @@ flyte:
             - container
             - sidecar
             - k8s-array
-            - agent-service
+            - connector-service
             - echo
           default-for-task-types:
             container: container
             sidecar: sidecar
             container_array: k8s-array
-            sensor: agent-service
+            sensor: connector-service
 
 
     # -- Kubernetes specific Flyte configuration

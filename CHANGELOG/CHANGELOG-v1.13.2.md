@@ -16,8 +16,8 @@
 * Update "Try Serverless" language in Quickstart guide by @neverett in https://github.com/flyteorg/flyte/pull/5698
 * Refactor flyteadmin to pass proto structs as pointers by @Sovietaced in https://github.com/flyteorg/flyte/pull/5717
 * fix: Use deterministic execution names in scheduler by @pingsutw in https://github.com/flyteorg/flyte/pull/5724
-* [flyteagent] Enable `agent-service` in every configuration  by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5730
-* [Docs][flyteagent] Remove `agent-service` config in flyte agent documentation by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5731
+* [flyteagent] Enable `connector-service` in every configuration  by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5730
+* [Docs][flyteagent] Remove `connector-service` config in flyte agent documentation by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5731
 * Fix flytectl returning the oldest workflow when using --latest flag by @RRap0so in https://github.com/flyteorg/flyte/pull/5716
 * Remove explicit go toolchain versions by @ddl-ebrown in https://github.com/flyteorg/flyte/pull/5723
 * Add listing api to stow storage by @bgedik in https://github.com/flyteorg/flyte/pull/5741

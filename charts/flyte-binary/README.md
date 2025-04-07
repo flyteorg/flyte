@@ -21,11 +21,11 @@ Chart for basic single Flyte executable deployment
 | clusterResourceTemplates.labels | object | `{}` |  |
 | commonAnnotations | object | `{}` |  |
 | commonLabels | object | `{}` |  |
-| configuration.agentService.defaultAgent.defaultTimeout | string | `"10s"` |  |
-| configuration.agentService.defaultAgent.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
-| configuration.agentService.defaultAgent.insecure | bool | `true` |  |
-| configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
-| configuration.agentService.defaultAgent.timeouts.ListAgents | string | `"3s"` |  |
+| configuration.agentService.defaultConnector.defaultTimeout | string | `"10s"` |  |
+| configuration.agentService.defaultConnector.endpoint | string | `"k8s://flyteagent.flyte:8000"` |  |
+| configuration.agentService.defaultConnector.insecure | bool | `true` |  |
+| configuration.agentService.defaultConnector.timeouts.GetTask | string | `"10s"` |  |
+| configuration.agentService.defaultConnector.timeouts.ListAgents | string | `"3s"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
@@ -116,9 +116,9 @@ Chart for basic single Flyte executable deployment
 | deployment.waitForDB.image.repository | string | `"postgres"` |  |
 | deployment.waitForDB.image.tag | string | `"15-alpine"` |  |
 | deployment.waitForDB.securityContext | object | `{}` |  |
-| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service","echo"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
-| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","agent-service","echo"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
-| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
+| enabled_plugins.tasks | object | `{"task-plugins":{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","connector-service","echo"]}}` | Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig) |
+| enabled_plugins.tasks.task-plugins | object | `{"default-for-task-types":{"container":"container","container_array":"k8s-array","sidecar":"sidecar"},"enabled-plugins":["container","sidecar","k8s-array","connector-service","echo"]}` | Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig) |
+| enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","connector-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | flyte-core-components.admin.disableClusterResourceManager | bool | `false` |  |
 | flyte-core-components.admin.disableScheduler | bool | `false` |  |
 | flyte-core-components.admin.disabled | bool | `false` |  |

@@ -1,4 +1,16 @@
 ---
+# Source: flyte-binary/charts/flyteagent/templates/agent/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyteagent-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-binary/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -12,6 +24,16 @@ metadata:
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
   annotations:
+---
+# Source: flyte-binary/charts/flyteagent/templates/agent/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyteagent
+  namespace: flyte
+type: Opaque
+data:
+  username: User
 ---
 # Source: flyte-binary/templates/config-secret.yaml
 apiVersion: v1
@@ -111,7 +133,7 @@ data:
         - container
         - sidecar
         - k8s-array
-        - agent-service
+        - connector-service
         - echo
     plugins:
       logs:
@@ -260,6 +282,31 @@ subjects:
     name: flyte-flyte-binary
     namespace: "flyte"
 ---
+# Source: flyte-binary/charts/flyteagent/templates/agent/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyteagent-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: ClusterIP
+  ports:
+  - name: agent-grpc
+    port: 8000
+    protocol: TCP
+    appProtocol: TCP
+    targetPort: agent-grpc
+  selector: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte-binary/templates/service/grpc.yaml
 apiVersion: v1
 kind: Service
@@ -334,6 +381,70 @@ spec:
     app.kubernetes.io/instance: flyte
     app.kubernetes.io/component: flyte-binary
 ---
+# Source: flyte-binary/charts/flyteagent/templates/agent/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteagent
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyteagent-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: flyteagent
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+      labels: 
+        app.kubernetes.io/name: flyteagent
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyteagent-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+      - command:
+        - pyflyte
+        - serve
+        - agent
+        image: "cr.flyte.org/flyteorg/flyteagent:1.15.3"
+        imagePullPolicy: "IfNotPresent"
+        name: flyteagent
+        volumeMounts:
+        - mountPath: /etc/secrets
+          name: flyteagent
+        ports:
+        - containerPort: 8000
+          name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        securityContext:
+            allowPrivilegeEscalation: false
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 300Mi
+          requests:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 200Mi
+      serviceAccountName: flyteagent
+      volumes:
+      - name: flyteagent
+        secret:
+          secretName: flyteagent
+---
 # Source: flyte-binary/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -363,7 +474,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: 8da18e6203fd4265bfe1120851960fb3a38547b79bbadfc89960e9ab375a0801
+        checksum/configuration: 0f80eb5c980a578f820d95122eaf5833057555a8afe0ccd6a4a100154dac1359
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:

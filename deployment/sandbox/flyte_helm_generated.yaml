@@ -645,13 +645,13 @@ data:
         default-for-task-types:
           container: container
           container_array: k8s-array
-          sensor: agent-service
+          sensor: connector-service
           sidecar: sidecar
         enabled-plugins:
         - container
         - sidecar
         - k8s-array
-        - agent-service
+        - connector-service
         - echo
   k8s.yaml: | 
     plugins:
@@ -7185,7 +7185,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8f119b0c2035e0ef93d1673a3bce8a3104dd57de7e48fefb5dd522590cf2615"
+        configChecksum: "00caff90fc776011e7c475e57e6240134a0521feb0c3ed0f09599489bd1790a"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7261,7 +7261,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: 1.15.1
       annotations:
-        configChecksum: "8f119b0c2035e0ef93d1673a3bce8a3104dd57de7e48fefb5dd522590cf2615"
+        configChecksum: "00caff90fc776011e7c475e57e6240134a0521feb0c3ed0f09599489bd1790a"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
