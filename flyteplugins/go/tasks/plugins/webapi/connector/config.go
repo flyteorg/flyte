@@ -82,7 +82,7 @@ type Config struct {
 	PollInterval config.Duration `json:"pollInterval,omitempty" yaml:"pollInterval,omitempty" pflag:",The interval at which the plugin should poll the connector for metadata updates."`
 
 	// Connector App Logs
-	Logs logs.LogConfig `json:"logs,omitempty" pflag:",Log configuration for connector tasks"`
+	Logs logs.LogConfig `json:"logs,omitempty" yaml:"logs,omitempty" pflag:",Log configuration for connector tasks"`
 }
 
 type Deployment struct {

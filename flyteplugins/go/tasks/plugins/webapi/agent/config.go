@@ -82,7 +82,7 @@ type Config struct {
 	PollInterval config.Duration `json:"pollInterval,omitempty" yaml:"pollInterval,omitempty" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
 
 	// Agent App Logs
-	Logs logs.LogConfig `json:"logs,omitempty" pflag:",Log configuration for agent tasks"`
+	Logs logs.LogConfig `json:"logs,omitempty" yaml:"logs,omitempty" pflag:",Log configuration for agent tasks"`
 }
 
 type Deployment struct {
