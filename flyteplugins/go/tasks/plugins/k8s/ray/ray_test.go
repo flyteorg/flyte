@@ -586,12 +586,14 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			headK8SPod:   &core.K8SPod{},
 			workerK8SPod: &core.K8SPod{},
 			headPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: resourceRequirements,
+				affinity:     &corev1.Affinity{},
+				resources:    resourceRequirements,
+				nodeSelector: map[string]string{},
 			},
 			workerPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: resourceRequirements,
+				affinity:     &corev1.Affinity{},
+				resources:    resourceRequirements,
+				nodeSelector: map[string]string{},
 			},
 		},
 		{
@@ -617,12 +619,14 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 				}),
 			},
 			headPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: expectedHeadResources,
+				affinity:     &corev1.Affinity{},
+				resources:    expectedHeadResources,
+				nodeSelector: map[string]string{},
 			},
 			workerPodAssertions: rayPodAssertions{
-				affinity:  &corev1.Affinity{},
-				resources: expectedWorkerResources,
+				affinity:     &corev1.Affinity{},
+				resources:    expectedWorkerResources,
+				nodeSelector: map[string]string{},
 			},
 		},
 		{
@@ -641,11 +645,13 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 				affinity:         &corev1.Affinity{},
 				resources:        resourceRequirements,
 				runtimeClassName: &nvidiaRuntimeClassName,
+				nodeSelector:     map[string]string{},
 			},
 			workerPodAssertions: rayPodAssertions{
 				affinity:         &corev1.Affinity{},
 				resources:        resourceRequirements,
 				runtimeClassName: &nvidiaRuntimeClassName,
+				nodeSelector:     map[string]string{},
 			},
 		},
 		{
@@ -688,14 +694,16 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 				PodSpec: transformStructToStructPB(t, workerPodSpecCustomTolerations),
 			},
 			headPodAssertions: rayPodAssertions{
-				affinity:    &corev1.Affinity{},
-				resources:   resourceRequirements,
-				tolerations: headTolerations,
+				affinity:     &corev1.Affinity{},
+				resources:    resourceRequirements,
+				tolerations:  headTolerations,
+				nodeSelector: map[string]string{},
 			},
 			workerPodAssertions: rayPodAssertions{
-				affinity:    &corev1.Affinity{},
-				resources:   resourceRequirements,
-				tolerations: workerTolerations,
+				affinity:     &corev1.Affinity{},
+				resources:    resourceRequirements,
+				tolerations:  workerTolerations,
+				nodeSelector: map[string]string{},
 			},
 		},
 		{
@@ -711,12 +719,14 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 				}),
 			},
 			headPodAssertions: rayPodAssertions{
-				affinity:  headAffinity,
-				resources: resourceRequirements,
+				affinity:     headAffinity,
+				resources:    resourceRequirements,
+				nodeSelector: map[string]string{},
 			},
 			workerPodAssertions: rayPodAssertions{
-				affinity:  workerAffinity,
-				resources: resourceRequirements,
+				affinity:     workerAffinity,
+				resources:    resourceRequirements,
+				nodeSelector: map[string]string{},
 			},
 		},
 	}
