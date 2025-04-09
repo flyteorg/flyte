@@ -485,6 +485,7 @@ type rayPodAssertions struct {
 	runtimeClassName *string
 	tolerations      []corev1.Toleration
 	affinity         *corev1.Affinity
+	nodeSelector     map[string]string
 }
 
 func TestBuildResourceRayCustomK8SPod(t *testing.T) {
@@ -648,6 +649,37 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			},
 		},
 		{
+			name: "custom node selector",
+			headK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					NodeSelector: map[string]string{
+						"node-type": "head-node",
+					},
+				}),
+			},
+			workerK8SPod: &core.K8SPod{
+				PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
+					NodeSelector: map[string]string{
+						"node-type": "worker-node",
+					},
+				}),
+			},
+			headPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: resourceRequirements,
+				nodeSelector: map[string]string{
+					"node-type": "head-node",
+				},
+			},
+			workerPodAssertions: rayPodAssertions{
+				affinity:  &corev1.Affinity{},
+				resources: resourceRequirements,
+				nodeSelector: map[string]string{
+					"node-type": "worker-node",
+				},
+			},
+		},
+		{
 			name: "custom tolerations",
 			headK8SPod: &core.K8SPod{
 				PodSpec: transformStructToStructPB(t, headPodSpecCustomTolerations),
@@ -724,6 +756,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 			assert.EqualValues(t, p.headPodAssertions.runtimeClassName, headPodSpec.RuntimeClassName)
 			assert.EqualValues(t, p.headPodAssertions.tolerations, headPodSpec.Tolerations)
 			assert.EqualValues(t, p.headPodAssertions.affinity, headPodSpec.Affinity)
+			assert.EqualValues(t, p.headPodAssertions.nodeSelector, headPodSpec.NodeSelector)
 
 			for _, workerGroupSpec := range rayJob.Spec.RayClusterSpec.WorkerGroupSpecs {
 				workerPodSpec := workerGroupSpec.Template.Spec
@@ -739,6 +772,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 				assert.EqualValues(t, p.workerPodAssertions.runtimeClassName, workerPodSpec.RuntimeClassName)
 				assert.EqualValues(t, p.workerPodAssertions.tolerations, workerPodSpec.Tolerations)
 				assert.EqualValues(t, p.workerPodAssertions.affinity, workerPodSpec.Affinity)
+				assert.EqualValues(t, p.workerPodAssertions.nodeSelector, workerPodSpec.NodeSelector)
 			}
 		})
 	}
