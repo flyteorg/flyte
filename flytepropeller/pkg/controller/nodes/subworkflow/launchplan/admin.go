@@ -3,8 +3,8 @@ package launchplan
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -103,9 +103,9 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
-	var interruptible *wrappers.BoolValue
+	var interruptible *wrapperspb.BoolValue
 	if launchCtx.Interruptible != nil {
-		interruptible = &wrappers.BoolValue{
+		interruptible = &wrapperspb.BoolValue{
 			Value: *launchCtx.Interruptible,
 		}
 	}

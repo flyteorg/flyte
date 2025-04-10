@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
@@ -11,10 +13,8 @@ import (
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -52,7 +52,7 @@ var taskID = &core.Identifier{
 }
 
 var occurredAt = time.Now().UTC()
-var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
+var occurredAtProto = timestamppb.New(occurredAt)
 
 var taskPhase = core.TaskExecution_RUNNING
 
@@ -161,7 +161,7 @@ func TestNewCloudEventsPublisher_EventTypes(t *testing.T) {
 				var currentEventPublisher = NewCloudEventsPublisher(mockPubSubSender, promutils.NewTestScope(), test.eventTypes)
 				var cnt = 0
 				for id, event := range test.events {
-					assert.Nil(t, currentEventPublisher.Publish(context.Background(), proto.MessageName(event),
+					assert.Nil(t, currentEventPublisher.Publish(context.Background(), string(proto.MessageName(event)),
 						event))
 					if test.shouldSendEvent[id] {
 						assert.Equal(t, proto.MessageName(event), testCloudEventPublisher.Published[cnt].Key)
@@ -176,9 +176,9 @@ func TestNewCloudEventsPublisher_EventTypes(t *testing.T) {
 						assert.Equal(t, cloudEvent.Source(), cloudEventSource)
 						assert.Equal(t, cloudEvent.Extensions(), map[string]interface{}{jsonSchemaURLKey: jsonSchemaURL})
 
-						e, err := (&jsonpb.Marshaler{}).MarshalToString(event)
+						e, err := protojson.Marshal(event)
 						assert.Nil(t, err)
-						assert.Equal(t, string(cloudEvent.Data()), e)
+						assert.Equal(t, cloudEvent.Data(), e)
 						cnt++
 					}
 				}
@@ -193,9 +193,9 @@ func TestCloudEventPublisher_PublishError(t *testing.T) {
 	currentEventPublisher := NewCloudEventsPublisher(mockPubSubSender, promutils.NewTestScope(), []string{"*"})
 	testCloudEventPublisher.GivenError = errorPublish
 	assert.Equal(t, errorPublish, currentEventPublisher.Publish(context.Background(),
-		proto.MessageName(taskRequest), taskRequest))
+		string(proto.MessageName(taskRequest)), taskRequest))
 
 	currentEventPublisher = NewCloudEventsPublisher(&mockKafkaSender{}, promutils.NewTestScope(), []string{"*"})
 	assert.Equal(t, errorPublish, currentEventPublisher.Publish(context.Background(),
-		proto.MessageName(taskRequest), taskRequest))
+		string(proto.MessageName(taskRequest)), taskRequest))
 }

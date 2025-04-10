@@ -9,8 +9,8 @@ import (
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"

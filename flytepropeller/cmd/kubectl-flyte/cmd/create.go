@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"

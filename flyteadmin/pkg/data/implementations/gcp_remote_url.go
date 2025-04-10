@@ -2,11 +2,11 @@ package implementations
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	credentials "cloud.google.com/go/iam/credentials/apiv1"
 	gcs "cloud.google.com/go/storage"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	gax "github.com/googleapis/gax-go/v2"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
@@ -164,7 +164,7 @@ func (ts impersonationTokenSource) Token() (*oauth2.Token, error) {
 	}, nil
 }
 
-func asTime(t *timestamp.Timestamp) time.Time {
+func asTime(t *timestamppb.Timestamp) time.Time {
 	return time.Unix(t.GetSeconds(), int64(t.GetNanos())).UTC()
 }
 

@@ -3,10 +3,9 @@ package array
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"strconv"
 	"time"
-
-	"github.com/golang/protobuf/ptypes"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -164,10 +163,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
 
 	// build TaskExecutionEvent
-	occurredAt, err := ptypes.TimestampProto(time.Now())
-	if err != nil {
-		return err
-	}
+	occurredAt := timestamppb.New(time.Now())
 
 	var taskID *idlcore.Identifier
 	subNode := nCtx.Node().GetArrayNode().GetSubNodeSpec()
@@ -351,7 +347,7 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	taskPhase idlcore.TaskExecution_Phase, eventRecorder interfaces.EventRecorder, eventConfig *config.EventConfig) error {
 
 	subNodeID := buildSubNodeID(nCtx, index)
-	timestamp := ptypes.TimestampNow()
+	timestamp := timestamppb.Now()
 	workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
 
 	// Extract dynamic chain information.

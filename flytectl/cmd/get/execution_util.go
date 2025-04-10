@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	"gopkg.in/yaml.v3"
 )
 

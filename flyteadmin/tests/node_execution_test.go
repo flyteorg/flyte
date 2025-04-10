@@ -11,10 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -43,7 +42,7 @@ func TestCreateNodeExecution(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
@@ -76,7 +75,7 @@ func TestCreateNodeExecutionWithParent(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
@@ -147,7 +146,7 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	defer conn.Close()
 
 	beganRunningAt := time.Now()
-	beganRunningAtProto, _ := ptypes.TimestampProto(beganRunningAt)
+	beganRunningAtProto, _ := timestamppb.New(beganRunningAt)
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
@@ -163,7 +162,7 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 
 	// Create another node execution to assert that we only (and successfully) update the desired node execution.
 	otherBeganRunningAt := beganRunningAt.Add(10 * time.Second)
-	otherBeganRunningAtProto, _ := ptypes.TimestampProto(otherBeganRunningAt)
+	otherBeganRunningAtProto, _ := timestamppb.New(otherBeganRunningAt)
 	otherNodeExecutionID := &core.NodeExecutionIdentifier{
 		NodeId: "other node",
 		ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -186,7 +185,7 @@ func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	assert.Nil(t, err)
 
 	succeededAt := beganRunningAt.Add(time.Minute)
-	succeededAtProto, _ := ptypes.TimestampProto(succeededAt)
+	succeededAtProto, _ := timestamppb.New(succeededAt)
 	outputURI := "output uri"
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
@@ -232,7 +231,7 @@ func TestCreateAndListNodeExecutions(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 	_, err := client.CreateWorkflowEvent(ctx, &admin.WorkflowExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.WorkflowExecutionEvent{
@@ -286,7 +285,7 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
 		Event: &event.NodeExecutionEvent{
@@ -399,7 +398,7 @@ func TestCreateChildNodeExecutionForTaskExecution(t *testing.T) {
 	defer conn.Close()
 
 	occurredAt := time.Now()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto, _ := timestamppb.New(occurredAt)
 
 	createTaskAndNodeExecution(ctx, t, client, conn, occurredAtProto)
 
@@ -416,7 +415,7 @@ func TestCreateChildNodeExecutionForTaskExecution(t *testing.T) {
 	assert.Nil(t, err)
 
 	childOccurredAt := occurredAt.Add(time.Minute)
-	childOccurredAtProto, _ := ptypes.TimestampProto(childOccurredAt)
+	childOccurredAtProto, _ := timestamppb.New(childOccurredAt)
 	childNodeExecutionID := &core.NodeExecutionIdentifier{
 		NodeId: "child_node",
 		ExecutionId: &core.WorkflowExecutionIdentifier{

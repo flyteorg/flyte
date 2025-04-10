@@ -3,16 +3,15 @@ package transformers
 import (
 	"context"
 	"fmt"
-	"math"
-	"strings"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -114,7 +113,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
 
-		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedCreatedAt := timestamppb.New(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
 			Phase:      core.WorkflowExecution_UNDEFINED,
 			CreatedAt:  expectedCreatedAt,
@@ -173,7 +172,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
 
-		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedCreatedAt := timestamppb.New(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
 			OutputResult: &admin.ExecutionClosure_Error{
@@ -239,7 +238,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
 
-		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedCreatedAt := timestamppb.New(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
 			OutputResult: &admin.ExecutionClosure_Error{
@@ -305,7 +304,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, expectedSpecBytes, execution.Spec)
 		assert.Equal(t, execution.User, principal)
 
-		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedCreatedAt := timestamppb.New(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
 			OutputResult: &admin.ExecutionClosure_Error{
@@ -331,7 +330,7 @@ func TestCreateExecutionModel(t *testing.T) {
 func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 
 	createdAt := time.Date(2018, 10, 29, 16, 0, 0, 0, time.UTC)
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	existingClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
@@ -348,7 +347,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
 
 	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 	err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase:      core.WorkflowExecution_RUNNING,
@@ -389,7 +388,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 
 func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	startedAt := time.Now()
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	existingClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
@@ -407,7 +406,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
 	duration := time.Minute
 	occurredAt := startedAt.Add(duration).UTC()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 	executionError := core.ExecutionError{
 		Code:    ec,
 		Kind:    ek,
@@ -425,7 +424,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	assert.Nil(t, err)
 
 	ekString := ek.String()
-	durationProto := ptypes.DurationProto(duration)
+	durationProto := durationpb.New(duration)
 	expectedClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
@@ -464,7 +463,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 
 func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	startedAt := time.Now()
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	existingClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
@@ -479,9 +478,9 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	executionModel := getRunningExecutionModel(specBytes, existingClosureBytes, startedAt)
 	duration := time.Minute
-	durationProto := ptypes.DurationProto(duration)
+	durationProto := durationpb.New(duration)
 	occurredAt := startedAt.Add(duration).UTC()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 
 	expectedModel := models.Execution{
 		ExecutionKey: models.ExecutionKey{
@@ -697,8 +696,8 @@ func TestFromExecutionModel(t *testing.T) {
 	phase := core.WorkflowExecution_RUNNING.String()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
 	createdAt := time.Date(2022, 01, 18, 0, 0, 0, 0, time.UTC)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	startedAtProto := timestamppb.New(startedAt)
+	createdAtProto := timestamppb.New(createdAt)
 	closure := admin.ExecutionClosure{
 		ComputedInputs: spec.GetInputs(),
 		Phase:          core.WorkflowExecution_RUNNING,
@@ -852,10 +851,10 @@ func TestFromExecutionModels(t *testing.T) {
 	phase := core.WorkflowExecution_SUCCEEDED.String()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
 	createdAt := time.Date(2022, 01, 18, 0, 0, 0, 0, time.UTC)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	startedAtProto := timestamppb.New(startedAt)
+	createdAtProto := timestamppb.New(createdAt)
 	duration := 2 * time.Minute
-	durationProto := ptypes.DurationProto(duration)
+	durationProto := durationpb.New(duration)
 	closure := admin.ExecutionClosure{
 		ComputedInputs: spec.GetInputs(),
 		Phase:          core.WorkflowExecution_RUNNING,
@@ -904,7 +903,7 @@ func TestFromExecutionModels(t *testing.T) {
 
 func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	createdAt := time.Date(2018, 10, 29, 16, 0, 0, 0, time.UTC)
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	existingClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
@@ -923,7 +922,7 @@ func TestUpdateModelState_WithClusterInformation(t *testing.T) {
 	altCluster := "C2"
 	executionModel.Cluster = testCluster
 	occurredAt := time.Date(2018, 10, 29, 16, 10, 0, 0, time.UTC)
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 	t.Run("update", func(t *testing.T) {
 		executionModel.Cluster = altCluster
 		err := UpdateExecutionModelState(context.TODO(), &executionModel, &admin.WorkflowExecutionEventRequest{
@@ -1029,7 +1028,7 @@ func TestReassignCluster(t *testing.T) {
 
 func TestGetExecutionStateFromModel(t *testing.T) {
 	createdAt := time.Date(2022, 01, 90, 16, 0, 0, 0, time.UTC)
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 
 	t.Run("supporting older executions", func(t *testing.T) {
 		executionModel := models.Execution{
@@ -1044,26 +1043,14 @@ func TestGetExecutionStateFromModel(t *testing.T) {
 		assert.NotNil(t, executionStatus.GetOccurredAt())
 		assert.Equal(t, createdAtProto, executionStatus.GetOccurredAt())
 	})
-	t.Run("incorrect created at", func(t *testing.T) {
-		createdAt := time.Unix(math.MinInt64, math.MinInt32).UTC()
-		executionModel := models.Execution{
-			BaseModel: models.BaseModel{
-				CreatedAt: createdAt,
-			},
-		}
-		executionStatus, err := PopulateDefaultStateChangeDetails(executionModel)
-		assert.NotNil(t, err)
-		assert.Nil(t, executionStatus)
-	})
 }
 
 func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 	t.Run("empty closure", func(t *testing.T) {
 		execModel := &models.Execution{}
 		stateUpdatedAt := time.Now()
-		statetUpdateAtProto, err := ptypes.TimestampProto(stateUpdatedAt)
-		assert.Nil(t, err)
-		err = UpdateExecutionModelStateChangeDetails(execModel, admin.ExecutionState_EXECUTION_ARCHIVED,
+		statetUpdateAtProto := timestamppb.New(stateUpdatedAt)
+		err := UpdateExecutionModelStateChangeDetails(execModel, admin.ExecutionState_EXECUTION_ARCHIVED,
 			stateUpdatedAt, "dummyUser")
 		assert.Nil(t, err)
 		stateInt := int32(admin.ExecutionState_EXECUTION_ARCHIVED)
@@ -1086,14 +1073,6 @@ func TestUpdateExecutionModelStateChangeDetails(t *testing.T) {
 			time.Now(), "dummyUser")
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "Failed to unmarshal execution closure")
-	})
-	t.Run("bad stateUpdatedAt time", func(t *testing.T) {
-		execModel := &models.Execution{}
-		badTimeData := time.Unix(math.MinInt64, math.MinInt32).UTC()
-		err := UpdateExecutionModelStateChangeDetails(execModel, admin.ExecutionState_EXECUTION_ARCHIVED,
-			badTimeData, "dummyUser")
-		assert.NotNil(t, err)
-		assert.False(t, strings.Contains(err.Error(), "Failed to unmarshal execution closure"))
 	})
 }
 

@@ -3,9 +3,9 @@ package validators
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"

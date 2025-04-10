@@ -3,12 +3,11 @@ package utils
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -90,14 +89,11 @@ func GetWorkflowIDFromOwner(reference *metav1.OwnerReference, namespace string) 
 	return "", NotTheOwnerError
 }
 
-func GetProtoTime(t *metav1.Time) *timestamp.Timestamp {
+func GetProtoTime(t *metav1.Time) *timestamppb.Timestamp {
 	if t != nil {
-		pTime, err := ptypes.TimestampProto(t.Time)
-		if err == nil {
-			return pTime
-		}
+		return timestamppb.New(t.Time)
 	}
-	return ptypes.TimestampNow()
+	return timestamppb.Now()
 }
 
 // SanitizeLabelValue ensures that the label value is a valid DNS-1123 string

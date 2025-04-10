@@ -19,9 +19,9 @@ package nodes
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -927,7 +927,7 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 		err := nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 			Id:         nodeExecutionID,
 			Phase:      core.NodeExecution_ABORTED,
-			OccurredAt: ptypes.TimestampNow(),
+			OccurredAt: timestamppb.Now(),
 			OutputResult: &event.NodeExecutionEvent_Error{
 				Error: &core.ExecutionError{
 					Code:    "NodeAborted",
@@ -935,7 +935,7 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 				},
 			},
 			ProducerId:       c.clusterID,
-			ReportedAt:       ptypes.TimestampNow(),
+			ReportedAt:       timestamppb.Now(),
 			IsInDynamicChain: dynamic,
 			TargetEntity:     targetEntity,
 		}, c.eventConfig)
@@ -1295,14 +1295,14 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 				err = nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 					Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 					Phase:      core.NodeExecution_FAILED,
-					OccurredAt: ptypes.TimestampNow(),
+					OccurredAt: timestamppb.Now(),
 					OutputResult: &event.NodeExecutionEvent_Error{
 						Error: &core.ExecutionError{
 							Code:    "NodeFailed",
 							Message: err.Error(),
 						},
 					},
-					ReportedAt:       ptypes.TimestampNow(),
+					ReportedAt:       timestamppb.Now(),
 					IsInDynamicChain: dynamic,
 					TargetEntity:     targetEntity,
 				}, c.eventConfig)

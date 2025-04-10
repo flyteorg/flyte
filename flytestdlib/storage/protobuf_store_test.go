@@ -9,10 +9,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	errs "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/stow/s3"

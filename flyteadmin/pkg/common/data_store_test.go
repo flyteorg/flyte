@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	errs "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"

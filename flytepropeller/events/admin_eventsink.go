@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -47,12 +47,12 @@ func NewAdminEventSink(ctx context.Context, adminClient service.AdminServiceClie
 
 // Sends events to the FlyteAdmin service through gRPC
 func (s *adminEventSink) Sink(ctx context.Context, message proto.Message) error {
-	logger.Debugf(ctx, "AdminEventSink received a new event %s", message.String())
+	logger.Debugf(ctx, "AdminEventSink received a new event %+v", message)
 
 	// Short-circuit if event has already been sent
 	id, err := IDFromMessage(message)
 	if err != nil {
-		return fmt.Errorf("Failed to parse message id [%v]", message.String())
+		return fmt.Errorf("Failed to parse message id [%+v]", message)
 	}
 
 	if s.filter.Contains(ctx, id) {
@@ -95,7 +95,7 @@ func (s *adminEventSink) Sink(ctx context.Context, message proto.Message) error 
 				return errors.WrapError(err)
 			}
 		default:
-			return fmt.Errorf("unknown event type [%s]", eventMessage.String())
+			return fmt.Errorf("unknown event type [%+v]", eventMessage)
 		}
 	} else {
 		return &errors.EventError{Code: errors.ResourceExhausted,
@@ -128,7 +128,7 @@ func IDFromMessage(message proto.Message) ([]byte, error) {
 		wid := nid.GetExecutionId()
 		id = fmt.Sprintf("%s:%s:%s:%s:%s:%s:%d:%d:%d", wid.GetProject(), wid.GetDomain(), wid.GetName(), nid.GetNodeId(), tid.GetName(), tid.GetVersion(), eventMessage.GetRetryAttempt(), eventMessage.GetPhase(), eventMessage.GetPhaseVersion())
 	default:
-		return nil, fmt.Errorf("unknown event type [%s]", eventMessage.String())
+		return nil, fmt.Errorf("unknown event type [%+v]", eventMessage)
 	}
 
 	return []byte(id), nil

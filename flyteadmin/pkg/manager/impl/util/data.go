@@ -3,7 +3,7 @@ package util
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/golang/protobuf/ptypes/duration"
+	"google.golang.org/protobuf/ptypes/duration"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 

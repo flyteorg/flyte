@@ -4,9 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/grpc/codes"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -87,14 +84,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			logger.Debugf(ctx, "Determining quality of service from execution spec for [%s/%s/%s]",
 				input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
 				input.ExecutionCreateRequest.GetName())
-			duration, err := ptypes.Duration(input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget())
-			if err != nil {
-				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Invalid custom quality of service set in create execution request [%s/%s/%s], failed to parse duration [%v] with: %v",
-					input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
-					input.ExecutionCreateRequest.GetName(),
-					input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget(), err)
-			}
+			duration := input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget().AsDuration()
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
 			}, nil
@@ -105,13 +95,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			logger.Debugf(ctx, "Determining quality of service from launch plan spec for [%s/%s/%s]",
 				input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
 				input.ExecutionCreateRequest.GetName())
-			duration, err := ptypes.Duration(input.LaunchPlan.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget())
-			if err != nil {
-				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Invalid custom quality of service set in launch plan [%v], failed to parse duration [%v] with: %v",
-					input.LaunchPlan.GetId(),
-					input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget(), err)
-			}
+			duration := input.LaunchPlan.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget().AsDuration()
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
 			}, nil
@@ -123,13 +107,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
 			input.ExecutionCreateRequest.GetName())
 		if input.Workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetMetadata().GetQualityOfService().GetSpec() != nil {
-			duration, err := ptypes.Duration(input.Workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetMetadata().GetQualityOfService().GetSpec().GetQueueingBudget())
-			if err != nil {
-				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Invalid custom quality of service set in workflow [%v], failed to parse duration [%v] with: %v",
-					workflowIdentifier,
-					input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget(), err)
-			}
+			duration := input.Workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetMetadata().GetQualityOfService().GetSpec().GetQueueingBudget().AsDuration()
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
 			}, nil
@@ -148,13 +126,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 			logger.Debugf(ctx, "Determining quality of service from spec database override for [%s/%s/%s]",
 				input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
 				input.ExecutionCreateRequest.GetName())
-			duration, err := ptypes.Duration(qualityOfService.GetSpec().GetQueueingBudget())
-			if err != nil {
-				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					"Invalid custom quality of service set in overridable matching attributes for [%v],"+
-						"failed to parse duration [%v] with: %v", workflowIdentifier,
-					input.ExecutionCreateRequest.GetSpec().GetQualityOfService().GetSpec().GetQueueingBudget(), err)
-			}
+			duration := qualityOfService.GetSpec().GetQueueingBudget().AsDuration()
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
 			}, nil
@@ -188,7 +160,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 		input.ExecutionCreateRequest.GetProject(), input.ExecutionCreateRequest.GetDomain(),
 		input.ExecutionCreateRequest.GetName(), qualityOfServiceTier)
 	// Config values should always be vetted so there's no need to check the error from conversion.
-	duration, _ := ptypes.Duration(executionValues.GetQueueingBudget())
+	duration := executionValues.GetQueueingBudget().AsDuration()
 
 	return QualityOfServiceSpec{
 		QueuingBudget: duration,

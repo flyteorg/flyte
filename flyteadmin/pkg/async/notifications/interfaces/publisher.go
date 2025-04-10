@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 //go:generate mockery --name=Publisher --output=../mocks --case=underscore --with-expecter

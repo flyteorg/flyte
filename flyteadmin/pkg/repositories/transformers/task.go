@@ -2,9 +2,9 @@
 package transformers
 
 import (
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -45,10 +45,7 @@ func FromTaskModel(taskModel models.Task) (admin.Task, error) {
 		return admin.Task{}, errors.NewFlyteAdminError(codes.Internal, "failed to unmarshal closure")
 	}
 
-	createdAt, err := ptypes.TimestampProto(taskModel.CreatedAt)
-	if err != nil {
-		return admin.Task{}, errors.NewFlyteAdminErrorf(codes.Internal, "failed to serialize created at")
-	}
+	createdAt := timestamppb.New(taskModel.CreatedAt)
 	taskClosure.CreatedAt = createdAt
 	id := core.Identifier{
 		ResourceType: core.ResourceType_TASK,

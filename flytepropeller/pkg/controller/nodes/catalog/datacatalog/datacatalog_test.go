@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/datacatalog/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -263,7 +263,7 @@ func TestCatalog_Get(t *testing.T) {
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
-		createdAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -61))
+		createdAt, err := timestamppb.New(time.Now().Add(time.Minute * -61))
 		assert.NoError(t, err)
 
 		sampleArtifact := &datacatalog.Artifact{
@@ -313,7 +313,7 @@ func TestCatalog_Get(t *testing.T) {
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
-		createdAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -59))
+		createdAt, err := timestamppb.New(time.Now().Add(time.Minute * -59))
 		assert.NoError(t, err)
 
 		sampleArtifact := &datacatalog.Artifact{

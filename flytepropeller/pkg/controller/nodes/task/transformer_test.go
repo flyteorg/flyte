@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/ptypes"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -46,7 +46,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		NodeExecutionId: nodeID,
 	}
 	n := time.Now()
-	np, _ := ptypes.TimestampProto(n)
+	np, _ := timestamppb.New(n)
 
 	in := &mocks.InputFilePaths{}
 	const inputPath = "in"
@@ -238,7 +238,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 		NodeExecutionId: nodeID,
 	}
 	n := time.Now()
-	np, _ := ptypes.TimestampProto(n)
+	np, _ := timestamppb.New(n)
 
 	in := &mocks.InputFilePaths{}
 	const inputPath = "in"

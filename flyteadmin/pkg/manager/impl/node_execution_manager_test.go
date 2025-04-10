@@ -4,16 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -36,7 +36,7 @@ import (
 )
 
 var occurredAt = time.Now().UTC()
-var occurredAtProto, _ = ptypes.TimestampProto(occurredAt)
+var occurredAtProto = timestamppb.New(occurredAt)
 
 var dynamicWorkflowClosure = &core.CompiledWorkflowClosure{
 	Primary: &core.CompiledWorkflow{

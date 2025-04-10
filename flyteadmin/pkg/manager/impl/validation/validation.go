@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"

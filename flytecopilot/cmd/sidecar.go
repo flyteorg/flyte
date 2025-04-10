@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
 	"github.com/flyteorg/flyte/flytecopilot/data"

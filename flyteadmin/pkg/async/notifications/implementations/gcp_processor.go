@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"

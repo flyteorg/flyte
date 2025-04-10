@@ -2,17 +2,17 @@
 package testutils
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var MockCreatedAtValue = time.Date(2018, time.February, 17, 00, 00, 00, 00, time.UTC).UTC()
-var MockCreatedAtProto, _ = ptypes.TimestampProto(MockCreatedAtValue)
+var MockCreatedAtProto = timestamppb.New(MockCreatedAtValue)
 
 func GetTaskClosure() *admin.TaskClosure {
 	return &admin.TaskClosure{

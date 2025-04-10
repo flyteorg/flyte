@@ -1,12 +1,12 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -48,7 +48,7 @@ func TestCreateWorkflowEmptyInterface(t *testing.T) {
 
 func TestFromWorkflowModel(t *testing.T) {
 	createdAt := time.Now()
-	createdAtProto, _ := ptypes.TimestampProto(createdAt)
+	createdAtProto := timestamppb.New(createdAt)
 	workflowModel := models.Workflow{
 		BaseModel: models.BaseModel{
 			CreatedAt: createdAt,
@@ -90,10 +90,10 @@ func TestFromWorkflowModel(t *testing.T) {
 
 func TestFromWorkflowModels(t *testing.T) {
 	createdAtA := time.Now()
-	createdAtAProto, _ := ptypes.TimestampProto(createdAtA)
+	createdAtAProto := timestamppb.New(createdAtA)
 
 	createdAtB := createdAtA.Add(time.Hour)
-	createdAtBProto, _ := ptypes.TimestampProto(createdAtB)
+	createdAtBProto := timestamppb.New(createdAtB)
 
 	workflowModels := []models.Workflow{
 		{

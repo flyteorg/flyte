@@ -14,12 +14,12 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
 	"github.com/landoop/tableprinter"
 	"github.com/pkg/browser"
 	"github.com/yalp/jsonpath"
+	"google.golang.org/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/yaml"
 )
 

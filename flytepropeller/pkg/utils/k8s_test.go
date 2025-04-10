@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/ptypes"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -32,7 +32,7 @@ func TestToK8sEnvVar(t *testing.T) {
 func TestGetProtoTime(t *testing.T) {
 	assert.NotNil(t, GetProtoTime(nil))
 	n := time.Now()
-	nproto, err := ptypes.TimestampProto(n)
+	nproto, err := timestamppb.New(n)
 	assert.NoError(t, err)
 	assert.Equal(t, nproto, GetProtoTime(&metav1.Time{Time: n}))
 }

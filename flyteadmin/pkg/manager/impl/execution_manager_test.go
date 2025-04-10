@@ -4,20 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -370,13 +370,13 @@ func TestCreateExecution(t *testing.T) {
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
 	qosProvider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
-			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+			QueueingBudget: durationpb.New(10 * time.Minute),
 		},
 		core.QualityOfService_MEDIUM: {
-			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+			QueueingBudget: durationpb.New(20 * time.Minute),
 		},
 		core.QualityOfService_LOW: {
-			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+			QueueingBudget: durationpb.New(30 * time.Minute),
 		},
 	})
 
@@ -647,13 +647,13 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
 	qosProvider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
-			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+			QueueingBudget: durationpb.New(10 * time.Minute),
 		},
 		core.QualityOfService_MEDIUM: {
-			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+			QueueingBudget: durationpb.New(20 * time.Minute),
 		},
 		core.QualityOfService_LOW: {
-			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+			QueueingBudget: durationpb.New(30 * time.Minute),
 		},
 	})
 
@@ -1029,7 +1029,7 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 			if tt.interruptible == nil {
 				request.Spec.Interruptible = nil
 			} else {
-				request.Spec.Interruptible = &wrappers.BoolValue{Value: *tt.interruptible}
+				request.Spec.Interruptible = &wrapperspb.BoolValue{Value: *tt.interruptible}
 			}
 
 			repository := getMockRepositoryForExecTest()
@@ -1343,7 +1343,7 @@ func makeExecutionInterruptibleGetFunc(
 		if interruptible == nil {
 			request.Spec.Interruptible = nil
 		} else {
-			request.Spec.Interruptible = &wrappers.BoolValue{Value: *interruptible}
+			request.Spec.Interruptible = &wrapperspb.BoolValue{Value: *interruptible}
 		}
 
 		specBytes, err := proto.Marshal(request.GetSpec())
@@ -1446,7 +1446,7 @@ func TestRelaunchExecution(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -1545,7 +1545,7 @@ func TestRelaunchExecution_CreateFailure(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -1585,7 +1585,7 @@ func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -1636,7 +1636,7 @@ func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -1759,7 +1759,7 @@ func TestRelaunchExecutionEnvsOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -1811,7 +1811,7 @@ func TestRecoverExecution(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -1870,7 +1870,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -2018,7 +2018,7 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -2052,7 +2052,7 @@ func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -2115,7 +2115,7 @@ func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -2176,7 +2176,7 @@ func TestRecoverExecutionEnvsOverride(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_SUCCEEDED,
 		StartedAt: startTimeProto,
@@ -2229,9 +2229,9 @@ func TestRecoverExecutionEnvsOverride(t *testing.T) {
 func TestCreateWorkflowEvent(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	duration := time.Second
-	durationProto := ptypes.DurationProto(duration)
+	durationProto := durationpb.New(duration)
 	existingClosure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startTimeProto,
@@ -2244,7 +2244,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	endTime := startTime.Add(duration)
-	occurredAt, _ := ptypes.TimestampProto(endTime)
+	occurredAt := timestamppb.New(endTime)
 	closure := admin.ExecutionClosure{
 		Phase:     core.WorkflowExecution_FAILED,
 		StartedAt: startTimeProto,
@@ -2446,7 +2446,7 @@ func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	occurredAt := time.Now().UTC()
-	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtProto := timestamppb.New(occurredAt)
 	executionGetFunc := makeExecutionGetFunc(t, closureBytes, nil)
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 
@@ -2476,7 +2476,7 @@ func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
-	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtTimestamp := timestamppb.New(occurredAt)
 	request := &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
@@ -2524,7 +2524,7 @@ func TestCreateWorkflowEvent_DuplicateRunning(t *testing.T) {
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
-	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtTimestamp := timestamppb.New(occurredAt)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
@@ -2567,7 +2567,7 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
-	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtTimestamp := timestamppb.New(occurredAt)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
@@ -2619,7 +2619,7 @@ func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
 
-	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtTimestamp := timestamppb.New(occurredAt)
 	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
 	request := &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
@@ -2678,7 +2678,7 @@ func TestCreateWorkflowEvent_UpdateModelError(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	duration := time.Second
 	endTime := startTime.Add(duration)
-	occurredAt, _ := ptypes.TimestampProto(endTime)
+	occurredAt := timestamppb.New(endTime)
 	executionError := core.ExecutionError{
 		Code:    "foo",
 		Message: "bar baz",
@@ -2714,7 +2714,7 @@ func TestCreateWorkflowEvent_DatabaseGetError(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	duration := time.Second
 	endTime := startTime.Add(duration)
-	occurredAt, _ := ptypes.TimestampProto(endTime)
+	occurredAt := timestamppb.New(endTime)
 	executionError := core.ExecutionError{
 		Code:    "foo",
 		Message: "bar baz",
@@ -2744,7 +2744,7 @@ func TestCreateWorkflowEvent_DatabaseUpdateError(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	duration := time.Second
 	endTime := startTime.Add(duration)
-	occurredAt, _ := ptypes.TimestampProto(endTime)
+	occurredAt := timestamppb.New(endTime)
 	executionError := core.ExecutionError{
 		Code:    "foo",
 		Message: "bar baz",
@@ -2803,7 +2803,7 @@ func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
-	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
+	occurredAtTimestamp := timestamppb.New(occurredAt)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
@@ -3940,7 +3940,7 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	startTime := time.Now()
-	startTimeProto, _ := ptypes.TimestampProto(startTime)
+	startTimeProto := timestamppb.New(startTime)
 	existingClosure := getLegacyClosure()
 	existingClosure.Phase = core.WorkflowExecution_RUNNING
 	existingClosure.StartedAt = startTimeProto
@@ -4391,7 +4391,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
 		func(input interfaces.Identifier) (models.Task, error) {
 			createdAt := time.Now()
-			createdAtProto, _ := ptypes.TimestampProto(createdAt)
+			createdAtProto := timestamppb.New(createdAt)
 			taskClosure := &admin.TaskClosure{
 				CompiledTask: &core.CompiledTask{
 					Template: &core.TaskTemplate{
@@ -4403,7 +4403,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 								Version: "0.6.2",
 								Flavor:  "python",
 							},
-							Timeout: ptypes.DurationProto(time.Second),
+							Timeout: durationpb.New(time.Second),
 						},
 						Interface: &core.TypedInterface{
 							Inputs: &core.VariableMap{
@@ -4549,8 +4549,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		},
 	}
 
-	marshaller := jsonpb.Marshaler{}
-	_, ferr := marshaller.MarshalToString(request)
+	_, ferr := protojson.Marshal(request)
 	assert.NoError(t, ferr)
 
 	// test once to create an initial launchplan
@@ -4617,7 +4616,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
 					WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
 						MaxParallelism: rmMaxParallelism,
-						Interruptible:  &wrappers.BoolValue{Value: rmInterruptible},
+						Interruptible:  &wrapperspb.BoolValue{Value: rmInterruptible},
 						OverwriteCache: rmOverwriteCache,
 						Annotations:    &admin.Annotations{Values: rmAnnotations},
 						RawOutputDataConfig: &admin.RawOutputDataConfig{
@@ -4667,7 +4666,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 				MaxParallelism: requestMaxParallelism,
-				Interruptible:  &wrappers.BoolValue{Value: requestInterruptible},
+				Interruptible:  &wrapperspb.BoolValue{Value: requestInterruptible},
 				OverwriteCache: requestOverwriteCache,
 				Envs:           &admin.Envs{Values: requestEnvironmentVariables},
 			},
@@ -4712,7 +4711,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 				MaxParallelism: launchPlanMaxParallelism,
-				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
+				Interruptible:  &wrapperspb.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
 				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
@@ -4752,7 +4751,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 				MaxParallelism: launchPlanMaxParallelism,
-				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
+				Interruptible:  &wrapperspb.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
 				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
@@ -4786,7 +4785,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					},
 				},
 				MaxParallelism: launchPlanMaxParallelism,
-				Interruptible:  &wrappers.BoolValue{Value: launchPlanInterruptible},
+				Interruptible:  &wrapperspb.BoolValue{Value: launchPlanInterruptible},
 				OverwriteCache: launchPlanOverwriteCache,
 				Envs:           &admin.Envs{Values: launchPlanEnvironmentVariables},
 			},
@@ -5008,7 +5007,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
 						WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
 							MaxParallelism: 300,
-							Interruptible:  &wrappers.BoolValue{Value: true},
+							Interruptible:  &wrapperspb.BoolValue{Value: true},
 							OverwriteCache: true,
 							SecurityContext: &core.SecurityContext{
 								RunAs: &core.Identity{
@@ -5111,7 +5110,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
 				Spec: &admin.ExecutionSpec{
-					Interruptible: &wrappers.BoolValue{Value: false},
+					Interruptible: &wrapperspb.BoolValue{Value: false},
 				},
 			}
 
@@ -5135,7 +5134,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
 				Spec: &admin.ExecutionSpec{
-					Interruptible: &wrappers.BoolValue{Value: true},
+					Interruptible: &wrapperspb.BoolValue{Value: true},
 				},
 			}
 
@@ -5185,7 +5184,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 
 			launchPlan := &admin.LaunchPlan{
 				Spec: &admin.LaunchPlanSpec{
-					Interruptible: &wrappers.BoolValue{Value: false},
+					Interruptible: &wrapperspb.BoolValue{Value: false},
 				},
 			}
 
@@ -5213,7 +5212,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 
 			launchPlan := &admin.LaunchPlan{
 				Spec: &admin.LaunchPlanSpec{
-					Interruptible: &wrappers.BoolValue{Value: true},
+					Interruptible: &wrapperspb.BoolValue{Value: true},
 					Envs:          &admin.Envs{Values: []*core.KeyValuePair{{Key: "foo", Value: "bar"}}},
 				},
 			}
@@ -5267,13 +5266,13 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				Project: workflowIdentifier.GetProject(),
 				Domain:  workflowIdentifier.GetDomain(),
 				Spec: &admin.ExecutionSpec{
-					Interruptible: &wrappers.BoolValue{Value: true},
+					Interruptible: &wrapperspb.BoolValue{Value: true},
 				},
 			}
 
 			launchPlan := &admin.LaunchPlan{
 				Spec: &admin.LaunchPlanSpec{
-					Interruptible: &wrappers.BoolValue{Value: false},
+					Interruptible: &wrapperspb.BoolValue{Value: false},
 				},
 			}
 

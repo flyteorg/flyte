@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/proto"
 
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"

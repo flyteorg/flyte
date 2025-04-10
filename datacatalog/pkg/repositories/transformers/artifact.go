@@ -1,8 +1,8 @@
 package transformers
 
 import (
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -76,7 +76,7 @@ func FromArtifactModel(artifact models.Artifact) (*datacatalog.Artifact, error) 
 		tags[i] = FromTagModel(datasetID, tag)
 	}
 
-	createdAt, err := ptypes.TimestampProto(artifact.CreatedAt)
+	createdAt, err := timestamppb.New(artifact.CreatedAt)
 	if err != nil {
 		return &datacatalog.Artifact{}, errors.NewDataCatalogErrorf(codes.Internal,
 			"artifact [%+v] invalid createdAt time conversion", artifact)

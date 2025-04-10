@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -28,7 +28,7 @@ var (
 			Name:    "n",
 		},
 		Phase:        core.WorkflowExecution_RUNNING,
-		OccurredAt:   ptypes.TimestampNow(),
+		OccurredAt:   timestamppb.Now(),
 		ProducerId:   "",
 		OutputResult: &event.WorkflowExecutionEvent_OutputUri{OutputUri: ""},
 	}
@@ -43,7 +43,7 @@ var (
 			},
 		},
 		Phase:      core.NodeExecution_FAILED,
-		OccurredAt: ptypes.TimestampNow(),
+		OccurredAt: timestamppb.Now(),
 		ProducerId: "",
 		InputValue: &event.NodeExecutionEvent_InputUri{
 			InputUri: "input-uri",
@@ -54,7 +54,7 @@ var (
 
 	taskEvent = &event.TaskExecutionEvent{
 		Phase:        core.TaskExecution_SUCCEEDED,
-		OccurredAt:   ptypes.TimestampNow(),
+		OccurredAt:   timestamppb.Now(),
 		TaskId:       &core.Identifier{ResourceType: core.ResourceType_TASK, Name: "task-id"},
 		RetryAttempt: 1,
 		ParentNodeExecutionId: &core.NodeExecutionIdentifier{
@@ -207,7 +207,7 @@ func TestIDFromMessage(t *testing.T) {
 			},
 		},
 		Phase:      core.NodeExecution_FAILED,
-		OccurredAt: ptypes.TimestampNow(),
+		OccurredAt: timestamppb.Now(),
 		ProducerId: "",
 		InputValue: &event.NodeExecutionEvent_InputUri{
 			InputUri: "input-uri",
@@ -218,7 +218,7 @@ func TestIDFromMessage(t *testing.T) {
 
 	retry0 := &event.TaskExecutionEvent{
 		Phase:        core.TaskExecution_SUCCEEDED,
-		OccurredAt:   ptypes.TimestampNow(),
+		OccurredAt:   timestamppb.Now(),
 		TaskId:       &core.Identifier{ResourceType: core.ResourceType_TASK, Name: "task-id"},
 		RetryAttempt: 0,
 		ParentNodeExecutionId: &core.NodeExecutionIdentifier{
@@ -235,7 +235,7 @@ func TestIDFromMessage(t *testing.T) {
 	pv1 := &event.TaskExecutionEvent{
 		Phase:        core.TaskExecution_SUCCEEDED,
 		PhaseVersion: 1,
-		OccurredAt:   ptypes.TimestampNow(),
+		OccurredAt:   timestamppb.Now(),
 		TaskId:       &core.Identifier{ResourceType: core.ResourceType_TASK, Name: "task-id"},
 		RetryAttempt: 0,
 		ParentNodeExecutionId: &core.NodeExecutionIdentifier{

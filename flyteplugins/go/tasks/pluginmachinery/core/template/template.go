@@ -24,8 +24,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 
@@ -181,7 +181,7 @@ func serializePrimitive(p *idlCore.Primitive) (string, error) {
 	case *idlCore.Primitive_Boolean:
 		return fmt.Sprintf("%v", o.Boolean), nil
 	case *idlCore.Primitive_Datetime:
-		return ptypes.TimestampString(o.Datetime), nil
+		return o.Datetime.AsTime().Format(time.RFC3339Nano), nil
 	case *idlCore.Primitive_Duration:
 		return o.Duration.String(), nil
 	case *idlCore.Primitive_FloatValue:

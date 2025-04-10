@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/go-test/deep"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"

@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/ptypes/duration"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

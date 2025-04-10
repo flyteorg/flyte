@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"github.com/golang/protobuf/ptypes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -35,10 +34,7 @@ func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) *v1alpha1.RetryStr
 func computeDeadline(n *core.Node) (*v1.Duration, error) {
 	var deadline *v1.Duration
 	if n.GetMetadata() != nil && n.GetMetadata().GetTimeout() != nil {
-		duration, err := ptypes.Duration(n.GetMetadata().GetTimeout())
-		if err != nil {
-			return nil, err
-		}
+		duration := n.GetMetadata().GetTimeout().AsDuration()
 		deadline = &v1.Duration{
 			Duration: duration,
 		}

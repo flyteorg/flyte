@@ -4,12 +4,11 @@ package aws
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/aws"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 
@@ -70,14 +69,7 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 	}
 	for name := range launchPlan.GetClosure().GetExpectedInputs().GetParameters() {
 		if name == request.KickoffTimeArg {
-			ts, err := ptypes.TimestampProto(request.KickoffTime)
-			if err != nil {
-				logger.Warningf(context.Background(),
-					"failed to serialize kickoff time %+v to timestamp proto for scheduled workflow execution with "+
-						"launchPlan [%+v]", request.KickoffTime, launchPlan.GetId())
-				return errors.NewFlyteAdminErrorf(
-					codes.Internal, "could not serialize kickoff time %+v to timestamp proto", request.KickoffTime)
-			}
+			ts := timestamppb.New(request.KickoffTime)
 			executionRequest.Inputs.Literals[name] = &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
@@ -139,15 +131,7 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 	name := generateExecutionName(launchPlan, kickoffTime)
 	logger.Debugf(context.Background(), "generated name [%s] for scheduled execution with launch plan [%+v]",
 		name, launchPlan.GetId())
-	kickoffTimeProto, err := ptypes.TimestampProto(kickoffTime)
-	if err != nil {
-		// We expected that kickoff times are valid (in order for a scheduled event to fire).
-		// If, for whatever reason we fail to record the kickoff time in the metadata, that's fine,
-		// we don't fail the execution simply use an empty value instead.
-		kickoffTimeProto = &timestamp.Timestamp{}
-		logger.Warningf(context.Background(), "failed to serialize kickoff time [%v] to proto with err: %v",
-			kickoffTime, err)
-	}
+	kickoffTimeProto := timestamppb.New(kickoffTime)
 	executionRequest := &admin.ExecutionCreateRequest{
 		Project: launchPlan.GetId().GetProject(),
 		Domain:  launchPlan.GetId().GetDomain(),

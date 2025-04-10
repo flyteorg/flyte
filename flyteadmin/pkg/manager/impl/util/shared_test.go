@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -760,17 +760,17 @@ func TestMergeIntoExecConfig(t *testing.T) {
 		// Interruptible
 		{
 			&admin.WorkflowExecutionConfig{
-				Interruptible: &wrappers.BoolValue{
+				Interruptible: &wrapperspb.BoolValue{
 					Value: false,
 				},
 			},
 			&admin.WorkflowExecutionConfig{
-				Interruptible: &wrappers.BoolValue{
+				Interruptible: &wrapperspb.BoolValue{
 					Value: true,
 				},
 			},
 			&admin.WorkflowExecutionConfig{
-				Interruptible: &wrappers.BoolValue{
+				Interruptible: &wrapperspb.BoolValue{
 					Value: false,
 				},
 			},

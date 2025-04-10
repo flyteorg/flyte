@@ -3,16 +3,16 @@ package aws
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -33,7 +33,7 @@ var testIdentifier = &admin.NamedEntityIdentifier{
 	Domain:  "domain",
 }
 
-var protoTestTimestamp, _ = ptypes.TimestampProto(testKickoffTimestamp)
+var protoTestTimestamp = timestamppb.New(testKickoffTimestamp)
 var testKickoffTimeProtoLiteral = &core.Literal{
 	Value: &core.Literal_Scalar{
 		Scalar: &core.Scalar{

@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 type MockEventSink struct {

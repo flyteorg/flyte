@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
+	ptypesStruct "google.golang.org/protobuf/types/known/structpb"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -22,11 +23,10 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var taskEventOccurredAt = time.Now().UTC()
-var taskEventOccurredAtProto, _ = ptypes.TimestampProto(taskEventOccurredAt)
+var taskEventOccurredAtProto = timestamppb.New(taskEventOccurredAt)
 
 var sampleTaskID = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
@@ -64,7 +64,7 @@ func transformMapToStructPB(t *testing.T, thing map[string]string) *structpb.Str
 	}
 
 	thingAsCustom := &structpb.Struct{}
-	if err := utils.UnmarshalBytesToPb(b, thingAsCustom); err != nil {
+	if err := protojson.Unmarshal(b, thingAsCustom); err != nil {
 		t.Fatal(t, err)
 	}
 	return thingAsCustom
@@ -73,7 +73,7 @@ func transformMapToStructPB(t *testing.T, thing map[string]string) *structpb.Str
 func TestAddTaskStartedState(t *testing.T) {
 	t.Run("model with unset started At ", func(t *testing.T) {
 		var startedAt = time.Now().UTC()
-		var startedAtProto, _ = ptypes.TimestampProto(startedAt)
+		var startedAtProto = timestamppb.New(startedAt)
 		request := admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
 				Phase:      core.TaskExecution_RUNNING,
@@ -85,15 +85,14 @@ func TestAddTaskStartedState(t *testing.T) {
 		err := addTaskStartedState(&request, &taskExecutionModel, closure)
 		assert.Nil(t, err)
 
-		timestamp, err := ptypes.Timestamp(closure.GetStartedAt())
-		assert.Nil(t, err)
+		timestamp := closure.GetStartedAt().AsTime()
 		assert.Equal(t, startedAt, timestamp)
 		assert.Equal(t, &startedAt, taskExecutionModel.StartedAt)
 	})
 	t.Run("model with set started At ", func(t *testing.T) {
 		var oldStartedAt = time.Now().UTC()
 		var newStartedAt = time.Now().UTC().Add(time.Minute * -10)
-		var startedAtProto, _ = ptypes.TimestampProto(newStartedAt)
+		var startedAtProto = timestamppb.New(newStartedAt)
 		request := admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
 				Phase:      core.TaskExecution_RUNNING,
@@ -109,8 +108,7 @@ func TestAddTaskStartedState(t *testing.T) {
 		err := addTaskStartedState(&request, &taskExecutionModel, closure)
 		assert.Nil(t, err)
 
-		timestamp, err := ptypes.Timestamp(closure.GetStartedAt())
-		assert.Nil(t, err)
+		timestamp := closure.GetStartedAt().AsTime()
 		assert.NotEqual(t, oldStartedAt, timestamp)
 		assert.Equal(t, &oldStartedAt, taskExecutionModel.StartedAt)
 	})
@@ -132,7 +130,7 @@ func TestAddTaskTerminalState_Error(t *testing.T) {
 	}
 	startedAt := occurredAt.Add(-time.Minute)
 
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
+	startedAtProto := timestamppb.New(startedAt)
 	taskExecutionModel := models.TaskExecution{
 		StartedAt: &startedAt,
 	}
@@ -167,8 +165,7 @@ func TestAddTaskTerminalState_OutputURI(t *testing.T) {
 		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 	assert.Nil(t, err)
 
-	duration, err := ptypes.Duration(closure.GetDuration())
-	assert.Nil(t, err)
+	duration := closure.GetDuration().AsDuration()
 	assert.EqualValues(t, request.GetEvent().GetOutputResult(), closure.GetOutputResult())
 	assert.EqualValues(t, outputURI, closure.GetOutputUri())
 	assert.EqualValues(t, time.Minute, duration)
@@ -230,8 +227,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
 
-		duration, err := ptypes.Duration(closure.GetDuration())
-		assert.Nil(t, err)
+		duration := closure.GetDuration().AsDuration()
 		assert.EqualValues(t, request.GetEvent().GetOutputResult(), closure.GetOutputResult())
 		assert.True(t, proto.Equal(outputData, closure.GetOutputData()))
 		assert.EqualValues(t, time.Minute, duration)
@@ -442,7 +438,7 @@ func TestCreateTaskExecutionModelSingleEvents(t *testing.T) {
 
 func TestCreateTaskExecutionModelBatchedEvents(t *testing.T) {
 	secondTaskEventOccurredAt := taskEventOccurredAt.Add(time.Second)
-	secondTaskEventOccurredAtProto, _ := ptypes.TimestampProto(secondTaskEventOccurredAt)
+	secondTaskEventOccurredAtProto := timestamppb.New(secondTaskEventOccurredAt)
 	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
 		Request: &admin.TaskExecutionEventRequest{
 			Event: &event.TaskExecutionEvent{
@@ -546,8 +542,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 	}
 
 	occuredAt := taskEventOccurredAt.Add(time.Minute)
-	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
-	assert.Nil(t, err)
+	occuredAtProto := timestamppb.New(occuredAt)
 
 	outputError := &core.ExecutionError{
 		ErrorUri: "error.pb",
@@ -590,7 +585,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		StartedAt: taskEventOccurredAtProto,
 		UpdatedAt: occuredAtProto,
 		CreatedAt: taskEventOccurredAtProto,
-		Duration:  ptypes.DurationProto(time.Minute),
+		Duration:  durationpb.New(time.Minute),
 		OutputResult: &admin.TaskExecutionClosure_Error{
 			Error: outputError,
 		},
@@ -699,8 +694,7 @@ func TestUpdateTaskExecutionModelFilterLogLinks(t *testing.T) {
 	}
 
 	occuredAt := taskEventOccurredAt.Add(time.Minute)
-	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
-	assert.Nil(t, err)
+	occuredAtProto := timestamppb.New(occuredAt)
 
 	updatedEventRequest := &admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
@@ -800,8 +794,7 @@ func TestUpdateTaskExecutionModelFilterLogLinksArray(t *testing.T) {
 	}
 
 	occuredAt := taskEventOccurredAt.Add(time.Minute)
-	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
-	assert.Nil(t, err)
+	occuredAtProto := timestamppb.New(occuredAt)
 
 	failedEventRequest := &admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
@@ -875,8 +868,7 @@ func TestUpdateTaskExecutionModelSingleEvents(t *testing.T) {
 	}
 
 	occuredAt := taskEventOccurredAt.Add(time.Minute)
-	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
-	assert.Nil(t, err)
+	occuredAtProto := timestamppb.New(occuredAt)
 
 	taskEventRequest := &admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
@@ -967,11 +959,9 @@ func TestUpdateTaskExecutionModelBatchedEvents(t *testing.T) {
 	}
 
 	occuredAt := taskEventOccurredAt.Add(time.Minute)
-	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
-	assert.Nil(t, err)
+	occuredAtProto := timestamppb.New(occuredAt)
 	secondOccuredAt := taskEventOccurredAt.Add(time.Minute * 2)
-	secondOccuredAtProto, err := ptypes.TimestampProto(secondOccuredAt)
-	assert.Nil(t, err)
+	secondOccuredAtProto := timestamppb.New(secondOccuredAt)
 
 	taskEventRequest := &admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
@@ -1037,7 +1027,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 		OutputResult: &admin.TaskExecutionClosure_OutputUri{
 			OutputUri: "out.pb",
 		},
-		Duration:  ptypes.DurationProto(time.Minute),
+		Duration:  durationpb.New(time.Minute),
 		StartedAt: taskEventOccurredAtProto,
 	}
 	closureBytes, err := proto.Marshal(taskClosure)
@@ -1158,7 +1148,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 		OutputResult: &admin.TaskExecutionClosure_OutputUri{
 			OutputUri: "out.pb",
 		},
-		Duration:  ptypes.DurationProto(time.Minute),
+		Duration:  durationpb.New(time.Minute),
 		StartedAt: taskEventOccurredAtProto,
 	}
 	closureBytes, err := proto.Marshal(taskClosure)
@@ -1536,12 +1526,11 @@ func TestMergeCustoms(t *testing.T) {
 		mergedCustom, err := mergeCustom(existingCustom, latestCustom)
 		assert.Nil(t, err)
 
-		var marshaler jsonpb.Marshaler
-		mergedJSON, err := marshaler.MarshalToString(mergedCustom)
+		mergedJSON, err := protojson.Marshal(mergedCustom)
 		assert.Nil(t, err)
 
 		var mergedMap map[string]string
-		err = json.Unmarshal([]byte(mergedJSON), &mergedMap)
+		err = json.Unmarshal(mergedJSON, &mergedMap)
 		assert.Nil(t, err)
 		assert.EqualValues(t, map[string]string{
 			"1":   "value1",

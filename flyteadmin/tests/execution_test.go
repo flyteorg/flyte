@@ -9,9 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -35,7 +34,7 @@ func TestUpdateWorkflowExecution(t *testing.T) {
 	defer conn.Close()
 
 	beganAt := time.Now()
-	beganAtProto, _ := ptypes.TimestampProto(beganAt)
+	beganAtProto, _ := timestamppb.New(beganAt)
 
 	_, err := client.CreateWorkflowEvent(ctx, &admin.WorkflowExecutionEventRequest{
 		RequestId: "request id",
@@ -58,7 +57,7 @@ func TestUpdateWorkflowExecution(t *testing.T) {
 	// Now mark the execution as successful and verify this updates the execution as we'd expect.
 	duration := 5 * time.Minute
 	succeededAt := beganAt.Add(duration)
-	succeededAtProto, _ := ptypes.TimestampProto(succeededAt)
+	succeededAtProto, _ := timestamppb.New(succeededAt)
 	outputURI := "output uri"
 	_, err = client.CreateWorkflowEvent(ctx, &admin.WorkflowExecutionEventRequest{
 		RequestId: "request id",
@@ -91,7 +90,7 @@ func TestUpdateWorkflowExecution_InvalidPhaseTransitions(t *testing.T) {
 	defer conn.Close()
 
 	beganAt := time.Now()
-	beganAtProto, _ := ptypes.TimestampProto(beganAt)
+	beganAtProto, _ := timestamppb.New(beganAt)
 
 	_, err := client.CreateWorkflowEvent(ctx, &admin.WorkflowExecutionEventRequest{
 		RequestId: "request id",

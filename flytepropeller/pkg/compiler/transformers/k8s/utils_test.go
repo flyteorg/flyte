@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
+	_struct "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )

@@ -2,18 +2,18 @@ package util
 
 import (
 	"context"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	_struct "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var testLaunchPlanDigest = []byte{
@@ -33,7 +33,7 @@ var compiledTask = &core.CompiledTask{
 		Id:   &taskIdentifier,
 		Type: "foo type",
 		Metadata: &core.TaskMetadata{
-			Timeout: &duration.Duration{
+			Timeout: &durationpb.Duration{
 				Seconds: 60,
 			},
 		},
@@ -92,7 +92,7 @@ func getCompiledWorkflow() (*core.CompiledWorkflowClosure, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = utils.UnmarshalBytesToPb(workflowJSON, &compiledWorkflow)
+	err = protojson.Unmarshal(workflowJSON, &compiledWorkflow)
 	if err != nil {
 		return nil, err
 	}

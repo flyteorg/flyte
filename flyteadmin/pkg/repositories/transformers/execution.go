@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -218,10 +218,7 @@ func UpdateExecutionModelState(
 	executionClosure.UpdatedAt = request.GetEvent().GetOccurredAt()
 	execution.Phase = request.GetEvent().GetPhase().String()
 
-	occurredAtTimestamp, err := ptypes.Timestamp(request.GetEvent().GetOccurredAt())
-	if err != nil {
-		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to parse OccurredAt: %v", err)
-	}
+	occurredAtTimestamp := request.GetEvent().GetOccurredAt().AsTime()
 	execution.ExecutionUpdatedAt = &occurredAtTimestamp
 
 	// only mark the execution started when we get the initial running event
@@ -231,7 +228,7 @@ func UpdateExecutionModelState(
 	} else if common.IsExecutionTerminal(request.GetEvent().GetPhase()) {
 		if execution.StartedAt != nil {
 			execution.Duration = occurredAtTimestamp.Sub(*execution.StartedAt)
-			executionClosure.Duration = ptypes.DurationProto(execution.Duration)
+			executionClosure.Duration = durationpb.New(execution.Duration)
 		} else {
 			logger.Infof(context.Background(),
 				"Cannot compute duration because startedAt was never set, requestId: %v", request.GetRequestId())
@@ -316,9 +313,7 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 	// Update the closure with the same
 	var stateUpdatedAtProto *timestamppb.Timestamp
 	// Default use the createdAt timestamp as the state change occurredAt time
-	if stateUpdatedAtProto, err = ptypes.TimestampProto(stateUpdatedAt); err != nil {
-		return err
-	}
+	stateUpdatedAtProto = timestamppb.New(stateUpdatedAt)
 	closure.StateChangeDetails = &admin.ExecutionStateChangeDetails{
 		State:      stateUpdatedTo,
 		Principal:  stateUpdatedBy,
@@ -428,13 +423,10 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 // PopulateDefaultStateChangeDetails used to populate execution state change details for older executions which do not
 // have these details captured. Hence we construct a default state change details from existing data model.
 func PopulateDefaultStateChangeDetails(executionModel models.Execution) (*admin.ExecutionStateChangeDetails, error) {
-	var err error
 	var occurredAt *timestamppb.Timestamp
 
 	// Default use the createdAt timestamp as the state change occurredAt time
-	if occurredAt, err = ptypes.TimestampProto(executionModel.CreatedAt); err != nil {
-		return nil, err
-	}
+	occurredAt = timestamppb.New(executionModel.CreatedAt)
 
 	return &admin.ExecutionStateChangeDetails{
 		State:      admin.ExecutionState_EXECUTION_ACTIVE,

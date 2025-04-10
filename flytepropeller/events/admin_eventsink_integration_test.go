@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/ptypes"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -62,7 +62,7 @@ func TestAdminEventSinkTimeout(t *testing.T) {
 
 	wfEvent := &event.WorkflowExecutionEvent{
 		Phase:      core.WorkflowExecution_RUNNING,
-		OccurredAt: ptypes.TimestampNow(),
+		OccurredAt: timestamppb.Now(),
 		ExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "flyteexamples",
 			Domain:  "development",

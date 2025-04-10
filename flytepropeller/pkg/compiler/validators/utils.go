@@ -3,9 +3,9 @@ package validators
 import (
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"

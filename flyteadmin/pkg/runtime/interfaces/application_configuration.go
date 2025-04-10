@@ -4,11 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"os"
 	"strings"
 
 	"github.com/Shopify/sarama"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -173,13 +173,13 @@ func (a *ApplicationConfig) GetLabels() *admin.Labels {
 	}
 }
 
-func (a *ApplicationConfig) GetInterruptible() *wrappers.BoolValue {
+func (a *ApplicationConfig) GetInterruptible() *wrapperspb.BoolValue {
 	// only return interruptible override if set to true as all workflows would be overwritten by the zero value false otherwise
 	if !a.Interruptible {
 		return nil
 	}
 
-	return &wrappers.BoolValue{
+	return &wrapperspb.BoolValue{
 		Value: true,
 	}
 }

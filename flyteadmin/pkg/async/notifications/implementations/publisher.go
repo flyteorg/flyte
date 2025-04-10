@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -27,11 +27,11 @@ type Publisher struct {
 // The key is the notification type as defined as an enum.
 func (p *Publisher) Publish(ctx context.Context, notificationType string, msg proto.Message) error {
 	p.systemMetrics.PublishTotal.Inc()
-	logger.Debugf(ctx, "Publishing the following message [%s]", msg.String())
+	logger.Debugf(ctx, "Publishing the following message [%+v]", msg)
 	err := p.pub.Publish(ctx, notificationType, msg)
 	if err != nil {
 		p.systemMetrics.PublishError.Inc()
-		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%s] and error: %v", notificationType, msg.String(), err)
+		logger.Errorf(ctx, "Failed to publish a message with key [%s] and message [%+v] and error: %v", notificationType, msg, err)
 	}
 	return err
 }

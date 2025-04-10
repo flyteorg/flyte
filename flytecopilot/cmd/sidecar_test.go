@@ -7,8 +7,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytecopilot/cmd/containerwatcher"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"

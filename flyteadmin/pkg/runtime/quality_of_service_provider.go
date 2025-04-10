@@ -1,9 +1,7 @@
 package runtime
 
 import (
-	"fmt"
-
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -27,7 +25,7 @@ func (p *QualityOfServiceConfigProvider) GetTierExecutionValues() map[core.Quali
 	for tierName, spec := range configValues {
 		tierExecutionValues[core.QualityOfService_Tier(core.QualityOfService_Tier_value[tierName])] =
 			&core.QualityOfServiceSpec{
-				QueueingBudget: ptypes.DurationProto(spec.QueueingBudget.Duration),
+				QueueingBudget: durationpb.New(spec.QueueingBudget.Duration),
 			}
 	}
 	return tierExecutionValues
@@ -42,19 +40,6 @@ func (p *QualityOfServiceConfigProvider) GetDefaultTiers() map[interfaces.Domain
 	return defaultTiers
 }
 
-func validateConfigValues() {
-	if qualityOfServiceConfig != nil {
-		values := qualityOfServiceConfig.GetConfig().(*interfaces.QualityOfServiceConfig).TierExecutionValues
-		for tierName, spec := range values {
-			_, err := ptypes.Duration(ptypes.DurationProto(spec.QueueingBudget.Duration))
-			if err != nil {
-				panic(fmt.Sprintf("Invalid duration [%+v] specified for %s", spec.QueueingBudget.Duration, tierName))
-			}
-		}
-	}
-}
-
 func NewQualityOfServiceConfigProvider() interfaces.QualityOfServiceConfiguration {
-	validateConfigValues()
 	return &QualityOfServiceConfigProvider{}
 }

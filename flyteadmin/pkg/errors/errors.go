@@ -4,23 +4,22 @@ package errors
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/protoadapt"
 	"strings"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/wI2L/jsondiff"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/wI2L/jsondiff"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type FlyteAdminError interface {
 	Error() string
 	Code() codes.Code
 	GRPCStatus() *status.Status
-	WithDetails(details proto.Message) (FlyteAdminError, error)
+	WithDetails(details protoadapt.MessageV1) (FlyteAdminError, error)
 	String() string
 }
 type flyteAdminErrorImpl struct {
@@ -46,7 +45,7 @@ func (e *flyteAdminErrorImpl) String() string {
 // enclose the error in the format that grpc server expect from golang:
 //
 //	https://github.com/grpc/grpc-go/blob/master/status/status.go#L133
-func (e *flyteAdminErrorImpl) WithDetails(details proto.Message) (FlyteAdminError, error) {
+func (e *flyteAdminErrorImpl) WithDetails(details protoadapt.MessageV1) (FlyteAdminError, error) {
 	s, err := e.status.WithDetails(details)
 	if err != nil {
 		return nil, err
@@ -91,7 +90,7 @@ func NewAlreadyInTerminalStateError(ctx context.Context, errorMsg string, curPha
 	statusErr, transformationErr := NewFlyteAdminError(codes.FailedPrecondition, errorMsg).WithDetails(reason)
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)  //nolint
+		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg) //nolint
 	}
 	return statusErr
 }
@@ -106,7 +105,7 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 	})
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr) //nolint
-		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg) //nolint
+		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)                          //nolint
 	}
 	return statusErr
 }

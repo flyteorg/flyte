@@ -1,10 +1,10 @@
 package transformers
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -18,7 +18,7 @@ func TestCreateExecutionEventModel(t *testing.T) {
 	phase := core.WorkflowExecution_RUNNING
 
 	timestamp := time.Now().UTC()
-	occurredAt, _ := ptypes.TimestampProto(timestamp)
+	occurredAt := timestamppb.New(timestamp)
 	executionEvent, err := CreateExecutionEventModel(
 		&admin.WorkflowExecutionEventRequest{
 			RequestId: requestID,

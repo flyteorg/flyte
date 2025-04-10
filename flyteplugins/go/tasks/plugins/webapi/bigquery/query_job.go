@@ -3,9 +3,9 @@ package bigquery
 import (
 	"strconv"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"google.golang.org/api/bigquery/v2"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
