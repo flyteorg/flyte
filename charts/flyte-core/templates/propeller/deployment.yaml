@@ -10,6 +10,12 @@ metadata:
   name: {{ template "flytepropeller.name" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
   {{- end }}
+  {{- if .Values.flytepropeller.annotations }}
+  annotations:
+    {{- with .Values.flytepropeller.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.flytepropeller.replicaCount }}
   selector:

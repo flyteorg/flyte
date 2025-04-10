@@ -5,6 +5,12 @@ metadata:
   name: syncresources
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteclusterresourcesync.labels" . | nindent 4 }}
+  {{- if .Values.cluster_resource_manager.annotations }}
+  annotations:
+    {{- with .Values.cluster_resource_manager.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
