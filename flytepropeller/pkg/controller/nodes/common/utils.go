@@ -91,7 +91,7 @@ func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
 	// read the offloaded literal
 	size := tobeRead.GetOffloadedMetadata().GetSizeBytes()
 	if err := datastore.ReadProtobuf(ctx, storage.DataReference(dataReference), tobeRead); err != nil {
-		logger.Errorf(ctx, "Failed to  read the offloaded literal at location [%s] with error [%s]", dataReference, err)
+		logger.Errorf(ctx, "failed to read the offloaded literal at location [%s] with error [%s]", dataReference, err)
 		return err
 	}
 

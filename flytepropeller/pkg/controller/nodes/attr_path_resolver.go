@@ -28,7 +28,7 @@ func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore,
 			// currVal will be overwritten with the contents of the offloaded data which contains the actual large literal.
 			err := common.ReadLargeLiteral(ctx, datastore, currVal)
 			if err != nil {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "failed to read offloaded metadata for promise")
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "failed to read offloaded metadata for promise with error: %v", err)
 			}
 		}
 		switch currVal.GetValue().(type) {
