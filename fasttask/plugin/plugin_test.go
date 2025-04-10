@@ -906,6 +906,12 @@ func TestGetTaskInfo(t *testing.T) {
 						TemplateURIs: []string{"http://foo.com/pod={{ .namespace }}/{{ .podName }}"},
 					},
 				},
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": {
+						DisplayName:  "Vscode",
+						TemplateURIs: []string{"http://foo.com/vscode={{ .namespace }}/{{ .podName }}"},
+					},
+				},
 			},
 		},
 	}
@@ -943,6 +949,12 @@ func TestGetTaskInfo(t *testing.T) {
 					Containers: []v1.Container{
 						{
 							Name: podName,
+							Env: []v1.EnvVar{
+								{
+									Name:  logs.FlyteEnableVscode,
+									Value: "true",
+								},
+							},
 						},
 					},
 					Hostname: "hostname",
@@ -986,8 +998,9 @@ func TestGetTaskInfo(t *testing.T) {
 		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
 		require.Nil(t, err)
-		require.Len(t, taskInfo.Logs, 1)
+		require.Len(t, taskInfo.Logs, 2)
 		assert.Equal(t, "Custom Logs", taskInfo.Logs[0].GetName())
+		assert.Equal(t, "Vscode", taskInfo.Logs[1].GetName())
 		assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
 		assert.Equal(t, expectedLogCtx, taskInfo.LogContext)
 	})

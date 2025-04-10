@@ -620,6 +620,18 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		return nil, err
 	}
 
+	enableVscode := false
+	for _, env := range pod.Spec.Containers[containerIndex].Env {
+		if env.Name != logs.FlyteEnableVscode {
+			continue
+		}
+		var err error
+		enableVscode, err = strconv.ParseBool(env.Value)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", logs.FlyteEnableVscode, env.Value, pod.Name)
+		}
+	}
+
 	in := tasklog.Input{
 		Namespace:       pod.Namespace,
 		PodName:         pod.Name,
@@ -647,6 +659,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 				Value: strconv.FormatInt(end.UnixMilli(), 10),
 			},
 		},
+		EnableVscode: enableVscode,
 	}
 	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
 	if err != nil {

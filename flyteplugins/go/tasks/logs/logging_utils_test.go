@@ -191,7 +191,7 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 					Name: "ContainerName",
 					Env: []v1.EnvVar{
 						{
-							Name:  flyteEnableVscode,
+							Name:  FlyteEnableVscode,
 							Value: "True",
 						},
 					},

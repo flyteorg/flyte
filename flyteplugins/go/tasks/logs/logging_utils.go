@@ -18,7 +18,7 @@ const (
 	kubernetesLogsDisplayName     = "Kubernetes Logs"
 	cloudwatchLoggingDisplayName  = "Cloudwatch Logs"
 	googleCloudLoggingDisplayName = "Google Cloud Logs"
-	flyteEnableVscode             = "_F_E_VS"
+	FlyteEnableVscode             = "_F_E_VS"
 )
 
 // Internal
@@ -50,13 +50,13 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 
 	enableVscode := false
 	for _, env := range pod.Spec.Containers[index].Env {
-		if env.Name != flyteEnableVscode {
+		if env.Name != FlyteEnableVscode {
 			continue
 		}
 		var err error
 		enableVscode, err = strconv.ParseBool(env.Value)
 		if err != nil {
-			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", flyteEnableVscode, env.Value, pod.Name)
+			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", FlyteEnableVscode, env.Value, pod.Name)
 		}
 	}
 
