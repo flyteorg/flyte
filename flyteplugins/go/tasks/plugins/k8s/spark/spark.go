@@ -391,6 +391,29 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 	taskLogs := make([]*core.TaskLog, 0, 3)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
+	// Extract Start and End times from SparkApplicationStatus
+	var startTime, finishTime int64
+	var RFC3999StartTime, RFC3999FinishTime string
+
+	// Use SubmissionTime as the start time
+	if !sj.Status.SubmissionTime.IsZero() {
+		RFC3999StartTime = sj.Status.SubmissionTime.Format(time.RFC3339)
+		startTime = sj.Status.SubmissionTime.Unix()
+	}
+
+	// Use CompletionTime or TerminationTime as the end time
+	var endTime metav1.Time
+	if !sj.Status.CompletionTime.IsZero() {
+		endTime = sj.Status.CompletionTime
+	} else if !sj.Status.TerminationTime.IsZero() {
+		endTime = sj.Status.TerminationTime
+	}
+
+	if !endTime.IsZero() {
+		RFC3999FinishTime = endTime.Format(time.RFC3339)
+		finishTime = endTime.Unix()
+	}
+
 	if sj.Status.DriverInfo.PodName != "" {
 		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
 		if err != nil {
@@ -399,10 +422,14 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		if p != nil {
 			o, err := p.GetTaskLogs(tasklog.Input{
-				PodName:         sj.Status.DriverInfo.PodName,
-				Namespace:       sj.Namespace,
-				LogName:         "(Driver Logs)",
-				TaskExecutionID: taskExecID,
+				PodName:              sj.Status.DriverInfo.PodName,
+				Namespace:            sj.Namespace,
+				LogName:              "(Driver Logs)",
+				TaskExecutionID:      taskExecID,
+				PodRFC3339StartTime:  RFC3999StartTime,
+				PodRFC3339FinishTime: RFC3999FinishTime,
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
 			})
 
 			if err != nil {
@@ -419,18 +446,24 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 	}
 
 	if p != nil {
-		o, err := p.GetTaskLogs(tasklog.Input{
-			PodName:         sj.Status.DriverInfo.PodName,
-			Namespace:       sj.Namespace,
-			LogName:         "(User Logs)",
-			TaskExecutionID: taskExecID,
-		})
+		if sj.Status.DriverInfo.PodName != "" {
+			o, err := p.GetTaskLogs(tasklog.Input{
+				PodName:              sj.Status.DriverInfo.PodName,
+				Namespace:            sj.Namespace,
+				LogName:              "(User Logs)",
+				TaskExecutionID:      taskExecID,
+				PodRFC3339StartTime:  RFC3999StartTime,
+				PodRFC3339FinishTime: RFC3999FinishTime,
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
+			})
 
-		if err != nil {
-			return nil, err
+			if err != nil {
+				return nil, err
+			}
+
+			taskLogs = append(taskLogs, o.TaskLogs...)
 		}
-
-		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
 
 	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
