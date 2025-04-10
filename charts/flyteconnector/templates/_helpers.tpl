@@ -13,23 +13,23 @@
 {{- end -}}
 
 
-{{- define "flyteagent.name" -}}
+{{- define "flyteconnector.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "flyteagent.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "flyteagent.name" . }}
+{{- define "flyteconnector.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flyteconnector.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{- define "flyteagent.labels" -}}
-{{ include "flyteagent.selectorLabels" . }}
+{{- define "flyteconnector.labels" -}}
+{{ include "flyteconnector.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "flyteagent.podLabels" -}}
-{{ include "flyteagent.labels" . }}
+{{- define "flyteconnector.podLabels" -}}
+{{ include "flyteconnector.labels" . }}
 {{- with .Values.podLabels }}
 {{ toYaml . }}
 {{- end }}
@@ -37,17 +37,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 
 # Optional blocks for secret mount
 
-{{- define "agentSecret.volume" -}}
+{{- define "connectorSecret.volume" -}}
 - name: {{ include "flyte.name" . }}
   secret:
     secretName: {{ include "flyte.name" . }}
 {{- end }}
 
-{{- define "agentSecret.volumeMount" -}}
+{{- define "connectorSecret.volumeMount" -}}
 - mountPath: /etc/secrets
   name: {{ include "flyte.name" . }}
 {{- end }}
 
-{{- define "flyteagent.servicePort" -}}
+{{- define "flyteconnector.servicePort" -}}
 {{ include .Values.ports.containerPort}}
 {{- end }}

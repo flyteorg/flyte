@@ -195,9 +195,9 @@ Get the Flyte service GRPC paths.
 {{- end -}}
 
 {{/*
-Get the Flyte agent service GRPC port.
+Get the Flyte connector service GRPC port.
 */}}
-{{- define "flyte-binary.flyteagent.grpc.port" -}}
+{{- define "flyte-binary.flyteconnector.grpc.port" -}}
 {{- default 8000 .Values.service.ports.grpc -}}
 {{- end -}}
 
@@ -224,16 +224,16 @@ Get the Flyte ClusterRole name.
 {{- end -}}
 
 {{/*
-Get the name of the Flyte Agent Deployment.
+Get the name of the Flyte connector Deployment.
 */}}
-{{- define "flyte-binary.agent.name" -}}
-{{- printf "%s-agent" (include "flyte-binary.fullname" .) -}}
+{{- define "flyte-binary.connector.name" -}}
+{{- printf "%s-connector" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
 
 {{/*
-Flyte Agent selector labels
+Flyte connector selector labels
 */}}
-{{- define "flyte-binary.agent.selectorLabels" -}}
+{{- define "flyte-binary.connector.selectorLabels" -}}
 {{ include "flyte-binary.baseLabels" . }}
-app.kubernetes.io/component: agent
+app.kubernetes.io/component: connector
 {{- end }}

@@ -26,8 +26,8 @@ sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-deps/README.md  > temp.txt && mv tem
 grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-binary/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
 sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-binary/README.md > temp.txt && mv temp.txt ./charts/flyte-binary/README.md
 
-grep -rlZ "version:[^P]*# VERSION" ./charts/flyteagent/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
-sed "s/v0.1.10/${VERSION}/g" ./charts/flyteagent/README.md > temp.txt && mv temp.txt ./charts/flyteagent/README.md
+grep -rlZ "version:[^P]*# VERSION" ./charts/flyteconnector/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+sed "s/v0.1.10/${VERSION}/g" ./charts/flyteconnector/README.md > temp.txt && mv temp.txt ./charts/flyteconnector/README.md
 
 grep -rlZ "version:[^P]*# VERSION" ./charts/flyte-binary/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
 sed "s/v0.1.10/${VERSION}/g" ./charts/flyte-binary/README.md > temp.txt && mv temp.txt ./charts/flyte-binary/README.md
@@ -73,5 +73,5 @@ sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${VERSION} # FLYTECOPILOT_TAG," ./cha
 sed -i "s,tag:[^P]*# FLYTEBINARY_TAG,tag: ${VERSION}  # FLYTEBINARY_TAG," ./charts/flyte-binary/values.yaml
 sed -i "s,repository:[^P]*# FLYTEBINARY_IMAGE,repository: cr.flyte.org/flyteorg/flyte-binary-release # FLYTEBINARY_IMAGE," ./charts/flyte-binary/values.yaml
 
-sed -i "s,tag:[^P]*# FLYTEAGENT_TAG,tag: ${VERSION} # FLYTEAGENT_TAG," ./charts/flyteagent/values.yaml
-sed -i "s,repository:[^P]*# FLYTEAGENT_IMAGE,repository: cr.flyte.org/flyteorg/flyteagent-release # FLYTEAGENT_IMAGE," ./charts/flyteagent/values.yaml
+sed -i "s,tag:[^P]*# FLYTECONNECTOR_TAG,tag: ${VERSION} # FLYTECONNECTOR_TAG," ./charts/flyteconnector/values.yaml
+sed -i "s,repository:[^P]*# FLYTECONNECTOR_IMAGE,repository: cr.flyte.org/flyteorg/flyteconnector-release # FLYTECONNECTOR_IMAGE," ./charts/flyteconnector/values.yaml

@@ -81,7 +81,7 @@ As mentioned before, this feature is shipped in an experimental capacity, the id
 * Remove welcomebot from boilerplate by @eapolinario in https://github.com/flyteorg/flyteplugins/pull/375
 * Carry over hash value for all literal types in remote caching by @nicholasjng in https://github.com/flyteorg/flyteplugins/pull/378
 * Send task execution metadata to out-core plugin by @honnix in https://github.com/flyteorg/flyteplugins/pull/369
-* Support gRPC config for agent-service plugin by @honnix in https://github.com/flyteorg/flyteplugins/pull/368
+* Support gRPC config for connector-service plugin by @honnix in https://github.com/flyteorg/flyteplugins/pull/368
 * Use agent as name where it fits by @honnix in https://github.com/flyteorg/flyteplugins/pull/381
 * Fix deletion of elastic task resource requests by @fg91 in https://github.com/flyteorg/flyteplugins/pull/379
 

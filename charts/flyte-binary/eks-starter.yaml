@@ -68,7 +68,7 @@ configuration:
           - container
           - sidecar
           - K8S-ARRAY #used for MapTasks
-          - agent-service
+          - connector-service
           - echo
         default-for-task-types:
           - container: container

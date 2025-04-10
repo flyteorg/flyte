@@ -120,7 +120,7 @@ flytepropeller:
 #
 # FLYTE_AGENT
 #
-flyteagent:
+flyteconnector:
   enabled: false
 
 #
@@ -296,7 +296,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          - connector-service
           - echo
         default-for-task-types:
           container: container

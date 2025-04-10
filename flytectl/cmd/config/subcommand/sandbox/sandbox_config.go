@@ -26,6 +26,9 @@ type Config struct {
 	// Agent Service
 	DisableAgent bool `json:"disable-agent" pflag:",Optional. Disable the agent service."`
 
+	// Connector Service
+	DisableConnector bool `json:"disable-connector" pflag:",Optional. Disable the connector service."`
+
 	// Optionally it is possible to pass in environment variables to sandbox container.
 	Env []string `json:"env" pflag:",Optional. Provide Env variable in key=value format which can be passed to sandbox container."`
 

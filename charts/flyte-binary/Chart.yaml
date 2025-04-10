@@ -16,8 +16,8 @@ version: v0.1.10  # VERSION
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
 dependencies:
-  - name: flyteagent
-    condition: flyteagent.enabled
-    alias: flyteagent
+  - name: flyteconnector
+    condition: flyteconnector.enabled
+    alias: flyteconnector
     version: v0.1.10  # VERSION
-    repository: file://../flyteagent  # REPOSITORY
+    repository: file://../flyteconnector  # REPOSITORY

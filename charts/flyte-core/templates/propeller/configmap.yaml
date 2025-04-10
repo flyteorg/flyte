@@ -51,8 +51,8 @@ data:
   task_logs.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
-{{- if .Values.flyteagent.enabled }}
-{{- with .Values.flyteagent.plugin_config }}
-  agent_service.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- if .Values.flyteconnector.enabled }}
+{{- with .Values.flyteconnector.plugin_config }}
+  connector_service.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
