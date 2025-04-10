@@ -15618,6 +15618,7 @@
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  * @property {boolean|null} [isEager] TaskMetadata isEager
                  * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
+                 * @property {flyteidl.core.TaskMetadata.ExecutionMode|null} [mode] TaskMetadata mode
                  */
     
                 /**
@@ -15741,6 +15742,14 @@
                  */
                 TaskMetadata.prototype.generatesDeck = null;
     
+                /**
+                 * TaskMetadata mode.
+                 * @member {flyteidl.core.TaskMetadata.ExecutionMode} mode
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.mode = 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -15807,6 +15816,8 @@
                         writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
                     if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
                         $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
+                    if (message.mode != null && message.hasOwnProperty("mode"))
+                        writer.uint32(/* id 16, wireType 0 =*/128).int32(message.mode);
                     return writer;
                 };
     
@@ -15873,6 +15884,9 @@
                             break;
                         case 15:
                             message.generatesDeck = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 16:
+                            message.mode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15952,8 +15966,30 @@
                         if (error)
                             return "generatesDeck." + error;
                     }
+                    if (message.mode != null && message.hasOwnProperty("mode"))
+                        switch (message.mode) {
+                        default:
+                            return "mode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
+    
+                /**
+                 * ExecutionMode enum.
+                 * @name flyteidl.core.TaskMetadata.ExecutionMode
+                 * @enum {string}
+                 * @property {number} DEFAULT=0 DEFAULT value
+                 * @property {number} DYNAMIC=1 DYNAMIC value
+                 */
+                TaskMetadata.ExecutionMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "DEFAULT"] = 0;
+                    values[valuesById[1] = "DYNAMIC"] = 1;
+                    return values;
+                })();
     
                 return TaskMetadata;
             })();
