@@ -97,6 +97,7 @@ var (
 		ClientID:             DefaultClientID,
 		AuthType:             AuthTypeClientSecret,
 		ClientSecretLocation: DefaultClientSecretLocation,
+		MaxMessageSizeBytes:  10 * 1024 * 1024, // 10MB
 		PkceConfig: pkce.Config{
 			TokenRefreshGracePeriod: config.Duration{Duration: 5 * time.Minute},
 			BrowserSessionTimeout:   config.Duration{Duration: 2 * time.Minute},
