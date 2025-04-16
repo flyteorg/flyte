@@ -63,7 +63,7 @@ func TestBuildNodeSpec(t *testing.T) {
 	errs := errors.NewCompileErrors()
 
 	mustBuild := func(t testing.TB, n common.Node, expectedInnerNodesCount int, errs errors.CompileErrors) *v1alpha1.NodeSpec {
-		specs, ok := buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		specs, ok := BuildNodeSpec(n.GetCoreNode(), tasks, errs)
 		assert.Len(t, specs, expectedInnerNodesCount)
 		spec := specs[0]
 		assert.Nil(t, spec.Interruptible)
@@ -306,7 +306,7 @@ func TestBuildNodeSpec(t *testing.T) {
 		}
 
 		mustBuild(t, n, 1, errs.NewScope())
-		specs, ok := buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		specs, ok := BuildNodeSpec(n.GetCoreNode(), tasks, errs)
 		assert.True(t, ok)
 		assert.Len(t, specs, 1)
 		assert.Equal(t, *specs[0].ArrayNode.Parallelism, uint32(10))
@@ -331,7 +331,7 @@ func TestBuildNodeSpec(t *testing.T) {
 		}
 
 		mustBuild(t, n, 1, errs.NewScope())
-		specs, ok = buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		specs, ok = BuildNodeSpec(n.GetCoreNode(), tasks, errs)
 		assert.True(t, ok)
 		assert.Len(t, specs, 1)
 		assert.Nil(t, specs[0].ArrayNode.Parallelism)

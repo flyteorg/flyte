@@ -771,7 +771,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "BindingResolutionFailure", err.Error(), nil), nil
 			}
 
-			if nodeInputs != nil {
+			if nodeInputs != nil && !config.GetConfig().NodeConfig.DisableInputFileWrites {
 				if config.GetConfig().AcceleratedInputs.Enabled {
 					c.replaceRemotePathsForMap(ctx, nodeInputs)
 				}

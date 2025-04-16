@@ -34,13 +34,13 @@ const NodeIDLabel = "node-id"
 const TaskNameLabel = "task-name"
 const NodeInterruptibleLabel = "interruptible"
 
-type eventRecorder struct {
-	taskEventRecorder events.TaskEventRecorder
-	nodeEventRecorder events.NodeEventRecorder
+type EventRecorder struct {
+	TaskEventRecorder events.TaskEventRecorder
+	NodeEventRecorder events.NodeEventRecorder
 }
 
-func (e eventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
-	if err := e.taskEventRecorder.RecordTaskEvent(ctx, ev, eventConfig); err != nil {
+func (e EventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+	if err := e.TaskEventRecorder.RecordTaskEvent(ctx, ev, eventConfig); err != nil {
 		if eventsErr.IsAlreadyExists(err) {
 			if eventConfig.ErrorOnAlreadyExists {
 				return err
@@ -61,7 +61,7 @@ func (e eventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskExecut
 	return nil
 }
 
-func (e eventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+func (e EventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
 	if nodeEvent == nil {
 		return fmt.Errorf("event recording attempt of Nil Node execution event")
 	}
@@ -71,7 +71,7 @@ func (e eventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.Nod
 	}
 
 	logger.Infof(ctx, "Recording NodeEvent [%s] phase[%s]", nodeEvent.GetId().String(), nodeEvent.Phase.String())
-	err := e.nodeEventRecorder.RecordNodeEvent(ctx, nodeEvent, eventConfig)
+	err := e.NodeEventRecorder.RecordNodeEvent(ctx, nodeEvent, eventConfig)
 	if err != nil {
 		if nodeEvent.GetId().NodeId == v1alpha1.EndNodeID {
 			return nil
@@ -131,7 +131,7 @@ type nodeExecContext struct {
 	store              *storage.DataStore
 	tr                 interfaces.TaskReader
 	md                 interfaces.NodeExecutionMetadata
-	eventRecorder      interfaces.EventRecorder
+	EventRecorder      interfaces.EventRecorder
 	inputs             io.InputReader
 	node               v1alpha1.ExecutableNode
 	nodeStatus         v1alpha1.ExecutableNodeStatus
@@ -190,7 +190,7 @@ func (e nodeExecContext) InputReader() io.InputReader {
 }
 
 func (e nodeExecContext) EventsRecorder() interfaces.EventRecorder {
-	return e.eventRecorder
+	return e.EventRecorder
 }
 
 func (e nodeExecContext) NodeID() v1alpha1.NodeID {
@@ -220,7 +220,7 @@ func (e nodeExecContext) GetExecutionEnvClient() pluginscore.ExecutionEnvClient 
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
-	taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
+	TaskEventRecorder events.TaskEventRecorder, NodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, rawOutputSuffix []string, outputShardSelector ioutils.ShardSelector,
 	executionEnvClient pluginscore.ExecutionEnvClient) *nodeExecContext {
 
@@ -252,9 +252,9 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		node:       node,
 		nodeStatus: nodeStatus,
 		inputs:     inputs,
-		eventRecorder: &eventRecorder{
-			taskEventRecorder: taskEventRecorder,
-			nodeEventRecorder: nodeEventRecorder,
+		EventRecorder: &EventRecorder{
+			TaskEventRecorder: TaskEventRecorder,
+			NodeEventRecorder: NodeEventRecorder,
 		},
 		tr:                 tr,
 		nsm:                nsm,

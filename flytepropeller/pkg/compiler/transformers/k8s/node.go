@@ -14,7 +14,7 @@ import (
 )
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
-func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) ([]*v1alpha1.NodeSpec, bool) {
+func BuildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) ([]*v1alpha1.NodeSpec, bool) {
 	if n == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "node"))
 		return nil, !errs.HasErrors()
@@ -196,7 +196,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		arrayNode := n.GetArrayNode()
 
 		// build subNodeSpecs
-		subNodeSpecs, ok := buildNodeSpec(arrayNode.Node, tasks, errs)
+		subNodeSpecs, ok := BuildNodeSpec(arrayNode.Node, tasks, errs)
 		if !ok {
 			return nil, ok
 		}
@@ -236,7 +236,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 }
 
 func buildIfBlockSpec(block *core.IfBlock, tasks []*core.CompiledTask, errs errors.CompileErrors) (*v1alpha1.IfBlock, []*v1alpha1.NodeSpec) {
-	nodeSpecs, ok := buildNodeSpec(block.ThenNode, tasks, errs)
+	nodeSpecs, ok := BuildNodeSpec(block.ThenNode, tasks, errs)
 	if !ok {
 		return nil, []*v1alpha1.NodeSpec{}
 	}
@@ -261,7 +261,7 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 
 	switch branch.IfElse.GetDefault().(type) {
 	case *core.IfElseBlock_ElseNode:
-		ns, ok := buildNodeSpec(branch.IfElse.GetElseNode(), tasks, errs)
+		ns, ok := BuildNodeSpec(branch.IfElse.GetElseNode(), tasks, errs)
 		if !ok {
 			return nil, []*v1alpha1.NodeSpec{}
 		}
@@ -286,7 +286,7 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 func buildNodes(nodes []*core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) (map[common.NodeID]*v1alpha1.NodeSpec, bool) {
 	res := make(map[common.NodeID]*v1alpha1.NodeSpec, len(nodes))
 	for _, nodeBuilder := range nodes {
-		nodeSpecs, ok := buildNodeSpec(nodeBuilder, tasks, errs.NewScope())
+		nodeSpecs, ok := BuildNodeSpec(nodeBuilder, tasks, errs.NewScope())
 		if !ok {
 			return nil, ok
 		}

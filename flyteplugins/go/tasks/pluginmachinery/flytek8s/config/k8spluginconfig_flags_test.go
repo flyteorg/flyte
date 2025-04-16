@@ -379,4 +379,18 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_disable-inject-owner-references", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("disable-inject-owner-references", testValue)
+			if vBool, err := cmdFlags.GetBool("disable-inject-owner-references"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vBool), &actual.DisableInjectOwnerReferences)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

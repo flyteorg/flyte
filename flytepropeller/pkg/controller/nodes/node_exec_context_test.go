@@ -431,8 +431,8 @@ func Test_NodeContext_RecordNodeEvent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			eventRecorder := &eventRecorder{
-				nodeEventRecorder: tt.rec,
+			eventRecorder := &EventRecorder{
+				NodeEventRecorder: tt.rec,
 			}
 
 			ev := &event.NodeExecutionEvent{
@@ -467,8 +467,8 @@ func Test_NodeContext_RecordTaskEvent(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := &eventRecorder{
-				taskEventRecorder: tt.rec,
+			t := &EventRecorder{
+				TaskEventRecorder: tt.rec,
 			}
 			ev := &event.TaskExecutionEvent{
 				Phase: tt.p,

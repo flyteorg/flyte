@@ -218,6 +218,9 @@ type K8sPluginConfig struct {
 
 	// Extended resources that should be added to the tolerations automatically.
 	AddTolerationsForExtendedResources []string `json:"add-tolerations-for-extended-resources" pflag:",Name of the extended resources for which tolerations should be added."`
+
+	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
+	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
