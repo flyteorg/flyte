@@ -46,7 +46,9 @@ data:
   databricks.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
+{{- if not .Values.storage.secretName }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
+{{- end }}
 {{- with .Values.configmap.task_logs }}
   task_logs.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}

@@ -615,6 +615,8 @@ common:
 #
 
 storage:
+  # -- Optionally load the storage configuration from a secret so that sensitive values aren't declared in the values file.
+  secretName: ""
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: sandbox
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
