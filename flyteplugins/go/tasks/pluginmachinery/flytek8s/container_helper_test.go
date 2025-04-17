@@ -405,6 +405,7 @@ func TestToK8sContainer(t *testing.T) {
 	})
 	mockTaskExecMetadata.EXPECT().GetNamespace().Return("my-namespace")
 	mockTaskExecMetadata.EXPECT().GetConsoleURL().Return("")
+	mockTaskExecMetadata.EXPECT().GetOnOOMConfig().Return(nil)
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.EXPECT().TaskExecutionMetadata().Return(&mockTaskExecMetadata)
@@ -480,6 +481,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	mockTaskExecMetadata.EXPECT().GetNamespace().Return("my-namespace")
 	mockTaskExecMetadata.EXPECT().GetConsoleURL().Return(consoleURL)
+	mockTaskExecMetadata.EXPECT().GetOnOOMConfig().Return(nil)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
