@@ -15,5 +15,7 @@ data:
 {{- with .Values.configmap.datacatalogServer }}
   server.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- if not .Values.storage.secretName }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
+{{- end }}
 {{- end }}

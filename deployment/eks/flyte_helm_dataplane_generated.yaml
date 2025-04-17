@@ -480,8 +480,10 @@ spec:
         terminationMessagePolicy: "FallbackToLogsOnError"
       serviceAccountName: flytepropeller
       volumes:
-      - configMap:
-          name: flyte-propeller-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-propeller-config
         name: config-volume
       - name: auth
         secret:
