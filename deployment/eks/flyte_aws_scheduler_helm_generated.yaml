@@ -1010,8 +1010,10 @@ spec:
         name: shared-data
       - emptyDir: {}
         name: scratch
-      - configMap:
-          name: flyte-admin-base-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-admin-base-config
         name: base-config-volume
       - projected:
           sources:
@@ -1250,8 +1252,10 @@ spec:
           secretName: db-pass
       - emptyDir: {}
         name: shared-data
-      - configMap:
-          name: datacatalog-config
+      - projected:
+          sources:
+            - configMap:
+                name: datacatalog-config
         name: config-volume
       affinity: 
         podAntiAffinity:
@@ -1331,8 +1335,10 @@ spec:
         terminationMessagePolicy: "FallbackToLogsOnError"
       serviceAccountName: flytepropeller
       volumes:
-      - configMap:
-          name: flyte-propeller-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-propeller-config
         name: config-volume
       - name: auth
         secret:
