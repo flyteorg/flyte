@@ -6516,6 +6516,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck */
             generatesDeck?: (google.protobuf.IBoolValue|null);
+
+            /** TaskMetadata metadata */
+            metadata?: (flyteidl.core.IK8sObjectMetadata|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6565,6 +6568,9 @@ export namespace flyteidl {
 
             /** TaskMetadata generatesDeck. */
             public generatesDeck?: (google.protobuf.IBoolValue|null);
+
+            /** TaskMetadata metadata. */
+            public metadata?: (flyteidl.core.IK8sObjectMetadata|null);
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

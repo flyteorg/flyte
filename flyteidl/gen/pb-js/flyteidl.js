@@ -15618,6 +15618,7 @@
                  * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  * @property {boolean|null} [isEager] TaskMetadata isEager
                  * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
+                 * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] TaskMetadata metadata
                  */
     
                 /**
@@ -15741,6 +15742,14 @@
                  */
                 TaskMetadata.prototype.generatesDeck = null;
     
+                /**
+                 * TaskMetadata metadata.
+                 * @member {flyteidl.core.IK8sObjectMetadata|null|undefined} metadata
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.metadata = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -15807,6 +15816,8 @@
                         writer.uint32(/* id 14, wireType 0 =*/112).bool(message.isEager);
                     if (message.generatesDeck != null && message.hasOwnProperty("generatesDeck"))
                         $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.core.K8sObjectMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                     return writer;
                 };
     
@@ -15873,6 +15884,9 @@
                             break;
                         case 15:
                             message.generatesDeck = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 16:
+                            message.metadata = $root.flyteidl.core.K8sObjectMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -15951,6 +15965,11 @@
                         var error = $root.google.protobuf.BoolValue.verify(message.generatesDeck);
                         if (error)
                             return "generatesDeck." + error;
+                    }
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.core.K8sObjectMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
                     }
                     return null;
                 };
