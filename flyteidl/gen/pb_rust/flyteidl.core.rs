@@ -1421,6 +1421,13 @@ pub struct TaskMetadata {
     /// - false: The task will not generate a deck.
     #[prost(message, optional, tag="15")]
     pub generates_deck: ::core::option::Option<bool>,
+    /// Metadata applied to task pods or task CR objects.
+    /// For tasks backed by pods like PythonFunctionTask, this takes precedence
+    /// over the metadata in the pod template (K8sPod). For tasks backed by
+    /// CRDs, this metadata is applied to the CR object while the metadata
+    /// in K8s pod is applied to the pod template spec.
+    #[prost(message, optional, tag="16")]
+    pub metadata: ::core::option::Option<K8sObjectMetadata>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being

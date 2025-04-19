@@ -1933,6 +1933,10 @@
         "generates_deck": {
           "type": "boolean",
           "description": "Indicates whether the task will generate a deck when it finishes executing.\nThe BoolValue can have three states:\n- nil: The value is not set.\n- true: The task will generate a deck.\n- false: The task will not generate a deck."
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreK8sObjectMetadata",
+          "description": "Metadata applied to task pods or task CR objects.\nFor tasks backed by pods like PythonFunctionTask, this takes precedence\nover the metadata in the pod template (K8sPod). For tasks backed by\nCRDs, this metadata is applied to the CR object while the metadata\nin K8s pod is applied to the pod template spec."
         }
       },
       "title": "Task Metadata"
