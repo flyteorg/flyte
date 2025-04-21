@@ -8364,7 +8364,7 @@
         },
         "metadata": {
           "$ref": "#/definitions/coreK8sObjectMetadata",
-          "description": "Metadata applied to task pods or task CR objects.\nFor tasks backed by pods like PythonFunctionTask, this takes precedence\nover the metadata in the pod template (K8sPod). For tasks backed by\nCRDs, this metadata is applied to the CR object while the metadata\nin K8s pod is applied to the pod template spec."
+          "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
         }
       },
       "title": "Task Metadata"

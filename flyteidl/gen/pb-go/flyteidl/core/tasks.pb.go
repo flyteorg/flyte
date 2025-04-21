@@ -800,10 +800,13 @@ type TaskMetadata struct {
 	// - false: The task will not generate a deck.
 	GeneratesDeck *wrapperspb.BoolValue `protobuf:"bytes,15,opt,name=generates_deck,json=generatesDeck,proto3" json:"generates_deck,omitempty"`
 	// Metadata applied to task pods or task CR objects.
-	// For tasks backed by pods like PythonFunctionTask, this takes precedence
-	// over the metadata in the pod template (K8sPod). For tasks backed by
-	// CRDs, this metadata is applied to the CR object while the metadata
-	// in K8s pod is applied to the pod template spec.
+	// In flytekit, labels and annotations resulting in this metadata field
+	// are provided via `@task(labels=..., annotations=...)`.
+	// For tasks backed by pods like PythonFunctionTask, these take precedence
+	// over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+	// in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+	// the CR object itself while the metadata in the pod template/K8sPod is applied
+	// to the pod template spec of the CR object.
 	Metadata *K8SObjectMetadata `protobuf:"bytes,16,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 

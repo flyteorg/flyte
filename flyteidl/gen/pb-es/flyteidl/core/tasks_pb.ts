@@ -526,10 +526,13 @@ export class TaskMetadata extends Message<TaskMetadata> {
 
   /**
    * Metadata applied to task pods or task CR objects.
-   * For tasks backed by pods like PythonFunctionTask, this takes precedence
-   * over the metadata in the pod template (K8sPod). For tasks backed by
-   * CRDs, this metadata is applied to the CR object while the metadata
-   * in K8s pod is applied to the pod template spec.
+   * In flytekit, labels and annotations resulting in this metadata field
+   * are provided via `@task(labels=..., annotations=...)`.
+   * For tasks backed by pods like PythonFunctionTask, these take precedence
+   * over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+   * in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+   * the CR object itself while the metadata in the pod template/K8sPod is applied
+   * to the pod template spec of the CR object.
    *
    * @generated from field: flyteidl.core.K8sObjectMetadata metadata = 16;
    */
