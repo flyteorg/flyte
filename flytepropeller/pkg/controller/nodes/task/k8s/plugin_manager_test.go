@@ -1042,6 +1042,46 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		}, o.GetLabels())
 	})
 
+	t.Run("Task template K8s metadata overwrites object metadata", func(t *testing.T) {
+		o := &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Labels: map[string]string{
+					"task_template_label": "should_be_overwritten",
+				},
+				Annotations: map[string]string{
+					"task_template_annotation": "should_be_overwritten",
+				},
+			},
+		}
+		p := pluginsk8sMock.Plugin{}
+		p.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+
+		tmpl = &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				Metadata: &core.K8SObjectMetadata{
+					Labels: map[string]string{
+						"task_template_label": "task_template_label_val",
+					},
+					Annotations: map[string]string{
+						"task_template_annotation": "task_template_annotation_val",
+					},
+				},
+			},
+		}
+
+		pluginManager := PluginManager{plugin: &p}
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey":                     "aVal",
+			"task_template_annotation": "task_template_annotation_val",
+		}, o.GetAnnotations())
+		assert.Equal(t, map[string]string{
+			"task_template_label": "task_template_label_val",
+			"l1":                  "lv1",
+		}, o.GetLabels())
+	})
+
 	t.Run("Task template K8s metadata overwritten by task execution metadata", func(t *testing.T) {
 		o := &v1.Pod{}
 		p := pluginsk8sMock.Plugin{}
