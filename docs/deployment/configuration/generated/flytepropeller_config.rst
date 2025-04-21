@@ -1859,7 +1859,7 @@ Defines the number of failures to fetch a task before failing the task.
 webapi.RateLimiterConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-qps (int)
+qps (float64)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Defines the max rate of calls per second.
@@ -4872,6 +4872,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  max-task-phase-version-attempts: 3
   use-map-plugin-logs: false
   
 
@@ -4969,6 +4970,18 @@ Override subNode log links with those configured for the map plugin logs
 .. code-block:: yaml
 
   "false"
+  
+
+max-task-phase-version-attempts (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum number of attempts for incrementing the task phase version on events to bypass the already exists error
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "3"
   
 
 config.CompositeQueueConfig
