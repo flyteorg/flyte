@@ -86,6 +86,9 @@ var (
 				},
 				ContainerName: EmbeddedSecretsFileMountInitContainerName,
 			},
+			ImagePullSecrets: ImagePullSecretsConfig{
+				Enabled: false,
+			},
 		},
 		ImageBuilderConfig: ImageBuilderConfig{
 			ExcludedContainerNames: []string{EmbeddedSecretsFileMountInitContainerName},
@@ -174,6 +177,7 @@ type EmbeddedSecretManagerConfig struct {
 	AzureConfig            AzureConfig                  `json:"azureConfig" pflag:",Config for Azure settings"`
 	K8sConfig              K8sConfig                    `json:"k8sConfig" pflag:",Config for K8s settings"`
 	FileMountInitContainer FileMountInitContainerConfig `json:"fileMountInitContainer" pflag:",Init container configuration to use for mounting secrets as files."`
+	ImagePullSecrets       ImagePullSecretsConfig       `json:"imagePullSecrets" pflag:",Whether to enable image pull secrets for the webhook pod."`
 }
 
 type AWSConfig struct {
@@ -235,6 +239,10 @@ type ImageBuilderConfig struct {
 	LabelSelector          metav1.LabelSelector `json:"labelSelector"`
 	ExcludedContainerNames []string             `json:"excludedContainerNames"`
 	ExcludedImagePrefixes  []string             `json:"excludedImagePrefixes"`
+}
+
+type ImagePullSecretsConfig struct {
+	Enabled bool `json:"enabled" pflag:",Whether to enable image pull secrets for the webhook pod."`
 }
 
 func GetConfig() *Config {

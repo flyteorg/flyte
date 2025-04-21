@@ -337,6 +337,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_embeddedSecretManagerConfig.imagePullSecrets.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.imagePullSecrets.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("embeddedSecretManagerConfig.imagePullSecrets.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_azureSecretManager.sidecarImage", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

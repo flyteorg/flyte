@@ -10,6 +10,10 @@ import (
 	"unicode/utf8"
 
 	corev1 "k8s.io/api/core/v1"
+	k8sError "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -57,8 +61,10 @@ const (
 // Otherwise, the Pod will fail with an init-error.
 // Files will be mounted on /etc/flyte/secrets/<SecretGroup>/<SecretKey>
 type EmbeddedSecretManagerInjector struct {
-	cfg           config.EmbeddedSecretManagerConfig
-	secretFetcher SecretFetcher
+	cfg                config.EmbeddedSecretManagerConfig
+	secretFetcher      SecretFetcher
+	k8sClient          client.Client
+	referenceNamespace string
 }
 
 func (i EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
@@ -94,14 +100,23 @@ func validateRequiredFieldsExist(labels map[string]string) error {
 	return nil
 }
 
-func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret *core.Secret, labels map[string]string) (*SecretValue, error) {
-	// Fetch the secret from configured secrets manager
+func deriveSecretNameComponents(secret *core.Secret, labels map[string]string) (*SecretNameComponents, error) {
 	err := validateRequiredFieldsExist(labels)
 	if err != nil {
 		return nil, err
 	}
+
+	return &SecretNameComponents{
+		Project: labels[ProjectLabel],
+		Domain:  labels[DomainLabel],
+		Org:     labels[OrganizationLabel],
+		Name:    secret.Key,
+	}, nil
+}
+
+func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, error) {
 	// Fetch project-domain scoped secret
-	projectDomainScopedSecret := EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secret.Key)
+	projectDomainScopedSecret := EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
 	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
 	if err == nil {
 		return secretValue, nil
@@ -111,7 +126,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	}
 
 	// Fetch domain scoped secret
-	domainScopedSecret := EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secret.Key)
+	domainScopedSecret := EncodeSecretName(components.Org, components.Domain, EmptySecretScope, components.Name)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
 	if err == nil {
 		return secretValue, nil
@@ -121,7 +136,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	}
 
 	// Fetch organization scoped secret
-	orgScopedSecret := EncodeSecretName(labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
+	orgScopedSecret := EncodeSecretName(components.Org, EmptySecretScope, EmptySecretScope, components.Name)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
 	if err == nil {
 		return secretValue, err
@@ -133,6 +148,96 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	return nil, stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
 }
 
+// addImagePullSecretToPod adds an image pull secret to a pod if it doesn't already exist
+func (i *EmbeddedSecretManagerInjector) addImagePullSecretToPod(
+	ctx context.Context,
+	pod *corev1.Pod,
+	secret *corev1.Secret,
+) (*corev1.Pod, error) {
+	// Check if there is a Secret in the same namespace of the Pod that has the same labels of the Secret parameter
+
+	mirroredSecret := &corev1.Secret{}
+	err := i.k8sClient.Get(ctx, types.NamespacedName{Name: secret.GetName(), Namespace: pod.GetNamespace()}, mirroredSecret)
+	if err != nil && k8sError.IsNotFound(err) {
+		// Can't deep copy existing secret because it is not in the same namespace and has fields not allowed in Create
+		newSecret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        secret.GetName(),
+				Namespace:   pod.GetNamespace(),
+				Labels:      secret.Labels,
+				Annotations: secret.Annotations,
+			},
+			Type:       secret.Type,
+			Data:       secret.Data,
+			StringData: secret.StringData,
+		}
+		err = i.k8sClient.Create(ctx, newSecret)
+		mirroredSecret = newSecret
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create mirrored secret [%s] in namespace [%s]: %v", secret.GetName(), pod.GetNamespace(), err)
+			return pod, fmt.Errorf("failed to create mirrored secret [%s] in namespace [%s]: %w", secret.GetName(), pod.GetNamespace(), err)
+		}
+	} else if err != nil {
+		logger.Errorf(ctx, "Failed to check for mirrored secret [%s] in namespace [%s]: %v", secret.GetName(), pod.GetNamespace(), err)
+		return pod, fmt.Errorf("failed to check for mirrored secret [%s] in namespace [%s]: %w", secret.GetName(), pod.GetNamespace(), err)
+	}
+
+	// Now add the image pull secret reference to the pod
+	imagePullSecretRef := corev1.LocalObjectReference{
+		Name: mirroredSecret.GetName(),
+	}
+
+	// Check if the secret reference already exists to avoid duplicates
+	secretExists := false
+	if pod.Spec.ImagePullSecrets != nil {
+		for _, existingSecret := range pod.Spec.ImagePullSecrets {
+			if existingSecret.Name == mirroredSecret.GetName() {
+				secretExists = true
+				break
+			}
+		}
+	}
+
+	// Add the image pull secret reference if it doesn't already exist
+	if !secretExists {
+		if pod.Spec.ImagePullSecrets == nil {
+			pod.Spec.ImagePullSecrets = make([]corev1.LocalObjectReference, 0)
+		}
+
+		pod.Spec.ImagePullSecrets = append(pod.Spec.ImagePullSecrets, imagePullSecretRef)
+		logger.Infof(ctx, "Added image pull secret [%s] to pod [%s/%s]",
+			mirroredSecret.GetName(), pod.Namespace, pod.Name)
+		return pod, nil
+	} else {
+		logger.Debugf(ctx, "Image pull secret [%s] already exists in pod [%s/%s]",
+			mirroredSecret.GetName(), pod.Namespace, pod.Name)
+		return pod, nil
+	}
+}
+
+// findAndAddImagePullSecret finds image pull secrets for the given secret and adds them to the pod
+func (i *EmbeddedSecretManagerInjector) findAndAddImagePullSecret(
+	ctx context.Context,
+	nameComponents *SecretNameComponents,
+	pod *corev1.Pod,
+) (*corev1.Pod, error) {
+
+	k8sSecretName := ToImagePullK8sName(*nameComponents)
+	referenceSecret := &corev1.Secret{}
+	// Pass an empty slice of client.GetOption instead of nil
+	err := i.k8sClient.Get(ctx, types.NamespacedName{Name: k8sSecretName, Namespace: i.referenceNamespace}, referenceSecret)
+	if err != nil && !k8sError.IsNotFound(err) {
+		return pod, fmt.Errorf("failed to get reference secret [%s]: %w", k8sSecretName, err)
+	}
+
+	if k8sError.IsNotFound(err) {
+		logger.Debugf(ctx, "No reference secret found for secret [%v]. Assuming not image pull secret.", nameComponents)
+		return pod, nil
+	}
+
+	return i.addImagePullSecretToPod(ctx, pod, referenceSecret)
+}
+
 func (i EmbeddedSecretManagerInjector) Inject(
 	ctx context.Context,
 	secret *core.Secret,
@@ -142,7 +247,12 @@ func (i EmbeddedSecretManagerInjector) Inject(
 		return pod, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. Secret: [%v]", secret)
 	}
 
-	secretValue, err := i.lookUpSecret(ctx, secret, pod.Labels)
+	secretNameComponents, err := deriveSecretNameComponents(secret, pod.Labels)
+	if err != nil {
+		return pod, false, err
+	}
+
+	secretValue, err := i.lookUpSecret(ctx, secretNameComponents)
 	if err != nil {
 		return pod, false, err
 	}
@@ -179,6 +289,14 @@ func (i EmbeddedSecretManagerInjector) Inject(
 		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
 		logger.Error(ctx, err)
 		return pod, false, err
+	}
+
+	if i.cfg.ImagePullSecrets.Enabled {
+		pod, err = i.findAndAddImagePullSecret(ctx, secretNameComponents, pod)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to add image pull secret [%s]: %v", secretNameComponents.Name, err)
+			return pod, false, err
+		}
 	}
 
 	return pod, true, nil
@@ -320,9 +438,22 @@ func appendSecretToFileMountInitContainer(initContainer *corev1.Container, secre
 	envVar.Value += fmt.Sprintf("%s=%s\n", secretKey, base64.StdEncoding.EncodeToString(secretValue))
 }
 
-func NewEmbeddedSecretManagerInjector(cfg config.EmbeddedSecretManagerConfig, secretFetcher SecretFetcher) SecretsInjector {
+func NewEmbeddedSecretManagerInjector(
+	cfg config.EmbeddedSecretManagerConfig,
+	secretFetcher SecretFetcher,
+	k8sClient client.Client,
+	referenceNamespace string,
+) SecretsInjector {
 	return EmbeddedSecretManagerInjector{
-		cfg:           cfg,
-		secretFetcher: secretFetcher,
+		cfg:                cfg,
+		secretFetcher:      secretFetcher,
+		k8sClient:          k8sClient,
+		referenceNamespace: referenceNamespace,
 	}
+}
+
+//go:generate mockery -name=MockableControllerRuntimeClient -output=./mocks -case=underscore
+
+type MockableControllerRuntimeClient interface {
+	client.Client
 }

@@ -67,6 +67,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.k8sConfig.namespace"), DefaultConfig.EmbeddedSecretManagerConfig.K8sConfig.Namespace, "K8s namespace to be used for storing union secrets")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.image"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.Image, "Specifies init container image to use for mounting secrets as files.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.containerName"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.ContainerName, "Specifies the name of the init container that mounts secrets as files.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.imagePullSecrets.enabled"), DefaultConfig.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled, "Whether to enable image pull secrets for the webhook pod.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "azureSecretManager.sidecarImage"), DefaultConfig.AzureSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	return cmdFlags
 }

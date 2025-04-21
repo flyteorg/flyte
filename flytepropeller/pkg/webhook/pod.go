@@ -170,7 +170,7 @@ func (pm PodCreationWebhookConfig) CreateMutationWebhookConfiguration(namespace 
 	return mutateConfig, nil
 }
 
-func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) (*PodCreationWebhookConfig, error) {
+func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, podNamespace string, scope promutils.Scope) (*PodCreationWebhookConfig, error) {
 	caBytes, err := os.ReadFile(filepath.Join(cfg.ExpandCertDir(), "ca.crt"))
 	if err != nil {
 		// ca.crt is optional. If not provided, API Server will assume the webhook is serving SSL using a certificate
@@ -182,7 +182,7 @@ func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme
 		}
 	}
 
-	secretsMutator, err := secret.NewSecretsMutator(ctx, cfg, scope.NewSubScope("secrets"))
+	secretsMutator, err := secret.NewSecretsMutator(ctx, cfg, podNamespace, scope.NewSubScope("secrets"))
 	if err != nil {
 		return nil, err
 	}

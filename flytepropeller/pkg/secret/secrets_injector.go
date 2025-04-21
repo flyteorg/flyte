@@ -5,10 +5,14 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 //go:generate mockery --output=./mocks --case=underscore --name=SecretsInjector
@@ -22,6 +26,7 @@ func newSecretsInjector(
 	secretManagerType config.SecretManagerType,
 	webhookConfig *config.Config,
 	globalSecretManagerConfig *secretmanager.Config,
+	podNamespace string,
 ) (SecretsInjector, error) {
 	switch secretManagerType {
 	case config.SecretManagerTypeGlobal:
@@ -39,7 +44,27 @@ func newSecretsInjector(
 		if err != nil {
 			return nil, err
 		}
-		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetcher), nil
+
+		kubeConfig, err := rest.InClusterConfig()
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
+			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
+		}
+
+		// Initialize controller-runtime client
+		ctrlRuntimeScheme := k8sRuntime.NewScheme()
+		if err := corev1.AddToScheme(ctrlRuntimeScheme); err != nil {
+			logger.Errorf(ctx, "Failed to add core v1 to scheme: %v", err)
+			return nil, fmt.Errorf("failed to add core v1 to scheme: %w", err)
+		}
+
+		ctrlRuntimeClient, err := client.New(kubeConfig, client.Options{
+			Scheme: ctrlRuntimeScheme,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
+		}
+		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetcher, ctrlRuntimeClient, podNamespace), nil
 	case config.SecretManagerTypeAzure:
 		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil
 	default:

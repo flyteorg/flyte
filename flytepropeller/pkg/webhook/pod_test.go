@@ -22,6 +22,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+const (
+	testPodNamespace = "test-namespace"
+)
+
 var (
 	expectedSecretsLabelSelector = metav1.LabelSelector{
 		MatchLabels: map[string]string{
@@ -57,7 +61,7 @@ func TestNewPodCreationWebhookConfig_NewPodCreationWebhookConfig(t *testing.T) {
 			CertDir:                     "testdata",
 			ServiceName:                 "my-service",
 			EmbeddedSecretManagerConfig: secretManagerConfig,
-		}, latest.Scheme, promutils.NewTestScope())
+		}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 
 		assert.NoError(t, err)
 		assert.NotNil(t, pm)
@@ -73,7 +77,7 @@ func TestNewPodCreationWebhookConfig_NewPodCreationWebhookConfig(t *testing.T) {
 			CertDir:            "testdata",
 			ServiceName:        "my-service",
 			ImageBuilderConfig: testImageBuilderConfig,
-		}, latest.Scheme, promutils.NewTestScope())
+		}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 
 		assert.NoError(t, err)
 		assert.NotNil(t, pm)
@@ -122,10 +126,11 @@ func TestPodMutator_Mutate(t *testing.T) {
 func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 	ctx := context.Background()
 	serviceName := "test-service"
+
 	pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 		CertDir:     "testdata",
 		ServiceName: serviceName,
-	}, latest.Scheme, promutils.NewTestScope())
+	}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	t.Run("Empty namespace", func(t *testing.T) {
@@ -151,11 +156,12 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 	})
 
 	t.Run("With image builder", func(t *testing.T) {
+
 		pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 			CertDir:            "testdata",
 			ServiceName:        serviceName,
 			ImageBuilderConfig: testImageBuilderConfig,
-		}, latest.Scheme, promutils.NewTestScope())
+		}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 		namespace := "test-namespace"
 		c, err := pm.CreateMutationWebhookConfiguration(namespace)
@@ -188,10 +194,11 @@ func Test_Register(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Defaults", func(t *testing.T) {
+
 		pm, err := NewPodCreationWebhookConfig(context.Background(), &config.Config{
 			CertDir:     "testdata",
 			ServiceName: "my-service",
-		}, latest.Scheme, promutils.NewTestScope())
+		}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		mockRegister := &mocks.HTTPHookRegistererIface{}
@@ -202,11 +209,12 @@ func Test_Register(t *testing.T) {
 	})
 
 	t.Run("With Image Builder", func(t *testing.T) {
+
 		pm, err := NewPodCreationWebhookConfig(context.Background(), &config.Config{
 			CertDir:            "testdata",
 			ServiceName:        "my-service",
 			ImageBuilderConfig: testImageBuilderConfig,
-		}, latest.Scheme, promutils.NewTestScope())
+		}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		mockRegister := &mocks.HTTPHookRegistererIface{}
@@ -222,11 +230,12 @@ func Test_Register(t *testing.T) {
 
 func Test_MutatorConfigHandle(t *testing.T) {
 	ctx := context.Background()
+
 	pm, err := NewPodCreationWebhookConfig(ctx, &config.Config{
 		CertDir:            "testdata",
 		ServiceName:        "my-service",
 		ImageBuilderConfig: testImageBuilderConfig,
-	}, latest.Scheme, promutils.NewTestScope())
+	}, latest.Scheme, testPodNamespace, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	req := admission.Request{

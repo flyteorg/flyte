@@ -54,7 +54,7 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook, err := NewPodCreationWebhookConfig(ctx, cfg, mgr.GetScheme(), webhookScope)
+	secretsWebhook, err := NewPodCreationWebhookConfig(ctx, cfg, mgr.GetScheme(), defaultNamespace, webhookScope)
 	if err != nil {
 		return err
 	}
@@ -76,17 +76,11 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodCreationWebhookConfig, defaultNamespace string) error {
+func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodCreationWebhookConfig, podNamespace string) error {
 	shouldAddOwnerRef := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {
 		shouldAddOwnerRef = false
-	}
-
-	podNamespace, found := os.LookupEnv(PodNamespaceEnvVar)
-	if !found {
-		shouldAddOwnerRef = false
-		podNamespace = defaultNamespace
 	}
 
 	mutateConfig, err := webhookObj.CreateMutationWebhookConfiguration(podNamespace)

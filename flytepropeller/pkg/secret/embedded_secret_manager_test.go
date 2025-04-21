@@ -10,14 +10,21 @@ import (
 	"github.com/go-test/deep"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
+	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+)
+
+const (
+	testReferenceNamespace = "test-reference-namespace"
 )
 
 func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
@@ -49,17 +56,16 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 		Project: gcpProject,
 	}, gcpClient)
 
-	injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, gcpSecretsFetcher)
-
 	inputSecret := &core.Secret{
 		Key: secretIDKey,
 	}
 	type test struct {
-		name             string
-		pod              *corev1.Pod
-		expectedPod      *corev1.Pod
-		expectedInjected bool
-		expectedError    error
+		name                  string
+		pod                   *corev1.Pod
+		expectedPod           *corev1.Pod
+		expectedK8sSecretName string
+		expectedInjected      bool
+		expectedError         error
 	}
 
 	tests := []test{
@@ -75,8 +81,9 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					Containers: []corev1.Container{},
 				},
 			},
-			expectedInjected: false,
-			expectedError:    stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, OrganizationLabel)),
+			expectedK8sSecretName: "",
+			expectedInjected:      false,
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, OrganizationLabel)),
 		},
 		{
 			name: "empty project",
@@ -100,8 +107,9 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					Containers: []corev1.Container{},
 				},
 			},
-			expectedInjected: false,
-			expectedError:    stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, ProjectLabel)),
+			expectedK8sSecretName: "",
+			expectedInjected:      false,
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, ProjectLabel)),
 		},
 		{
 			name: "empty domain",
@@ -127,8 +135,9 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					Containers: []corev1.Container{},
 				},
 			},
-			expectedInjected: false,
-			expectedError:    stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, DomainLabel)),
+			expectedK8sSecretName: "",
+			expectedInjected:      false,
+			expectedError:         stdlibErrors.Errorf(ErrCodeSecretRequirementsError, fmt.Sprintf(SecretRequirementsErrorFormat, DomainLabel)),
 		},
 		{
 			name: "all labels",
@@ -172,12 +181,27 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					InitContainers: []corev1.Container{},
 				},
 			},
+			expectedK8sSecretName: ToImagePullK8sName(SecretNameComponents{
+				Org:     OrganizationLabel,
+				Domain:  "",
+				Project: "",
+				Name:    secretIDKey,
+			}),
 			expectedInjected: true,
 			expectedError:    nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mocks.MockableControllerRuntimeClient{}
+
+			if tt.expectedInjected {
+				mockClient.
+					On("Get", ctx, types.NamespacedName{Name: tt.expectedK8sSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+					Return(k8sError.NewNotFound(corev1.Resource("secret"), tt.expectedK8sSecretName))
+			}
+
+			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, gcpSecretsFetcher, mockClient, testReferenceNamespace)
 
 			actualP, injected, err := injector.Inject(ctx, inputSecret, tt.pod)
 			assert.Equal(t, tt.expectedInjected, injected)
@@ -232,6 +256,17 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 				},
 			}
 
+			mockClient := &mocks.MockableControllerRuntimeClient{}
+			kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
+				Org:     "organization",
+				Domain:  "domain",
+				Project: "project",
+				Name:    "secret1",
+			})
+			mockClient.
+				On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+				Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName))
+
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
 				secretFetcherMock{
@@ -240,7 +275,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 							BinaryValue: []byte("banana"),
 						},
 					},
-				})
+				}, mockClient, testReferenceNamespace)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -260,7 +295,6 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 				assert.True(t, found)
 				assert.Equal(t, "/etc/flyte/secrets/secret1", env.Value)
 			}
-
 		})
 	}
 }
@@ -301,6 +335,17 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 				},
 			}
 
+			mockClient := &mocks.MockableControllerRuntimeClient{}
+			kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
+				Org:     "o-apple",
+				Domain:  "",
+				Project: "",
+				Name:    "secret1",
+			})
+			mockClient.
+				On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+				Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName))
+
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
 				secretFetcherMock{
@@ -309,7 +354,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 							StringValue: "fruits",
 						},
 					},
-				})
+				}, mockClient, testReferenceNamespace)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -338,6 +383,26 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 		},
 	}
 
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "",
+		Project: "",
+		Name:    "secret1",
+	})
+	kubernetesSecretName2 := ToImagePullK8sName(SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "",
+		Name:    "secret1",
+	})
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName1, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName1))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName2, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName2))
+
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
 		secretFetcherMock{
@@ -349,7 +414,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 					StringValue: "fruits @ domain",
 				},
 			},
-		})
+		}, mockClient, testReferenceNamespace)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -375,6 +440,35 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 		},
 	}
 
+	mockClient := &mocks.MockableControllerRuntimeClient{}
+	kubernetesSecretName1 := ToImagePullK8sName(SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "",
+		Project: "",
+		Name:    "secret1",
+	})
+	kubernetesSecretName2 := ToImagePullK8sName(SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "",
+		Name:    "secret1",
+	})
+	kubernetesSecretName3 := ToImagePullK8sName(SecretNameComponents{
+		Org:     "o-apple",
+		Domain:  "d-cherry",
+		Project: "p-banana",
+		Name:    "secret1",
+	})
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName1, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName1))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName2, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName2))
+	mockClient.
+		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName3, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName3))
+
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
 		secretFetcherMock{
@@ -389,12 +483,162 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 					StringValue: "fruits @ project",
 				},
 			},
-		})
+		}, mockClient, testReferenceNamespace)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
 	assert.True(t, injected)
 	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project", ""))
+}
+
+func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
+	ctx = context.Background()
+
+	testOrganization := "test-organization"
+	testDomain := "test-domain"
+	testProject := "test-project"
+	testSecretName := "test-secret"
+	testNamespace := "test-pod-namespace"
+
+	secretName := "u__org__test-organization__domain__test-domain__project__test-project__key__test-secret" //nolint:gosec
+	kubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
+		Org:     testOrganization,
+		Domain:  testDomain,
+		Project: testProject,
+		Name:    testSecretName,
+	})
+
+	referenceImagePullSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      kubernetesSecretName,
+			Namespace: testReferenceNamespace,
+		},
+		Data: map[string][]byte{
+			".dockerconfigjson": []byte("test-credentials"),
+		},
+	}
+
+	existingMirrorImagePullSecret := referenceImagePullSecret.DeepCopy()
+	existingMirrorImagePullSecret.SetNamespace(testNamespace)
+
+	secret := &core.Secret{Key: testSecretName}
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{},
+			},
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": testOrganization,
+				"domain":       testDomain,
+				"project":      testProject,
+			},
+			Namespace: testNamespace,
+		},
+	}
+
+	enabledConfig := config.EmbeddedSecretManagerConfig{
+		ImagePullSecrets: config.ImagePullSecretsConfig{
+			Enabled: true,
+		},
+	}
+
+	t.Run("existing image pull secret", func(t *testing.T) {
+		testPod := pod.DeepCopy()
+
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+			Run(func(args mock.Arguments) {
+				secret := args.Get(2).(*corev1.Secret)
+				*secret = *referenceImagePullSecret
+			}).
+			Return(nil)
+
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testNamespace}, &corev1.Secret{}).
+			Run(func(args mock.Arguments) {
+				secret := args.Get(2).(*corev1.Secret)
+				*secret = *existingMirrorImagePullSecret
+			}).
+			Return(nil)
+
+		injector := NewEmbeddedSecretManagerInjector(
+			enabledConfig,
+			secretFetcherMock{
+				Secrets: map[string]SecretValue{
+					secretName: {
+						BinaryValue: []byte("test-credentials"),
+					},
+				},
+			}, mockClient, testReferenceNamespace)
+
+		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.Equal(t, []corev1.LocalObjectReference{{Name: kubernetesSecretName}}, resultPod.Spec.ImagePullSecrets)
+	})
+
+	t.Run("missing image pull secret", func(t *testing.T) {
+		testPod := pod.DeepCopy()
+
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+			Run(func(args mock.Arguments) {
+				secret := args.Get(2).(*corev1.Secret)
+				*secret = *referenceImagePullSecret
+			}).
+			Return(nil)
+
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testNamespace}, &corev1.Secret{}).
+			Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName))
+
+		mockClient.
+			On("Create", ctx, existingMirrorImagePullSecret).
+			Return(nil)
+
+		injector := NewEmbeddedSecretManagerInjector(
+			enabledConfig,
+			secretFetcherMock{
+				Secrets: map[string]SecretValue{
+					secretName: {
+						BinaryValue: []byte("test-credentials"),
+					},
+				},
+			}, mockClient, testReferenceNamespace)
+
+		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.Equal(t, []corev1.LocalObjectReference{{Name: kubernetesSecretName}}, resultPod.Spec.ImagePullSecrets)
+	})
+
+	t.Run("image pull secrets disabled", func(t *testing.T) {
+		testPod := pod.DeepCopy()
+
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+
+		injector := NewEmbeddedSecretManagerInjector(
+			config.EmbeddedSecretManagerConfig{},
+			secretFetcherMock{
+				Secrets: map[string]SecretValue{
+					secretName: {
+						BinaryValue: []byte("test-credentials"),
+					},
+				},
+			}, mockClient, testReferenceNamespace)
+
+		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.Nil(t, resultPod.Spec.ImagePullSecrets)
+
+		mockClient.AssertNotCalled(t, "Get", mock.Anything, mock.Anything, mock.Anything)
+		mockClient.AssertNotCalled(t, "Create", mock.Anything, mock.Anything)
+	})
 }
 
 func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {

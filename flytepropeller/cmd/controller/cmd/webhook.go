@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -29,10 +31,10 @@ var webhookCmd = &cobra.Command{
 	Short:   "Runs Propeller Pod Webhook that listens for certain labels and modify the pod accordingly.",
 	Long: `
 This command initializes propeller's Pod webhook that enables it to mutate pods whether they are created directly from
-plugins or indirectly through the creation of other CRDs (e.g. Spark/Pytorch). 
+plugins or indirectly through the creation of other CRDs (e.g. Spark/Pytorch).
 In order to use this Webhook:
-1) Keys need to be mounted to the POD that runs this command; tls.crt should be a CA-issued cert (not a self-signed 
-   cert), tls.key as the private key for that cert and, optionally, ca.crt in case tls.crt's CA is not a known 
+1) Keys need to be mounted to the POD that runs this command; tls.crt should be a CA-issued cert (not a self-signed
+   cert), tls.key as the private key for that cert and, optionally, ca.crt in case tls.crt's CA is not a known
    Certificate Authority (e.g. in case ca.crt is self-issued).
 2) POD_NAME and POD_NAMESPACE environment variables need to be populated because the webhook initialization will lookup
    this pod to copy OwnerReferences into the new MutatingWebhookConfiguration object it'll create to ensure proper
@@ -44,7 +46,7 @@ A sample Container for this webhook might look like this:
         - name: config-volume
           configMap:
             name: flyte-propeller-config-492gkfhbgk
-        # Certs secret created by running 'flytepropeller webhook init-certs' 
+        # Certs secret created by running 'flytepropeller webhook init-certs'
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
@@ -143,8 +145,15 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		return err
 	})
 
+	// Always use the Pod namespace when running as a container
+	podNamespace, found := os.LookupEnv(webhook.PodNamespaceEnvVar)
+	if !found {
+		logger.Fatalf(childCtx, "%s environment variable not set", webhook.PodNamespaceEnvVar)
+		return fmt.Errorf("%s environment variable not set", webhook.PodNamespaceEnvVar)
+	}
+
 	g.Go(func() error {
-		err := webhook.Run(childCtx, propellerCfg, cfg, defaultNamespace, &webhookScope, mgr)
+		err := webhook.Run(childCtx, propellerCfg, cfg, podNamespace, &webhookScope, mgr)
 		if err != nil {
 			logger.Fatalf(childCtx, "Failed to start webhook. Error: %v", err)
 		}
