@@ -4,15 +4,25 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/types"
 
+	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
+
+var testConfig = &Config{
+	FastTaskExecutionMetric: FastTaskExecutionMetricConfig{
+		TTL:             config.Duration{Duration: 5 * time.Second},
+		CleanupInterval: config.Duration{Duration: time.Second},
+	},
+}
 
 func TestCheckStatus(t *testing.T) {
 	ctx := context.TODO()
@@ -111,7 +121,7 @@ func TestCheckStatus(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope)
+			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
 
 			// setup taskStatusChannels
 			if test.taskStatuses != nil {
@@ -159,8 +169,8 @@ func TestCheckStatus(t *testing.T) {
 			fastTaskService.queues = queues
 
 			// offer on queue and validate
-			phase, _, err := fastTaskService.CheckStatus(ctx, test.taskID, test.queueID, test.workerID)
-			assert.Equal(t, test.expectedPhase, phase)
+			taskStatus, err := fastTaskService.CheckStatus(ctx, test.taskID, test.queueID, test.workerID)
+			assert.Equal(t, test.expectedPhase, taskStatus.Phase)
 			assert.Equal(t, test.expectedError, err)
 
 			// validate ACK response
@@ -288,7 +298,7 @@ func TestCleanup(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope)
+			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
 
 			// setup response channels for queue workers
 			responseChans := make(map[string]chan *pb.HeartbeatResponse)
@@ -482,7 +492,7 @@ func TestOfferOnQueue(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope)
+			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
 
 			// setup response channels for queue workers
 			responseChans := make(map[string]chan *pb.HeartbeatResponse)
@@ -500,7 +510,13 @@ func TestOfferOnQueue(t *testing.T) {
 			assert.False(t, exists)
 
 			// offer on queue and validate
-			workerID, err := fastTaskService.OfferOnQueue(ctx, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string))
+			execID := &coreIdl.WorkflowExecutionIdentifier{
+				Org:     "foo",
+				Project: "bar",
+				Domain:  "dev",
+				Name:    "abc",
+			}
+			workerID, err := fastTaskService.OfferOnQueue(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string))
 			assert.Equal(t, test.expectedWorkerID, workerID)
 			assert.Equal(t, test.expectedError, err)
 
@@ -514,6 +530,10 @@ func TestOfferOnQueue(t *testing.T) {
 							assert.NotNil(t, response)
 							assert.Equal(t, test.taskID, response.GetTaskId())
 							assert.Equal(t, pb.HeartbeatResponse_ASSIGN, response.GetOperation())
+							assert.Equal(t, execID.GetOrg(), response.GetExecId().GetOrg())
+							assert.Equal(t, execID.GetProject(), response.GetExecId().GetProject())
+							assert.Equal(t, execID.GetDomain(), response.GetExecId().GetDomain())
+							assert.Equal(t, execID.GetName(), response.GetExecId().GetName())
 						default:
 							assert.Fail(t, "expected response")
 						}
@@ -552,7 +572,7 @@ func TestPendingOwnerManagement(t *testing.T) {
 	}
 	scope := promutils.NewTestScope()
 
-	fastTaskService := newFastTaskService(enqueueOwner, scope)
+	fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
 	assert.Equal(t, 0, len(fastTaskService.queues))
 
 	// add pending owners
@@ -669,7 +689,7 @@ func TestQueueWorkerManagement(t *testing.T) {
 	}
 	scope := promutils.NewTestScope()
 
-	fastTaskService := newFastTaskService(enqueueOwner, scope)
+	fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
 	assert.Equal(t, 0, len(fastTaskService.queues))
 
 	// add workers

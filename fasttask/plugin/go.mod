@@ -9,6 +9,7 @@ require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.5.4
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/prometheus/client_golang v1.19.1
 	github.com/samber/lo v1.39.0
 	github.com/spf13/pflag v1.0.5

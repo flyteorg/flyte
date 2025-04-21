@@ -2,9 +2,9 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use crate::common::{Executor, Response, Task};
+use crate::common::{Executor, Response, Task, ToProstDuration};
 use crate::common::{TaskContext, FAILED, QUEUED, RUNNING};
-use crate::pb::fasttask::TaskStatus;
+use crate::pb::fasttask::{ExecutionIdentifier, TaskStatus};
 
 use anyhow::{bail, Result};
 use async_channel::{self, Receiver, Sender, TryRecvError};
@@ -23,6 +23,7 @@ pub async fn execute(
     task_id: String,
     namespace: String,
     workflow_id: String,
+    exec_id: ExecutionIdentifier,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
@@ -52,7 +53,8 @@ pub async fn execute(
     }
 
     // if backlogged we wait until we can execute
-    let (mut phase, mut reason) = (QUEUED, "".to_string());
+    let (mut phase, mut reason, mut task_duration) =
+        (QUEUED, "".to_string(), Duration::from_secs(0));
     if backlogged {
         executor = wait_in_backlog(
             task_contexts.clone(),
@@ -60,6 +62,7 @@ pub async fn execute(
             &task_id,
             &namespace,
             &workflow_id,
+            &exec_id,
             &task_status_tx,
             task_status_report_interval_seconds,
             last_ack_grace_period_seconds,
@@ -80,6 +83,7 @@ pub async fn execute(
             &task_id,
             &namespace,
             &workflow_id,
+            &exec_id,
             cmd,
             env_vars,
             additional_distribution,
@@ -89,6 +93,7 @@ pub async fn execute(
             last_ack_grace_period_seconds,
             &mut phase,
             &mut reason,
+            &mut task_duration,
             &mut executor,
         )
         .await
@@ -126,11 +131,13 @@ pub async fn execute(
             &task_id,
             &namespace,
             &workflow_id,
+            &exec_id,
             &task_status_tx,
             task_status_report_interval_seconds,
             last_ack_grace_period_seconds,
             &mut phase,
             &mut reason,
+            Some(task_duration),
         )
         .await?;
     }
@@ -158,11 +165,13 @@ async fn report_terminal_status(
     task_id: &str,
     namespace: &str,
     workflow_id: &str,
+    exec_id: &ExecutionIdentifier,
     task_status_tx: &Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
     last_ack_grace_period_seconds: u64,
     phase: &mut i32,
     reason: &mut String,
+    task_duration: Option<Duration>,
 ) -> Result<()> {
     // send completed task status until deleted
     let mut interval =
@@ -191,8 +200,10 @@ async fn report_terminal_status(
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
                     workflow_id: workflow_id.to_string(),
+                    exec_id: Some(exec_id.clone()),
                     phase: *phase,
                     reason: reason.clone(),
+                    task_duration: task_duration.map(|d|d.to_prost()),
                 }).await;
 
                 if error.is_err() {
@@ -213,6 +224,7 @@ async fn run_command(
     task_id: &str,
     namespace: &str,
     workflow_id: &str,
+    exec_id: &ExecutionIdentifier,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
@@ -222,10 +234,12 @@ async fn run_command(
     last_ack_grace_period_seconds: u64,
     phase: &mut i32,
     reason: &mut String,
+    task_duration: &mut Duration,
     executor: &mut Executor,
 ) -> Result<RunCommandResult> {
     // execute command and monitor
-    let task_start_ts = Instant::now();
+    let task_first_ts = Instant::now();
+    let mut task_prev_ts = task_first_ts;
 
     let buf = bincode::serialize(&Task {
         cmd,
@@ -243,7 +257,9 @@ async fn run_command(
         tokio::select! {
             result = executor.framed.next() => {
                 // executor returned a result for the task execution
-                info!("completed task_id {} in {}", task_id, task_start_ts.elapsed().as_millis());
+                info!("completed task_id {} in {} ms", task_id, task_first_ts.elapsed().as_millis());
+                *task_duration = task_prev_ts.elapsed();
+
                 let buf = result.unwrap().unwrap();
 
                 let response: Response = bincode::deserialize(&buf).unwrap();
@@ -304,13 +320,19 @@ async fn run_command(
                         })
                 }
 
+                let current_ts = Instant::now();
+                let current_duration = current_ts.duration_since(task_prev_ts);
+                task_prev_ts = current_ts;
+
                 // send task status
                 let error = task_status_tx.send(TaskStatus{
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
                     workflow_id: workflow_id.to_string(),
+                    exec_id: Some(exec_id.clone()),
                     phase: *phase,
                     reason: reason.clone(),
+                    task_duration: Some(current_duration.to_prost()),
                 }).await;
 
                 if error.is_err() {
@@ -343,6 +365,7 @@ async fn wait_in_backlog<T>(
     task_id: &str,
     namespace: &str,
     workflow_id: &str,
+    exec_id: &ExecutionIdentifier,
     task_status_tx: &Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
     last_ack_grace_period_seconds: u64,
@@ -388,8 +411,10 @@ async fn wait_in_backlog<T>(
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
                     workflow_id: workflow_id.to_string(),
+                    exec_id: Some(exec_id.clone()),
                     phase: *phase,
                     reason: reason.clone(),
+                    task_duration: None,
                 }).await;
 
                 if error.is_err() {
@@ -461,6 +486,12 @@ mod tests {
             "namespace".to_string(),
             "workflow_id".to_string(),
         );
+        let exec_id = ExecutionIdentifier {
+            org: "dogfood".to_string(),
+            project: "flytesnacks".to_string(),
+            domain: "development".to_string(),
+            name: "abc123".to_string(),
+        };
         let (task_status_tx, task_status_rx) = async_channel::unbounded();
         let (task_status_report_interval_seconds, last_ack_grace_period_seconds) =
             (1, last_ack_grace_period_seconds);
@@ -493,6 +524,7 @@ mod tests {
                 &task_id,
                 &namespace,
                 &workflow_id,
+                &exec_id,
                 &task_status_tx,
                 task_status_report_interval_seconds,
                 last_ack_grace_period_seconds,
@@ -603,6 +635,12 @@ mod tests {
             "namespace".to_string(),
             "workflow_id".to_string(),
         );
+        let exec_id = ExecutionIdentifier {
+            org: "dogfood".to_string(),
+            project: "flytesnacks".to_string(),
+            domain: "development".to_string(),
+            name: "abc123".to_string(),
+        };
         let (task_status_tx, task_status_rx) = async_channel::unbounded();
         let (task_status_report_interval_seconds, last_ack_grace_period_seconds) =
             (1, last_ack_grace_period_seconds);
@@ -630,11 +668,13 @@ mod tests {
                 &task_id,
                 &namespace,
                 &workflow_id,
+                &exec_id,
                 &task_status_tx,
                 task_status_report_interval_seconds,
                 last_ack_grace_period_seconds,
                 &mut phase,
                 &mut reason,
+                None,
             )
             .await
         });

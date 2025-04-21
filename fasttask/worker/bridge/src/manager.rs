@@ -12,7 +12,7 @@ use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use tracing::warn;
 
 use crate::common::{AsyncBool, Executor, TaskContext, SUCCEEDED};
-use crate::pb::fasttask::{Capacity, TaskStatus};
+use crate::pb::fasttask::{Capacity, ExecutionIdentifier, TaskStatus};
 use crate::task::{self};
 
 pub trait TaskManager {
@@ -22,6 +22,7 @@ pub trait TaskManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
+        exec_id: ExecutionIdentifier,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>>;
@@ -105,8 +106,15 @@ impl ExecutionStrategy {
                         task_id: task_assignment.task_id.clone(),
                         namespace: task_assignment.namespace,
                         workflow_id: task_assignment.workflow_id,
+                        exec_id: Some(ExecutionIdentifier {
+                            org: task_assignment.exec_id.org,
+                            project: task_assignment.exec_id.project,
+                            domain: task_assignment.exec_id.domain,
+                            name: task_assignment.exec_id.name,
+                        }),
                         phase: SUCCEEDED,
                         reason: "reason".to_string(),
+                        task_duration: None,
                     })
                     .await?;
 
@@ -120,6 +128,7 @@ impl ExecutionStrategy {
                     task_assignment.task_id.clone(),
                     task_assignment.namespace,
                     task_assignment.workflow_id,
+                    task_assignment.exec_id,
                     task_assignment.cmd,
                     task_assignment.env_vars,
                     task_assignment.additional_distribution,
@@ -155,6 +164,7 @@ struct TaskAssignment {
     task_id: String,
     namespace: String,
     workflow_id: String,
+    exec_id: ExecutionIdentifier,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
@@ -237,6 +247,7 @@ impl TaskManager for MultiProcessManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
+        exec_id: ExecutionIdentifier,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
@@ -253,6 +264,7 @@ impl TaskManager for MultiProcessManager {
                 task_id,
                 namespace,
                 workflow_id,
+                exec_id,
                 cmd: actor_cmd,
                 env_vars,
                 additional_distribution,
@@ -464,8 +476,8 @@ fn transform_cmd(
  */
 
 pub struct SuccessManager {
-    task_tx: Sender<(String, String, String)>,
-    task_rx: Receiver<(String, String, String)>,
+    task_tx: Sender<(String, String, String, ExecutionIdentifier)>,
+    task_rx: Receiver<(String, String, String, ExecutionIdentifier)>,
 }
 
 impl SuccessManager {
@@ -485,12 +497,15 @@ impl TaskManager for SuccessManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
+        exec_id: ExecutionIdentifier,
         _cmd: Vec<String>,
         _env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
         let task_tx = self.task_tx.clone();
         async move {
-            let send_result = task_tx.send((task_id, namespace, workflow_id)).await;
+            let send_result = task_tx
+                .send((task_id, namespace, workflow_id, exec_id))
+                .await;
             assert!(send_result.is_ok());
             Ok(())
         }
@@ -517,7 +532,7 @@ impl TaskManager for SuccessManager {
 }
 
 pub struct SuccessRuntime {
-    task_rx: Receiver<(String, String, String)>,
+    task_rx: Receiver<(String, String, String, ExecutionIdentifier)>,
 }
 
 impl TaskManagerRuntime for SuccessRuntime {
@@ -536,13 +551,15 @@ impl TaskManagerRuntime for SuccessRuntime {
             let task_result = task_rx.recv().await;
             assert!(task_result.is_ok());
 
-            let (task_id, namespace, workflow_id) = task_result.unwrap();
+            let (task_id, namespace, workflow_id, exec_id) = task_result.unwrap();
             let task_status = TaskStatus {
                 task_id,
                 namespace,
                 workflow_id,
+                exec_id: Some(exec_id),
                 phase: SUCCEEDED,
                 reason: "".to_string(),
+                task_duration: None,
             };
 
             let send_result = task_status_tx.send(task_status).await;
@@ -565,6 +582,12 @@ mod tests {
             "namespace".to_string(),
             "workflow_id".to_string(),
         );
+        let exec_id = ExecutionIdentifier {
+            org: "dogfood".to_string(),
+            project: "flytesnacks".to_string(),
+            domain: "development".to_string(),
+            name: "abc123".to_string(),
+        };
         let cmd = vec!["".to_string()];
         let env_vars = HashMap::new();
 
@@ -607,6 +630,7 @@ mod tests {
                 task_id.clone(),
                 namespace.clone(),
                 workflow_id.clone(),
+                exec_id.clone(),
                 cmd,
                 env_vars,
             )
@@ -629,6 +653,7 @@ mod tests {
         assert_eq!(task_status.namespace, namespace);
         assert_eq!(task_status.workflow_id, workflow_id);
         assert_eq!(task_status.phase, SUCCEEDED);
+        assert_eq!(task_status.exec_id, Some(exec_id));
 
         // validate task_context
         let initial_ack_timestamp = {

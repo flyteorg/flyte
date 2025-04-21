@@ -1,4 +1,16 @@
 // @generated
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionIdentifier {
+    #[prost(string, tag = "1")]
+    pub org: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub project: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub domain: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub name: ::prost::alloc::string::String,
+}
 /// The current execution status of a specific fasttask execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -19,6 +31,12 @@ pub struct TaskStatus {
     /// This is notably useful for explaining failure scenarios.
     #[prost(string, tag = "5")]
     pub reason: ::prost::alloc::string::String,
+    /// Identifier of an execution to which this task belongs
+    #[prost(message, optional, tag = "6")]
+    pub exec_id: ::core::option::Option<ExecutionIdentifier>,
+    /// For how long this task was running since last task status report
+    #[prost(message, optional, tag = "7")]
+    pub task_duration: ::core::option::Option<::prost_types::Duration>,
 }
 /// The current execution capacity for a fasttask worker replia.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -79,6 +97,8 @@ pub struct HeartbeatResponse {
     #[prost(map = "string, string", tag = "6")]
     pub env_vars:
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    #[prost(message, optional, tag = "7")]
+    pub exec_id: ::core::option::Option<ExecutionIdentifier>,
 }
 /// Nested message and enum types in `HeartbeatResponse`.
 pub mod heartbeat_response {

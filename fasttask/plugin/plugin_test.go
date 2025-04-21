@@ -31,8 +31,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 
-	"github.com/unionai/flyte/fasttask/plugin/mocks"
+	"github.com/unionai/flyte/fasttask/plugin/api"
+	"github.com/unionai/flyte/fasttask/plugin/api/mocks"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -265,7 +267,7 @@ func TestGetExecutionEnv(t *testing.T) {
 			clientGetExists: false,
 			createExectionEnvMatcher: mock.MatchedBy(func(environmentSpec *structpb.Struct) bool {
 				spec := &pb.FastTaskEnvironmentSpec{}
-				err := utils.UnmarshalStruct(environmentSpec, spec)
+				err := stdlibUtils.UnmarshalStructToPb(environmentSpec, spec)
 				assert.Nil(t, err)
 				var podTemplateSpec v1.PodTemplateSpec
 				err = json.Unmarshal(spec.GetPodTemplateSpec(), &podTemplateSpec)
@@ -521,13 +523,37 @@ func TestHandleNotYetStarted(t *testing.T) {
 		Namespace: "namespace",
 		Name:      "execution_id",
 	})
-	envVars := map[string]string{"TEST": "VALUE"}
+	envVars := map[string]string{
+		"TEST":                             "VALUE",
+		"FLYTE_ATTEMPT_NUMBER":             "0",
+		"FLYTE_INTERNAL_DOMAIN":            "domain",
+		"FLYTE_INTERNAL_EXECUTION_DOMAIN":  "domain",
+		"FLYTE_INTERNAL_EXECUTION_ID":      "abc123",
+		"FLYTE_INTERNAL_EXECUTION_PROJECT": "project",
+		"FLYTE_INTERNAL_NAME":              "",
+		"FLYTE_INTERNAL_PROJECT":           "project",
+		"FLYTE_INTERNAL_TASK_DOMAIN":       "domain",
+		"FLYTE_INTERNAL_TASK_NAME":         "",
+		"FLYTE_INTERNAL_TASK_PROJECT":      "project",
+		"FLYTE_INTERNAL_TASK_VERSION":      "",
+		"FLYTE_INTERNAL_VERSION":           "",
+		"_F_PN":                            "",
+	}
 	taskMetadata.OnGetEnvironmentVariables().Return(envVars)
 	taskExecutionID := &coremocks.TaskExecutionID{}
+	execID := &idlcore.WorkflowExecutionIdentifier{
+		Org:     "foo",
+		Project: "project",
+		Domain:  "domain",
+		Name:    "abc123",
+	}
 	taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
 		TaskId: &idlcore.Identifier{
 			Project: "project",
 			Domain:  "domain",
+		},
+		NodeExecutionId: &idlcore.NodeExecutionIdentifier{
+			ExecutionId: execID,
 		},
 	})
 	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
@@ -580,7 +606,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 				// create FastTaskService mock
 				fastTaskService := &mocks.FastTaskService{}
-				fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}, envVars).Return(test.workerID, nil)
+				fastTaskService.OnOfferOnQueue(ctx, execID, "foo", "task-id", "namespace", "execution_id", []string{}, envVars).Return(test.workerID, nil)
 
 				// initialize plugin
 				plugin := &Plugin{
@@ -600,7 +626,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 				assert.Len(t, transition.Info().Info().Logs, 0)
 				require.Len(t, transition.Info().Info().ExternalResources, 1)
 				assignment := pb.FastTaskAssignment{}
-				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+				require.NoError(t, stdlibUtils.UnmarshalStructToPb(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
 				assert.Equal(t, "", assignment.GetEnvironmentOrg())
 				assert.Equal(t, "project", assignment.GetEnvironmentProject())
 				assert.Equal(t, "domain", assignment.GetEnvironmentDomain())
@@ -842,7 +868,7 @@ func TestHandleRunning(t *testing.T) {
 
 			// create FastTaskService mock
 			fastTaskService := &mocks.FastTaskService{}
-			fastTaskService.OnCheckStatusMatch(ctx, "task-id", "foo", "w0").Return(test.taskStatusPhase, "", test.checkStatusError)
+			fastTaskService.OnCheckStatusMatch(ctx, "task-id", "foo", "w0").Return(api.TaskStatus{Phase: test.taskStatusPhase}, test.checkStatusError)
 
 			// initialize plugin
 			plugin := &Plugin{
@@ -873,7 +899,7 @@ func TestHandleRunning(t *testing.T) {
 			if test.expectedError == nil {
 				require.Len(t, transition.Info().Info().ExternalResources, 1)
 				assignment := pb.FastTaskAssignment{}
-				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+				require.NoError(t, stdlibUtils.UnmarshalStructToPb(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
 				assert.Equal(t, "", assignment.GetEnvironmentOrg())
 				assert.Equal(t, "project", assignment.GetEnvironmentProject())
 				assert.Equal(t, "domain", assignment.GetEnvironmentDomain())

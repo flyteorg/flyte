@@ -4,6 +4,18 @@ package fasttask;
 
 option go_package = "pb/";
 
+import "google/protobuf/duration.proto";
+
+message ExecutionIdentifier {
+    string org = 1;
+
+    string project = 2;
+
+    string domain = 3;
+
+    string name = 4;
+}
+
 // The current execution status of a specific fasttask execution.
 message TaskStatus {
     // The unique identifier for the fasttask execution instance.
@@ -21,6 +33,12 @@ message TaskStatus {
     // A brief description to understand why this fasttask execution is in the specified phase.
     // This is notably useful for explaining failure scenarios.
     string reason = 5;
+
+    // Identifier of an execution to which this task belongs
+    ExecutionIdentifier exec_id = 6;
+
+    // For how long this task was running since last task status report
+    google.protobuf.Duration task_duration = 7;
 }
 
 // The current execution capacity for a fasttask worker replia.
@@ -89,6 +107,8 @@ message HeartbeatResponse {
 
     // A map of environment variables for the fasttask execution.
     map<string, string> envVars = 6;
+
+    ExecutionIdentifier exec_id = 7;
 }
 
 service FastTask {

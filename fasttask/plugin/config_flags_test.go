@@ -421,4 +421,32 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_fast-task-execution-metric.ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.FastTaskExecutionMetric.TTL.String()
+
+			cmdFlags.Set("fast-task-execution-metric.ttl", testValue)
+			if vString, err := cmdFlags.GetString("fast-task-execution-metric.ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.FastTaskExecutionMetric.TTL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_fast-task-execution-metric.cleanup-interval", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.FastTaskExecutionMetric.CleanupInterval.String()
+
+			cmdFlags.Set("fast-task-execution-metric.cleanup-interval", testValue)
+			if vString, err := cmdFlags.GetString("fast-task-execution-metric.cleanup-interval"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.FastTaskExecutionMetric.CleanupInterval)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

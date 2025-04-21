@@ -5,7 +5,10 @@ package mocks
 import (
 	context "context"
 
-	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	api "github.com/unionai/flyte/fasttask/plugin/api"
+
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -18,8 +21,8 @@ type FastTaskService_CheckStatus struct {
 	*mock.Call
 }
 
-func (_m FastTaskService_CheckStatus) Return(_a0 core.Phase, _a1 string, _a2 error) *FastTaskService_CheckStatus {
-	return &FastTaskService_CheckStatus{Call: _m.Call.Return(_a0, _a1, _a2)}
+func (_m FastTaskService_CheckStatus) Return(_a0 api.TaskStatus, _a1 error) *FastTaskService_CheckStatus {
+	return &FastTaskService_CheckStatus{Call: _m.Call.Return(_a0, _a1)}
 }
 
 func (_m *FastTaskService) OnCheckStatus(ctx context.Context, taskID string, queueID string, workerID string) *FastTaskService_CheckStatus {
@@ -33,31 +36,24 @@ func (_m *FastTaskService) OnCheckStatusMatch(matchers ...interface{}) *FastTask
 }
 
 // CheckStatus provides a mock function with given fields: ctx, taskID, queueID, workerID
-func (_m *FastTaskService) CheckStatus(ctx context.Context, taskID string, queueID string, workerID string) (core.Phase, string, error) {
+func (_m *FastTaskService) CheckStatus(ctx context.Context, taskID string, queueID string, workerID string) (api.TaskStatus, error) {
 	ret := _m.Called(ctx, taskID, queueID, workerID)
 
-	var r0 core.Phase
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) core.Phase); ok {
+	var r0 api.TaskStatus
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) api.TaskStatus); ok {
 		r0 = rf(ctx, taskID, queueID, workerID)
 	} else {
-		r0 = ret.Get(0).(core.Phase)
+		r0 = ret.Get(0).(api.TaskStatus)
 	}
 
-	var r1 string
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) string); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
 		r1 = rf(ctx, taskID, queueID, workerID)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, string, string, string) error); ok {
-		r2 = rf(ctx, taskID, queueID, workerID)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 type FastTaskService_Cleanup struct {
@@ -100,8 +96,8 @@ func (_m FastTaskService_OfferOnQueue) Return(_a0 string, _a1 error) *FastTaskSe
 	return &FastTaskService_OfferOnQueue{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) *FastTaskService_OfferOnQueue {
-	c_call := _m.On("OfferOnQueue", ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
+func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) *FastTaskService_OfferOnQueue {
+	c_call := _m.On("OfferOnQueue", ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
@@ -110,20 +106,20 @@ func (_m *FastTaskService) OnOfferOnQueueMatch(matchers ...interface{}) *FastTas
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
-// OfferOnQueue provides a mock function with given fields: ctx, queueID, taskID, namespace, workflowID, cmd, envVars
-func (_m *FastTaskService) OfferOnQueue(ctx context.Context, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) (string, error) {
-	ret := _m.Called(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
+// OfferOnQueue provides a mock function with given fields: ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars
+func (_m *FastTaskService) OfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) (string, error) {
+	ret := _m.Called(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string, []string, map[string]string) string); ok {
-		r0 = rf(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string) string); ok {
+		r0 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string, []string, map[string]string) error); ok {
-		r1 = rf(ctx, queueID, taskID, namespace, workflowID, cmd, envVars)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string) error); ok {
+		r1 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
 	} else {
 		r1 = ret.Error(1)
 	}

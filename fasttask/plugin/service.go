@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"strings"
 	"sync"
+	"time"
 
+	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/types"
 
+	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
+	"github.com/unionai/flyte/fasttask/plugin/api"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -21,15 +26,6 @@ const (
 	maxPendingOwnersPerQueue = 100
 	queueIdLabel             = "queue_id"
 )
-
-//go:generate mockery -all -case=underscore
-
-// FastTaskService defines the interface for managing assignment and management of task executions
-type FastTaskService interface {
-	CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error)
-	Cleanup(ctx context.Context, taskID, queueID, workerID string) error
-	OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error)
-}
 
 // fastTaskServiceImpl is a gRPC service that manages assignment and management of task executions
 // with respect to fasttask workers.
@@ -47,6 +43,39 @@ type fastTaskServiceImpl struct {
 
 	taskStatusChannels sync.Map // map[taskID]chan *WorkerTaskStatus
 	metrics            serviceMetrics
+}
+
+type fastTaskExecutionMetric struct {
+	prom  *prometheus.CounterVec
+	cache *cache.Cache
+}
+
+const fastTaskMetricKeySeparator = ":"
+
+func newFastTaskExecutionMetric(scope promutils.Scope, cfg *FastTaskExecutionMetricConfig) fastTaskExecutionMetric {
+	prom := scope.MustNewCounterVec("fast_task_execution_duration",
+		"Cumulative duration of all fast task executions within a given execution",
+		"org", "project", "domain", "execution_id", "namespace", "pod")
+	c := cache.New(cfg.TTL.Duration, cfg.CleanupInterval.Duration)
+	c.OnEvicted(func(key string, _ interface{}) {
+		splt := strings.SplitN(key, fastTaskMetricKeySeparator, 6)
+		if len(splt) != 4 {
+			return
+		}
+		org, project, domain, execName, namespace, pod := splt[0], splt[1], splt[2], splt[3], splt[4], splt[5]
+		prom.DeleteLabelValues(org, project, domain, execName, namespace, pod)
+	})
+	return fastTaskExecutionMetric{
+		prom:  prom,
+		cache: c,
+	}
+}
+
+func (m *fastTaskExecutionMetric) add(execID *pb.ExecutionIdentifier, namespace, pod string, duration time.Duration) {
+	org, project, domain, execName := execID.GetOrg(), execID.GetProject(), execID.GetDomain(), execID.GetName()
+	m.prom.WithLabelValues(org, project, domain, execName, namespace, pod).Add(duration.Seconds())
+	key := strings.Join([]string{org, project, domain, execName, namespace, pod}, fastTaskMetricKeySeparator)
+	m.cache.Set(key, nil, cache.DefaultExpiration)
 }
 
 // Queue is a collection of Workers that are capable of executing similar tasks.
@@ -70,29 +99,31 @@ type workerTaskStatus struct {
 
 // serviceMetrics defines a collection of metrics for the fasttask service.
 type serviceMetrics struct {
-	taskNoWorkersAvailable  prometheus.Counter
-	taskNoCapacityAvailable prometheus.Counter
-	taskAssigned            prometheus.Counter
-	queues                  *prometheus.Desc
-	workers                 *prometheus.Desc
-	executions              *prometheus.Desc
-	executionsLimit         *prometheus.Desc
-	backlog                 *prometheus.Desc
-	backlogLimit            *prometheus.Desc
+	taskNoWorkersAvailable    prometheus.Counter
+	taskNoCapacityAvailable   prometheus.Counter
+	taskAssigned              prometheus.Counter
+	queues                    *prometheus.Desc
+	workers                   *prometheus.Desc
+	executions                *prometheus.Desc
+	executionsLimit           *prometheus.Desc
+	backlog                   *prometheus.Desc
+	backlogLimit              *prometheus.Desc
+	fastTaskExecutionDuration fastTaskExecutionMetric
 }
 
 // newServiceMetrics creates a new serviceMetrics with the given scope.
-func newServiceMetrics(scope promutils.Scope) serviceMetrics {
+func newServiceMetrics(scope promutils.Scope, cfg *Config) serviceMetrics {
 	return serviceMetrics{
-		taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
-		taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
-		taskAssigned:            scope.MustNewCounter("task_assigned", "Count of task assignments"),
-		queues:                  prometheus.NewDesc(scope.NewScopedMetricName("queues"), "Current number of queues", nil, nil),
-		workers:                 prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers per queue", []string{queueIdLabel}, nil),
-		executions:              prometheus.NewDesc(scope.NewScopedMetricName("executions"), "Current number of task executions per queue", []string{queueIdLabel}, nil),
-		executionsLimit:         prometheus.NewDesc(scope.NewScopedMetricName("executions_limit"), "Total executions limit per queue", []string{queueIdLabel}, nil),
-		backlog:                 prometheus.NewDesc(scope.NewScopedMetricName("backlog"), "Current number of backlogged tasks per queue", []string{queueIdLabel}, nil),
-		backlogLimit:            prometheus.NewDesc(scope.NewScopedMetricName("backlog_limit"), "Total backlog limit per queue", []string{queueIdLabel}, nil),
+		taskNoWorkersAvailable:    scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
+		taskNoCapacityAvailable:   scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
+		taskAssigned:              scope.MustNewCounter("task_assigned", "Count of task assignments"),
+		queues:                    prometheus.NewDesc(scope.NewScopedMetricName("queues"), "Current number of queues", nil, nil),
+		workers:                   prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers per queue", []string{queueIdLabel}, nil),
+		executions:                prometheus.NewDesc(scope.NewScopedMetricName("executions"), "Current number of task executions per queue", []string{queueIdLabel}, nil),
+		executionsLimit:           prometheus.NewDesc(scope.NewScopedMetricName("executions_limit"), "Total executions limit per queue", []string{queueIdLabel}, nil),
+		backlog:                   prometheus.NewDesc(scope.NewScopedMetricName("backlog"), "Current number of backlogged tasks per queue", []string{queueIdLabel}, nil),
+		backlogLimit:              prometheus.NewDesc(scope.NewScopedMetricName("backlog_limit"), "Total backlog limit per queue", []string{queueIdLabel}, nil),
+		fastTaskExecutionDuration: newFastTaskExecutionMetric(scope, &cfg.FastTaskExecutionMetric),
 	}
 }
 
@@ -217,7 +248,13 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 					taskStatus: taskStatus,
 				}
 			}
-
+			execID := taskStatus.GetExecId()
+			if taskStatus.GetTaskDuration().AsDuration() > 0 {
+				f.metrics.fastTaskExecutionDuration.add(execID,
+					taskStatus.GetNamespace(),
+					heartbeatRequest.GetWorkerId(),
+					taskStatus.GetTaskDuration().AsDuration())
+			}
 			// if taskStatus is complete then enqueueOwner for fast feedback
 			phase := core.Phase(taskStatus.GetPhase())
 			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
@@ -332,7 +369,7 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 
 // OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
 // empty string is returned.
-func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error) {
+func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error) {
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
@@ -375,7 +412,13 @@ func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID,
 	// send assign message to worker
 	f.metrics.taskAssigned.Inc()
 	worker.responseChan <- &pb.HeartbeatResponse{
-		TaskId:     taskID,
+		TaskId: taskID,
+		ExecId: &pb.ExecutionIdentifier{
+			Org:     execID.GetOrg(),
+			Project: execID.GetProject(),
+			Domain:  execID.GetDomain(),
+			Name:    execID.GetName(),
+		},
 		Namespace:  namespace,
 		WorkflowId: workflowID,
 		Cmd:        cmd,
@@ -389,13 +432,13 @@ func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID,
 }
 
 // CheckStatus checks the status of a task on a specific queue and worker.
-func (f *fastTaskServiceImpl) CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error) {
+func (f *fastTaskServiceImpl) CheckStatus(_ context.Context, taskID, queueID, workerID string) (api.TaskStatus, error) {
 	taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskID)
 	if !exists {
 		// if this plugin restarts then TaskContexts may not exist for tasks that are still active. we can
 		// create a TaskContext here because we ensure it will be cleaned up when the task completes.
 		f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
-		return core.PhaseUndefined, "", fmt.Errorf("task context not found: %w", taskContextNotFoundError)
+		return api.TaskStatus{}, fmt.Errorf("task context not found: %w", taskContextNotFoundError)
 	}
 
 	taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
@@ -415,7 +458,7 @@ Loop:
 	}
 
 	if latestWorkerTaskStatus == nil {
-		return core.PhaseUndefined, "", fmt.Errorf("unable to find task status update: %w", statusUpdateNotFoundError)
+		return api.TaskStatus{}, fmt.Errorf("unable to find task status update: %w", statusUpdateNotFoundError)
 	}
 
 	taskStatus := latestWorkerTaskStatus.taskStatus
@@ -440,7 +483,11 @@ Loop:
 		}
 	}
 
-	return phase, taskStatus.GetReason(), nil
+	return api.TaskStatus{
+		Phase:        phase,
+		Reason:       taskStatus.GetReason(),
+		TaskDuration: taskStatus.GetTaskDuration().AsDuration(),
+	}, nil
 }
 
 // Cleanup is used to indicate a task is no longer being tracked by the worker and delete the
@@ -472,12 +519,12 @@ func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, work
 }
 
 // newFastTaskService creates a new fastTaskServiceImpl.
-func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope) *fastTaskServiceImpl {
+func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope, cfg *Config) *fastTaskServiceImpl {
 	svc := &fastTaskServiceImpl{
 		enqueueOwner:      enqueueOwner,
 		queues:            make(map[string]*Queue),
 		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
-		metrics:           newServiceMetrics(scope),
+		metrics:           newServiceMetrics(scope, cfg),
 	}
 	prometheus.MustRegister(svc)
 	return svc

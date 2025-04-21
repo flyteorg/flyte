@@ -81,8 +81,13 @@ pub async fn run<T: ConnectionBuilder, U: Heartbeater + Send, V: TaskManager>(
                     };
 
                     let result = match Operation::from_i32(operation.operation) {
-                        Some(Operation::Assign) => manager.assign(operation.task_id.clone(), operation.namespace,
-                            operation.workflow_id, operation.cmd, operation.env_vars).await,
+                        Some(Operation::Assign) => manager.assign(
+                            operation.task_id.clone(),
+                            operation.namespace,
+                            operation.workflow_id,
+                            operation.exec_id.unwrap(),
+                            operation.cmd,
+                            operation.env_vars).await,
                         Some(Operation::Ack) => manager.ack(operation.task_id.clone()).await,
                         Some(Operation::Delete) => manager.delete(operation.task_id.clone()).await,
                         _ => unimplemented!(),
@@ -118,6 +123,7 @@ pub async fn run<T: ConnectionBuilder, U: Heartbeater + Send, V: TaskManager>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::pb::fasttask::ExecutionIdentifier;
 
     #[tokio::test]
     async fn happy() {
@@ -148,6 +154,12 @@ mod tests {
             task_id: "task_id".to_string(),
             namespace: "namespace".to_string(),
             workflow_id: "workflow_id".to_string(),
+            exec_id: Some(ExecutionIdentifier {
+                org: "foo".to_string(),
+                project: "bar".to_string(),
+                domain: "dev".to_string(),
+                name: "abc123".to_string(),
+            }),
             cmd: vec!["c".to_string(), "m".to_string(), "d".to_string()],
             env_vars: HashMap::new(),
             operation: Operation::Assign.into(),
@@ -183,6 +195,7 @@ mod tests {
         assert_eq!(task_status.namespace, heartbeat_request.namespace);
         assert_eq!(task_status.workflow_id, heartbeat_request.workflow_id);
         assert_eq!(task_status.phase, SUCCEEDED);
+        assert_eq!(task_status.exec_id, heartbeat_request.exec_id);
 
         // cleanup
         run_handle.abort();

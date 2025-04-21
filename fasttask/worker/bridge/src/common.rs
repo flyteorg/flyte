@@ -1,11 +1,11 @@
+use async_channel::Sender;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
-
-use async_channel::Sender;
-use serde::{Deserialize, Serialize};
+use std::time::Duration;
 use tokio::net::TcpStream;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
@@ -84,6 +84,19 @@ impl AsyncBool {
         self.value = true;
         if let Some(waker) = &self.waker {
             waker.clone().wake();
+        }
+    }
+}
+
+pub trait ToProstDuration {
+    fn to_prost(&self) -> prost_types::Duration;
+}
+
+impl ToProstDuration for Duration {
+    fn to_prost(&self) -> prost_types::Duration {
+        prost_types::Duration {
+            seconds: self.as_secs() as i64,
+            nanos: self.subsec_nanos() as i32,
         }
     }
 }

@@ -36,6 +36,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
+	"github.com/unionai/flyte/fasttask/plugin/api"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -87,7 +88,7 @@ type State struct {
 // Plugin is a fast task plugin that offers task execution to a worker pool.
 type Plugin struct {
 	cfg             *Config
-	fastTaskService FastTaskService
+	fastTaskService api.FastTaskService
 	metrics         pluginMetrics
 }
 
@@ -388,7 +389,8 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 	// offer the work to the queue
 	queueID := fastTaskEnvironment.GetQueueId()
 	ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-	workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars)
+	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	workerID, err := p.fastTaskService.OfferOnQueue(ctx, taskExecID.GetNodeExecutionId().GetExecutionId(), queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
 	}
@@ -492,7 +494,7 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 	// check the task status
 	pluginState := *initialState
 	var phaseInfo core.PhaseInfo
-	phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, queueID, workerID)
+	taskStatus, err := p.fastTaskService.CheckStatus(ctx, taskID, queueID, workerID)
 	if err != nil {
 		if errors.Is(err, statusUpdateNotFoundError) && time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
 			// if task has not been updated within the grace period we should abort
@@ -506,7 +508,7 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 		}
 	} else {
 		pluginState.LastUpdated = time.Now()
-		switch phase {
+		switch taskStatus.Phase {
 		case core.PhaseSuccess:
 			// gather outputs or errors
 			outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
@@ -517,7 +519,7 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 
 			phaseInfo = core.PhaseInfoSuccess(taskInfo)
 		case core.PhaseRetryableFailure:
-			phaseInfo = core.PhaseInfoRetryableFailure("unknown", reason, taskInfo)
+			phaseInfo = core.PhaseInfoRetryableFailure("unknown", taskStatus.Reason, taskInfo)
 		default:
 			pluginState.PhaseVersion++
 			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
@@ -718,8 +720,9 @@ func init() {
 					return nil, err
 				}
 
+				cfg := GetConfig()
 				// create and start grpc server
-				fastTaskService := newFastTaskService(iCtx.EnqueueOwner(), iCtx.MetricsScope())
+				fastTaskService := newFastTaskService(iCtx.EnqueueOwner(), iCtx.MetricsScope(), cfg)
 				go func() {
 					grpcServer := grpc.NewServer()
 					pb.RegisterFastTaskServer(grpcServer, fastTaskService)
@@ -729,7 +732,7 @@ func init() {
 				}()
 
 				return &Plugin{
-					cfg:             GetConfig(),
+					cfg:             cfg,
 					fastTaskService: fastTaskService,
 					metrics:         newPluginMetrics(iCtx.MetricsScope()),
 				}, nil

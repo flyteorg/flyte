@@ -176,6 +176,7 @@ impl HeartbeatRuntime for PassthroughHeartbeatRuntime {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::pb::fasttask::ExecutionIdentifier;
 
     #[tokio::test]
     async fn periodic_heartbeater() {
@@ -235,8 +236,15 @@ mod tests {
             task_id: "task_id".to_string(),
             namespace: "namespace".to_string(),
             workflow_id: "workflow_id".to_string(),
+            exec_id: Some(ExecutionIdentifier {
+                org: "foo".to_string(),
+                project: "bar".to_string(),
+                domain: "dev".to_string(),
+                name: "abc123".to_string(),
+            }),
             phase: SUCCEEDED,
             reason: "reason".to_string(),
+            task_duration: None,
         };
 
         let succeeded_now = Instant::now();
