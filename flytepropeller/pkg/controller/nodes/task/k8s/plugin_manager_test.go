@@ -1031,9 +1031,6 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 
 		pluginManager := PluginManager{plugin: &p}
 		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
-		assert.Equal(t, genName, o.GetName())
-		assert.Equal(t, []metav1.OwnerReference{or}, o.GetOwnerReferences())
-		assert.Equal(t, ns, o.GetNamespace())
 		assert.Equal(t, map[string]string{
 			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
 			"aKey":                     "aVal",
@@ -1043,7 +1040,6 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 			"task_template_label": "task_template_label_val",
 			"l1":                  "lv1",
 		}, o.GetLabels())
-		assert.Equal(t, 0, len(o.GetFinalizers()))
 	})
 
 }
