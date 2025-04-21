@@ -275,8 +275,8 @@ func buildPluginWithAbortOverride(ctx context.Context, tctx pluginsCore.TaskExec
 
 func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 	ctx := context.TODO()
-	/*var tmpl *core.TaskTemplate
-	var inputs *core.LiteralMap*/
+	var tmpl *core.TaskTemplate
+	/*var inputs *core.LiteralMap*/
 
 	t.Run("jobQueued", func(t *testing.T) {
 		tCtx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
@@ -301,7 +301,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseQueued, transitionInfo.Phase())
 		createdPod := &v1.Pod{}
 
-		pluginManager.addObjectMetadata(tCtx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
+		pluginManager.addObjectMetadata(tCtx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{}, tmpl)
 		assert.NoError(t, fakeClient.Get(ctx, k8stypes.NamespacedName{Namespace: tCtx.TaskExecutionMetadata().GetNamespace(),
 			Name: tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()}, createdPod))
 		assert.Equal(t, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), createdPod.Name)
@@ -310,6 +310,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 
 	t.Run("jobAlreadyExists", func(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
+		var tmpl *core.TaskTemplate
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
 		mockResourceHandler.EXPECT().GetProperties().Return(k8s.PluginProperties{})
@@ -324,7 +325,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
-		pluginManager.addObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
+		pluginManager.addObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{}, tmpl)
 		assert.NoError(t, fakeClient.Create(ctx, createdPod))
 
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -410,6 +411,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 
 	t.Run("Insufficient resource blocking pod creation for the first time", func(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
+		var tmpl *core.TaskTemplate
 		// Creating a mock k8s plugin
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
 		mockResourceHandler.EXPECT().GetProperties().Return(k8s.PluginProperties{})
@@ -456,7 +458,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		// Build a reference resource that is supposed to be identical to the resource built by pluginManager
 		referenceResource, err := mockResourceHandler.BuildResource(ctx, tctx)
 		assert.NoError(t, err)
-		pluginManager.addObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
+		pluginManager.addObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig(), tmpl)
 		refKey := backoff.ComposeResourceKey(referenceResource)
 		podBackOffHandler, found := backOffController.GetBackOffHandler(refKey)
 		assert.True(t, found)
@@ -909,6 +911,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 	l := map[string]string{"l1": "lv1"}
 	a := map[string]string{"aKey": "aVal"}
 	tm := getMockTaskExecutionMetadataCustom(genName, ns, a, l, or)
+	var tmpl *core.TaskTemplate
 
 	cfg := config.GetK8sPluginConfig()
 
@@ -917,7 +920,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		p := pluginsk8sMock.Plugin{}
 		p.EXPECT().GetProperties().Return(k8s.PluginProperties{})
 		pluginManager := PluginManager{plugin: &p}
-		pluginManager.addObjectMetadata(tm, o, cfg)
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
 		assert.Equal(t, genName, o.GetName())
 		assert.Equal(t, []metav1.OwnerReference{or}, o.GetOwnerReferences())
 		assert.Equal(t, ns, o.GetNamespace())
@@ -934,7 +937,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		p.EXPECT().GetProperties().Return(k8s.PluginProperties{DisableInjectOwnerReferences: true})
 		pluginManager := PluginManager{plugin: &p}
 		o := &v1.Pod{}
-		pluginManager.addObjectMetadata(tm, o, cfg)
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
 		assert.Equal(t, genName, o.GetName())
 		// empty OwnerReference since we are ignoring
 		assert.Equal(t, 0, len(o.GetOwnerReferences()))
@@ -954,7 +957,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		// enable finalizer injection
 		cfg.InjectFinalizer = true
 		o := &v1.Pod{}
-		pluginManager.addObjectMetadata(tm, o, cfg)
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
 		assert.Equal(t, genName, o.GetName())
 		// empty OwnerReference since we are ignoring
 		assert.Equal(t, 1, len(o.GetOwnerReferences()))
@@ -974,7 +977,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		// disable finalizer injection
 		cfg.InjectFinalizer = false
 		o := &v1.Pod{}
-		pluginManager.addObjectMetadata(tm, o, cfg)
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
 		assert.Equal(t, genName, o.GetName())
 		// empty OwnerReference since we are ignoring
 		assert.Equal(t, 1, len(o.GetOwnerReferences()))
@@ -994,7 +997,7 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		// enable finalizer injection
 		cfg.InjectFinalizer = true
 		o := &v1.Pod{}
-		pluginManager.addObjectMetadata(tm, o, cfg)
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
 		assert.Equal(t, genName, o.GetName())
 		// empty OwnerReference since we are ignoring
 		assert.Equal(t, 1, len(o.GetOwnerReferences()))
@@ -1006,6 +1009,41 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		assert.Equal(t, l, o.GetLabels())
 		assert.Equal(t, 1, len(o.GetFinalizers()))
 		assert.Contains(t, o.GetFinalizers(), finalizer)
+	})
+
+	t.Run("Task template K8s metadata", func(t *testing.T) {
+		o := &v1.Pod{}
+		p := pluginsk8sMock.Plugin{}
+		p.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+
+		tmpl = &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				Metadata: &core.K8SObjectMetadata{
+					Labels: map[string]string{
+						"task_template_label": "task_template_label_val",
+					},
+					Annotations: map[string]string{
+						"task_template_annotation": "task_template_annotation_val",
+					},
+				},
+			},
+		}
+
+		pluginManager := PluginManager{plugin: &p}
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
+		assert.Equal(t, genName, o.GetName())
+		assert.Equal(t, []metav1.OwnerReference{or}, o.GetOwnerReferences())
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey":                     "aVal",
+			"task_template_annotation": "task_template_annotation_val",
+		}, o.GetAnnotations())
+		assert.Equal(t, map[string]string{
+			"task_template_label": "task_template_label_val",
+			"l1":                  "lv1",
+		}, o.GetLabels())
+		assert.Equal(t, 0, len(o.GetFinalizers()))
 	})
 
 }
