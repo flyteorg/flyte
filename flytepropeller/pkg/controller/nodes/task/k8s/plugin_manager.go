@@ -116,8 +116,8 @@ func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 	k8sMetadata := taskMetadata.GetMetadata()
 
 	o.SetNamespace(taskCtx.GetNamespace())
-	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations()), k8sMetadata.GetAnnotations()))
-	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels()), k8sMetadata.GetLabels()))
+	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), k8sMetadata.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
+	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), k8sMetadata.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
 	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
 
 	if !e.plugin.GetProperties().DisableInjectOwnerReferences {

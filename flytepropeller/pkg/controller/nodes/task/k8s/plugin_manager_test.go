@@ -1042,6 +1042,35 @@ func TestPluginManager_AddObjectMetadata(t *testing.T) {
 		}, o.GetLabels())
 	})
 
+	t.Run("Task template K8s metadata overwritten by task execution metadata", func(t *testing.T) {
+		o := &v1.Pod{}
+		p := pluginsk8sMock.Plugin{}
+		p.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+
+		tmpl = &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				Metadata: &core.K8SObjectMetadata{
+					Labels: map[string]string{
+						"l1": "should_be_overwritten",
+					},
+					Annotations: map[string]string{
+						"aKey": "should_be_overwritten",
+					},
+				},
+			},
+		}
+
+		pluginManager := PluginManager{plugin: &p}
+		pluginManager.addObjectMetadata(tm, o, cfg, tmpl)
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, map[string]string{
+			"l1": "lv1",
+		}, o.GetLabels())
+	})
+
 }
 
 func TestResourceManagerConstruction(t *testing.T) {
