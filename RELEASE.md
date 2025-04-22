@@ -15,7 +15,7 @@ This will take you near 1 minute.
 ## 2. Create a Release PR and Merge it
 1. Run [Generate Flyte Manifests workflow](https://github.com/flyteorg/flyte/actions/workflows/generate_flyte_manifest.yml). It’ll create a PR ([example](https://github.com/flyteorg/flyte/pull/888))
 2. Update [docs version](https://github.com/flyteorg/flyte/blob/master/docs/conf.py#L33) to match the milestone version.
-3. Create a CHANGELOG file ([example](https://github.com/flyteorg/flyte/pull/888/files#diff-0c33dda4ecbd7e1116ddce683b5e143d85b22e43223ca258ecc571fb3b240a57))
+3. Create a CHANGELOG file based on your new version ([example](https://github.com/flyteorg/flyte/pull/888/files#diff-0c33dda4ecbd7e1116ddce683b5e143d85b22e43223ca258ecc571fb3b240a57))
 4. Wait for endtoend tests to finish then Merge PR.
 
 ## 3. Create a release
@@ -23,7 +23,6 @@ This will take you near 1 minute.
    It will create a tag and then publish all deployment manifest in github release and will create a discussion thread in github release
 2. Kick off a run of the functional tests in https://github.com/unionai/genesis-device/actions/workflows/update_cluster_and_run_tests.yml
 3. Close the milestone
-4. Ping #core ([slack](https://slack.flyte.org/) channel) to send announcements about the milestone with the contents of the CHANGELOG to all social channels.
 
 ## (Optional) Resolve Issues
 1. Create [a new milestone](https://github.com/flyteorg/flyte/milestones) if one doesn't exist.
