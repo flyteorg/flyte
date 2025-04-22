@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------
-# FLYTE_connector SETTINGS
+# FLYTE_CONNCETOR SETTINGS
 # ---------------------------------------------------------------------
 
 # nameOverride String to override flyteconnector.name template
