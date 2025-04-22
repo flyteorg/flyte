@@ -6,7 +6,6 @@ The below are steps to release a new version of Flyte.
 Please note that each step must be completed before proceeding to the next one.
 Running steps in parallel may cause errors.
 
-Let's say right now the version of flyteidl is v1.15.3, then the next version should be v1.15.4.
 
 ## 1. Release a new flyteidl version at PyPI
 [Create a FlyteIDL release](https://github.com/flyteorg/flyte/actions/workflows/flyteidl-release.yml)
