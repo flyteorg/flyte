@@ -6,11 +6,11 @@ helmCharts:
   namespace: flyte
   valuesInline:
     flyte-binary:
-      flyteagent:
+      flyteconnector:
         enabled: True
 namespace: flyte
 resources:
 - ../namespace.yaml
 
 patchesStrategicMerge:
-  - add-agent-secret-patch.yaml
+  - add-connector-secret-patch.yaml

@@ -1,75 +1,75 @@
 ---
-# Source: flyteagent/templates/agent/serviceaccount.yaml
+# Source: flyteconnector/templates/connector/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flyteagent
+  name: flyteconnector
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/name: flyteconnector
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyteagent-v0.1.10
+    helm.sh/chart: flyteconnector-v0.1.10
     app.kubernetes.io/managed-by: Helm
 ---
-# Source: flyteagent/templates/agent/secret.yaml
+# Source: flyteconnector/templates/connector/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyteagent
+  name: flyteconnector
   namespace: flyte
 type: Opaque
 data:
   username: User
 ---
-# Source: flyteagent/templates/agent/service.yaml
+# Source: flyteconnector/templates/connector/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: flyteagent
+  name: flyteconnector
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/name: flyteconnector
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyteagent-v0.1.10
+    helm.sh/chart: flyteconnector-v0.1.10
     app.kubernetes.io/managed-by: Helm
   annotations: 
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
   ports:
-  - name: agent-grpc
+  - name: connector-grpc
     port: 8000
     protocol: TCP
     appProtocol: TCP
-    targetPort: agent-grpc
+    targetPort: connector-grpc
   selector: 
-    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/name: flyteconnector
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyteagent/templates/agent/deployment.yaml
+# Source: flyteconnector/templates/connector/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flyteagent
+  name: flyteconnector
   namespace: flyte
   labels: 
-    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/name: flyteconnector
     app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyteagent-v0.1.10
+    helm.sh/chart: flyteconnector-v0.1.10
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
     matchLabels: 
-      app.kubernetes.io/name: flyteagent
+      app.kubernetes.io/name: flyteconnector
       app.kubernetes.io/instance: flyte
   template:
     metadata:
       annotations:
       labels: 
-        app.kubernetes.io/name: flyteagent
+        app.kubernetes.io/name: flyteconnector
         app.kubernetes.io/instance: flyte
-        helm.sh/chart: flyteagent-v0.1.10
+        helm.sh/chart: flyteconnector-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
@@ -81,13 +81,13 @@ spec:
         - agent
         image: "cr.flyte.org/flyteorg/flyteagent:1.15.3"
         imagePullPolicy: "IfNotPresent"
-        name: flyteagent
+        name: flyteconnector
         volumeMounts:
         - mountPath: /etc/secrets
-          name: flyteagent
+          name: flyteconnector
         ports:
         - containerPort: 8000
-          name: agent-grpc
+          name: connector-grpc
         readinessProbe:
           grpc:
             port: 8000
@@ -104,8 +104,8 @@ spec:
             cpu: 500m
             ephemeral-storage: 200Mi
             memory: 200Mi
-      serviceAccountName: flyteagent
+      serviceAccountName: flyteconnector
       volumes:
-      - name: flyteagent
+      - name: flyteconnector
         secret:
-          secretName: flyteagent
+          secretName: flyteconnector

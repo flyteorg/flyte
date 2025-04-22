@@ -121,6 +121,7 @@ func TestStartFunc(t *testing.T) {
 	}
 	config.Dev = true
 	config.DisableAgent = true
+	config.DisableConnector = true
 	assert.Nil(t, util.SetupFlyteDir())
 	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm))
 	assert.Nil(t, os.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm)) // #nosec G306
