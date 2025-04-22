@@ -2,6 +2,7 @@ package cloudevent
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
@@ -34,7 +35,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 	reconnectDelay := time.Duration(cloudEventsConfig.ReconnectDelaySeconds) * time.Second
 
 	var sender interfaces.Sender
-	switch cloudEventsConfig.Type {
+	switch strings.ToLower(cloudEventsConfig.Type) {
 	case common.AWS:
 		snsConfig := gizmoAWS.SNSConfig{
 			Topic: cloudEventsConfig.EventsPublisherConfig.TopicName,

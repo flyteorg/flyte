@@ -239,6 +239,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_userAuth.openId.issuerUrl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.UserAuth.OpenID.IssuerURL.String()
+
+			cmdFlags.Set("userAuth.openId.issuerUrl", testValue)
+			if vString, err := cmdFlags.GetString("userAuth.openId.issuerUrl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.UserAuth.OpenID.IssuerURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_userAuth.openId.scopes", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -16,7 +16,7 @@ import (
 type Receiver = string
 
 const (
-	Kafka Receiver = "Kafka"
+	Kafka Receiver = "kafka"
 )
 
 // PubSubSender Implementation of Sender

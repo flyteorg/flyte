@@ -556,6 +556,45 @@ func TestTemplateLogPlugin(t *testing.T) {
 				Name:          "main_logs",
 			}}},
 		},
+		{
+			"template variables in display name and log name",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.podName}}"},
+				DisplayName:   "logs-{{.podName}}-",
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					PodName:       "test-pod",
+					LogName:       "{{.podName}}-logs",
+					ContainerName: "test-container",
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://example.com/logs/test-pod",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "logs-test-pod-test-pod-logs",
+			}}},
+		},
+		{
+			"task execution with template variables",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.taskId}}"},
+				DisplayName:   "task-{{.taskId}}-",
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					LogName:         "{{.taskId}}-logs",
+					TaskExecutionID: dummyTaskExecID(),
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://example.com/logs/my-task-name",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "task-my-task-name-my-task-name-logs",
+			}}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
