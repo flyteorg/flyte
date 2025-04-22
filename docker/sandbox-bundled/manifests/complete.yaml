@@ -462,7 +462,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.2"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.3"
       k8s-array:
         logs:
           config:
@@ -803,7 +803,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: azA4UGExTXV2UmVkNDZ2YQ==
+  haSharedSecret: UGhIZUtoWkJNZ2E2dnVWVA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1201,7 +1201,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 7b5b0b40d93ef9372c17942c5ed6b26335468e623e2223994e1f02c6ff2acfb5
+        checksum/configuration: 5f731b4f418804fd9ec32cd3b8abe032230d9fbc200cefb6bd6db75d7f3e5c3f
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1367,7 +1367,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 904d2f771de2ae86a0815c7fa161bf9274692c9440f39d22839b2bb07d7f5825
+        checksum/secret: 065640f3125eae2703ccdaade6ed19647c88e1554d48005edc98fd4fd4ee1cce
       labels:
         app: docker-registry
         release: flyte-sandbox
