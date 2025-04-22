@@ -639,6 +639,53 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 		mockClient.AssertNotCalled(t, "Get", mock.Anything, mock.Anything, mock.Anything)
 		mockClient.AssertNotCalled(t, "Create", mock.Anything, mock.Anything)
 	})
+
+	t.Run("image pull secret is not scoped to project or domain", func(t *testing.T) {
+		testPod := pod.DeepCopy()
+		orgBasedSecretName := "u__org__test-organization__domain____project____key__test-secret" //nolint:gosec
+		orgBasedKubernetesSecretName := ToImagePullK8sName(SecretNameComponents{
+			Org:     testOrganization,
+			Domain:  "",
+			Project: "",
+			Name:    testSecretName,
+		})
+
+		orgBasedReferenceImagePullSecret := referenceImagePullSecret.DeepCopy()
+		orgBasedReferenceImagePullSecret.SetName(orgBasedKubernetesSecretName)
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: orgBasedKubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
+			Run(func(args mock.Arguments) {
+				secret := args.Get(2).(*corev1.Secret)
+				*secret = *orgBasedReferenceImagePullSecret
+			}).
+			Return(nil)
+
+		orgBasedExistingMirrorSecret := existingMirrorImagePullSecret.DeepCopy()
+		orgBasedExistingMirrorSecret.SetName(orgBasedKubernetesSecretName)
+		mockClient.
+			On("Get", ctx, types.NamespacedName{Name: orgBasedKubernetesSecretName, Namespace: testNamespace}, &corev1.Secret{}).
+			Run(func(args mock.Arguments) {
+				secret := args.Get(2).(*corev1.Secret)
+				*secret = *orgBasedExistingMirrorSecret
+			}).
+			Return(nil)
+
+		injector := NewEmbeddedSecretManagerInjector(
+			enabledConfig,
+			secretFetcherMock{
+				Secrets: map[string]SecretValue{
+					orgBasedSecretName: {
+						BinaryValue: []byte("test-credentials"),
+					},
+				},
+			}, mockClient, testReferenceNamespace)
+
+		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
+		assert.NoError(t, err)
+		assert.True(t, injected)
+		assert.Equal(t, []corev1.LocalObjectReference{{Name: orgBasedKubernetesSecretName}}, resultPod.Spec.ImagePullSecrets)
+	})
 }
 
 func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string, envVar string) bool {

@@ -114,38 +114,44 @@ func deriveSecretNameComponents(secret *core.Secret, labels map[string]string) (
 	}, nil
 }
 
-func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, error) {
+func encodeSecretName(components *SecretNameComponents) string {
+	return EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
+}
+
+func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
 	// Fetch project-domain scoped secret
-	projectDomainScopedSecret := EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
+	projectDomainScopedSecret := encodeSecretName(components)
 	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
 	if err == nil {
-		return secretValue, nil
+		return secretValue, ToImagePullK8sName(*components), nil
 	}
 	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Fetch domain scoped secret
-	domainScopedSecret := EncodeSecretName(components.Org, components.Domain, EmptySecretScope, components.Name)
+	components.Project = EmptySecretScope
+	domainScopedSecret := encodeSecretName(components)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
 	if err == nil {
-		return secretValue, nil
+		return secretValue, ToImagePullK8sName(*components), nil
 	}
 	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Fetch organization scoped secret
-	orgScopedSecret := EncodeSecretName(components.Org, EmptySecretScope, EmptySecretScope, components.Name)
+	components.Domain = EmptySecretScope
+	orgScopedSecret := encodeSecretName(components)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
 	if err == nil {
-		return secretValue, err
+		return secretValue, ToImagePullK8sName(*components), err
 	}
 	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, err
+		return nil, "", err
 	}
 
-	return nil, stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
+	return nil, "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
 }
 
 // addImagePullSecretToPod adds an image pull secret to a pod if it doesn't already exist
@@ -218,11 +224,9 @@ func (i *EmbeddedSecretManagerInjector) addImagePullSecretToPod(
 // findAndAddImagePullSecret finds image pull secrets for the given secret and adds them to the pod
 func (i *EmbeddedSecretManagerInjector) findAndAddImagePullSecret(
 	ctx context.Context,
-	nameComponents *SecretNameComponents,
+	k8sSecretName string,
 	pod *corev1.Pod,
 ) (*corev1.Pod, error) {
-
-	k8sSecretName := ToImagePullK8sName(*nameComponents)
 	referenceSecret := &corev1.Secret{}
 	// Pass an empty slice of client.GetOption instead of nil
 	err := i.k8sClient.Get(ctx, types.NamespacedName{Name: k8sSecretName, Namespace: i.referenceNamespace}, referenceSecret)
@@ -231,7 +235,7 @@ func (i *EmbeddedSecretManagerInjector) findAndAddImagePullSecret(
 	}
 
 	if k8sError.IsNotFound(err) {
-		logger.Debugf(ctx, "No reference secret found for secret [%v]. Assuming not image pull secret.", nameComponents)
+		logger.Debugf(ctx, "No reference Kubernetes secret found [%s]. Assuming not image pull secret.", k8sSecretName)
 		return pod, nil
 	}
 
@@ -252,7 +256,7 @@ func (i EmbeddedSecretManagerInjector) Inject(
 		return pod, false, err
 	}
 
-	secretValue, err := i.lookUpSecret(ctx, secretNameComponents)
+	secretValue, k8sImagePullSecretName, err := i.lookUpSecret(ctx, secretNameComponents)
 	if err != nil {
 		return pod, false, err
 	}
@@ -292,7 +296,7 @@ func (i EmbeddedSecretManagerInjector) Inject(
 	}
 
 	if i.cfg.ImagePullSecrets.Enabled {
-		pod, err = i.findAndAddImagePullSecret(ctx, secretNameComponents, pod)
+		pod, err = i.findAndAddImagePullSecret(ctx, k8sImagePullSecretName, pod)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to add image pull secret [%s]: %v", secretNameComponents.Name, err)
 			return pod, false, err
