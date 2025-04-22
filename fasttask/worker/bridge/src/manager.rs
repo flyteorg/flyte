@@ -22,7 +22,7 @@ pub trait TaskManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
-        exec_id: ExecutionIdentifier,
+        exec_id: Option<ExecutionIdentifier>,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>>;
@@ -106,12 +106,7 @@ impl ExecutionStrategy {
                         task_id: task_assignment.task_id.clone(),
                         namespace: task_assignment.namespace,
                         workflow_id: task_assignment.workflow_id,
-                        exec_id: Some(ExecutionIdentifier {
-                            org: task_assignment.exec_id.org,
-                            project: task_assignment.exec_id.project,
-                            domain: task_assignment.exec_id.domain,
-                            name: task_assignment.exec_id.name,
-                        }),
+                        exec_id: task_assignment.exec_id,
                         phase: SUCCEEDED,
                         reason: "reason".to_string(),
                         task_duration: None,
@@ -164,7 +159,7 @@ struct TaskAssignment {
     task_id: String,
     namespace: String,
     workflow_id: String,
-    exec_id: ExecutionIdentifier,
+    exec_id: Option<ExecutionIdentifier>,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
     additional_distribution: Option<String>,
@@ -247,7 +242,7 @@ impl TaskManager for MultiProcessManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
-        exec_id: ExecutionIdentifier,
+        exec_id: Option<ExecutionIdentifier>,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
@@ -476,8 +471,8 @@ fn transform_cmd(
  */
 
 pub struct SuccessManager {
-    task_tx: Sender<(String, String, String, ExecutionIdentifier)>,
-    task_rx: Receiver<(String, String, String, ExecutionIdentifier)>,
+    task_tx: Sender<(String, String, String, Option<ExecutionIdentifier>)>,
+    task_rx: Receiver<(String, String, String, Option<ExecutionIdentifier>)>,
 }
 
 impl SuccessManager {
@@ -497,7 +492,7 @@ impl TaskManager for SuccessManager {
         task_id: String,
         namespace: String,
         workflow_id: String,
-        exec_id: ExecutionIdentifier,
+        exec_id: Option<ExecutionIdentifier>,
         _cmd: Vec<String>,
         _env_vars: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
@@ -532,7 +527,7 @@ impl TaskManager for SuccessManager {
 }
 
 pub struct SuccessRuntime {
-    task_rx: Receiver<(String, String, String, ExecutionIdentifier)>,
+    task_rx: Receiver<(String, String, String, Option<ExecutionIdentifier>)>,
 }
 
 impl TaskManagerRuntime for SuccessRuntime {
@@ -556,7 +551,7 @@ impl TaskManagerRuntime for SuccessRuntime {
                 task_id,
                 namespace,
                 workflow_id,
-                exec_id: Some(exec_id),
+                exec_id,
                 phase: SUCCEEDED,
                 reason: "".to_string(),
                 task_duration: None,
@@ -630,7 +625,7 @@ mod tests {
                 task_id.clone(),
                 namespace.clone(),
                 workflow_id.clone(),
-                exec_id.clone(),
+                Some(exec_id.clone()),
                 cmd,
                 env_vars,
             )

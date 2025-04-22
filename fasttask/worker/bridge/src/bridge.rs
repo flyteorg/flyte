@@ -85,7 +85,7 @@ pub async fn run<T: ConnectionBuilder, U: Heartbeater + Send, V: TaskManager>(
                             operation.task_id.clone(),
                             operation.namespace,
                             operation.workflow_id,
-                            operation.exec_id.unwrap(),
+                            operation.exec_id,
                             operation.cmd,
                             operation.env_vars).await,
                         Some(Operation::Ack) => manager.ack(operation.task_id.clone()).await,
