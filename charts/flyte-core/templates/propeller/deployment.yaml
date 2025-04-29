@@ -112,8 +112,14 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "flytepropeller.name" . }}
       volumes:
-      - configMap:
-          name: flyte-propeller-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-propeller-config
+          {{- if .Values.storage.secretName }}
+            - secret:
+                name: {{ .Values.storage.secretName }}
+          {{- end }}
         name: config-volume
       {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
