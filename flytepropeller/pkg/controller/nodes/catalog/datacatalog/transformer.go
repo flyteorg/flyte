@@ -16,6 +16,8 @@ import (
 )
 
 const cachedTaskTag = "flyte_cached"
+const cachedFutureTag = "flyte_cached_future"
+const futureDataName = "future"
 const taskNamespace = "flyte_task"
 const maxParamHashLength = 8
 
@@ -66,6 +68,26 @@ func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.Type
 	}
 
 	return &core.LiteralMap{Literals: outputs}, nil
+}
+
+// Transform the artifact Data into DynamicJobSpec as a literalmap
+func GenerateFutureLiteralMapFromArtifact(id core.Identifier, artifact *datacatalog.Artifact) (*core.LiteralMap, error) {
+	artifactDataList := artifact.GetData()
+
+	// retrieve future literal from artifactDataList
+	literals := make(map[string]*core.Literal, 1)
+	for _, artifactData := range artifactDataList {
+		if artifactData.GetName() == futureDataName {
+			literals[artifactData.GetName()] = artifactData.GetValue()
+		}
+	}
+
+	if len(literals) == 0 {
+		return nil, fmt.Errorf("the dynamic task %s has no cached future", id.String())
+	}
+
+	return &core.LiteralMap{Literals: literals}, nil
+
 }
 
 func generateDataSetVersionFromTask(ctx context.Context, taskInterface core.TypedInterface, cacheVersion string) (string, error) {
@@ -125,6 +147,15 @@ func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cache
 		return "", err
 	}
 	tag := fmt.Sprintf("%s-%s", cachedTaskTag, hashString)
+	return tag, nil
+}
+
+func GenerateFutureArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
+	hashString, err := catalog.HashLiteralMap(ctx, inputs, cacheIgnoreInputVars)
+	if err != nil {
+		return "", err
+	}
+	tag := fmt.Sprintf("%s-%s", cachedFutureTag, hashString)
 	return tag, nil
 }
 
