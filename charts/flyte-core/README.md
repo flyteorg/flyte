@@ -75,7 +75,8 @@ helm install gateway bitnami/contour -n flyte
 | cloud_events.kafka.tlsConfig.keyPath | string | `"/etc/ssl/certs/kafka-client.key"` | Path to the client private key |
 | cloud_events.kafka.version | string | `"3.7.0"` | The version of Kafka |
 | cloud_events.type | string | `"aws"` |  |
-| cluster_resource_manager | object | `{"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"prometheus":{"enabled":false,"path":"/metrics","port":10254},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
+| cluster_resource_manager | object | `{"annotations":{},"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"prometheus":{"enabled":false,"path":"/metrics","port":10254},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
+| cluster_resource_manager.annotations | object | `{}` | Annotations for ClusterResource deployment |
 | cluster_resource_manager.config | object | `{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}}` | Configmap for ClusterResource parameters |
 | cluster_resource_manager.config.cluster_resources | object | `{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}` | ClusterResource parameters Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize. |
 | cluster_resource_manager.config.cluster_resources.refreshInterval | string | `"5m"` | How frequently to run the sync process |
@@ -140,6 +141,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | datacatalog.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | datacatalog.affinity | object | `{}` | affinity for Datacatalog deployment |
+| datacatalog.annotations | object | `{}` | Annotations for Datacatalog deployment |
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.enabled | bool | `true` |  |
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
@@ -175,6 +177,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flyteadmin.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | flyteadmin.affinity | object | `{}` | affinity for Flyteadmin deployment |
+| flyteadmin.annotations | object | `{}` | Annotations for Flyteadmin deployment |
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.enabled | bool | `true` |  |
 | flyteadmin.env | list | `[]` | Additional flyteadmin container environment variables  e.g. SendGrid's API key  - name: SENDGRID_API_KEY    value: "<your sendgrid api key>"  e.g. secret environment variable (you can combine it with .additionalVolumes): - name: SENDGRID_API_KEY   valueFrom:     secretKeyRef:       name: sendgrid-secret       key: api_key |
@@ -218,6 +221,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconnector.plugin_config.plugins.connector-service.supportedTaskTypes | list | `[]` | The task types supported by the default agent. As of #5460 these are discovered automatically and don't need to be configured. |
 | flyteconnector.podLabels | object | `{}` | Labels for flyteconnector pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
+| flyteconsole.annotations | object | `{}` | Annotations for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |
 | flyteconsole.ga.tracking_id | string | `"G-0QW4DJWJ20"` |  |
@@ -246,6 +250,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flytepropeller.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | flytepropeller.affinity | object | `{}` | affinity for Flytepropeller deployment |
+| flytepropeller.annotations | object | `{}` | Annotations for Flytepropeller deployment |
 | flytepropeller.clusterName | string | `""` | Defines the cluster name used in events sent to Admin |
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytepropeller.createCRDs | bool | `true` | Whether to install the flyteworkflows CRD with helm |
@@ -283,6 +288,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | flytescheduler.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | flytescheduler.affinity | object | `{}` | affinity for Flytescheduler deployment |
+| flytescheduler.annotations | object | `{}` | Annotations for Flytescheduler deployment |
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
@@ -321,6 +327,7 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.endpoint | string | `""` | endpoint URL of s3-compatible service |
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
+| webhook.annotations | object | `{}` | Annotations for webhook deployment |
 | webhook.autoscaling.enabled | bool | `false` |  |
 | webhook.autoscaling.maxReplicas | int | `10` |  |
 | webhook.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
