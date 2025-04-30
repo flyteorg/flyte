@@ -62,5 +62,5 @@ func (t *Handler) IsCacheable(ctx context.Context, nCtx interfaces.NodeExecution
 		return false, false, err
 	}
 
-	return taskTemplate.Metadata.Discoverable, taskTemplate.Metadata.Discoverable && taskTemplate.Metadata.CacheSerializable, nil
+	return taskTemplate.GetMetadata().GetDiscoverable(), taskTemplate.GetMetadata().GetDiscoverable() && taskTemplate.GetMetadata().GetCacheSerializable(), nil
 }
