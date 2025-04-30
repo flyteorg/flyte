@@ -524,6 +524,20 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   generatesDeck?: boolean;
 
+  /**
+   * Metadata applied to task pods or task CR objects.
+   * In flytekit, labels and annotations resulting in this metadata field
+   * are provided via `@task(labels=..., annotations=...)`.
+   * For tasks backed by pods like PythonFunctionTask, these take precedence
+   * over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+   * in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+   * the CR object itself while the metadata in the pod template/K8sPod is applied
+   * to the pod template spec of the CR object.
+   *
+   * @generated from field: flyteidl.core.K8sObjectMetadata metadata = 16;
+   */
+  metadata?: K8sObjectMetadata;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -545,6 +559,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
+    { no: 16, name: "metadata", kind: "message", T: K8sObjectMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {

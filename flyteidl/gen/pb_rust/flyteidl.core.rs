@@ -1421,6 +1421,16 @@ pub struct TaskMetadata {
     /// - false: The task will not generate a deck.
     #[prost(message, optional, tag="15")]
     pub generates_deck: ::core::option::Option<bool>,
+    /// Metadata applied to task pods or task CR objects.
+    /// In flytekit, labels and annotations resulting in this metadata field
+    /// are provided via `@task(labels=..., annotations=...)`.
+    /// For tasks backed by pods like PythonFunctionTask, these take precedence
+    /// over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+    /// in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+    /// the CR object itself while the metadata in the pod template/K8sPod is applied
+    /// to the pod template spec of the CR object.
+    #[prost(message, optional, tag="16")]
+    pub metadata: ::core::option::Option<K8sObjectMetadata>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
