@@ -848,7 +848,7 @@ configmap:
       pod-template-name: "flytepropeller-template"
     # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
     propeller:
-      rawoutput-prefix: s3://my-s3-bucket/
+      rawoutput-prefix: "s3://{{ .Values.storage.bucketName }}/"
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
