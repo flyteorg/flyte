@@ -8,7 +8,7 @@
 
 For every {py:class}`flytekit.PythonFunctionTask` task or a task decorated with the `@task` decorator, you can specify rules for binding container images.
 By default, flytekit binds a single container image, i.e., the [default Docker image](https://ghcr.io/flyteorg/flytekit), to all tasks.
-To modify this behavior, use the `container_image` parameter available in the {py:func}`flytekit.task` decorator.
+To modify this behavior, use the `image` parameter available in the {py:func}`flytekit.task` decorator.
 
 :::{note}
 If the Docker image is not available publicly, refer to {ref}`Pulling Private Images<private_images>`.
@@ -32,7 +32,7 @@ The following parameters can be used to configure images in the `@task` decorato
 
 1. `image` refers to the name of the image in the image configuration. The name `default` is a reserved keyword and will automatically apply to the default image name for this repository.
 2. `fqn` refers to the fully qualified name of the image. For example, it includes the repository and domain URL of the image. Example: docker.io/my_repo/xyz.
-3. `version` refers to the tag of the image. For example: latest, or python-3.9 etc. If `container_image` is not specified, then the default configured image for the project is used.
+3. `version` refers to the tag of the image. For example: latest, or python-3.9 etc. If `image` parameter of the {py:func}`flytekit.task` decorator is not specified, then the default configured image for the project is used.
 
 ## Sending images to `pyflyte` command
 
