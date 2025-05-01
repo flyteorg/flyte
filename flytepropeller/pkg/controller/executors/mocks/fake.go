@@ -45,7 +45,7 @@ func (f *FakeInformers) GetInformer(ctx context.Context, obj client.Object, opts
 
 func NewFakeKubeClient() *Client {
 	c := Client{}
-	c.OnGetClient().Return(fake.NewClientBuilder().WithRuntimeObjects().Build())
-	c.OnGetCache().Return(&FakeInformers{})
+	c.EXPECT().GetClient().Return(fake.NewClientBuilder().WithRuntimeObjects().Build())
+	c.EXPECT().GetCache().Return(&FakeInformers{})
 	return &c
 }

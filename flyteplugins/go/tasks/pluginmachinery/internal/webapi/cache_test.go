@@ -58,8 +58,8 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		}
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
@@ -87,8 +87,8 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		}
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
@@ -117,12 +117,12 @@ func TestResourceCache_SyncResource(t *testing.T) {
 			State: state,
 		}
 
-		mockClient.OnGet(ctx, newPluginContext("123456", nil, "", nil)).Return("newID", nil)
-		mockClient.OnStatusMatch(mock.Anything, "newID", mock.Anything).Return(core.PhaseInfoSuccess(nil), nil)
+		mockClient.EXPECT().Get(ctx, newPluginContext("123456", nil, "", nil)).Return("newID", nil)
+		mockClient.EXPECT().Status(mock.Anything, "newID").Return(core.PhaseInfoSuccess(nil), nil)
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
@@ -133,7 +133,7 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		mockCache := &cacheMocks.AutoRefresh{}
 		mockClient := &mocks.Client{}
 		mockSecretManager := &mocks2.SecretManager{}
-		mockSecretManager.OnGetMatch(mock.Anything, mock.Anything).Return("fake key", nil)
+		mockSecretManager.EXPECT().Get(mock.Anything, mock.Anything).Return("fake key", nil)
 
 		q := ResourceCache{
 			AutoRefresh: mockCache,
@@ -152,11 +152,11 @@ func TestResourceCache_SyncResource(t *testing.T) {
 			State: state,
 		}
 
-		mockClient.OnGet(ctx, newPluginContext("123456", nil, "", nil)).Return("newID", fmt.Errorf("failed to retrieve resource"))
+		mockClient.EXPECT().Get(ctx, newPluginContext("123456", nil, "", nil)).Return("newID", fmt.Errorf("failed to retrieve resource"))
 
 		iw := &cacheMocks.ItemWrapper{}
-		iw.OnGetItem().Return(cacheItem)
-		iw.OnGetID().Return("some-id")
+		iw.EXPECT().GetItem().Return(cacheItem)
+		iw.EXPECT().GetID().Return("some-id")
 
 		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
 		newExecutionState := newCacheItem[0].Item.(CacheItem)

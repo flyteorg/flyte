@@ -1,8 +1,6 @@
 package k8s
 
 import (
-	"math"
-
 	"github.com/golang/protobuf/ptypes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -72,10 +70,6 @@ func toBindingValueArray(bindings []*core.Binding) []*v1alpha1.Binding {
 	}
 
 	return res
-}
-
-func minInt(i, j int) int {
-	return int(math.Min(float64(i), float64(j)))
 }
 
 // StripTypeMetadata strips the type metadata from the given type.

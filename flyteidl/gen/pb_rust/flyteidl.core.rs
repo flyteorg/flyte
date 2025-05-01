@@ -1301,6 +1301,22 @@ pub mod gpu_accelerator {
         PartitionSize(::prost::alloc::string::String),
     }
 }
+/// Metadata associated with configuring a shared memory volume for a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SharedMemory {
+    /// Mount path to place in container
+    #[prost(string, tag="1")]
+    pub mount_path: ::prost::alloc::string::String,
+    /// Name for volume
+    #[prost(string, tag="2")]
+    pub mount_name: ::prost::alloc::string::String,
+    /// Size limit for shared memory. If not set, then the shared memory is equal
+    /// to the allocated memory.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub size_limit: ::prost::alloc::string::String,
+}
 /// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
 /// allocate to a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1310,6 +1326,8 @@ pub struct ExtendedResources {
     /// for multi-instance GPUs, the partition size to use.
     #[prost(message, optional, tag="1")]
     pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
+    #[prost(message, optional, tag="2")]
+    pub shared_memory: ::core::option::Option<SharedMemory>,
 }
 /// Runtime information. This is loosely defined to allow for extensibility.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1403,6 +1421,16 @@ pub struct TaskMetadata {
     /// - false: The task will not generate a deck.
     #[prost(message, optional, tag="15")]
     pub generates_deck: ::core::option::Option<bool>,
+    /// Metadata applied to task pods or task CR objects.
+    /// In flytekit, labels and annotations resulting in this metadata field
+    /// are provided via `@task(labels=..., annotations=...)`.
+    /// For tasks backed by pods like PythonFunctionTask, these take precedence
+    /// over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+    /// in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+    /// the CR object itself while the metadata in the pod template/K8sPod is applied
+    /// to the pod template spec of the CR object.
+    #[prost(message, optional, tag="16")]
+    pub metadata: ::core::option::Option<K8sObjectMetadata>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
@@ -2461,6 +2489,9 @@ pub struct ArrayNode {
     /// data_mode determines how input data is passed to the sub-nodes
     #[prost(enumeration="array_node::DataMode", tag="7")]
     pub data_mode: i32,
+    /// +optional. Specifies input bindings that are not mapped over for the node.
+    #[prost(string, repeated, tag="8")]
+    pub bound_inputs: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]

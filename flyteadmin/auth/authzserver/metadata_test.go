@@ -42,8 +42,8 @@ func TestGetJSONWebKeysEndpoint(t *testing.T) {
 	t.Run("Empty keyset", func(t *testing.T) {
 		authCtx := &mocks.AuthenticationContext{}
 		oauth2Provider := &mocks.OAuth2Provider{}
-		authCtx.OnOAuth2Provider().Return(oauth2Provider)
-		oauth2Provider.OnKeySet().Return(jwk.NewSet())
+		authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
+		oauth2Provider.EXPECT().KeySet().Return(jwk.NewSet())
 
 		handler := GetJSONWebKeysEndpoint(authCtx)
 		responseRecorder := httptest.NewRecorder()
@@ -55,7 +55,7 @@ func TestGetJSONWebKeysEndpoint(t *testing.T) {
 	t.Run("2 keys", func(t *testing.T) {
 		authCtx := &mocks.AuthenticationContext{}
 		oauth2Provider := &mocks.OAuth2Provider{}
-		authCtx.OnOAuth2Provider().Return(oauth2Provider)
+		authCtx.EXPECT().OAuth2Provider().Return(oauth2Provider)
 
 		publicKeys := make([]rsa.PublicKey, 0, 5)
 		for i := 0; i < cap(publicKeys); i++ {
@@ -67,7 +67,7 @@ func TestGetJSONWebKeysEndpoint(t *testing.T) {
 		keySet, err := newJSONWebKeySet(publicKeys)
 		assert.NoError(t, err)
 
-		oauth2Provider.OnKeySet().Return(keySet)
+		oauth2Provider.EXPECT().KeySet().Return(keySet)
 
 		handler := GetJSONWebKeysEndpoint(authCtx)
 		responseRecorder := httptest.NewRecorder()

@@ -21,8 +21,8 @@ func Benchmark_initDefaultRegexes(b *testing.B) {
 
 func dummyTaskExecID() pluginCore.TaskExecutionID {
 	tID := &coreMocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("generated-name")
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetGeneratedName().Return("generated-name")
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -39,7 +39,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		},
 		RetryAttempt: 1,
 	})
-	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.EXPECT().GetUniqueNodeID().Return("n0-0-n0")
 	return tID
 }
 
@@ -554,6 +554,45 @@ func TestTemplateLogPlugin(t *testing.T) {
 				Uri:           "https://dashboard.k8s.net/#!/log/flyteexamples-development/flyteexamples-development-task-name/pod?namespace=flyteexamples-development",
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "main_logs",
+			}}},
+		},
+		{
+			"template variables in display name and log name",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.podName}}"},
+				DisplayName:   "logs-{{.podName}}-",
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					PodName:       "test-pod",
+					LogName:       "{{.podName}}-logs",
+					ContainerName: "test-container",
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://example.com/logs/test-pod",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "logs-test-pod-test-pod-logs",
+			}}},
+		},
+		{
+			"task execution with template variables",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://example.com/logs/{{.taskId}}"},
+				DisplayName:   "task-{{.taskId}}-",
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					LogName:         "{{.taskId}}-logs",
+					TaskExecutionID: dummyTaskExecID(),
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://example.com/logs/my-task-name",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "task-my-task-name-my-task-name-logs",
 			}}},
 		},
 	}

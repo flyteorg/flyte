@@ -163,8 +163,8 @@ func newFakeSetupContext() *pluginCoreMocks.SetupContext {
 	labeled.SetMetricKeys(contextutils.NamespaceKey)
 
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
-	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope("test"))
-	fakeSetupContext.OnResourceRegistrar().Return(&fakeResourceRegistrar)
+	fakeSetupContext.EXPECT().MetricsScope().Return(promutils.NewScope("test"))
+	fakeSetupContext.EXPECT().ResourceRegistrar().Return(&fakeResourceRegistrar)
 
 	return &fakeSetupContext
 }

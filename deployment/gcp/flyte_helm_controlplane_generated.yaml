@@ -358,6 +358,7 @@ data:
       username: flyteadmin
   server.yaml: | 
     application:
+      grpcMaxRecvMsgSizeMBs: 6
       grpcPort: 8089
       grpcServerReflection: true
       httpPort: 8080
@@ -597,7 +598,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           securityContext:
@@ -618,7 +619,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           securityContext:
@@ -636,7 +637,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           securityContext:
@@ -653,7 +654,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -680,7 +681,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -727,8 +728,10 @@ spec:
         name: shared-data
       - emptyDir: {}
         name: scratch
-      - configMap:
-          name: flyte-admin-base-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-admin-base-config
         name: base-config-volume
       - projected:
           sources:
@@ -787,7 +790,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.14.1"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -843,7 +846,7 @@ spec:
         seLinuxOptions:
           type: spc_t
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.19.0"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.20.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -896,7 +899,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "537b12b49584e5eb9da85bbf0d8d8d21d8edce0560b0b53f595485f2cdb1cb6"
+        configChecksum: "4b8758ec18556294a51a4c08ad7b82e4311d52c1a58448d1caa9589682482cb"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -917,7 +920,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.14.1"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.15.3"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -935,7 +938,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.14.1"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.15.3"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -967,8 +970,10 @@ spec:
           secretName: db-pass
       - emptyDir: {}
         name: shared-data
-      - configMap:
-          name: datacatalog-config
+      - projected:
+          sources:
+            - configMap:
+                name: datacatalog-config
         name: config-volume
       affinity: 
         podAntiAffinity:
@@ -1018,7 +1023,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.14.1"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.15.3"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         securityContext:
@@ -1038,7 +1043,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.14.1"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.15.3"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:

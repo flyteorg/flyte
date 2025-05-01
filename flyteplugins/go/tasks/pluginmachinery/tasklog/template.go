@@ -109,6 +109,7 @@ func (input Input) templateVars() []TemplateVar {
 		TemplateVar{defaultRegexes.Hostname, input.HostName},
 		TemplateVar{defaultRegexes.NodeName, input.NodeName},
 	)
+
 	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
 		vars = append(
@@ -204,7 +205,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:              replaceAll(templateURI, templateVars),
-			Name:             p.DisplayName + input.LogName,
+			Name:             replaceAll(p.DisplayName, templateVars) + replaceAll(input.LogName, templateVars),
 			MessageFormat:    p.MessageFormat,
 			ShowWhilePending: p.ShowWhilePending,
 			HideOnceFinished: p.HideOnceFinished,

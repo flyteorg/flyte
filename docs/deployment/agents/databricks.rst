@@ -178,7 +178,7 @@ Specify agent configuration
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
-      :emphasize-lines: 9
+      :emphasize-lines: 8,13
 
         enabled_plugins:
           tasks:

@@ -59,7 +59,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	literalOffloadingConfig := config.LiteralOffloadingConfig{Enabled: true, MinSizeInMBForOffloading: 1024, MaxSizeInMBForOffloading: 1024 * 1024}
 	mockEventSink := eventmocks.NewMockEventSink()
 	mockHandlerFactory := &mocks.HandlerFactory{}
-	mockHandlerFactory.OnGetHandlerMatch(mock.Anything).Return(nodeHandler, nil)
+	mockHandlerFactory.EXPECT().GetHandler(mock.Anything).Return(nodeHandler, nil)
 	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
 	mockSignalClient := &gatemocks.SignalServiceClient{}
@@ -85,23 +85,23 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnCurrentAttempt().Return(uint32(0))
+	nCtx.EXPECT().CurrentAttempt().Return(uint32(0))
 
 	// ContextualNodeLookup
 	nodeLookup := &execmocks.NodeLookup{}
-	nodeLookup.OnFromNodeMatch(mock.Anything).Return(nil, nil)
-	nCtx.OnContextualNodeLookup().Return(nodeLookup)
+	nodeLookup.EXPECT().FromNode(mock.Anything).Return(nil, nil)
+	nCtx.EXPECT().ContextualNodeLookup().Return(nodeLookup)
 
 	// DataStore
-	nCtx.OnDataStore().Return(dataStore)
+	nCtx.EXPECT().DataStore().Return(dataStore)
 
 	// ExecutionContext
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		MaxParallelism: maxParallelism,
 	})
-	executionContext.OnGetExecutionID().Return(
+	executionContext.EXPECT().GetExecutionID().Return(
 		v1alpha1.ExecutionID{
 			WorkflowExecutionIdentifier: &idlcore.WorkflowExecutionIdentifier{
 				Project: "project",
@@ -109,15 +109,15 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 				Name:    "name",
 			},
 		})
-	executionContext.OnGetLabels().Return(nil)
-	executionContext.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-	executionContext.OnIsInterruptible().Return(false)
-	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.EXPECT().GetLabels().Return(nil)
+	executionContext.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+	executionContext.EXPECT().IsInterruptible().Return(false)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
 	outputVariableMap := make(map[string]*idlcore.Variable)
 	for _, outputVariable := range outputVariables {
 		outputVariableMap[outputVariable] = &idlcore.Variable{}
 	}
-	executionContext.OnGetTask(taskRef).Return(
+	executionContext.EXPECT().GetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Interface: &idlcore.TypedInterface{
@@ -129,32 +129,32 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		},
 		nil,
 	)
-	executionContext.OnCurrentParallelism().Return(currentParallelism)
+	executionContext.EXPECT().CurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
-	executionContext.OnIncrementNodeExecutionCount().Return(1)
-	executionContext.OnIncrementTaskExecutionCount().Return(1)
-	executionContext.OnCurrentNodeExecutionCount().Return(1)
-	executionContext.OnCurrentTaskExecutionCount().Return(1)
-	nCtx.OnExecutionContext().Return(executionContext)
+	executionContext.EXPECT().IncrementNodeExecutionCount().Return(1)
+	executionContext.EXPECT().IncrementTaskExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentNodeExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentTaskExecutionCount().Return(1)
+	nCtx.EXPECT().ExecutionContext().Return(executionContext)
 
 	// EventsRecorder
-	nCtx.OnEventsRecorder().Return(eventRecorder)
+	nCtx.EXPECT().EventsRecorder().Return(eventRecorder)
 
 	// InputReader
 	inputFilePaths := &pluginiomocks.InputFilePaths{}
-	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
-	nCtx.OnInputReader().Return(
+	inputFilePaths.EXPECT().GetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	nCtx.EXPECT().InputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,
 			inputLiteralMap,
 		))
 
 	// Node
-	nCtx.OnNode().Return(arrayNodeSpec)
+	nCtx.EXPECT().Node().Return(arrayNodeSpec)
 
 	// NodeExecutionMetadata
 	nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
-	nodeExecutionMetadata.OnGetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
+	nodeExecutionMetadata.EXPECT().GetNodeExecutionID().Return(&idlcore.NodeExecutionIdentifier{
 		NodeId: "foo",
 		ExecutionId: &idlcore.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -162,35 +162,35 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 			Name:    "name",
 		},
 	})
-	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+	nodeExecutionMetadata.EXPECT().GetOwnerID().Return(types.NamespacedName{
 		Namespace: "wf-namespace",
 		Name:      "wf-name",
 	})
-	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
+	nCtx.EXPECT().NodeExecutionMetadata().Return(nodeExecutionMetadata)
 
 	// NodeID
-	nCtx.OnNodeID().Return("foo")
+	nCtx.EXPECT().NodeID().Return("foo")
 
 	// NodeStateReader
 	nodeStateReader := &mocks.NodeStateReader{}
-	nodeStateReader.OnGetArrayNodeState().Return(*arrayNodeState)
-	nCtx.OnNodeStateReader().Return(nodeStateReader)
+	nodeStateReader.EXPECT().GetArrayNodeState().Return(*arrayNodeState)
+	nCtx.EXPECT().NodeStateReader().Return(nodeStateReader)
 
 	// NodeStateWriter
 	nodeStateWriter := &mocks.NodeStateWriter{}
-	nodeStateWriter.OnPutArrayNodeStateMatch(mock.Anything, mock.Anything).Run(
-		func(args mock.Arguments) {
-			*arrayNodeState = args.Get(0).(handler.ArrayNodeState)
+	nodeStateWriter.EXPECT().PutArrayNodeState(mock.Anything).Run(
+		func(s handler.ArrayNodeState) {
+			*arrayNodeState = s
 		},
 	).Return(nil)
-	nCtx.OnNodeStateWriter().Return(nodeStateWriter)
+	nCtx.EXPECT().NodeStateWriter().Return(nodeStateWriter)
 
 	// NodeStatus
 	nowMinus := time.Now().Add(time.Duration(-5) * time.Second)
 	metav1NowMinus := metav1.Time{
 		Time: nowMinus,
 	}
-	nCtx.OnNodeStatus().Return(&v1alpha1.NodeStatus{
+	nCtx.EXPECT().NodeStatus().Return(&v1alpha1.NodeStatus{
 		DataDir:              storage.DataReference("s3://bucket/data"),
 		OutputDir:            storage.DataReference("s3://bucket/output"),
 		LastAttemptStartedAt: &metav1NowMinus,
@@ -245,8 +245,8 @@ func TestAbort(t *testing.T) {
 			assert.NoError(t, err)
 
 			nodeHandler := &mocks.NodeHandler{}
-			nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 
 			// initialize ArrayNodeHandler
 			arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
@@ -324,7 +324,7 @@ func TestFinalize(t *testing.T) {
 	assert.NoError(t, err)
 
 	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 
 	// initialize ArrayNodeHandler
 	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
@@ -416,15 +416,18 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 
 	tests := []struct {
 		name                           string
-		inputValues                    map[string][]int64
+		inputMap                       *idlcore.LiteralMap
 		expectedArrayNodePhase         v1alpha1.ArrayNodePhase
 		expectedTransitionPhase        handler.EPhase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
+		boundInputs                    []string
 	}{
 		{
 			name: "Success",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
 			expectedTransitionPhase:        handler.EPhaseRunning,
@@ -432,9 +435,11 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		},
 		{
 			name: "SuccessMultipleInputs",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2, 3},
-				"bar": []int64{4, 5, 6},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": convertListToLiterals([]int64{4, 5, 6}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
 			expectedTransitionPhase:        handler.EPhaseRunning,
@@ -442,13 +447,53 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		},
 		{
 			name: "FailureDifferentInputListLengths",
-			inputValues: map[string][]int64{
-				"foo": []int64{1, 2},
-				"bar": []int64{3},
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2}),
+					"bar": convertListToLiterals([]int64{3}),
+				},
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseNone,
 			expectedTransitionPhase:        handler.EPhaseFailed,
 			expectedExternalResourcePhases: nil,
+		},
+		{
+			name: "boundInputs",
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": {
+						Value: &idlcore.Literal_Scalar{
+							Scalar: &idlcore.Scalar{
+								Value: &idlcore.Scalar_Primitive{
+									Primitive: &idlcore.Primitive{
+										Value: &idlcore.Primitive_Integer{
+											Integer: 1,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			boundInputs:                    []string{"bar"},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED},
+		},
+		{
+			name: "All boundInputs",
+			inputMap: &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"foo": convertListToLiterals([]int64{1, 2, 3}),
+					"bar": convertListToLiterals([]int64{1, 2, 3}),
+				},
+			},
+			boundInputs:                    []string{"foo", "bar"},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_UNDEFINED},
 		},
 	}
 
@@ -456,11 +501,11 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
-			literalMap := convertMapToArrayLiterals(test.inputValues)
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
 			}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			arrayNodeSpec.ArrayNode.BoundInputs = test.boundInputs
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, test.inputMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
@@ -934,21 +979,21 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
-			nodeHandler.OnFinalizeRequired().Return(false)
+			nodeHandler.EXPECT().FinalizeRequired().Return(false)
 			for i, transition := range test.subNodeTransitions {
 				nodeID := fmt.Sprintf("n%d", i)
 				transitionPhase := test.expectedExternalResourcePhases[i]
 
-				nodeHandler.OnHandleMatch(mock.Anything, mock.MatchedBy(func(arrayNCtx interfaces.NodeExecutionContext) bool {
+				nodeHandler.EXPECT().Handle(mock.Anything, mock.MatchedBy(func(arrayNCtx interfaces.NodeExecutionContext) bool {
 					return arrayNCtx.NodeID() == nodeID // match on NodeID using index to ensure each subNode is handled independently
 				})).Run(
-					func(args mock.Arguments) {
+					func(ctx context.Context, executionContext interfaces.NodeExecutionContext) {
 						// mock sending TaskExecutionEvent from handler to show task state transition
 						taskExecutionEvent := &event.TaskExecutionEvent{
 							Phase: transitionPhase,
 						}
 
-						err := args.Get(1).(interfaces.NodeExecutionContext).EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
+						err := executionContext.EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, &config.EventConfig{})
 						assert.NoError(t, err)
 					},
 				).Return(transition, nil)
@@ -1146,10 +1191,10 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
-			nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
-			nodeHandler.OnFinalizeRequired().Return(false)
-			nodeHandler.OnHandleMatch(mock.Anything, mock.Anything).Return(test.transition, nil)
+			nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
+			nodeHandler.EXPECT().FinalizeRequired().Return(false)
+			nodeHandler.EXPECT().Handle(mock.Anything, mock.Anything).Return(test.transition, nil)
 
 			arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
 			assert.NoError(t, err)
@@ -1329,8 +1374,8 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 	assert.NoError(t, err)
 
 	nodeHandler := &mocks.NodeHandler{}
-	nodeHandler.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	nodeHandler.OnFinalizeMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Abort(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	nodeHandler.EXPECT().Finalize(mock.Anything, mock.Anything).Return(nil)
 
 	// initialize ArrayNodeHandler
 	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
@@ -1438,5 +1483,31 @@ func convertMapToArrayLiterals(values map[string][]int64) *idlcore.LiteralMap {
 
 	return &idlcore.LiteralMap{
 		Literals: literalMap,
+	}
+}
+
+func convertListToLiterals(values []int64) *idlcore.Literal {
+	literalList := make([]*idlcore.Literal, 0, len(values))
+	for _, x := range values {
+		literalList = append(literalList, &idlcore.Literal{
+			Value: &idlcore.Literal_Scalar{
+				Scalar: &idlcore.Scalar{
+					Value: &idlcore.Scalar_Primitive{
+						Primitive: &idlcore.Primitive{
+							Value: &idlcore.Primitive_Integer{
+								Integer: x,
+							},
+						},
+					},
+				},
+			},
+		})
+	}
+	return &idlcore.Literal{
+		Value: &idlcore.Literal_Collection{
+			Collection: &idlcore.LiteralCollection{
+				Literals: literalList,
+			},
+		},
 	}
 }

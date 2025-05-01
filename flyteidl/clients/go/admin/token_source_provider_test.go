@@ -64,8 +64,8 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		cfg := GetConfig(ctx)
 		tokenCache := &tokenCacheMocks.TokenCache{}
 		metadataClient := &adminMocks.AuthMetadataServiceClient{}
-		metadataClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
-		metadataClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
+		metadataClient.EXPECT().GetOAuth2Metadata(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
+		metadataClient.EXPECT().GetPublicClientConfig(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
 		cfg.AuthType = AuthTypeClientSecret
 		cfg.Audience = test.audienceCfg
 		cfg.Scopes = test.scopesCfg
@@ -128,9 +128,9 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			tokenCache := &tokenCacheMocks.TokenCache{}
-			tokenCache.OnGetToken().Return(test.token, nil).Maybe()
-			tokenCache.On("Lock").Return().Maybe()
-			tokenCache.On("Unlock").Return().Maybe()
+			tokenCache.EXPECT().GetToken().Return(test.token, nil).Maybe()
+			tokenCache.EXPECT().Lock().Return().Maybe()
+			tokenCache.EXPECT().Unlock().Return().Maybe()
 			provider, err := NewClientCredentialsTokenSourceProvider(ctx, cfg, []string{}, "", tokenCache, "")
 			assert.NoError(t, err)
 			source, err := provider.GetTokenSource(ctx)
@@ -141,14 +141,14 @@ func TestCustomTokenSource_Token(t *testing.T) {
 			mockSource := &adminMocks.TokenSource{}
 			if test.token != validToken {
 				if test.newToken != nil {
-					mockSource.OnToken().Return(test.newToken, nil)
+					mockSource.EXPECT().Token().Return(test.newToken, nil)
 				} else {
-					mockSource.OnToken().Return(nil, fmt.Errorf("refresh token failed"))
+					mockSource.EXPECT().Token().Return(nil, fmt.Errorf("refresh token failed"))
 				}
 			}
 			customSource.new = mockSource
 			if test.newToken != nil {
-				tokenCache.OnSaveToken(test.newToken).Return(nil).Once()
+				tokenCache.EXPECT().SaveToken(test.newToken).Return(nil).Once()
 			}
 			token, err := source.Token()
 			if test.expectedToken != nil {

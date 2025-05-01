@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -29,7 +29,7 @@ const (
 )
 
 // ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
-func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
+func ExtractCurrentCondition(jobConditions []kubeflowv1.JobCondition) (kubeflowv1.JobCondition, error) {
 	if jobConditions != nil {
 		sort.Slice(jobConditions, func(i, j int) bool {
 			return jobConditions[i].LastTransitionTime.Time.After(jobConditions[j].LastTransitionTime.Time)
@@ -40,28 +40,28 @@ func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.Jo
 				return jc, nil
 			}
 		}
-		return commonOp.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
+		return kubeflowv1.JobCondition{}, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions)
 	}
-	return commonOp.JobCondition{}, nil
+	return kubeflowv1.JobCondition{}, nil
 }
 
 // GetPhaseInfo will return the phase of kubeflow job
-func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
+func GetPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	if len(currentCondition.Type) == 0 {
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	}
 	switch currentCondition.Type {
-	case commonOp.JobCreated:
+	case kubeflowv1.JobCreated:
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
-	case commonOp.JobRunning:
+	case kubeflowv1.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
-	case commonOp.JobSucceeded:
+	case kubeflowv1.JobSucceeded:
 		return pluginsCore.PhaseInfoSuccess(&taskPhaseInfo), nil
-	case commonOp.JobFailed:
+	case kubeflowv1.JobFailed:
 		details := fmt.Sprintf("Job failed:\n\t%v - %v", currentCondition.Reason, currentCondition.Message)
 		return pluginsCore.PhaseInfoRetryableFailure(flyteerr.DownstreamSystemError, details, &taskPhaseInfo), nil
-	case commonOp.JobRestarting:
+	case kubeflowv1.JobRestarting:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	}
 
@@ -69,19 +69,19 @@ func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 }
 
 // GetMPIPhaseInfo will return the phase of MPI job
-func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
+func GetMPIPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	switch currentCondition.Type {
-	case commonOp.JobCreated:
+	case kubeflowv1.JobCreated:
 		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator", &taskPhaseInfo), nil
-	case commonOp.JobRunning:
+	case kubeflowv1.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
-	case commonOp.JobSucceeded:
+	case kubeflowv1.JobSucceeded:
 		return pluginsCore.PhaseInfoSuccess(&taskPhaseInfo), nil
-	case commonOp.JobFailed:
+	case kubeflowv1.JobFailed:
 		details := fmt.Sprintf("Job failed:\n\t%v - %v", currentCondition.Reason, currentCondition.Message)
 		return pluginsCore.PhaseInfoRetryableFailure(flyteerr.DownstreamSystemError, details, &taskPhaseInfo), nil
-	case commonOp.JobRestarting:
+	case kubeflowv1.JobRestarting:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	}
 
@@ -89,7 +89,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 }
 
 // GetLogs will return the logs for kubeflow job
-func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
+func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, taskTemplate *core.TaskTemplate, hasMaster bool,
 	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
@@ -125,6 +125,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 				PodUnixStartTime:     startTime,
 				PodUnixFinishTime:    finishTime,
 				TaskExecutionID:      taskExecID,
+				TaskTemplate:         taskTemplate,
 			},
 		)
 		if masterErr != nil {
@@ -143,6 +144,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodUnixStartTime:     startTime,
 			PodUnixFinishTime:    finishTime,
 			TaskExecutionID:      taskExecID,
+			TaskTemplate:         taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -160,6 +162,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -172,6 +175,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-chiefReplica-%d", 0),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -184,6 +188,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodName:         name + fmt.Sprintf("-evaluatorReplica-%d", 0),
 			Namespace:       namespace,
 			TaskExecutionID: taskExecID,
+			TaskTemplate:    taskTemplate,
 		})
 		if err != nil {
 			return nil, err
@@ -210,8 +215,8 @@ func OverridePrimaryContainerName(podSpec *v1.PodSpec, primaryContainerName stri
 }
 
 // ParseRunPolicy converts a kubeflow plugin RunPolicy object to a k8s RunPolicy object.
-func ParseRunPolicy(flyteRunPolicy kfplugins.RunPolicy) commonOp.RunPolicy {
-	runPolicy := commonOp.RunPolicy{}
+func ParseRunPolicy(flyteRunPolicy kfplugins.RunPolicy) kubeflowv1.RunPolicy {
+	runPolicy := kubeflowv1.RunPolicy{}
 	if flyteRunPolicy.GetBackoffLimit() != 0 {
 		var backoffLimit = flyteRunPolicy.GetBackoffLimit()
 		runPolicy.BackoffLimit = &backoffLimit
@@ -231,21 +236,21 @@ func ParseRunPolicy(flyteRunPolicy kfplugins.RunPolicy) commonOp.RunPolicy {
 }
 
 // Get k8s clean pod policy from flyte kubeflow plugins clean pod policy.
-func ParseCleanPodPolicy(flyteCleanPodPolicy kfplugins.CleanPodPolicy) commonOp.CleanPodPolicy {
-	cleanPodPolicyMap := map[kfplugins.CleanPodPolicy]commonOp.CleanPodPolicy{
-		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_NONE:    commonOp.CleanPodPolicyNone,
-		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL:     commonOp.CleanPodPolicyAll,
-		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_RUNNING: commonOp.CleanPodPolicyRunning,
+func ParseCleanPodPolicy(flyteCleanPodPolicy kfplugins.CleanPodPolicy) kubeflowv1.CleanPodPolicy {
+	cleanPodPolicyMap := map[kfplugins.CleanPodPolicy]kubeflowv1.CleanPodPolicy{
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_NONE:    kubeflowv1.CleanPodPolicyNone,
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL:     kubeflowv1.CleanPodPolicyAll,
+		kfplugins.CleanPodPolicy_CLEANPOD_POLICY_RUNNING: kubeflowv1.CleanPodPolicyRunning,
 	}
 	return cleanPodPolicyMap[flyteCleanPodPolicy]
 }
 
 // Get k8s restart policy from flyte kubeflow plugins restart policy.
-func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) commonOp.RestartPolicy {
-	restartPolicyMap := map[kfplugins.RestartPolicy]commonOp.RestartPolicy{
-		kfplugins.RestartPolicy_RESTART_POLICY_NEVER:      commonOp.RestartPolicyNever,
-		kfplugins.RestartPolicy_RESTART_POLICY_ON_FAILURE: commonOp.RestartPolicyOnFailure,
-		kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS:     commonOp.RestartPolicyAlways,
+func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) kubeflowv1.RestartPolicy {
+	restartPolicyMap := map[kfplugins.RestartPolicy]kubeflowv1.RestartPolicy{
+		kfplugins.RestartPolicy_RESTART_POLICY_NEVER:      kubeflowv1.RestartPolicyNever,
+		kfplugins.RestartPolicy_RESTART_POLICY_ON_FAILURE: kubeflowv1.RestartPolicyOnFailure,
+		kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS:     kubeflowv1.RestartPolicyAlways,
 	}
 	return restartPolicyMap[flyteRestartPolicy]
 }
@@ -266,7 +271,7 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 	return nil
 }
 
-func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string) (*commonOp.ReplicaSpec, error) {
+func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string) (*kubeflowv1.ReplicaSpec, error) {
 	podSpec, objectMeta, oldPrimaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
@@ -279,13 +284,13 @@ func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
 	replicas := int32(0)
-	return &commonOp.ReplicaSpec{
+	return &kubeflowv1.ReplicaSpec{
 		Replicas: &replicas,
 		Template: v1.PodTemplateSpec{
 			ObjectMeta: *objectMeta,
 			Spec:       *podSpec,
 		},
-		RestartPolicy: commonOp.RestartPolicyNever,
+		RestartPolicy: kubeflowv1.RestartPolicyNever,
 	}, nil
 }
 
@@ -301,7 +306,7 @@ type allowsCommandOverride interface {
 	GetCommand() []string
 }
 
-func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*commonOp.ReplicaSpec, error) {
+func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*kubeflowv1.ReplicaSpec, error) {
 	var replicas int32
 	var image string
 	var resources *core.Resources
@@ -328,6 +333,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
 		}
+		*resources = flytek8s.ApplyK8sResourceOverrides(taskCtx.TaskExecutionMetadata(), resources)
 		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
 	}
 	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
@@ -364,7 +370,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	return replicaSpec, nil
 }
 
-func GetReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
+func GetReplicaCount(specs map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec, replicaType kubeflowv1.ReplicaType) *int32 {
 	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
 		return spec.Replicas
 	}

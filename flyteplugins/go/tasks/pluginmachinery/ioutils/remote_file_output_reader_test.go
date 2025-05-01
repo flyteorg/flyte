@@ -11,6 +11,7 @@ import (
 	regErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/runtime/protoiface"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -46,13 +47,13 @@ func (m MemoryMetadata) Etag() string {
 func TestExistsTooBig(t *testing.T) {
 	ctx := context.TODO()
 	opath := &pluginsIOMock.OutputFilePaths{}
-	opath.OnGetErrorPath().Return("")
+	opath.EXPECT().GetErrorPath().Return("")
 	deckPath := "some.file"
-	opath.OnGetOutputPath().Return(storage.DataReference(deckPath))
+	opath.EXPECT().GetOutputPath().Return(storage.DataReference(deckPath))
 
 	t.Run("too large", func(t *testing.T) {
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnHead(ctx, "some.file").Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("some.file")).Return(MemoryMetadata{
 			exists: true,
 			size:   2,
 		}, nil)
@@ -73,9 +74,9 @@ func TestReadOrigin(t *testing.T) {
 	ctx := context.TODO()
 
 	opath := &pluginsIOMock.OutputFilePaths{}
-	opath.OnGetErrorPath().Return("")
+	opath.EXPECT().GetErrorPath().Return("")
 	deckPath := "deck.html"
-	opath.OnGetDeckPath().Return(storage.DataReference(deckPath))
+	opath.EXPECT().GetDeckPath().Return(storage.DataReference(deckPath))
 
 	t.Run("user", func(t *testing.T) {
 		errorDoc := &core.ErrorDocument{
@@ -87,14 +88,13 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-			incomingErrorDoc := args.Get(2)
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, incomingErrorDoc protoiface.MessageV1) {
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
-		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -125,8 +125,7 @@ func TestReadOrigin(t *testing.T) {
 			},
 		}
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-			incomingErrorDoc := args.Get(2)
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, incomingErrorDoc protoiface.MessageV1) {
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.GetError()
@@ -148,11 +147,10 @@ func TestReadOrigin(t *testing.T) {
 
 	t.Run("multi-user-error", func(t *testing.T) {
 		outputPaths := &pluginsIOMock.OutputFilePaths{}
-		outputPaths.OnGetErrorPath().Return("s3://errors/error.pb")
+		outputPaths.EXPECT().GetErrorPath().Return("s3://errors/error.pb")
 
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-			errorFilePath := args.Get(1).(storage.DataReference)
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, errorFilePath storage.DataReference, incomingErrorDoc protoiface.MessageV1) {
 			workerIdx, err := strconv.Atoi(strings.Split(strings.Split(errorFilePath.String(), "-")[1], ".")[0])
 			assert.NoError(t, err)
 			errorDoc := &core.ErrorDocument{
@@ -165,24 +163,23 @@ func TestReadOrigin(t *testing.T) {
 					Timestamp: timestamppb.New(time.Unix(int64(100-workerIdx%2), 0)),
 				},
 			}
-			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
-		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
+		store.EXPECT().List(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
 			[]storage.DataReference{"s3://errors/error-0.pb", "s3://errors/error-1.pb", "s3://errors/error-2.pb"}, storage.NewCursorAtEnd(), nil)
 
-		store.OnHead(ctx, storage.DataReference("s3://errors/error-0.pb")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("s3://errors/error-0.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
-		store.OnHead(ctx, storage.DataReference("s3://errors/error-1.pb")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("s3://errors/error-1.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
-		store.OnHead(ctx, storage.DataReference("s3://errors/error-2.pb")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("s3://errors/error-2.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -212,10 +209,10 @@ func TestReadOrigin(t *testing.T) {
 
 	t.Run("multi-user-error-backward-compat", func(t *testing.T) {
 		outputPaths := &pluginsIOMock.OutputFilePaths{}
-		outputPaths.OnGetErrorPath().Return("s3://errors/error.pb")
+		outputPaths.EXPECT().GetErrorPath().Return("s3://errors/error.pb")
 
 		store := &storageMocks.ComposedProtobufStore{}
-		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).Run(func(ctx context.Context, reference storage.DataReference, incomingErrorDoc protoiface.MessageV1) {
 			errorDoc := &core.ErrorDocument{
 				Error: &core.ContainerError{
 					Code:    "red",
@@ -224,16 +221,15 @@ func TestReadOrigin(t *testing.T) {
 					Origin:  core.ExecutionError_USER,
 				},
 			}
-			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.GetError()
 		}).Return(nil)
 
-		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
+		store.EXPECT().List(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
 			[]storage.DataReference{"s3://errors/error.pb"}, storage.NewCursorAtEnd(), nil)
 
-		store.OnHead(ctx, storage.DataReference("s3://errors/error.pb")).Return(MemoryMetadata{
+		store.EXPECT().Head(ctx, storage.DataReference("s3://errors/error.pb")).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 

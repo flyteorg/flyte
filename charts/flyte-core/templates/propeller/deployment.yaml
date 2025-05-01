@@ -10,6 +10,12 @@ metadata:
   name: {{ template "flytepropeller.name" . }}
   labels: {{ include "flytepropeller.labels" . | nindent 4 }}
   {{- end }}
+  {{- if .Values.flytepropeller.annotations }}
+  annotations:
+    {{- with .Values.flytepropeller.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.flytepropeller.replicaCount }}
   selector:
@@ -106,8 +112,14 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "flytepropeller.name" . }}
       volumes:
-      - configMap:
-          name: flyte-propeller-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-propeller-config
+          {{- if .Values.storage.secretName }}
+            - secret:
+                name: {{ .Values.storage.secretName }}
+          {{- end }}
         name: config-volume
       {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth

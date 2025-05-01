@@ -68,7 +68,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Variable not in inputs", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 		bindings := []*core.Binding{
 			{
 				Var: "x",
@@ -86,7 +86,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Bind the same variable twice", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -123,7 +123,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -159,7 +159,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Enum legal string", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -191,7 +191,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Enum illegal string", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -223,7 +223,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Maps", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -261,9 +261,9 @@ func TestValidateBindings(t *testing.T) {
 
 	t.Run("Promises", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -273,10 +273,10 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -294,7 +294,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -335,9 +335,9 @@ func TestValidateBindings(t *testing.T) {
 		// List/Dict with attribute path should conduct validation
 
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -347,10 +347,10 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -377,7 +377,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -426,9 +426,9 @@ func TestValidateBindings(t *testing.T) {
 		// Dataclass with attribute path should skip validation
 
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -438,9 +438,9 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
-		n2.OnGetOutputAliases().Return(nil)
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
 		literalType := &core.LiteralType{
 			Type: &core.LiteralType_Simple{
 				Simple: core.SimpleType_STRUCT,
@@ -448,13 +448,13 @@ func TestValidateBindings(t *testing.T) {
 		}
 		literalType.Structure = &core.TypeStructure{}
 		literalType.Structure.DataclassType = map[string]*core.LiteralType{
-			"x": &core.LiteralType{
+			"x": {
 				Type: &core.LiteralType_Simple{
 					Simple: core.SimpleType_INTEGER,
 				},
 			},
 		}
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -468,7 +468,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -515,8 +515,8 @@ func TestValidateBindings(t *testing.T) {
 
 	t.Run("Nil Binding Value", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -526,9 +526,9 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -546,7 +546,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -581,7 +581,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Int to Unambiguous Union Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -628,7 +628,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Int to Ambiguous Union Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -673,7 +673,7 @@ func TestValidateBindings(t *testing.T) {
 		// Should still succeed because ambiguity checking is deferred to the SDK which knows about type transformers
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -713,7 +713,7 @@ func TestValidateBindings(t *testing.T) {
 		// Should still succeed because ambiguity checking is deferred to the SDK which knows about type transformers
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -785,8 +785,8 @@ func TestValidateBindings(t *testing.T) {
 		// Should still succeed because ambiguity checking is deferred to the SDK which knows about type transformers
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 
 		bindings := []*core.Binding{
 			{
@@ -846,7 +846,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("List of Int to List of Unions Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -897,7 +897,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("List of Int to List of Incompatible Unions Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -946,7 +946,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("List of Int to Union of Lists Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -1001,7 +1001,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("List of Int to Incompatible Union of Lists Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -1054,7 +1054,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("List of Int to Ambiguous Union of Lists Binding", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		bindings := []*core.Binding{
 			{
@@ -1106,9 +1106,9 @@ func TestValidateBindings(t *testing.T) {
 
 	t.Run("Union Promise Unambiguous", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1118,10 +1118,10 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1139,7 +1139,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -1193,9 +1193,9 @@ func TestValidateBindings(t *testing.T) {
 
 	t.Run("Union Promise Ambiguous", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "n"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "n"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1205,10 +1205,10 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "n2"})
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "n2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1226,7 +1226,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{
@@ -1287,9 +1287,9 @@ func TestValidateBindings(t *testing.T) {
 
 	t.Run("Union Promise Union Literal", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("node1")
+		n.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1299,10 +1299,10 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		n2 := &mocks.NodeBuilder{}
-		n2.OnGetId().Return("node2")
-		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
-		n2.OnGetOutputAliases().Return(nil)
-		n2.OnGetInterface().Return(&core.TypedInterface{
+		n2.EXPECT().GetId().Return("node2")
+		n2.EXPECT().GetMetadata().Return(&core.NodeMetadata{Name: "node2"})
+		n2.EXPECT().GetOutputAliases().Return(nil)
+		n2.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
 			},
@@ -1329,7 +1329,7 @@ func TestValidateBindings(t *testing.T) {
 		})
 
 		wf := &mocks.WorkflowBuilder{}
-		wf.OnGetNode("n2").Return(n2, true)
+		wf.EXPECT().GetNode("n2").Return(n2, true)
 		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
 
 		bindings := []*core.Binding{

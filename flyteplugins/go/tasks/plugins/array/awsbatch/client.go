@@ -19,7 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore --with-expecter
 
 // AWS Batch Client interface.
 type Client interface {

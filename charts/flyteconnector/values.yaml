@@ -1,35 +1,35 @@
 # ---------------------------------------------------------------------
-# FLYTE_AGENT SETTINGS
+# FLYTE_CONNCETOR SETTINGS
 # ---------------------------------------------------------------------
 
-# nameOverride String to override flyteagent.name template
+# nameOverride String to override flyteconnector.name template
 nameOverride: ""
-# fullnameOverride String to override flyteagent.fullname template
+# fullnameOverride String to override flyteconnector.fullname template
 fullnameOverride: ""
 # commonLabels Add labels to all the deployed resources
 commonLabels: {}
 # commonAnnotations Add annotations to all the deployed resources
 commonAnnotations: {}
 
-agentSecret:
+connectorSecret:
   # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data).
   secretData:
     data:
       username: User
 
-# -- Replicas count for flyteagent deployment
+# -- Replicas count for flyteconnector deployment
 replicaCount: 1
 image:
-  # -- Docker image for flyteagent deployment
-  repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEAGENT_IMAGE
+  # -- Docker image for flyteconnector deployment
+  repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEconnector_IMAGE
   # -- Docker image tag
-  tag: 1.14.2  # FLYTEAGENT_TAG
+  tag: 1.15.3  # FLYTECONNECTOR_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
   containerPort: 8000
-  name: agent-grpc
-# -- Default resources requests and limits for flyteagent deployment
+  name: connector-grpc
+# -- Default resources requests and limits for flyteconnector deployment
 resources:
   limits:
     cpu: 500m
@@ -40,23 +40,23 @@ resources:
     ephemeral-storage: 200Mi
     memory: 200Mi
 # -- Default regex string for searching configuration files
-configPath: /etc/flyteagent/config/*.yaml
-# -- Service settings for flyteagent
+configPath: /etc/flyteconnector/config/*.yaml
+# -- Service settings for flyteconnector
 service:
   annotations:
     projectcontour.io/upstream-protocol.h2c: grpc
   type: ClusterIP
-# -- Configuration for service accounts for flyteagent
+# -- Configuration for service accounts for flyteconnector
 serviceAccount:
-  # -- Should a service account be created for flyteagent
+  # -- Should a service account be created for flyteconnector
   create: true
-  # -- Annotations for ServiceAccount attached to flyteagent pods
+  # -- Annotations for ServiceAccount attached to flyteconnector pods
   annotations: {}
   # -- ImagePullSecrets to automatically assign to the service account
   imagePullSecrets: []
 # -- Security context for pod
 podSecurityContext: {}
-# -- Readiness probe for flyteagent. Use readinessProbe: {} if agent doesn't implement grpc-health-checking service.
+# -- Readiness probe for flyteconnector. Use readinessProbe: {} if connector doesn't implement grpc-health-checking service.
 # -- https://kubernetes.io/blog/2022/05/13/grpc-probes-now-in-beta/#trying-the-feature-out
 readinessProbe:
   grpc:
@@ -66,17 +66,17 @@ readinessProbe:
 # -- Security context for container
 securityContext:
   allowPrivilegeEscalation: false
-# -- Annotations for flyteagent pods
+# -- Annotations for flyteconnector pods
 podAnnotations: {}
-# -- Additional flyteagent pod container environment variables
+# -- Additional flyteconnector pod container environment variables
 podEnv: {}
-# -- Labels for flyteagent pods
+# -- Labels for flyteconnector pods
 podLabels: {}
-# -- nodeSelector for flyteagent deployment
+# -- nodeSelector for flyteconnector deployment
 nodeSelector: {}
-# -- tolerations for flyteagent deployment
+# -- tolerations for flyteconnector deployment
 tolerations: []
-# -- affinity for flyteagent deployment
+# -- affinity for flyteconnector deployment
 affinity: {}
 # -- Appends additional volumes to the deployment spec. May include template values.
 additionalVolumes: []

@@ -242,9 +242,9 @@ flytepropeller:
   priorityClassName: ""
 
 #
-# FLYTE_AGENT
+# FLYTE_CONNECTOR
 #
-flyteagent:
+flyteconnector:
   enabled: false
 
 #
@@ -571,6 +571,7 @@ configmap:
       grpcPort: 8089
       httpPort: 8080
       grpcServerReflection: true
+      grpcMaxRecvMsgSizeMBs: 6
 
   # -- Task default resources configuration
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).
@@ -674,7 +675,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          - connector-service
           - echo
         default-for-task-types:
           container: container

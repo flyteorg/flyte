@@ -56,9 +56,9 @@ func Setup(t *testing.T) (s TestStruct) {
 	s.FetcherExt = new(extMocks.AdminFetcherExtInterface)
 	s.UpdaterExt = new(extMocks.AdminUpdaterExtInterface)
 	s.DeleterExt = new(extMocks.AdminDeleterExtInterface)
-	s.FetcherExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.UpdaterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.DeleterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
+	s.FetcherExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
+	s.UpdaterExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
+	s.DeleterExt.EXPECT().AdminServiceClient().Return(s.MockClient.AdminClient())
 	s.MockAdminClient = s.MockClient.AdminClient().(*mocks.AdminServiceClient)
 	s.MockOutStream = s.Writer
 	s.CmdCtx = cmdCore.NewCommandContextWithExt(s.MockClient, s.FetcherExt, s.UpdaterExt, s.DeleterExt, s.MockOutStream)

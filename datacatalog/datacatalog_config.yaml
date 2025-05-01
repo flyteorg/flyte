@@ -7,6 +7,7 @@ application:
   grpcPort: 8081
   httpPort: 8080
   grpcServerReflection: true
+  grpcMaxRecvMsgSizeMBs: 6
 datacatalog:
   storage-prefix: "metadata"
   metrics-scope: "datacatalog"

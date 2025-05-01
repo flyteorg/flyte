@@ -228,6 +228,65 @@ export class GPUAccelerator extends Message<GPUAccelerator> {
 }
 
 /**
+ * Metadata associated with configuring a shared memory volume for a task.
+ *
+ * @generated from message flyteidl.core.SharedMemory
+ */
+export class SharedMemory extends Message<SharedMemory> {
+  /**
+   * Mount path to place in container
+   *
+   * @generated from field: string mount_path = 1;
+   */
+  mountPath = "";
+
+  /**
+   * Name for volume
+   *
+   * @generated from field: string mount_name = 2;
+   */
+  mountName = "";
+
+  /**
+   * Size limit for shared memory. If not set, then the shared memory is equal
+   * to the allocated memory.
+   * +optional
+   *
+   * @generated from field: string size_limit = 3;
+   */
+  sizeLimit = "";
+
+  constructor(data?: PartialMessage<SharedMemory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.SharedMemory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "mount_path", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "mount_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "size_limit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SharedMemory {
+    return new SharedMemory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SharedMemory {
+    return new SharedMemory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SharedMemory {
+    return new SharedMemory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SharedMemory | PlainMessage<SharedMemory> | undefined, b: SharedMemory | PlainMessage<SharedMemory> | undefined): boolean {
+    return proto3.util.equals(SharedMemory, a, b);
+  }
+}
+
+/**
  * Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
  * allocate to a task.
  *
@@ -242,6 +301,11 @@ export class ExtendedResources extends Message<ExtendedResources> {
    */
   gpuAccelerator?: GPUAccelerator;
 
+  /**
+   * @generated from field: flyteidl.core.SharedMemory shared_memory = 2;
+   */
+  sharedMemory?: SharedMemory;
+
   constructor(data?: PartialMessage<ExtendedResources>) {
     super();
     proto3.util.initPartial(data, this);
@@ -251,6 +315,7 @@ export class ExtendedResources extends Message<ExtendedResources> {
   static readonly typeName = "flyteidl.core.ExtendedResources";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "gpu_accelerator", kind: "message", T: GPUAccelerator },
+    { no: 2, name: "shared_memory", kind: "message", T: SharedMemory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExtendedResources {
@@ -459,6 +524,20 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   generatesDeck?: boolean;
 
+  /**
+   * Metadata applied to task pods or task CR objects.
+   * In flytekit, labels and annotations resulting in this metadata field
+   * are provided via `@task(labels=..., annotations=...)`.
+   * For tasks backed by pods like PythonFunctionTask, these take precedence
+   * over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+   * in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+   * the CR object itself while the metadata in the pod template/K8sPod is applied
+   * to the pod template spec of the CR object.
+   *
+   * @generated from field: flyteidl.core.K8sObjectMetadata metadata = 16;
+   */
+  metadata?: K8sObjectMetadata;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -480,6 +559,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 13, name: "cache_ignore_input_vars", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
+    { no: 16, name: "metadata", kind: "message", T: K8sObjectMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {

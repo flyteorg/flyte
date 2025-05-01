@@ -38,7 +38,7 @@ func TestWithUserEmail(t *testing.T) {
 
 func setupMockedAuthContextAtEndpoint(endpoint string) *mocks.AuthenticationContext {
 	mockAuthCtx := &mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.EXPECT().Options().Return(&config.Config{})
 	mockCookieHandler := new(mocks.CookieHandler)
 	dummyOAuth2Config := oauth2.Config{
 		ClientID: "abc",
@@ -51,11 +51,11 @@ func setupMockedAuthContextAtEndpoint(endpoint string) *mocks.AuthenticationCont
 	dummyHTTPClient := &http.Client{
 		Timeout: IdpConnectionTimeout,
 	}
-	mockAuthCtx.OnCookieManagerMatch().Return(mockCookieHandler)
-	mockCookieHandler.OnSetTokenCookiesMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
-	mockCookieHandler.OnSetUserInfoCookieMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
-	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
-	mockAuthCtx.OnGetHTTPClient().Return(dummyHTTPClient)
+	mockAuthCtx.EXPECT().CookieManager().Return(mockCookieHandler)
+	mockCookieHandler.EXPECT().SetTokenCookies(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	mockCookieHandler.EXPECT().SetUserInfoCookie(mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	mockAuthCtx.EXPECT().OAuth2ClientConfig(mock.Anything).Return(&dummyOAuth2Config)
+	mockAuthCtx.EXPECT().GetHTTPClient().Return(dummyHTTPClient)
 	return mockAuthCtx
 }
 
@@ -173,7 +173,7 @@ func TestGetCallbackHandler(t *testing.T) {
 			}`, issuer, issuer, issuer, issuer)
 		oidcProvider, err := oidc.NewProvider(ctx, issuer)
 		assert.Nil(t, err)
-		mockAuthCtx.OnOidcProviderMatch().Return(oidcProvider)
+		mockAuthCtx.EXPECT().OidcProvider().Return(oidcProvider)
 		callbackHandlerFunc(writer, request)
 		assert.Equal(t, "403 Forbidden", writer.Result().Status)
 	})
@@ -201,7 +201,7 @@ func TestGetCallbackHandler(t *testing.T) {
 			}`, issuer, issuer, issuer, issuer, issuer)
 		oidcProvider, err := oidc.NewProvider(ctx, issuer)
 		assert.Nil(t, err)
-		mockAuthCtx.OnOidcProviderMatch().Return(oidcProvider)
+		mockAuthCtx.EXPECT().OidcProvider().Return(oidcProvider)
 		callbackHandlerFunc(writer, request)
 		assert.Equal(t, "307 Temporary Redirect", writer.Result().Status)
 	})
@@ -232,7 +232,7 @@ func TestGetCallbackHandler(t *testing.T) {
 			}`, issuer, issuer, issuer, issuer, issuer)
 		oidcProvider, err := oidc.NewProvider(ctx, issuer)
 		assert.Nil(t, err)
-		mockAuthCtx.OnOidcProviderMatch().Return(oidcProvider)
+		mockAuthCtx.EXPECT().OidcProvider().Return(oidcProvider)
 		callbackHandlerFunc(writer, request)
 		assert.Equal(t, "412 Precondition Failed", writer.Result().Status)
 	})
@@ -245,12 +245,12 @@ func TestGetLoginHandler(t *testing.T) {
 		Scopes:   []string{"openid", "other"},
 	}
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{
+	mockAuthCtx.EXPECT().Options().Return(&config.Config{
 		UserAuth: config.UserAuthConfig{
 			IDPQueryParameter: "idp",
 		},
 	})
-	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
+	mockAuthCtx.EXPECT().OAuth2ClientConfig(mock.Anything).Return(&dummyOAuth2Config)
 	handler := GetLoginHandler(ctx, &mockAuthCtx)
 
 	type test struct {
@@ -296,7 +296,7 @@ func TestGetLogoutHandler(t *testing.T) {
 	t.Run("no_hook_no_redirect", func(t *testing.T) {
 		cookieHandler := &CookieManager{}
 		authCtx := mocks.AuthenticationContext{}
-		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.EXPECT().CookieManager().Return(cookieHandler).Once()
 		w := httptest.NewRecorder()
 		r := plugins.NewRegistry()
 		req, err := http.NewRequest(http.MethodGet, "/logout", nil)
@@ -313,7 +313,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		ctx := context.Background()
 		cookieHandler := &CookieManager{}
 		authCtx := mocks.AuthenticationContext{}
-		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.EXPECT().CookieManager().Return(cookieHandler).Once()
 		w := httptest.NewRecorder()
 		r := plugins.NewRegistry()
 		req, err := http.NewRequest(http.MethodGet, "/logout?redirect_url=/foo", nil)
@@ -330,7 +330,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		ctx := context.Background()
 		cookieHandler := &CookieManager{}
 		authCtx := mocks.AuthenticationContext{}
-		authCtx.OnCookieManager().Return(cookieHandler).Once()
+		authCtx.EXPECT().CookieManager().Return(cookieHandler).Once()
 		w := httptest.NewRecorder()
 		r := plugins.NewRegistry()
 		hook := new(mock.Mock)
@@ -393,8 +393,8 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	cookieManager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
 	assert.NoError(t, err)
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnCookieManager().Return(&cookieManager)
-	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.EXPECT().CookieManager().Return(&cookieManager)
+	mockAuthCtx.EXPECT().Options().Return(&config.Config{})
 	handler := GetHTTPRequestCookieToMetadataHandler(&mockAuthCtx)
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
@@ -439,7 +439,7 @@ func TestGetHTTPRequestCookieToMetadataHandler_CustomHeader(t *testing.T) {
 	mockConfig := &config.Config{
 		HTTPAuthorizationHeader: "Custom-Header",
 	}
-	mockAuthCtx.OnOptions().Return(mockConfig)
+	mockAuthCtx.EXPECT().Options().Return(mockConfig)
 	handler := GetHTTPRequestCookieToMetadataHandler(&mockAuthCtx)
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
@@ -485,7 +485,7 @@ func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			metadataPath := mustParseURL(t, tt.metadataPath)
 			mockAuthCtx := mocks.AuthenticationContext{}
-			mockAuthCtx.OnOptions().Return(&config.Config{
+			mockAuthCtx.EXPECT().Options().Return(&config.Config{
 				UserAuth: config.UserAuthConfig{
 					OpenID: config.OpenIDOptions{
 						BaseURL: stdConfig.URL{URL: mustParseURL(t, tt.baseURL)},
@@ -493,7 +493,7 @@ func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 				},
 			})
 
-			mockAuthCtx.OnGetOIdCMetadataURL().Return(&metadataPath)
+			mockAuthCtx.EXPECT().GetOIdCMetadataURL().Return(&metadataPath)
 			handler := GetOIdCMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
 			req, err := http.NewRequest("GET", "/xyz", nil)
 			assert.NoError(t, err)

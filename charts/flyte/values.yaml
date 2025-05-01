@@ -15,7 +15,7 @@ flyte:
       # -- Docker image for Flyteadmin deployment
       repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
       # -- Docker image tag
-      tag: v1.14.1  # FLYTEADMIN_TAG
+      tag: v1.15.3  # FLYTEADMIN_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Additional flyteadmin container environment variables
@@ -83,7 +83,7 @@ flyte:
       # -- Docker image for Flytescheduler deployment
       repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
       # -- Docker image tag
-      tag: v1.14.1  # FLYTESCHEDULER_TAG
+      tag: v1.15.3  # FLYTESCHEDULER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytescheduler deployment
@@ -128,7 +128,7 @@ flyte:
       # -- Docker image for Datacatalog deployment
       repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
       # -- Docker image tag
-      tag: v1.14.1  # DATACATALOG_TAG
+      tag: v1.15.3  # DATACATALOG_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Datacatalog deployment
@@ -177,7 +177,7 @@ flyte:
       # -- Docker image for Flytepropeller deployment
       repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
       # -- Docker image tag
-      tag: v1.14.1  # FLYTEPROPELLER_TAG
+      tag: v1.15.3  # FLYTEPROPELLER_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flytepropeller deployment
@@ -221,7 +221,7 @@ flyte:
       # -- Docker image for Flyteconsole deployment
       repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
       # -- Docker image tag
-      tag: v1.19.0  # FLYTECONSOLE_TAG
+      tag: v1.20.0  # FLYTECONSOLE_TAG
       # -- Docker image pull policy
       pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Flyteconsole deployment
@@ -442,6 +442,7 @@ flyte:
         grpcPort: 8089
         httpPort: 8080
         grpcServerReflection: true
+        grpcMaxRecvMsgSizeMBs: 6
 
     # -- Task default resources configuration
     # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).
@@ -473,7 +474,7 @@ flyte:
           # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
           co-pilot:
             name: flyte-copilot-
-            image: cr.flyte.org/flyteorg/flytecopilot:v1.14.1  # FLYTECOPILOT_IMAGE
+            image: cr.flyte.org/flyteorg/flytecopilot:v1.15.3  # FLYTECOPILOT_IMAGE
             start-timeout: 30s
 
     # -- Core propeller configuration
@@ -529,13 +530,13 @@ flyte:
             - container
             - sidecar
             - k8s-array
-            - agent-service
+            - connector-service
             - echo
           default-for-task-types:
             container: container
             sidecar: sidecar
             container_array: k8s-array
-            sensor: agent-service
+            sensor: connector-service
 
 
     # -- Kubernetes specific Flyte configuration
@@ -862,5 +863,5 @@ daskoperator:
   # --- enable or disable the dask operator deployment installation
   enabled: false
 
-flyteagent:
+flyteconnector:
   enabled: true

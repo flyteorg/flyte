@@ -25,13 +25,13 @@ func Test_monitor(t *testing.T) {
 	tCtx := &mocks.TaskExecutionContext{}
 	ctxMeta := &mocks.TaskExecutionMetadata{}
 	execID := &mocks.TaskExecutionID{}
-	execID.OnGetGeneratedName().Return("generated_name")
-	execID.OnGetID().Return(core.TaskExecutionIdentifier{})
-	ctxMeta.OnGetTaskExecutionID().Return(execID)
-	tCtx.OnTaskExecutionMetadata().Return(ctxMeta)
+	execID.EXPECT().GetGeneratedName().Return("generated_name")
+	execID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{})
+	ctxMeta.EXPECT().GetTaskExecutionID().Return(execID)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(ctxMeta)
 
 	client := &internalMocks.Client{}
-	client.OnStatusMatch(ctx, mock.Anything).Return(core2.PhaseInfoSuccess(nil), nil)
+	client.EXPECT().Status(ctx, mock.Anything).Return(core2.PhaseInfoSuccess(nil), nil)
 
 	wg := sync.WaitGroup{}
 	wg.Add(8)

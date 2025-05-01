@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.14.1  # FLYTEADMIN_TAG
+    tag: v1.15.3  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -96,6 +96,8 @@ flyteadmin:
       # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
       verbs:
         - "*"
+  # -- Annotations for Flyteadmin deployment
+  annotations: {}
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- Labels for Flyteadmin pods
@@ -148,7 +150,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.14.1  # FLYTESCHEDULER_TAG
+    tag: v1.15.3  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -172,6 +174,8 @@ flytescheduler:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Flytescheduler deployment
+  annotations: {}
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
   # -- Additional Flytescheduler container environment variables
@@ -214,7 +218,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.14.1  # DATACATALOG_TAG
+    tag: v1.15.3  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -244,6 +248,8 @@ datacatalog:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Datacatalog deployment
+  annotations: {}
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
   # -- Additional Datacatalog container environment variables
@@ -279,22 +285,22 @@ datacatalog:
 # FLYTE_AGENT SETTINGS
 #
 
-flyteagent:
+flyteconnector:
   enabled: false
   plugin_config:
     plugins:
       # -- Agent service configuration for propeller.
-      agent-service:
+      connector-service:
         # -- The default agent service to use for plugin tasks.
-        defaultAgent:
+        defaultConnector:
           # -- The agent service endpoint propeller should connect to.
-          endpoint: "k8s://flyteagent.flyte:8000"
+          endpoint: "k8s://flyteconnector.flyte:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
         # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
         # need to be configured.
         supportedTaskTypes: []
-  # -- Labels for flyteagent pods
+  # -- Labels for flyteconnector pods
   podLabels: {}
 
 #
@@ -311,7 +317,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.14.1  # FLYTEPROPELLER_TAG
+    tag: v1.15.3  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -347,6 +353,8 @@ flytepropeller:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+  # -- Annotations for Flytepropeller deployment
+  annotations: {}
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
   # -- Additional Flytepropeller container environment variables
@@ -410,7 +418,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
-    tag: v1.19.0  # FLYTECONSOLE_TAG
+    tag: v1.20.0  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -426,6 +434,8 @@ flyteconsole:
       enabled: false
     annotations: {}
     type: ClusterIP
+  # -- Annotations for Flyteconsole deployment
+  annotations: {}
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
   # -- Additional Flyteconsole container environment variables
@@ -511,6 +521,8 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook deployment
+  annotations: {}
   # -- Annotations for webhook pods
   podAnnotations: {}
   # -- Additional webhook container environment variables
@@ -603,12 +615,16 @@ common:
 #
 
 storage:
+  # -- Optionally load the storage configuration from a secret so that sensitive values aren't declared in the values file.
+  secretName: ""
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: sandbox
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
   bucketName: my-s3-bucket
   # -- settings for storage type s3
   s3:
+    # -- endpoint URL of s3-compatible service
+    endpoint: ""
     region: us-east-1
     # -- type of authentication to use for S3 buckets, can either be iam or accesskey
     authType: iam
@@ -779,6 +795,7 @@ configmap:
       grpcPort: 8089
       httpPort: 8080
       grpcServerReflection: true
+      grpcMaxRecvMsgSizeMBs: 6
 
   # -- Task default resources configuration
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).
@@ -819,7 +836,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.14.1  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.15.3  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -864,7 +881,7 @@ configmap:
           rate: 10
           capacity: 100
       literal-offloading-config:
-        enabled: true
+        enabled: false
     webhook:
       certDir: /etc/webhook/certs
       serviceName: flyte-pod-webhook
@@ -882,14 +899,14 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          - agent-service
+          - connector-service
           - echo
         default-for-task-types:
           container: container
           sidecar: sidecar
           container_array: k8s-array
           # -- Uncomment to enable task type that uses Flyte Agent
-          # bigquery_query_job_task: agent-service
+          # bigquery_query_job_task: connector-service
 
   # -- Kubernetes specific Flyte configuration
   k8s:
@@ -1017,6 +1034,8 @@ cluster_resource_manager:
   standaloneDeployment: false
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Annotations for ClusterResource deployment
+  annotations: {}
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
   # -- Additional ClusterResource container environment variables

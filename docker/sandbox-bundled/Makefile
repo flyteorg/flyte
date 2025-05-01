@@ -26,7 +26,7 @@ flyte: create_builder
 
 .PHONY: dep_update
 dep_update:
-	helm dependency update ../../charts/flyteagent
+	helm dependency update ../../charts/flyteconnector
 	helm dependency update ../../charts/flyte-binary
 	helm dependency update ../../charts/flyte-sandbox
 
@@ -44,7 +44,7 @@ manifests: dep_update
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
-		kustomize/complete-agent > manifests/complete-agent.yaml
+		kustomize/complete-connector > manifests/complete-connector.yaml
 
 .PHONY: build
 build: flyte dep_update manifests

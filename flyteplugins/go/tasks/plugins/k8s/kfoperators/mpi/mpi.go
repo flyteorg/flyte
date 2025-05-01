@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -56,9 +55,9 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	}
 
 	slots := int32(1)
-	runPolicy := commonOp.RunPolicy{}
+	runPolicy := kubeflowv1.RunPolicy{}
 
-	var launcherReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
+	var launcherReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
 	if taskTemplate.GetTaskTypeVersion() == 0 {
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
@@ -135,7 +134,7 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	jobSpec := kubeflowv1.MPIJobSpec{
 		SlotsPerWorker: &slots,
 		RunPolicy:      runPolicy,
-		MPIReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+		MPIReplicaSpecs: map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec{
 			kubeflowv1.MPIJobReplicaTypeLauncher: launcherReplicaSpec,
 			kubeflowv1.MPIJobReplicaTypeWorker:   workerReplicaSpec,
 		},
@@ -155,22 +154,29 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 // Analyzes the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (mpiOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	var numWorkers, numLauncherReplicas *int32
 	app, ok := resource.(*kubeflowv1.MPIJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
 	}
 
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
 	numWorkers = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker)
 	numLauncherReplicas = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher)
 
-	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, false,
+	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, taskTemplate, false,
 		*numWorkers, *numLauncherReplicas, 0, 0)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
-	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+
+	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
+	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the mpi custom resource since creation time %v", app.CreationTimestamp)
 	}
 	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)

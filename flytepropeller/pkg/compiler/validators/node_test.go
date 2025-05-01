@@ -14,10 +14,10 @@ import (
 func TestValidateBranchNode(t *testing.T) {
 	t.Run("No Case No Default", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetBranchNode().Return(&core.BranchNode{
+		n.EXPECT().GetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{},
 		})
-		n.OnGetId().Return("node1")
+		n.EXPECT().GetId().Return("node1")
 
 		wf := &mocks.WorkflowBuilder{}
 		errs := errors.NewCompileErrors()
@@ -38,7 +38,7 @@ func TestValidateBranchNode(t *testing.T) {
 func TestValidateNode(t *testing.T) {
 	t.Run("Start-node", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return(common.StartNodeID)
+		n.EXPECT().GetId().Return(common.StartNodeID)
 
 		wf := &mocks.WorkflowBuilder{}
 		errs := errors.NewCompileErrors()
@@ -50,19 +50,19 @@ func TestValidateNode(t *testing.T) {
 
 	t.Run("Sort upstream node ids", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
-		n.OnGetId().Return("my-node")
-		n.OnGetInterface().Return(&core.TypedInterface{
+		n.EXPECT().GetId().Return("my-node")
+		n.EXPECT().GetInterface().Return(&core.TypedInterface{
 			Outputs: &core.VariableMap{},
 			Inputs:  &core.VariableMap{},
 		})
-		n.OnGetOutputAliases().Return(nil)
-		n.OnGetBranchNode().Return(nil)
-		n.OnGetWorkflowNode().Return(nil)
-		n.OnGetTaskNode().Return(nil)
+		n.EXPECT().GetOutputAliases().Return(nil)
+		n.EXPECT().GetBranchNode().Return(nil)
+		n.EXPECT().GetWorkflowNode().Return(nil)
+		n.EXPECT().GetTaskNode().Return(nil)
 
 		coreN := &core.Node{}
 		coreN.UpstreamNodeIds = []string{"n1", "n0"}
-		n.OnGetCoreNode().Return(coreN)
+		n.EXPECT().GetCoreNode().Return(coreN)
 		n.On("GetUpstreamNodeIds").Return(func() []string {
 			return coreN.GetUpstreamNodeIds()
 		})

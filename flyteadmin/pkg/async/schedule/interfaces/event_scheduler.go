@@ -27,6 +27,8 @@ type RemoveScheduleInput struct {
 	ScheduleNamePrefix string
 }
 
+//go:generate mockery --name=EventScheduler --output=../mocks --case=underscore --with-expecter
+
 type EventScheduler interface {
 	// Schedules an event.
 	AddSchedule(ctx context.Context, input AddScheduleInput) error

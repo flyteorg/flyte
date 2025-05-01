@@ -8,7 +8,6 @@ import (
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -122,25 +121,25 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, pluginState k8s.PluginState) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
-	taskCtx.OnInputReader().Return(inputReader)
+	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
+	inputReader.EXPECT().GetInputPath().Return("/input")
+	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
+	taskCtx.EXPECT().InputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
-	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
-	outputReader.OnGetOutputPrefixPath().Return("/data/")
-	outputReader.OnGetRawOutputPrefix().Return("")
-	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
-	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	taskCtx.OnOutputWriter().Return(outputReader)
+	outputReader.EXPECT().GetOutputPath().Return("/data/outputs.pb")
+	outputReader.EXPECT().GetOutputPrefixPath().Return("/data/")
+	outputReader.EXPECT().GetRawOutputPrefix().Return("")
+	outputReader.EXPECT().GetCheckpointPrefix().Return("/checkpoint")
+	outputReader.EXPECT().GetPreviousCheckpointsPrefix().Return("/prev")
+	taskCtx.EXPECT().OutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	taskCtx.OnTaskReader().Return(taskReader)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.EXPECT().TaskReader().Return(taskReader)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -149,31 +148,31 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 			},
 		},
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resources)
-	overrides.OnGetExtendedResources().Return(extendedResources)
-	overrides.OnGetContainerImage().Return("")
-	overrides.OnGetPodTemplate().Return(nil)
+	overrides.EXPECT().GetResources().Return(resources)
+	overrides.EXPECT().GetExtendedResources().Return(extendedResources)
+	overrides.EXPECT().GetContainerImage().Return("")
+	overrides.EXPECT().GetPodTemplate().Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
-	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
-	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
+	taskExecutionMetadata.EXPECT().GetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.EXPECT().GetLabels().Return(dummyLabels)
+	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(overrides)
-	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
-	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
-	taskExecutionMetadata.OnGetConsoleURL().Return("")
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().IsInterruptible().Return(true)
+	taskExecutionMetadata.EXPECT().GetOverrides().Return(overrides)
+	taskExecutionMetadata.EXPECT().GetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.EXPECT().GetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 
 	pluginStateReaderMock := mocks.PluginStateReader{}
 	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
@@ -185,18 +184,18 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 			return nil
 		})
 
-	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
+	taskCtx.EXPECT().PluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
 func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorResourceHandler,
-	workers int32, psReplicas int32, chiefReplicas int32, evaluatorReplicas int32, conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
-	var jobConditions []commonOp.JobCondition
+	workers int32, psReplicas int32, chiefReplicas int32, evaluatorReplicas int32, conditionType kubeflowv1.JobConditionType) *kubeflowv1.TFJob {
+	var jobConditions []kubeflowv1.JobCondition
 
 	now := time.Now()
 
-	jobCreated := commonOp.JobCondition{
-		Type:    commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobCreated,
 		Status:  corev1.ConditionTrue,
 		Reason:  "TensorFlowJobCreated",
 		Message: "TensorFlowJob the-job is created.",
@@ -207,8 +206,8 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			Time: now,
 		},
 	}
-	jobRunningActive := commonOp.JobCondition{
-		Type:    commonOp.JobRunning,
+	jobRunningActive := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobRunning,
 		Status:  corev1.ConditionTrue,
 		Reason:  "TensorFlowJobRunning",
 		Message: "TensorFlowJob the-job is running.",
@@ -221,8 +220,8 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 	}
 	jobRunningInactive := *jobRunningActive.DeepCopy()
 	jobRunningInactive.Status = corev1.ConditionFalse
-	jobSucceeded := commonOp.JobCondition{
-		Type:    commonOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobSucceeded,
 		Status:  corev1.ConditionTrue,
 		Reason:  "TensorFlowJobSucceeded",
 		Message: "TensorFlowJob the-job is successfully completed.",
@@ -233,8 +232,8 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			Time: now.Add(2 * time.Minute),
 		},
 	}
-	jobFailed := commonOp.JobCondition{
-		Type:    commonOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobFailed,
 		Status:  corev1.ConditionTrue,
 		Reason:  "TensorFlowJobFailed",
 		Message: "TensorFlowJob the-job is failed.",
@@ -245,8 +244,8 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			Time: now.Add(2 * time.Minute),
 		},
 	}
-	jobRestarting := commonOp.JobCondition{
-		Type:    commonOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobRestarting,
 		Status:  corev1.ConditionTrue,
 		Reason:  "TensorFlowJobRestarting",
 		Message: "TensorFlowJob the-job is restarting because some replica(s) failed.",
@@ -259,29 +258,29 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 	}
 
 	switch conditionType {
-	case commonOp.JobCreated:
-		jobConditions = []commonOp.JobCondition{
+	case kubeflowv1.JobCreated:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 		}
-	case commonOp.JobRunning:
-		jobConditions = []commonOp.JobCondition{
+	case kubeflowv1.JobRunning:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningActive,
 		}
-	case commonOp.JobSucceeded:
-		jobConditions = []commonOp.JobCondition{
+	case kubeflowv1.JobSucceeded:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobSucceeded,
 		}
-	case commonOp.JobFailed:
-		jobConditions = []commonOp.JobCondition{
+	case kubeflowv1.JobFailed:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobFailed,
 		}
-	case commonOp.JobRestarting:
-		jobConditions = []commonOp.JobCondition{
+	case kubeflowv1.JobRestarting:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobFailed,
@@ -302,7 +301,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 			Namespace: jobNamespace,
 		},
 		Spec: resource.(*kubeflowv1.TFJob).Spec,
-		Status: commonOp.JobStatus{
+		Status: kubeflowv1.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
 			StartTime:         &v1.Time{Time: time.Now()},
@@ -558,40 +557,59 @@ func TestGetTaskPhase(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyTensorFlowJobResourceCreator := func(conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
+	dummyTensorFlowJobResourceCreator := func(conditionType kubeflowv1.JobConditionType) *kubeflowv1.TFJob {
 		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, conditionType)
 	}
 
 	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, k8s.PluginState{})
-	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobCreated))
+	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobRunning))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(kubeflowv1.JobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobSucceeded))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(kubeflowv1.JobSucceeded))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobFailed))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(kubeflowv1.JobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobRestarting))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(kubeflowv1.JobRestarting))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	// Training operator did not modify the job even though it is not suspended
+	tfJob := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJob.Status.StartTime = nil
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, tfJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	tfJobSuspended := dummyTensorFlowJobResourceCreator(kubeflowv1.JobCreated)
+	tfJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	tfJobSuspended.Status.StartTime = nil
+	suspend := true
+	tfJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, tfJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
@@ -605,7 +623,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil, pluginState)
 
-	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, commonOp.JobCreated))
+	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -623,9 +641,10 @@ func TestGetLogs(t *testing.T) {
 	evaluatorReplicas := int32(1)
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, evaluatorReplicas, commonOp.JobRunning)
-	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)), resourceRequirements, nil, k8s.PluginState{})
-	jobLogs, err := common.GetLogs(taskCtx, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, false,
+	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, evaluatorReplicas, kubeflowv1.JobRunning)
+	taskTemplate := dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas))
+	taskCtx := dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(taskCtx, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, taskTemplate, false,
 		workers, psReplicas, chiefReplicas, evaluatorReplicas)
 	assert.NoError(t, err)
 	assert.Equal(t, 5, len(jobLogs))
@@ -650,18 +669,18 @@ func TestReplicaCounts(t *testing.T) {
 		workerReplicaCount    int32
 		evaluatorReplicaCount int32
 		expectError           bool
-		contains              []commonOp.ReplicaType
-		notContains           []commonOp.ReplicaType
+		contains              []kubeflowv1.ReplicaType
+		notContains           []kubeflowv1.ReplicaType
 	}{
 		{"NoWorkers", 1, 1, 0, 1, true, nil, nil},
 		{"SingleChief", 1, 0, 1, 0, false,
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeWorker},
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeEval}},
+			[]kubeflowv1.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeWorker},
+			[]kubeflowv1.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeEval}},
 		{"SinglePS", 0, 1, 1, 0, false,
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker},
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval}},
+			[]kubeflowv1.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker},
+			[]kubeflowv1.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval}},
 		{"AllContains", 1, 1, 1, 1, false,
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker, kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval},
+			[]kubeflowv1.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker, kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval},
 			nil,
 		},
 	} {
@@ -836,7 +855,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 	}
 	for _, taskConfig := range taskConfigs {
 
-		resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
+		resourceRequirementsMap := map[kubeflowv1.ReplicaType]*corev1.ResourceRequirements{
 			kubeflowv1.TFJobReplicaTypeChief: {
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("250m"),
@@ -909,7 +928,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 
 			assert.True(t, hasContainerWithDefaultTensorFlowName)
 		}
-		assert.Equal(t, commonOp.CleanPodPolicyAll, *tensorflowJob.Spec.RunPolicy.CleanPodPolicy)
+		assert.Equal(t, kubeflowv1.CleanPodPolicyAll, *tensorflowJob.Spec.RunPolicy.CleanPodPolicy)
 		assert.Equal(t, int64(100), *tensorflowJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 	}
 }
@@ -955,7 +974,7 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 	}
 
 	for _, taskConfig := range taskConfigs {
-		resourceRequirementsMap := map[commonOp.ReplicaType]*corev1.ResourceRequirements{
+		resourceRequirementsMap := map[kubeflowv1.ReplicaType]*corev1.ResourceRequirements{
 			kubeflowv1.TFJobReplicaTypeWorker: {
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:         resource.MustParse("1024m"),

@@ -65,9 +65,9 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      {{- if .Values.flyteagent.enabled }}
-      agent-service:
-      {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
+      {{- if .Values.flyteconnector.enabled }}
+      connector-service:
+      {{- tpl ( .Values.configuration.connectorService | toYaml ) . | nindent 8 }}
       {{- end }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}

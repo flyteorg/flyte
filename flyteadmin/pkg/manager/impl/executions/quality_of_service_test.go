@@ -39,7 +39,7 @@ func getQualityOfServiceWithDuration(duration time.Duration) *core.QualityOfServ
 func getMockConfig() runtimeInterfaces.Configuration {
 	mockConfig := mocks.NewMockConfigurationProvider(nil, nil, nil, nil, nil, nil)
 	provider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	provider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
+	provider.EXPECT().GetTierExecutionValues().Return(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
 			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
 		},
@@ -51,7 +51,7 @@ func getMockConfig() runtimeInterfaces.Configuration {
 		},
 	})
 
-	provider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+	provider.EXPECT().GetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
 		"production":  core.QualityOfService_HIGH,
 		"development": core.QualityOfService_LOW,
 	})

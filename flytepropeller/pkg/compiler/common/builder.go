@@ -19,7 +19,7 @@ const (
 	EdgeDirectionUpstream
 )
 
-//go:generate mockery -all -output=mocks -case=underscore
+//go:generate mockery --all --output=mocks --case=underscore --with-expecter
 
 // A mutable workflow used during the build of the intermediate layer.
 type WorkflowBuilder interface {

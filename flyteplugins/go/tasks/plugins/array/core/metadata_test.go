@@ -23,21 +23,21 @@ func TestInitializeExternalResources(t *testing.T) {
 	}
 
 	tr := &mocks.TaskReader{}
-	tr.OnRead(ctx).Return(&idlCore.TaskTemplate{
+	tr.EXPECT().Read(ctx).Return(&idlCore.TaskTemplate{
 		Metadata: &idlCore.TaskMetadata{
 			Discoverable: true,
 		},
 	}, nil)
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetGeneratedName().Return("notfound")
+	tID.EXPECT().GetGeneratedName().Return("notfound")
 
 	tMeta := &mocks.TaskExecutionMetadata{}
-	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.EXPECT().GetTaskExecutionID().Return(tID)
 
 	tCtx := &mocks.TaskExecutionContext{}
-	tCtx.OnTaskReader().Return(tr)
-	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+	tCtx.EXPECT().TaskReader().Return(tr)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(tMeta)
 
 	state := State{
 		OriginalArraySize:  int64(subTaskCount),

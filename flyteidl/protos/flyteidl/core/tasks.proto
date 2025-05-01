@@ -61,12 +61,25 @@ message GPUAccelerator {
     }
 }
 
+// Metadata associated with configuring a shared memory volume for a task.
+message SharedMemory {
+    // Mount path to place in container
+    string mount_path = 1;
+    // Name for volume
+    string mount_name = 2;
+    // Size limit for shared memory. If not set, then the shared memory is equal
+    // to the allocated memory.
+    // +optional
+    string size_limit = 3;
+}
+
 // Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
 // allocate to a task.
 message ExtendedResources {
     // GPU accelerator to select for task. Contains information about device type, and
     // for multi-instance GPUs, the partition size to use.
     GPUAccelerator gpu_accelerator = 1;
+    SharedMemory shared_memory = 2;
 }
 
 // Runtime information. This is loosely defined to allow for extensibility.
@@ -146,6 +159,16 @@ message TaskMetadata {
     // - true: The task will generate a deck.
     // - false: The task will not generate a deck.
     google.protobuf.BoolValue generates_deck = 15;
+
+    // Metadata applied to task pods or task CR objects.
+    // In flytekit, labels and annotations resulting in this metadata field
+    // are provided via `@task(labels=..., annotations=...)`.
+    // For tasks backed by pods like PythonFunctionTask, these take precedence
+    // over the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported
+    // in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
+    // the CR object itself while the metadata in the pod template/K8sPod is applied
+    // to the pod template spec of the CR object.
+    K8sObjectMetadata metadata = 16;
 }
 
 // A Task structure that uniquely identifies a task in the system

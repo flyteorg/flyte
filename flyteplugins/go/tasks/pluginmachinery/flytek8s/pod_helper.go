@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -27,6 +28,9 @@ const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
 const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
+
+// unsignedSIGKILL = 256 - 9
+const unsignedSIGKILL = 247
 
 const defaultContainerTemplateName = "default"
 const defaultInitContainerTemplateName = "default-init"
@@ -129,7 +133,67 @@ func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *c
 		new.GpuAccelerator = overrides.GetGpuAccelerator()
 	}
 
+	if overrides.GetSharedMemory() != nil {
+		new.SharedMemory = overrides.GetSharedMemory()
+	}
+
 	return new
+}
+
+func ApplySharedMemory(podSpec *v1.PodSpec, primaryContainerName string, SharedMemory *core.SharedMemory) error {
+	sharedMountName := SharedMemory.GetMountName()
+	sharedMountPath := SharedMemory.GetMountPath()
+	if sharedMountName == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount name is not set")
+	}
+	if sharedMountPath == "" {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "mount path is not set")
+	}
+
+	var primaryContainer *v1.Container
+	for index, container := range podSpec.Containers {
+		if container.Name == primaryContainerName {
+			primaryContainer = &podSpec.Containers[index]
+		}
+	}
+	if primaryContainer == nil {
+		return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to find primary container")
+	}
+
+	for _, volume := range podSpec.Volumes {
+		if volume.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in pod spec", sharedMountName)
+		}
+	}
+
+	for _, volume_mount := range primaryContainer.VolumeMounts {
+		if volume_mount.Name == sharedMountName {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "A volume is already named %v in container", sharedMountName)
+		}
+		if volume_mount.MountPath == sharedMountPath {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "%s is already mounted in container", sharedMountPath)
+		}
+	}
+
+	var quantity resource.Quantity
+	var err error
+	if SharedMemory.GetSizeLimit() != "" {
+		quantity, err = resource.ParseQuantity(SharedMemory.GetSizeLimit())
+		if err != nil {
+			return pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "Unable to parse size limit: %v", err.Error())
+		}
+	}
+
+	podSpec.Volumes = append(
+		podSpec.Volumes,
+		v1.Volume{
+			Name:         sharedMountName,
+			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{Medium: v1.StorageMediumMemory, SizeLimit: &quantity}},
+		},
+	)
+	primaryContainer.VolumeMounts = append(primaryContainer.VolumeMounts, v1.VolumeMount{Name: sharedMountName, MountPath: sharedMountPath})
+
+	return nil
 }
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
@@ -289,7 +353,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
 			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
@@ -325,7 +389,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 		// handle pod template override
 		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate.GetPodSpec() != nil {
+		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
 			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
 			if err != nil {
 				return nil, nil, "", err
@@ -449,6 +513,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	// GPU accelerator
 	if extendedResources.GetGpuAccelerator() != nil {
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+	}
+
+	// Shared memory volume
+	if extendedResources.GetSharedMemory() != nil {
+		err = ApplySharedMemory(podSpec, primaryContainerName, extendedResources.GetSharedMemory())
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	// Override container image if necessary
@@ -601,8 +673,9 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 		return podSpec, objectMeta, nil
 	}
 
-	// merge podSpec with podTemplate
-	mergedPodSpec, err := mergePodSpecs(&podTemplate.Template.Spec, podSpec, primaryContainerName, primaryInitContainerName)
+	// merge podTemplate onto podSpec
+	templateSpec := &podTemplate.Template.Spec
+	mergedPodSpec, err := MergeBasePodSpecOntoTemplate(templateSpec, podSpec, primaryContainerName, primaryInitContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -616,50 +689,54 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	return mergedPodSpec, mergedObjectMeta, nil
 }
 
-// mergePodSpecs merges the two provided PodSpecs. This process uses the first as the base configuration, where values
-// set by the first PodSpec are overwritten by the second in the return value. Additionally, this function applies
-// container-level configuration from the basePodSpec.
-func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
-	if basePodSpec == nil || podSpec == nil {
-		return nil, errors.New("neither the basePodSpec or the podSpec can be nil")
+// MergeBasePodSpecOntoTemplate merges a base pod spec onto a template pod spec. The template pod spec has some
+// magic values that allow users to specify templates that target all containers and primary containers. Aside from
+// magic values this method will merge containers that have matching names.
+func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.PodSpec, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, error) {
+	if templatePodSpec == nil || basePodSpec == nil {
+		return nil, errors.New("neither the templatePodSpec or the basePodSpec can be nil")
 	}
 
-	// extract defaultContainerTemplate and primaryContainerTemplate
+	// extract primaryContainerTemplate. The base should always contain the primary container.
 	var defaultContainerTemplate, primaryContainerTemplate *v1.Container
-	for i := 0; i < len(basePodSpec.Containers); i++ {
-		if basePodSpec.Containers[i].Name == defaultContainerTemplateName {
-			defaultContainerTemplate = &basePodSpec.Containers[i]
-		} else if basePodSpec.Containers[i].Name == primaryContainerTemplateName {
-			primaryContainerTemplate = &basePodSpec.Containers[i]
+
+	// extract default container template
+	for i := 0; i < len(templatePodSpec.Containers); i++ {
+		if templatePodSpec.Containers[i].Name == defaultContainerTemplateName {
+			defaultContainerTemplate = &templatePodSpec.Containers[i]
+		} else if templatePodSpec.Containers[i].Name == primaryContainerTemplateName {
+			primaryContainerTemplate = &templatePodSpec.Containers[i]
 		}
 	}
 
-	// extract defaultInitContainerTemplate and primaryInitContainerTemplate
+	// extract primaryInitContainerTemplate. The base should always contain the primary container.
 	var defaultInitContainerTemplate, primaryInitContainerTemplate *v1.Container
-	for i := 0; i < len(basePodSpec.InitContainers); i++ {
-		if basePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
-			defaultInitContainerTemplate = &basePodSpec.InitContainers[i]
-		} else if basePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
-			primaryInitContainerTemplate = &basePodSpec.InitContainers[i]
+
+	// extract defaultInitContainerTemplate
+	for i := 0; i < len(templatePodSpec.InitContainers); i++ {
+		if templatePodSpec.InitContainers[i].Name == defaultInitContainerTemplateName {
+			defaultInitContainerTemplate = &templatePodSpec.InitContainers[i]
+		} else if templatePodSpec.InitContainers[i].Name == primaryInitContainerTemplateName {
+			primaryInitContainerTemplate = &templatePodSpec.InitContainers[i]
 		}
 	}
 
-	// merge PodTemplate PodSpec with podSpec
-	var mergedPodSpec *v1.PodSpec = basePodSpec.DeepCopy()
-	if err := mergo.Merge(mergedPodSpec, podSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+	// Merge base into template
+	mergedPodSpec := templatePodSpec.DeepCopy()
+	if err := mergo.Merge(mergedPodSpec, basePodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, err
 	}
 
 	// merge PodTemplate containers
 	var mergedContainers []v1.Container
-	for _, container := range podSpec.Containers {
+	for _, container := range basePodSpec.Containers {
 		// if applicable start with defaultContainerTemplate
 		var mergedContainer *v1.Container
 		if defaultContainerTemplate != nil {
 			mergedContainer = defaultContainerTemplate.DeepCopy()
 		}
 
-		// if applicable merge with primaryContainerTemplate
+		// If this is a primary container handle the template
 		if container.Name == primaryContainerName && primaryContainerTemplate != nil {
 			if mergedContainer == nil {
 				mergedContainer = primaryContainerTemplate.DeepCopy()
@@ -671,31 +748,48 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			}
 		}
 
-		// if applicable merge with existing container
+		// Check for any name matching template containers
+		for _, templateContainer := range templatePodSpec.Containers {
+			if templateContainer.Name != container.Name {
+				continue
+			}
+
+			if mergedContainer == nil {
+				mergedContainer = &templateContainer
+			} else {
+				err := mergo.Merge(mergedContainer, templateContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		// Merge in the base container
 		if mergedContainer == nil {
-			mergedContainers = append(mergedContainers, container)
+			mergedContainer = container.DeepCopy()
 		} else {
 			err := mergo.Merge(mergedContainer, container, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
 			}
-
-			mergedContainers = append(mergedContainers, *mergedContainer)
 		}
+
+		mergedContainers = append(mergedContainers, *mergedContainer)
+
 	}
 
 	mergedPodSpec.Containers = mergedContainers
 
 	// merge PodTemplate init containers
 	var mergedInitContainers []v1.Container
-	for _, initContainer := range podSpec.InitContainers {
+	for _, initContainer := range basePodSpec.InitContainers {
 		// if applicable start with defaultContainerTemplate
 		var mergedInitContainer *v1.Container
 		if defaultInitContainerTemplate != nil {
 			mergedInitContainer = defaultInitContainerTemplate.DeepCopy()
 		}
 
-		// if applicable merge with primaryInitContainerTemplate
+		// If this is a primary init container handle the template
 		if initContainer.Name == primaryInitContainerName && primaryInitContainerTemplate != nil {
 			if mergedInitContainer == nil {
 				mergedInitContainer = primaryInitContainerTemplate.DeepCopy()
@@ -707,17 +801,86 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			}
 		}
 
-		// if applicable merge with existing init initContainer
+		// Check for any name matching template containers
+		for _, templateInitContainer := range templatePodSpec.InitContainers {
+			if templateInitContainer.Name != initContainer.Name {
+				continue
+			}
+
+			if mergedInitContainer == nil {
+				mergedInitContainer = &templateInitContainer
+			} else {
+				err := mergo.Merge(mergedInitContainer, templateInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		// Merge in the base init container
 		if mergedInitContainer == nil {
-			mergedInitContainers = append(mergedInitContainers, initContainer)
+			mergedInitContainer = initContainer.DeepCopy()
 		} else {
 			err := mergo.Merge(mergedInitContainer, initContainer, mergo.WithOverride, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, err
 			}
-
-			mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 		}
+
+		mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
+	}
+
+	mergedPodSpec.InitContainers = mergedInitContainers
+
+	return mergedPodSpec, nil
+}
+
+// MergeOverlayPodSpecOntoBase merges a customized pod spec onto a base pod spec. At a container level it will
+// merge containers that have matching names.
+func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.PodSpec) (*v1.PodSpec, error) {
+	if basePodSpec == nil || overlayPodSpec == nil {
+		return nil, errors.New("neither the basePodSpec or the overlayPodSpec can be nil")
+	}
+
+	mergedPodSpec := basePodSpec.DeepCopy()
+	if err := mergo.Merge(mergedPodSpec, overlayPodSpec, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+		return nil, err
+	}
+
+	// merge PodTemplate containers
+	var mergedContainers []v1.Container
+	for _, container := range basePodSpec.Containers {
+
+		mergedContainer := container.DeepCopy()
+
+		for _, overlayContainer := range overlayPodSpec.Containers {
+			if mergedContainer.Name == overlayContainer.Name {
+				err := mergo.Merge(mergedContainer, overlayContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		mergedContainers = append(mergedContainers, *mergedContainer)
+	}
+
+	mergedPodSpec.Containers = mergedContainers
+
+	// merge PodTemplate init containers
+	var mergedInitContainers []v1.Container
+	for _, initContainer := range basePodSpec.InitContainers {
+
+		mergedInitContainer := initContainer.DeepCopy()
+
+		for _, overlayInitContainer := range overlayPodSpec.InitContainers {
+			if mergedInitContainer.Name == overlayInitContainer.Name {
+				err := mergo.Merge(mergedInitContainer, overlayInitContainer, mergo.WithOverride, mergo.WithAppendSlice)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		mergedInitContainers = append(mergedInitContainers, *mergedInitContainer)
 	}
 
 	mergedPodSpec.InitContainers = mergedInitContainers
@@ -949,7 +1112,7 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 // DeterminePrimaryContainerPhase as the name suggests, given all the containers, will return a pluginsCore.PhaseInfo object
 // corresponding to the phase of the primaryContainer which is identified using the provided name.
 // This is useful in case of sidecars or pod jobs, where Flyte will monitor successful exit of a single container.
-func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
+func DeterminePrimaryContainerPhase(ctx context.Context, primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
 	for _, s := range statuses {
 		if s.Name == primaryContainerName {
 			if s.State.Waiting != nil || s.State.Running != nil {
@@ -957,16 +1120,36 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 			}
 
 			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 || strings.Contains(s.State.Terminated.Reason, OOMKilled) {
-					message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
-						s.Name,
-						s.State.Terminated.ExitCode,
-						s.State.Terminated.Reason,
-						s.State.Terminated.Message)
-					return pluginsCore.PhaseInfoRetryableFailure(
+				message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+					s.Name,
+					s.State.Terminated.ExitCode,
+					s.State.Terminated.Reason,
+					s.State.Terminated.Message)
+
+				var phaseInfo pluginsCore.PhaseInfo
+				switch {
+				case strings.Contains(s.State.Terminated.Reason, OOMKilled):
+					// OOMKilled typically results in a SIGKILL signal, but we classify it as a user error
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(
 						s.State.Terminated.Reason, message, info)
+				case isTerminatedWithSigKill(s.State):
+					// If the primary container exited with SIGKILL, we treat it as a system-level error
+					// (such as node termination or preemption). This best-effort approach accepts some false positives.
+					// In the case that node preemption terminates the kubelet *before* the kubelet is able to persist
+					// the pod's state to the Kubernetes API server, we rely on Kubernetes to eventually resolve
+					// the state. This will enable Propeller to eventually query the API server and determine that
+					// the pod no longer exists, which will then be counted as a system error.
+					phaseInfo = pluginsCore.PhaseInfoSystemRetryableFailure(
+						s.State.Terminated.Reason, message, info)
+				case s.State.Terminated.ExitCode != 0:
+					phaseInfo = pluginsCore.PhaseInfoRetryableFailure(
+						s.State.Terminated.Reason, message, info)
+				default:
+					return pluginsCore.PhaseInfoSuccess(info)
 				}
-				return pluginsCore.PhaseInfoSuccess(info)
+
+				logger.Warnf(ctx, "Primary container terminated with issue. Message: '%s'", message)
+				return phaseInfo
 			}
 		}
 	}
@@ -978,7 +1161,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 
 // DemystifyFailure resolves the various Kubernetes pod failure modes to determine
 // the most appropriate course of action
-func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore.TaskInfo, primaryContainerName string) (pluginsCore.PhaseInfo, error) {
 	code := "UnknownError"
 	message := "Pod failed. No message received from kubernetes."
 	if len(status.Reason) > 0 {
@@ -1038,10 +1221,19 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 		if containerState.Terminated != nil {
 			if strings.Contains(containerState.Terminated.Reason, OOMKilled) {
 				code = OOMKilled
-			} else if containerState.Terminated.ExitCode == SIGKILL {
+			} else if isTerminatedWithSigKill(containerState) {
 				// in some setups, node termination sends SIGKILL to all the containers running on that node. Capturing and
 				// tagging that correctly.
 				code = Interrupted
+				// If the primary container exited with SIGKILL, we treat it as a system-level error
+				// (such as node termination or preemption). This best-effort approach accepts some false positives.
+				// In the case that node preemption terminates the kubelet *before* the kubelet is able to persist
+				// the pod's state to the Kubernetes API server, we rely on Kubernetes to eventually resolve
+				// the state. This will enable Propeller to eventually query the API server and determine that
+				// the pod no longer exists, which will then be counted as a system error.
+				if c.Name == primaryContainerName {
+					isSystemError = true
+				}
 			}
 
 			if containerState.Terminated.ExitCode == 0 {
@@ -1056,10 +1248,19 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 		}
 	}
 
+	// If the code remains 'UnknownError', it indicates that the kubelet did not have a chance
+	// to record a more specific failure before the node was terminated or preempted.
+	// In such cases, we classify the error as system-level and accept false positives
+	if code == "UnknownError" {
+		isSystemError = true
+	}
+
 	if isSystemError {
+		logger.Warnf(ctx, "Pod failed with a system error. Code: %s, Message: %s", code, message)
 		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
 	}
 
+	logger.Warnf(ctx, "Pod failed with a user error. Code: %s, Message: %s", code, message)
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 
@@ -1096,4 +1297,8 @@ func GetReportedAt(pod *v1.Pod) metav1.Time {
 	}
 
 	return reportedAt
+}
+
+func isTerminatedWithSigKill(state v1.ContainerState) bool {
+	return state.Terminated != nil && (state.Terminated.ExitCode == SIGKILL || state.Terminated.ExitCode == unsignedSIGKILL)
 }

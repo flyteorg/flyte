@@ -34,16 +34,16 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			},
 		}})
 		status := mocks.ExecutableNodeStatus{}
-		status.OnGetOutputDir().Return(storage.DataReference("s3://foo/bar"))
-		status.OnGetParentNodeID().Return(nil)
+		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetParentNodeID().Return(nil)
 		parentInfo := mocks2.ImmutableParentInfo{}
-		parentInfo.OnCurrentAttempt().Return(0)
-		parentInfo.OnGetUniqueID().Return("u")
-		parentInfo.OnIsInDynamicChain().Return(true)
+		parentInfo.EXPECT().CurrentAttempt().Return(0)
+		parentInfo.EXPECT().GetUniqueID().Return("u")
+		parentInfo.EXPECT().IsInDynamicChain().Return(true)
 		node := mocks.ExecutableNode{}
-		node.OnGetID().Return("n")
-		node.OnGetName().Return("nodey")
-		node.OnGetKind().Return(v1alpha1.NodeKindTask)
+		node.EXPECT().GetID().Return("n")
+		node.EXPECT().GetName().Return("nodey")
+		node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 
 		nev, err := ToNodeExecutionEvent(&core.NodeExecutionIdentifier{
 			NodeId: "nodey",
@@ -66,20 +66,20 @@ func TestToNodeExecutionEvent(t *testing.T) {
 			TaskNodeMetadata: &event.TaskNodeMetadata{},
 		}})
 		status := mocks.ExecutableNodeStatus{}
-		status.OnGetOutputDir().Return(storage.DataReference("s3://foo/bar"))
-		status.OnGetParentNodeID().Return(nil)
+		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetParentNodeID().Return(nil)
 		parentInfo := mocks2.ImmutableParentInfo{}
-		parentInfo.OnCurrentAttempt().Return(0)
-		parentInfo.OnGetUniqueID().Return("u")
-		parentInfo.OnIsInDynamicChain().Return(false)
+		parentInfo.EXPECT().CurrentAttempt().Return(0)
+		parentInfo.EXPECT().GetUniqueID().Return("u")
+		parentInfo.EXPECT().IsInDynamicChain().Return(false)
 		node := mocks.ExecutableNode{}
-		node.OnGetID().Return("n")
-		node.OnGetName().Return("nodey")
-		node.OnGetKind().Return(v1alpha1.NodeKindWorkflow)
+		node.EXPECT().GetID().Return("n")
+		node.EXPECT().GetName().Return("nodey")
+		node.EXPECT().GetKind().Return(v1alpha1.NodeKindWorkflow)
 		executableWorkflowNode := mocks.ExecutableWorkflowNode{}
 		subworkflowRef := "ref"
-		executableWorkflowNode.OnGetSubWorkflowRef().Return(&subworkflowRef)
-		node.OnGetWorkflowNode().Return(&executableWorkflowNode)
+		executableWorkflowNode.EXPECT().GetSubWorkflowRef().Return(&subworkflowRef)
+		node.EXPECT().GetWorkflowNode().Return(&executableWorkflowNode)
 
 		nev, err := ToNodeExecutionEvent(&core.NodeExecutionIdentifier{
 			NodeId: "nodey",
@@ -104,12 +104,12 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		}
 		info := handler.PhaseInfoQueued("z", inputs)
 		status := mocks.ExecutableNodeStatus{}
-		status.OnGetOutputDir().Return(storage.DataReference("s3://foo/bar"))
-		status.OnGetParentNodeID().Return(nil)
+		status.EXPECT().GetOutputDir().Return(storage.DataReference("s3://foo/bar"))
+		status.EXPECT().GetParentNodeID().Return(nil)
 		node := mocks.ExecutableNode{}
-		node.OnGetID().Return("n")
-		node.OnGetName().Return("nodey")
-		node.OnGetKind().Return(v1alpha1.NodeKindTask)
+		node.EXPECT().GetID().Return("n")
+		node.EXPECT().GetName().Return("nodey")
+		node.EXPECT().GetKind().Return(v1alpha1.NodeKindTask)
 		nev, err := ToNodeExecutionEvent(&core.NodeExecutionIdentifier{
 			NodeId: "nodey",
 			ExecutionId: &core.WorkflowExecutionIdentifier{

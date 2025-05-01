@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -17,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 func TestMain(m *testing.M) {
@@ -27,15 +29,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestExtractCurrentCondition(t *testing.T) {
-	jobCreated := commonOp.JobCondition{
-		Type:   commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type:   kubeflowv1.JobCreated,
 		Status: corev1.ConditionTrue,
 	}
-	jobRunningActive := commonOp.JobCondition{
-		Type:   commonOp.JobRunning,
+	jobRunningActive := kubeflowv1.JobCondition{
+		Type:   kubeflowv1.JobRunning,
 		Status: corev1.ConditionFalse,
 	}
-	jobConditions := []commonOp.JobCondition{
+	jobConditions := []kubeflowv1.JobCondition{
 		jobCreated,
 		jobRunningActive,
 	}
@@ -46,30 +48,30 @@ func TestExtractCurrentCondition(t *testing.T) {
 	jobConditions = nil
 	currentCondition, err = ExtractCurrentCondition(jobConditions)
 	assert.NoError(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 
 	currentCondition, err = ExtractCurrentCondition(nil)
 	assert.NoError(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 
-	jobUnknown := commonOp.JobCondition{Type: "unknown"}
-	jobConditions = []commonOp.JobCondition{jobUnknown}
+	jobUnknown := kubeflowv1.JobCondition{Type: "unknown"}
+	jobConditions = []kubeflowv1.JobCondition{jobUnknown}
 	currentCondition, err = ExtractCurrentCondition(jobConditions)
 	assert.Error(t, err)
-	assert.Equal(t, currentCondition, commonOp.JobCondition{})
+	assert.Equal(t, currentCondition, kubeflowv1.JobCondition{})
 	assert.Equal(t, err, fmt.Errorf("found no current condition. Conditions: %+v", jobConditions))
 }
 
 func TestGetPhaseInfo(t *testing.T) {
-	jobCreating := commonOp.JobCondition{}
+	jobCreating := kubeflowv1.JobCondition{}
 	taskPhase, err := GetPhaseInfo(jobCreating, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobCreated := commonOp.JobCondition{
-		Type: commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobCreated,
 	}
 	taskPhase, err = GetPhaseInfo(jobCreated, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -77,8 +79,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobSucceeded := commonOp.JobCondition{
-		Type: commonOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSucceeded,
 	}
 	taskPhase, err = GetPhaseInfo(jobSucceeded, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -86,8 +88,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobFailed := commonOp.JobCondition{
-		Type: commonOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobFailed,
 	}
 	taskPhase, err = GetPhaseInfo(jobFailed, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -95,8 +97,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting := commonOp.JobCondition{
-		Type: commonOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRestarting,
 	}
 	taskPhase, err = GetPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -104,8 +106,8 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting = commonOp.JobCondition{
-		Type: commonOp.JobRunning,
+	jobRestarting = kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRunning,
 	}
 	taskPhase, err = GetPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -115,8 +117,8 @@ func TestGetPhaseInfo(t *testing.T) {
 }
 
 func TestGetMPIPhaseInfo(t *testing.T) {
-	jobCreated := commonOp.JobCondition{
-		Type: commonOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobCreated,
 	}
 	taskPhase, err := GetMPIPhaseInfo(jobCreated, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -124,8 +126,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobSucceeded := commonOp.JobCondition{
-		Type: commonOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSucceeded,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobSucceeded, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -133,8 +135,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobFailed := commonOp.JobCondition{
-		Type: commonOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobFailed,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobFailed, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -142,8 +144,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting := commonOp.JobCondition{
-		Type: commonOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRestarting,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -151,8 +153,8 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	jobRestarting = commonOp.JobCondition{
-		Type: commonOp.JobRunning,
+	jobRestarting = kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobRunning,
 	}
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
@@ -170,12 +172,13 @@ func TestGetLogs(t *testing.T) {
 	workers := int32(1)
 	launcher := int32(1)
 
+	taskTemplate := dummyTaskTemplate()
 	taskCtx := dummyTaskContext()
 	mpiJobObjectMeta := meta_v1.ObjectMeta{
 		Name:      "test",
 		Namespace: "mpi-namespace",
 	}
-	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0, 0)
+	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].GetUri())
@@ -184,7 +187,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "pytorch-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0, 0)
+	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].GetUri())
@@ -194,7 +197,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "tensorflow-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1, 0)
+	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, taskTemplate, false, workers, launcher, 1, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].GetUri())
@@ -209,6 +212,7 @@ func TestGetLogsTemplateUri(t *testing.T) {
 		StackDriverTemplateURI: "https://console.cloud.google.com/logs/query;query=resource.labels.pod_name={{.podName}}&timestamp>{{.podRFC3339StartTime}}",
 	}))
 
+	taskTemplate := dummyTaskTemplate()
 	taskCtx := dummyTaskContext()
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
 		Name: "test",
@@ -218,11 +222,42 @@ func TestGetLogsTemplateUri(t *testing.T) {
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},
 	}
-	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
+	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, 1, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].GetUri())
 	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[1].GetUri())
+}
+
+func TestGetLogsDynamic(t *testing.T) {
+	dynamicLinks := map[string]tasklog.TemplateLogPlugin{
+		"test-dynamic-link": {
+			TemplateURIs: []string{"https://some-service.com/{{.taskConfig.dynamicParam}}"},
+		},
+	}
+
+	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
+		DynamicLogLinks: dynamicLinks,
+	}))
+
+	taskTemplate := dummyTaskTemplate()
+	taskTemplate.Config = map[string]string{
+		"link_type":    "test-dynamic-link",
+		"dynamicParam": "dynamic-value",
+	}
+	taskCtx := dummyTaskContext()
+	pytorchJobObjectMeta := meta_v1.ObjectMeta{
+		Name: "test",
+		Namespace: "pytorch-" +
+			"namespace",
+		CreationTimestamp: meta_v1.Time{
+			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
+		},
+	}
+	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, taskTemplate, true, 1, 0, 0, 0)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobLogs))
+	assert.Equal(t, "https://some-service.com/dynamic-value", jobLogs[0].GetUri())
 }
 
 func dummyPodSpec() v1.PodSpec {
@@ -297,11 +332,30 @@ func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 	assert.Equal(t, []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"}, podSpec.Containers[0].Args)
 }
 
+func dummyTaskTemplate() *core.TaskTemplate {
+	id := "dummy-id"
+
+	testImage := "dummy-image"
+
+	structObj := structpb.Struct{}
+
+	return &core.TaskTemplate{
+		Id:   &core.Identifier{Name: id},
+		Type: "container",
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image: testImage,
+			},
+		},
+		Custom: &structObj,
+	}
+}
+
 func dummyTaskContext() pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	tID := &mocks.TaskExecutionID{}
-	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+	tID.EXPECT().GetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Name:         "my-task-name",
@@ -318,11 +372,11 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 		},
 		RetryAttempt: 0,
 	})
-	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.EXPECT().GetGeneratedName().Return("some-acceptable-name")
 	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
-	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
+	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

@@ -25,7 +25,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -37,7 +37,7 @@ func TestPluginOverride(t *testing.T) {
 
 		deletePluginOverrideSetup()
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(fmt.Errorf("failed to delete project domain attributes"))
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -52,7 +52,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_plugin_override.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteProjectDomainAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -66,7 +66,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deletePluginOverride(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
@@ -81,7 +81,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(fmt.Errorf("failed to delete workflow attribute"))
 		err := deletePluginOverride(s.Ctx, args, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -97,7 +97,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = "testdata/valid_workflow_plugin_override.yaml"
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
@@ -112,7 +112,7 @@ func TestPluginOverride(t *testing.T) {
 		// Empty attribute file
 		pluginoverride.DefaultDelConfig.AttrFile = testDataNonExistentFile
 		// No args implying project domain attribute deletion
-		s.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
+		s.DeleterExt.EXPECT().DeleteWorkflowAttributes(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
@@ -130,8 +130,8 @@ func TestPluginOverride(t *testing.T) {
 		err := deletePluginOverride(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t,
-			fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""),
-			err)
+			"error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\"",
+			err.Error())
 		s.DeleterExt.AssertNotCalled(t, "DeleteProjectDomainAttributes",
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_PLUGIN_OVERRIDE)
 	})

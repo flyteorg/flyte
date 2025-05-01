@@ -19,7 +19,7 @@ Scaling Beyond Kubernetes
 
 .. tip::
    
-   As described in the `Architecture Overview <https://docs.flyte.org/en/latest/concepts/architecture.html>`_,
+   As described in the :doc:`Architecture Overview </user_guide/concepts/component_architecture/index>`,
    the Flyte ``Control Plane`` sends workflows off to the ``Data Plane`` for
    execution. The data plane fulfills these workflows by launching pods in
    Kubernetes.
