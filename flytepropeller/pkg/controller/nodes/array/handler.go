@@ -208,7 +208,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			if slices.Contains(arrayNode.GetBoundInputs(), key) {
 				continue
 			}
-			
+
 			if variable.GetOffloadedMetadata() != nil {
 				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
 				// We need this for the map task to be able to create the subNodeSpec
