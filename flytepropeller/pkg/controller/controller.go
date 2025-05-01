@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/pprof"
+	"sync/atomic"
 	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -93,6 +94,7 @@ type Controller struct {
 	leaderElector  *leaderelection.LeaderElector
 	levelMonitor   *ResourceLevelMonitor
 	executionStats *workflowstore.ExecutionStatsMonitor
+	leader         atomic.Bool
 }
 
 // Run either as a leader -if configured- or as a standalone process.
@@ -133,6 +135,7 @@ func (c *Controller) run(ctx context.Context) error {
 
 // Called from leader elector -if configured- to start running as the leader.
 func (c *Controller) onStartedLeading(ctx context.Context) {
+	c.leader.Store(true)
 	backgroundCtx, cancelNow := context.WithCancel(ctx)
 	logger.Infof(ctx, "Acquired leader lease.")
 	go func() {
@@ -142,6 +145,7 @@ func (c *Controller) onStartedLeading(ctx context.Context) {
 	}()
 
 	<-backgroundCtx.Done()
+
 	logger.Infof(ctx, "Lost leader lease.")
 	cancelNow()
 }
@@ -157,6 +161,10 @@ func (c *Controller) enqueueFlyteWorkflow(obj interface{}) {
 		return
 	}
 	key := wf.GetK8sWorkflowID()
+	if !c.leader.Load() {
+		logger.Debug(ctx, "Ignoring workflow [%v]  as non-leader", key)
+		return
+	}
 	logger.Infof(ctx, "==> Enqueueing workflow [%v]", key)
 	c.workQueue.AddRateLimited(key.String())
 }
