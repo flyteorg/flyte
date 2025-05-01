@@ -529,6 +529,10 @@ webhook:
   podEnv: {}
   # -- Labels for webhook pods
   podLabels: {}
+  # -- Affinity for webhook deployment
+  affinity: {}
+  # -- TopologySpreadConstraints for webhook deployment
+  topologySpreadConstraints: {}
   # -- nodeSelector for webhook deployment
   nodeSelector: {}
   # -- Sets securityContext for webhook pod(s).
