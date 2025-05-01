@@ -162,7 +162,7 @@ func (c *Controller) enqueueFlyteWorkflow(obj interface{}) {
 	}
 	key := wf.GetK8sWorkflowID()
 	if !c.leader.Load() {
-		logger.Debug(ctx, "Ignoring workflow [%v]  as non-leader", key)
+		logger.Debug(ctx, "Ignoring workflow [%v] as non-leader", key)
 		return
 	}
 	logger.Infof(ctx, "==> Enqueueing workflow [%v]", key)
