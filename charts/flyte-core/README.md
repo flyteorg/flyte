@@ -328,6 +328,7 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.secretName | string | `""` | Optionally load the storage configuration from a secret so that sensitive values aren't declared in the values file. |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
+| webhook.affinity | object | `{}` | Affinity for webhook deployment |
 | webhook.annotations | object | `{}` | Annotations for webhook deployment |
 | webhook.autoscaling.enabled | bool | `false` |  |
 | webhook.autoscaling.maxReplicas | int | `10` |  |
@@ -356,5 +357,6 @@ helm install gateway bitnami/contour -n flyte
 | webhook.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to the webhook |
 | webhook.serviceAccount.create | bool | `true` | Should a service account be created for the webhook |
 | webhook.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| webhook.topologySpreadConstraints | object | `{}` | TopologySpreadConstraints for webhook deployment |
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler | object | `{"config":{},"enabled":false,"type":""}` | **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |
