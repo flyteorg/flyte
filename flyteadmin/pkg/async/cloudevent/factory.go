@@ -10,6 +10,7 @@ import (
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
 	"github.com/Shopify/sarama"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
+	"github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
@@ -85,6 +86,9 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 			panic(err)
 		}
 		sender = &cloudEventImplementations.KafkaSender{Client: client}
+
+	case cloudEventImplementations.Nats:
+		nats.NewSender() // TODO: complete this
 
 	case common.Sandbox:
 		var publisher pubsub.Publisher

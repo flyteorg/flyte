@@ -323,6 +323,18 @@ func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
 	}
 }
 
+// This section holds configs for Nats clients
+// TODO: complete this
+type NatsConfig struct {
+	Version string `json:"version"`
+	// kafka broker addresses
+	Servers []string `json:"servers"`
+	// sasl config
+	//SASLConfig SASLConfig `json:"saslConfig"`
+	// tls config
+	// TLSConfig TLSConfig `json:"tlsConfig"`
+}
+
 // This section holds configuration for the event scheduler used to schedule workflow executions.
 type EventSchedulerConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -641,6 +653,7 @@ type CloudEventsConfig struct {
 	AWSConfig   AWSConfig   `json:"aws"`
 	GCPConfig   GCPConfig   `json:"gcp"`
 	KafkaConfig KafkaConfig `json:"kafka"`
+	NatsConfig  NatsConfig  `json:"nats"`
 	// Publish events to a pubsub tops
 	EventsPublisherConfig EventsPublisherConfig `json:"eventsPublisher"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.

@@ -8,6 +8,7 @@ import (
 	"github.com/Shopify/sarama"
 	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
+	"github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -17,6 +18,7 @@ type Receiver = string
 
 const (
 	Kafka Receiver = "kafka"
+	Nats  Receiver = "nats"
 )
 
 // PubSubSender Implementation of Sender
@@ -49,6 +51,20 @@ func (s *KafkaSender) Send(ctx context.Context, notificationType string, event c
 		kafka_sarama.WithMessageKey(ctx, sarama.StringEncoder(event.ID())),
 		event,
 	); cloudevents.IsUndelivered(result) {
+		return fmt.Errorf("failed to send cloud event: %v", result)
+	}
+	return nil
+}
+
+// Nats Implementation of Sender
+type NatsSender struct {
+	Client cloudevents.Client
+}
+
+func (s *NatsSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
+	// TODO: complete this
+	p, err := nats.NewSenderFromConn(s)
+	if result := s.Client.Send(ctx, event); cloudevents.IsUndelivered(result) {
 		return fmt.Errorf("failed to send cloud event: %v", result)
 	}
 	return nil
