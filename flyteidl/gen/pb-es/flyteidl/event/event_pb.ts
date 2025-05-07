@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Identifier, NodeExecutionIdentifier, TaskExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
-import { ExecutionError, NodeExecution_Phase, TaskExecution_Phase, TaskLog, WorkflowExecution_Phase } from "../core/execution_pb.js";
+import { ExecutionError, LogContext, NodeExecution_Phase, TaskExecution_Phase, TaskLog, WorkflowExecution_Phase } from "../core/execution_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { CatalogCacheStatus, CatalogMetadata, CatalogReservation_Status } from "../core/catalog_pb.js";
 import { CompiledWorkflowClosure } from "../core/compiler_pb.js";
@@ -836,6 +836,13 @@ export class TaskExecutionEvent extends Message<TaskExecutionEvent> {
    */
   reportedAt?: Timestamp;
 
+  /**
+   * Contains metadata required to identify logs related to this task execution
+   *
+   * @generated from field: flyteidl.core.LogContext log_context = 22;
+   */
+  logContext?: LogContext;
+
   constructor(data?: PartialMessage<TaskExecutionEvent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -864,6 +871,7 @@ export class TaskExecutionEvent extends Message<TaskExecutionEvent> {
     { no: 16, name: "metadata", kind: "message", T: TaskExecutionMetadata },
     { no: 18, name: "event_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 20, name: "reported_at", kind: "message", T: Timestamp },
+    { no: 22, name: "log_context", kind: "message", T: LogContext },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionEvent {
@@ -955,6 +963,13 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
    */
   customInfo?: Struct;
 
+  /**
+   * Contains metadata required to identify logs related to this task execution
+   *
+   * @generated from field: flyteidl.core.LogContext log_context = 9;
+   */
+  logContext?: LogContext;
+
   constructor(data?: PartialMessage<ExternalResourceInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -971,6 +986,7 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
     { no: 6, name: "logs", kind: "message", T: TaskLog, repeated: true },
     { no: 7, name: "workflow_node_metadata", kind: "message", T: WorkflowNodeMetadata, oneof: "target_metadata" },
     { no: 8, name: "custom_info", kind: "message", T: Struct },
+    { no: 9, name: "log_context", kind: "message", T: LogContext },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceInfo {

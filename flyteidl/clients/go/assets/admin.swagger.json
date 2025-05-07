@@ -4299,6 +4299,20 @@
       "default": "UNKNOWN",
       "description": "Architecture-type the container image supports."
     },
+    "ContainerContextProcessContext": {
+      "type": "object",
+      "properties": {
+        "container_start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "container_end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "title": "Contains metadata required to identify logs produces by a single light-weight process that was run inside a container"
+    },
     "DataLoadingConfigLiteralMapFormat": {
       "type": "string",
       "enum": [
@@ -6162,6 +6176,10 @@
             "$ref": "#/definitions/adminReason"
           },
           "description": "A time-series of the phase transition or update explanations. This, when compared to storing a singular reason\nas previously done, is much more valuable in visualizing and understanding historical evaluations."
+        },
+        "log_context": {
+          "$ref": "#/definitions/coreLogContext",
+          "title": "Contains metadata required to identify logs related to this task execution"
         }
       },
       "description": "Container for task execution details and results."
@@ -7087,6 +7105,18 @@
         }
       }
     },
+    "coreContainerContext": {
+      "type": "object",
+      "properties": {
+        "container_name": {
+          "type": "string"
+        },
+        "process": {
+          "$ref": "#/definitions/ContainerContextProcessContext"
+        }
+      },
+      "title": "Contains metadata required to identify logs produces by a single container"
+    },
     "coreContainerPort": {
       "type": "object",
       "properties": {
@@ -7600,6 +7630,22 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
+    "coreLogContext": {
+      "type": "object",
+      "properties": {
+        "pods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/corePodLogContext"
+          }
+        },
+        "primary_pod_name": {
+          "type": "string"
+        }
+      },
+      "title": "Contains metadata required to identify logs produces by a set of pods"
+    },
     "coreNode": {
       "type": "object",
       "properties": {
@@ -7858,6 +7904,35 @@
           }
         }
       }
+    },
+    "corePodLogContext": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string"
+        },
+        "pod_name": {
+          "type": "string"
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreContainerContext"
+          }
+        },
+        "primary_container_name": {
+          "type": "string"
+        },
+        "init_containers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreContainerContext"
+          }
+        }
+      },
+      "title": "Contains metadata required to identify logs produces by a single pod"
     },
     "corePrimitive": {
       "type": "object",
@@ -8771,6 +8846,10 @@
         "custom_info": {
           "type": "object",
           "title": "Extensible field for custom, plugin-specific info"
+        },
+        "log_context": {
+          "$ref": "#/definitions/coreLogContext",
+          "title": "Contains metadata required to identify logs related to this task execution"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
@@ -9004,6 +9083,10 @@
           "type": "string",
           "format": "date-time",
           "description": "This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s\npod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,\nbut this event will not be reported until the pod is marked as completed. Extracting both of these timestamps\nfacilitates a more accurate portrayal of the evaluation time-series."
+        },
+        "log_context": {
+          "$ref": "#/definitions/coreLogContext",
+          "title": "Contains metadata required to identify logs related to this task execution"
         }
       },
       "description": "Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob."
