@@ -277,6 +277,9 @@ pub struct TaskExecutionEvent {
     /// facilitates a more accurate portrayal of the evaluation time-series. 
     #[prost(message, optional, tag="20")]
     pub reported_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Contains metadata required to identify logs related to this task execution
+    #[prost(message, optional, tag="22")]
+    pub log_context: ::core::option::Option<super::core::LogContext>,
     #[prost(oneof="task_execution_event::InputValue", tags="8, 19")]
     pub input_value: ::core::option::Option<task_execution_event::InputValue>,
     #[prost(oneof="task_execution_event::OutputResult", tags="9, 10, 17")]
@@ -337,6 +340,9 @@ pub struct ExternalResourceInfo {
     /// Extensible field for custom, plugin-specific info
     #[prost(message, optional, tag="8")]
     pub custom_info: ::core::option::Option<::prost_types::Struct>,
+    /// Contains metadata required to identify logs related to this task execution
+    #[prost(message, optional, tag="9")]
+    pub log_context: ::core::option::Option<super::core::LogContext>,
     /// Additional metadata to do with this event's node target based on the node type. We are
     /// explicitly not including the task_node_metadata here because it is not clear if it is needed.
     /// If we decide to include in the future, we should deprecate the cache_status field.

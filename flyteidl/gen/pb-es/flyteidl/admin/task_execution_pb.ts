@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Duration, Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { NodeExecutionIdentifier, TaskExecutionIdentifier } from "../core/identifier_pb.js";
 import { FlyteURLs, Sort, UrlBlob } from "./common_pb.js";
-import { ExecutionError, TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
+import { ExecutionError, LogContext, TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskExecutionMetadata } from "../event/event_pb.js";
 
@@ -378,6 +378,13 @@ export class TaskExecutionClosure extends Message<TaskExecutionClosure> {
    */
   reasons: Reason[] = [];
 
+  /**
+   * Contains metadata required to identify logs related to this task execution
+   *
+   * @generated from field: flyteidl.core.LogContext log_context = 19;
+   */
+  logContext?: LogContext;
+
   constructor(data?: PartialMessage<TaskExecutionClosure>) {
     super();
     proto3.util.initPartial(data, this);
@@ -401,6 +408,7 @@ export class TaskExecutionClosure extends Message<TaskExecutionClosure> {
     { no: 16, name: "metadata", kind: "message", T: TaskExecutionMetadata },
     { no: 17, name: "event_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 18, name: "reasons", kind: "message", T: Reason, repeated: true },
+    { no: 19, name: "log_context", kind: "message", T: LogContext },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionClosure {

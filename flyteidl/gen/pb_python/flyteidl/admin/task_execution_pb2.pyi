@@ -54,7 +54,7 @@ class TaskExecutionList(_message.Message):
     def __init__(self, task_executions: _Optional[_Iterable[_Union[TaskExecution, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class TaskExecutionClosure(_message.Message):
-    __slots__ = ["output_uri", "error", "output_data", "phase", "logs", "started_at", "duration", "created_at", "updated_at", "custom_info", "reason", "task_type", "metadata", "event_version", "reasons"]
+    __slots__ = ["output_uri", "error", "output_data", "phase", "logs", "started_at", "duration", "created_at", "updated_at", "custom_info", "reason", "task_type", "metadata", "event_version", "reasons", "log_context"]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -70,6 +70,7 @@ class TaskExecutionClosure(_message.Message):
     METADATA_FIELD_NUMBER: _ClassVar[int]
     EVENT_VERSION_FIELD_NUMBER: _ClassVar[int]
     REASONS_FIELD_NUMBER: _ClassVar[int]
+    LOG_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     output_uri: str
     error: _execution_pb2.ExecutionError
     output_data: _literals_pb2.LiteralMap
@@ -85,7 +86,8 @@ class TaskExecutionClosure(_message.Message):
     metadata: _event_pb2.TaskExecutionMetadata
     event_version: int
     reasons: _containers.RepeatedCompositeFieldContainer[Reason]
-    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reasons: _Optional[_Iterable[_Union[Reason, _Mapping]]] = ...) -> None: ...
+    log_context: _execution_pb2.LogContext
+    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reasons: _Optional[_Iterable[_Union[Reason, _Mapping]]] = ..., log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ...) -> None: ...
 
 class Reason(_message.Message):
     __slots__ = ["occurred_at", "message"]

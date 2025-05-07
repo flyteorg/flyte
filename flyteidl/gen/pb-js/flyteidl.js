@@ -14403,6 +14403,601 @@
                 return TaskLog;
             })();
     
+            core.LogContext = (function() {
+    
+                /**
+                 * Properties of a LogContext.
+                 * @memberof flyteidl.core
+                 * @interface ILogContext
+                 * @property {Array.<flyteidl.core.IPodLogContext>|null} [pods] LogContext pods
+                 * @property {string|null} [primaryPodName] LogContext primaryPodName
+                 */
+    
+                /**
+                 * Constructs a new LogContext.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a LogContext.
+                 * @implements ILogContext
+                 * @constructor
+                 * @param {flyteidl.core.ILogContext=} [properties] Properties to set
+                 */
+                function LogContext(properties) {
+                    this.pods = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * LogContext pods.
+                 * @member {Array.<flyteidl.core.IPodLogContext>} pods
+                 * @memberof flyteidl.core.LogContext
+                 * @instance
+                 */
+                LogContext.prototype.pods = $util.emptyArray;
+    
+                /**
+                 * LogContext primaryPodName.
+                 * @member {string} primaryPodName
+                 * @memberof flyteidl.core.LogContext
+                 * @instance
+                 */
+                LogContext.prototype.primaryPodName = "";
+    
+                /**
+                 * Creates a new LogContext instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.LogContext
+                 * @static
+                 * @param {flyteidl.core.ILogContext=} [properties] Properties to set
+                 * @returns {flyteidl.core.LogContext} LogContext instance
+                 */
+                LogContext.create = function create(properties) {
+                    return new LogContext(properties);
+                };
+    
+                /**
+                 * Encodes the specified LogContext message. Does not implicitly {@link flyteidl.core.LogContext.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.LogContext
+                 * @static
+                 * @param {flyteidl.core.ILogContext} message LogContext message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                LogContext.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.pods != null && message.pods.length)
+                        for (var i = 0; i < message.pods.length; ++i)
+                            $root.flyteidl.core.PodLogContext.encode(message.pods[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.primaryPodName != null && message.hasOwnProperty("primaryPodName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.primaryPodName);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a LogContext message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.LogContext
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.LogContext} LogContext
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                LogContext.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.LogContext();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.pods && message.pods.length))
+                                message.pods = [];
+                            message.pods.push($root.flyteidl.core.PodLogContext.decode(reader, reader.uint32()));
+                            break;
+                        case 2:
+                            message.primaryPodName = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a LogContext message.
+                 * @function verify
+                 * @memberof flyteidl.core.LogContext
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                LogContext.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.pods != null && message.hasOwnProperty("pods")) {
+                        if (!Array.isArray(message.pods))
+                            return "pods: array expected";
+                        for (var i = 0; i < message.pods.length; ++i) {
+                            var error = $root.flyteidl.core.PodLogContext.verify(message.pods[i]);
+                            if (error)
+                                return "pods." + error;
+                        }
+                    }
+                    if (message.primaryPodName != null && message.hasOwnProperty("primaryPodName"))
+                        if (!$util.isString(message.primaryPodName))
+                            return "primaryPodName: string expected";
+                    return null;
+                };
+    
+                return LogContext;
+            })();
+    
+            core.PodLogContext = (function() {
+    
+                /**
+                 * Properties of a PodLogContext.
+                 * @memberof flyteidl.core
+                 * @interface IPodLogContext
+                 * @property {string|null} [namespace] PodLogContext namespace
+                 * @property {string|null} [podName] PodLogContext podName
+                 * @property {Array.<flyteidl.core.IContainerContext>|null} [containers] PodLogContext containers
+                 * @property {string|null} [primaryContainerName] PodLogContext primaryContainerName
+                 * @property {Array.<flyteidl.core.IContainerContext>|null} [initContainers] PodLogContext initContainers
+                 */
+    
+                /**
+                 * Constructs a new PodLogContext.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a PodLogContext.
+                 * @implements IPodLogContext
+                 * @constructor
+                 * @param {flyteidl.core.IPodLogContext=} [properties] Properties to set
+                 */
+                function PodLogContext(properties) {
+                    this.containers = [];
+                    this.initContainers = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PodLogContext namespace.
+                 * @member {string} namespace
+                 * @memberof flyteidl.core.PodLogContext
+                 * @instance
+                 */
+                PodLogContext.prototype.namespace = "";
+    
+                /**
+                 * PodLogContext podName.
+                 * @member {string} podName
+                 * @memberof flyteidl.core.PodLogContext
+                 * @instance
+                 */
+                PodLogContext.prototype.podName = "";
+    
+                /**
+                 * PodLogContext containers.
+                 * @member {Array.<flyteidl.core.IContainerContext>} containers
+                 * @memberof flyteidl.core.PodLogContext
+                 * @instance
+                 */
+                PodLogContext.prototype.containers = $util.emptyArray;
+    
+                /**
+                 * PodLogContext primaryContainerName.
+                 * @member {string} primaryContainerName
+                 * @memberof flyteidl.core.PodLogContext
+                 * @instance
+                 */
+                PodLogContext.prototype.primaryContainerName = "";
+    
+                /**
+                 * PodLogContext initContainers.
+                 * @member {Array.<flyteidl.core.IContainerContext>} initContainers
+                 * @memberof flyteidl.core.PodLogContext
+                 * @instance
+                 */
+                PodLogContext.prototype.initContainers = $util.emptyArray;
+    
+                /**
+                 * Creates a new PodLogContext instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.PodLogContext
+                 * @static
+                 * @param {flyteidl.core.IPodLogContext=} [properties] Properties to set
+                 * @returns {flyteidl.core.PodLogContext} PodLogContext instance
+                 */
+                PodLogContext.create = function create(properties) {
+                    return new PodLogContext(properties);
+                };
+    
+                /**
+                 * Encodes the specified PodLogContext message. Does not implicitly {@link flyteidl.core.PodLogContext.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.PodLogContext
+                 * @static
+                 * @param {flyteidl.core.IPodLogContext} message PodLogContext message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PodLogContext.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.namespace != null && message.hasOwnProperty("namespace"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.namespace);
+                    if (message.podName != null && message.hasOwnProperty("podName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.podName);
+                    if (message.containers != null && message.containers.length)
+                        for (var i = 0; i < message.containers.length; ++i)
+                            $root.flyteidl.core.ContainerContext.encode(message.containers[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.primaryContainerName);
+                    if (message.initContainers != null && message.initContainers.length)
+                        for (var i = 0; i < message.initContainers.length; ++i)
+                            $root.flyteidl.core.ContainerContext.encode(message.initContainers[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PodLogContext message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.PodLogContext
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.PodLogContext} PodLogContext
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PodLogContext.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PodLogContext();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.namespace = reader.string();
+                            break;
+                        case 2:
+                            message.podName = reader.string();
+                            break;
+                        case 3:
+                            if (!(message.containers && message.containers.length))
+                                message.containers = [];
+                            message.containers.push($root.flyteidl.core.ContainerContext.decode(reader, reader.uint32()));
+                            break;
+                        case 4:
+                            message.primaryContainerName = reader.string();
+                            break;
+                        case 5:
+                            if (!(message.initContainers && message.initContainers.length))
+                                message.initContainers = [];
+                            message.initContainers.push($root.flyteidl.core.ContainerContext.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PodLogContext message.
+                 * @function verify
+                 * @memberof flyteidl.core.PodLogContext
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PodLogContext.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.namespace != null && message.hasOwnProperty("namespace"))
+                        if (!$util.isString(message.namespace))
+                            return "namespace: string expected";
+                    if (message.podName != null && message.hasOwnProperty("podName"))
+                        if (!$util.isString(message.podName))
+                            return "podName: string expected";
+                    if (message.containers != null && message.hasOwnProperty("containers")) {
+                        if (!Array.isArray(message.containers))
+                            return "containers: array expected";
+                        for (var i = 0; i < message.containers.length; ++i) {
+                            var error = $root.flyteidl.core.ContainerContext.verify(message.containers[i]);
+                            if (error)
+                                return "containers." + error;
+                        }
+                    }
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        if (!$util.isString(message.primaryContainerName))
+                            return "primaryContainerName: string expected";
+                    if (message.initContainers != null && message.hasOwnProperty("initContainers")) {
+                        if (!Array.isArray(message.initContainers))
+                            return "initContainers: array expected";
+                        for (var i = 0; i < message.initContainers.length; ++i) {
+                            var error = $root.flyteidl.core.ContainerContext.verify(message.initContainers[i]);
+                            if (error)
+                                return "initContainers." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return PodLogContext;
+            })();
+    
+            core.ContainerContext = (function() {
+    
+                /**
+                 * Properties of a ContainerContext.
+                 * @memberof flyteidl.core
+                 * @interface IContainerContext
+                 * @property {string|null} [containerName] ContainerContext containerName
+                 * @property {flyteidl.core.ContainerContext.IProcessContext|null} [process] ContainerContext process
+                 */
+    
+                /**
+                 * Constructs a new ContainerContext.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a ContainerContext.
+                 * @implements IContainerContext
+                 * @constructor
+                 * @param {flyteidl.core.IContainerContext=} [properties] Properties to set
+                 */
+                function ContainerContext(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ContainerContext containerName.
+                 * @member {string} containerName
+                 * @memberof flyteidl.core.ContainerContext
+                 * @instance
+                 */
+                ContainerContext.prototype.containerName = "";
+    
+                /**
+                 * ContainerContext process.
+                 * @member {flyteidl.core.ContainerContext.IProcessContext|null|undefined} process
+                 * @memberof flyteidl.core.ContainerContext
+                 * @instance
+                 */
+                ContainerContext.prototype.process = null;
+    
+                /**
+                 * Creates a new ContainerContext instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.ContainerContext
+                 * @static
+                 * @param {flyteidl.core.IContainerContext=} [properties] Properties to set
+                 * @returns {flyteidl.core.ContainerContext} ContainerContext instance
+                 */
+                ContainerContext.create = function create(properties) {
+                    return new ContainerContext(properties);
+                };
+    
+                /**
+                 * Encodes the specified ContainerContext message. Does not implicitly {@link flyteidl.core.ContainerContext.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.ContainerContext
+                 * @static
+                 * @param {flyteidl.core.IContainerContext} message ContainerContext message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ContainerContext.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.containerName != null && message.hasOwnProperty("containerName"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.containerName);
+                    if (message.process != null && message.hasOwnProperty("process"))
+                        $root.flyteidl.core.ContainerContext.ProcessContext.encode(message.process, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ContainerContext message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.ContainerContext
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.ContainerContext} ContainerContext
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ContainerContext.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ContainerContext();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.containerName = reader.string();
+                            break;
+                        case 2:
+                            message.process = $root.flyteidl.core.ContainerContext.ProcessContext.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ContainerContext message.
+                 * @function verify
+                 * @memberof flyteidl.core.ContainerContext
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ContainerContext.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.containerName != null && message.hasOwnProperty("containerName"))
+                        if (!$util.isString(message.containerName))
+                            return "containerName: string expected";
+                    if (message.process != null && message.hasOwnProperty("process")) {
+                        var error = $root.flyteidl.core.ContainerContext.ProcessContext.verify(message.process);
+                        if (error)
+                            return "process." + error;
+                    }
+                    return null;
+                };
+    
+                ContainerContext.ProcessContext = (function() {
+    
+                    /**
+                     * Properties of a ProcessContext.
+                     * @memberof flyteidl.core.ContainerContext
+                     * @interface IProcessContext
+                     * @property {google.protobuf.ITimestamp|null} [containerStartTime] ProcessContext containerStartTime
+                     * @property {google.protobuf.ITimestamp|null} [containerEndTime] ProcessContext containerEndTime
+                     */
+    
+                    /**
+                     * Constructs a new ProcessContext.
+                     * @memberof flyteidl.core.ContainerContext
+                     * @classdesc Represents a ProcessContext.
+                     * @implements IProcessContext
+                     * @constructor
+                     * @param {flyteidl.core.ContainerContext.IProcessContext=} [properties] Properties to set
+                     */
+                    function ProcessContext(properties) {
+                        if (properties)
+                            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                                if (properties[keys[i]] != null)
+                                    this[keys[i]] = properties[keys[i]];
+                    }
+    
+                    /**
+                     * ProcessContext containerStartTime.
+                     * @member {google.protobuf.ITimestamp|null|undefined} containerStartTime
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @instance
+                     */
+                    ProcessContext.prototype.containerStartTime = null;
+    
+                    /**
+                     * ProcessContext containerEndTime.
+                     * @member {google.protobuf.ITimestamp|null|undefined} containerEndTime
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @instance
+                     */
+                    ProcessContext.prototype.containerEndTime = null;
+    
+                    /**
+                     * Creates a new ProcessContext instance using the specified properties.
+                     * @function create
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @static
+                     * @param {flyteidl.core.ContainerContext.IProcessContext=} [properties] Properties to set
+                     * @returns {flyteidl.core.ContainerContext.ProcessContext} ProcessContext instance
+                     */
+                    ProcessContext.create = function create(properties) {
+                        return new ProcessContext(properties);
+                    };
+    
+                    /**
+                     * Encodes the specified ProcessContext message. Does not implicitly {@link flyteidl.core.ContainerContext.ProcessContext.verify|verify} messages.
+                     * @function encode
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @static
+                     * @param {flyteidl.core.ContainerContext.IProcessContext} message ProcessContext message or plain object to encode
+                     * @param {$protobuf.Writer} [writer] Writer to encode to
+                     * @returns {$protobuf.Writer} Writer
+                     */
+                    ProcessContext.encode = function encode(message, writer) {
+                        if (!writer)
+                            writer = $Writer.create();
+                        if (message.containerStartTime != null && message.hasOwnProperty("containerStartTime"))
+                            $root.google.protobuf.Timestamp.encode(message.containerStartTime, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                        if (message.containerEndTime != null && message.hasOwnProperty("containerEndTime"))
+                            $root.google.protobuf.Timestamp.encode(message.containerEndTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                        return writer;
+                    };
+    
+                    /**
+                     * Decodes a ProcessContext message from the specified reader or buffer.
+                     * @function decode
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @static
+                     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                     * @param {number} [length] Message length if known beforehand
+                     * @returns {flyteidl.core.ContainerContext.ProcessContext} ProcessContext
+                     * @throws {Error} If the payload is not a reader or valid buffer
+                     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                     */
+                    ProcessContext.decode = function decode(reader, length) {
+                        if (!(reader instanceof $Reader))
+                            reader = $Reader.create(reader);
+                        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ContainerContext.ProcessContext();
+                        while (reader.pos < end) {
+                            var tag = reader.uint32();
+                            switch (tag >>> 3) {
+                            case 1:
+                                message.containerStartTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                                break;
+                            case 2:
+                                message.containerEndTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                                break;
+                            default:
+                                reader.skipType(tag & 7);
+                                break;
+                            }
+                        }
+                        return message;
+                    };
+    
+                    /**
+                     * Verifies a ProcessContext message.
+                     * @function verify
+                     * @memberof flyteidl.core.ContainerContext.ProcessContext
+                     * @static
+                     * @param {Object.<string,*>} message Plain object to verify
+                     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                     */
+                    ProcessContext.verify = function verify(message) {
+                        if (typeof message !== "object" || message === null)
+                            return "object expected";
+                        if (message.containerStartTime != null && message.hasOwnProperty("containerStartTime")) {
+                            var error = $root.google.protobuf.Timestamp.verify(message.containerStartTime);
+                            if (error)
+                                return "containerStartTime." + error;
+                        }
+                        if (message.containerEndTime != null && message.hasOwnProperty("containerEndTime")) {
+                            var error = $root.google.protobuf.Timestamp.verify(message.containerEndTime);
+                            if (error)
+                                return "containerEndTime." + error;
+                        }
+                        return null;
+                    };
+    
+                    return ProcessContext;
+                })();
+    
+                return ContainerContext;
+            })();
+    
             core.QualityOfServiceSpec = (function() {
     
                 /**
@@ -22495,6 +23090,7 @@
                  * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
                  * @property {number|null} [eventVersion] TaskExecutionEvent eventVersion
                  * @property {google.protobuf.ITimestamp|null} [reportedAt] TaskExecutionEvent reportedAt
+                 * @property {flyteidl.core.ILogContext|null} [logContext] TaskExecutionEvent logContext
                  */
     
                 /**
@@ -22674,6 +23270,14 @@
                  */
                 TaskExecutionEvent.prototype.reportedAt = null;
     
+                /**
+                 * TaskExecutionEvent logContext.
+                 * @member {flyteidl.core.ILogContext|null|undefined} logContext
+                 * @memberof flyteidl.event.TaskExecutionEvent
+                 * @instance
+                 */
+                TaskExecutionEvent.prototype.logContext = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -22765,6 +23369,8 @@
                     if (message.reasons != null && message.reasons.length)
                         for (var i = 0; i < message.reasons.length; ++i)
                             $root.flyteidl.event.EventReason.encode(message.reasons[i], writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
+                    if (message.logContext != null && message.hasOwnProperty("logContext"))
+                        $root.flyteidl.core.LogContext.encode(message.logContext, writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
                     return writer;
                 };
     
@@ -22849,6 +23455,9 @@
                             break;
                         case 20:
                             message.reportedAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 22:
+                            message.logContext = $root.flyteidl.core.LogContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22990,6 +23599,11 @@
                         if (error)
                             return "reportedAt." + error;
                     }
+                    if (message.logContext != null && message.hasOwnProperty("logContext")) {
+                        var error = $root.flyteidl.core.LogContext.verify(message.logContext);
+                        if (error)
+                            return "logContext." + error;
+                    }
                     return null;
                 };
     
@@ -23010,6 +23624,7 @@
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
                  * @property {flyteidl.event.IWorkflowNodeMetadata|null} [workflowNodeMetadata] ExternalResourceInfo workflowNodeMetadata
                  * @property {google.protobuf.IStruct|null} [customInfo] ExternalResourceInfo customInfo
+                 * @property {flyteidl.core.ILogContext|null} [logContext] ExternalResourceInfo logContext
                  */
     
                 /**
@@ -23092,6 +23707,14 @@
                  */
                 ExternalResourceInfo.prototype.customInfo = null;
     
+                /**
+                 * ExternalResourceInfo logContext.
+                 * @member {flyteidl.core.ILogContext|null|undefined} logContext
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.logContext = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -23147,6 +23770,8 @@
                         $root.flyteidl.event.WorkflowNodeMetadata.encode(message.workflowNodeMetadata, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                         $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.logContext != null && message.hasOwnProperty("logContext"))
+                        $root.flyteidl.core.LogContext.encode(message.logContext, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -23193,6 +23818,9 @@
                             break;
                         case 8:
                             message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.logContext = $root.flyteidl.core.LogContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23272,6 +23900,11 @@
                         var error = $root.google.protobuf.Struct.verify(message.customInfo);
                         if (error)
                             return "customInfo." + error;
+                    }
+                    if (message.logContext != null && message.hasOwnProperty("logContext")) {
+                        var error = $root.flyteidl.core.LogContext.verify(message.logContext);
+                        if (error)
+                            return "logContext." + error;
                     }
                     return null;
                 };
@@ -49367,6 +50000,7 @@
                  * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionClosure metadata
                  * @property {number|null} [eventVersion] TaskExecutionClosure eventVersion
                  * @property {Array.<flyteidl.admin.IReason>|null} [reasons] TaskExecutionClosure reasons
+                 * @property {flyteidl.core.ILogContext|null} [logContext] TaskExecutionClosure logContext
                  */
     
                 /**
@@ -49506,6 +50140,14 @@
                  */
                 TaskExecutionClosure.prototype.reasons = $util.emptyArray;
     
+                /**
+                 * TaskExecutionClosure logContext.
+                 * @member {flyteidl.core.ILogContext|null|undefined} logContext
+                 * @memberof flyteidl.admin.TaskExecutionClosure
+                 * @instance
+                 */
+                TaskExecutionClosure.prototype.logContext = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -49576,6 +50218,8 @@
                     if (message.reasons != null && message.reasons.length)
                         for (var i = 0; i < message.reasons.length; ++i)
                             $root.flyteidl.admin.Reason.encode(message.reasons[i], writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
+                    if (message.logContext != null && message.hasOwnProperty("logContext"))
+                        $root.flyteidl.core.LogContext.encode(message.logContext, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                     return writer;
                 };
     
@@ -49645,6 +50289,9 @@
                             if (!(message.reasons && message.reasons.length))
                                 message.reasons = [];
                             message.reasons.push($root.flyteidl.admin.Reason.decode(reader, reader.uint32()));
+                            break;
+                        case 19:
+                            message.logContext = $root.flyteidl.core.LogContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -49761,6 +50408,11 @@
                             if (error)
                                 return "reasons." + error;
                         }
+                    }
+                    if (message.logContext != null && message.hasOwnProperty("logContext")) {
+                        var error = $root.flyteidl.core.LogContext.verify(message.logContext);
+                        if (error)
+                            return "logContext." + error;
                     }
                     return null;
                 };
