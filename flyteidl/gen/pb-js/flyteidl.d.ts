@@ -3983,8 +3983,69 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a RetryOnOOM. */
+        interface IRetryOnOOM {
+
+            /** RetryOnOOM factor */
+            factor?: (number|null);
+
+            /** RetryOnOOM limit */
+            limit?: (string|null);
+        }
+
+        /** Represents a RetryOnOOM. */
+        class RetryOnOOM implements IRetryOnOOM {
+
+            /**
+             * Constructs a new RetryOnOOM.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IRetryOnOOM);
+
+            /** RetryOnOOM factor. */
+            public factor: number;
+
+            /** RetryOnOOM limit. */
+            public limit: string;
+
+            /**
+             * Creates a new RetryOnOOM instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetryOnOOM instance
+             */
+            public static create(properties?: flyteidl.core.IRetryOnOOM): flyteidl.core.RetryOnOOM;
+
+            /**
+             * Encodes the specified RetryOnOOM message. Does not implicitly {@link flyteidl.core.RetryOnOOM.verify|verify} messages.
+             * @param message RetryOnOOM message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IRetryOnOOM, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RetryOnOOM message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RetryOnOOM
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.RetryOnOOM;
+
+            /**
+             * Verifies a RetryOnOOM message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a RetryStrategy. */
         interface IRetryStrategy {
+
+            /** RetryStrategy onOom */
+            onOom?: (flyteidl.core.IRetryOnOOM|null);
 
             /** RetryStrategy retries */
             retries?: (number|null);
@@ -3998,6 +4059,9 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.core.IRetryStrategy);
+
+            /** RetryStrategy onOom. */
+            public onOom?: (flyteidl.core.IRetryOnOOM|null);
 
             /** RetryStrategy retries. */
             public retries: number;
