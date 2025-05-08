@@ -2,10 +2,9 @@ package validators
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -170,86 +169,6 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 	return res, nil
 }
 
-func buildMultipleTypeUnion(innerType []*core.LiteralType) *core.LiteralType {
-	var variants []*core.LiteralType
-	isNested := false
-
-	for _, x := range innerType {
-		unionType := x.GetCollectionType().GetUnionType()
-		if unionType != nil {
-			isNested = true
-			variants = append(variants, unionType.GetVariants()...)
-		} else {
-			variants = append(variants, x)
-		}
-	}
-	unionLiteralType := &core.LiteralType{
-		Type: &core.LiteralType_UnionType{
-			UnionType: &core.UnionType{
-				Variants: variants,
-			},
-		},
-	}
-
-	if isNested {
-		return &core.LiteralType{
-			Type: &core.LiteralType_CollectionType{
-				CollectionType: unionLiteralType,
-			},
-		}
-	}
-
-	return unionLiteralType
-}
-
-func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
-	innerType := make([]*core.LiteralType, 0, 1)
-	innerTypeSet := sets.NewString()
-	var noneType *core.LiteralType
-	for _, x := range literals {
-		otherType := LiteralTypeForLiteral(x)
-		otherTypeKey := otherType.String()
-		if _, ok := x.GetValue().(*core.Literal_Collection); ok {
-			if x.GetCollection().GetLiterals() == nil {
-				noneType = otherType
-				continue
-			}
-		}
-
-		if !innerTypeSet.Has(otherTypeKey) {
-			innerType = append(innerType, otherType)
-			innerTypeSet.Insert(otherTypeKey)
-		}
-	}
-
-	// only add none type if there aren't other types
-	if len(innerType) == 0 && noneType != nil {
-		innerType = append(innerType, noneType)
-	}
-
-	if len(innerType) == 0 {
-		return &core.LiteralType{
-			Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE},
-		}
-	} else if len(innerType) == 1 {
-		return innerType[0]
-	}
-
-	// sort inner types to ensure consistent union types are generated
-	slices.SortFunc(innerType, func(a, b *core.LiteralType) int {
-		aStr := a.String()
-		bStr := b.String()
-		if aStr < bStr {
-			return -1
-		} else if aStr > bStr {
-			return 1
-		}
-
-		return 0
-	})
-	return buildMultipleTypeUnion(innerType)
-}
-
 // ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
 func ValidateLiteralType(lt *core.LiteralType) error {
 	if lt == nil {
@@ -267,28 +186,227 @@ func ValidateLiteralType(lt *core.LiteralType) error {
 	return nil
 }
 
-// LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
-// type None if the literal is a non-homogeneous type.
-func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
-	switch l.GetValue().(type) {
-	case *core.Literal_Scalar:
-		return literalTypeForScalar(l.GetScalar())
-	case *core.Literal_Collection:
-		return &core.LiteralType{
-			Type: &core.LiteralType_CollectionType{
-				CollectionType: literalTypeForLiterals(l.GetCollection().GetLiterals()),
-			},
-		}
-	case *core.Literal_Map:
-		return &core.LiteralType{
-			Type: &core.LiteralType_MapValueType{
-				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().GetLiterals())),
-			},
-		}
-	case *core.Literal_OffloadedMetadata:
-		return l.GetOffloadedMetadata().GetInferredType()
+type instanceChecker interface {
+	isInstance(*core.Literal) bool
+}
+
+type trivialInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t trivialInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetValue().(*core.Literal_Scalar); !ok {
+		return false
 	}
-	return nil
+	targetType := t.literalType
+	if targetType.GetEnumType() != nil {
+		// If t is an enum, it can be created from a string as Enums as just constrained String aliases
+		if _, ok := lit.GetScalar().GetPrimitive().GetValue().(*core.Primitive_StringValue); ok {
+			return true
+		}
+	}
+
+	literalType := literalTypeForScalar(lit.GetScalar())
+	err := ValidateLiteralType(literalType)
+	if err != nil {
+		return false
+	}
+	return AreTypesCastable(literalType, targetType)
+}
+
+type noneInstanceChecker struct{}
+
+func (t noneInstanceChecker) isInstance(lit *core.Literal) bool {
+	if lit == nil {
+		return true
+	}
+	_, ok := lit.GetScalar().GetValue().(*core.Scalar_NoneType)
+	return ok
+}
+
+type collectionInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t collectionInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetValue().(*core.Literal_Collection); !ok {
+		return false
+	}
+	for _, x := range lit.GetCollection().GetLiterals() {
+		if !IsInstance(x, t.literalType.GetCollectionType()) {
+			return false
+		}
+	}
+	return true
+}
+
+type mapInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t mapInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetValue().(*core.Literal_Map); !ok {
+		return false
+	}
+	for _, x := range lit.GetMap().GetLiterals() {
+		if !IsInstance(x, t.literalType.GetMapValueType()) {
+			return false
+		}
+	}
+	return true
+}
+
+type blobInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t blobInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetScalar().GetValue().(*core.Scalar_Blob); !ok {
+		return false
+	}
+
+	blobType := lit.GetScalar().GetBlob().GetMetadata().GetType()
+	if blobType == nil {
+		return false
+	}
+
+	// Empty blobs should match any blob.
+	if blobType.GetFormat() == "" || t.literalType.GetBlob().GetFormat() == "" {
+		return true
+	}
+
+	return blobType.GetFormat() == t.literalType.GetBlob().GetFormat() && blobType.GetDimensionality() == t.literalType.GetBlob().GetDimensionality()
+}
+
+type schemaInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t schemaInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetValue().(*core.Literal_Scalar); !ok {
+		return false
+	}
+	scalar := lit.GetScalar()
+
+	switch v := scalar.GetValue().(type) {
+	case *core.Scalar_Schema:
+		return schemaCastFromSchema(scalar.GetSchema().GetType(), t.literalType.GetSchema())
+	case *core.Scalar_StructuredDataset:
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
+			return true
+		}
+		return schemaCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(), t.literalType.GetSchema())
+	default:
+		return false
+	}
+}
+
+type structuredDatasetInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t structuredDatasetInstanceChecker) isInstance(lit *core.Literal) bool {
+	if _, ok := lit.GetValue().(*core.Literal_Scalar); !ok {
+		return false
+	}
+	scalar := lit.GetScalar()
+
+	switch v := scalar.GetValue().(type) {
+	case *core.Scalar_NoneType:
+		return true
+	case *core.Scalar_Schema:
+		// Flyte Schema can only be serialized to parquet
+		format := t.literalType.GetStructuredDatasetType().GetFormat()
+		if len(format) != 0 && !strings.EqualFold(format, "parquet") {
+			return false
+		}
+		return structuredDatasetCastFromSchema(scalar.GetSchema().GetType(), t.literalType.GetStructuredDatasetType())
+	case *core.Scalar_StructuredDataset:
+		if v.StructuredDataset == nil || v.StructuredDataset.GetMetadata() == nil {
+			return true
+		}
+		return structuredDatasetCastFromStructuredDataset(scalar.GetStructuredDataset().GetMetadata().GetStructuredDatasetType(), t.literalType.GetStructuredDatasetType())
+	default:
+		return false
+	}
+}
+
+type unionInstanceChecker struct {
+	literalType *core.LiteralType
+}
+
+func (t unionInstanceChecker) isInstance(lit *core.Literal) bool {
+	unionType := t.literalType.GetUnionType()
+
+	if u := lit.GetScalar().GetUnion().GetType(); u != nil {
+		found := false
+		for _, d := range unionType.GetVariants() {
+			if AreTypesCastable(u, d) {
+				found = true
+				break
+			}
+		}
+		return found
+	}
+
+	// Matches iff we can unambiguously select a variant
+	foundOne := false
+	for _, x := range unionType.GetVariants() {
+		if IsInstance(lit, x) {
+			if foundOne {
+				return false
+			}
+			foundOne = true
+		}
+	}
+
+	return foundOne
+}
+
+func getInstanceChecker(t *core.LiteralType) instanceChecker {
+	switch t.GetType().(type) {
+	case *core.LiteralType_CollectionType:
+		return collectionInstanceChecker{
+			literalType: t,
+		}
+	case *core.LiteralType_MapValueType:
+		return mapInstanceChecker{
+			literalType: t,
+		}
+	case *core.LiteralType_Blob:
+		return blobInstanceChecker{
+			literalType: t,
+		}
+	case *core.LiteralType_Schema:
+		return schemaInstanceChecker{
+			literalType: t,
+		}
+	case *core.LiteralType_UnionType:
+		return unionInstanceChecker{
+			literalType: t,
+		}
+	case *core.LiteralType_StructuredDatasetType:
+		return structuredDatasetInstanceChecker{
+			literalType: t,
+		}
+	default:
+		if isNoneType(t) {
+			return noneInstanceChecker{}
+		}
+
+		return trivialInstanceChecker{
+			literalType: t,
+		}
+	}
+}
+
+func IsInstance(lit *core.Literal, t *core.LiteralType) bool {
+	instanceChecker := getInstanceChecker(t)
+
+	if lit.GetOffloadedMetadata() != nil {
+		return AreTypesCastable(lit.GetOffloadedMetadata().GetInferredType(), t)
+	}
+	return instanceChecker.isInstance(lit)
 }
 
 func GetTagForType(x *core.LiteralType) string {
