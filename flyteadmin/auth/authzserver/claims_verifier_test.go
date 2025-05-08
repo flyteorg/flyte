@@ -13,6 +13,20 @@ func Test_verifyClaims(t *testing.T) {
 		assert.Error(t, err)
 	})
 
+	t.Run("ExpectedAudience == '*' allows any aud", func(t *testing.T) {
+		identityCtx, err := verifyClaims(sets.NewString("*"), map[string]interface{}{
+			"aud": []string{"https://myserver"},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "", identityCtx.Audience())
+	})
+
+	t.Run("ExpectedAudience == '*' allows missing aud", func(t *testing.T) {
+		identityCtx, err := verifyClaims(sets.NewString("*"), map[string]interface{}{})
+		assert.NoError(t, err)
+		assert.Equal(t, "", identityCtx.Audience())
+	})
+
 	t.Run("All filled", func(t *testing.T) {
 		identityCtx, err := verifyClaims(sets.NewString("https://myserver"), map[string]interface{}{
 			"aud": []string{"https://myserver"},
