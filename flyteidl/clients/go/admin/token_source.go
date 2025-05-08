@@ -2,6 +2,8 @@ package admin
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/externalprocess"
+	"strings"
 
 	"golang.org/x/oauth2"
 )
@@ -48,4 +50,19 @@ func NewCustomHeaderTokenSource(source oauth2.TokenSource, insecure bool, custom
 		customHeader: header,
 		insecure:     insecure,
 	}
+}
+
+type ExternalCommandTokenSource struct {
+	command []string
+}
+
+func (s *ExternalCommandTokenSource) Token() (*oauth2.Token, error) {
+	output, err := externalprocess.Execute(s.command)
+	if err != nil {
+		return nil, err
+	}
+	return &oauth2.Token{
+		AccessToken: strings.Trim(string(output), "\t \n"),
+		TokenType:   "bearer",
+	}, nil
 }
