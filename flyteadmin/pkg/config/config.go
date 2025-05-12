@@ -51,6 +51,7 @@ type GrpcConfig struct {
 	ServerReflection         bool `json:"serverReflection" pflag:",Enable GRPC Server Reflection"`
 	MaxMessageSizeBytes      int  `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
 	EnableGrpcLatencyMetrics bool `json:"enableGrpcLatencyMetrics" pflag:",Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers."`
+	MaxConcurrentStreams     int  `json:"maxConcurrentStreams" pflag:",Limit on the number of concurrent streams to each ServerTransport."`
 }
 
 // KubeClientConfig contains the configuration used by flyteadmin to configure its internal Kubernetes Client.
