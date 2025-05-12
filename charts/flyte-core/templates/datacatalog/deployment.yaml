@@ -15,6 +15,9 @@ spec:
   replicas: {{ .Values.datacatalog.replicaCount }}
   selector:
     matchLabels: {{ include "datacatalog.selectorLabels" . | nindent 6 }}
+  {{- with .Values.datacatalog.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:
