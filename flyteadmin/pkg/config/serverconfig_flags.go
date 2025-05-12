@@ -68,6 +68,7 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpc.serverReflection"), defaultServerConfig.GrpcConfig.ServerReflection, "Enable GRPC Server Reflection")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpc.maxMessageSizeBytes"), defaultServerConfig.GrpcConfig.MaxMessageSizeBytes, "The max size in bytes for incoming gRPC messages")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpc.enableGrpcLatencyMetrics"), defaultServerConfig.GrpcConfig.EnableGrpcLatencyMetrics, "Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpc.maxConcurrentStreams"), defaultServerConfig.GrpcConfig.MaxConcurrentStreams, "Limit on the number of concurrent streams to each ServerTransport.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.clientId"), defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.ClientID, "public identifier for the app which handles authorization for a Flyte deployment")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.redirectUri"), defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.RedirectURI, "This is the callback uri registered with the app which handles authorization for a Flyte deployment")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.scopes"), defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.Scopes, "Recommended scopes for the client to request.")
