@@ -1094,7 +1094,6 @@ cluster_resource_manager:
 
   prometheus:
     enabled: false
-    path: "/metrics"
     port: 10254
 
   # -- Resource templates that should be applied
