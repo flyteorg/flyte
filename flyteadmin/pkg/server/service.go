@@ -141,7 +141,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes), grpc.MaxSendMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
 	}
 	if cfg.GrpcConfig.MaxConcurrentStreams > 0 {
-		serverOpts = append(serverOpts, grpc.MaxConcurrentStreams(uint32(cfg.GrpcConfig.MaxConcurrentStreams)))
+		serverOpts = append(serverOpts, grpc.MaxConcurrentStreams(uint32(cfg.GrpcConfig.MaxConcurrentStreams))) // #nosec G115
 	}
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
