@@ -138,7 +138,7 @@ type NamedEntityIdentifier struct {
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// User provided value for the resource.
 	// The combination of project + domain + name uniquely identifies the resource.
-	// +optional - in certain contexts - like 'ListAndFilterExpired API', 'Launch plans'
+	// +optional - in certain contexts - like 'List API', 'Launch plans'
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Optional, org key applied to the resource.
 	Org string `protobuf:"bytes,4,opt,name=org,proto3" json:"org,omitempty"`

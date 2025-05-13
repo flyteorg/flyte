@@ -1275,6 +1275,8 @@ export class Artifact extends Message<Artifact> {
   createdAt?: Timestamp;
 
   /**
+   * Optional, time to live if artifact should validity should expire
+   *
    * @generated from field: google.protobuf.Duration ttl = 8;
    */
   ttl?: Duration;

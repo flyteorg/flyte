@@ -388,7 +388,7 @@ func TestGetArtifact(t *testing.T) {
 	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
 	t.Run("Get by Id", func(t *testing.T) {
-		dcRepo.MockArtifactRepo.On("Get", mock.Anything,
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
 				return artifactKey.ArtifactID == expectedArtifact.GetId() &&
 					artifactKey.DatasetProject == expectedArtifact.GetDataset().GetProject() &&

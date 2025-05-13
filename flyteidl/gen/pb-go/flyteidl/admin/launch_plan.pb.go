@@ -679,7 +679,7 @@ type LaunchPlanMetadata struct {
 
 	// Schedule to execute the Launch Plan
 	Schedule *Schedule `protobuf:"bytes,1,opt,name=schedule,proto3" json:"schedule,omitempty"`
-	// ListAndFilterExpired of notifications based on Execution status transitions
+	// List of notifications based on Execution status transitions
 	Notifications []*Notification `protobuf:"bytes,2,rep,name=notifications,proto3" json:"notifications,omitempty"`
 	// Additional metadata for how to launch the launch plan
 	LaunchConditions *anypb.Any `protobuf:"bytes,3,opt,name=launch_conditions,json=launchConditions,proto3" json:"launch_conditions,omitempty"`
