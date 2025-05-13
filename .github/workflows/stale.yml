@@ -20,7 +20,7 @@ jobs:
         exempt-issue-labels: "untriaged, enhancement"  # Comma-separated list of labels.
         days-before-stale: 90
         days-before-close: 7
-  # Config for PRs      
+        # Config for PRs      
         stale-pr-label: "stale"
         close-pr-message: "Hello 👋, this PR has been inactive for over 9 months. To help maintain a clean and focused backlog, 
           we'll be marking this PR as stale and will close the PR if we detect no activity in the next 14 days. Thank you for your contribution and understanding! 🙏"
