@@ -184,7 +184,7 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 		logger.Debugf(ctx, "Get artifact by id %v", key)
 		artifactKey := transformers.ToArtifactKey(datasetID, key)
 		var err error
-		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
+		artifactModel, err = m.repo.ArtifactRepo().GetAndFilterExpired(ctx, artifactKey)
 
 		if err != nil {
 			if errors.IsDoesNotExistError(err) {
@@ -273,7 +273,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	}
 
 	// Perform the list with the dataset and listInput filters
-	artifactModels, err := m.repo.ArtifactRepo().List(ctx, dataset.DatasetKey, listInput)
+	artifactModels, err := m.repo.ArtifactRepo().ListAndFilterExpired(ctx, dataset.DatasetKey, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Unable to list Artifacts err: %v", err)
 		m.systemMetrics.listFailureCounter.Inc(ctx)

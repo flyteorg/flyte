@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type ArtifactKey struct {
 	DatasetProject string `gorm:"primary_key"`
 	DatasetName    string `gorm:"primary_key"`
@@ -9,7 +11,10 @@ type ArtifactKey struct {
 }
 
 type Artifact struct {
-	BaseModel
+	CreatedAt time.Time `gorm:"primary_key"`
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
+
 	ArtifactKey
 	DatasetUUID        string         `gorm:"type:uuid;index:artifacts_dataset_uuid_idx"`
 	Dataset            Dataset        `gorm:"association_autocreate:false"`
@@ -17,6 +22,7 @@ type Artifact struct {
 	Partitions         []Partition    `gorm:"references:ArtifactID;foreignkey:ArtifactID"`
 	Tags               []Tag          `gorm:"references:ArtifactID,DatasetUUID;foreignkey:ArtifactID,DatasetUUID"`
 	SerializedMetadata []byte
+	ExpiresAt          *time.Time `sql:"index"`
 }
 
 type ArtifactData struct {

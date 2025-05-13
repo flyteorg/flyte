@@ -528,7 +528,7 @@ type Reservation struct {
 	Key               string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`                                                      // The unique ID for the reservation - same as the cache key
 	OwnerId           string                 `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`                               // The unique ID of the owner for the reservation
 	HeartbeatInterval *durationpb.Duration   `protobuf:"bytes,3,opt,name=heartbeat_interval,json=heartbeatInterval,proto3" json:"heartbeat_interval,omitempty"` // Requested reservation extension heartbeat interval
-	ExpiresAt         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                         // Expiration timestamp of this reservation
+	ExpiresAt         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                         // ExpiresAt timestamp of this reservation
 }
 
 func (x *Reservation) Reset() {

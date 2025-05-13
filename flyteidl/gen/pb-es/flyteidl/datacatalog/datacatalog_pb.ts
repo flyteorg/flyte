@@ -1274,6 +1274,11 @@ export class Artifact extends Message<Artifact> {
    */
   createdAt?: Timestamp;
 
+  /**
+   * @generated from field: google.protobuf.Duration ttl = 8;
+   */
+  ttl?: Duration;
+
   constructor(data?: PartialMessage<Artifact>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1289,6 +1294,7 @@ export class Artifact extends Message<Artifact> {
     { no: 5, name: "partitions", kind: "message", T: Partition, repeated: true },
     { no: 6, name: "tags", kind: "message", T: Tag, repeated: true },
     { no: 7, name: "created_at", kind: "message", T: Timestamp },
+    { no: 8, name: "ttl", kind: "message", T: Duration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Artifact {

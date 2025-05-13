@@ -4,10 +4,13 @@ import (
 	"context"
 	"database/sql/driver"
 	"testing"
+	"time"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+	"k8s.io/utils/clock"
+	testclock "k8s.io/utils/clock/testing"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	apiErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
@@ -115,7 +118,7 @@ func TestCreateArtifact(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithCallback(
+		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata","expires_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			artifactCreated = true
 		},
@@ -153,7 +156,7 @@ func TestCreateArtifact(t *testing.T) {
 
 	artifact.Partitions = partitions
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.NoError(t, err)
 	assert.True(t, artifactCreated)
@@ -172,9 +175,11 @@ func TestGetArtifact(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
+
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts" WHERE "artifacts"."dataset_project" = $1 AND "artifacts"."dataset_name" = $2 AND "artifacts"."dataset_domain" = $3 AND "artifacts"."dataset_version" = $4 AND "artifacts"."artifact_id" = $5 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."dataset_project" = $2 AND "artifacts"."dataset_name" = $3 AND "artifacts"."dataset_domain" = $4 AND "artifacts"."dataset_version" = $5 AND "artifacts"."artifact_id" = $6 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)!(string=testProject)(EXTRA time.Time=1970-01-01 01:00:00 +0100 CET)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -189,8 +194,8 @@ func TestGetArtifact(t *testing.T) {
 		ArtifactID:     artifact.ArtifactID,
 	}
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	response, err := artifactRepo.Get(context.Background(), getInput)
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), testClock)
+	response, err := artifactRepo.GetAndFilterExpired(context.Background(), getInput)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 	assert.Equal(t, artifact.DatasetProject, response.DatasetProject)
@@ -214,9 +219,11 @@ func TestGetArtifactByID(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
+
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts" WHERE "artifacts"."artifact_id" = $1 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!(EXTRA string=123)`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."artifact_id" = $2 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)(EXTRA time.Time=1970-01-01 01:00:00 +0100 CET)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -227,8 +234,8 @@ func TestGetArtifactByID(t *testing.T) {
 		ArtifactID: artifact.ArtifactID,
 	}
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	response, err := artifactRepo.Get(context.Background(), getInput)
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), testClock)
+	response, err := artifactRepo.GetAndFilterExpired(context.Background(), getInput)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 }
@@ -248,8 +255,8 @@ func TestGetArtifactDoesNotExist(t *testing.T) {
 	}
 
 	// by default mocket will return nil for any queries
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	_, err := artifactRepo.Get(context.Background(), getInput)
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
+	_, err := artifactRepo.GetAndFilterExpired(context.Background(), getInput)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
@@ -264,11 +271,11 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithError(
+		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata","expires_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`).WithError(
 		getAlreadyExistsErr(),
 	)
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
@@ -288,7 +295,7 @@ func TestListArtifactsWithPartition(t *testing.T) {
 	expectedPartitionResponse := getDBPartitionResponse(artifact)
 	expectedTagResponse := getDBTagResponse(artifact)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata" FROM "artifacts" JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id WHERE partitions0.key = $1 AND partitions0.val = $2 AND artifacts.dataset_uuid = $3 ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10%!!(string=test-uuid)!(string=val2)(EXTRA string=val1)`).WithReply(expectedArtifactResponse)
+		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata","artifacts"."expires_at" FROM "artifacts" JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id WHERE partitions0.key = $1 AND partitions0.val = $2 AND artifacts.dataset_uuid = $3 ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10%!!(string=test-uuid)!(string=val2)(EXTRA string=val1)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -296,7 +303,7 @@ func TestListArtifactsWithPartition(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	listInput := models.ListModelsInput{
 		ModelFilters: []models.ModelFilter{
 			{Entity: common.Partition,
@@ -311,7 +318,7 @@ func TestListArtifactsWithPartition(t *testing.T) {
 		Limit:         10,
 		SortParameter: NewGormSortParameter(datacatalog.PaginationOptions_CREATION_TIME, datacatalog.PaginationOptions_DESCENDING),
 	}
-	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	artifacts, err := artifactRepo.ListAndFilterExpired(context.Background(), dataset.DatasetKey, listInput)
 	assert.NoError(t, err)
 	assert.Len(t, artifacts, 1)
 	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
@@ -338,12 +345,12 @@ func TestListArtifactsNoPartitions(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	listInput := models.ListModelsInput{
 		Offset: 10,
 		Limit:  10,
 	}
-	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	artifacts, err := artifactRepo.ListAndFilterExpired(context.Background(), dataset.DatasetKey, listInput)
 	assert.NoError(t, err)
 	assert.Len(t, artifacts, 1)
 	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
@@ -394,7 +401,7 @@ func TestUpdateArtifact(t *testing.T) {
 		},
 	}
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	err := artifactRepo.Update(ctx, updateInput)
 	assert.NoError(t, err)
 	assert.True(t, artifactUpdated)
@@ -425,7 +432,7 @@ func TestUpdateArtifactDoesNotExist(t *testing.T) {
 		},
 	}
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 	err := artifactRepo.Update(ctx, updateInput)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
@@ -461,7 +468,7 @@ func TestUpdateArtifactError(t *testing.T) {
 			},
 		}
 
-		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 		err := artifactRepo.Update(ctx, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
@@ -501,7 +508,7 @@ func TestUpdateArtifactError(t *testing.T) {
 			},
 		}
 
-		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 		err := artifactRepo.Update(ctx, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
@@ -548,7 +555,7 @@ func TestUpdateArtifactError(t *testing.T) {
 			},
 		}
 
-		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
 		err := artifactRepo.Update(ctx, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)

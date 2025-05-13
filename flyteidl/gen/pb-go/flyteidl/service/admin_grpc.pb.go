@@ -104,7 +104,7 @@ type AdminServiceClient interface {
 	GetLaunchPlan(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error)
 	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
 	GetActiveLaunchPlan(ctx context.Context, in *admin.ActiveLaunchPlanRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error)
-	// List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
+	// ListAndFilterExpired active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
 	ListActiveLaunchPlans(ctx context.Context, in *admin.ActiveLaunchPlanListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
@@ -738,7 +738,7 @@ type AdminServiceServer interface {
 	GetLaunchPlan(context.Context, *admin.ObjectGetRequest) (*admin.LaunchPlan, error)
 	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
 	GetActiveLaunchPlan(context.Context, *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error)
-	// List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
+	// ListAndFilterExpired active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.
 	ListActiveLaunchPlans(context.Context, *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)

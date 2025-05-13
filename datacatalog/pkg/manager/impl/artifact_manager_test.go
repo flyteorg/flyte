@@ -164,9 +164,7 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 		Tags: []models.Tag{
 			{TagKey: models.TagKey{TagName: "test-tag"}, DatasetUUID: expectedDataset.GetUUID(), ArtifactID: artifact.GetId()},
 		},
-		BaseModel: models.BaseModel{
-			CreatedAt: getTestTimestamp(),
-		},
+		CreatedAt: getTestTimestamp(),
 	}
 }
 
@@ -484,7 +482,7 @@ func TestListArtifact(t *testing.T) {
 	expectedArtifact := getTestArtifact()
 	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
-	t.Run("List Artifact on invalid filter", func(t *testing.T) {
+	t.Run("ListAndFilterExpired Artifact on invalid filter", func(t *testing.T) {
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		filter := &datacatalog.FilterExpression{
 			Filters: []*datacatalog.SinglePropertyFilter{
@@ -507,7 +505,7 @@ func TestListArtifact(t *testing.T) {
 		assert.Equal(t, codes.InvalidArgument, responseCode)
 	})
 
-	t.Run("List Artifacts with Partition and Tag", func(t *testing.T) {
+	t.Run("ListAndFilterExpired Artifacts with Partition and Tag", func(t *testing.T) {
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		filter := &datacatalog.FilterExpression{
 			Filters: []*datacatalog.SinglePropertyFilter{
@@ -554,7 +552,7 @@ func TestListArtifact(t *testing.T) {
 			mockArtifactModel,
 		}
 
-		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+		dcRepo.MockArtifactRepo.On("ListAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
 				return dataset.Project == expectedDataset.GetId().GetProject() &&
 					dataset.Domain == expectedDataset.GetId().GetDomain() &&
@@ -578,7 +576,7 @@ func TestListArtifact(t *testing.T) {
 		assert.NotEmpty(t, artifactResponse)
 	})
 
-	t.Run("List Artifacts with No Partition", func(t *testing.T) {
+	t.Run("ListAndFilterExpired Artifacts with No Partition", func(t *testing.T) {
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		filter := &datacatalog.FilterExpression{Filters: nil}
 
@@ -594,7 +592,7 @@ func TestListArtifact(t *testing.T) {
 			mockArtifactModel,
 			mockArtifactModel,
 		}
-		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+		dcRepo.MockArtifactRepo.On("ListAndFilterExpired", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
 				return dataset.Project == expectedDataset.GetId().GetProject() &&
 					dataset.Domain == expectedDataset.GetId().GetDomain() &&

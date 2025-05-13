@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
@@ -18,13 +19,20 @@ type artifactRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
 	repoMetrics      gormMetrics
+	clock            clock.Clock
 }
 
-func NewArtifactRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.ArtifactRepo {
+func NewArtifactRepo(
+	db *gorm.DB,
+	errorTransformer errors.ErrorTransformer,
+	scope promutils.Scope,
+	clock clock.Clock,
+) interfaces.ArtifactRepo {
 	return &artifactRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
 		repoMetrics:      newGormMetrics(scope),
+		clock:            clock,
 	}
 }
 
@@ -34,6 +42,19 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	defer timer.Stop()
 
 	tx := h.db.WithContext(ctx).Begin()
+
+	existing, err := h.getForUpdate(ctx, artifact.ArtifactKey, tx)
+	if err == nil {
+		if existing.ExpiresAt != nil && h.clock.Now().After(*existing.ExpiresAt) {
+			// If the previous artifact is expired, soft delete it before creating a new record
+			tx.Delete(&existing)
+		}
+	} else {
+		if err.Error() != gorm.ErrRecordNotFound.Error() {
+			return h.errorTransformer.ToDataCatalogError(err)
+		}
+		// Not found is desirable
+	}
 
 	tx = tx.Create(&artifact)
 
@@ -50,17 +71,19 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	return nil
 }
 
-func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
+func (h *artifactRepo) GetAndFilterExpired(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
 	timer := h.repoMetrics.GetDuration.Start(ctx)
 	defer timer.Stop()
 
 	var artifact models.Artifact
-	result := h.db.WithContext(ctx).Preload("ArtifactData").
+	result := h.db.WithContext(ctx).
+		Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now()).
+		Preload("ArtifactData").
 		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
 			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
 		}).
 		Preload("Tags").
-		Order("artifacts.created_at DESC").
+		Order("artifacts.created_at DESC"). // Always pick the most recent
 		First(
 			&artifact,
 			&models.Artifact{ArtifactKey: in},
@@ -85,7 +108,27 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	return artifact, nil
 }
 
-func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+// Gets the artifact and locks the row
+func (h *artifactRepo) getForUpdate(ctx context.Context, in models.ArtifactKey, db *gorm.DB) (models.Artifact, error) {
+
+	var artifact models.Artifact
+	result := db.
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Preload("ArtifactData").
+		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
+			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+		}).
+		Preload("Tags").
+		Order("artifacts.created_at DESC"). // Always pick the most recent
+		First(
+			&artifact,
+			&models.Artifact{ArtifactKey: in},
+		)
+
+	return artifact, result.Error
+}
+
+func (h *artifactRepo) ListAndFilterExpired(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
 	timer := h.repoMetrics.ListDuration.Start(ctx)
 	defer timer.Stop()
 

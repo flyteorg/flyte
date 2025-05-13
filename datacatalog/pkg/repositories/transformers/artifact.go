@@ -1,6 +1,8 @@
 package transformers
 
 import (
+	"time"
+
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 
@@ -34,6 +36,13 @@ func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactDat
 		}
 	}
 
+	var maybeExpiration *time.Time
+
+	if request.GetArtifact().GetTtl() != nil {
+		expiration := time.Now().Add(request.GetArtifact().GetTtl().AsDuration())
+		maybeExpiration = &expiration
+	}
+
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
 			DatasetProject: datasetID.GetProject(),
@@ -46,6 +55,7 @@ func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactDat
 		ArtifactData:       artifactData,
 		SerializedMetadata: serializedMetadata,
 		Partitions:         partitions,
+		ExpiresAt:          maybeExpiration,
 	}, nil
 }
 

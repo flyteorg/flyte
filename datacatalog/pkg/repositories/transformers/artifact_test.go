@@ -123,9 +123,7 @@ func TestFromArtifactModel(t *testing.T) {
 		SerializedMetadata: []byte{},
 		Partitions:         getTestPartitions(),
 		Tags:               getTestTags(),
-		BaseModel: models.BaseModel{
-			CreatedAt: createdAt,
-		},
+		CreatedAt:          createdAt,
 	}
 
 	actual, err := FromArtifactModel(artifactModel)

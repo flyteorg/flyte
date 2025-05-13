@@ -486,7 +486,7 @@ func (x *WorkflowExecutionGetRequest) GetId() *core.WorkflowExecutionIdentifier 
 
 // A workflow execution represents an instantiated workflow, including all inputs and additional
 // metadata as well as computed results included state, outputs, and duration-based attributes.
-// Used as a response object used in Get and List execution requests.
+// Used as a response object used in Get and ListAndFilterExpired execution requests.
 type Execution struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1455,7 +1455,7 @@ type isExecutionSpec_NotificationOverrides interface {
 }
 
 type ExecutionSpec_Notifications struct {
-	// List of notifications based on Execution status transitions
+	// ListAndFilterExpired of notifications based on Execution status transitions
 	// When this list is not empty it is used rather than any notifications defined in the referenced launch plan.
 	// When this list is empty, the notifications defined for the launch plan will be applied.
 	Notifications *NotificationList `protobuf:"bytes,5,opt,name=notifications,proto3,oneof"`
