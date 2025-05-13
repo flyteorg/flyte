@@ -92,6 +92,26 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, 11, len(CopilotCommandArgs(storage.GetConfig())))
 	})
 
+	t.Run("storage override", func(t *testing.T) {
+
+		storageConfigOverride := storage.Config{}
+
+		storageConfigOverride.Type = storage.TypeStow
+		storageConfigOverride.InitContainer = "bucket"
+		storageConfigOverride.Stow.Kind = "google"
+		storageConfigOverride.Stow.Config = map[string]string{
+			"json":       "",
+			"project_id": "flyte-gcp",
+		}
+		cfg.StorageConfigOverride = &storageConfigOverride
+
+		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(c.VolumeMounts))
+
+		assert.Equal(t, c.Command, CopilotCommandArgs(&storageConfigOverride))
+	})
+
 	t.Run("bad-res-cpu", func(t *testing.T) {
 		old := cfg.CPU
 		cfg.CPU = "x"

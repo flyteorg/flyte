@@ -36,10 +36,18 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 	if err != nil {
 		return v1.Container{}, err
 	}
+
+	var storageCfg *storage.Config
+	if cfg.StorageConfigOverride != nil {
+		storageCfg = cfg.StorageConfigOverride
+	} else {
+		storageCfg = storage.GetConfig()
+	}
+
 	return v1.Container{
 		Name:       cfg.NamePrefix + name,
 		Image:      cfg.Image,
-		Command:    CopilotCommandArgs(storage.GetConfig()),
+		Command:    CopilotCommandArgs(storageCfg),
 		Args:       args,
 		WorkingDir: "/",
 		SecurityContext: &v1.SecurityContext{

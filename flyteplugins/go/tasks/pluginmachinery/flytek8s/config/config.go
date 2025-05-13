@@ -13,6 +13,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 //go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig
@@ -242,9 +243,10 @@ type FlyteCoPilotConfig struct {
 	// the process will be assumed to be dead or in a terminal condition and will trigger an abort.
 	StartTimeout config2.Duration `json:"start-timeout" pflag:"-,Time for which the sidecar should wait on startup before assuming the primary container to have failed startup."`
 	// Resources for CoPilot Containers
-	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
-	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
-	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	CPU                   string          `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
+	Memory                string          `json:"memory" pflag:",Used to set memory for co-pilot containers"`
+	Storage               string          `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
+	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:",Override for the storage config to use for co-pilot"`
 }
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.
