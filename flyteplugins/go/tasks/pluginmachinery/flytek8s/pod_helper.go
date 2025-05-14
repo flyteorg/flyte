@@ -37,6 +37,10 @@ const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
 
+// nodePreemptionStatusReasons are the status reasons that a pod's respective node
+// is preempted by the scheduler
+var nodePreemptionStatusReasons = sets.NewString("Shutdown", "Terminated", "NodeShutdown")
+
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
 // objects to an existing v1.Affinity object. If there are no existing required
 // node selectors, the new v1.NodeSelectorRequirement will be added as-is.
@@ -1019,8 +1023,8 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	//
 
 	var isSystemError bool
-	// In some versions of GKE the reason can also be "Terminated"
-	if code == "Shutdown" || code == "Terminated" {
+	// In some versions of GKE the reason can also be "Terminated" or "NodeShutdown"
+	if nodePreemptionStatusReasons.Has(code) {
 		isSystemError = true
 	}
 
