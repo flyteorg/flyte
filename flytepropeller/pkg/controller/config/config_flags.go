@@ -120,6 +120,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "array-node.use-map-plugin-logs"), defaultConfig.ArrayNode.UseMapPluginLogs, "Override subNode log links with those configured for the map plugin logs")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node.max-delta-timestamp"), defaultConfig.ArrayNode.MaxDeltaTimestamp.String(), "Maximum delta timestamp between ArrayNode start and an individual subNode start.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node.max-task-phase-version-attempts"), defaultConfig.ArrayNode.MaxTaskPhaseVersionAttempts, "Maximum number of attempts for incrementing the task phase version on events to bypass the already exists error")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.Enabled"), defaultConfig.LiteralOffloadingConfig.Enabled, "")
 	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.supported-sdk-versions"), defaultConfig.LiteralOffloadingConfig.SupportedSDKVersions, "Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.")

@@ -1079,6 +1079,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_array-node.max-delta-timestamp", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.ArrayNode.MaxDeltaTimestamp.String()
+
+			cmdFlags.Set("array-node.max-delta-timestamp", testValue)
+			if vString, err := cmdFlags.GetString("array-node.max-delta-timestamp"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ArrayNode.MaxDeltaTimestamp)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_array-node.max-task-phase-version-attempts", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

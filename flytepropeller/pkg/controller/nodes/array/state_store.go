@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
@@ -149,7 +150,7 @@ func (m *minStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailur
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 		{arrayReference: &m.arrayNodeStateCopy.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
-		{arrayReference: &m.arrayNodeStateCopy.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodeDeltaTimestamps, maxValue: int(config.GetConfig().ArrayNode.MaxDeltaTimestamp.Seconds())},
 	} {
 		var err error
 		*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
