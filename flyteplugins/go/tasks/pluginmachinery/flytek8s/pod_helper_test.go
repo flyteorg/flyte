@@ -1715,9 +1715,9 @@ func TestDemystifyFailure(t *testing.T) {
 				}, pluginsCore.TaskInfo{}, "")
 				assert.Nil(t, err)
 				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-				assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
-				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
-				assert.Equal(t, message, phaseInfo.Err().Message)
+				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+				assert.Equal(t, message, phaseInfo.Err().GetMessage())
 			})
 		}
 	})
