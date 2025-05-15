@@ -125,6 +125,7 @@ var (
 			EventVersion:                0,
 			DefaultParallelismBehavior:  ParallelismBehaviorUnlimited,
 			UseMapPluginLogs:            false,
+			MaxDeltaTimestamp:           config.Duration{Duration: 3 * 24 * time.Hour},
 			MaxTaskPhaseVersionAttempts: 3,
 		},
 		LiteralOffloadingConfig: LiteralOffloadingConfig{
@@ -351,6 +352,7 @@ type ArrayNodeConfig struct {
 	EventVersion                int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	DefaultParallelismBehavior  ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
 	UseMapPluginLogs            bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
+	MaxDeltaTimestamp           config.Duration     `json:"max-delta-timestamp" pflag:",Maximum delta timestamp between ArrayNode start and an individual subNode start."`
 	MaxTaskPhaseVersionAttempts int                 `json:"max-task-phase-version-attempts" pflag:",Maximum number of attempts for incrementing the task phase version on events to bypass the already exists error"`
 }
 
