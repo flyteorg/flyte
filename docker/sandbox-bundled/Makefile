@@ -51,6 +51,16 @@ build: flyte dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
 
+.PHONY: build-gpu
+build-gpu: flyte manifests
+	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
+		docker buildx create --name flyte-sandbox \
+		--driver docker-container --driver-opt image=moby/buildkit:master \
+		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
+		--platform linux/arm64,linux/amd64
+	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
+                --tag flyte-sandbox-gpu:latest -f Dockerfile.gpu .
+
 # Port map
 # 6443 - k8s API server
 # 30000 - Docker Registry
