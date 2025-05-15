@@ -213,6 +213,14 @@ func NewMismatchingTypesErr(nodeID, fromVar, fromType, toType string) *CompileEr
 	)
 }
 
+func NewMismatchingInstanceErr(nodeID, toVar, toType, fromVar string) *CompileError {
+	return newError(
+		MismatchingTypes,
+		fmt.Sprintf("Variable [%v] expected to be of type [%v], but got [%v].", toVar, toType, fromVar),
+		nodeID,
+	)
+}
+
 func NewMismatchingVariablesErr(nodeID, fromVar, fromType, toVar, toType string) *CompileError {
 	return newError(
 		MismatchingTypes,
