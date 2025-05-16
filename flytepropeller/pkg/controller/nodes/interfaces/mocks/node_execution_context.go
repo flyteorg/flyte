@@ -122,6 +122,51 @@ func (_c *NodeExecutionContext_CurrentAttempt_Call) RunAndReturn(run func() uint
 	return _c
 }
 
+// CurrentOOMFailures provides a mock function with given fields:
+func (_m *NodeExecutionContext) CurrentOOMFailures() uint32 {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for CurrentOOMFailures")
+	}
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+// NodeExecutionContext_CurrentOOMFailures_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CurrentOOMFailures'
+type NodeExecutionContext_CurrentOOMFailures_Call struct {
+	*mock.Call
+}
+
+// CurrentOOMFailures is a helper method to define mock.On call
+func (_e *NodeExecutionContext_Expecter) CurrentOOMFailures() *NodeExecutionContext_CurrentOOMFailures_Call {
+	return &NodeExecutionContext_CurrentOOMFailures_Call{Call: _e.mock.On("CurrentOOMFailures")}
+}
+
+func (_c *NodeExecutionContext_CurrentOOMFailures_Call) Run(run func()) *NodeExecutionContext_CurrentOOMFailures_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *NodeExecutionContext_CurrentOOMFailures_Call) Return(_a0 uint32) *NodeExecutionContext_CurrentOOMFailures_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *NodeExecutionContext_CurrentOOMFailures_Call) RunAndReturn(run func() uint32) *NodeExecutionContext_CurrentOOMFailures_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DataStore provides a mock function with given fields:
 func (_m *NodeExecutionContext) DataStore() *storage.DataStore {
 	ret := _m.Called()

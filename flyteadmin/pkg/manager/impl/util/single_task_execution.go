@@ -22,7 +22,13 @@ import (
 
 const maxNodeIDLength = 63
 
+var defaultRetryStrategyOnOOM = &core.RetryOnOOM{
+	Factor: 0,
+	Limit:  "",
+}
+
 var defaultRetryStrategy = core.RetryStrategy{
+	OnOom:   defaultRetryStrategyOnOOM,
 	Retries: 3,
 }
 
@@ -88,6 +94,9 @@ func CreateOrGetWorkflowModel(
 	var retryStrategy *core.RetryStrategy
 	if task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries() != nil {
 		retryStrategy = task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries()
+		if retryStrategy.GetOnOom() == nil {
+			retryStrategy.OnOom = defaultRetryStrategyOnOOM
+		}
 	} else {
 		retryStrategy = &defaultRetryStrategy
 	}
