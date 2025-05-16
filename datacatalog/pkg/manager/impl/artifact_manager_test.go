@@ -629,7 +629,7 @@ func TestUpdateArtifact(t *testing.T) {
 		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
 		dcRepo := newMockDataCatalogRepo()
-		dcRepo.MockArtifactRepo.On("Get",
+		dcRepo.MockArtifactRepo.On("GetAndFilterExpired",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
 				return artifactKey.ArtifactID == expectedArtifact.GetId() &&
