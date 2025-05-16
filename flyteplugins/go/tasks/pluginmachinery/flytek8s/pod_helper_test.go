@@ -2077,7 +2077,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		}
 
 		primaryInitContainerTemplate := v1.Container{
-			Name:                   primaryInitContainerTemplateName,
+			Name:                   PrimaryInitContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
