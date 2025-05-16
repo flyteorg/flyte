@@ -3,6 +3,7 @@ package catalog
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -27,6 +28,7 @@ type Key struct {
 	Identifier           core.Identifier
 	CacheVersion         string
 	CacheIgnoreInputVars []string
+	CacheTtl             *durationpb.Duration
 	TypedInterface       core.TypedInterface
 	InputReader          io.InputReader
 }
