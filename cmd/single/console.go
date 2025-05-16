@@ -18,8 +18,8 @@ const (
 func GetConsoleFile(name string) string {
 	// Serve requests for static assets at `/console/assets/<filename>`
 	// as-is from `dist`
-	if strings.HasPrefix(name, consoleStatic) {
-		return filepath.Join(packageDir, strings.TrimPrefix(name, consoleStatic))
+	if after, ok := strings.CutPrefix(name, consoleStatic); ok {
+		return filepath.Join(packageDir, after)
 	}
 
 	// Send all other requests to `index.html` to be handled by react router
