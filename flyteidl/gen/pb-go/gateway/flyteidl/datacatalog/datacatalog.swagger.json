@@ -517,7 +517,7 @@
         },
         "ttl": {
           "type": "string",
-          "title": "Optional, time to live if artifact should validity should expire"
+          "title": "Optional, time to live of artifact should validity should expire"
         }
       },
       "description": "Artifact message. It is composed of several string fields."

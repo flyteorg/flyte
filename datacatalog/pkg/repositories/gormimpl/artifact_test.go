@@ -40,6 +40,20 @@ func getTestArtifact() models.Artifact {
 	}
 }
 
+func getTestArtifactWithExpiration(expiresAt time.Time) models.Artifact {
+	return models.Artifact{
+		ArtifactKey: models.ArtifactKey{
+			ArtifactID:     "123",
+			DatasetProject: "testProject",
+			DatasetDomain:  "testDomain",
+			DatasetName:    "testName",
+			DatasetVersion: "testVersion",
+		},
+		DatasetUUID: "test-uuid",
+		ExpiresAt:   &expiresAt,
+	}
+}
+
 func getTestPartition() models.Partition {
 	return models.Partition{
 		DatasetUUID: "test-uuid",
@@ -59,6 +73,9 @@ func getDBArtifactResponse(artifact models.Artifact) []map[string]interface{} {
 	sampleArtifact["dataset_version"] = artifact.DatasetVersion
 	sampleArtifact["artifact_id"] = artifact.ArtifactID
 	sampleArtifact["dataset_uuid"] = artifact.DatasetUUID
+	if artifact.ExpiresAt != nil {
+		sampleArtifact["expires_at"] = artifact.ExpiresAt
+	}
 	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
 	return expectedArtifactResponse
 }
@@ -164,8 +181,9 @@ func TestCreateArtifact(t *testing.T) {
 	assert.Equal(t, 1, numPartitionsCreated)
 }
 
-func TestGetArtifact(t *testing.T) {
-	artifact := getTestArtifact()
+func TestGetArtifactNotExpired(t *testing.T) {
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
+	artifact := getTestArtifactWithExpiration(testClock.Now().Add(time.Second))
 
 	expectedArtifactDataResponse := getDBArtifactDataResponse(artifact)
 	expectedArtifactResponse := getDBArtifactResponse(artifact)
@@ -174,8 +192,6 @@ func TestGetArtifact(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
-
-	testClock := testclock.NewFakeClock(time.Unix(0, 0))
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
@@ -240,7 +256,7 @@ func TestGetArtifactByID(t *testing.T) {
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 }
 
-func TestGetArtifactDoesNotExist(t *testing.T) {
+func TestGetArtifactDoesNotExistOrExpired(t *testing.T) {
 	artifact := getTestArtifact()
 
 	GlobalMock := mocket.Catcher.Reset()
@@ -263,24 +279,69 @@ func TestGetArtifactDoesNotExist(t *testing.T) {
 	assert.Equal(t, dcErr.Code(), codes.NotFound)
 }
 
-func TestCreateArtifactAlreadyExists(t *testing.T) {
-	artifact := getTestArtifact()
+func TestCreateArtifactExistingExpired(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
-	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(
-		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata","expires_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`).WithError(
-		getAlreadyExistsErr(),
-	)
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
+	artifact := getTestArtifactWithExpiration(testClock.Now())
+	expectedArtifactResponse := getDBArtifactResponse(artifact)
+
+	// Fast forward time to expire the artifact
+	testClock.Step(time.Second)
+
+	// Only match on queries that append expected filters
+	expiredFound := false
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "artifacts" WHERE "artifacts"."dataset_project" = $1 AND "artifacts"."dataset_name" = $2 AND "artifacts"."dataset_domain" = $3 AND "artifacts"."dataset_version" = $4 AND "artifacts"."artifact_id" = $5 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1 FOR UPDATE%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).
+		WithReply(expectedArtifactResponse).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			expiredFound = true
+		})
+	newCreated := true
+	GlobalMock.NewMock().WithQuery(
+		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata","expires_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			newCreated = true
+		})
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), testClock)
+	err := artifactRepo.Create(context.Background(), artifact)
+	assert.NoError(t, err)
+
+	assert.True(t, expiredFound)
+	assert.True(t, newCreated)
+}
+
+func TestCreateArtifactExistingNotExpired(t *testing.T) {
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
+
+	artifact := getTestArtifactWithExpiration(testClock.Now().Add(time.Second)) // expires in the future
+	expectedArtifactResponse := getDBArtifactResponse(artifact)
+
+	// Only match on queries that append expected filters
+	notExpiredFound := false
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "artifacts" WHERE "artifacts"."dataset_project" = $1 AND "artifacts"."dataset_name" = $2 AND "artifacts"."dataset_domain" = $3 AND "artifacts"."dataset_version" = $4 AND "artifacts"."artifact_id" = $5 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1 FOR UPDATE%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).
+		WithReply(expectedArtifactResponse).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			notExpiredFound = true
+		})
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), testClock)
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
-	assert.Equal(t, dcErr.Code().String(), codes.AlreadyExists.String())
+	assert.Equal(t, dcErr.Code(), codes.AlreadyExists)
+
+	assert.True(t, notExpiredFound)
 }
 
 func TestListArtifactsWithPartition(t *testing.T) {
@@ -366,7 +427,7 @@ func TestUpdateArtifact(t *testing.T) {
 	GlobalMock.Logging = true
 
 	artifactUpdated := false
-	GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+	GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE (artifacts.expires_at is null or artifacts.expires_at < $3) AND "artifact_id" = $4`).
 		WithRowsNum(1).
 		WithCallback(func(s string, values []driver.NamedValue) {
 			artifactUpdated = true
@@ -399,6 +460,59 @@ func TestUpdateArtifact(t *testing.T) {
 				Location: "additional-test-dataloc-location",
 			},
 		},
+	}
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
+	err := artifactRepo.Update(ctx, updateInput)
+	assert.NoError(t, err)
+	assert.True(t, artifactUpdated)
+	assert.True(t, artifactDataDeleted)
+	assert.True(t, artifactDataUpserted)
+}
+
+func TestUpdateArtifactWithExpiration(t *testing.T) {
+	ctx := context.Background()
+	testClock := testclock.NewFakeClock(time.Unix(0, 0))
+	artifact := getTestArtifactWithExpiration(testClock.Now())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	artifactUpdated := false
+	GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2,"expires_at"=$3 WHERE (artifacts.expires_at is null or artifacts.expires_at < $4) AND "artifact_id" = $5`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactUpdated = true
+		})
+	artifactDataDeleted := false
+	GlobalMock.NewMock().
+		WithQuery(`DELETE FROM "artifact_data" WHERE "artifact_data"."artifact_id" = $1 AND name NOT IN ($2,$3)`).
+		WithRowsNum(0).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDataDeleted = true
+		})
+	artifactDataUpserted := false
+	GlobalMock.NewMock().WithQuery(`INSERT INTO "artifact_data" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name","location") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10),($11,$12,$13,$14,$15,$16,$17,$18,$19,$20) ON CONFLICT DO NOTHING`).
+		WithRowsNum(1).
+		WithCallback(func(s string, values []driver.NamedValue) {
+			artifactDataUpserted = true
+		})
+
+	updateInput := models.Artifact{
+		ArtifactKey: models.ArtifactKey{
+			ArtifactID: artifact.ArtifactID,
+		},
+		ArtifactData: []models.ArtifactData{
+			{
+				Name:     "test-dataloc-name",
+				Location: "test-dataloc-location",
+			},
+			{
+				Name:     "additional-test-dataloc-name",
+				Location: "additional-test-dataloc-location",
+			},
+		},
+		ExpiresAt: artifact.ExpiresAt,
 	}
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope(), clock.RealClock{})
@@ -449,7 +563,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		GlobalMock := mocket.Catcher.Reset()
 		GlobalMock.Logging = true
 
-		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE (artifacts.expires_at is null or artifacts.expires_at < $3) AND "artifact_id" = $4`).
 			WithExecException()
 
 		updateInput := models.Artifact{
@@ -483,7 +597,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		GlobalMock.Logging = true
 
 		artifactUpdated := false
-		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE (artifacts.expires_at is null or artifacts.expires_at < $3) AND "artifact_id" = $4`).
 			WithRowsNum(1).
 			WithCallback(func(s string, values []driver.NamedValue) {
 				artifactUpdated = true
@@ -524,7 +638,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		GlobalMock.Logging = true
 
 		artifactUpdated := false
-		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE "artifact_id" = $3`).
+		GlobalMock.NewMock().WithQuery(`UPDATE "artifacts" SET "updated_at"=$1,"artifact_id"=$2 WHERE (artifacts.expires_at is null or artifacts.expires_at < $3) AND "artifact_id" = $4`).
 			WithRowsNum(1).
 			WithCallback(func(s string, values []driver.NamedValue) {
 				artifactUpdated = true

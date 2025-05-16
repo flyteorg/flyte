@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
@@ -51,6 +52,7 @@ type artifactManager struct {
 	repo          repositories.RepositoryInterface
 	artifactStore ArtifactDataStore
 	systemMetrics artifactMetrics
+	clock         clock.Clock
 }
 
 // Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
@@ -109,6 +111,12 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 		logger.Errorf(ctx, "Failed to transform artifact err: %v", err)
 		m.systemMetrics.transformerErrorCounter.Inc(ctx)
 		return nil, err
+	}
+
+	// Set expiration
+	if request.GetArtifact().GetTtl() != nil {
+		expiration := m.clock.Now().Add(request.GetArtifact().GetTtl().AsDuration())
+		artifactModel.ExpiresAt = &expiration
 	}
 
 	err = m.repo.ArtifactRepo().Create(ctx, artifactModel)
@@ -379,6 +387,15 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 
 	// update artifact in DB, also replaces/upserts associated artifact data
 	artifactModel.ArtifactData = artifactDataModels
+
+	// Reset TTL on the artifact since all the data is fresh.
+	if request.GetTtl() != nil {
+		expiration := m.clock.Now().Add(request.GetTtl().AsDuration())
+		artifactModel.ExpiresAt = &expiration
+	} else {
+		artifactModel.ExpiresAt = nil
+	}
+
 	logger.Debugf(ctx, "Updating ArtifactModel with %+v", artifactModel)
 
 	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
@@ -416,7 +433,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	}, nil
 }
 
-func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
+func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope, clock clock.Clock) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
 		createResponseTime:       labeled.NewStopWatch("create_duration", "The duration of the create artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
@@ -446,5 +463,6 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		repo:          repo,
 		artifactStore: NewArtifactDataStore(store, storagePrefix),
 		systemMetrics: artifactMetrics,
+		clock:         clock,
 	}
 }

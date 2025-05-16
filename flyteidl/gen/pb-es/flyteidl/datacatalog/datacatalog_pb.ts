@@ -665,6 +665,13 @@ export class UpdateArtifactRequest extends Message<UpdateArtifactRequest> {
    */
   metadata?: Metadata;
 
+  /**
+   * Optional, time to live of artifact should validity should expire
+   *
+   * @generated from field: google.protobuf.Duration ttl = 6;
+   */
+  ttl?: Duration;
+
   constructor(data?: PartialMessage<UpdateArtifactRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -678,6 +685,7 @@ export class UpdateArtifactRequest extends Message<UpdateArtifactRequest> {
     { no: 3, name: "tag_name", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "query_handle" },
     { no: 4, name: "data", kind: "message", T: ArtifactData, repeated: true },
     { no: 5, name: "metadata", kind: "message", T: Metadata },
+    { no: 6, name: "ttl", kind: "message", T: Duration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateArtifactRequest {
@@ -1275,7 +1283,7 @@ export class Artifact extends Message<Artifact> {
   createdAt?: Timestamp;
 
   /**
-   * Optional, time to live if artifact should validity should expire
+   * Optional, time to live of artifact should validity should expire
    *
    * @generated from field: google.protobuf.Duration ttl = 8;
    */
