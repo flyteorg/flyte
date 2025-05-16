@@ -8,7 +8,6 @@ import (
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -189,13 +188,13 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 }
 
 func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
-	workers int32, launcher int32, slots int32, conditionType mpiOp.JobConditionType) *kubeflowv1.MPIJob {
-	var jobConditions []mpiOp.JobCondition
+	workers int32, launcher int32, slots int32, conditionType kubeflowv1.JobConditionType) *kubeflowv1.MPIJob {
+	var jobConditions []kubeflowv1.JobCondition
 
 	now := time.Now()
 
-	jobCreated := mpiOp.JobCondition{
-		Type:    mpiOp.JobCreated,
+	jobCreated := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobCreated,
 		Status:  corev1.ConditionTrue,
 		Reason:  "MPICreated",
 		Message: "MPIJob the-job is created.",
@@ -206,8 +205,8 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 			Time: now,
 		},
 	}
-	jobRunningActive := mpiOp.JobCondition{
-		Type:    mpiOp.JobRunning,
+	jobRunningActive := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobRunning,
 		Status:  corev1.ConditionTrue,
 		Reason:  "MPIJobRunning",
 		Message: "MPIJob the-job is running.",
@@ -220,8 +219,8 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 	}
 	jobRunningInactive := *jobRunningActive.DeepCopy()
 	jobRunningInactive.Status = corev1.ConditionFalse
-	jobSucceeded := mpiOp.JobCondition{
-		Type:    mpiOp.JobSucceeded,
+	jobSucceeded := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobSucceeded,
 		Status:  corev1.ConditionTrue,
 		Reason:  "MPIJobSucceeded",
 		Message: "MPIJob the-job is successfully completed.",
@@ -232,8 +231,8 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 			Time: now.Add(2 * time.Minute),
 		},
 	}
-	jobFailed := mpiOp.JobCondition{
-		Type:    mpiOp.JobFailed,
+	jobFailed := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobFailed,
 		Status:  corev1.ConditionTrue,
 		Reason:  "MPIJobFailed",
 		Message: "MPIJob the-job is failed.",
@@ -244,8 +243,8 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 			Time: now.Add(2 * time.Minute),
 		},
 	}
-	jobRestarting := mpiOp.JobCondition{
-		Type:    mpiOp.JobRestarting,
+	jobRestarting := kubeflowv1.JobCondition{
+		Type:    kubeflowv1.JobRestarting,
 		Status:  corev1.ConditionTrue,
 		Reason:  "MPIJobRestarting",
 		Message: "MPIJob the-job is restarting because some replica(s) failed.",
@@ -258,29 +257,29 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 	}
 
 	switch conditionType {
-	case mpiOp.JobCreated:
-		jobConditions = []mpiOp.JobCondition{
+	case kubeflowv1.JobCreated:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 		}
-	case mpiOp.JobRunning:
-		jobConditions = []mpiOp.JobCondition{
+	case kubeflowv1.JobRunning:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningActive,
 		}
-	case mpiOp.JobSucceeded:
-		jobConditions = []mpiOp.JobCondition{
+	case kubeflowv1.JobSucceeded:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobSucceeded,
 		}
-	case mpiOp.JobFailed:
-		jobConditions = []mpiOp.JobCondition{
+	case kubeflowv1.JobFailed:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobFailed,
 		}
-	case mpiOp.JobRestarting:
-		jobConditions = []mpiOp.JobCondition{
+	case kubeflowv1.JobRestarting:
+		jobConditions = []kubeflowv1.JobCondition{
 			jobCreated,
 			jobRunningInactive,
 			jobFailed,
@@ -301,7 +300,7 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 			Namespace: jobNamespace,
 		},
 		Spec: resource.(*kubeflowv1.MPIJob).Spec,
-		Status: mpiOp.JobStatus{
+		Status: kubeflowv1.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
 			StartTime:         &v1.Time{Time: time.Now()},
@@ -512,40 +511,59 @@ func TestGetTaskPhase(t *testing.T) {
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyMPIJobResourceCreator := func(conditionType mpiOp.JobConditionType) *kubeflowv1.MPIJob {
+	dummyMPIJobResourceCreator := func(conditionType kubeflowv1.JobConditionType) *kubeflowv1.MPIJob {
 		return dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, conditionType)
 	}
 
 	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, k8s.PluginState{})
-	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobCreated))
+	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(kubeflowv1.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobRunning))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(kubeflowv1.JobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobSucceeded))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(kubeflowv1.JobSucceeded))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobFailed))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(kubeflowv1.JobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobRestarting))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(kubeflowv1.JobRestarting))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	// Training operator did not modify the job even though it is not suspended
+	mpiJob := dummyMPIJobResourceCreator(kubeflowv1.JobCreated)
+	mpiJob.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	mpiJob.Status.StartTime = nil
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, mpiJob)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "kubeflow operator hasn't updated")
+	assert.Equal(t, pluginsCore.PhaseInfoUndefined, taskPhase)
+
+	// Training operator did not modify the job because it is suspended
+	mpiJobSuspended := dummyMPIJobResourceCreator(kubeflowv1.JobCreated)
+	mpiJobSuspended.CreationTimestamp = v1.Time{Time: time.Now().Add(-time.Hour)}
+	mpiJobSuspended.Status.StartTime = nil
+	suspend := true
+	mpiJobSuspended.Spec.RunPolicy.Suspend = &suspend
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, mpiJobSuspended)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 }
 
 func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
@@ -559,7 +577,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, pluginState)
 
-	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, mpiOp.JobCreated))
+	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, kubeflowv1.JobCreated))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -576,7 +594,7 @@ func TestGetLogs(t *testing.T) {
 	slots := int32(1)
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
-	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
+	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, kubeflowv1.JobRunning)
 	taskTemplate := dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots))
 	taskCtx := dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
 	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
@@ -598,12 +616,12 @@ func TestReplicaCounts(t *testing.T) {
 		launcherReplicaCount int32
 		workerReplicaCount   int32
 		expectError          bool
-		contains             []mpiOp.ReplicaType
-		notContains          []mpiOp.ReplicaType
+		contains             []kubeflowv1.ReplicaType
+		notContains          []kubeflowv1.ReplicaType
 	}{
 		{"NoWorkers", 1, 0, true, nil, nil},
-		{"Minimum One Launcher", 0, 1, false, []mpiOp.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []mpiOp.ReplicaType{}},
-		{"Works", 1, 1, false, []mpiOp.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []mpiOp.ReplicaType{}},
+		{"Minimum One Launcher", 0, 1, false, []kubeflowv1.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []kubeflowv1.ReplicaType{}},
+		{"Works", 1, 1, false, []kubeflowv1.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []kubeflowv1.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			mpiResourceHandler := mpiOperatorResourceHandler{}

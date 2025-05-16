@@ -1699,50 +1699,27 @@ func TestDemystifyFailure(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
-	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
-		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-			Message: "Pod Node is in progress of shutting down, not admitting any new pods",
-			Reason:  "Shutdown",
-			ContainerStatuses: []v1.ContainerStatus{
-				{
-					LastTerminationState: v1.ContainerState{
-						Terminated: &v1.ContainerStateTerminated{
-							Reason:   containerReason,
-							ExitCode: SIGKILL,
-						},
-					},
-				},
-			},
-		}, pluginsCore.TaskInfo{}, "")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
-	})
-
-	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
-		containerReason := "some reason"
-		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
-			Message: "Foobar",
-			Reason:  "Terminated",
-			ContainerStatuses: []v1.ContainerStatus{
-				{
-					LastTerminationState: v1.ContainerState{
-						Terminated: &v1.ContainerStateTerminated{
-							Reason:   containerReason,
-							ExitCode: SIGKILL,
-						},
-					},
-				},
-			},
-		}, pluginsCore.TaskInfo{}, "")
-		assert.Nil(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
-		assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
-		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
-		assert.Contains(t, phaseInfo.Err().GetMessage(), containerReason)
+	t.Run("GKE node preemption", func(t *testing.T) {
+		for _, reason := range []string{
+			"Terminated",
+			"Shutdown",
+			"NodeShutdown",
+		} {
+			t.Run(reason, func(t *testing.T) {
+				message := "Test pod status message"
+				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+					Message: message,
+					Reason:  reason,
+					// Can't always rely on GCP returining container statuses when node is preempted
+					ContainerStatuses: []v1.ContainerStatus{},
+				}, pluginsCore.TaskInfo{}, "")
+				assert.Nil(t, err)
+				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+				assert.Equal(t, message, phaseInfo.Err().GetMessage())
+			})
+		}
 	})
 }
 

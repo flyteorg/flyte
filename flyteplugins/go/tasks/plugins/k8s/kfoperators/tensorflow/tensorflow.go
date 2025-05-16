@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -52,8 +51,8 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
-	replicaSpecMap := make(map[commonOp.ReplicaType]*commonOp.ReplicaSpec)
-	runPolicy := commonOp.RunPolicy{}
+	replicaSpecMap := make(map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec)
+	runPolicy := kubeflowv1.RunPolicy{}
 
 	if taskTemplate.GetTaskTypeVersion() == 0 {
 		tensorflowTaskExtraArgs := plugins.DistributedTensorflowTrainingTask{}
@@ -68,7 +67,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
 		}
 
-		replicaNumMap := map[commonOp.ReplicaType]int32{
+		replicaNumMap := map[kubeflowv1.ReplicaType]int32{
 			kubeflowv1.TFJobReplicaTypeChief:  tensorflowTaskExtraArgs.GetChiefReplicas(),
 			kubeflowv1.TFJobReplicaTypeWorker: tensorflowTaskExtraArgs.GetWorkers(),
 			kubeflowv1.TFJobReplicaTypePS:     tensorflowTaskExtraArgs.GetPsReplicas(),
@@ -91,7 +90,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		replicaSpecCfgMap := map[commonOp.ReplicaType]*kfplugins.DistributedTensorflowTrainingReplicaSpec{
+		replicaSpecCfgMap := map[kubeflowv1.ReplicaType]*kfplugins.DistributedTensorflowTrainingReplicaSpec{
 			kubeflowv1.TFJobReplicaTypeChief:  kfTensorflowTaskExtraArgs.GetChiefReplicas(),
 			kubeflowv1.TFJobReplicaTypeWorker: kfTensorflowTaskExtraArgs.GetWorkerReplicas(),
 			kubeflowv1.TFJobReplicaTypePS:     kfTensorflowTaskExtraArgs.GetPsReplicas(),
@@ -173,7 +172,8 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
+	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the tensorflow custom resource since creation time %v", app.CreationTimestamp)
 	}
 

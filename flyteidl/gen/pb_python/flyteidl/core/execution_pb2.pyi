@@ -1,9 +1,10 @@
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -130,6 +131,43 @@ class TaskLog(_message.Message):
     ShowWhilePending: bool
     HideOnceFinished: bool
     def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ..., HideOnceFinished: bool = ...) -> None: ...
+
+class LogContext(_message.Message):
+    __slots__ = ["pods", "primary_pod_name"]
+    PODS_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_POD_NAME_FIELD_NUMBER: _ClassVar[int]
+    pods: _containers.RepeatedCompositeFieldContainer[PodLogContext]
+    primary_pod_name: str
+    def __init__(self, pods: _Optional[_Iterable[_Union[PodLogContext, _Mapping]]] = ..., primary_pod_name: _Optional[str] = ...) -> None: ...
+
+class PodLogContext(_message.Message):
+    __slots__ = ["namespace", "pod_name", "containers", "primary_container_name", "init_containers"]
+    NAMESPACE_FIELD_NUMBER: _ClassVar[int]
+    POD_NAME_FIELD_NUMBER: _ClassVar[int]
+    CONTAINERS_FIELD_NUMBER: _ClassVar[int]
+    PRIMARY_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
+    INIT_CONTAINERS_FIELD_NUMBER: _ClassVar[int]
+    namespace: str
+    pod_name: str
+    containers: _containers.RepeatedCompositeFieldContainer[ContainerContext]
+    primary_container_name: str
+    init_containers: _containers.RepeatedCompositeFieldContainer[ContainerContext]
+    def __init__(self, namespace: _Optional[str] = ..., pod_name: _Optional[str] = ..., containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ..., primary_container_name: _Optional[str] = ..., init_containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ...) -> None: ...
+
+class ContainerContext(_message.Message):
+    __slots__ = ["container_name", "process"]
+    class ProcessContext(_message.Message):
+        __slots__ = ["container_start_time", "container_end_time"]
+        CONTAINER_START_TIME_FIELD_NUMBER: _ClassVar[int]
+        CONTAINER_END_TIME_FIELD_NUMBER: _ClassVar[int]
+        container_start_time: _timestamp_pb2.Timestamp
+        container_end_time: _timestamp_pb2.Timestamp
+        def __init__(self, container_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., container_end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
+    PROCESS_FIELD_NUMBER: _ClassVar[int]
+    container_name: str
+    process: ContainerContext.ProcessContext
+    def __init__(self, container_name: _Optional[str] = ..., process: _Optional[_Union[ContainerContext.ProcessContext, _Mapping]] = ...) -> None: ...
 
 class QualityOfServiceSpec(_message.Message):
     __slots__ = ["queueing_budget"]

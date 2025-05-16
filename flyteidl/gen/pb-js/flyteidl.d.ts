@@ -5960,6 +5960,259 @@ export namespace flyteidl {
             }
         }
 
+        /** Properties of a LogContext. */
+        interface ILogContext {
+
+            /** LogContext pods */
+            pods?: (flyteidl.core.IPodLogContext[]|null);
+
+            /** LogContext primaryPodName */
+            primaryPodName?: (string|null);
+        }
+
+        /** Represents a LogContext. */
+        class LogContext implements ILogContext {
+
+            /**
+             * Constructs a new LogContext.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ILogContext);
+
+            /** LogContext pods. */
+            public pods: flyteidl.core.IPodLogContext[];
+
+            /** LogContext primaryPodName. */
+            public primaryPodName: string;
+
+            /**
+             * Creates a new LogContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LogContext instance
+             */
+            public static create(properties?: flyteidl.core.ILogContext): flyteidl.core.LogContext;
+
+            /**
+             * Encodes the specified LogContext message. Does not implicitly {@link flyteidl.core.LogContext.verify|verify} messages.
+             * @param message LogContext message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ILogContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LogContext message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LogContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.LogContext;
+
+            /**
+             * Verifies a LogContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a PodLogContext. */
+        interface IPodLogContext {
+
+            /** PodLogContext namespace */
+            namespace?: (string|null);
+
+            /** PodLogContext podName */
+            podName?: (string|null);
+
+            /** PodLogContext containers */
+            containers?: (flyteidl.core.IContainerContext[]|null);
+
+            /** PodLogContext primaryContainerName */
+            primaryContainerName?: (string|null);
+
+            /** PodLogContext initContainers */
+            initContainers?: (flyteidl.core.IContainerContext[]|null);
+        }
+
+        /** Represents a PodLogContext. */
+        class PodLogContext implements IPodLogContext {
+
+            /**
+             * Constructs a new PodLogContext.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IPodLogContext);
+
+            /** PodLogContext namespace. */
+            public namespace: string;
+
+            /** PodLogContext podName. */
+            public podName: string;
+
+            /** PodLogContext containers. */
+            public containers: flyteidl.core.IContainerContext[];
+
+            /** PodLogContext primaryContainerName. */
+            public primaryContainerName: string;
+
+            /** PodLogContext initContainers. */
+            public initContainers: flyteidl.core.IContainerContext[];
+
+            /**
+             * Creates a new PodLogContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PodLogContext instance
+             */
+            public static create(properties?: flyteidl.core.IPodLogContext): flyteidl.core.PodLogContext;
+
+            /**
+             * Encodes the specified PodLogContext message. Does not implicitly {@link flyteidl.core.PodLogContext.verify|verify} messages.
+             * @param message PodLogContext message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IPodLogContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PodLogContext message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PodLogContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.PodLogContext;
+
+            /**
+             * Verifies a PodLogContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ContainerContext. */
+        interface IContainerContext {
+
+            /** ContainerContext containerName */
+            containerName?: (string|null);
+
+            /** ContainerContext process */
+            process?: (flyteidl.core.ContainerContext.IProcessContext|null);
+        }
+
+        /** Represents a ContainerContext. */
+        class ContainerContext implements IContainerContext {
+
+            /**
+             * Constructs a new ContainerContext.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IContainerContext);
+
+            /** ContainerContext containerName. */
+            public containerName: string;
+
+            /** ContainerContext process. */
+            public process?: (flyteidl.core.ContainerContext.IProcessContext|null);
+
+            /**
+             * Creates a new ContainerContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ContainerContext instance
+             */
+            public static create(properties?: flyteidl.core.IContainerContext): flyteidl.core.ContainerContext;
+
+            /**
+             * Encodes the specified ContainerContext message. Does not implicitly {@link flyteidl.core.ContainerContext.verify|verify} messages.
+             * @param message ContainerContext message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IContainerContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ContainerContext message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ContainerContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ContainerContext;
+
+            /**
+             * Verifies a ContainerContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace ContainerContext {
+
+            /** Properties of a ProcessContext. */
+            interface IProcessContext {
+
+                /** ProcessContext containerStartTime */
+                containerStartTime?: (google.protobuf.ITimestamp|null);
+
+                /** ProcessContext containerEndTime */
+                containerEndTime?: (google.protobuf.ITimestamp|null);
+            }
+
+            /** Represents a ProcessContext. */
+            class ProcessContext implements IProcessContext {
+
+                /**
+                 * Constructs a new ProcessContext.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: flyteidl.core.ContainerContext.IProcessContext);
+
+                /** ProcessContext containerStartTime. */
+                public containerStartTime?: (google.protobuf.ITimestamp|null);
+
+                /** ProcessContext containerEndTime. */
+                public containerEndTime?: (google.protobuf.ITimestamp|null);
+
+                /**
+                 * Creates a new ProcessContext instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns ProcessContext instance
+                 */
+                public static create(properties?: flyteidl.core.ContainerContext.IProcessContext): flyteidl.core.ContainerContext.ProcessContext;
+
+                /**
+                 * Encodes the specified ProcessContext message. Does not implicitly {@link flyteidl.core.ContainerContext.ProcessContext.verify|verify} messages.
+                 * @param message ProcessContext message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: flyteidl.core.ContainerContext.IProcessContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a ProcessContext message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns ProcessContext
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ContainerContext.ProcessContext;
+
+                /**
+                 * Verifies a ProcessContext message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+            }
+        }
+
         /** Properties of a QualityOfServiceSpec. */
         interface IQualityOfServiceSpec {
 
@@ -6517,8 +6770,8 @@ export namespace flyteidl {
             /** TaskMetadata generatesDeck */
             generatesDeck?: (google.protobuf.IBoolValue|null);
 
-            /** TaskMetadata mode */
-            mode?: (flyteidl.core.TaskMetadata.ExecutionMode|null);
+            /** TaskMetadata metadata */
+            metadata?: (flyteidl.core.IK8sObjectMetadata|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6569,8 +6822,8 @@ export namespace flyteidl {
             /** TaskMetadata generatesDeck. */
             public generatesDeck?: (google.protobuf.IBoolValue|null);
 
-            /** TaskMetadata mode. */
-            public mode: flyteidl.core.TaskMetadata.ExecutionMode;
+            /** TaskMetadata metadata. */
+            public metadata?: (flyteidl.core.IK8sObjectMetadata|null);
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -9229,6 +9482,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent reportedAt */
             reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** TaskExecutionEvent logContext */
+            logContext?: (flyteidl.core.ILogContext|null);
         }
 
         /** Represents a TaskExecutionEvent. */
@@ -9300,6 +9556,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent reportedAt. */
             public reportedAt?: (google.protobuf.ITimestamp|null);
 
+            /** TaskExecutionEvent logContext. */
+            public logContext?: (flyteidl.core.ILogContext|null);
+
             /** TaskExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
 
@@ -9365,6 +9624,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo logContext */
+            logContext?: (flyteidl.core.ILogContext|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9399,6 +9661,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo logContext. */
+            public logContext?: (flyteidl.core.ILogContext|null);
 
             /** ExternalResourceInfo targetMetadata. */
             public targetMetadata?: "workflowNodeMetadata";
@@ -20517,6 +20782,9 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure reasons */
             reasons?: (flyteidl.admin.IReason[]|null);
+
+            /** TaskExecutionClosure logContext */
+            logContext?: (flyteidl.core.ILogContext|null);
         }
 
         /** Represents a TaskExecutionClosure. */
@@ -20572,6 +20840,9 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure reasons. */
             public reasons: flyteidl.admin.IReason[];
+
+            /** TaskExecutionClosure logContext. */
+            public logContext?: (flyteidl.core.ILogContext|null);
 
             /** TaskExecutionClosure outputResult. */
             public outputResult?: ("outputUri"|"error"|"outputData");

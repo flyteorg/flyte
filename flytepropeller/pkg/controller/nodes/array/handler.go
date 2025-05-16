@@ -32,11 +32,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-const (
-	// value is 3 days of seconds which is covered by 18 bits (262144)
-	MAX_DELTA_TIMESTAMP = 259200
-)
-
 var (
 	nilLiteral = &idlcore.Literal{
 		Value: &idlcore.Literal_Scalar{
@@ -277,7 +272,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
 			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
 			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
-			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: MAX_DELTA_TIMESTAMP},
+			{arrayReference: &arrayNodeState.SubNodeDeltaTimestamps, maxValue: int(config.GetConfig().ArrayNode.MaxDeltaTimestamp.Seconds())},
 		} {
 
 			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue)) // #nosec G115
@@ -665,7 +660,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.TaskPhaseVersion++
 		}
 
-		const maxRetries = 3
+		maxRetries := config.GetConfig().ArrayNode.MaxTaskPhaseVersionAttempts
 		retries := 0
 		for retries <= maxRetries {
 			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)

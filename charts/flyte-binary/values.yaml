@@ -167,11 +167,11 @@ configuration:
       # repository CoPilot sidecar image repository
       repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
       # tag CoPilot sidecar image tag
-      tag: v1.15.0  # FLYTECOPILOT_TAG
-  # agentService Flyte Agent configuration
-  agentService:
-    defaultAgent:
-      endpoint: "k8s://flyteagent.flyte:8000"
+      tag: v1.15.3  # FLYTECOPILOT_TAG
+  # connectorService Flyte Connector configuration
+  connectorService:
+    defaultConnector:
+      endpoint: "k8s://flyteconnector.flyte:8000"
       insecure: true
       timeouts:
         GetTask: 10s
@@ -402,9 +402,9 @@ serviceAccount:
   # imagePullSecrets Secrets to use for fetching images from private registries
   imagePullSecrets: []
 
-# flyteagent Configure Flyte Agent objects
-flyteagent:
-  # enable Flag to enable bundled Flyte Agent
+# flyteconnector Configure Flyte Connector objects
+flyteconnector:
+  # enable Flag to enable bundled Flyte Connector
   enabled: false
 
 enabled_plugins:
@@ -418,11 +418,11 @@ enabled_plugins:
         - container
         - sidecar
         - k8s-array
-        - agent-service
+        - connector-service
         - echo
       default-for-task-types:
         container: container
         sidecar: sidecar
         container_array: k8s-array
-        # -- Uncomment to enable task type that uses Flyte Agent
-        # bigquery_query_job_task: agent-service
+        # -- Uncomment to enable task type that uses Flyte Connector
+        # bigquery_query_job_task: connector-service

@@ -214,7 +214,7 @@ import torch.nn as nn
 
 @task(
     requests=Resources(cpu="2", mem="16Gi"),
-    container_image="ghcr.io/flyteorg/flytekit:py3.9-latest",
+    image="ghcr.io/flyteorg/flytekit:py3.9-latest",
 )
 def get_data() -> Tuple[np.ndarray, np.ndarray]:
     ...  # get dataset as numpy ndarrays
@@ -222,7 +222,7 @@ def get_data() -> Tuple[np.ndarray, np.ndarray]:
 
 @task(
     requests=Resources(cpu="4", gpu="1", mem="16Gi"),
-    container_image="ghcr.io/flyteorg/flytecookbook:kfpytorch-latest",
+    image="ghcr.io/flyteorg/flytecookbook:kfpytorch-latest",
 )
 def train_model(features: np.ndarray, target: np.ndarray) -> nn.Module:
     ...  # train a model using gpus
@@ -257,7 +257,7 @@ from flytekitplugins.kfpytorch import PyTorch
     task_config=PyTorch(num_workers=2),
     requests=Resources(cpu="2", gpu="1", mem="8Gi"),
     limits=Resources(cpu="4", gpu="2", mem="16Gi"),
-    container_image="ghcr.io/flyteorg/flytecookbook:kfpytorch-latest",
+    image="ghcr.io/flyteorg/flytecookbook:kfpytorch-latest",
 )
 def train_model(features: np.ndarray, target: np.ndarray) -> nn.Module:
     ...  # train a model using gpus

@@ -5,6 +5,12 @@ metadata:
   name: {{ template "flyteadmin.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+  {{- if .Values.flyteadmin.annotations }}
+  annotations:
+    {{- with .Values.flyteadmin.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.flyteadmin.replicaCount }}
   selector:
@@ -193,8 +199,14 @@ spec:
         name: shared-data
       - emptyDir: {}
         name: scratch
-      - configMap:
-          name: flyte-admin-base-config
+      - projected:
+          sources:
+            - configMap:
+                name: flyte-admin-base-config
+            {{- if .Values.storage.secretName }}
+            - secret:
+                name: {{ .Values.storage.secretName }}
+            {{- end }}
         name: base-config-volume
       - projected:
           sources:
@@ -202,6 +214,10 @@ spec:
                 name: flyte-admin-base-config
             - configMap:
                 name: flyte-admin-clusters-config
+            {{- if .Values.storage.secretName }}
+            - secret:
+                name: {{ .Values.storage.secretName }}
+            {{- end }}
         name: clusters-config-volume
       {{- if .Values.cluster_resource_manager.enabled }}
       - configMap:

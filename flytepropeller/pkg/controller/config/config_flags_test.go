@@ -981,6 +981,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_array-node-config.max-delta-timestamp", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.ArrayNode.MaxDeltaTimestamp.String()
+
+			cmdFlags.Set("array-node-config.max-delta-timestamp", testValue)
+			if vString, err := cmdFlags.GetString("array-node-config.max-delta-timestamp"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ArrayNode.MaxDeltaTimestamp)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node-config.max-task-phase-version-attempts", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-config.max-task-phase-version-attempts", testValue)
+			if vInt, err := cmdFlags.GetInt("array-node-config.max-task-phase-version-attempts"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ArrayNode.MaxTaskPhaseVersionAttempts)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_literal-offloading-config.Enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

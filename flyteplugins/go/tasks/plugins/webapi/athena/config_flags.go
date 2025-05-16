@@ -50,9 +50,9 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.readRateLimiter.qps"), defaultConfig.WebAPI.ReadRateLimiter.QPS, "Defines the max rate of calls per second.")
+	cmdFlags.Float64(fmt.Sprintf("%v%v", prefix, "webApi.readRateLimiter.qps"), defaultConfig.WebAPI.ReadRateLimiter.QPS, "Defines the max rate of calls per second.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.readRateLimiter.burst"), defaultConfig.WebAPI.ReadRateLimiter.Burst, "Defines the maximum burst size.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.writeRateLimiter.qps"), defaultConfig.WebAPI.WriteRateLimiter.QPS, "Defines the max rate of calls per second.")
+	cmdFlags.Float64(fmt.Sprintf("%v%v", prefix, "webApi.writeRateLimiter.qps"), defaultConfig.WebAPI.WriteRateLimiter.QPS, "Defines the max rate of calls per second.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.writeRateLimiter.burst"), defaultConfig.WebAPI.WriteRateLimiter.Burst, "Defines the maximum burst size.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webApi.caching.size"), defaultConfig.WebAPI.Caching.Size, "Defines the maximum number of items to cache.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "webApi.caching.resyncInterval"), defaultConfig.WebAPI.Caching.ResyncInterval.String(), "Defines the sync interval.")

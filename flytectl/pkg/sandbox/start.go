@@ -238,6 +238,10 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 		sandboxEnv = append(sandboxEnv, "DISABLE_AGENT=True")
 	}
 
+	if sandboxConfig.DisableConnector {
+		sandboxEnv = append(sandboxEnv, "DISABLE_CONNECTOR=True")
+	}
+
 	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
 		sandboxImage, sandboxEnv, sandboxConfig.DryRun)
 

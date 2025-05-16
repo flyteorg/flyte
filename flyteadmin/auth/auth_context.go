@@ -141,6 +141,12 @@ func NewAuthenticationContext(ctx context.Context, sm core.SecretManager, oauth2
 	// Construct an oidc Provider, which needs its own http Client.
 	oidcCtx := oidc.ClientContext(ctx, httpClient)
 	baseURL := options.UserAuth.OpenID.BaseURL.String()
+	// use a different issuer for token validation if configured
+	// this allows discovery to work when issuer_url from upstream is mismatched
+	// see https://github.com/coreos/go-oidc/pull/315
+	if iss := options.UserAuth.OpenID.IssuerURL.String(); iss != "" {
+		oidcCtx = oidc.InsecureIssuerURLContext(oidcCtx, iss)
+	}
 	provider, err := oidc.NewProvider(oidcCtx, baseURL)
 	if err != nil {
 		return Context{}, errors.Wrapf(ErrauthCtx, err, "Error creating oidc provider w/ issuer [%v]", baseURL)

@@ -16,6 +16,12 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels:
     app: {{ template "flyte-pod-webhook.name" . }}
+  {{- if .Values.webhook.annotations }}
+  annotations:
+    {{- with .Values.webhook.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
@@ -135,6 +141,12 @@ spec:
             secretName: flyte-pod-webhook
       {{- with .Values.webhook.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 ---
 # Service

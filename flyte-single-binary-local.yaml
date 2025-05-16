@@ -43,7 +43,7 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
-      - agent-service
+      - connector-service
       - echo
     default-for-task-types:
       - container: container

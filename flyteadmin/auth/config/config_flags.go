@@ -60,6 +60,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.clientSecretName"), DefaultConfig.UserAuth.OpenID.ClientSecretName, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.clientSecretFile"), DefaultConfig.UserAuth.OpenID.DeprecatedClientSecretFile, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.baseUrl"), DefaultConfig.UserAuth.OpenID.BaseURL.String(), "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.openId.issuerUrl"), DefaultConfig.UserAuth.OpenID.IssuerURL.String(), "OPTIONAL: Use this issuer URL for request validation rather than baseUrl.")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "userAuth.openId.scopes"), DefaultConfig.UserAuth.OpenID.Scopes, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.httpProxyURL"), DefaultConfig.UserAuth.HTTPProxyURL.String(), "OPTIONAL: HTTP Proxy to be used for OAuth requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "userAuth.cookieHashKeySecretName"), DefaultConfig.UserAuth.CookieHashKeySecretName, "OPTIONAL: Secret name to use for cookie hash key.")

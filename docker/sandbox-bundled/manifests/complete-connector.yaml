@@ -47,9 +47,9 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteagent
-    helm.sh/chart: flyteagent-v0.1.10
-  name: flyteagent
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v0.1.10
+  name: flyteconnector
   namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -463,7 +463,7 @@ data:
         - container
         - sidecar
         - k8s-array
-        - agent-service
+        - connector-service
         - echo
     plugins:
       logs:
@@ -473,7 +473,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.0"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.15.3"
       k8s-array:
         logs:
           config:
@@ -481,10 +481,10 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
-      agent-service:
-        defaultAgent:
+      connector-service:
+        defaultConnector:
           defaultTimeout: 10s
-          endpoint: k8s://flyteagent.flyte:8000
+          endpoint: k8s://flyteconnector.flyte:8000
           insecure: true
           timeouts:
             GetTask: 10s
@@ -822,7 +822,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: QmI4MXpvM09oS3llTGdqUA==
+  haSharedSecret: MU5oRkF5V1pWc042eUMwTw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -883,7 +883,7 @@ data:
   username: User
 kind: Secret
 metadata:
-  name: flyteagent
+  name: flyteconnector
   namespace: flyte
 type: Opaque
 ---
@@ -1133,20 +1133,20 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteagent
-    helm.sh/chart: flyteagent-v0.1.10
-  name: flyteagent
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v0.1.10
+  name: flyteconnector
   namespace: flyte
 spec:
   ports:
   - appProtocol: TCP
-    name: agent-grpc
+    name: connector-grpc
     port: 8000
     protocol: TCP
-    targetPort: agent-grpc
+    targetPort: connector-grpc
   selector:
     app.kubernetes.io/instance: flyte-sandbox
-    app.kubernetes.io/name: flyteagent
+    app.kubernetes.io/name: flyteconnector
   type: ClusterIP
 ---
 apiVersion: v1
@@ -1253,7 +1253,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: b533618121828e0b225f6495c59e279a9d937cec325d2bc7de88c41611d2b06e
+        checksum/configuration: 4366c02a08555e2fe71f47f10272c62356827d85922fa735076747346f51d080
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1419,7 +1419,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 4b662157a726a9258a5d99962d949e97a3e107d9fbfee3662d79a1f475493e46
+        checksum/secret: 85e1c09e96d353100c24e440cf19c6803faabbe8ae9772c68be514d63306bf11
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1732,23 +1732,23 @@ metadata:
   labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteagent
-    helm.sh/chart: flyteagent-v0.1.10
-  name: flyteagent
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v0.1.10
+  name: flyteconnector
   namespace: flyte
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/instance: flyte-sandbox
-      app.kubernetes.io/name: flyteagent
+      app.kubernetes.io/name: flyteconnector
   template:
     metadata:
       labels:
         app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: flyteagent
-        helm.sh/chart: flyteagent-v0.1.10
+        app.kubernetes.io/name: flyteconnector
+        helm.sh/chart: flyteconnector-v0.1.10
     spec:
       containers:
       - command:
@@ -1762,12 +1762,12 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.15.0
+        image: cr.flyte.org/flyteorg/flyteagent:1.15.3
         imagePullPolicy: IfNotPresent
-        name: flyteagent
+        name: flyteconnector
         ports:
         - containerPort: 8000
-          name: agent-grpc
+          name: connector-grpc
         readinessProbe:
           grpc:
             port: 8000
@@ -1786,13 +1786,13 @@ spec:
           allowPrivilegeEscalation: false
         volumeMounts:
         - mountPath: /etc/secrets
-          name: flyteagent
+          name: flyteconnector
       securityContext: {}
-      serviceAccountName: flyteagent
+      serviceAccountName: flyteconnector
       volumes:
-      - name: flyteagent
+      - name: flyteconnector
         secret:
-          secretName: flyteagent
+          secretName: flyteconnector
 ---
 apiVersion: apps/v1
 kind: StatefulSet

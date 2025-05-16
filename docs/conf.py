@@ -31,13 +31,13 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = "Flyte"
-copyright = "2024, Flyte authors"
+copyright = "2025, Flyte authors"
 author = "Flyte"
 
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.15.0"
+release = "1.15.3"
 
 # -- General configuration ---------------------------------------------------
 

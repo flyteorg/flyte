@@ -169,6 +169,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_disable-connector", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("disable-connector", testValue)
+			if vBool, err := cmdFlags.GetBool("disable-connector"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.DisableConnector)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_env", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

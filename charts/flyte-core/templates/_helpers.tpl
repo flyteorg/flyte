@@ -197,6 +197,9 @@ storage:
   connection:
     auth-type: {{ .Values.storage.s3.authType }}
     region: {{ .Values.storage.s3.region }}
+    {{- if .Values.storage.s3.endpoint }}
+    endpoint: {{ .Values.storage.s3.endpoint }}
+    {{- end }}
     {{- if eq .Values.storage.s3.authType "accesskey" }}
     access-key: {{ .Values.storage.s3.accessKey }}
     secret-key: {{ .Values.storage.s3.secretKey }}

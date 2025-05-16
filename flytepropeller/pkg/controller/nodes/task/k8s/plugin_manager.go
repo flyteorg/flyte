@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -110,10 +111,13 @@ type PluginManager struct {
 	updateBackoffRetries      int
 }
 
-func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig, taskTemplate *core.TaskTemplate) {
+	taskMetadata := taskTemplate.GetMetadata()
+	k8sMetadata := taskMetadata.GetMetadata()
+
 	o.SetNamespace(taskCtx.GetNamespace())
-	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
-	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
+	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), k8sMetadata.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
+	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), k8sMetadata.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
 	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
 
 	if !e.plugin.GetProperties().DisableInjectOwnerReferences {
@@ -210,7 +214,13 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 		return pluginsCore.UnknownTransition, err
 	}
 
-	e.addObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig())
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read task template. Error: %v", err)
+		return pluginsCore.UnknownTransition, err
+	}
+
+	e.addObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig(), taskTemplate)
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
@@ -265,7 +275,13 @@ func (e *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskEx
 		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
 		return nil, err
 	}
-	e.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read task template. Error: %v", err)
+		return nil, err
+	}
+
+	e.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig(), taskTemplate)
 	return o, nil
 }
 
