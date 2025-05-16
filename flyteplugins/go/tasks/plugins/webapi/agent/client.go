@@ -150,13 +150,11 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 			strings.Join(maps.Keys(agentSupportedTaskCategories), ", "))
 	}
 
-	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
+	// Always replace the registry with the settings defined in the configuration
 	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
 		if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
-			if _, ok := newAgentRegistry[taskType]; !ok {
-				agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
-				newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
-			}
+			agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
+			newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 		}
 	}
 
