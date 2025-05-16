@@ -16214,6 +16214,7 @@
                  * @property {boolean|null} [isEager] TaskMetadata isEager
                  * @property {google.protobuf.IBoolValue|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] TaskMetadata metadata
+                 * @property {flyteidl.core.TaskMetadata.ExecutionMode|null} [mode] TaskMetadata mode
                  */
     
                 /**
@@ -16345,6 +16346,14 @@
                  */
                 TaskMetadata.prototype.metadata = null;
     
+                /**
+                 * TaskMetadata mode.
+                 * @member {flyteidl.core.TaskMetadata.ExecutionMode} mode
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.mode = 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -16413,6 +16422,8 @@
                         $root.google.protobuf.BoolValue.encode(message.generatesDeck, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
                     if (message.metadata != null && message.hasOwnProperty("metadata"))
                         $root.flyteidl.core.K8sObjectMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
+                    if (message.mode != null && message.hasOwnProperty("mode"))
+                        writer.uint32(/* id 17, wireType 0 =*/136).int32(message.mode);
                     return writer;
                 };
     
@@ -16482,6 +16493,9 @@
                             break;
                         case 16:
                             message.metadata = $root.flyteidl.core.K8sObjectMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 17:
+                            message.mode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -16566,6 +16580,14 @@
                         if (error)
                             return "metadata." + error;
                     }
+                    if (message.mode != null && message.hasOwnProperty("mode"))
+                        switch (message.mode) {
+                        default:
+                            return "mode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
     

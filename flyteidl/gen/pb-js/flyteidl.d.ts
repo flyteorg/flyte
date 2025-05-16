@@ -6772,6 +6772,9 @@ export namespace flyteidl {
 
             /** TaskMetadata metadata */
             metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** TaskMetadata mode */
+            mode?: (flyteidl.core.TaskMetadata.ExecutionMode|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6824,6 +6827,9 @@ export namespace flyteidl {
 
             /** TaskMetadata metadata. */
             public metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** TaskMetadata mode. */
+            public mode: flyteidl.core.TaskMetadata.ExecutionMode;
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

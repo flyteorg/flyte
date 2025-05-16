@@ -1431,6 +1431,9 @@ pub struct TaskMetadata {
     /// to the pod template spec of the CR object.
     #[prost(message, optional, tag="16")]
     pub metadata: ::core::option::Option<K8sObjectMetadata>,
+    /// Indicates whether the execution mode is Dynamic or not
+    #[prost(enumeration="task_metadata::ExecutionMode", tag="17")]
+    pub mode: i32,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
