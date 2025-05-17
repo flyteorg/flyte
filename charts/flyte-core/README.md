@@ -75,7 +75,7 @@ helm install gateway bitnami/contour -n flyte
 | cloud_events.kafka.tlsConfig.keyPath | string | `"/etc/ssl/certs/kafka-client.key"` | Path to the client private key |
 | cloud_events.kafka.version | string | `"3.7.0"` | The version of Kafka |
 | cloud_events.type | string | `"aws"` |  |
-| cluster_resource_manager | object | `{"annotations":{},"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"prometheus":{"enabled":false,"path":"/metrics","port":10254},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
+| cluster_resource_manager | object | `{"annotations":{},"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"prometheus":{"enabled":false,"path":"/metrics","port":10254},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"strategy":{},"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
 | cluster_resource_manager.annotations | object | `{}` | Annotations for ClusterResource deployment |
 | cluster_resource_manager.config | object | `{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}}` | Configmap for ClusterResource parameters |
 | cluster_resource_manager.config.cluster_resources | object | `{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}` | ClusterResource parameters Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize. |
@@ -162,6 +162,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
 | datacatalog.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| datacatalog.strategy | object | `{}` |  |
 | datacatalog.tolerations | list | `[]` | tolerations for Datacatalog deployment |
 | db.admin.database.dbname | string | `"flyteadmin"` |  |
 | db.admin.database.host | string | `"postgres"` |  |
@@ -212,6 +213,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
 | flyteadmin.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
 | flyteadmin.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
+| flyteadmin.strategy | object | `{}` |  |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteconnector.enabled | bool | `false` |  |
 | flyteconnector.plugin_config.plugins.connector-service | object | `{"defaultConnector":{"endpoint":"k8s://flyteconnector.flyte:8000","insecure":true},"supportedTaskTypes":[]}` | Agent service configuration for propeller. |
@@ -245,6 +247,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
 | flyteconsole.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
 | flyteconsole.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
+| flyteconsole.strategy | object | `{}` |  |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
 | flytepropeller.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flytepropeller.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
@@ -282,6 +285,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
 | flytepropeller.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
 | flytepropeller.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
+| flytepropeller.strategy | object | `{}` |  |
 | flytepropeller.terminationMessagePolicy | string | `"FallbackToLogsOnError"` | Error reporting |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
 | flytescheduler.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
@@ -306,6 +310,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
 | flytescheduler.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flytescheduler.strategy | object | `{}` |  |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
 | secrets.adminOauthClientCredentials.clientSecret | string | `"foobar"` |  |
@@ -357,6 +362,7 @@ helm install gateway bitnami/contour -n flyte
 | webhook.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to the webhook |
 | webhook.serviceAccount.create | bool | `true` | Should a service account be created for the webhook |
 | webhook.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| webhook.strategy | object | `{}` |  |
 | webhook.topologySpreadConstraints | object | `{}` | TopologySpreadConstraints for webhook deployment |
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |
 | workflow_scheduler | object | `{"config":{},"enabled":false,"type":""}` | **Optional Component** Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without, this module, you will not have scheduled launchplans / workflows. Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows |

@@ -15,6 +15,9 @@ spec:
   replicas: {{ .Values.flyteadmin.replicaCount }}
   selector:
     matchLabels: {{ include "flyteadmin.selectorLabels" . | nindent 6 }}
+  {{- with .Values.flyteadmin.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:

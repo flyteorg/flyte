@@ -26,6 +26,9 @@ spec:
   selector:
     matchLabels:
       app: {{ template "flyte-pod-webhook.name" . }}
+  {{- with .Values.webhook.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       labels:
