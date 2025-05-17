@@ -3,9 +3,10 @@ package array
 import (
 	"context"
 	"fmt"
-	"google.golang.org/protobuf/types/known/durationpb"
 	"math"
 	"strconv"
+
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
