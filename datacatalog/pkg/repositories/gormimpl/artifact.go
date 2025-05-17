@@ -3,7 +3,6 @@ package gormimpl
 import (
 	"context"
 
-
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

@@ -9,15 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/protobuf/types/known/durationpb"
-	"k8s.io/utils/clock"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"k8s.io/utils/clock"
 	testclock "k8s.io/utils/clock/testing"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
