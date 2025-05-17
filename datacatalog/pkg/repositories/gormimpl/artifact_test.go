@@ -195,7 +195,7 @@ func TestGetArtifactNotExpired(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."dataset_project" = $2 AND "artifacts"."dataset_name" = $3 AND "artifacts"."dataset_domain" = $4 AND "artifacts"."dataset_version" = $5 AND "artifacts"."artifact_id" = $6 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)!(string=testProject)(EXTRA time.Time=1970-01-01 01:00:00 +0100 CET)`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."dataset_project" = $2 AND "artifacts"."dataset_name" = $3 AND "artifacts"."dataset_domain" = $4 AND "artifacts"."dataset_version" = $5 AND "artifacts"."artifact_id" = $6 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)!(string=testProject)(EXTRA time.Time=1970-01-01 00:00:00 +0000 UTC)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -239,7 +239,7 @@ func TestGetArtifactByID(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."artifact_id" = $2 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)(EXTRA time.Time=1970-01-01 01:00:00 +0100 CET)`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE (artifacts.expires_at is null or artifacts.expires_at < $1) AND "artifacts"."artifact_id" = $2 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)(EXTRA time.Time=1970-01-01 00:00:00 +0000 UTC)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(

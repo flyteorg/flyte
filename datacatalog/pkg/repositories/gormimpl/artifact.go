@@ -83,7 +83,7 @@ func (h *artifactRepo) GetAndFilterExpired(ctx context.Context, in models.Artifa
 
 	var artifact models.Artifact
 	result := h.db.WithContext(ctx).
-		Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now()).
+		Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now().UTC()).
 		Preload("ArtifactData").
 		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
 			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
@@ -160,7 +160,7 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 		if res := tx.Model(&models.Artifact{
 			ArtifactKey: artifact.ArtifactKey,
 		}).
-			Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now()).
+			Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now().UTC()).
 			Updates(artifact); res.Error != nil {
 			return h.errorTransformer.ToDataCatalogError(res.Error)
 		} else if res.RowsAffected == 0 {
