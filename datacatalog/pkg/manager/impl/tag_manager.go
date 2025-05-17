@@ -55,7 +55,7 @@ func (m *tagManager) AddTag(ctx context.Context, request *datacatalog.AddTagRequ
 	}
 
 	artifactKey := transformers.ToArtifactKey(datasetID, request.GetTag().GetArtifactId())
-	_, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
+	_, err = m.repo.ArtifactRepo().GetAndFilterExpired(ctx, artifactKey)
 	if err != nil {
 		m.systemMetrics.addTagFailureCounter.Inc(ctx)
 		return nil, err
