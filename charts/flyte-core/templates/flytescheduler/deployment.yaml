@@ -16,6 +16,9 @@ spec:
   replicas: 1
   selector:
     matchLabels: {{ include "flytescheduler.selectorLabels" . | nindent 6 }}
+  {{- with .Values.flytescheduler.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:

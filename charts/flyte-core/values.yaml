@@ -43,6 +43,8 @@ flyteadmin:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 50Mi
+  # Strategy for Flyteadmin deployment
+  strategy: {}
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
   # -- Initial projects to create
@@ -163,6 +165,8 @@ flytescheduler:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 50Mi
+  # Strategy for Flytescheduler deployment
+  strategy: {}
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
@@ -231,6 +235,8 @@ datacatalog:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 50Mi
+  # Strategy for Datacatalog deployment
+  strategy: {}
   # -- Default regex string for searching configuration files
   configPath: /etc/datacatalog/config/*.yaml
   # -- Service settings for Datacatalog
@@ -329,6 +335,8 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
+  # Strategy for Flytepropeller deployment
+  strategy: {}
   # -- If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods
   manager_resources:
     resources:
@@ -428,6 +436,8 @@ flyteconsole:
     requests:
       cpu: 10m
       memory: 50Mi
+  # Strategy for Flyteconsole deployment
+  strategy: {}
   # -- Service settings for Flyteconsole
   service:
     appProtocols:
@@ -549,6 +559,9 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+
+  # Strategy for webhook deployment
+  strategy: {}
 
   autoscaling:
     enabled: false
@@ -1050,6 +1063,8 @@ cluster_resource_manager:
   nodeSelector: {}
   # -- Resources for ClusterResource deployment
   resources: {}
+  # Strategy for ClusterResource deployment
+  strategy: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
