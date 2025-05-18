@@ -15,6 +15,9 @@ spec:
   replicas: 1
   selector:
     matchLabels: {{ include "flyteclusterresourcesync.selectorLabels" . | nindent 6 }}
+  {{- with .Values.cluster_resource_manager.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:

@@ -24,6 +24,9 @@ spec:
     {{- else }}
     matchLabels: {{ include "flytepropeller.selectorLabels" . | nindent 6 }}
     {{- end }}
+  {{- with .Values.flytepropeller.strategy }}
+  strategy: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:
