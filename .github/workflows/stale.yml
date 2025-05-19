@@ -22,9 +22,10 @@ jobs:
         days-before-close: 7
         # Config for PRs      
         stale-pr-label: "stale"
-        close-pr-message: "Hello 👋, this PR has been inactive for over 9 months. To help maintain a clean and focused backlog, 
+        close-pr-message: > 
+          "Hello 👋, this PR has been inactive for over 9 months. To help maintain a clean and focused backlog, 
           we'll be marking this PR as stale and will close the PR if we detect no activity in the next 14 days. Thank you for your contribution and understanding! 🙏"
-        exempt-pr-labels: 'awaiting-approval,work-in-progress'
+        exempt-pr-labels: 'review-needed,work-in-progress'
         enable-statistics: "true"
         days-before-pr-stale: 270
         days-before-pr-close: 14
