@@ -359,7 +359,7 @@ type NodeStatus struct {
 	LastAttemptStartedAt *metav1.Time  `json:"laStartedAt,omitempty"`
 	Message              string        `json:"message,omitempty"`
 	DataDir              DataReference `json:"-"`
-	OutputDir            DataReference `json:"-"`
+	OutputDir            DataReference `json:"outputDir,omitempty"`
 	Attempts             uint32        `json:"attempts,omitempty"`
 	SystemFailures       uint32        `json:"systemFailures,omitempty"`
 	Cached               bool          `json:"cached,omitempty"`
