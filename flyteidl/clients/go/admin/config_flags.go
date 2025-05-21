@@ -64,7 +64,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clientId"), defaultConfig.ClientID, "Client ID")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clientSecretLocation"), defaultConfig.ClientSecretLocation, "File containing the client secret")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "clientSecretEnvVar"), defaultConfig.ClientSecretEnvVar, "Environment variable containing the client secret")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "scopes"), defaultConfig.Scopes, "List of scopes to request")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "scopes"), defaultConfig.Scopes, "ListAndFilterExpired of scopes to request")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "useAudienceFromAdmin"), defaultConfig.UseAudienceFromAdmin, "Use Audience configured from admins public endpoint config.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "audience"), defaultConfig.Audience, "Audience to use when initiating OAuth2 authorization requests.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authorizationServerUrl"), defaultConfig.DeprecatedAuthorizationServerURL, "This is the URL to your IdP's authorization server. It'll default to Endpoint")

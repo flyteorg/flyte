@@ -29,6 +29,7 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 		Identifier:           *taskTemplate.Id, //nolint:protogetter
 		CacheVersion:         taskTemplate.GetMetadata().GetDiscoveryVersion(),
 		CacheIgnoreInputVars: taskTemplate.GetMetadata().GetCacheIgnoreInputVars(),
+		CacheTtl:             taskTemplate.GetMetadata().GetCacheTtl(),
 		TypedInterface:       *taskTemplate.GetInterface(),
 		InputReader:          nCtx.InputReader(),
 	}, nil
