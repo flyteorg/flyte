@@ -539,6 +539,8 @@ export class TaskMetadata extends Message<TaskMetadata> {
   metadata?: K8sObjectMetadata;
 
   /**
+   * Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled.
+   *
    * @generated from field: google.protobuf.Duration cache_ttl = 17;
    */
   cacheTtl?: Duration;

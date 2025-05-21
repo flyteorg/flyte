@@ -807,7 +807,8 @@ type TaskMetadata struct {
 	// in the K8sPod message. For tasks backed by CRDs, this metadata is applied to
 	// the CR object itself while the metadata in the pod template/K8sPod is applied
 	// to the pod template spec of the CR object.
-	Metadata *K8SObjectMetadata   `protobuf:"bytes,16,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata *K8SObjectMetadata `protobuf:"bytes,16,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled.
 	CacheTtl *durationpb.Duration `protobuf:"bytes,17,opt,name=cache_ttl,json=cacheTtl,proto3" json:"cache_ttl,omitempty"`
 }
 
