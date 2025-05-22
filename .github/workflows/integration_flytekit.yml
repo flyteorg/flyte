@@ -21,9 +21,11 @@ jobs:
 
       - name: Install Flytectl
         run: |
-          ls flytectl/ 
+          mkdir -p flytectl_tmp/
+          cd flytectl_tmp/
           curl -sL https://github.com/flyteorg/flytectl/releases/latest/download/flytectl_Linux_x86_64.tar.gz | tar -xz
           sudo mv flytectl /usr/local/bin/
+          cd ..
 
       - name: Build PR-based Flyte Sandbox Image
         run: |
