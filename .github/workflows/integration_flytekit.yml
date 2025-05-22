@@ -21,7 +21,8 @@ jobs:
 
       - name: Install Flytectl
         run: |
-          sudo mv flytectl /usr/local/bin/
+          chmod +x flytectl 
+          sudo cp flytectl /usr/local/bin/
 
       - name: Build PR-based Flyte Sandbox Image
         run: |
