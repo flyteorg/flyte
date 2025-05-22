@@ -1721,6 +1721,28 @@ func TestDemystifyFailure(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("Kubelet admission denies pod due to missing node label", func(t *testing.T) {
+		for _, reason := range []string{
+			"NodeAffinity",
+		} {
+			t.Run(reason, func(t *testing.T) {
+				message := "Pod was rejected: Predicate NodeAffinity failed: node(s) didn't match Pod's node affinity/selector"
+				phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+					Message: message,
+					Reason:  reason,
+					Phase:   v1.PodFailed,
+					// Can't always rely on GCP returining container statuses when node is preempted
+					ContainerStatuses: []v1.ContainerStatus{},
+				}, pluginsCore.TaskInfo{}, "")
+				assert.Nil(t, err)
+				assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+				assert.Equal(t, "Interrupted", phaseInfo.Err().GetCode())
+				assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+				assert.Equal(t, message, phaseInfo.Err().GetMessage())
+			})
+		}
+	})
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
