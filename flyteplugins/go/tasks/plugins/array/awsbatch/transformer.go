@@ -82,7 +82,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
 
 	// compile resources
-	res, err := flytek8s.ToK8sResourceRequirements(taskTemplate.GetContainer().GetResources())
+	res, err := flytek8s.ToK8sResourceRequirements(taskTemplate.GetContainer().GetResources(), tCtx.TaskExecutionMetadata().GetOnOOMConfig())
 	if err != nil {
 		return nil, err
 	}
