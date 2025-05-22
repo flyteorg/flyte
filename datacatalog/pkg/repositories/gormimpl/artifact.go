@@ -3,13 +3,11 @@ package gormimpl
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -43,38 +41,21 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	err := h.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var existing models.Artifact
-		getResult := tx.
-			Clauses(clause.Locking{Strength: "UPDATE"}).
-			Order("artifacts.created_at DESC"). // Always pick the most recent
-			First(
-				&existing,
-				&models.Artifact{ArtifactKey: artifact.ArtifactKey},
-			)
+	tx := h.db.WithContext(ctx).Begin()
 
-		if getResult.Error == nil {
-			if existing.ExpiresAt != nil && h.clock.Now().Before(*existing.ExpiresAt) {
-				// If the previous artifact is not expired return already exists
-				return catalogErrors.NewDataCatalogErrorf(codes.AlreadyExists, "value already exists")
-			}
-		} else {
-			if getResult.Error.Error() != gorm.ErrRecordNotFound.Error() {
-				return h.errorTransformer.ToDataCatalogError(getResult.Error)
-			}
-			// Not found is desirable
-		}
+	tx = tx.Create(&artifact)
 
-		createResult := tx.Create(&artifact)
+	if tx.Error != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
 
-		if createResult.Error != nil {
-			return h.errorTransformer.ToDataCatalogError(createResult.Error)
-		}
+	tx = tx.Commit()
+	if tx.Error != nil {
+		return h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
 
-		return nil
-	})
-
-	return err
+	return nil
 }
 
 func (h *artifactRepo) GetAndFilterExpired(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {

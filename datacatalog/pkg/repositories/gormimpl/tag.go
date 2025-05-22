@@ -2,7 +2,6 @@ package gormimpl
 
 import (
 	"context"
-
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"

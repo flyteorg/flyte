@@ -223,6 +223,11 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 		artifactModel = tag.Artifact
 	}
 
+	// If the artifact is expired consider this tag expired too
+	if artifactModel.ExpiresAt != nil && artifactModel.ExpiresAt.Before(m.clock.Now()) {
+		return models.Artifact{}, errors.NewDataCatalogErrorf(codes.NotFound, "entry not found")
+	}
+
 	if len(artifactModel.ArtifactData) == 0 {
 		return models.Artifact{}, errors.NewDataCatalogErrorf(codes.Internal, "artifact [%+v] with key %v does not have artifact data associated", artifactModel, key)
 	}

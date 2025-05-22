@@ -11,10 +11,7 @@ type ArtifactKey struct {
 }
 
 type Artifact struct {
-	CreatedAt time.Time `gorm:"primary_key"`
-	UpdatedAt time.Time
-	DeletedAt *time.Time `sql:"index"`
-
+	BaseModel
 	ArtifactKey
 	DatasetUUID        string         `gorm:"type:uuid;index:artifacts_dataset_uuid_idx"`
 	Dataset            Dataset        `gorm:"association_autocreate:false"`

@@ -201,7 +201,9 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 		Tags: []models.Tag{
 			{TagKey: models.TagKey{TagName: "test-tag"}, DatasetUUID: expectedDataset.GetUUID(), ArtifactID: artifact.GetId()},
 		},
-		CreatedAt: getTestTimestamp(),
+		BaseModel: models.BaseModel{
+			CreatedAt: getTestTimestamp(),
+		},
 	}
 }
 
