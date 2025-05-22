@@ -4,7 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestInitializeClients(t *testing.T) {
@@ -25,4 +28,50 @@ func TestInitializeClients(t *testing.T) {
 	assert.True(t, ok)
 	_, ok = cs.asyncAgentClients["x"]
 	assert.True(t, ok)
+}
+
+func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
+	deploymentX := Deployment{Endpoint: "x"}
+	deploymentY := Deployment{Endpoint: "y"}
+	cfg := defaultConfig
+	cfg.AgentDeployments = map[string]*Deployment{
+		"x": &deploymentX,
+		"y": &deploymentY,
+	}
+	cfg.AgentForTaskTypes = map[string]string{
+		"task1": "x", // we expect the "task1" task type should always route to deploymentX
+	}
+	ctx := context.Background()
+	err := SetConfig(&cfg)
+	assert.NoError(t, err)
+	cs := getAgentClientSets(ctx)
+	
+	// let's mock the "ListAgent" behaviour for both deploymentX and deploymentY
+	// they both have SupportedTaskTypes "task1"
+	mockClientForDeploymentX := mocks.NewAgentMetadataServiceClient(t)
+	mockClientForDeploymentY := mocks.NewAgentMetadataServiceClient(t)
+	mockClientForDeploymentX.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name: "agent1",
+				SupportedTaskTypes: []string{"task1",},
+			},
+		},
+	}, nil)
+	mockClientForDeploymentY.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name: "agent2",
+				SupportedTaskTypes: []string{"task1",},
+			},
+		},
+	}, nil)
+	cs.agentMetadataClients[deploymentX.Endpoint] = mockClientForDeploymentX
+	cs.agentMetadataClients[deploymentY.Endpoint] = mockClientForDeploymentY
+	// while auto-discovery execute in getAgentRegistry function, the deployment of task1 will be amended to deploymentY
+	// but the new always-overwrite policy will overwrite deployment of task1 back to deploymentX according to cfg.AgentForTaskTypes
+	registry := getAgentRegistry(ctx, cs)
+	finalDeployment := registry["task1"][defaultTaskTypeVersion].AgentDeployment
+	expectedDeployment := &deploymentX
+	assert.Equal(t, finalDeployment, expectedDeployment)
 }
