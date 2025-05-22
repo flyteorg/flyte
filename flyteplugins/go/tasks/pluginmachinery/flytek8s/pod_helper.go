@@ -38,9 +38,15 @@ const primaryContainerTemplateName = "primary"
 const primaryInitContainerTemplateName = "primary-init"
 const PrimaryContainerKey = "primary_container_name"
 
-// nodePreemptionStatusReasons are the status reasons that a pod's respective node
-// is preempted by the scheduler
-var nodePreemptionStatusReasons = sets.NewString("Shutdown", "Terminated", "NodeShutdown")
+var retryableStatusReasons = sets.NewString(
+	// Reasons that indicate the node was preempted aggressively.
+	// Kubelet can miss deleting the pod prior to the node being shutdown.
+	"Shutdown",
+	"Terminated",
+	"NodeShutdown",
+	// kubelet admission rejects the pod before the node gets assigned appropriate labels.
+	"NodeAffinity",
+)
 
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
 // objects to an existing v1.Affinity object. If there are no existing required
@@ -1207,7 +1213,7 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 
 	var isSystemError bool
 	// In some versions of GKE the reason can also be "Terminated" or "NodeShutdown"
-	if nodePreemptionStatusReasons.Has(code) {
+	if retryableStatusReasons.Has(code) {
 		isSystemError = true
 	}
 
