@@ -19,6 +19,11 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
+      - name: Install Flytectl
+        run: |
+          curl -sL https://github.com/flyteorg/flytectl/releases/latest/download/flytectl_Linux_x86_64.tar.gz | tar -xz
+          sudo mv flytectl /usr/local/bin/
+
       - name: Build PR-based Flyte Sandbox Image
         run: |
           docker build -t pr-sandbox:${{ github.sha }} .
