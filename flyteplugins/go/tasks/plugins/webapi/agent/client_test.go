@@ -34,10 +34,12 @@ func TestInitializeClients(t *testing.T) {
 func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
 	deploymentX := Deployment{Endpoint: "x"}
 	deploymentY := Deployment{Endpoint: "y"}
+	deploymentZ := Deployment{Endpoint: "z"}
 	cfg := defaultConfig
 	cfg.AgentDeployments = map[string]*Deployment{
 		"x": &deploymentX,
 		"y": &deploymentY,
+		"z": &deploymentZ,
 	}
 	cfg.AgentForTaskTypes = map[string]string{
 		"task1": "x", // we expect the "task1" task type should always route to deploymentX
@@ -47,10 +49,11 @@ func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
 	assert.NoError(t, err)
 	cs := getAgentClientSets(ctx)
 
-	// let's mock the "ListAgent" behaviour for both deploymentX and deploymentY
+	// let's mock the "ListAgent" behaviour for 3 deployments
 	// they both have SupportedTaskTypes "task1"
 	mockClientForDeploymentX := mocks.NewAgentMetadataServiceClient(t)
 	mockClientForDeploymentY := mocks.NewAgentMetadataServiceClient(t)
+	mockClientForDeploymentZ := mocks.NewAgentMetadataServiceClient(t)
 	mockClientForDeploymentX.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
@@ -67,10 +70,19 @@ func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
 			},
 		},
 	}, nil)
+	mockClientForDeploymentZ.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name:               "agent3",
+				SupportedTaskTypes: []string{"task1"},
+			},
+		},
+	}, nil)
 	cs.agentMetadataClients[deploymentX.Endpoint] = mockClientForDeploymentX
 	cs.agentMetadataClients[deploymentY.Endpoint] = mockClientForDeploymentY
-	// while auto-discovery execute in getAgentRegistry function, the deployment of task1 will be amended to deploymentY
-	// but the new always-overwrite policy will overwrite deployment of task1 back to deploymentX according to cfg.AgentForTaskTypes
+	cs.agentMetadataClients[deploymentZ.Endpoint] = mockClientForDeploymentZ
+	// while auto-discovery execute in getAgentRegistry function, the deployment of task1 will be amended to deploymentZ
+	// but the always-overwrite policy will overwrite deployment of task1 back to deploymentX according to cfg.AgentForTaskTypes
 	registry := getAgentRegistry(ctx, cs)
 	finalDeployment := registry["task1"][defaultTaskTypeVersion].AgentDeployment
 	expectedDeployment := &deploymentX
