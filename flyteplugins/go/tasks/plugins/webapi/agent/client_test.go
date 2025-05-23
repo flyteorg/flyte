@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func TestInitializeClients(t *testing.T) {
@@ -45,7 +46,7 @@ func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 	cs := getAgentClientSets(ctx)
-	
+
 	// let's mock the "ListAgent" behaviour for both deploymentX and deploymentY
 	// they both have SupportedTaskTypes "task1"
 	mockClientForDeploymentX := mocks.NewAgentMetadataServiceClient(t)
@@ -53,16 +54,16 @@ func TestAgentForTaskTypesAlwaysOverwrite(t *testing.T) {
 	mockClientForDeploymentX.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
-				Name: "agent1",
-				SupportedTaskTypes: []string{"task1",},
+				Name:               "agent1",
+				SupportedTaskTypes: []string{"task1"},
 			},
 		},
 	}, nil)
 	mockClientForDeploymentY.On("ListAgents", mock.Anything, mock.Anything).Return(&admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
-				Name: "agent2",
-				SupportedTaskTypes: []string{"task1",},
+				Name:               "agent2",
+				SupportedTaskTypes: []string{"task1"},
 			},
 		},
 	}, nil)
