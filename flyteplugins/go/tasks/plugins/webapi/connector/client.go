@@ -149,7 +149,7 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
 
-	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
+	// Always replace the registry with the settings defined in the configuration
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
 			connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: false}
