@@ -46,4 +46,4 @@ VOLUME /var/lib/flyte/storage
 ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
-CMD [ "server", "--disable=traefik", "--disable=servicelb" ]
+CMD [ "server", "--disable=traefik", "--disable=servicelb", "--egress-selector-mode=disabled", "-kube-apiserver-arg=enable-aggregator-routing=false" ]
