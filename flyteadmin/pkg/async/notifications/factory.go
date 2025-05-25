@@ -49,7 +49,7 @@ type EmailerConfig struct {
 
 // For sandbox only
 
-func CreateMsgChan() {
+func createMsgChan() {
 
 	once.Do(func() {
 
@@ -329,7 +329,7 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 
 	case common.Sandbox:
 
-		CreateMsgChan()
+		createMsgChan()
 
 		return implementations.NewSandboxPublisher(msgChan)
 
