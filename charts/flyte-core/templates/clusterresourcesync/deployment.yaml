@@ -25,7 +25,7 @@ spec:
         {{- with .Values.cluster_resource_manager.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        prometheus.io/path: {{ .Values.cluster_resource_manager.prometheus.path | quote }}
+        prometheus.io/path: "/metrics"
         prometheus.io/port: {{ .Values.cluster_resource_manager.prometheus.port | quote }}
         {{- with .Values.cluster_resource_manager.prometheus.enabled }}
         prometheus.io/scrape: "true"
