@@ -394,6 +394,53 @@ func (_c *TaskExecutionMetadata_GetNamespace_Call) RunAndReturn(run func() strin
 	return _c
 }
 
+// GetOnOOMConfig provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetOnOOMConfig() core.OnOOMConfig {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOnOOMConfig")
+	}
+
+	var r0 core.OnOOMConfig
+	if rf, ok := ret.Get(0).(func() core.OnOOMConfig); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.OnOOMConfig)
+		}
+	}
+
+	return r0
+}
+
+// TaskExecutionMetadata_GetOnOOMConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOnOOMConfig'
+type TaskExecutionMetadata_GetOnOOMConfig_Call struct {
+	*mock.Call
+}
+
+// GetOnOOMConfig is a helper method to define mock.On call
+func (_e *TaskExecutionMetadata_Expecter) GetOnOOMConfig() *TaskExecutionMetadata_GetOnOOMConfig_Call {
+	return &TaskExecutionMetadata_GetOnOOMConfig_Call{Call: _e.mock.On("GetOnOOMConfig")}
+}
+
+func (_c *TaskExecutionMetadata_GetOnOOMConfig_Call) Run(run func()) *TaskExecutionMetadata_GetOnOOMConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetOnOOMConfig_Call) Return(_a0 core.OnOOMConfig) *TaskExecutionMetadata_GetOnOOMConfig_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *TaskExecutionMetadata_GetOnOOMConfig_Call) RunAndReturn(run func() core.OnOOMConfig) *TaskExecutionMetadata_GetOnOOMConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOverrides provides a mock function with given fields:
 func (_m *TaskExecutionMetadata) GetOverrides() core.TaskOverrides {
 	ret := _m.Called()
