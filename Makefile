@@ -140,6 +140,45 @@ go-tidy:
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
 
+.PHONY: lint
+lint:
+	make -C cacheservice lint
+	make -C datacatalog lint
+	make -C fasttask/plugin lint
+	make -C flyteadmin lint
+	make -C flytectl lint
+	make -C flyteidl lint
+	make -C flytepropeller lint
+	make -C flyteplugins lint
+	make -C flytestdlib lint
+	make -C flytecopilot lint
+
+.PHONY: lint-fix
+lint-fix:
+	make -C cacheservice lint-fix
+	make -C datacatalog lint-fix
+	make -C fasttask/plugin lint-fix
+	make -C flyteadmin lint-fix
+	make -C flytectl lint-fix
+	make -C flyteidl lint-fix
+	make -C flytepropeller lint-fix
+	make -C flyteplugins lint-fix
+	make -C flytestdlib lint-fix
+	make -C flytecopilot lint-fix
+
+.PHONY: generate
+generate:
+	make -C cacheservice generate
+	make -C datacatalog generate
+	make -C fasttask/plugin generate
+	make -C flyteadmin generate
+	make -C flytectl generate
+	#	make -C flyteidl generate
+	make -C flytepropeller generate
+	make -C flyteplugins generate
+	make -C flytestdlib generate
+	make -C flytecopilot generate
+
 .PHONY: lint-helm-charts
 lint-helm-charts:
 	# This pressuposes that you have act installed

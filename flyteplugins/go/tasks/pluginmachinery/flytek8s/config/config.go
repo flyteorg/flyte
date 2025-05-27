@@ -246,7 +246,7 @@ type FlyteCoPilotConfig struct {
 	CPU                   string          `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
 	Memory                string          `json:"memory" pflag:",Used to set memory for co-pilot containers"`
 	Storage               string          `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
-	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:",Override for the storage config to use for co-pilot"`
+	StorageConfigOverride *storage.Config `json:"storage-config-override" pflag:"-,Override for the storage config to use for co-pilot"`
 }
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.

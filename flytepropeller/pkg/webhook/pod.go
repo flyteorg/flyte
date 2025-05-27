@@ -41,11 +41,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/rand"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -109,6 +111,8 @@ type PodMutator interface {
 }
 
 func (h httpHandler) Handle(ctx context.Context, request admission.Request) admission.Response {
+	ctx = contextutils.WithRequestID(ctx, rand.String(10))
+
 	// Get the object in the request
 	obj := &corev1.Pod{}
 	err := h.decoder.Decode(request, obj)
@@ -122,6 +126,7 @@ func (h httpHandler) Handle(ctx context.Context, request admission.Request) admi
 	}
 
 	if changed {
+		logger.Infof(ctx, "Mutated Pod [%v/%v]", obj.Namespace, obj.Name)
 		marshalled, err := json.Marshal(newObj)
 		if err != nil {
 			return admission.Errored(http.StatusInternalServerError, err)
@@ -206,6 +211,24 @@ func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme
 			mutatingWebhookName: getMutatingWebhookName(imageBuilderMutator.ID()),
 			path:                getPodMutatePath(imageBuilderMutator.ID()),
 		})
+	}
+
+	managedImagesCfg := GetManagedImagesConfig()
+	if managedImagesCfg.Enabled {
+		logger.Infof(ctx, "Enabling Managed Image Mutator")
+		mutator, err := NewManagedImageMutator(managedImagesCfg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create managed image mutator: %w", err)
+		}
+
+		httpHandlers = append(httpHandlers, httpHandler{
+			decoder:             decoder,
+			mutator:             mutator,
+			mutatingWebhookName: getMutatingWebhookName(mutator.ID()),
+			path:                getPodMutatePath(mutator.ID()),
+		})
+	} else {
+		logger.Infof(ctx, "Managed Image Mutator is disabled")
 	}
 
 	err = verifyHTTPHandlers(ctx, httpHandlers)

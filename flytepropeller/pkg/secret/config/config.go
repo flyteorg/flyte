@@ -248,3 +248,7 @@ type ImagePullSecretsConfig struct {
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
+
+func MustRegisterSubsection(key config.SectionKey, section config.Config) config.Section {
+	return configSection.MustRegisterSection(key, section)
+}
