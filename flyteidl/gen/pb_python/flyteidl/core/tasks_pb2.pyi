@@ -52,11 +52,23 @@ class GPUAccelerator(_message.Message):
     partition_size: str
     def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ...) -> None: ...
 
+class SharedMemory(_message.Message):
+    __slots__ = ["mount_path", "mount_name", "size_limit"]
+    MOUNT_PATH_FIELD_NUMBER: _ClassVar[int]
+    MOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
+    SIZE_LIMIT_FIELD_NUMBER: _ClassVar[int]
+    mount_path: str
+    mount_name: str
+    size_limit: str
+    def __init__(self, mount_path: _Optional[str] = ..., mount_name: _Optional[str] = ..., size_limit: _Optional[str] = ...) -> None: ...
+
 class ExtendedResources(_message.Message):
-    __slots__ = ["gpu_accelerator"]
+    __slots__ = ["gpu_accelerator", "shared_memory"]
     GPU_ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
+    SHARED_MEMORY_FIELD_NUMBER: _ClassVar[int]
     gpu_accelerator: GPUAccelerator
-    def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ...) -> None: ...
+    shared_memory: SharedMemory
+    def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ..., shared_memory: _Optional[_Union[SharedMemory, _Mapping]] = ...) -> None: ...
 
 class RuntimeMetadata(_message.Message):
     __slots__ = ["type", "version", "flavor"]
