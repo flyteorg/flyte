@@ -62,6 +62,8 @@ type executionSystemMetrics struct {
 	AcceptanceDelay            prometheus.Summary
 	PublishEventError          prometheus.Counter
 	TerminateExecutionFailures prometheus.Counter
+	ConcurrencyCheckDuration   labeled.StopWatch
+	ConcurrencyLimitHits       *prometheus.CounterVec
 }
 
 type executionUserMetrics struct {
@@ -1097,6 +1099,16 @@ func (m *ExecutionManager) launchExecution(
 		Namespace:             namespace,
 	}
 
+	// Check ConcurrencyPolicy for LaunchPlan, this is a means to limit the concurrency of a launch plan across versions
+	// NOTE: There's a potential race condition here. Multiple concurrent requests
+	// might pass this check before the database reflects the newly created executions,
+	// potentially leading to more than 'Max' concurrent executions.
+	if launchPlan.Spec.ConcurrencyPolicy != nil {
+		if err := checkLaunchPlanConcurrency(ctx, launchPlan, m.db.ExecutionRepo(), m.systemMetrics); err != nil {
+			return nil, nil, nil, err
+		}
+	}
+
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
@@ -1154,6 +1166,100 @@ func (m *ExecutionManager) createExecutionModel(
 	m.systemMetrics.SpecSizeBytes.Observe(float64(len(executionModel.Spec)))
 	m.systemMetrics.ClosureSizeBytes.Observe(float64(len(executionModel.Closure)))
 	return workflowExecutionIdentifier, nil
+}
+
+func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPlan, executionRepo repositoryInterfaces.ExecutionRepoInterface, metrics executionSystemMetrics) error {
+	lpID := launchPlan.Id
+	lpProject := lpID.Project
+	lpDomain := lpID.Domain
+	lpName := lpID.Name
+	ctxForTimer := contextutils.WithProjectDomain(ctx, lpProject, lpDomain)
+	ctxForTimer = contextutils.WithLaunchPlanID(ctxForTimer, lpName)
+	timer := metrics.ConcurrencyCheckDuration.Start(ctxForTimer)
+	defer timer.Stop()
+
+	logger.Infof(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.Spec.ConcurrencyPolicy)
+
+	// Active phases based on the workflow enum
+	activePhases := []string{
+		core.WorkflowExecution_QUEUED.String(),
+		core.WorkflowExecution_RUNNING.String(),
+		core.WorkflowExecution_SUCCEEDING.String(),
+		core.WorkflowExecution_FAILING.String(),
+		core.WorkflowExecution_ABORTING.String(),
+	}
+
+	projectFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "project", lpProject)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create project filter for concurrency check: %v", err)
+		return err
+	}
+	domainFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "domain", lpDomain)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create domain filter for concurrency check: %v", err)
+		return err
+	}
+
+	lpNameFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, "name", lpName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create launch plan name filter for concurrency check (JOIN): %v", err)
+		return err
+	}
+
+	phaseFilter, err := common.NewRepeatedValueFilter(common.Execution, common.ValueIn, "phase", activePhases)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create phase filter for concurrency check (JOIN): %v", err)
+		return err
+	}
+
+	// Count active executions for this launch plan, including an inner join with launch_plans table.
+	// This query joins 'executions' with 'launch_plans' to filter by launch plan name across all its versions,
+	// and then filters by active execution phases. This benefits from the existing indexes on the join keys (project, domain, name on launch_plans) and the execution phase. In plain SQL this is the expression:
+	/*
+		SELECT
+			COUNT(executions.id)
+		FROM
+			executions
+		INNER JOIN
+			launch_plans ON executions.launch_plan_id = launch_plans.id
+		WHERE
+			executions.project = '${lpProject}'
+			AND executions.domain = '${lpDomain}'
+			AND launch_plans.name = '${lpName}'
+			AND executions.phase IN (
+				'QUEUED',
+				'RUNNING',
+				'SUCCEEDING',
+				'FAILING',
+				'ABORTING'
+			); -- Values from the activePhases slice
+	*/
+
+	count, err := executionRepo.Count(ctx, repositoryInterfaces.CountResourceInput{
+		InlineFilters: []common.InlineFilter{projectFilter, domainFilter, lpNameFilter, phaseFilter},
+		JoinTableEntities: map[common.Entity]bool{
+			common.LaunchPlan: true,
+		},
+	})
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to count active executions using JOIN for launch plan %s.%s.%s: %v", lpProject, lpDomain, lpName, err)
+		// We still proceed to log the count as 0 and potentially hit the concurrency limit if Max is 0.
+	}
+
+	logger.Infof(ctx, "Found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
+
+	// Check against the policy limit
+	if count >= int64(launchPlan.Spec.ConcurrencyPolicy.Max) {
+		logger.Warningf(ctx, "Concurrency limit (%d) reached for launch plan %v (active: %d)", launchPlan.Spec.ConcurrencyPolicy.Max, lpID, count)
+		if launchPlan.Spec.ConcurrencyPolicy.Behavior == admin.ConcurrencyLimitBehavior_SKIP {
+			metrics.ConcurrencyLimitHits.WithLabelValues(lpProject, lpDomain, lpName).Inc()
+			logger.Infof(ctx, "Skipping execution creation for launch plan %v due to concurrency limit", lpID)
+			return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Concurrency limit (%d) reached for launch plan %s. Skipping execution.",
+				launchPlan.Spec.ConcurrencyPolicy.Max, lpName)
+		}
+	}
+	return nil
 }
 
 func (m *ExecutionManager) CreateExecution(
