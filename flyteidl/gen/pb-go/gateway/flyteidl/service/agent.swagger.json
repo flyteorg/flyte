@@ -1937,6 +1937,10 @@
         "metadata": {
           "$ref": "#/definitions/coreK8sObjectMetadata",
           "description": "Metadata applied to task pods or task CR objects.\nIn flytekit, labels and annotations resulting in this metadata field\nare provided via `@task(labels=..., annotations=...)`.\nFor tasks backed by pods like PythonFunctionTask, these take precedence\nover the metadata provided via `@task(pod_template=PodTemplate(labels=...))` which are transported\nin the K8sPod message. For tasks backed by CRDs, this metadata is applied to\nthe CR object itself while the metadata in the pod template/K8sPod is applied\nto the pod template spec of the CR object."
+        },
+        "cache_ttl": {
+          "type": "string",
+          "description": "Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled."
         }
       },
       "title": "Task Metadata"

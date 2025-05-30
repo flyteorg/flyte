@@ -6772,6 +6772,9 @@ export namespace flyteidl {
 
             /** TaskMetadata metadata */
             metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** TaskMetadata cacheTtl */
+            cacheTtl?: (google.protobuf.IDuration|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -6824,6 +6827,9 @@ export namespace flyteidl {
 
             /** TaskMetadata metadata. */
             public metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** TaskMetadata cacheTtl. */
+            public cacheTtl?: (google.protobuf.IDuration|null);
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

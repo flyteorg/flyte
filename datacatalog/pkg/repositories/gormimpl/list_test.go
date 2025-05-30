@@ -21,7 +21,7 @@ func TestApplyFilter(t *testing.T) {
 	validInputApply := false
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata" FROM "artifacts"`).WithCallback(
+		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata","artifacts"."expires_at" FROM "artifacts"`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			// separate the regex matching because the joins reorder on different test runs
 			validInputApply = strings.Contains(s, `JOIN tags tags1 ON artifacts.artifact_id = tags1.artifact_id`) &&

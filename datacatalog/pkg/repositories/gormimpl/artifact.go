@@ -3,10 +3,13 @@ package gormimpl
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -18,13 +21,20 @@ type artifactRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
 	repoMetrics      gormMetrics
+	clock            clock.Clock
 }
 
-func NewArtifactRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.ArtifactRepo {
+func NewArtifactRepo(
+	db *gorm.DB,
+	errorTransformer errors.ErrorTransformer,
+	scope promutils.Scope,
+	clock clock.Clock,
+) interfaces.ArtifactRepo {
 	return &artifactRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
 		repoMetrics:      newGormMetrics(scope),
+		clock:            clock,
 	}
 }
 
@@ -33,34 +43,46 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	tx := h.db.WithContext(ctx).Begin()
+	err := h.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		tx = tx.
+			Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now().UTC()).
+			Order("artifacts.created_at DESC"). // Always pick the most recent
+			Find(
+				&models.Artifact{ArtifactKey: artifact.ArtifactKey},
+			)
 
-	tx = tx.Create(&artifact)
+		if tx.Error != nil {
+			return tx.Error
+		}
 
-	if tx.Error != nil {
-		tx.Rollback()
-		return h.errorTransformer.ToDataCatalogError(tx.Error)
-	}
+		if tx.RowsAffected > 0 {
+			return catalogErrors.NewDataCatalogErrorf(codes.AlreadyExists, "artifact already exists")
+		}
 
-	tx = tx.Commit()
-	if tx.Error != nil {
-		return h.errorTransformer.ToDataCatalogError(tx.Error)
+		tx = tx.Create(&artifact)
+		return tx.Error
+	})
+
+	if err != nil {
+		return h.errorTransformer.ToDataCatalogError(err)
 	}
 
 	return nil
 }
 
-func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
+func (h *artifactRepo) GetAndFilterExpired(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
 	timer := h.repoMetrics.GetDuration.Start(ctx)
 	defer timer.Stop()
 
 	var artifact models.Artifact
-	result := h.db.WithContext(ctx).Preload("ArtifactData").
+	result := h.db.WithContext(ctx).
+		Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now().UTC()).
+		Preload("ArtifactData").
 		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
 			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
 		}).
 		Preload("Tags").
-		Order("artifacts.created_at DESC").
+		Order("artifacts.created_at DESC"). // Always pick the most recent
 		First(
 			&artifact,
 			&models.Artifact{ArtifactKey: in},
@@ -85,7 +107,7 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	return artifact, nil
 }
 
-func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+func (h *artifactRepo) ListAndFilterExpired(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
 	timer := h.repoMetrics.ListDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -126,57 +148,46 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 	timer := h.repoMetrics.UpdateDuration.Start(ctx)
 	defer timer.Stop()
 
-	tx := h.db.WithContext(ctx).Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
+	err := h.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// ensure all artifact fields in DB are up-to-date
+		if res := tx.Model(&models.Artifact{
+			ArtifactKey: artifact.ArtifactKey,
+		}).
+			Where("artifacts.expires_at is null or artifacts.expires_at < ?", h.clock.Now().UTC()).
+			Updates(artifact); res.Error != nil {
+			return h.errorTransformer.ToDataCatalogError(res.Error)
+		} else if res.RowsAffected == 0 {
+			// no rows affected --> artifact not found
+			return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
+				Dataset: &datacatalog.DatasetID{
+					Project: artifact.DatasetProject,
+					Domain:  artifact.DatasetDomain,
+					Name:    artifact.DatasetName,
+					Version: artifact.DatasetVersion,
+				},
+				Id: artifact.ArtifactID,
+			})
 		}
-	}()
 
-	if err := tx.Error; err != nil {
-		return err
-	}
+		artifactDataNames := make([]string, len(artifact.ArtifactData))
+		for i := range artifact.ArtifactData {
+			artifactDataNames[i] = artifact.ArtifactData[i].Name
+			// ensure artifact data is fully associated with correct artifact
+			artifact.ArtifactData[i].ArtifactKey = artifact.ArtifactKey
+		}
 
-	// ensure all artifact fields in DB are up-to-date
-	if res := tx.Model(&models.Artifact{ArtifactKey: artifact.ArtifactKey}).Updates(artifact); res.Error != nil {
-		tx.Rollback()
-		return h.errorTransformer.ToDataCatalogError(res.Error)
-	} else if res.RowsAffected == 0 {
-		// no rows affected --> artifact not found
-		tx.Rollback()
-		return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
-			Dataset: &datacatalog.DatasetID{
-				Project: artifact.DatasetProject,
-				Domain:  artifact.DatasetDomain,
-				Name:    artifact.DatasetName,
-				Version: artifact.DatasetVersion,
-			},
-			Id: artifact.ArtifactID,
-		})
-	}
+		// delete all removed artifact data entries from the DB
+		if err := tx.Where(&models.ArtifactData{ArtifactKey: artifact.ArtifactKey}).Where("name NOT IN ?", artifactDataNames).Delete(&models.ArtifactData{}).Error; err != nil {
+			return h.errorTransformer.ToDataCatalogError(err)
+		}
 
-	artifactDataNames := make([]string, len(artifact.ArtifactData))
-	for i := range artifact.ArtifactData {
-		artifactDataNames[i] = artifact.ArtifactData[i].Name
-		// ensure artifact data is fully associated with correct artifact
-		artifact.ArtifactData[i].ArtifactKey = artifact.ArtifactKey
-	}
+		// upsert artifact data, adding new entries and ignoring conflicts (no actual data changed)
+		if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(artifact.ArtifactData).Error; err != nil {
+			return h.errorTransformer.ToDataCatalogError(err)
+		}
 
-	// delete all removed artifact data entries from the DB
-	if err := tx.Where(&models.ArtifactData{ArtifactKey: artifact.ArtifactKey}).Where("name NOT IN ?", artifactDataNames).Delete(&models.ArtifactData{}).Error; err != nil {
-		tx.Rollback()
-		return h.errorTransformer.ToDataCatalogError(err)
-	}
+		return nil
+	})
 
-	// upsert artifact data, adding new entries and ignoring conflicts (no actual data changed)
-	if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(artifact.ArtifactData).Error; err != nil {
-		tx.Rollback()
-		return h.errorTransformer.ToDataCatalogError(err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return h.errorTransformer.ToDataCatalogError(err)
-	}
-
-	return nil
+	return err
 }
