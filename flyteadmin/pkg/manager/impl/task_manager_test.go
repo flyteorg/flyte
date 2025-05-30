@@ -33,9 +33,11 @@ const nameValue = "baz"
 const limit = 100
 
 func getMockConfigForTaskTest() runtimeInterfaces.Configuration {
+	whitelistConfiguration := &runtimeMocks.WhitelistConfiguration{}
+	whitelistConfiguration.EXPECT().GetTaskTypeWhitelist().Return(map[string][]runtimeInterfaces.WhitelistScope{})
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, runtimeMocks.NewMockTaskResourceConfiguration(
-			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}), runtimeMocks.NewMockWhitelistConfiguration(), nil)
+			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}), whitelistConfiguration, nil)
 	return mockConfig
 }
 
