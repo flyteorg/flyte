@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -389,8 +392,9 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	}
 
 	go func() {
-		err := grpcServer.Serve(lis)
-		logger.Fatalf(ctx, "Failed to create GRPC Server, Err: ", err)
+		if err := grpcServer.Serve(lis); err != nil {
+			logger.Fatalf(ctx, "Failed to create GRPC Server, Err: %v", err)
+		}
 	}()
 
 	logger.Infof(ctx, "Starting HTTP/1 Gateway server on %s", cfg.GetHostAddress())
@@ -425,11 +429,35 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
 	}
 
-	err = server.ListenAndServe()
-	if err != nil {
-		return errors.Wrapf(err, "failed to Start HTTP Server")
+	go func() {
+		err = server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			logger.Fatalf(ctx, "Failed to start HTTP Server: %v", err)
+		}
+	}()
+
+	// Gracefully shut down the servers
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+
+	// force to shut down servers after 10 seconds
+	logger.Infof(ctx, "Shutting down server... timeout: %d seconds", cfg.GracefulShutdownTimeoutSeconds)
+	shutdownTimeout := cfg.GracefulShutdownTimeoutSeconds
+	timer := time.AfterFunc(time.Duration(shutdownTimeout)*time.Second, func() {
+		logger.Infof(ctx, "Server couldn't stop gracefully in time. Doing force stop.")
+		server.Close()
+		grpcServer.Stop()
+	})
+	defer timer.Stop()
+
+	grpcServer.GracefulStop()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Errorf(ctx, "Failed to gracefully shutdown HTTP server: %v", err)
 	}
 
+	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
 }
 
@@ -537,10 +565,26 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeoutSeconds) * time.Second,
 	}
 
-	err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
+	go func() {
+		err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
+		if err != nil && err != http.ErrServerClosed {
+			logger.Errorf(ctx, "Failed to start HTTP/2 Server: %v", err)
+		}
+	}()
 
-	if err != nil {
-		return errors.Wrapf(err, "failed to Start HTTP/2 Server")
+	// Gracefully shutdown the servers
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+
+	// Create a context with timeout for the shutdown process
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Duration(cfg.GracefulShutdownTimeoutSeconds)*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Errorf(ctx, "Failed to shutdown HTTP server: %v", err)
 	}
+
+	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
 }
