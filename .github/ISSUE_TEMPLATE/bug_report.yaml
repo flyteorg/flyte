@@ -4,6 +4,13 @@ title: "[BUG] "
 labels: bug,untriaged
 body:
   - type: textarea
+    id: version
+    validations:
+      required: true
+    attributes:
+      label: "Flyte & Flytekit version"
+      description: "What version of Flyte & Flytekit are you experiencing the bug on?"
+  - type: textarea
     id: steps-to-reproduce
     validations:
       required: true
