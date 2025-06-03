@@ -33,6 +33,16 @@ flyteadmin:
   env: []
   # -- Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap)
   envFrom: []
+  # -- Default readinessProbe and livenessProbe for Flyteadmin deployment
+  readinessProbe: |-
+    exec:
+      command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+    initialDelaySeconds: 15
+  livenessProbe: |-
+    exec:
+      command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+    initialDelaySeconds: 20
+    periodSeconds: 5
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
