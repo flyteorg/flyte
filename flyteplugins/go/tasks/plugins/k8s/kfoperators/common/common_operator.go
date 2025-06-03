@@ -329,6 +329,9 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 
 	// Check if podTemplate contains resources and if yes - we don't apply k8s overrides
 	basePodTemplate, err := flytek8s.GetBasePodTemplate(ctx, taskCtx, flytek8s.DefaultPodTemplateStore)
+	if err != nil {
+		return nil, err
+	}
 	var podTemplateResources *v1.ResourceRequirements
 	if basePodTemplate != nil {
 		resources := flytek8s.ExtractContainerResourcesFromPodTemplate(basePodTemplate, primaryContainerName)
