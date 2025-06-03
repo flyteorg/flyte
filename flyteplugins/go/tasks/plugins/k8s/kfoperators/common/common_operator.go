@@ -327,8 +327,16 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		restartPolicy = rs.GetRestartPolicy()
 	}
 
+	// Check if podTemplate contains resources and if yes - we don't apply k8s overrides
+	basePodTemplate, err := flytek8s.GetBasePodTemplate(ctx, taskCtx, flytek8s.DefaultPodTemplateStore)
+	var podTemplateResources *v1.ResourceRequirements
+	if basePodTemplate != nil {
+		resources := flytek8s.ExtractContainerResourcesFromPodTemplate(basePodTemplate, primaryContainerName)
+		podTemplateResources = &resources
+	}
+
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if resources != nil {
+	if resources != nil && podTemplateResources == nil {
 		resources, err := flytek8s.ToK8sResourceRequirements(resources)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
