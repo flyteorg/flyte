@@ -732,3 +732,182 @@ func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 	assert.Equal(t, container.EnvFrom[0], configMapSource)
 	assert.Equal(t, container.EnvFrom[1], secretSource)
 }
+
+func TestAddFlyteCustomizationsToContainerWithPodTemplate(t *testing.T) {
+	t.Run("merge pod template resources with proper priority", func(t *testing.T) {
+		container := &v1.Container{
+			Command: []string{
+				"{{ .Input }}",
+			},
+			Args: []string{
+				"{{ .OutputPrefix }}",
+			},
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:   resource.MustParse("1"), // Container inline resource (priority 2)
+					"nvidia.com/gpu": resource.MustParse("2"), // Container inline resource (priority 2)
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU:   resource.MustParse("10"),
+					"nvidia.com/gpu": resource.MustParse("2"),
+				},
+			},
+		}
+
+		// Pod template resources (priority 3)
+		podTemplateResources := &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("5"),   // Should NOT override container CPU
+				v1.ResourceMemory: resource.MustParse("8Gi"), // Should be used since not in container
+				"rdma/infiniband": resource.MustParse("4"),   // Should be used since not in container
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("50"),
+				v1.ResourceMemory: resource.MustParse("16Gi"),
+				"rdma/infiniband": resource.MustParse("4"),
+			},
+		}
+
+		// Override resources (priority 1)
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("16Gi"), // Should override pod template memory
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceMemory: resource.MustParse("32Gi"),
+			},
+		}, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("2"),
+				v1.ResourceMemory: resource.MustParse("4Gi"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU:    resource.MustParse("20"),
+				v1.ResourceMemory: resource.MustParse("8Gi"),
+			},
+		}, false, "")
+
+		err := AddFlyteCustomizationsToContainerWithPodTemplate(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container, podTemplateResources)
+		assert.NoError(t, err)
+
+		// Verify resource priority:
+		// 1. Override resources should take precedence but are subject to platform limits
+		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("8Gi")), "Memory request should be capped at platform limit")
+		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("8Gi")), "Memory limit should be capped at platform limit")
+
+		// 2. Container inline resources should be preserved when not overridden
+		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")), "Container CPU request should be preserved")
+		assert.True(t, container.Resources.Requests["nvidia.com/gpu"].Equal(resource.MustParse("2")), "Container GPU request should be preserved")
+
+		// 3. Pod template resources should be used when not present in container or overrides
+		assert.True(t, container.Resources.Requests["rdma/infiniband"].Equal(resource.MustParse("4")), "Pod template RDMA should be used")
+		assert.True(t, container.Resources.Limits["rdma/infiniband"].Equal(resource.MustParse("4")), "Pod template RDMA limit should be used")
+	})
+}
+
+func TestExtractContainerResourcesFromPodTemplate(t *testing.T) {
+	t.Run("extract resources from pod template with exact name match", func(t *testing.T) {
+		podTemplate := &v1.PodTemplate{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "my-container",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("55"),
+									v1.ResourceMemory: resource.MustParse("1837Gi"),
+									"nvidia.com/gpu":  resource.MustParse("120"),
+									"rdma/infiniband": resource.MustParse("63"),
+								},
+								Limits: v1.ResourceList{
+									v1.ResourceCPU:    resource.MustParse("55"),
+									v1.ResourceMemory: resource.MustParse("1837Gi"),
+									"nvidia.com/gpu":  resource.MustParse("120"),
+									"rdma/infiniband": resource.MustParse("63"),
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		resources := ExtractContainerResourcesFromPodTemplate(podTemplate, "my-container")
+
+		assert.True(t, resources.Requests.Cpu().Equal(resource.MustParse("55")))
+		assert.True(t, resources.Requests.Memory().Equal(resource.MustParse("1837Gi")))
+		assert.True(t, resources.Requests["nvidia.com/gpu"].Equal(resource.MustParse("120")))
+		assert.True(t, resources.Requests["rdma/infiniband"].Equal(resource.MustParse("63")))
+	})
+
+	t.Run("extract resources from pod template with primary fallback", func(t *testing.T) {
+		podTemplate := &v1.PodTemplate{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "primary",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU: resource.MustParse("2"),
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		resources := ExtractContainerResourcesFromPodTemplate(podTemplate, "non-existent")
+
+		assert.True(t, resources.Requests.Cpu().Equal(resource.MustParse("2")))
+	})
+
+	t.Run("extract resources from pod template with default fallback", func(t *testing.T) {
+		podTemplate := &v1.PodTemplate{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "default",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceMemory: resource.MustParse("4Gi"),
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		resources := ExtractContainerResourcesFromPodTemplate(podTemplate, "non-existent")
+
+		assert.True(t, resources.Requests.Memory().Equal(resource.MustParse("4Gi")))
+	})
+
+	t.Run("return empty resources when no match found", func(t *testing.T) {
+		podTemplate := &v1.PodTemplate{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "some-other-container",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceCPU: resource.MustParse("1"),
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		resources := ExtractContainerResourcesFromPodTemplate(podTemplate, "non-existent")
+
+		assert.Empty(t, resources.Requests)
+		assert.Empty(t, resources.Limits)
+	})
+}
