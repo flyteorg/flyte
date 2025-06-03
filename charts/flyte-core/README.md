@@ -188,10 +188,12 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
 | flyteadmin.image.tag | string | `"v1.15.3"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
+| flyteadmin.livenessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 20\nperiodSeconds: 5"` |  |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.podLabels | object | `{}` | Labels for Flyteadmin pods |
 | flyteadmin.priorityClassName | string | `""` | Sets priorityClassName for flyteadmin pod(s). |
+| flyteadmin.readinessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 15"` | Default readinessProbe and livenessProbe for Flyteadmin deployment |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
