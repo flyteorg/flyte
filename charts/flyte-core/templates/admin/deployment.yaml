@@ -170,14 +170,13 @@ spec:
         - containerPort: {{ .Values.configmap.adminServer.server.grpc.port }}
         - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         readinessProbe:
-          exec:
-            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
-          initialDelaySeconds: 15
+        {{- with .Values.flyteadmin.readinessProbe -}}
+        {{- . | nindent 10 }}
+        {{- end }}
         livenessProbe:
-          exec:
-            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
-          initialDelaySeconds: 20
-          periodSeconds: 5
+        {{- with .Values.flyteadmin.livenessProbe -}}
+        {{- . | nindent 10 }}
+        {{- end }}
         resources: {{- toYaml .Values.flyteadmin.resources | nindent 10 }}
         securityContext:
           allowPrivilegeEscalation: false
