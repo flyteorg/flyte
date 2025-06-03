@@ -417,6 +417,9 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 	case ResourceCustomizationModeEnsureExistingResourcesInRange:
 		// this use the platformResources defaults to ensure that the container.Resources values are within the
 		// platformResources limits. it will not override any existing container.Resources values.
+
+		// Merge pod template resources for any resources not already set
+		MergeResourcesIfMissing(effectivePodTemplateResources, &container.Resources)
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
 	}
 
