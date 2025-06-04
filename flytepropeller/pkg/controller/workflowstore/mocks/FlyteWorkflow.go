@@ -6,7 +6,6 @@ import (
 	context "context"
 
 	v1alpha1 "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	workflowstore "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -83,9 +82,9 @@ func (_c *FlyteWorkflow_Get_Call) RunAndReturn(run func(context.Context, string,
 	return _c
 }
 
-// Update provides a mock function with given fields: ctx, workflow, priorityClass
-func (_m *FlyteWorkflow) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error) {
-	ret := _m.Called(ctx, workflow, priorityClass)
+// Update provides a mock function with given fields: ctx, workflow
+func (_m *FlyteWorkflow) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+	ret := _m.Called(ctx, workflow)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
@@ -93,19 +92,19 @@ func (_m *FlyteWorkflow) Update(ctx context.Context, workflow *v1alpha1.FlyteWor
 
 	var r0 *v1alpha1.FlyteWorkflow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error)); ok {
-		return rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)); ok {
+		return rf(ctx, workflow)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) *v1alpha1.FlyteWorkflow); ok {
-		r0 = rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) *v1alpha1.FlyteWorkflow); ok {
+		r0 = rf(ctx, workflow)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*v1alpha1.FlyteWorkflow)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) error); ok {
-		r1 = rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(1).(func(context.Context, *v1alpha1.FlyteWorkflow) error); ok {
+		r1 = rf(ctx, workflow)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -121,14 +120,13 @@ type FlyteWorkflow_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - workflow *v1alpha1.FlyteWorkflow
-//   - priorityClass workflowstore.PriorityClass
-func (_e *FlyteWorkflow_Expecter) Update(ctx interface{}, workflow interface{}, priorityClass interface{}) *FlyteWorkflow_Update_Call {
-	return &FlyteWorkflow_Update_Call{Call: _e.mock.On("Update", ctx, workflow, priorityClass)}
+func (_e *FlyteWorkflow_Expecter) Update(ctx interface{}, workflow interface{}) *FlyteWorkflow_Update_Call {
+	return &FlyteWorkflow_Update_Call{Call: _e.mock.On("Update", ctx, workflow)}
 }
 
-func (_c *FlyteWorkflow_Update_Call) Run(run func(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass)) *FlyteWorkflow_Update_Call {
+func (_c *FlyteWorkflow_Update_Call) Run(run func(ctx context.Context, workflow *v1alpha1.FlyteWorkflow)) *FlyteWorkflow_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*v1alpha1.FlyteWorkflow), args[2].(workflowstore.PriorityClass))
+		run(args[0].(context.Context), args[1].(*v1alpha1.FlyteWorkflow))
 	})
 	return _c
 }
@@ -138,14 +136,14 @@ func (_c *FlyteWorkflow_Update_Call) Return(newWF *v1alpha1.FlyteWorkflow, err e
 	return _c
 }
 
-func (_c *FlyteWorkflow_Update_Call) RunAndReturn(run func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error)) *FlyteWorkflow_Update_Call {
+func (_c *FlyteWorkflow_Update_Call) RunAndReturn(run func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)) *FlyteWorkflow_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateStatus provides a mock function with given fields: ctx, workflow, priorityClass
-func (_m *FlyteWorkflow) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error) {
-	ret := _m.Called(ctx, workflow, priorityClass)
+// UpdateStatus provides a mock function with given fields: ctx, workflow
+func (_m *FlyteWorkflow) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+	ret := _m.Called(ctx, workflow)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateStatus")
@@ -153,19 +151,19 @@ func (_m *FlyteWorkflow) UpdateStatus(ctx context.Context, workflow *v1alpha1.Fl
 
 	var r0 *v1alpha1.FlyteWorkflow
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error)); ok {
-		return rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)); ok {
+		return rf(ctx, workflow)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) *v1alpha1.FlyteWorkflow); ok {
-		r0 = rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) *v1alpha1.FlyteWorkflow); ok {
+		r0 = rf(ctx, workflow)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*v1alpha1.FlyteWorkflow)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) error); ok {
-		r1 = rf(ctx, workflow, priorityClass)
+	if rf, ok := ret.Get(1).(func(context.Context, *v1alpha1.FlyteWorkflow) error); ok {
+		r1 = rf(ctx, workflow)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -181,14 +179,13 @@ type FlyteWorkflow_UpdateStatus_Call struct {
 // UpdateStatus is a helper method to define mock.On call
 //   - ctx context.Context
 //   - workflow *v1alpha1.FlyteWorkflow
-//   - priorityClass workflowstore.PriorityClass
-func (_e *FlyteWorkflow_Expecter) UpdateStatus(ctx interface{}, workflow interface{}, priorityClass interface{}) *FlyteWorkflow_UpdateStatus_Call {
-	return &FlyteWorkflow_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, workflow, priorityClass)}
+func (_e *FlyteWorkflow_Expecter) UpdateStatus(ctx interface{}, workflow interface{}) *FlyteWorkflow_UpdateStatus_Call {
+	return &FlyteWorkflow_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, workflow)}
 }
 
-func (_c *FlyteWorkflow_UpdateStatus_Call) Run(run func(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass workflowstore.PriorityClass)) *FlyteWorkflow_UpdateStatus_Call {
+func (_c *FlyteWorkflow_UpdateStatus_Call) Run(run func(ctx context.Context, workflow *v1alpha1.FlyteWorkflow)) *FlyteWorkflow_UpdateStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*v1alpha1.FlyteWorkflow), args[2].(workflowstore.PriorityClass))
+		run(args[0].(context.Context), args[1].(*v1alpha1.FlyteWorkflow))
 	})
 	return _c
 }
@@ -198,7 +195,7 @@ func (_c *FlyteWorkflow_UpdateStatus_Call) Return(newWF *v1alpha1.FlyteWorkflow,
 	return _c
 }
 
-func (_c *FlyteWorkflow_UpdateStatus_Call) RunAndReturn(run func(context.Context, *v1alpha1.FlyteWorkflow, workflowstore.PriorityClass) (*v1alpha1.FlyteWorkflow, error)) *FlyteWorkflow_UpdateStatus_Call {
+func (_c *FlyteWorkflow_UpdateStatus_Call) RunAndReturn(run func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)) *FlyteWorkflow_UpdateStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

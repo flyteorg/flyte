@@ -67,9 +67,8 @@ func (r *resourceVersionCaching) Get(ctx context.Context, namespace, name string
 	return w, nil
 }
 
-func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
-	newWF, err = r.w.UpdateStatus(ctx, workflow, priorityClass)
+func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
+	newWF, err = r.w.UpdateStatus(ctx, workflow)
 	if err != nil {
 		return nil, err
 	}
@@ -91,9 +90,8 @@ func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1a
 	return newWF, nil
 }
 
-func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
-	newWF, err = r.w.Update(ctx, workflow, priorityClass)
+func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
+	newWF, err = r.w.Update(ctx, workflow)
 	if err != nil {
 		return nil, err
 	}

@@ -347,7 +347,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			Code:    "ExecutionNotFound",
 			Message: "Workflow execution not found in flyteadmin.",
 		})
-		if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+		if _, e := p.wfStore.Update(ctx, mutableW); e != nil {
 			logger.Errorf(ctx, "Failed to record an ExecutionNotFound workflow as failed, reason: %s. Retrying...", e)
 			return nil, e
 		}
@@ -367,7 +367,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			Code:    string(eventsErr.EventIncompatibleCusterError),
 			Message: fmt.Sprintf("Workflow execution cluster reassigned: %v", err),
 		})
-		if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+		if _, e := p.wfStore.Update(ctx, mutableW); e != nil {
 			logger.Errorf(ctx, "Failed to record an EventIncompatibleClusterError workflow as failed, reason: %s. Retrying...", e)
 			return nil, e
 		}
@@ -380,7 +380,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 	// allow changes to the Spec of the resource, which is ideal for ensuring
 	// nothing other than resource status has been updated.
 	_, wfStoreUpdateSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Update")
-	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
+	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf)
 	wfStoreUpdateSpan.End()
 	if updateErr != nil {
 		// The update has failed, lets check if this is because the size is too large. If so
@@ -410,7 +410,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 					Message: "Workflow execution state is too large for Flyte to handle.",
 				})
 			}
-			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+			if _, e := p.wfStore.Update(ctx, mutableW); e != nil {
 				logger.Errorf(ctx, "Failed recording a large workflow as failed, reason: %s. Retrying...", e)
 				return nil, e
 			}

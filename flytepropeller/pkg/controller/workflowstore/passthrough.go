@@ -44,8 +44,7 @@ func (p *passthroughWorkflowStore) Get(ctx context.Context, namespace, name stri
 	return w, nil
 }
 
-func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
+func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
 	p.metrics.workflowUpdateCount.Inc()
 	// Something has changed. Lets save
 	logger.Debugf(ctx, "Observed FlyteWorkflow State change. [%v] -> [%v]", workflow.Status.Phase.String(), workflow.Status.Phase.String())
@@ -73,8 +72,7 @@ func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v
 	return newWF, nil
 }
 
-func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
+func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
 	// If the workflow has any managed fields setting the array to one empty ManagedField clears them in the CRD.
 	// FlyteWorkflow CRDs are only managed by a single FlytePropeller instance and therefore the managed fields paradigm
 	// does not add useful functionality. Clearing them reduces CRD size, improving etcd I/O performance.

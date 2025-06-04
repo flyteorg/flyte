@@ -45,8 +45,7 @@ func (i *InmemoryWorkflowStore) Get(ctx context.Context, namespace, name string)
 	return nil, ErrWorkflowNotFound
 }
 
-func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
+func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
 	if w != nil {
 		if w.Name != "" && w.Namespace != "" {
 			if m, ok := i.store[w.Namespace]; ok {
@@ -66,9 +65,8 @@ func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.Fl
 	return nil, kubeerrors.NewBadRequest("Workflow object with Namespace & Name is required")
 }
 
-func (i *InmemoryWorkflowStore) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
-	return i.UpdateStatus(ctx, w, priorityClass)
+func (i *InmemoryWorkflowStore) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
+	return i.UpdateStatus(ctx, w)
 }
 
 // Returns an inmemory store, that will update the resource version for every update automatically. This is a good

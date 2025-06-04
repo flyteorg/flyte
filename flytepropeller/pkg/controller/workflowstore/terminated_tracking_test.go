@@ -36,7 +36,7 @@ func TestTerminatedTrackingStore_Update(t *testing.T) {
 		_, err := mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
 		assert.NoError(t, err)
 
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
@@ -56,7 +56,7 @@ func TestTerminatedTrackingStore_Update(t *testing.T) {
 		_, err := mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
 		assert.NoError(t, err)
 
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
@@ -87,11 +87,11 @@ func TestTerminatedTrackingStore_UpdateStatus(t *testing.T) {
 	_, err = mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
 	assert.NoError(t, err)
 
-	_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+	_, err = wfStore.Update(ctx, wf)
 	assert.NoError(t, err)
 
 	wf.Status.Phase = v1alpha1.WorkflowPhaseAborted
-	_, err = wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
+	_, err = wfStore.UpdateStatus(ctx, wf)
 	assert.NoError(t, err)
 
 	l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {

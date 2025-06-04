@@ -101,7 +101,7 @@ func TestPassthroughWorkflowStore_UpdateStatus(t *testing.T) {
 	const namespace = "test-ns"
 	t.Run("notFound", func(t *testing.T) {
 		wf := dummyWf(namespace, "x")
-		_, err := wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
+		_, err := wfStore.UpdateStatus(ctx, wf)
 		assert.NoError(t, err)
 		updated, err := mockClient.FlyteWorkflows(namespace).Get(ctx, "x", v1.GetOptions{})
 		assert.Error(t, err)
@@ -119,7 +119,7 @@ func TestPassthroughWorkflowStore_UpdateStatus(t *testing.T) {
 		if assert.NoError(t, err) {
 			assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, updated.GetExecutionStatus().GetPhase())
 			wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "", &core.ExecutionError{})
-			_, err := wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
+			_, err := wfStore.UpdateStatus(ctx, wf)
 			assert.NoError(t, err)
 			newVal, err := n.Get(ctx, "x", v1.GetOptions{})
 			assert.NoError(t, err)
