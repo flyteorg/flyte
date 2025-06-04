@@ -141,65 +141,6 @@ func (_c *FlyteWorkflow_Update_Call) RunAndReturn(run func(context.Context, *v1a
 	return _c
 }
 
-// UpdateStatus provides a mock function with given fields: ctx, workflow
-func (_m *FlyteWorkflow) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
-	ret := _m.Called(ctx, workflow)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateStatus")
-	}
-
-	var r0 *v1alpha1.FlyteWorkflow
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)); ok {
-		return rf(ctx, workflow)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *v1alpha1.FlyteWorkflow) *v1alpha1.FlyteWorkflow); ok {
-		r0 = rf(ctx, workflow)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*v1alpha1.FlyteWorkflow)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *v1alpha1.FlyteWorkflow) error); ok {
-		r1 = rf(ctx, workflow)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// FlyteWorkflow_UpdateStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateStatus'
-type FlyteWorkflow_UpdateStatus_Call struct {
-	*mock.Call
-}
-
-// UpdateStatus is a helper method to define mock.On call
-//   - ctx context.Context
-//   - workflow *v1alpha1.FlyteWorkflow
-func (_e *FlyteWorkflow_Expecter) UpdateStatus(ctx interface{}, workflow interface{}) *FlyteWorkflow_UpdateStatus_Call {
-	return &FlyteWorkflow_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, workflow)}
-}
-
-func (_c *FlyteWorkflow_UpdateStatus_Call) Run(run func(ctx context.Context, workflow *v1alpha1.FlyteWorkflow)) *FlyteWorkflow_UpdateStatus_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*v1alpha1.FlyteWorkflow))
-	})
-	return _c
-}
-
-func (_c *FlyteWorkflow_UpdateStatus_Call) Return(newWF *v1alpha1.FlyteWorkflow, err error) *FlyteWorkflow_UpdateStatus_Call {
-	_c.Call.Return(newWF, err)
-	return _c
-}
-
-func (_c *FlyteWorkflow_UpdateStatus_Call) RunAndReturn(run func(context.Context, *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)) *FlyteWorkflow_UpdateStatus_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // NewFlyteWorkflow creates a new instance of FlyteWorkflow. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewFlyteWorkflow(t interface {

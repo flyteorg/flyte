@@ -29,21 +29,6 @@ func (t *terminatedTracking) Get(ctx context.Context, namespace, name string) (*
 	return t.w.Get(ctx, namespace, name)
 }
 
-func (t *terminatedTracking) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
-	newWF, err = t.w.UpdateStatus(ctx, workflow)
-	if err != nil {
-		return nil, err
-	}
-
-	if newWF != nil {
-		if newWF.GetExecutionStatus().IsTerminated() {
-			t.terminatedFilter.Add(ctx, []byte(workflowKey(workflow.Namespace, workflow.Name)))
-		}
-	}
-
-	return newWF, nil
-}
-
 func (t *terminatedTracking) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
 	newWF, err = t.w.Update(ctx, workflow)
 	if err != nil {

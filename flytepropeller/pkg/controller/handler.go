@@ -374,11 +374,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 		return nil, nil
 	}
 
-	// TODO we will need to call updatestatus when it is supported. But to preserve metadata like (label/finalizer) we will need to use update
-
-	// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
-	// allow changes to the Spec of the resource, which is ideal for ensuring
-	// nothing other than resource status has been updated.
+	// update the GetExecutionStatus block of the FlyteWorkflow resource.
 	_, wfStoreUpdateSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Update")
 	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf)
 	wfStoreUpdateSpan.End()
