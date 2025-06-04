@@ -27,4 +27,4 @@ sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${VERSION}  # FLYTECOPILOT_TAG," ./ch
 
 sed -i "s,tag:[^P]*# FLYTEBINARY_TAG,tag: ${VERSION}  # FLYTEBINARY_TAG," ./charts/flyte-binary/values.yaml
 
-sed -i "s,tag:[^P]*# FLYTEAGENT_TAG,tag: ${FLYTEKIT_TAG}  # FLYTEAGENT_TAG," ./charts/flyteagent/values.yaml
+sed -i "s,tag:[^P]*# FLYTEAGENT_TAG,tag: ${FLYTEKIT_TAG}  # FLYTEAGENT_TAG," ./charts/flyteconnector/values.yaml
