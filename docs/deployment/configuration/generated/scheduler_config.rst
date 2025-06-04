@@ -5629,6 +5629,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  max-delta-timestamp: 72h0m0s
   max-task-phase-version-attempts: 3
   use-map-plugin-logs: false
   
@@ -5727,6 +5728,18 @@ Override subNode log links with those configured for the map plugin logs
 .. code-block:: yaml
 
   "false"
+  
+
+max-delta-timestamp (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum delta timestamp between ArrayNode start and an individual subNode start.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  72h0m0s
   
 
 max-task-phase-version-attempts (int)
@@ -6954,6 +6967,7 @@ grpc (`config.GrpcConfig`_)
 .. code-block:: yaml
 
   enableGrpcLatencyMetrics: false
+  maxConcurrentStreams: 0
   maxMessageSizeBytes: 0
   port: 8089
   serverReflection: true
@@ -7164,6 +7178,18 @@ Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometh
 .. code-block:: yaml
 
   "false"
+  
+
+maxConcurrentStreams (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Limit on the number of concurrent streams to each ServerTransport.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 config.KubeClientConfig (kubeClientConfig)
