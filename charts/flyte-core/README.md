@@ -111,8 +111,8 @@ helm install gateway bitnami/contour -n flyte
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |
 | configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config"}` | Configuration for Flyte console UI |
-| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0b1","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
-| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0b1","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
+| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b2","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
+| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b2","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
 | configmap.core | object | `{"manager":{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"},"propeller":{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"},"webhook":{"certDir":"/etc/webhook/certs","serviceName":"flyte-pod-webhook"}}` | Core propeller configuration |
 | configmap.core.manager | object | `{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config). |
 | configmap.core.propeller | object | `{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config). |
@@ -147,7 +147,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v1.16.0b1"` | Docker image tag |
+| datacatalog.image.tag | string | `"v1.16.0-b2"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.podEnv | object | `{}` | Additional Datacatalog container environment variables |
@@ -186,7 +186,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v1.16.0b1"` |  |
+| flyteadmin.image.tag | string | `"v1.16.0-b2"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.livenessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 20\nperiodSeconds: 5"` |  |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
@@ -263,7 +263,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.16.0b1"` |  |
+| flytepropeller.image.tag | string | `"v1.16.0-b2"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.manager_resources | object | `{"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}}` | If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
@@ -298,7 +298,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flytescheduler.image.tag | string | `"v1.16.0b1"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v1.16.0-b2"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.podEnv | object | `{}` | Additional Flytescheduler container environment variables |
