@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       next-version:
-        description: "version name. example v0.1.1"
+        description: "version name. example v0.1.1, v1.16.0-b0"
         required: true
 
 jobs:
