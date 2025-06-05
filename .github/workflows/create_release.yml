@@ -179,7 +179,7 @@ jobs:
           git stash
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6.3.0
         with:
           version: latest
           args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
