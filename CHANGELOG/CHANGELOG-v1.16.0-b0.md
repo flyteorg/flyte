@@ -1,4 +1,4 @@
-# Flyte 1.16.0b0 release notes
+# Flyte 1.16.0-b0 release notes
 
 ## What's Changed
 * [propeller] tasklog bug fix by @Future-Outlier in https://github.com/flyteorg/flyte/pull/6399
