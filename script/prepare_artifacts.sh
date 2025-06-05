@@ -14,6 +14,11 @@ for file in ./deployment/**/flyte_generated.yaml; do
     fi
 done
 
+# Normalize VERSION if it's a beta (e.g., v1.16.0b0 → v1.16.0-beta.0)
+if [[ "$VERSION" =~ b[0-9]+ ]]; then
+  VERSION=$(echo "${VERSION}" | sed -E 's/b([0-9]+)/-beta.\1/')
+fi
+
 grep -rlZ "version:[^P]*# VERSION" ./charts/flyte/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
 sed "s/v0.1.10/${VERSION}/g" ./charts/flyte/README.md  > temp.txt && mv temp.txt ./charts/flyte/README.md
 
