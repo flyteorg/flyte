@@ -28,10 +28,11 @@ func getMockTaskResources() workflowengineInterfaces.TaskResources {
 	}
 }
 
-var mockWhitelistConfigProvider = runtimeMocks.NewMockWhitelistConfiguration()
+var mockWhitelistConfigProvider = runtimeMocks.WhitelistConfiguration{}
 var taskApplicationConfigProvider = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestValidateTask(t *testing.T) {
+	mockWhitelistConfigProvider.EXPECT().GetTaskTypeWhitelist().Return(map[string][]runtimeInterfaces.WhitelistScope{})
 	request := testutils.GetValidTaskRequest()
 	resources := []*core.Resources_ResourceEntry{
 		{
@@ -45,26 +46,26 @@ func TestValidateTask(t *testing.T) {
 	}
 	request.Spec.Template.GetContainer().Resources = &core.Resources{Requests: resources}
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
 
 	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{}}
 	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "invalid TaskSpecification, pod tasks should specify their target as a K8sPod with a defined pod spec")
 
 	resourceList := corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("1.5Gi")}
 	podSpec := &corev1.PodSpec{Containers: []corev1.Container{{Resources: corev1.ResourceRequirements{Requests: resourceList}}}}
 	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{PodSpec: transformStructToStructPB(t, podSpec)}}
 	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "Requested CPU default [1536Mi] is greater than current limit set in the platform configuration [200m]. Please contact Flyte Admins to change these limits or consult the configuration")
 
 	resourceList = corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("200m")}
 	podSpec = &corev1.PodSpec{Containers: []corev1.Container{{Resources: corev1.ResourceRequirements{Requests: resourceList}}}}
 	request.Spec.Template.Target = &core.TaskTemplate_K8SPod{K8SPod: &core.K8SPod{PodSpec: transformStructToStructPB(t, podSpec)}}
 	err = ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.Nil(t, err)
 }
 
@@ -83,14 +84,14 @@ func TestValidateTaskEmptyProject(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Id.Project = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing project")
 }
 
 func TestValidateTaskInvalidProjectAndDomain(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProjectAndErr(errors.New("foo")),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] are registered, err: [foo]")
 }
 
@@ -98,7 +99,7 @@ func TestValidateTaskEmptyDomain(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Id.Domain = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing domain")
 }
 
@@ -106,7 +107,7 @@ func TestValidateTaskEmptyName(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Id.Name = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing name")
 }
 
@@ -114,7 +115,7 @@ func TestValidateTaskEmptyVersion(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Id.Version = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing version")
 }
 
@@ -122,7 +123,7 @@ func TestValidateTaskEmptyType(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Type = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing type")
 }
 
@@ -130,7 +131,7 @@ func TestValidateTaskEmptyMetadata(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Metadata = nil
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing metadata")
 }
 
@@ -138,7 +139,7 @@ func TestValidateTaskEmptyRuntimeVersion(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Metadata.Runtime.Version = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing runtime version")
 }
 
@@ -146,7 +147,7 @@ func TestValidateTaskEmptyTypedInterface(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Interface = nil
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing typed interface")
 }
 
@@ -154,7 +155,7 @@ func TestValidateTaskEmptyContainer(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Target = nil
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.Nil(t, err)
 }
 
@@ -162,13 +163,13 @@ func TestValidateTaskEmptyImage(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.GetContainer().Image = ""
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+		getMockTaskResources(), &mockWhitelistConfigProvider, taskApplicationConfigProvider)
 	assert.EqualError(t, err, "missing image")
 }
 
 func TestValidateTaskTypeWhitelist(t *testing.T) {
-	whitelistConfig := runtimeMocks.NewMockWhitelistConfiguration()
-	whitelistConfig.(*runtimeMocks.MockWhitelistConfiguration).TaskTypeWhitelist = runtimeInterfaces.TaskTypeWhitelist{
+	whitelistConfig := runtimeMocks.NewWhitelistConfiguration(t)
+	whitelistConfig.EXPECT().GetTaskTypeWhitelist().Return(runtimeInterfaces.TaskTypeWhitelist{
 		"every_type": {},
 		"type_a": {
 			{
@@ -184,7 +185,7 @@ func TestValidateTaskTypeWhitelist(t *testing.T) {
 				Project: "proj_c",
 			},
 		},
-	}
+	})
 	err := validateTaskType(&core.Identifier{
 		Project: "proj_a",
 		Domain:  "domain_a",
