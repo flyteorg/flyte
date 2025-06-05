@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	nodeerrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
@@ -338,7 +339,10 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	}
 
 	workflowEnqueuer := func() error {
-		c.enqueueWorkflow(executionContext.GetID())
+		labels := map[string]string{
+			k8s.WorkflowID: executionContext.GetID(),
+		}
+		c.enqueueWorkflow(labels)
 		return nil
 	}
 

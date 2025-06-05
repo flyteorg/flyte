@@ -1,8 +1,6 @@
 package task
 
 import (
-	"k8s.io/apimachinery/pkg/types"
-
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -23,10 +21,14 @@ func (s setupContext) KubeClient() pluginCore.KubeClient {
 }
 
 func (s setupContext) EnqueueOwner() pluginCore.EnqueueOwner {
-	return func(ownerId types.NamespacedName) error {
-		s.SetupContext.EnqueueOwner()(ownerId.String())
+	return func(labels map[string]string) error {
+		s.SetupContext.EnqueueOwner()(labels)
 		return nil
 	}
+}
+
+func (s setupContext) IncludeEnqueueLabels() []string {
+	return s.SetupContext.IncludeEnqueueLabels()
 }
 
 func (t *Handler) newSetupContext(sCtx interfaces.SetupContext) *setupContext {

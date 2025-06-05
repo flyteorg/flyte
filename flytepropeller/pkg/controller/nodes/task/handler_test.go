@@ -260,7 +260,8 @@ func Test_task_Setup(t *testing.T) {
 			mockClientset := k8sfake.NewSimpleClientset()
 			sCtx.On("KubeClient").Return(fakeKubeClient)
 			sCtx.On("OwnerKind").Return("test")
-			sCtx.On("EnqueueOwner").Return(pluginCore.EnqueueOwner(func(name types.NamespacedName) error { return nil }))
+			sCtx.On("EnqueueOwner").Return(pluginCore.EnqueueOwner(func(labels map[string]string) error { return nil }))
+			sCtx.On("IncludeEnqueueLabels").Return([]string{})
 			sCtx.On("MetricsScope").Return(promutils.NewTestScope())
 
 			tk, err := New(context.TODO(), fakeKubeClient, mockClientset, &pluginCatalogMocks.Client{}, eventConfig, testClusterID, promutils.NewTestScope())

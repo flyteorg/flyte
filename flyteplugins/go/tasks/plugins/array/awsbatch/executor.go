@@ -12,6 +12,7 @@ import (
 	batchConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
@@ -151,7 +152,10 @@ func NewExecutor(ctx context.Context, awsClient aws.Client, cfg *batchConfig.Con
 	batchClient := NewBatchClient(awsClient, getRateLimiter, defaultRateLimiter)
 	jobStore, err := NewJobStore(ctx, batchClient, cfg.JobStoreConfig, EventHandler{
 		Updated: func(ctx context.Context, event Event) {
-			err := enqueueOwner(event.NewJob.OwnerReference)
+			labels := map[string]string{
+				k8s.WorkflowID: event.NewJob.OwnerReference.String(),
+			}
+			err := enqueueOwner(labels)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to enqueue owner [%v] of job [%v]. Error: %v", event.NewJob.OwnerReference, event.NewJob.ID)
 			}

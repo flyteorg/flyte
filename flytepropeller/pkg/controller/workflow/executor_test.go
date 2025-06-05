@@ -246,7 +246,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 
 	te := createTaskExecutorErrorInCheck(t)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCacheClient(ctx, nil)
@@ -332,7 +332,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	te := createHappyPathTaskExecutor(t, true)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCacheClient(ctx, nil)
@@ -402,7 +402,7 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 
 	te := createHappyPathTaskExecutor(b, false)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	eventSink := eventMocks.NewMockEventSink()
 	catalogClient, err := catalog.NewCacheClient(ctx, nil)
@@ -480,7 +480,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	te := createFailingTaskExecutor(t)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	recordedRunning := false
 	recordedFailed := false
@@ -585,7 +585,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	te := createHappyPathTaskExecutor(t, true)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	recordedRunning := false
 	recordedSuccess := false
@@ -680,7 +680,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	te := createHappyPathTaskExecutor(t, true)
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
-	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
+	enqueueWorkflow := func(labels map[string]string) {}
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	assert.NoError(t, err)

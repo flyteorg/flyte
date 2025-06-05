@@ -135,7 +135,8 @@ func ExampleNewPluginManager() {
 	mockClientset := k8sfake.NewSimpleClientset()
 	sCtx.On("KubeClient").Return(fakeKubeClient)
 	sCtx.On("OwnerKind").Return("test")
-	sCtx.On("EnqueueOwner").Return(pluginsCore.EnqueueOwner(func(name k8stypes.NamespacedName) error { return nil }))
+	sCtx.On("EnqueueOwner").Return(pluginsCore.EnqueueOwner(func(labels map[string]string) error { return nil }))
+	sCtx.On("IncludeEnqueueLabels").Return([]string{})
 	sCtx.On("MetricsScope").Return(promutils.NewTestScope())
 	ctx := context.TODO()
 
@@ -239,8 +240,9 @@ func getMockTaskExecutionMetadataCustom(
 
 func dummySetupContext(fakeClient client.Client) pluginsCore.SetupContext {
 	setupContext := &pluginsCoreMock.SetupContext{}
-	var enqueueOwnerFunc = pluginsCore.EnqueueOwner(func(ownerId k8stypes.NamespacedName) error { return nil })
+	var enqueueOwnerFunc = pluginsCore.EnqueueOwner(func(labels map[string]string) error { return nil })
 	setupContext.On("EnqueueOwner").Return(enqueueOwnerFunc)
+	setupContext.On("IncludeEnqueueLabels").Return([]string{})
 
 	kubeClient := &pluginsCoreMock.KubeClient{}
 	kubeClient.On("GetClient").Return(fakeClient)

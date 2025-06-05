@@ -353,7 +353,10 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 	for _, itemSyncResponse := range resp {
 		exec := itemSyncResponse.Item.(executionCacheItem)
 		if exec.IsTerminal() {
-			a.enqueueWorkflow(exec.ParentWorkflowID)
+			labels := map[string]string{
+				k8s.WorkflowID: exec.ParentWorkflowID,
+			}
+			a.enqueueWorkflow(labels)
 		}
 	}
 
@@ -429,7 +432,10 @@ func (a *adminLaunchPlanExecutor) watchExecutionStatusUpdates(ctx context.Contex
 			exists := a.cache.Update(execID.String(), exec)
 			if exists {
 				if exec.IsTerminal() {
-					a.enqueueWorkflow(exec.ParentWorkflowID)
+					labels := map[string]string{
+						k8s.WorkflowID: exec.ParentWorkflowID,
+					}
+					a.enqueueWorkflow(labels)
 				}
 			} else {
 				logger.Warnf(ctx, "execution cache item was not found during update")

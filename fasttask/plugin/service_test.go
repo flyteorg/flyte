@@ -116,7 +116,7 @@ func TestCheckStatus(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// create fastTaskService
-			enqueueOwner := func(owner types.NamespacedName) error {
+			enqueueOwner := func(labels map[string]string) error {
 				return nil
 			}
 			scope := promutils.NewTestScope()
@@ -293,7 +293,7 @@ func TestCleanup(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// create fastTaskService
-			enqueueOwner := func(owner types.NamespacedName) error {
+			enqueueOwner := func(labels map[string]string) error {
 				return nil
 			}
 			scope := promutils.NewTestScope()
@@ -487,7 +487,7 @@ func TestOfferOnQueue(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// create fastTaskService
-			enqueueOwner := func(owner types.NamespacedName) error {
+			enqueueOwner := func(labels map[string]string) error {
 				return nil
 			}
 			scope := promutils.NewTestScope()
@@ -566,7 +566,7 @@ func TestOfferOnQueue(t *testing.T) {
 func TestPendingOwnerManagement(t *testing.T) {
 	// create fastTaskService
 	ownerEnqueueCount := 0
-	enqueueOwner := func(owner types.NamespacedName) error {
+	enqueueOwner := func(labels map[string]string) error {
 		ownerEnqueueCount++
 		return nil
 	}
@@ -684,7 +684,7 @@ func TestPendingOwnerManagement(t *testing.T) {
 
 func TestQueueWorkerManagement(t *testing.T) {
 	// create fastTaskService
-	enqueueOwner := func(owner types.NamespacedName) error {
+	enqueueOwner := func(labels map[string]string) error {
 		return nil
 	}
 	scope := promutils.NewTestScope()

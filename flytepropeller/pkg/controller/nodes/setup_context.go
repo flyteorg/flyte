@@ -9,11 +9,15 @@ import (
 )
 
 type setupContext struct {
-	enq   func(string)
+	enq   func(map[string]string)
 	scope promutils.Scope
 }
 
-func (s *setupContext) EnqueueOwner() func(string) {
+func (s *setupContext) IncludeEnqueueLabels() []string {
+	return []string{}
+}
+
+func (s *setupContext) EnqueueOwner() func(map[string]string) {
 	return s.enq
 }
 

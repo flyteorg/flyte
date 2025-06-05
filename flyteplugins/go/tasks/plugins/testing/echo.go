@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -48,7 +49,10 @@ func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext
 		go func() {
 			echoConfig := ConfigSection.GetConfig().(*Config)
 			time.Sleep(echoConfig.SleepDuration.Duration)
-			if err := e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID()); err != nil {
+			labels := map[string]string{
+				k8s.WorkflowID: tCtx.TaskExecutionMetadata().GetOwnerID().String(),
+			}
+			if err := e.enqueueOwner(labels); err != nil {
 				logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
 			}
 		}()

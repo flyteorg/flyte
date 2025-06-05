@@ -34,6 +34,8 @@ const (
 	ParentClusterLabel = "parent-cluster"
 	// Shard id of parent propeller that spawned this child execution
 	ParentShardLabel = "parent-shard"
+	// Name of the workflow getting re-enqueued
+	WorkflowID = "workflow-id"
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {

@@ -159,8 +159,10 @@ func (c *Controller) enqueueFlyteWorkflow(obj interface{}) {
 	c.workQueue.AddRateLimited(key.String())
 }
 
-func (c *Controller) enqueueWorkflowForNodeUpdates(workflowID v1alpha1.WorkflowID) {
+func (c *Controller) enqueueWorkflowForNodeUpdates(labels map[string]string) {
 	ctx := context.TODO()
+
+	workflowID := labels[k8s.WorkflowID]
 
 	// validate workflowID
 	_, _, err := cache.SplitMetaNamespaceKey(workflowID)

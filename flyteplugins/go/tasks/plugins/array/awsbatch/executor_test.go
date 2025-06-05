@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
@@ -146,7 +145,7 @@ func TestExecutor_Start(t *testing.T) {
 	awsClient, err := aws.GetClient()
 	assert.NoError(t, err)
 
-	exec, err := NewExecutor(context.Background(), awsClient, batchConfig.GetConfig(), func(id types.NamespacedName) error {
+	exec, err := NewExecutor(context.Background(), awsClient, batchConfig.GetConfig(), func(labels map[string]string) error {
 		return nil
 	}, promutils.NewTestScope())
 

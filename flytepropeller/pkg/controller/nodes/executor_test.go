@@ -67,7 +67,7 @@ var eventConfig = &config.EventConfig{
 func TestSetInputsForStartNode(t *testing.T) {
 	ctx := context.Background()
 	mockStorage := createInmemoryDataStore(t, testScope.NewSubScope("f"))
-	enQWf := func(workflowID v1alpha1.WorkflowID) {}
+	enQWf := func(labels map[string]string) {}
 
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	hf := &nodemocks.HandlerFactory{}
@@ -136,7 +136,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 
 func TestNodeExecutor_Initialize(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 
 	mockEventSink := eventMocks.NewMockEventSink()
@@ -171,7 +171,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -277,7 +277,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -488,7 +488,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -1015,7 +1015,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -1127,7 +1127,7 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -1245,7 +1245,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 	ctx := context.TODO()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -1901,7 +1901,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 
 func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 	ctx := context.Background()
-	enQWf := func(workflowID v1alpha1.WorkflowID) {
+	enQWf := func(labels map[string]string) {
 	}
 	mockEventSink := eventMocks.NewMockEventSink()
 
@@ -2672,7 +2672,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 
 		// create mocks
 		adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-		enqueueWorkflow := func(workflowID v1alpha1.WorkflowID) {}
+		enqueueWorkflow := func(labels map[string]string) {}
 		eventConfig := &config.EventConfig{
 			RawOutputPolicy: config.RawOutputPolicyReference,
 		}

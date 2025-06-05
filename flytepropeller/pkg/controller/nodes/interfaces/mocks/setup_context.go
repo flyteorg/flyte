@@ -16,7 +16,7 @@ type SetupContext_EnqueueOwner struct {
 	*mock.Call
 }
 
-func (_m SetupContext_EnqueueOwner) Return(_a0 func(string)) *SetupContext_EnqueueOwner {
+func (_m SetupContext_EnqueueOwner) Return(_a0 func(map[string]string)) *SetupContext_EnqueueOwner {
 	return &SetupContext_EnqueueOwner{Call: _m.Call.Return(_a0)}
 }
 
@@ -31,15 +31,49 @@ func (_m *SetupContext) OnEnqueueOwnerMatch(matchers ...interface{}) *SetupConte
 }
 
 // EnqueueOwner provides a mock function with given fields:
-func (_m *SetupContext) EnqueueOwner() func(string) {
+func (_m *SetupContext) EnqueueOwner() func(map[string]string) {
 	ret := _m.Called()
 
-	var r0 func(string)
-	if rf, ok := ret.Get(0).(func() func(string)); ok {
+	var r0 func(map[string]string)
+	if rf, ok := ret.Get(0).(func() func(map[string]string)); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(func(string))
+			r0 = ret.Get(0).(func(map[string]string))
+		}
+	}
+
+	return r0
+}
+
+type SetupContext_IncludeEnqueueLabels struct {
+	*mock.Call
+}
+
+func (_m SetupContext_IncludeEnqueueLabels) Return(_a0 []string) *SetupContext_IncludeEnqueueLabels {
+	return &SetupContext_IncludeEnqueueLabels{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *SetupContext) OnIncludeEnqueueLabels() *SetupContext_IncludeEnqueueLabels {
+	c_call := _m.On("IncludeEnqueueLabels")
+	return &SetupContext_IncludeEnqueueLabels{Call: c_call}
+}
+
+func (_m *SetupContext) OnIncludeEnqueueLabelsMatch(matchers ...interface{}) *SetupContext_IncludeEnqueueLabels {
+	c_call := _m.On("IncludeEnqueueLabels", matchers...)
+	return &SetupContext_IncludeEnqueueLabels{Call: c_call}
+}
+
+// IncludeEnqueueLabels provides a mock function with given fields:
+func (_m *SetupContext) IncludeEnqueueLabels() []string {
+	ret := _m.Called()
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
 		}
 	}
 

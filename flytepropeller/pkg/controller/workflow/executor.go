@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -197,7 +198,10 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 		return StatusSucceeding, nil
 	}
 	if state.PartiallyComplete() {
-		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
+		labels := map[string]string{
+			k8s.WorkflowID: w.GetK8sWorkflowID().String(),
+		}
+		c.enqueueWorkflow(labels)
 	}
 	return StatusRunning, nil
 }
@@ -230,7 +234,10 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 		fallthrough
 	case interfaces.NodePhaseSuccess:
 		// Re-enqueue the workflow
-		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
+		labels := map[string]string{
+			k8s.WorkflowID: w.GetK8sWorkflowID().String(),
+		}
+		c.enqueueWorkflow(labels)
 		return StatusFailureNode(execErr), nil
 	}
 

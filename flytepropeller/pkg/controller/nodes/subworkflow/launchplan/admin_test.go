@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/watch"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	ctrlConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
@@ -81,7 +82,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
 		mockClient.Test(t)
 		defer mockClient.AssertExpectations(t)
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 
 		initCtx, done := context.WithCancel(ctx)
@@ -169,7 +170,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		mockClient.Test(t)
 		defer mockClient.AssertExpectations(t)
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 
 		initCtx, done := context.WithCancel(ctx)
@@ -223,7 +224,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		mockClient.Test(t)
 		defer mockClient.AssertExpectations(t)
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 
 		initCtx, done := context.WithCancel(ctx)
@@ -311,7 +312,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			Return(nil, nil).
 			Once()
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 
 		var labels = map[string]string{"foo": "bar", "shard-key": "1"}
@@ -347,7 +348,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				Name:    "orig",
 			},
 		}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
 			OnRecoverExecutionMatch(
 				ctx,
@@ -390,7 +391,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				Name:    "orig",
 			},
 		}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 
 		recoveryErr := status.Error(codes.NotFound, "foo")
@@ -442,7 +443,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.Test(t)
 		defer mockClient.AssertExpectations(t)
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
 			OnCreateExecutionMatch(
 				ctx,
@@ -477,7 +478,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.Test(t)
 		defer mockClient.AssertExpectations(t)
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.
 			OnCreateExecutionMatch(
 				ctx,
@@ -524,7 +525,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("happy", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -537,7 +538,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("notFound", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -550,7 +551,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("other", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -578,7 +579,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 
 	t.Run("launch plan found", func(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 		mockClient.OnGetLaunchPlanMatch(
 			ctx,
@@ -591,7 +592,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 
 	t.Run("launch plan not found", func(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(string) {})
+		exec, err := NewAdminLaunchPlanExecutor(ctx, ctrlConfig.GetConfig(), mockClient, nil, adminConfig, promutils.NewTestScope(), memStore, func(labels map[string]string) {})
 		assert.NoError(t, err)
 		mockClient.OnGetLaunchPlanMatch(
 			ctx,
@@ -643,8 +644,8 @@ func (s *LPExecutorSuite) SetupTest() {
 		ComposedProtobufStore: s.pbStore,
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
-	exec, err := NewAdminLaunchPlanExecutor(s.ctx, cfg, s.adminClient, s.watchServiceClient, s.adminConfig, promutils.NewTestScope(), storageClient, func(id string) {
-		s.enqueueWorkflow.MethodCalled("enqueueWorkflow", id)
+	exec, err := NewAdminLaunchPlanExecutor(s.ctx, cfg, s.adminClient, s.watchServiceClient, s.adminConfig, promutils.NewTestScope(), storageClient, func(labels map[string]string) {
+		s.enqueueWorkflow.MethodCalled("enqueueWorkflow", labels)
 	})
 	s.NoError(err)
 	s.Require().IsType(&adminLaunchPlanExecutor{}, exec)
@@ -689,7 +690,10 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED() {
 		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -723,7 +727,10 @@ func (s *LPExecutorSuite) Test_syncItem_FAILED() {
 			OutputResult: &admin.ExecutionClosure_Error{Error: expectedErr},
 		}}, nil).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -864,7 +871,10 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_SyncDataError() {
 		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(nil, expectedErr).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -915,7 +925,10 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_Exhausted() {
 		}).
 		Return(nil).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -971,7 +984,10 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_MissingOutput
 		}).
 		Return(nil).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -1021,7 +1037,10 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_ReadProtoErro
 	s.pbStore.OnReadProtobufMatch(s.ctx, storage.DataReference(testURI), mock.Anything).
 		Return(expectedErr).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
 	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
 
@@ -1073,7 +1092,10 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(execData, nil).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)
@@ -1202,7 +1224,10 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_FetchExecutionDataErr
 		OnGetExecutionDataMatch(mock.Anything, &admin.WorkflowExecutionGetDataRequest{Id: execID}).
 		Return(nil, expectedErr).
 		Once()
-	s.enqueueWorkflow.On("enqueueWorkflow", parentWorkflowID).Return().Once()
+	labels := map[string]string{
+		k8s.WorkflowID: parentWorkflowID,
+	}
+	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 	s.adminEventsSrv.OnCloseSend().Return(nil).Once()
 
 	s.executor.watchExecutionStatusUpdates(s.ctx)

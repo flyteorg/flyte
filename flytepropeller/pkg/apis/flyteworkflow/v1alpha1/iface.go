@@ -569,8 +569,8 @@ type NodeStatusVisitor interface {
 	VisitNodeStatuses(visitor NodeStatusVisitFn)
 }
 
-// Simple callback that can be used to indicate that the workflow with WorkflowID should be re-enqueued for examination.
-type EnqueueWorkflow func(workflowID WorkflowID)
+// Simple callback that can be used to indicate that the workflow with a set of labels should be re-enqueued for examination.
+type EnqueueWorkflow func(labels map[string]string)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
 	return outputDir + "/outputs.pb"

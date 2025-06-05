@@ -599,7 +599,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)
 
 	workflowParentPredicate := func(o metav1.Object) bool {
-		if entry.Plugin.GetProperties().DisableInjectOwnerReferences {
+		if entry.Plugin.GetProperties().DisableInjectOwnerReferences || config.GetK8sPluginConfig().DisableInjectOwnerReferences {
 			return true
 		}
 
@@ -619,6 +619,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	genericCount := labeled.NewCounter("informer_generic", "Generic events from informer", metricsScope)
 
 	enqueueOwner := iCtx.EnqueueOwner()
+	enqueueAdditionalLabels := iCtx.IncludeEnqueueLabels()
 	err := src.Start(
 		ctx,
 		// Handlers
@@ -633,16 +634,28 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 					// attempt to enqueue this tasks owner by retrieving the workfowID from the resource labels
 					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
 
+					labels := map[string]string{}
 					workflowID, exists := evt.ObjectNew.GetLabels()[compiler.ExecutionIDLabel]
 					if exists {
-						logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
 						namespacedName := k8stypes.NamespacedName{
 							Name:      workflowID,
 							Namespace: evt.ObjectNew.GetNamespace(),
 						}
+						labels[compiler.WorkflowID] = namespacedName.String()
+					}
 
-						if err := enqueueOwner(namespacedName); err != nil {
-							logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", namespacedName)
+					for _, label := range enqueueAdditionalLabels {
+						val, exists := evt.ObjectNew.GetLabels()[label]
+						if exists {
+							labels[label] = val
+						}
+					}
+
+					if len(labels) != 0 {
+						logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
+
+						if err := enqueueOwner(labels); err != nil {
+							logger.Warnf(context.Background(), "Failed to handle Update event for object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
 						}
 						updateCount.Inc(newCtx)
 					}

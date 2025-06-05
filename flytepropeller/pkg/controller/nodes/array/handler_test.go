@@ -82,7 +82,7 @@ var (
 func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler interfaces.NodeHandler, dataStore *storage.DataStore, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// mock components
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
+	enqueueWorkflowFunc := func(labels map[string]string) {}
 	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
 	offloadingConfig := config.LiteralOffloadingConfig{Enabled: false}
 	literalOffloadingConfig := config.LiteralOffloadingConfig{Enabled: true, MinSizeInMBForOffloading: 1024, MaxSizeInMBForOffloading: 1024 * 1024}

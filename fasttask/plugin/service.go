@@ -15,6 +15,7 @@ import (
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
@@ -258,10 +259,14 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 			// if taskStatus is complete then enqueueOwner for fast feedback
 			phase := core.Phase(taskStatus.GetPhase())
 			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
-				if err := f.enqueueOwner(types.NamespacedName{
+				namespacedName := types.NamespacedName{
 					Namespace: taskStatus.GetNamespace(),
 					Name:      taskStatus.GetWorkflowId(),
-				}); err != nil {
+				}
+				labels := map[string]string{
+					k8s.WorkflowID: namespacedName.String(),
+				}
+				if err := f.enqueueOwner(labels); err != nil {
 					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
 				}
 			}
@@ -358,7 +363,10 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 		if _, ok := enqueued[ownerID]; ok {
 			continue
 		}
-		if err := f.enqueueOwner(ownerID); err != nil {
+		labels := map[string]string{
+			k8s.WorkflowID: ownerID.String(),
+		}
+		if err := f.enqueueOwner(labels); err != nil {
 			logger.Warnf(context.Background(), "failed to enqueue owner %s: %+v", ownerID, err)
 		}
 		enqueued[ownerID] = true

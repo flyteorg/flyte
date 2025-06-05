@@ -50,7 +50,8 @@ type CacheableNodeHandler interface {
 }
 
 type SetupContext interface {
-	EnqueueOwner() func(string)
+	EnqueueOwner() func(map[string]string)
+	IncludeEnqueueLabels() []string
 	OwnerKind() string
 	MetricsScope() promutils.Scope
 }

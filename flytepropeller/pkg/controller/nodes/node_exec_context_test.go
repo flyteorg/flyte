@@ -132,7 +132,7 @@ func Test_NodeContextDefault(t *testing.T) {
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
-		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+		enqueueWorkflow:               func(labels map[string]string) {},
 	}
 	p := parentInfo{}
 	execContext := executors.NewExecutionContext(w1, w1, w1, p, nil)
@@ -265,7 +265,7 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
-		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+		enqueueWorkflow:               func(labels map[string]string) {},
 		metrics: &nodeMetrics{
 			InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
 			InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
@@ -526,7 +526,7 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 				defaultDataSandbox:              "s3://bucket-a",
 				store:                           dataStore,
 				shardSelector:                   ioutils.NewConstantShardSelector([]string{"x"}),
-				enqueueWorkflow:                 func(workflowID v1alpha1.WorkflowID) {},
+				enqueueWorkflow:                 func(labels map[string]string) {},
 				metrics: &nodeMetrics{
 					InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
 					InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
