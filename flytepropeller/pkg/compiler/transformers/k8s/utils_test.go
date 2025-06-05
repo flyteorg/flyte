@@ -18,11 +18,13 @@ func TestComputeRetryStrategy(t *testing.T) {
 		nodeRetries     uint32
 		taskRetries     uint32
 		expectedRetries uint32
+		onOOMFactor     float32
+		onOOMLimit      string
 	}{
-		{"node-only", 1, 0, 2},
-		{"task-only", 0, 1, 2},
-		{"node-task", 2, 3, 3},
-		{"no-retries", 0, 0, 0},
+		{"node-only", 1, 0, 2, 1.0, "10Gi"},
+		{"task-only", 0, 1, 2, 1.5, "32M"},
+		{"node-task", 2, 3, 3, 2.0, "126e5"},
+		{"no-retries", 0, 0, 0, 2.2, "12582912"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -32,6 +34,10 @@ func TestComputeRetryStrategy(t *testing.T) {
 				node = &core.Node{
 					Metadata: &core.NodeMetadata{
 						Retries: &core.RetryStrategy{
+							OnOom: &core.RetryOnOOM{
+								Factor: test.onOOMFactor,
+								Limit:  test.onOOMLimit,
+							},
 							Retries: test.nodeRetries,
 						},
 					},
@@ -43,6 +49,10 @@ func TestComputeRetryStrategy(t *testing.T) {
 				tmpl = &core.TaskTemplate{
 					Metadata: &core.TaskMetadata{
 						Retries: &core.RetryStrategy{
+							OnOom: &core.RetryOnOOM{
+								Factor: test.onOOMFactor,
+								Limit:  test.onOOMLimit,
+							},
 							Retries: test.taskRetries,
 						},
 					},

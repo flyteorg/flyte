@@ -1071,11 +1071,68 @@ export class KeyValuePair extends Message<KeyValuePair> {
 }
 
 /**
- * Retry strategy associated with an executable unit.
+ * RetryOnOOM defines memory scaling behavior for out-of-memory errors.
+ * New memory = min(previous_memory * factor, limit)
+ *
+ * @generated from message flyteidl.core.RetryOnOOM
+ */
+export class RetryOnOOM extends Message<RetryOnOOM> {
+  /**
+   * Factor to multiply previous memory by (e.g. 2.0 doubles memory)
+   *
+   * @generated from field: float factor = 1;
+   */
+  factor = 0;
+
+  /**
+   * Maximum memory limit as resource quantity (e.g. "2Gi")
+   *
+   * @generated from field: string limit = 2;
+   */
+  limit = "";
+
+  constructor(data?: PartialMessage<RetryOnOOM>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.RetryOnOOM";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "factor", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 2, name: "limit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RetryOnOOM {
+    return new RetryOnOOM().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RetryOnOOM | PlainMessage<RetryOnOOM> | undefined, b: RetryOnOOM | PlainMessage<RetryOnOOM> | undefined): boolean {
+    return proto3.util.equals(RetryOnOOM, a, b);
+  }
+}
+
+/**
+ * RetryStrategy configures task execution retry behavior
  *
  * @generated from message flyteidl.core.RetryStrategy
  */
 export class RetryStrategy extends Message<RetryStrategy> {
+  /**
+   * Optional memory scaling config for OOM errors
+   *
+   * @generated from field: flyteidl.core.RetryOnOOM on_oom = 1;
+   */
+  onOom?: RetryOnOOM;
+
   /**
    * Number of retries. Retries will be consumed when the job fails with a recoverable error.
    * The number of retries must be less than or equals to 10.
@@ -1092,6 +1149,7 @@ export class RetryStrategy extends Message<RetryStrategy> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.RetryStrategy";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "on_oom", kind: "message", T: RetryOnOOM },
     { no: 5, name: "retries", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
