@@ -1,3 +1,3 @@
 package utils
 
-const MaxUniqueIDLength = 20
+const MaxUniqueIDLength = 30
