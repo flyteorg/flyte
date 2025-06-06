@@ -283,18 +283,23 @@ export enum TaskExecution_Phase {
   FAILED = 5,
 
   /**
+   * @generated from enum value: RETRYABLE_FAILED = 6;
+   */
+  RETRYABLE_FAILED = 6,
+
+  /**
    * To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
    *
-   * @generated from enum value: INITIALIZING = 6;
+   * @generated from enum value: INITIALIZING = 7;
    */
-  INITIALIZING = 6,
+  INITIALIZING = 7,
 
   /**
    * To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
    *
-   * @generated from enum value: WAITING_FOR_RESOURCES = 7;
+   * @generated from enum value: WAITING_FOR_RESOURCES = 8;
    */
-  WAITING_FOR_RESOURCES = 7,
+  WAITING_FOR_RESOURCES = 8,
 }
 // Retrieve enum metadata with: proto3.getEnumType(TaskExecution_Phase)
 proto3.util.setEnumType(TaskExecution_Phase, "flyteidl.core.TaskExecution.Phase", [
@@ -304,8 +309,9 @@ proto3.util.setEnumType(TaskExecution_Phase, "flyteidl.core.TaskExecution.Phase"
   { no: 3, name: "SUCCEEDED" },
   { no: 4, name: "ABORTED" },
   { no: 5, name: "FAILED" },
-  { no: 6, name: "INITIALIZING" },
-  { no: 7, name: "WAITING_FOR_RESOURCES" },
+  { no: 6, name: "RETRYABLE_FAILED" },
+  { no: 7, name: "INITIALIZING" },
+  { no: 8, name: "WAITING_FOR_RESOURCES" },
 ]);
 
 /**

@@ -312,6 +312,8 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 	case flyteIdl.TaskExecution_ABORTED:
 		return core.PhaseInfoFailure(errorCode, "failed to run the job with aborted phase.", taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
+		return core.PhaseInfoFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
+	case flyteIdl.TaskExecution_RETRYABLE_FAILED:
 		return core.PhaseInfoRetryableFailure(errorCode, fmt.Sprintf("failed to run the job: %s", resource.Message), taskInfo), nil
 	}
 	// The default phase is undefined.
