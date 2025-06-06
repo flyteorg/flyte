@@ -29,10 +29,11 @@ import (
 )
 
 type DataCatalogService struct {
-	DatasetManager     interfaces.DatasetManager
-	ArtifactManager    interfaces.ArtifactManager
-	TagManager         interfaces.TagManager
-	ReservationManager interfaces.ReservationManager
+	DatasetManager        interfaces.DatasetManager
+	ArtifactManager       interfaces.ArtifactManager
+	TagManager            interfaces.TagManager
+	ReservationManager    interfaces.ReservationManager
+	FutureArtifactManager interfaces.FutureArtifactManager
 }
 
 func (s *DataCatalogService) CreateDataset(ctx context.Context, request *catalog.CreateDatasetRequest) (*catalog.CreateDatasetResponse, error) {
@@ -75,6 +76,18 @@ func (s *DataCatalogService) ReleaseReservation(ctx context.Context, request *ca
 	return s.ReservationManager.ReleaseReservation(ctx, request)
 }
 
+func (s *DataCatalogService) CreateFutureArtifact(ctx context.Context, request *catalog.CreateArtifactRequest) (*catalog.CreateArtifactResponse, error) {
+	return s.FutureArtifactManager.CreateFutureArtifact(ctx, request)
+}
+
+func (s *DataCatalogService) GetFutureArtifact(ctx context.Context, request *catalog.GetArtifactRequest) (*catalog.GetArtifactResponse, error) {
+	return s.FutureArtifactManager.GetFutureArtifact(ctx, request)
+}
+
+func (s *DataCatalogService) UpdateFutureArtifact(ctx context.Context, request *catalog.UpdateArtifactRequest) (*catalog.UpdateArtifactResponse, error) {
+	return s.FutureArtifactManager.UpdateFutureArtifact(ctx, request)
+}
+
 func NewDataCatalogService() *DataCatalogService {
 	configProvider := runtime.NewConfigurationProvider()
 	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()
@@ -114,6 +127,7 @@ func NewDataCatalogService() *DataCatalogService {
 		TagManager:      impl.NewTagManager(repos, dataStorageClient, catalogScope.NewSubScope("tag")),
 		ReservationManager: impl.NewReservationManager(repos, time.Duration(dataCatalogConfig.HeartbeatGracePeriodMultiplier), dataCatalogConfig.MaxReservationHeartbeat.Duration, time.Now,
 			catalogScope.NewSubScope("reservation")),
+		FutureArtifactManager: impl.NewFutureArtifactManager(repos, dataStorageClient, storagePrefix, catalogScope.NewSubScope("future_artifact")),
 	}
 }
 
