@@ -1960,7 +1960,7 @@ func TestGetPodTemplate(t *testing.T) {
 		store.SetDefaultNamespace(podTemplate.Namespace)
 
 		// validate base PodTemplate
-		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, store)
 		assert.Nil(t, err)
 		assert.Nil(t, basePodTemplate)
 	})
@@ -1987,7 +1987,7 @@ func TestGetPodTemplate(t *testing.T) {
 		store.Store(&podTemplate)
 
 		// validate base PodTemplate
-		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, store)
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podTemplate, *basePodTemplate))
 	})
@@ -2013,7 +2013,7 @@ func TestGetPodTemplate(t *testing.T) {
 		store.SetDefaultNamespace(podTemplate.Namespace)
 
 		// validate base PodTemplate
-		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, store)
 		assert.NotNil(t, err)
 		assert.Nil(t, basePodTemplate)
 	})
@@ -2042,7 +2042,7 @@ func TestGetPodTemplate(t *testing.T) {
 		store.Store(&podTemplate)
 
 		// validate base PodTemplate
-		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
+		basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, store)
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podTemplate, *basePodTemplate))
 	})
