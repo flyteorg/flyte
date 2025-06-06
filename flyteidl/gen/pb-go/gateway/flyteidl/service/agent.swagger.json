@@ -1844,6 +1844,7 @@
         "SUCCEEDED",
         "ABORTED",
         "FAILED",
+        "RETRYABLE_FAILED",
         "INITIALIZING",
         "WAITING_FOR_RESOURCES"
       ],

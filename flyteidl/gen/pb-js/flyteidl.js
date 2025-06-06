@@ -13946,8 +13946,9 @@
                  * @property {number} SUCCEEDED=3 SUCCEEDED value
                  * @property {number} ABORTED=4 ABORTED value
                  * @property {number} FAILED=5 FAILED value
-                 * @property {number} INITIALIZING=6 INITIALIZING value
-                 * @property {number} WAITING_FOR_RESOURCES=7 WAITING_FOR_RESOURCES value
+                 * @property {number} RETRYABLE_FAILED=6 RETRYABLE_FAILED value
+                 * @property {number} INITIALIZING=7 INITIALIZING value
+                 * @property {number} WAITING_FOR_RESOURCES=8 WAITING_FOR_RESOURCES value
                  */
                 TaskExecution.Phase = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -13957,8 +13958,9 @@
                     values[valuesById[3] = "SUCCEEDED"] = 3;
                     values[valuesById[4] = "ABORTED"] = 4;
                     values[valuesById[5] = "FAILED"] = 5;
-                    values[valuesById[6] = "INITIALIZING"] = 6;
-                    values[valuesById[7] = "WAITING_FOR_RESOURCES"] = 7;
+                    values[valuesById[6] = "RETRYABLE_FAILED"] = 6;
+                    values[valuesById[7] = "INITIALIZING"] = 7;
+                    values[valuesById[8] = "WAITING_FOR_RESOURCES"] = 8;
                     return values;
                 })();
     
@@ -23504,6 +23506,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.producerId != null && message.hasOwnProperty("producerId"))
@@ -23863,6 +23866,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.cacheStatus != null && message.hasOwnProperty("cacheStatus"))
@@ -25976,6 +25980,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.customInfo != null && message.hasOwnProperty("customInfo")) {
@@ -50350,6 +50355,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.logs != null && message.hasOwnProperty("logs")) {
