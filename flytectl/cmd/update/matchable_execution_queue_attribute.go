@@ -62,13 +62,16 @@ Usage
 
 func updateExecutionQueueAttributesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	updateConfig := executionqueueattribute.DefaultUpdateConfig
-	if len(updateConfig.AttrFile) == 0 {
-		return fmt.Errorf("attrFile is mandatory while calling update for execution queue attribute")
-	}
 
 	executionQueueAttrFileConfig := executionqueueattribute.AttrFileConfig{}
-	if err := sconfig.ReadConfigFromFile(&executionQueueAttrFileConfig, updateConfig.AttrFile); err != nil {
-		return err
+	if updateConfig.AttrFile != "" {
+		if err := sconfig.ReadConfigFromFile(&executionQueueAttrFileConfig, updateConfig.AttrFile); err != nil {
+			return err
+		}
+	} else if *executionqueueattribute.DefaultAttrFileConfig == executionQueueAttrFileConfig {
+		return fmt.Errorf("attrFile is mandatory while calling update for execution queue attribute")
+	} else {
+		executionQueueAttrFileConfig = *executionqueueattribute.DefaultAttrFileConfig
 	}
 
 	// Get project domain workflow name from the read file.
