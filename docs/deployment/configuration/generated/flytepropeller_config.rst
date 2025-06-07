@@ -4872,6 +4872,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  max-delta-timestamp: 72h0m0s
   max-task-phase-version-attempts: 3
   use-map-plugin-logs: false
   
@@ -4970,6 +4971,18 @@ Override subNode log links with those configured for the map plugin logs
 .. code-block:: yaml
 
   "false"
+  
+
+max-delta-timestamp (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum delta timestamp between ArrayNode start and an individual subNode start.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  72h0m0s
   
 
 max-task-phase-version-attempts (int)
