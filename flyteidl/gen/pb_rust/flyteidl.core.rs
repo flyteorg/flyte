@@ -2127,11 +2127,11 @@ pub mod task_execution {
         Succeeded = 3,
         Aborted = 4,
         Failed = 5,
-        RetryableFailed = 6,
         /// To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
-        Initializing = 7,
+        Initializing = 6,
         /// To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
-        WaitingForResources = 8,
+        WaitingForResources = 7,
+        RetryableFailed = 8,
     }
     impl Phase {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2146,9 +2146,9 @@ pub mod task_execution {
                 Phase::Succeeded => "SUCCEEDED",
                 Phase::Aborted => "ABORTED",
                 Phase::Failed => "FAILED",
-                Phase::RetryableFailed => "RETRYABLE_FAILED",
                 Phase::Initializing => "INITIALIZING",
                 Phase::WaitingForResources => "WAITING_FOR_RESOURCES",
+                Phase::RetryableFailed => "RETRYABLE_FAILED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2160,9 +2160,9 @@ pub mod task_execution {
                 "SUCCEEDED" => Some(Self::Succeeded),
                 "ABORTED" => Some(Self::Aborted),
                 "FAILED" => Some(Self::Failed),
-                "RETRYABLE_FAILED" => Some(Self::RetryableFailed),
                 "INITIALIZING" => Some(Self::Initializing),
                 "WAITING_FOR_RESOURCES" => Some(Self::WaitingForResources),
+                "RETRYABLE_FAILED" => Some(Self::RetryableFailed),
                 _ => None,
             }
         }

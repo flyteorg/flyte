@@ -50,11 +50,11 @@ message TaskExecution{
         SUCCEEDED = 3;
         ABORTED = 4;
         FAILED = 5;
-        RETRYABLE_FAILED = 6;
         // To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
-        INITIALIZING = 7;
+        INITIALIZING = 6;
         // To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
-        WAITING_FOR_RESOURCES = 8;
+        WAITING_FOR_RESOURCES = 7;
+        RETRYABLE_FAILED = 8;
     }
 }
 

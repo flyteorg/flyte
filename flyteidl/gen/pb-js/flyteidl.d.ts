@@ -5771,9 +5771,9 @@ export namespace flyteidl {
                 SUCCEEDED = 3,
                 ABORTED = 4,
                 FAILED = 5,
-                RETRYABLE_FAILED = 6,
-                INITIALIZING = 7,
-                WAITING_FOR_RESOURCES = 8
+                INITIALIZING = 6,
+                WAITING_FOR_RESOURCES = 7,
+                RETRYABLE_FAILED = 8
             }
         }
 
