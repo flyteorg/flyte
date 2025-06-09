@@ -3,7 +3,6 @@ package connector
 import (
 	"context"
 	"crypto/x509"
-	"strings"
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -91,8 +91,7 @@ func getFinalContext(ctx context.Context, operation string, connector *Deploymen
 	return context.WithTimeout(ctx, timeout)
 }
 
-func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
-	newConnectorRegistry := make(Registry)
+func watchConnectors(ctx context.Context, cs *ClientSet) {
 	cfg := GetConfig()
 	var connectorDeployments []*Deployment
 
@@ -127,48 +126,27 @@ func getConnectorRegistry(ctx context.Context, cs *ClientSet) Registry {
 			logger.Errorf(finalCtx, "failed to list connector: [%v] with error: [%v]", connectorDeployment.Endpoint, err)
 			continue
 		}
-
-		connectorSupportedTaskCategories := make(map[string]struct{})
+		// connectorSupportedTaskCategories := make(map[string]struct{})
+		// If a connector's support task type plugin was not registered yet, we should do registration
 		for _, connector := range res.GetAgents() {
 			deprecatedSupportedTaskTypes := connector.GetSupportedTaskTypes()
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
-				newConnectorRegistry[supportedTaskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
-				connectorSupportedTaskCategories[supportedTaskType] = struct{}{}
-			}
-
-			supportedTaskCategories := connector.GetSupportedTaskCategories()
-			for _, supportedCategory := range supportedTaskCategories {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: connector.GetIsSync()}
-				supportedCategoryName := supportedCategory.GetName()
-				newConnectorRegistry[supportedCategoryName] = map[int32]*Connector{supportedCategory.GetVersion(): connector}
-				connectorSupportedTaskCategories[supportedCategoryName] = struct{}{}
-			}
-		}
-		logger.Infof(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
-			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
-	}
-
-	// If the connector doesn't implement the metadata service, we construct the registry based on the configuration
-	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
-		if connectorDeployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			if _, ok := newConnectorRegistry[taskType]; !ok {
-				connector := &Connector{ConnectorDeployment: connectorDeployment, IsSync: false}
-				newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+				if ok := pluginmachinery.PluginRegistry().IsTaskTypeRegistered(supportedTaskType); !ok {
+					plugin := createPluginEntry(supportedTaskType, connectorDeployment, cs)
+					pluginmachinery.PluginRegistry().RegisterRemotePlugin(plugin)
+					pluginmachinery.PluginRegistry().GetPluginRegistrationChan() <- plugin
+				}
 			}
 		}
 	}
-
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
-		if _, ok := newConnectorRegistry[taskType]; !ok {
-			connector := &Connector{ConnectorDeployment: &cfg.DefaultConnector, IsSync: false}
-			newConnectorRegistry[taskType] = map[int32]*Connector{defaultTaskTypeVersion: connector}
+		if ok := pluginmachinery.PluginRegistry().IsTaskTypeRegistered(taskType); !ok {
+			plugin := createPluginEntry(taskType, &cfg.DefaultConnector, cs)
+			pluginmachinery.PluginRegistry().RegisterRemotePlugin(plugin)
+			pluginmachinery.PluginRegistry().GetPluginRegistrationChan() <- plugin
 		}
 	}
-
-	logger.Infof(ctx, "ConnectorDeployments support the following task types: [%v]", strings.Join(maps.Keys(newConnectorRegistry), ", "))
-	return newConnectorRegistry
 }
 
 func getConnectorClientSets(ctx context.Context) *ClientSet {

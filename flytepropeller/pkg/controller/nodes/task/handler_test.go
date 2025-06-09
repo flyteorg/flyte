@@ -29,7 +29,6 @@ import (
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/connector"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
@@ -353,7 +352,6 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				defaultPlugin:    tt.fields.defaultPlugin,
 				pluginsForType:   tt.fields.pluginsForType,
 				agentService:     &agent.AgentService{},
-				connectorService: &connector.ConnectorService{},
 			}
 			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {

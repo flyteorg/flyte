@@ -251,7 +251,6 @@ type Handler struct {
 	eventConfig      *controllerConfig.EventConfig
 	clusterID        string
 	agentService     *agent.AgentService
-	connectorService *connector.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -268,6 +267,40 @@ func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	return nil
 }
 
+func (t *Handler) watchPlugins(ctx context.Context, sCtx interfaces.SetupContext) error {
+	for {
+		select {
+		case wpe := <-pluginMachinery.PluginRegistry().GetPluginRegistrationChan():
+			tSCtx := t.newSetupContext(sCtx)
+			// Create a new base resource negotiator
+			resourceManagerConfig := rmConfig.GetConfig()
+			newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type, t.metrics.scope)
+			if err != nil {
+				return err
+			}
+			pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(wpe.ID))
+			sCtxFinal := newNameSpacedSetupCtx(
+				tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), wpe.ID)
+			logger.Infof(ctx, "Loading Plugin [%s] ENABLED", wpe.ID)
+			// register core plugin
+			for _, cpe := range pluginMachinery.PluginRegistry().GetCorePlugins() {
+				if cpe.ID == wpe.ID {
+					cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, cpe)
+					if err != nil {
+						return regErrors.Wrapf(err, "failed to load plugin - %s", wpe.ID)
+					}
+					// register the plugin to task handler local plugin registry
+					t.defaultPlugins[cp.GetID()] = cp
+					pluginMachinery.PluginRegistry().AddRegisteredTaskType(cp.GetID())
+				}
+			}
+		case <-ctx.Done():
+			logger.Infof(ctx, "Plugin watcher stopped due to context cancellation")
+			return nil
+		}
+	}
+}
+
 func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error {
 	tSCtx := t.newSetupContext(sCtx)
 
@@ -281,7 +314,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	once.Do(func() {
 		// The agent service plugin is deprecated and will be removed in the future
 		agent.RegisterAgentPlugin(t.agentService)
-		connector.RegisterConnectorPlugin(t.connectorService)
+		connector.RegisterConnectorPlugin()
 	})
 
 	// Create the resource negotiator here
@@ -306,10 +339,6 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
-		}
-
-		if cp.GetID() == connector.ID {
-			t.connectorService.CorePlugin = cp
 		}
 
 		// The agent service plugin is deprecated and will be removed in the future
@@ -368,6 +397,9 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		}
 	}
 
+	// execute watcher to monitor plugins waiting for register from connector/agent plugin
+	go t.watchPlugins(ctx, sCtx)
+
 	rm, err := newResourceManagerBuilder.BuildResourceManager(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build a resource manager")
@@ -404,10 +436,6 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 	if ok {
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
-	}
-
-	if t.connectorService != nil && t.connectorService.ContainTaskType(ttype) {
-		return t.connectorService.CorePlugin, nil
 	}
 
 	// The agent service plugin is deprecated and will be removed in the future
@@ -1052,6 +1080,5 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		eventConfig:      eventConfig,
 		clusterID:        clusterID,
 		agentService:     &agent.AgentService{},
-		connectorService: &connector.ConnectorService{},
 	}, nil
 }

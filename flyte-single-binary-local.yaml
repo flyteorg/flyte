@@ -68,6 +68,30 @@ plugins:
         kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
         cloudwatch-enabled: false
         stackdriver-enabled: false
+  connector-service:
+    supportedTaskTypes:
+      - bigquery_query_job_task
+      - sensor
+      - chatgpt
+    connectors:
+      my-test-connector:
+        endpoint: "localhost:8000"
+        insecure: true
+        timeouts:
+          CreateTask: 5s
+          GetTask: 30s
+          DeleteTask: 30s
+        defaultTimeout: 30s
+        webApi:
+          caching:
+            resyncInterval: 60s
+    defaultConnector:
+      endpoint: "localhost:8000"
+    webApi:
+      caching:
+        resyncInterval: 120s
+    connectorForTaskTypes:
+      - my_test_task1: my-test-connector
 
 database:
   postgres:

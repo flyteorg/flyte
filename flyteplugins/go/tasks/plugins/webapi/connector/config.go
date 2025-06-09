@@ -93,6 +93,9 @@ type Deployment struct {
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
 	DefaultTimeout config.Duration `json:"defaultTimeout"`
+
+	// WebAPI defines config for the base WebAPI plugin
+	WebAPI webapi.PluginConfig `json:"webApi" pflag:",Defines config for the base WebAPI plugin."`
 }
 
 func GetConfig() *Config {

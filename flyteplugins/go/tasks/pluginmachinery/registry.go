@@ -11,14 +11,20 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+const defaultPluginBufferSize = 5
+
 type taskPluginRegistry struct {
 	m          sync.Mutex
 	k8sPlugin  []k8s.PluginEntry
 	corePlugin []core.PluginEntry
+	pluginRegistrationChan chan webapi.PluginEntry
+	registeredTaskTypes map[string]struct{}
 }
 
 // A singleton variable that maintains a registry of all plugins. The framework uses this to access all plugins
-var pluginRegistry = &taskPluginRegistry{}
+var pluginRegistry = &taskPluginRegistry{
+	pluginRegistrationChan: make(chan webapi.PluginEntry, defaultPluginBufferSize),
+}
 
 func PluginRegistry() TaskPluginRegistry {
 	return pluginRegistry
@@ -41,6 +47,29 @@ func (p *taskPluginRegistry) RegisterRemotePlugin(info webapi.PluginEntry) {
 	p.m.Lock()
 	defer p.m.Unlock()
 	p.corePlugin = append(p.corePlugin, internalRemote.CreateRemotePlugin(info))
+	p.AddRegisteredTaskType(info.ID)
+}
+
+func (p *taskPluginRegistry) GetPluginRegistrationChan() chan webapi.PluginEntry {
+	return p.pluginRegistrationChan
+}
+
+// IsTaskTypeRegistered checks if a task type is registered
+func (p *taskPluginRegistry) IsTaskTypeRegistered(taskType string) bool {
+	p.m.Lock()
+	defer p.m.Unlock()
+	_, exists := p.registeredTaskTypes[taskType]
+	return exists
+}
+
+// RegisterTaskType registers a single task type
+func (p *taskPluginRegistry) AddRegisteredTaskType(taskType string) {
+	p.m.Lock()
+	defer p.m.Unlock()
+	if p.registeredTaskTypes == nil {
+		p.registeredTaskTypes = make(map[string]struct{})
+	}
+	p.registeredTaskTypes[taskType] = struct{}{}
 }
 
 func CreateRemotePlugin(pluginEntry webapi.PluginEntry) core.PluginEntry {
@@ -107,4 +136,7 @@ type TaskPluginRegistry interface {
 	RegisterRemotePlugin(info webapi.PluginEntry)
 	GetCorePlugins() []core.PluginEntry
 	GetK8sPlugins() []k8s.PluginEntry
+	GetPluginRegistrationChan() chan webapi.PluginEntry
+	IsTaskTypeRegistered(taskType string) bool
+	AddRegisteredTaskType(taskType string)
 }
