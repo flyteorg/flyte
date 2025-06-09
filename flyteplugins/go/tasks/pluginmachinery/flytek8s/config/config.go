@@ -222,7 +222,7 @@ type K8sPluginConfig struct {
 	EnableDistributedErrorAggregation bool `json:"enable-distributed-error-aggregation" pflag:",If true, will aggregate errors of different worker pods for distributed tasks."`
 
 	// EnableCreatePodGroupForPod enables creating volcano podgroups for pods.
-	EnableCreatePodGroupForPod bool `json:"enable-create-pod-group-for-pod" pflag:",If true, propeller won't create volcano podgroups."`
+	EnableCreatePodGroupForPod bool `json:"enable-create-pod-group-for-pod" pflag:",If true, propeller will create volcano podgroups for podTasks."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
