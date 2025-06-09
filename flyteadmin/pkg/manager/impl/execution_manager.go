@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -172,6 +173,25 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 	return nil, nil
 }
 
+// adjustRetryStrategyLimits ensures that the retry strategy's OOM memory limit does not exceed the platform's memory limit.
+// If the OOM limit is greater than the platform limit, it will be adjusted down to match the platform limit.
+// This prevents tasks from requesting more memory during retries than what is allowed by the platform.
+func (m *ExecutionManager) adjustRetryStrategyLimits(ctx context.Context, retryStrategy *core.RetryStrategy,
+	platformTaskResources workflowengineInterfaces.TaskResources) {
+	if retryStrategy.GetOnOom() != nil {
+		onOOMLimitVal := retryStrategy.GetOnOom().GetLimit()
+		onOOMLimit, err := resource.ParseQuantity(onOOMLimitVal)
+		if err != nil {
+			logger.Infof(ctx, "Failed to parse owner's resource's value [%s] with err: %v", onOOMLimitVal, err)
+		}
+		platformLimit := platformTaskResources.Limits.Memory
+		if onOOMLimit.Cmp(platformLimit) > 0 {
+			logger.Infof(ctx, "OOM limit [%v] is greater than platform limit [%v], adjusting OOM limit to platform limit", onOOMLimit, platformLimit)
+			retryStrategy.GetOnOom().Limit = platformLimit.String()
+		}
+	}
+}
+
 // TODO: Delete this code usage after the flyte v0.17.0 release
 // Assumes input contains a compiled task with a valid container resource execConfig.
 //
@@ -268,6 +288,8 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		Requests: finalizedResourceRequests,
 		Limits:   finalizedResourceLimits,
 	}
+
+	m.adjustRetryStrategyLimits(ctx, task.GetTemplate().GetMetadata().GetRetries(), platformTaskResources)
 }
 
 // Fetches inherited execution metadata including the parent node execution db model id and the source execution model id
@@ -558,6 +580,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	platformTaskResources := util.GetTaskResources(ctx, workflow.GetId(), m.resourceManager, m.config.TaskResourceConfiguration())
 	for _, t := range workflow.GetClosure().GetCompiledWorkflow().GetTasks() {
 		m.setCompiledTaskDefaults(ctx, t, platformTaskResources)
+	}
+	for _, node := range workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetNodes() {
+		m.adjustRetryStrategyLimits(ctx, node.GetMetadata().GetRetries(), platformTaskResources)
 	}
 
 	// Dynamically assign execution queues.
@@ -993,6 +1018,9 @@ func (m *ExecutionManager) launchExecution(
 	platformTaskResources := util.GetTaskResources(ctx, workflow.GetId(), m.resourceManager, m.config.TaskResourceConfiguration())
 	for _, task := range workflow.GetClosure().GetCompiledWorkflow().GetTasks() {
 		m.setCompiledTaskDefaults(ctx, task, platformTaskResources)
+	}
+	for _, node := range workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetNodes() {
+		m.adjustRetryStrategyLimits(ctx, node.GetMetadata().GetRetries(), platformTaskResources)
 	}
 
 	// Dynamically assign execution queues.

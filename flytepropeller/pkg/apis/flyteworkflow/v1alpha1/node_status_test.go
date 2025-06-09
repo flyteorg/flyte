@@ -492,3 +492,19 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 }
+
+func TestNodeStatus_IncrementOOMFailures(t *testing.T) {
+	ns := NodeStatus{}
+	assert.Equal(t, uint32(0), ns.OOMFailures)
+	assert.False(t, ns.IsDirty())
+
+	result := ns.IncrementOOMFailures()
+	assert.Equal(t, uint32(1), ns.OOMFailures)
+	assert.Equal(t, uint32(1), result)
+	assert.True(t, ns.IsDirty())
+}
+
+func TestNodeStatus_GetOOMFailures(t *testing.T) {
+	ns := NodeStatus{}
+	assert.Equal(t, uint32(0), ns.GetOOMFailures())
+}
