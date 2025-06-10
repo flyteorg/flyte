@@ -361,16 +361,6 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 			},
 		}
 
-		// handle pod template override
-		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
-			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
-			if err != nil {
-				return nil, nil, "", err
-			}
-			primaryContainerName = podTemplate.GetPrimaryContainerName()
-		}
-
 	case *core.TaskTemplate_K8SPod:
 		// handles pod tasks that marshal the pod spec to the k8s_pod task target.
 		if target.K8SPod.GetPodSpec() == nil {
@@ -395,16 +385,6 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 		if taskTemplate.GetK8SPod().GetMetadata() != nil {
 			mergeMapInto(target.K8SPod.GetMetadata().GetAnnotations(), objectMeta.Annotations)
 			mergeMapInto(target.K8SPod.GetMetadata().GetLabels(), objectMeta.Labels)
-		}
-
-		// handle pod template override
-		podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
-		if podTemplate != nil && podTemplate.GetPodSpec() != nil {
-			podSpec, objectMeta, err = ApplyPodTemplateOverride(objectMeta, podTemplate)
-			if err != nil {
-				return nil, nil, "", err
-			}
-			primaryContainerName = podTemplate.GetPrimaryContainerName()
 		}
 
 	default:
@@ -513,6 +493,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
+	// merge pod template overrides (if exists) onto PodSpec and ObjectMeta
+	podSpec, objectMeta, err = MergeWithPodTemplateOverride(ctx, tCtx, podSpec, objectMeta)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// handling for extended resources
 	// Merge overrides with base extended resources
 	extendedResources := applyExtendedResourcesOverrides(
@@ -548,23 +534,6 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 			return
 		}
 	}
-}
-
-func ApplyPodTemplateOverride(objectMeta metav1.ObjectMeta, podTemplate *core.K8SPod) (*v1.PodSpec, metav1.ObjectMeta, error) {
-	if podTemplate.GetMetadata().GetAnnotations() != nil {
-		mergeMapInto(podTemplate.GetMetadata().GetAnnotations(), objectMeta.Annotations)
-	}
-	if podTemplate.GetMetadata().GetLabels() != nil {
-		mergeMapInto(podTemplate.GetMetadata().GetLabels(), objectMeta.Labels)
-	}
-
-	var podSpecOverride *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
-	if err != nil {
-		return nil, objectMeta, err
-	}
-
-	return podSpecOverride, objectMeta, nil
 }
 
 func addTolerationInPodSpec(podSpec *v1.PodSpec, toleration *v1.Toleration) *v1.PodSpec {
@@ -669,6 +638,32 @@ func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionConte
 	return podTemplate, nil
 }
 
+func getOverridesPodTemplate(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	podTemplate := tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()
+	if podTemplate != nil {
+		var podSpecOverride *v1.PodSpec
+
+		if podTemplate.GetPodSpec() != nil {
+			err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
+			if err != nil {
+				return nil, nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
+					"Unable to unmarshal task overriden pod template k8s pod [%v], Err: [%v]", podTemplate.GetPodSpec(), err.Error())
+			}
+		}
+
+		objectMetaOverride := &metav1.ObjectMeta{}
+
+		if podTemplate.GetMetadata() != nil {
+			objectMetaOverride.Annotations = podTemplate.GetMetadata().Annotations
+			objectMetaOverride.Labels = podTemplate.GetMetadata().Labels
+		}
+
+		return podSpecOverride, objectMetaOverride, nil
+	}
+
+	return nil, nil, nil
+}
+
 // MergeWithBasePodTemplate attempts to merge the provided PodSpec and ObjectMeta with the configuration PodTemplate for
 // this task.
 func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
@@ -694,6 +689,38 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	var mergedObjectMeta *metav1.ObjectMeta = podTemplate.Template.ObjectMeta.DeepCopy()
 	if err := mergo.Merge(mergedObjectMeta, objectMeta, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
 		return nil, nil, err
+	}
+
+	return mergedPodSpec, mergedObjectMeta, nil
+}
+
+// MergeWithPodTemplateOverride attempts to merge any pod template override onto the provided PodSpec and ObjectMeta.
+func MergeWithPodTemplateOverride(ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
+	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+
+	podSpecOverride, objectMetaOverride, err := getOverridesPodTemplate(ctx, tCtx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("getting overrides pod template: %v", err)
+	} else if podSpecOverride == nil && objectMetaOverride == nil {
+		// if no pod template / object meta override -> return
+		return podSpec, objectMeta, nil
+	}
+
+	mergedPodSpec := podSpec
+
+	if podSpecOverride != nil {
+		mergedPodSpec, err = MergeOverlayPodSpecOntoBase(podSpec, podSpecOverride)
+		if err != nil {
+			return nil, nil, fmt.Errorf("merging override pod spec: %v", err)
+		}
+	}
+
+	var mergedObjectMeta = objectMeta.DeepCopy()
+
+	if objectMetaOverride != nil {
+		if err := mergo.Merge(mergedObjectMeta, objectMetaOverride, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+			return nil, nil, fmt.Errorf("merging override metadata: %v", err)
+		}
 	}
 
 	return mergedPodSpec, mergedObjectMeta, nil

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
@@ -1066,7 +1067,7 @@ func TestToK8sPodContainerImage(t *testing.T) {
 }
 
 func TestPodTemplateOverride(t *testing.T) {
-	metadata := &core.K8SObjectMetadata{
+	podTemplateMetadata := &core.K8SObjectMetadata{
 		Labels: map[string]string{
 			"l": "a",
 		},
@@ -1075,34 +1076,96 @@ func TestPodTemplateOverride(t *testing.T) {
 		},
 	}
 
-	podSpec := v1.PodSpec{
-		Containers: []v1.Container{
-			{
-				Name:  "foo",
-				Image: "foo:latest",
-				Args:  []string{"foo", "bar"},
-			},
+	tolerations := []v1.Toleration{
+		{
+			Key:      "foo-toleration",
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
 		},
 	}
 
-	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	podTemplatePodSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+			},
+		},
+		Tolerations: tolerations,
+	}
+
+	podTemplateK8sPod, err := utils.MarshalObjToStruct(podTemplatePodSpec)
 	assert.NoError(t, err)
 
-	t.Run("Override pod template", func(t *testing.T) {
+	t.Run("Override pod template success", func(t *testing.T) {
+
 		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Requests: v1.ResourceList{
 				v1.ResourceCPU: resource.MustParse("1024m"),
 			}}, nil, "", &core.K8SPod{
-			PrimaryContainerName: "foo",
-			PodSpec:              podSpecStruct,
-			Metadata:             metadata,
+			PrimaryContainerName: "primary",
+			PodSpec:              podTemplateK8sPod,
+			Metadata:             podTemplateMetadata,
 		})
 		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, "a", m.Labels["l"])
-		assert.Equal(t, "b", m.Annotations["a"])
-		assert.Equal(t, "foo:latest", p.Containers[0].Image)
-		assert.Equal(t, "foo", p.Containers[0].Name)
+		require.NoError(t, err)
+		require.Equal(t, []string{"command"}, p.Containers[0].Command) // validate that existing fields don't disappear.
+		require.Equal(t, tolerations, p.Tolerations)                   // validate that overlay works
+
+		expectedMetadata := &metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"a": "b",
+			},
+			Labels: map[string]string{
+				"l": "a",
+			},
+		}
+		require.Equal(t, expectedMetadata, m) // validate that annotations are merged appropriately
+	})
+
+	t.Run("Override pod template no metadata", func(t *testing.T) {
+
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1024m"),
+			}}, nil, "", &core.K8SPod{
+			PrimaryContainerName: "primary",
+			PodSpec:              podTemplateK8sPod,
+		})
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		require.NoError(t, err)
+		require.Equal(t, []string{"command"}, p.Containers[0].Command) // validate that existing fields don't disappear.
+		require.Equal(t, tolerations, p.Tolerations)                   // validate that overlay works
+
+		expectedMetadata := &metav1.ObjectMeta{
+			Annotations: map[string]string{},
+			Labels:      map[string]string{},
+		}
+		require.Equal(t, expectedMetadata, m) // validate that annotations are merged appropriately
+	})
+
+	t.Run("Override pod template success no pod", func(t *testing.T) {
+
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("1024m"),
+			}}, nil, "", &core.K8SPod{
+			PrimaryContainerName: "primary",
+			Metadata:             podTemplateMetadata,
+		})
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		require.NoError(t, err)
+		require.Equal(t, []string{"command"}, p.Containers[0].Command) // validate that existing fields don't disappear.
+		require.Empty(t, p.Tolerations)                                // validate no overlay
+
+		expectedMetadata := &metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"a": "b",
+			},
+			Labels: map[string]string{
+				"l": "a",
+			},
+		}
+		require.Equal(t, expectedMetadata, m) // validate that annotations are merged appropriately
 	})
 }
 
@@ -2045,6 +2108,110 @@ func TestGetPodTemplate(t *testing.T) {
 		basePodTemplate, err := getBasePodTemplate(ctx, tCtx, store)
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podTemplate, *basePodTemplate))
+	})
+}
+
+func TestMergeWithPodTemplateOverride(t *testing.T) {
+
+	baseObjectMeta := metav1.ObjectMeta{
+		Labels: map[string]string{
+			"fooKey": "barValue",
+		},
+		Annotations: map[string]string{
+			"a": "z",
+		},
+	}
+
+	podTemplateMetadata := &core.K8SObjectMetadata{
+		Labels: map[string]string{
+			"l": "a",
+		},
+		Annotations: map[string]string{
+			"a": "b",
+		},
+	}
+
+	tolerations := []v1.Toleration{
+		{
+			Key:      "foo-toleration",
+			Operator: v1.TolerationOpExists,
+			Effect:   v1.TaintEffectNoSchedule,
+		},
+	}
+
+	basePodSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+			},
+		},
+		ServiceAccountName: "default",
+	}
+
+	podTemplatePodSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary",
+			},
+		},
+		Tolerations: tolerations,
+	}
+
+	podTemplateK8sPod, err := utils.MarshalObjToStruct(podTemplatePodSpec)
+	assert.NoError(t, err)
+
+	t.Run("PodTemplateOverrideDoesntExist", func(t *testing.T) {
+		task := &core.TaskTemplate{
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", nil)
+
+		resultPodSpec, resultObjectMeta, err := MergeWithPodTemplateOverride(context.TODO(), taskContext, &basePodSpec, &baseObjectMeta)
+		require.Nil(t, err)
+		assert.True(t, reflect.DeepEqual(basePodSpec, *resultPodSpec))
+		assert.True(t, reflect.DeepEqual(baseObjectMeta, *resultObjectMeta))
+	})
+
+	t.Run("PodTemplateOverrideExists", func(t *testing.T) {
+		task := &core.TaskTemplate{
+			Type: "test",
+		}
+
+		taskReader := &pluginsCoreMock.TaskReader{}
+		taskReader.On("Read", mock.Anything).Return(task, nil)
+
+		podTemplate := &core.K8SPod{
+			PrimaryContainerName: "primary",
+			PodSpec:              podTemplateK8sPod,
+			Metadata:             podTemplateMetadata,
+		}
+
+		taskContext := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "", podTemplate)
+
+		resultPodSpec, resultObjectMeta, err := MergeWithPodTemplateOverride(context.TODO(), taskContext, &basePodSpec, &baseObjectMeta)
+		require.Nil(t, err)
+
+		// test that template podSpec is merged
+		primaryContainer := resultPodSpec.Containers[0]
+		assert.Equal(t, basePodSpec.Containers[0].Name, primaryContainer.Name)
+		assert.Equal(t, tolerations, resultPodSpec.Tolerations)
+		assert.Equal(t, "default", resultPodSpec.ServiceAccountName)
+
+		expectedAnnotations := map[string]string{
+			"a": "b",
+		}
+		require.Equal(t, expectedAnnotations, resultObjectMeta.Annotations)
+		expectedLabels := map[string]string{
+			"fooKey": "barValue",
+			"l":      "a",
+		}
+		require.Equal(t, expectedLabels, resultObjectMeta.Labels)
+
+		// test that template object metadata is copied
 	})
 }
 
