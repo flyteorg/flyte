@@ -295,6 +295,11 @@ export enum TaskExecution_Phase {
    * @generated from enum value: WAITING_FOR_RESOURCES = 7;
    */
   WAITING_FOR_RESOURCES = 7,
+
+  /**
+   * @generated from enum value: RETRYABLE_FAILED = 8;
+   */
+  RETRYABLE_FAILED = 8,
 }
 // Retrieve enum metadata with: proto3.getEnumType(TaskExecution_Phase)
 proto3.util.setEnumType(TaskExecution_Phase, "flyteidl.core.TaskExecution.Phase", [
@@ -306,6 +311,7 @@ proto3.util.setEnumType(TaskExecution_Phase, "flyteidl.core.TaskExecution.Phase"
   { no: 5, name: "FAILED" },
   { no: 6, name: "INITIALIZING" },
   { no: 7, name: "WAITING_FOR_RESOURCES" },
+  { no: 8, name: "RETRYABLE_FAILED" },
 ]);
 
 /**

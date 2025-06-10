@@ -2131,6 +2131,7 @@ pub mod task_execution {
         Initializing = 6,
         /// To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
         WaitingForResources = 7,
+        RetryableFailed = 8,
     }
     impl Phase {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2147,6 +2148,7 @@ pub mod task_execution {
                 Phase::Failed => "FAILED",
                 Phase::Initializing => "INITIALIZING",
                 Phase::WaitingForResources => "WAITING_FOR_RESOURCES",
+                Phase::RetryableFailed => "RETRYABLE_FAILED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2160,6 +2162,7 @@ pub mod task_execution {
                 "FAILED" => Some(Self::Failed),
                 "INITIALIZING" => Some(Self::Initializing),
                 "WAITING_FOR_RESOURCES" => Some(Self::WaitingForResources),
+                "RETRYABLE_FAILED" => Some(Self::RetryableFailed),
                 _ => None,
             }
         }

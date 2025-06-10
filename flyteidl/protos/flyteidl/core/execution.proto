@@ -54,6 +54,7 @@ message TaskExecution{
         INITIALIZING = 6;
         // To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
         WAITING_FOR_RESOURCES = 7;
+        RETRYABLE_FAILED = 8;
     }
 }
 
