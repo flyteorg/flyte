@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

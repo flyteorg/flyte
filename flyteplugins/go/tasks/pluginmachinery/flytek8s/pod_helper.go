@@ -647,15 +647,15 @@ func getOverridesPodTemplate(_ context.Context, tCtx pluginsCore.TaskExecutionCo
 			err := utils.UnmarshalStructToObj(podTemplate.GetPodSpec(), &podSpecOverride)
 			if err != nil {
 				return nil, nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification,
-					"Unable to unmarshal task overriden pod template k8s pod [%v], Err: [%v]", podTemplate.GetPodSpec(), err.Error())
+					"Unable to unmarshal task overridden pod template k8s pod [%v], Err: [%v]", podTemplate.GetPodSpec(), err.Error())
 			}
 		}
 
 		objectMetaOverride := &metav1.ObjectMeta{}
 
 		if podTemplate.GetMetadata() != nil {
-			objectMetaOverride.Annotations = podTemplate.GetMetadata().Annotations
-			objectMetaOverride.Labels = podTemplate.GetMetadata().Labels
+			objectMetaOverride.Annotations = podTemplate.GetMetadata().GetAnnotations()
+			objectMetaOverride.Labels = podTemplate.GetMetadata().GetLabels()
 		}
 
 		return podSpecOverride, objectMetaOverride, nil
