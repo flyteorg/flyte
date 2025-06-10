@@ -54,6 +54,13 @@ func generateCatalogKeys(ctx context.Context, t *testing.T) (catalog.Key, catalo
 		TypedInterface: sampleInterface,
 		InputReader:    mockInputReader,
 	}
+	sampleCatalogKeyWithSetKey := catalog.Key{
+		Identifier:     sampleIdentifier,
+		CacheVersion:   "1.0.0",
+		TypedInterface: sampleInterface,
+		InputReader:    mockInputReader,
+		CacheKey:       "alreadySetValue",
+	}
 	sampleCatalogKeyErr := catalog.Key{
 		Identifier:     sampleIdentifier,
 		CacheVersion:   "1.0.0",
@@ -62,6 +69,10 @@ func generateCatalogKeys(ctx context.Context, t *testing.T) (catalog.Key, catalo
 	}
 	sampleCacheKey, err := GenerateCacheKey(ctx, sampleCatalogKey)
 	assert.NoError(t, err)
+	assert.Equal(t, "+UmrGhEwHv3FesdpA4gliBluF3FUXz4tshmuOlw1FSk=-gfjJTWtY-GKw-c0Pw-jwhb7XmCTEQeFc_pixCptPWTWg_hezuWfuZAwHJDwWQ-1.0.0", sampleCacheKey)
+	sampleCacheKeyWithSetKey, err := GenerateCacheKey(ctx, sampleCatalogKeyWithSetKey)
+	assert.NoError(t, err)
+	assert.Equal(t, "alreadySetValue", sampleCacheKeyWithSetKey)
 	_, err = GenerateCacheKey(ctx, sampleCatalogKeyErr)
 	assert.Error(t, err)
 

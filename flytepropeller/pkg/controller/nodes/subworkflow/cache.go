@@ -107,6 +107,7 @@ func (w *workflowNodeHandler) GetCatalogKey(ctx context.Context, nCtx interfaces
 		CacheIgnoreInputVars: nil,
 		TypedInterface:       *typedInterface,
 		InputReader:          inputReader,
+		CacheKey:             nCtx.NodeExecutionMetadata().GetCacheKey(),
 	}, nil
 }
 

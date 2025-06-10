@@ -31,6 +31,7 @@ type Key struct {
 	CacheIgnoreInputVars []string
 	TypedInterface       core.TypedInterface
 	InputReader          io.InputReader
+	CacheKey             string
 }
 
 type ReservationCache struct {

@@ -104,6 +104,10 @@ type nodeExecMetadata struct {
 	nodeLabels                    map[string]string
 }
 
+func (e nodeExecMetadata) GetCacheKey() string {
+	return ""
+}
+
 func (e nodeExecMetadata) GetNodeExecutionID() *core.NodeExecutionIdentifier {
 	return e.nodeExecID
 }

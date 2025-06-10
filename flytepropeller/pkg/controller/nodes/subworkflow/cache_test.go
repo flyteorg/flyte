@@ -160,6 +160,10 @@ func TestGetCatalogKey(t *testing.T) {
 			nCtx.OnNode().Return(mockNode)
 			nCtx.OnExecutionContext().Return(mockExecutionContext)
 
+			mockNodeExecutionMetadata := &interfacesmocks.NodeExecutionMetadata{}
+			mockNodeExecutionMetadata.OnGetCacheKey().Return("")
+			nCtx.OnNodeExecutionMetadata().Return(mockNodeExecutionMetadata)
+
 			mockLaunchPlanExecutor := &launchplanmocks.Executor{}
 			mockRecoveryClient := &recoverymocks.Client{}
 

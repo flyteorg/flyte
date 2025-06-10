@@ -51,6 +51,38 @@ func (_m *NodeExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type NodeExecutionMetadata_GetCacheKey struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionMetadata_GetCacheKey) Return(_a0 string) *NodeExecutionMetadata_GetCacheKey {
+	return &NodeExecutionMetadata_GetCacheKey{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionMetadata) OnGetCacheKey() *NodeExecutionMetadata_GetCacheKey {
+	c_call := _m.On("GetCacheKey")
+	return &NodeExecutionMetadata_GetCacheKey{Call: c_call}
+}
+
+func (_m *NodeExecutionMetadata) OnGetCacheKeyMatch(matchers ...interface{}) *NodeExecutionMetadata_GetCacheKey {
+	c_call := _m.On("GetCacheKey", matchers...)
+	return &NodeExecutionMetadata_GetCacheKey{Call: c_call}
+}
+
+// GetCacheKey provides a mock function with given fields:
+func (_m *NodeExecutionMetadata) GetCacheKey() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type NodeExecutionMetadata_GetConsoleURL struct {
 	*mock.Call
 }

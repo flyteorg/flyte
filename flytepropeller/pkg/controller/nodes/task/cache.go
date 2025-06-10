@@ -31,6 +31,7 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 		CacheIgnoreInputVars: taskTemplate.Metadata.CacheIgnoreInputVars,
 		TypedInterface:       *taskTemplate.Interface,
 		InputReader:          nCtx.InputReader(),
+		CacheKey:             nCtx.NodeExecutionMetadata().GetCacheKey(),
 	}, nil
 }
 
