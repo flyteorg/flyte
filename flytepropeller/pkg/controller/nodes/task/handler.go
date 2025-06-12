@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"runtime/debug"
 	"time"
@@ -675,6 +676,9 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	jsonBytes, _ := json.MarshalIndent(p, "", "  ")
+	logger.Debug(ctx, "The task type is [%s]", string(ttype))
+	logger.Debug(ctx, "The deployment config is [%s]", string(jsonBytes))
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}

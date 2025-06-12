@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"reflect"
 	"sync"
 	"time"
 
@@ -56,11 +55,55 @@ type ResourceMetaWrapper struct {
 }
 
 func (p *Plugin) GetConfig() webapi.PluginConfig {
-	if p.deployment.ConnectorDeployment != nil && !reflect.DeepEqual(p.deployment.ConnectorDeployment.WebAPI, webapi.PluginConfig{}) {
-		return p.deployment.ConnectorDeployment.WebAPI
-	} else {
+	// Return default config if deployment is nil
+	if p.deployment.ConnectorDeployment == nil {
 		return p.cfg.WebAPI
 	}
+
+	// Create a new config object by copying deployment's config
+	config := p.deployment.ConnectorDeployment.WebAPI
+
+	// 1. Check if ResourceQuotas is nil
+	if config.ResourceQuotas == nil {
+		config.ResourceQuotas = p.cfg.WebAPI.ResourceQuotas
+	}
+
+	// 2. Check ReadRateLimiter values individually
+	if config.ReadRateLimiter.QPS == 0 {
+		config.ReadRateLimiter.QPS = p.cfg.WebAPI.ReadRateLimiter.QPS
+	}
+	if config.ReadRateLimiter.Burst == 0 {
+		config.ReadRateLimiter.Burst = p.cfg.WebAPI.ReadRateLimiter.Burst
+	}
+
+	// 3. Check WriteRateLimiter values individually
+	if config.WriteRateLimiter.QPS == 0 {
+		config.WriteRateLimiter.QPS = p.cfg.WebAPI.WriteRateLimiter.QPS
+	}
+	if config.WriteRateLimiter.Burst == 0 {
+		config.WriteRateLimiter.Burst = p.cfg.WebAPI.WriteRateLimiter.Burst
+	}
+
+	// 4. Check Caching configuration values individually
+	if config.Caching.ResyncInterval.Duration == time.Duration(0) {
+		config.Caching.ResyncInterval = p.cfg.WebAPI.Caching.ResyncInterval
+	}
+	if config.Caching.Size == 0 {
+		config.Caching.Size = p.cfg.WebAPI.Caching.Size
+	}
+	if config.Caching.Workers == 0 {
+		config.Caching.Workers = p.cfg.WebAPI.Caching.Workers
+	}
+	if config.Caching.MaxSystemFailures == 0 {
+		config.Caching.MaxSystemFailures = p.cfg.WebAPI.Caching.MaxSystemFailures
+	}
+
+	// 5. Check if ResourceMeta is nil
+	if config.ResourceMeta == nil {
+		config.ResourceMeta = p.cfg.WebAPI.ResourceMeta
+	}
+
+	return config
 }
 
 func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (

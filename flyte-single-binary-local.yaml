@@ -43,8 +43,9 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
-      - connector-service
       - echo
+      - agent-service
+      # - noop_async_agent_task
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
@@ -68,13 +69,37 @@ plugins:
         kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
         cloudwatch-enabled: false
         stackdriver-enabled: false
-  connector-service:
+  # connector-service:
+  #   supportedTaskTypes:
+  #     - bigquery_query_job_task
+  #     - sensor
+  #     - chatgpt
+    # connectors:
+    #   my-test-connector1:
+    #     endpoint: "localhost:8000"
+    #     insecure: true
+    #     timeouts:
+    #       CreateTask: 5s
+    #       GetTask: 30s
+    #       DeleteTask: 30s
+    #     defaultTimeout: 30s
+    #     webApi:
+    #       caching:
+    #         resyncInterval: 60s
+    # defaultConnector:
+    #   endpoint: "localhost:8000"
+    # webApi:
+    #   caching:
+    #     resyncInterval: 120s
+    # connectorForTaskTypes:
+    #   - noop_async_agent_task: my-test-connector1
+  agent-service:
     supportedTaskTypes:
       - bigquery_query_job_task
       - sensor
       - chatgpt
-    connectors:
-      my-test-connector:
+    agents:
+      my-test-connector1:
         endpoint: "localhost:8000"
         insecure: true
         timeouts:
@@ -82,16 +107,13 @@ plugins:
           GetTask: 30s
           DeleteTask: 30s
         defaultTimeout: 30s
-        webApi:
-          caching:
-            resyncInterval: 60s
-    defaultConnector:
+    defaultAgent:
       endpoint: "localhost:8000"
     webApi:
       caching:
         resyncInterval: 120s
-    connectorForTaskTypes:
-      - my_test_task1: my-test-connector
+    agentForTaskTypes:
+      - noop_async_agent_task: my-test-connector1
 
 database:
   postgres:

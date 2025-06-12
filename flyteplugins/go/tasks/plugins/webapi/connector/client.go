@@ -95,10 +95,10 @@ func watchConnectors(ctx context.Context, cs *ClientSet) {
 	cfg := GetConfig()
 	var connectorDeployments []*Deployment
 
+	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
 		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector)
 	}
-	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
 	for _, connectorDeployment := range connectorDeployments {
 		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
 		if !ok {

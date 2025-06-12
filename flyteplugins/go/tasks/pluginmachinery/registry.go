@@ -64,8 +64,6 @@ func (p *taskPluginRegistry) IsTaskTypeRegistered(taskType string) bool {
 
 // RegisterTaskType registers a single task type
 func (p *taskPluginRegistry) AddRegisteredTaskType(taskType string) {
-	p.m.Lock()
-	defer p.m.Unlock()
 	if p.registeredTaskTypes == nil {
 		p.registeredTaskTypes = make(map[string]struct{})
 	}
