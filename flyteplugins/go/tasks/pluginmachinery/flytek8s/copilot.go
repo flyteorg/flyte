@@ -62,6 +62,7 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
+		"--logger.level=" + strconv.Itoa(logger.GetConfig().Level),
 	}
 	if storageConfig.MultiContainerEnabled {
 		commands = append(commands, "--storage.enable-multicontainer")
