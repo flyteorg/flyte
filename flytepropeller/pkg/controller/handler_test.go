@@ -770,7 +770,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			},
 		}
 		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
+		s.EXPECT().Update(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)
@@ -791,7 +791,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 			},
 		}
 		s.EXPECT().Get(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
-		s.EXPECT().Update(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
+		s.EXPECT().Update(mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
 
 		err := p.Handle(ctx, namespace, name)
 		assert.Error(t, err)

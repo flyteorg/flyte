@@ -170,7 +170,7 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 		wfStore := NewResourceVersionCachingStore(ctx, scope, trackTerminatedWfStore)
 		assert.NoError(t, err)
 		// Insert a new workflow with R1
-		_, err = wfStore.Update(ctx, newWf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, newWf)
 		assert.NoError(t, err)
 
 		w, err := wfStore.Get(ctx, resourceVersionCachingNamespace, staleName)
@@ -192,7 +192,7 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 		wfStore := NewResourceVersionCachingStore(ctx, scope, trackTerminatedWfStore)
 		assert.NoError(t, err)
 		// Insert a new workflow with R1
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		// Update the workflow version
@@ -227,7 +227,7 @@ func TestResourceVersionCaching_Get_UpdateAndRead(t *testing.T) {
 		wfStore := NewResourceVersionCachingStore(ctx, scope, trackTerminatedWfStore)
 		assert.NoError(t, err)
 		// Insert a new workflow with R1
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		// Return updated workflow
@@ -265,7 +265,7 @@ func TestResourceVersionCaching_UpdateTerminated(t *testing.T) {
 	wfStore := NewResourceVersionCachingStore(ctx, scope, trackTerminatedWfStore)
 	assert.NoError(t, err)
 	// Insert a new workflow with R1
-	_, err = wfStore.Update(ctx, newWf, PriorityClassCritical)
+	_, err = wfStore.Update(ctx, newWf)
 	assert.NoError(t, err)
 
 	rvStore := wfStore.(*resourceVersionCaching)
@@ -275,7 +275,7 @@ func TestResourceVersionCaching_UpdateTerminated(t *testing.T) {
 
 	wf2 := wf.DeepCopy()
 	wf2.Status.Phase = v1alpha1.WorkflowPhaseAborted
-	_, err = wfStore.Update(ctx, wf2, PriorityClassCritical)
+	_, err = wfStore.Update(ctx, wf2)
 	assert.NoError(t, err)
 
 	v, ok = rvStore.lastUpdatedResourceVersionCache.Load(resourceVersionKey(resourceVersionCachingNamespace, resourceVersionCachingName))
