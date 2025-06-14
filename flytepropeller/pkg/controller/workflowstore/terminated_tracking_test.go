@@ -36,7 +36,7 @@ func TestTerminatedTrackingStore_Update(t *testing.T) {
 		_, err := mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
 		assert.NoError(t, err)
 
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
@@ -56,7 +56,7 @@ func TestTerminatedTrackingStore_Update(t *testing.T) {
 		_, err := mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
 		assert.NoError(t, err)
 
-		_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
+		_, err = wfStore.Update(ctx, wf)
 		assert.NoError(t, err)
 
 		l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
@@ -66,38 +66,4 @@ func TestTerminatedTrackingStore_Update(t *testing.T) {
 		assert.Nil(t, terminatedWf)
 		assert.True(t, IsWorkflowTerminated(err))
 	})
-}
-
-func TestTerminatedTrackingStore_UpdateStatus(t *testing.T) {
-	ctx := context.TODO()
-
-	mockClient := fake.NewSimpleClientset().FlyteworkflowV1alpha1()
-
-	scope := promutils.NewTestScope()
-	l := &mockWFNamespaceLister{}
-	passthroughWfStore := NewPassthroughWorkflowStore(ctx, scope, mockClient, &mockWFLister{V: l})
-	wfStore, err := NewTerminatedTrackingStore(ctx, scope, passthroughWfStore)
-	assert.NoError(t, err)
-
-	name := "name"
-
-	wf := dummyWf(terminatedTrackingNamespace, name)
-	wf.Status.Phase = v1alpha1.WorkflowPhaseSucceeding
-
-	_, err = mockClient.FlyteWorkflows(wf.GetNamespace()).Create(ctx, wf, v1.CreateOptions{})
-	assert.NoError(t, err)
-
-	_, err = wfStore.Update(ctx, wf, PriorityClassCritical)
-	assert.NoError(t, err)
-
-	wf.Status.Phase = v1alpha1.WorkflowPhaseAborted
-	_, err = wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
-	assert.NoError(t, err)
-
-	l.GetCb = func(name string) (*v1alpha1.FlyteWorkflow, error) {
-		return wf, nil
-	}
-	terminatedWf, err := wfStore.Get(ctx, terminatedTrackingNamespace, name)
-	assert.Nil(t, terminatedWf)
-	assert.True(t, IsWorkflowTerminated(err))
 }
