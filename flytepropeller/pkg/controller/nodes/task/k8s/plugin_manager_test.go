@@ -1126,6 +1126,41 @@ func TestResourceManagerConstruction(t *testing.T) {
 	assert.NotNil(t, rm)
 }
 
+func TestPluginManager_CreatePodGroupForPod(t *testing.T) {
+	t.Run("Build volcano podgroup for a pod", func(t *testing.T) {
+		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
+		pod := &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
+			},
+			TypeMeta: metav1.TypeMeta{
+				Kind:       flytek8s.PodKind,
+				APIVersion: v1.SchemeGroupVersion.String(),
+			},
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+					}},
+					{Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("2"), v1.ResourceMemory: resource.MustParse("2Gi")},
+					}},
+					{Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3"), v1.ResourceMemory: resource.MustParse("3Gi")},
+					}},
+				},
+			},
+		}
+		podgroup := createPodGroupForPod(tctx.TaskExecutionMetadata(), pod)
+		assert.Equal(t, podgroup.Name, pod.Name)
+		assert.Equal(t, podgroup.Namespace, pod.Namespace)
+		assert.Equal(t, podgroup.Kind, "PodGroup")
+		assert.Equal(t, podgroup.Spec.MinResources.Cpu().Cmp(resource.MustParse("6")), 0)
+		assert.Equal(t, podgroup.Spec.MinResources.Memory().Cmp(resource.MustParse("6Gi")), 0)
+	})
+}
+
 func TestFinalize(t *testing.T) {
 	t.Run("DeleteResourceOnFinalize=True", func(t *testing.T) {
 		ctx := context.Background()
