@@ -538,6 +538,13 @@ export class TaskMetadata extends Message<TaskMetadata> {
    */
   metadata?: K8sObjectMetadata;
 
+  /**
+   * Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled.
+   *
+   * @generated from field: google.protobuf.Duration cache_ttl = 17;
+   */
+  cacheTtl?: Duration;
+
   constructor(data?: PartialMessage<TaskMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -560,6 +567,7 @@ export class TaskMetadata extends Message<TaskMetadata> {
     { no: 14, name: "is_eager", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 15, name: "generates_deck", kind: "message", T: BoolValue },
     { no: 16, name: "metadata", kind: "message", T: K8sObjectMetadata },
+    { no: 17, name: "cache_ttl", kind: "message", T: Duration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskMetadata {
