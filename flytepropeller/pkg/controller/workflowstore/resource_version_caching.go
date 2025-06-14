@@ -75,7 +75,11 @@ func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.
 
 	if newWF != nil {
 		// If the update succeeded AND a resource version has changed (indicating the new WF was actually changed),
-		// cache the old
+		// cache the old.  The behavior this code is trying to accomplish is this.  Normally, if the CRD has not changed,
+		// the code will look at the workflow at the normal frequency.  As soon as something has changed, and we get
+		// confirmation that we have written the newer workflow to the api server, and receive a different ResourceVersion,
+		// we cache the old ResourceVersion number.  This means that we will never process that exact version again
+		// (as long as the cache is up) thus saving us from things like sending duplicate events.
 		if newWF.ResourceVersion != workflow.ResourceVersion {
 			r.updateRevisionCache(ctx, workflow.Namespace, workflow.Name, workflow.ResourceVersion, workflow.Status.IsTerminated())
 		} else {
