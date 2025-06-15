@@ -67,9 +67,8 @@ func (r *resourceVersionCaching) Get(ctx context.Context, namespace, name string
 	return w, nil
 }
 
-func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
-	newWF, err = r.w.UpdateStatus(ctx, workflow, priorityClass)
+func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow) (newWF *v1alpha1.FlyteWorkflow, err error) {
+	newWF, err = r.w.Update(ctx, workflow)
 	if err != nil {
 		return nil, err
 	}
@@ -81,26 +80,6 @@ func (r *resourceVersionCaching) UpdateStatus(ctx context.Context, workflow *v1a
 		// confirmation that we have written the newer workflow to the api server, and receive a different ResourceVersion,
 		// we cache the old ResourceVersion number.  This means that we will never process that exact version again
 		// (as long as the cache is up) thus saving us from things like sending duplicate events.
-		if newWF.ResourceVersion != workflow.ResourceVersion {
-			r.updateRevisionCache(ctx, workflow.Namespace, workflow.Name, workflow.ResourceVersion, workflow.Status.IsTerminated())
-		} else {
-			r.metrics.workflowRedundantUpdatesCount.Inc(ctx)
-		}
-	}
-
-	return newWF, nil
-}
-
-func (r *resourceVersionCaching) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
-	newWF *v1alpha1.FlyteWorkflow, err error) {
-	newWF, err = r.w.Update(ctx, workflow, priorityClass)
-	if err != nil {
-		return nil, err
-	}
-
-	if newWF != nil {
-		// If the update succeeded AND a resource version has changed (indicating the new WF was actually changed),
-		// cache the old
 		if newWF.ResourceVersion != workflow.ResourceVersion {
 			r.updateRevisionCache(ctx, workflow.Namespace, workflow.Name, workflow.ResourceVersion, workflow.Status.IsTerminated())
 		} else {
