@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "uploader"
-	flyteDownloaderContainerName    = "downloader"
+	flyteSidecarContainerName    = "uploader"
+	flyteDownloaderContainerName = "downloader"
 )
 
 var pTraceCapability = v1.Capability("SYS_PTRACE")

@@ -3,10 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"time"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
