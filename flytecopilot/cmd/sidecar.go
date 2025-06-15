@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
@@ -87,34 +90,8 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 		return fmt.Errorf("incorrect input upload mode specified, given [%s], possible values [%+v]", u.uploadMode, GetUploadModeVals())
 	}
 
-	logger.Infof(ctx, "Creating start watcher type: %s", u.startWatcherType)
-	w, err := u.createWatcher(ctx, u.startWatcherType)
-	if err != nil {
-		return err
-	}
-
-	logger.Infof(ctx, "Waiting for Container to start with timeout %s.", u.containerStartTimeout)
-	childCtx, cancelFn := context.WithTimeout(ctx, u.containerStartTimeout)
-	defer cancelFn()
-	err = w.WaitToStart(childCtx)
-	if err != nil && err != containerwatcher.ErrTimeout {
-		return err
-	}
-
-	if err != nil {
-		logger.Warnf(ctx, "Container start detection aborted, :%s", err.Error())
-	}
-
-	if u.startWatcherType != u.exitWatcherType {
-		logger.Infof(ctx, "Creating watcher type: %s", u.exitWatcherType)
-		w, err = u.createWatcher(ctx, u.exitWatcherType)
-		if err != nil {
-			return err
-		}
-	}
-
 	logger.Infof(ctx, "Waiting for Container to exit.")
-	if err := w.WaitToExit(ctx); err != nil {
+	if err := u.WaitToExit(ctx); err != nil {
 		logger.Errorf(ctx, "Failed waiting for container to exit. Err: %s", err)
 		return err
 	}
@@ -129,7 +106,7 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 
 	dl := data.NewUploader(ctx, u.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_UploadMode(m), ErrorFile)
 
-	childCtx, cancelFn = context.WithTimeout(ctx, u.timeout)
+	childCtx, cancelFn := context.WithTimeout(ctx, u.timeout)
 	defer cancelFn()
 	if err := dl.RecursiveUpload(childCtx, outputInterface, u.localDirectoryPath, toOutputPath, storage.DataReference(u.remoteOutputsRawPrefix)); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
@@ -138,6 +115,29 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 
 	logger.Infof(ctx, "Uploader completed successfully!")
 	return nil
+}
+
+func (u *UploadOptions) WaitToExit(ctx context.Context) error {
+	logger.Infof(ctx, "SNPS Watcher waiting for termination signal")
+	defer logger.Infof(ctx, "SNPS Watcher exiting on termination signal")
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Listen for SIGTERM
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM)
+	defer signal.Stop(sigs)
+
+	// Wait for SIGTERM signal or cancel context
+	select {
+	case sig := <-sigs:
+		logger.Infof(ctx, "Received signal: %v", sig)
+		return nil
+	case <-ctx.Done():
+		logger.Infof(ctx, "Context canceled")
+		return nil
+	}
 }
 
 func (u *UploadOptions) Sidecar(ctx context.Context) error {

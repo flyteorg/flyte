@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/utils/ptr"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -270,10 +271,12 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 				return primaryInitContainerName, err
 			}
 			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
+			// Make it into sidecar container
+			sidecar.RestartPolicy = ptr.To(v1.ContainerRestartPolicyAlways)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
+			coPilotPod.InitContainers = append(coPilotPod.InitContainers, sidecar)
 		}
 	}
 
