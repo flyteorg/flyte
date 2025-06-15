@@ -90,7 +90,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"project_id": "flyte-gcp",
 			"scope":      "read_write",
 		}
-		assert.Equal(t, 11, len(CopilotCommandArgs(storage.GetConfig())))
+		assert.Equal(t, 12, len(CopilotCommandArgs(storage.GetConfig())))
 	})
 
 	t.Run("bad-res-cpu", func(t *testing.T) {
