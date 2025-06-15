@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/utils/ptr"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -20,8 +22,8 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "uploader"
-	flyteInitContainerName    = "downloader"
+	flyteSidecarContainerName    = "uploader"
+	flyteDownloaderContainerName = "downloader"
 )
 
 var pTraceCapability = v1.Capability("SYS_PTRACE")
@@ -62,6 +64,7 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
+		"--logger.level=" + strconv.Itoa(logger.GetConfig().Level),
 	}
 	if storageConfig.MultiContainerEnabled {
 		commands = append(commands, "--storage.enable-multicontainer")
@@ -236,7 +239,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount)
+			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
@@ -268,10 +271,12 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 				return primaryInitContainerName, err
 			}
 			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
+			// Make it into sidecar container
+			sidecar.RestartPolicy = ptr.To(v1.ContainerRestartPolicyAlways)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
+			coPilotPod.InitContainers = append(coPilotPod.InitContainers, sidecar)
 		}
 	}
 
