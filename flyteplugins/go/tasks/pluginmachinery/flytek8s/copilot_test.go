@@ -261,7 +261,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 			cntr := c
 			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &cntr)
 		} else {
-			if c.Name == cfg.NamePrefix+flyteInitContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
+			if c.Name == cfg.NamePrefix+flyteDownloaderContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
 				if iFace != nil {
 					vmap := map[string]v1.VolumeMount{}
 					for _, v := range c.VolumeMounts {
@@ -273,7 +273,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 							path = pilot.GetInputPath()
 						}
 						v, found := vmap[cfg.InputVolumeName]
-						if c.Name == cfg.NamePrefix+flyteInitContainerName {
+						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
 							assert.Equal(t, path, v.MountPath, "Input Path does not match")
 							assert.True(t, found, "Input volume mount expected but not found!")
 						} else {
@@ -287,7 +287,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 							path = pilot.GetOutputPath()
 						}
 						v, found := vmap[cfg.OutputVolumeName]
-						if c.Name == cfg.NamePrefix+flyteInitContainerName {
+						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
 							assert.False(t, found, "Output volume mount not expected but found on init container!")
 						} else {
 							assert.Equal(t, path, v.MountPath, "Output Path does not match")

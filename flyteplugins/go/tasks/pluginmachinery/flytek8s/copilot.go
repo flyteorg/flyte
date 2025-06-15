@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -21,7 +22,7 @@ import (
 
 const (
 	flyteSidecarContainerName = "uploader"
-	flyteInitContainerName    = "downloader"
+	flyteDownloaderContainerName    = "downloader"
 )
 
 var pTraceCapability = v1.Capability("SYS_PTRACE")
@@ -237,7 +238,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount)
+			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
