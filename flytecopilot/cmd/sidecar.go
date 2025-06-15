@@ -118,29 +118,6 @@ func (u *UploadOptions) uploader(ctx context.Context) error {
 	return nil
 }
 
-func (u *UploadOptions) WaitToExit(ctx context.Context) error {
-	logger.Infof(ctx, "SNPS Watcher waiting for termination signal")
-	defer logger.Infof(ctx, "SNPS Watcher exiting on termination signal")
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	// Listen for SIGTERM
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGTERM)
-	defer signal.Stop(sigs)
-
-	// Wait for SIGTERM signal or cancel context
-	select {
-	case sig := <-sigs:
-		logger.Infof(ctx, "Received signal: %v", sig)
-		return nil
-	case <-ctx.Done():
-		logger.Infof(ctx, "Context canceled")
-		return nil
-	}
-}
-
 func (u *UploadOptions) Sidecar(ctx context.Context) error {
 
 	if err := u.uploader(ctx); err != nil {
