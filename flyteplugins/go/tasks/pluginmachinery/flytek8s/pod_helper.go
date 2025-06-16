@@ -438,6 +438,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
+	// Fetch base pod template early to extract container resources for proper priority handling
+	basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
 		Inputs:            tCtx.InputReader(),
@@ -451,7 +457,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	for index := range podSpec.InitContainers {
 		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
+		// Extract pod template resources for this init container
+		var podTemplateResources *v1.ResourceRequirements
+		if basePodTemplate != nil {
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, podSpec.InitContainers[index].Name)
+			podTemplateResources = &resources
+		}
+
+		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index], podTemplateResources); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -464,7 +477,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 			resourceMode = ResourceCustomizationModeMergeExistingResources
 		}
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.Containers[index]); err != nil {
+		// Extract pod template resources for this container
+		var podTemplateResources *v1.ResourceRequirements
+		if basePodTemplate != nil {
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, container.Name)
+			podTemplateResources = &resources
+		}
+
+		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.Containers[index], podTemplateResources); err != nil {
 			return nil, nil, err
 		}
 
@@ -644,11 +664,11 @@ func GetContainer(podSpec *v1.PodSpec, name string) (*v1.Container, error) {
 	return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, container [%s] not defined", name)
 }
 
-// getBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
+// GetBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
 // come from one of the following:
 // (1) PodTemplate name in the TaskMetadata: This name is then looked up in the PodTemplateStore.
 // (2) Default PodTemplate name from configuration: This name is then looked up in the PodTemplateStore.
-func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podTemplateStore PodTemplateStore) (*v1.PodTemplate, error) {
+func GetBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podTemplateStore PodTemplateStore) (*v1.PodTemplate, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "TaskSpecification cannot be read, Err: [%v]", err.Error())
@@ -675,7 +695,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 
 	// attempt to retrieve base PodTemplate
-	podTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
+	podTemplate, err := GetBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
 	if err != nil {
 		return nil, nil, err
 	} else if podTemplate == nil {
