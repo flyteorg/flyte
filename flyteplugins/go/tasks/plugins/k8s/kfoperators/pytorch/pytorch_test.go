@@ -763,9 +763,9 @@ func TestGetLogs(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, k8s.PluginState{})
-
-	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
+	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
+	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
@@ -785,9 +785,9 @@ func TestGetLogsElastic(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	pluginContext := dummyPytorchPluginContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, k8s.PluginState{})
-
-	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0, 0)
+	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
+	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))

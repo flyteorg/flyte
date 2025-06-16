@@ -693,9 +693,9 @@ func TestGetLogs(t *testing.T) {
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, evaluatorReplicas, commonOp.JobRunning)
-	pluginContext := dummyTensorFlowPluginContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)), resourceRequirements, nil, k8s.PluginState{})
-
-	jobLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, false,
+	taskTemplate := dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas))
+	pluginContext := dummyTensorFlowPluginContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, taskTemplate, false,
 		workers, psReplicas, chiefReplicas, evaluatorReplicas)
 
 	assert.NoError(t, err)

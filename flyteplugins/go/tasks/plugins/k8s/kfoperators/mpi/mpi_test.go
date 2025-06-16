@@ -647,9 +647,9 @@ func TestGetLogs(t *testing.T) {
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
-	pluginContext := dummyMPIPluginContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil, k8s.PluginState{})
-
-	jobLogs, err := common.GetLogs(pluginContext, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0, 0)
+	taskTemplate := dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots))
+	pluginContext := dummyMPIPluginContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
+	jobLogs, err := common.GetLogs(pluginContext, common.MPITaskType, mpiJob.ObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
