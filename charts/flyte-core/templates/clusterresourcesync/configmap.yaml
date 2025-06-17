@@ -1,4 +1,4 @@
-
+{{- if .Values.cluster_resource_manager.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,4 +34,4 @@ data:
     clusters:
       {{- tpl (toYaml .) $ | nindent 6 }}
   {{- end }}
-
+{{- end }}

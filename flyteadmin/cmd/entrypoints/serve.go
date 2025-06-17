@@ -49,5 +49,5 @@ var serveCmd = &cobra.Command{
 func init() {
 	// Command information
 	RootCmd.AddCommand(serveCmd)
-	RootCmd.AddCommand(secretsCmd)
+	RootCmd.AddCommand(SecretsCmd)
 }

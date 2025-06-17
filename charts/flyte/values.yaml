@@ -450,8 +450,6 @@ flyte:
           - "metadata"
           - "admin"
         eventVersion: 2
-        testing:
-          host: http://flyteadmin
       # -- Authentication configuration
       auth:
         authorizedUris:

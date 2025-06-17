@@ -87,66 +87,20 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
 	scope promutils.Scope, sm core.SecretManager, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
-	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
-	pluginRegistry.RegisterDefault(
-		plugins.PluginIDUnaryServiceMiddleware,
-		grpcmiddleware.ChainUnaryServer(
-			RequestIDInterceptor,
-			ErrorMessageTruncatorInterceptor,
-			auth.BlanketAuthorization,
-			auth.ExecutionUserIdentifierInterceptor))
-
-	srvMetricsOpts := []grpcprometheus.ServerMetricsOption{}
+	var srvMetricsOpts []grpcprometheus.ServerMetricsOption
 	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
 		srvMetricsOpts = append(srvMetricsOpts, grpcprometheus.WithServerHandlingTimeHistogram())
 	}
 	srvMetrics := grpcutils.GrpcServerMetrics(srvMetricsOpts...)
 
-	// Not yet implemented for streaming
-	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
-	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
-		otelgrpc.WithTracerProvider(tracerProvider),
-		otelgrpc.WithPropagators(propagation.TraceContext{}),
-	)
-
 	adminScope := scope.NewSubScope("admin")
 	recoveryInterceptor := middleware.NewRecoveryInterceptor(adminScope)
-
-	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
-	if cfg.Security.UseAuth {
-		logger.Infof(ctx, "Creating gRPC server with authentication")
-		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
-			// recovery interceptor should always be first in order to handle any panics in the middleware or server
-			recoveryInterceptor.UnaryServerInterceptor(),
-			grpcrecovery.UnaryServerInterceptor(),
-			srvMetrics.UnaryServerInterceptor(),
-			otelUnaryServerInterceptor,
-			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
-			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
-			auth.AuthenticationLoggingInterceptor,
-			middlewareInterceptors,
-		)
-	} else {
-		logger.Infof(ctx, "Creating gRPC server without authentication")
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
-			// recovery interceptor should always be first in order to handle any panics in the middleware or server
-			recoveryInterceptor.UnaryServerInterceptor(),
-			srvMetrics.UnaryServerInterceptor(),
-			otelUnaryServerInterceptor,
-		)
-	}
-
-	chainedStreamInterceptors := grpcmiddleware.ChainStreamServer(
-		// recovery interceptor should always be first in order to handle any panics in the middleware or server
-		recoveryInterceptor.StreamServerInterceptor(),
-		srvMetrics.StreamServerInterceptor(),
-	)
+	unaryIntr := unaryInterceptor(ctx, pluginRegistry, recoveryInterceptor, srvMetrics, authCtx)
+	streamIntr := streamInterceptor(recoveryInterceptor, srvMetrics)
 
 	serverOpts := []grpc.ServerOption{
-		// recovery interceptor should always be first in order to handle any panics in the middleware or server
-		grpc.StreamInterceptor(chainedStreamInterceptors),
-		grpc.UnaryInterceptor(chainedUnaryInterceptors),
+		grpc.UnaryInterceptor(unaryIntr),
+		grpc.StreamInterceptor(streamIntr),
 	}
 	if cfg.GrpcConfig.MaxMessageSizeBytes > 0 {
 		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes), grpc.MaxSendMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
@@ -370,44 +324,12 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	scope promutils.Scope) error {
 	logger.Infof(ctx, "Serving Flyte Admin Insecure")
 
-	// This will parse configuration and create the necessary objects for dealing with auth
-	var authCtx interfaces.AuthenticationContext
-	var err error
-
 	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 
-	// This code is here to support authentication without SSL. This setup supports a network topology where
-	// Envoy does the SSL termination. The final hop is made over localhost only on a trusted machine.
-	// Warning: Running authentication without SSL in any other topology is a severe security flaw.
-	// See the auth.Config object for additional settings as well.
-	if cfg.Security.UseAuth {
-
-		var oauth2Provider interfaces.OAuth2Provider
-		var oauth2ResourceServer interfaces.OAuth2ResourceServer
-		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
-			if err != nil {
-				logger.Errorf(ctx, "Error creating authorization server %s", err)
-				return err
-			}
-
-			oauth2ResourceServer = oauth2Provider
-		} else {
-			oauth2ResourceServer, err = authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, authCfg.UserAuth.OpenID.BaseURL)
-			if err != nil {
-				logger.Errorf(ctx, "Error creating resource server %s", err)
-				return err
-			}
-		}
-
-		oauth2MetadataProvider := authzserver.NewService(authCfg)
-		oidcUserInfoProvider := auth.NewUserInfoProvider()
-
-		authCtx, err = auth.NewAuthenticationContext(ctx, sm, oauth2Provider, oauth2ResourceServer, oauth2MetadataProvider, oidcUserInfoProvider, authCfg)
-		if err != nil {
-			logger.Errorf(ctx, "Error creating auth context %s", err)
-			return err
-		}
+	// This will parse configuration and create the necessary objects for dealing with auth
+	authCtx, err := newAuthContext(ctx, sm, scope)
+	if err != nil {
+		return err
 	}
 
 	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope, sm)
@@ -485,40 +407,15 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
 	scope promutils.Scope) error {
 	certPool, cert, err := GetSslCredentials(ctx, cfg.Security.Ssl.CertificateFile, cfg.Security.Ssl.KeyFile)
-	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
-
 	if err != nil {
 		return err
 	}
-	// This will parse configuration and create the necessary objects for dealing with auth
-	var authCtx interfaces.AuthenticationContext
-	if cfg.Security.UseAuth {
-		var oauth2Provider interfaces.OAuth2Provider
-		var oauth2ResourceServer interfaces.OAuth2ResourceServer
-		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
-			if err != nil {
-				logger.Errorf(ctx, "Error creating authorization server %s", err)
-				return err
-			}
 
-			oauth2ResourceServer = oauth2Provider
-		} else {
-			oauth2ResourceServer, err = authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, authCfg.UserAuth.OpenID.BaseURL)
-			if err != nil {
-				logger.Errorf(ctx, "Error creating resource server %s", err)
-				return err
-			}
-		}
+	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 
-		oauth2MetadataProvider := authzserver.NewService(authCfg)
-		oidcUserInfoProvider := auth.NewUserInfoProvider()
-
-		authCtx, err = auth.NewAuthenticationContext(ctx, sm, oauth2Provider, oauth2ResourceServer, oauth2MetadataProvider, oidcUserInfoProvider, authCfg)
-		if err != nil {
-			logger.Errorf(ctx, "Error creating auth context %s", err)
-			return err
-		}
+	authCtx, err := newAuthContext(ctx, sm, scope)
+	if err != nil {
+		return err
 	}
 
 	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, sm, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
@@ -576,4 +473,100 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		return errors.Wrapf(err, "failed to Start HTTP/2 Server")
 	}
 	return nil
+}
+
+func newAuthContext(ctx context.Context, sm secretmanager.FileEnvSecretManager, scope promutils.Scope) (authCtx interfaces.AuthenticationContext, err error) {
+	serverConfig := config.GetConfig()
+
+	// This code is here to support authentication without SSL. This setup supports a network topology where
+	// Envoy does the SSL termination. The final hop is made over localhost only on a trusted machine.
+	// Warning: Running authentication without SSL in any other topology is a severe security flaw.
+	// See the auth.Config object for additional settings as well.
+	if serverConfig.Security.UseAuth {
+		var oauth2Provider interfaces.OAuth2Provider
+		var oauth2ResourceServer interfaces.OAuth2ResourceServer
+		authCfg := authConfig.GetConfig()
+		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
+			if err != nil {
+				logger.Errorf(ctx, "Error creating authorization server %s", err)
+				return nil, err
+			}
+
+			oauth2ResourceServer = oauth2Provider
+		} else {
+			oauth2ResourceServer, err = authzserver.NewOAuth2ResourceServer(ctx, authCfg.AppAuth.ExternalAuthServer, authCfg.UserAuth.OpenID.BaseURL)
+			if err != nil {
+				logger.Errorf(ctx, "Error creating resource server %s", err)
+				return nil, err
+			}
+		}
+
+		oauth2MetadataProvider := authzserver.NewService(authCfg)
+		oidcUserInfoProvider := auth.NewUserInfoProvider()
+
+		authCtx, err = auth.NewAuthenticationContext(ctx, sm, oauth2Provider, oauth2ResourceServer, oauth2MetadataProvider, oidcUserInfoProvider, authCfg)
+		if err != nil {
+			logger.Errorf(ctx, "Error creating auth context %s", err)
+			return nil, err
+		}
+	}
+	return authCtx, nil
+}
+
+func unaryInterceptor(ctx context.Context,
+	pluginRegistry *plugins.Registry,
+	recovery *middleware.RecoveryInterceptor,
+	srvMetrics *grpcprometheus.ServerMetrics,
+	authCtx interfaces.AuthenticationContext,
+) grpc.UnaryServerInterceptor {
+	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
+	pluginRegistry.RegisterDefault(
+		plugins.PluginIDUnaryServiceMiddleware,
+		grpcmiddleware.ChainUnaryServer(
+			RequestIDInterceptor,
+			ErrorMessageTruncatorInterceptor,
+			auth.BlanketAuthorization,
+			auth.ExecutionUserIdentifierInterceptor,
+		),
+	)
+
+	// Not yet implemented for streaming
+	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminServerTracer)
+	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
+
+	interceptors := []grpc.UnaryServerInterceptor{
+		// recovery interceptor should always be first in order to handle any panics in the middleware or server
+		recovery.UnaryServerInterceptor(),
+		grpcrecovery.UnaryServerInterceptor(),
+		srvMetrics.UnaryServerInterceptor(),
+		otelUnaryServerInterceptor,
+	}
+	serverConfig := config.GetConfig()
+
+	if serverConfig.Security.UseAuth {
+		logger.Infof(ctx, "Creating gRPC server with authentication")
+		interceptors = append(interceptors,
+			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
+			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
+			auth.AuthenticationLoggingInterceptor,
+		)
+	} else {
+		logger.Infof(ctx, "Creating gRPC server without authentication")
+	}
+
+	middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
+	interceptors = append(interceptors, middlewareInterceptors)
+	return grpcmiddleware.ChainUnaryServer(interceptors...)
+}
+
+func streamInterceptor(recovery *middleware.RecoveryInterceptor, srvMetrics *grpcprometheus.ServerMetrics) grpc.StreamServerInterceptor {
+	return grpcmiddleware.ChainStreamServer(
+		// recovery interceptor should always be first in order to handle any panics in the middleware or server
+		recovery.StreamServerInterceptor(),
+		srvMetrics.StreamServerInterceptor(),
+	)
 }

@@ -6,13 +6,13 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 )
 
-var secretsCmd = &cobra.Command{
+var SecretsCmd = &cobra.Command{
 	Use:     "secret",
 	Aliases: []string{"secrets"},
 }
 
 func init() {
-	secretsCmd.AddCommand(auth.GetCreateSecretsCommand())
-	secretsCmd.AddCommand(auth.GetInitSecretsCommand())
-	RootCmd.AddCommand(secretsCmd)
+	SecretsCmd.AddCommand(auth.GetCreateSecretsCommand())
+	SecretsCmd.AddCommand(auth.GetInitSecretsCommand())
+	RootCmd.AddCommand(SecretsCmd)
 }

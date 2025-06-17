@@ -185,8 +185,6 @@ data:
       metricsScope: 'flyte:'
       profilerPort: 10254
       roleNameKey: iam.amazonaws.com/role
-      testing:
-        host: http://flyteadmin
     server:
       grpc:
         port: 8089
@@ -1041,7 +1039,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
+        configChecksum: "1bcc1376c1e2df8c753aecfec203e06918bdac26489fe0a476170924ea54317"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1342,7 +1340,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6b58ac31892fae343eadcfbe5cfc197d0c8fbe4504a414ce00d3e6d83904217"
+        configChecksum: "f584904ce263d89211b247bfbab4e51833ec92a3ef8435267599204bea9f4dc"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1569,7 +1567,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
+        configChecksum: "1bcc1376c1e2df8c753aecfec203e06918bdac26489fe0a476170924ea54317"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
