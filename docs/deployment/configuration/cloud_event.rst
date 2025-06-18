@@ -82,6 +82,7 @@ To turn on, add the following to your FlyteAdmin:
              enable: true
              kafka:
                brokers: 127.0.0.1:9092
+               version: my-kafka-version
              eventsPublisher:
                eventTypes:
                - all
