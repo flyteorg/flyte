@@ -18,8 +18,8 @@ func (n SignalWatcher) WaitToStart(ctx context.Context) error {
 }
 
 func (n SignalWatcher) WaitToExit(ctx context.Context) error {
-	logger.Infof(ctx, "SNPS Watcher waiting for termination signal")
-	defer logger.Infof(ctx, "SNPS Watcher exiting on termination signal")
+	logger.Infof(ctx, "Signal Watcher waiting for termination signal")
+	defer logger.Infof(ctx, "Signal Watcher exiting on termination signal")
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
