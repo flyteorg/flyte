@@ -64,6 +64,39 @@ export const DataCatalog = {
       kind: MethodKind.Unary,
     },
     /**
+     * Create future artifact data.
+     *
+     * @generated from rpc datacatalog.DataCatalog.CreateFutureArtifact
+     */
+    createFutureArtifact: {
+      name: "CreateFutureArtifact",
+      I: CreateArtifactRequest,
+      O: CreateArtifactResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Retrieve a future artifact by an identifying handle. This returns an artifact along with the artifact data.
+     *
+     * @generated from rpc datacatalog.DataCatalog.GetFutureArtifact
+     */
+    getFutureArtifact: {
+      name: "GetFutureArtifact",
+      I: GetArtifactRequest,
+      O: GetArtifactResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Updates an existing future artifact, overwriting the stored artifact data in the underlying blob storage.
+     *
+     * @generated from rpc datacatalog.DataCatalog.UpdateFutureArtifact
+     */
+    updateFutureArtifact: {
+      name: "UpdateFutureArtifact",
+      I: UpdateArtifactRequest,
+      O: UpdateArtifactResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * Associate a tag with an artifact. Tags are unique within a Dataset.
      *
      * @generated from rpc datacatalog.DataCatalog.AddTag
