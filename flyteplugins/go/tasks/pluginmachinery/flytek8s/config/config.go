@@ -40,9 +40,6 @@ var (
 			OutputVolumeName:     "flyte-outputs",
 			CPU:                  "500m",
 			Memory:               "128Mi",
-			StartTimeout: config2.Duration{
-				Duration: time.Second * 100,
-			},
 			Timeout: config2.Duration{
 				Duration: time.Hour * 1,
 			},

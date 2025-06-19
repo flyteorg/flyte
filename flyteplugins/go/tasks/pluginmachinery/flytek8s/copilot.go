@@ -91,7 +91,7 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	}...)
 }
 
-func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, startTimeout time.Duration, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
+func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
 	if iface == nil {
 		return nil, fmt.Errorf("interface is required for CoPilot Sidecar")
 	}
@@ -101,8 +101,6 @@ func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storag
 	}
 	return []string{
 		"sidecar",
-		"--start-timeout",
-		startTimeout.String(),
 		"--timeout",
 		uploadTimeout.String(),
 		"--to-raw-output",
@@ -268,7 +266,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.OutputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.StartTimeout.Duration, cfg.Timeout.Duration, iFace)
+			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.Timeout.Duration, iFace)
 			if err != nil {
 				return primaryInitContainerName, err
 			}
