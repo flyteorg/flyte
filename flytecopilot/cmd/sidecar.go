@@ -33,12 +33,12 @@ type UploadOptions struct {
 	// Local directory path where the sidecar should look for outputs.
 	localDirectoryPath string
 	// Non primitive types will be dumped in this output format
-	metadataFormat        string
-	uploadMode            string
-	timeout               time.Duration
-	typedInterface        []byte
-	startWatcherType      containerwatcher.WatcherType
-	exitWatcherType       containerwatcher.WatcherType
+	metadataFormat   string
+	uploadMode       string
+	timeout          time.Duration
+	typedInterface   []byte
+	startWatcherType containerwatcher.WatcherType
+	exitWatcherType  containerwatcher.WatcherType
 }
 
 func (u *UploadOptions) createWatcher(ctx context.Context, w containerwatcher.WatcherType) (containerwatcher.Watcher, error) {

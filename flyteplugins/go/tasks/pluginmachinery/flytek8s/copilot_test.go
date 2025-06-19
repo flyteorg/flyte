@@ -161,9 +161,9 @@ func TestSidecarCommandArgs(t *testing.T) {
 			},
 		},
 	}
-	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Second*10, iFace)
+	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Hour*1, iFace)
 	assert.NoError(t, err)
-	expected := []string{"sidecar", "--start-timeout", "10s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
+	expected := []string{"sidecar", "--timeout", "1h0m0s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])
