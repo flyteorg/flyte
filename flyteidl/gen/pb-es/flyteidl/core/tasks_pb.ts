@@ -833,7 +833,7 @@ export class Container extends Message<Container> {
 
   /**
    * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-   * This makes it possible to to run a completely portable container, that uses inputs and outputs
+   * This makes it possible to run a completely portable container, that uses inputs and outputs
    * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
    * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
    * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
@@ -1182,7 +1182,7 @@ export class K8sPod extends Message<K8sPod> {
 
   /**
    * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-   * This makes it possible to to run a completely portable container, that uses inputs and outputs
+   * This makes it possible to run a completely portable container, that uses inputs and outputs
    * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
    * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
    * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation

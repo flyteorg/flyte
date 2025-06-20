@@ -336,7 +336,7 @@ When using the Vault secret manager, make sure you have Vault Agent deployed on 
 Vault secrets can only be mounted as files and will become available under `"/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME"`.
 
 Vault comes with various secrets engines. Currently Flyte supports working with both version 1 and 2 of the `Key Vault engine <https://developer.hashicorp.com/vault/docs/secrets/kv>` as well as the `databases secrets engine <https://developer.hashicorp.com/vault/docs/secrets/databases>`.
-You can use use the `group_version` parameter to specify which secret backend engine to use. Available choices are: "kv1", "kv2", "db":
+You can use the `group_version` parameter to specify which secret backend engine to use. Available choices are: "kv1", "kv2", "db":
 
 #### Requesting secrets with the Vault secret manager
 

@@ -709,7 +709,7 @@ pub enum ResourceType {
     Workflow = 2,
     LaunchPlan = 3,
     /// A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
-    /// Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
+    /// Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects
     /// in a similar manner to other Flyte objects
     Dataset = 4,
 }
@@ -1563,7 +1563,7 @@ pub struct Container {
     #[prost(message, repeated, tag="7")]
     pub ports: ::prost::alloc::vec::Vec<ContainerPort>,
     /// BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-    /// This makes it possible to to run a completely portable container, that uses inputs and outputs
+    /// This makes it possible to run a completely portable container, that uses inputs and outputs
     /// only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
     /// If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
     /// are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
@@ -1773,7 +1773,7 @@ pub struct K8sPod {
     #[prost(message, optional, tag="2")]
     pub pod_spec: ::core::option::Option<::prost_types::Struct>,
     /// BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-    /// This makes it possible to to run a completely portable container, that uses inputs and outputs
+    /// This makes it possible to run a completely portable container, that uses inputs and outputs
     /// only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
     /// If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
     /// are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
@@ -2763,7 +2763,7 @@ pub mod node {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WorkflowMetadata {
-    /// Indicates the runtime priority of workflow executions. 
+    /// Indicates the runtime priority of workflow executions.
     #[prost(message, optional, tag="1")]
     pub quality_of_service: ::core::option::Option<QualityOfService>,
     /// Defines how the system should behave when a failure is detected in the workflow execution.
@@ -2862,7 +2862,7 @@ pub struct WorkflowTemplate {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskNodeOverrides {
-    /// A customizable interface to convey resources requested for a task container. 
+    /// A customizable interface to convey resources requested for a task container.
     #[prost(message, optional, tag="1")]
     pub resources: ::core::option::Option<Resources>,
     /// Overrides for all non-standard resources, not captured by
