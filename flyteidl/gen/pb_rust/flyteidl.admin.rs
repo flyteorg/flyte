@@ -2169,7 +2169,7 @@ pub struct ConcurrencyPolicy {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LaunchPlanClosure {
-    /// Indicate the Launch plan state.
+    /// Indicate the Launch plan state. 
     #[prost(enumeration="LaunchPlanState", tag="1")]
     pub state: i32,
     /// Indicates the set of inputs expected when creating an execution with the Launch plan
