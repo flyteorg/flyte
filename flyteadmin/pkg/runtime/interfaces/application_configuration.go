@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
@@ -323,16 +324,29 @@ func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
 	}
 }
 
+type NatsUserPassAuthConfig struct {
+	// Whether to use user/pass authentication
+	Enabled bool `json:"enabled"`
+	// Username to be used when connecting to the server.
+	User string `json:"user"`
+	// Password to be used when connecting to a server.
+	Password string `json:"password"`
+}
+type NatsTokenAuthConfig struct {
+	// Whether to use token authentication
+	Enabled bool `json:"enabled"`
+	// Token to be used when connecting to the server.
+	Token string `json:"token"`
+}
+
 // This section holds configs for Nats clients
-// TODO: complete this
 type NatsConfig struct {
-	Version string `json:"version"`
-	// kafka broker addresses
+	// nats broker addresses
 	Servers []string `json:"servers"`
-	// sasl config
-	//SASLConfig SASLConfig `json:"saslConfig"`
-	// tls config
-	// TLSConfig TLSConfig `json:"tlsConfig"`
+	// Username/password authentication config
+	UserPassAuthConfig NatsUserPassAuthConfig `json:"userAuthentication"`
+	// Token authentication config
+	TokenAuthConfig NatsTokenAuthConfig `json:"tokenAuthentication"`
 }
 
 // This section holds configuration for the event scheduler used to schedule workflow executions.
