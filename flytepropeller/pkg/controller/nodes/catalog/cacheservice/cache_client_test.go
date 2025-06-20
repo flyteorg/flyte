@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -283,6 +284,10 @@ func TestCache_Put(t *testing.T) {
 
 	sampleCatalogKey, sampleCatalogKeyErr, sampleCacheKey := generateCatalogKeys(ctx, t)
 
+	sampleMetadata := &core.CatalogMetadata{
+		DatasetId: &sampleCatalogKey.Identifier,
+	}
+
 	sampleOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"c": 3})
 	assert.NoError(t, err)
 
@@ -326,7 +331,7 @@ func TestCache_Put(t *testing.T) {
 		mockServiceReturnResponse *cacheservice.PutCacheResponse
 		mockServiceReturnError    error
 		expectClientError         bool
-		expectedClientStatus      core.CatalogCacheStatus
+		expectedClientStatus      catalog.Status
 		expectedClientErrCode     codes.Code
 		inlineCache               bool
 	}{
@@ -336,7 +341,7 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockOutputReader,
 			mockServiceReturnResponse: &cacheservice.PutCacheResponse{},
 			mockServiceReturnError:    nil,
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_POPULATED,
+			expectedClientStatus:      catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, sampleMetadata),
 			inlineCache:               true,
 		},
 		{
@@ -345,7 +350,7 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockOutputReaderExecErr,
 			mockServiceReturnResponse: &cacheservice.PutCacheResponse{},
 			mockServiceReturnError:    nil,
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
+			expectedClientStatus:      catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, sampleMetadata),
 			expectClientError:         true,
 			inlineCache:               true,
 		},
@@ -355,7 +360,7 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockOutputReaderErr,
 			mockServiceReturnResponse: &cacheservice.PutCacheResponse{},
 			mockServiceReturnError:    nil,
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
+			expectedClientStatus:      catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, sampleMetadata),
 			expectClientError:         true,
 			inlineCache:               true,
 		},
@@ -365,7 +370,7 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockOutputReader,
 			mockServiceReturnResponse: nil,
 			mockServiceReturnError:    status.Error(codes.NotFound, "test error"),
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
+			expectedClientStatus:      catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, sampleMetadata),
 			expectClientError:         true,
 			inlineCache:               true,
 		},
@@ -375,9 +380,11 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockOutputReader,
 			mockServiceReturnResponse: nil,
 			mockServiceReturnError:    nil,
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_DISABLED,
-			expectClientError:         true,
-			inlineCache:               true,
+			expectedClientStatus: catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, &core.CatalogMetadata{
+				DatasetId: &sampleCatalogKeyErr.Identifier,
+			}),
+			expectClientError: true,
+			inlineCache:       true,
 		},
 		{
 			name:                      "successful put, uri",
@@ -385,14 +392,14 @@ func TestCache_Put(t *testing.T) {
 			mockOutputReader:          mockRemoteFileOutputReader,
 			mockServiceReturnResponse: &cacheservice.PutCacheResponse{},
 			mockServiceReturnError:    nil,
-			expectedClientStatus:      core.CatalogCacheStatus_CACHE_POPULATED,
+			expectedClientStatus:      catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, sampleMetadata),
 			inlineCache:               false,
 		},
 		{
 			name:                 "output reader error - uri path does not exist",
 			catalogKey:           sampleCatalogKey,
 			mockOutputReader:     mockRemoteFileOutputReaderErr,
-			expectedClientStatus: core.CatalogCacheStatus_CACHE_DISABLED,
+			expectedClientStatus: catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, sampleMetadata),
 			expectClientError:    true,
 			inlineCache:          false,
 		},
@@ -431,7 +438,8 @@ func TestCache_Put(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, resp)
 			}
-			assert.Equal(t, tc.expectedClientStatus, resp.GetCacheStatus())
+			assert.Equal(t, tc.expectedClientStatus.GetCacheStatus(), resp.GetCacheStatus())
+			assert.True(t, proto.Equal(tc.expectedClientStatus.GetMetadata(), resp.GetMetadata()))
 		})
 	}
 

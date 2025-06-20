@@ -285,7 +285,7 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 	if err != nil {
 		n.metrics.catalogPutFailureCount.Inc(ctx)
 		logger.Errorf(ctx, "Failed to write results to catalog for Task [%v]. Error: %v", catalogKey.Identifier, err)
-		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_PUT_FAILURE, status.GetMetadata()), nil
+		return status, nil
 	}
 
 	n.metrics.catalogPutSuccessCount.Inc(ctx)

@@ -143,7 +143,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 	cacheKey, err := GenerateCacheKey(ctx, key)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to generate cache key for %v, err %v", key.Identifier, err)
-		return catalog.Status{}, errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
+		return catalog.NewPutFailureStatus(&key), errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
 	}
 
 	cacheMetadata := GenerateCacheMetadata(key, metadata)
@@ -152,11 +152,11 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 		outputs, executionErr, err := reader.Read(ctx)
 		if executionErr != nil {
 			logger.Errorf(ctx, "Failed to read output for %v, err %v", key.Identifier, executionErr)
-			return catalog.Status{}, errors.New(fmt.Sprintf("Failed to read output for %v, err %v", key.Identifier, executionErr))
+			return catalog.NewPutFailureStatus(&key), errors.New(fmt.Sprintf("Failed to read output for %v, err %v", key.Identifier, executionErr))
 		}
 		if err != nil {
 			logger.Errorf(ctx, "Failed to read output for %v, err %v", key.Identifier, err)
-			return catalog.Status{}, err
+			return catalog.NewPutFailureStatus(&key), err
 		}
 		cacheRequest = &cacheservice.PutCacheRequest{
 			Key: cacheKey,
@@ -176,16 +176,16 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 		remoteFileOutputReader, ok := reader.(ioutils.RemoteFileOutputReader)
 		if !ok {
 			logger.Warnf(ctx, "Remote file output reader is expected for non-inline caching")
-			return catalog.Status{}, errors.New("remote file output reader is expected for non-inline caching")
+			return catalog.NewPutFailureStatus(&key), errors.New("remote file output reader is expected for non-inline caching")
 		}
 		exists, err := remoteFileOutputReader.Exists(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to check if output file exists for %v, err %v", key.Identifier, err)
-			return catalog.Status{}, errors.Wrapf(err, "failed to check if output file exists for %v", key.Identifier.String())
+			return catalog.NewPutFailureStatus(&key), errors.Wrapf(err, "failed to check if output file exists for %v", key.Identifier.String())
 		}
 		if !exists {
 			logger.Errorf(ctx, "Output file does not exist for %v", key.Identifier)
-			return catalog.Status{}, status.Errorf(codes.NotFound, "Output file does not exist for %v", key.Identifier)
+			return catalog.NewPutFailureStatus(&key), status.Errorf(codes.NotFound, "Output file does not exist for %v", key.Identifier)
 		}
 		outputURI := remoteFileOutputReader.OutPath.GetOutputPath()
 
@@ -208,7 +208,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 	_, err = c.client.Put(ctx, cacheRequest)
 	if err != nil {
 		logger.Errorf(ctx, "Caching output for %v returned err %v", key.Identifier, err)
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
 	md := &core.CatalogMetadata{
