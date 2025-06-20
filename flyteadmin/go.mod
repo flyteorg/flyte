@@ -156,6 +156,9 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/nats-io/nats.go v1.31.0 // indirect
+	github.com/nats-io/nkeys v0.4.6 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncw/swift v1.0.53 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/ory/go-acc v0.2.6 // indirect
@@ -226,6 +229,7 @@ require (
 	github.com/Shopify/sarama v1.26.4
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737 // indirect
 	github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2 v2.8.0
+	github.com/cloudevents/sdk-go/protocol/nats/v2 v2.15.2
 	github.com/imdario/mergo v0.3.13 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect

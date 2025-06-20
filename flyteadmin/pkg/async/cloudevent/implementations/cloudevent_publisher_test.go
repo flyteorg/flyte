@@ -28,6 +28,12 @@ func (s mockKafkaSender) Send(ctx context.Context, notificationType string, even
 	return errorPublish
 }
 
+type mockNatsSender struct{}
+
+func (s mockNatsSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
+	return errorPublish
+}
+
 var errorPublish = errors.New("publish() returns an error")
 var testCloudEventPublisher pubsubtest.TestPublisher
 var mockCloudEventPublisher pubsub.Publisher = &testCloudEventPublisher
@@ -196,6 +202,9 @@ func TestCloudEventPublisher_PublishError(t *testing.T) {
 		proto.MessageName(taskRequest), taskRequest))
 
 	currentEventPublisher = NewCloudEventsPublisher(&mockKafkaSender{}, promutils.NewTestScope(), []string{"*"})
+	assert.Equal(t, errorPublish, currentEventPublisher.Publish(context.Background(),
+		proto.MessageName(taskRequest), taskRequest))
+	currentEventPublisher = NewCloudEventsPublisher(&mockNatsSender{}, promutils.NewTestScope(), []string{"*"})
 	assert.Equal(t, errorPublish, currentEventPublisher.Publish(context.Background(),
 		proto.MessageName(taskRequest), taskRequest))
 }
