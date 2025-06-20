@@ -103,3 +103,21 @@ func TestInvalidKafkaConfig(t *testing.T) {
 	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
 }
+
+func TestInvalidNatsConfig(t *testing.T) {
+	defer func() { r := recover(); assert.NotNil(t, r) }()
+	cfg := runtimeInterfaces.CloudEventsConfig{
+		Enable:                true,
+		Type:                  implementations.Nats,
+		EventsPublisherConfig: runtimeInterfaces.EventsPublisherConfig{TopicName: "topic"},
+		NatsConfig:            runtimeInterfaces.NatsConfig{},
+	}
+	db := mocks.NewMockRepository()
+	mockStore := getMockStore()
+	url := &dataMocks.RemoteURLInterface{}
+
+	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	cfg.NatsConfig.Servers = []string{"localhost:4222"}
+	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	t.Errorf("did not panic")
+}
