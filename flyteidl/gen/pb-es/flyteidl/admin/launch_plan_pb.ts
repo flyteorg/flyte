@@ -554,7 +554,7 @@ export class ConcurrencyPolicy extends Message<ConcurrencyPolicy> {
  */
 export class LaunchPlanClosure extends Message<LaunchPlanClosure> {
   /**
-   * Indicate the Launch plan state.
+   * Indicate the Launch plan state. 
    *
    * @generated from field: flyteidl.admin.LaunchPlanState state = 1;
    */
