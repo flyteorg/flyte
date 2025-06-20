@@ -1079,7 +1079,7 @@
         },
         "data_config": {
           "$ref": "#/definitions/coreDataLoadingConfig",
-          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
         },
         "architecture": {
           "$ref": "#/definitions/ContainerArchitecture"
@@ -1303,7 +1303,7 @@
         },
         "data_config": {
           "$ref": "#/definitions/coreDataLoadingConfig",
-          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
         },
         "primary_container_name": {
           "type": "string",
