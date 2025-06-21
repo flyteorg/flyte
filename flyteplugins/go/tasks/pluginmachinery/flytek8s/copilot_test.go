@@ -90,7 +90,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 			"project_id": "flyte-gcp",
 			"scope":      "read_write",
 		}
-		assert.Equal(t, 11, len(CopilotCommandArgs(storage.GetConfig())))
+		assert.Equal(t, 12, len(CopilotCommandArgs(storage.GetConfig())))
 	})
 
 	t.Run("bad-res-cpu", func(t *testing.T) {
@@ -161,9 +161,9 @@ func TestSidecarCommandArgs(t *testing.T) {
 			},
 		},
 	}
-	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Second*10, iFace)
+	d, err := SidecarCommandArgs("/from", "s3://output-meta", "s3://raw-output", time.Hour*1, iFace)
 	assert.NoError(t, err)
-	expected := []string{"sidecar", "--start-timeout", "10s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
+	expected := []string{"sidecar", "--timeout", "1h0m0s", "--to-raw-output", "s3://raw-output", "--to-output-prefix", "s3://output-meta", "--from-local-dir", "/from", "--interface", "<interface>"}
 	if assert.Len(t, d, len(expected)) {
 		for i := 0; i < len(expected)-1; i++ {
 			assert.Equal(t, expected[i], d[i])
@@ -261,7 +261,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 			cntr := c
 			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &cntr)
 		} else {
-			if c.Name == cfg.NamePrefix+flyteInitContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
+			if c.Name == cfg.NamePrefix+flyteDownloaderContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
 				if iFace != nil {
 					vmap := map[string]v1.VolumeMount{}
 					for _, v := range c.VolumeMounts {
@@ -273,7 +273,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 							path = pilot.GetInputPath()
 						}
 						v, found := vmap[cfg.InputVolumeName]
-						if c.Name == cfg.NamePrefix+flyteInitContainerName {
+						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
 							assert.Equal(t, path, v.MountPath, "Input Path does not match")
 							assert.True(t, found, "Input volume mount expected but not found!")
 						} else {
@@ -287,7 +287,7 @@ func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *cor
 							path = pilot.GetOutputPath()
 						}
 						v, found := vmap[cfg.OutputVolumeName]
-						if c.Name == cfg.NamePrefix+flyteInitContainerName {
+						if c.Name == cfg.NamePrefix+flyteDownloaderContainerName {
 							assert.False(t, found, "Output volume mount not expected but found on init container!")
 						} else {
 							assert.Equal(t, path, v.MountPath, "Output Path does not match")
