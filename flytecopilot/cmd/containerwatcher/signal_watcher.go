@@ -21,9 +21,6 @@ func (n SignalWatcher) WaitToExit(ctx context.Context) error {
 	logger.Infof(ctx, "Signal Watcher waiting for termination signal")
 	defer logger.Infof(ctx, "Signal Watcher exiting on termination signal")
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	// Listen for SIGTERM
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM)
