@@ -41,10 +41,8 @@ type UploadOptions struct {
 	exitWatcherType  containerwatcher.WatcherType
 }
 
-func (u *UploadOptions) createWatcher(ctx context.Context, w containerwatcher.WatcherType) (containerwatcher.Watcher, error) {
+func (u *UploadOptions) createWatcher(_ context.Context, w containerwatcher.WatcherType) (containerwatcher.Watcher, error) {
 	switch w {
-	case containerwatcher.WatcherTypeSharedProcessNS:
-		return containerwatcher.NewSharedProcessNSWatcher(ctx, time.Second*2, 2)
 	case containerwatcher.WatcherTypeSignal:
 		return containerwatcher.SignalWatcher{}, nil
 	case containerwatcher.WatcherTypeNoop:
