@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/Shopify/sarama"
-
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
