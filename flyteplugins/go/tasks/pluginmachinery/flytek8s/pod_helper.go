@@ -455,12 +455,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
-		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
+		var resourceMode = ResourceCustomizationModeMergeExistingResources
 
 		// Extract pod template resources for this init container
 		var podTemplateResources *v1.ResourceRequirements
 		if basePodTemplate != nil {
-			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, podSpec.InitContainers[index].Name)
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, podSpec.InitContainers[index].Name, true)
 			podTemplateResources = &resources
 		}
 
@@ -480,7 +480,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		// Extract pod template resources for this container
 		var podTemplateResources *v1.ResourceRequirements
 		if basePodTemplate != nil {
-			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, container.Name)
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, container.Name, false)
 			podTemplateResources = &resources
 		}
 
