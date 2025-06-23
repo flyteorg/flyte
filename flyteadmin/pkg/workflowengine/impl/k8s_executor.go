@@ -12,6 +12,7 @@ import (
 	execClusterInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -87,6 +88,23 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	}, nil
 }
 
+const (
+	// Labels that are set on the FlyteWorkflow CRD
+	DomainLabel      = "domain"
+	ExecutionIDLabel = "execution-id"
+	ProjectLabel     = "project"
+)
+
+func executionLabelSelector(executionID *core.WorkflowExecutionIdentifier) *v1.LabelSelector {
+	return &v1.LabelSelector{
+		MatchLabels: map[string]string{
+			DomainLabel:      executionID.GetDomain(),
+			ExecutionIDLabel: executionID.GetName(),
+			ProjectLabel:     executionID.GetProject(),
+		},
+	}
+}
+
 func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortData) error {
 	target, err := e.executionCluster.GetTarget(ctx, &executioncluster.ExecutionTargetSpec{
 		TargetID: data.Cluster,
@@ -94,9 +112,13 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error()) //nolint
 	}
-	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
-		PropagationPolicy: &deletePropagationBackground,
-	})
+	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).DeleteCollection(
+		ctx,
+		v1.DeleteOptions{PropagationPolicy: &deletePropagationBackground},
+		v1.ListOptions{
+			LabelSelector: v1.FormatLabelSelector(executionLabelSelector(data.ExecutionID)),
+		},
+	)
 	// An IsNotFound error indicates the resource is already deleted.
 	if err != nil && !k8_api_err.IsNotFound(err) {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
