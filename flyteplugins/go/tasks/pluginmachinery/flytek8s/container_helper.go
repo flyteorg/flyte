@@ -43,6 +43,37 @@ func MergeResources(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
 	}
 }
 
+// MergeResourcesIfMissing merges resources from 'in' to 'out', but only for resources that are not already set in 'out'.
+// This is used for pod template resource merging where we want to preserve higher priority resources.
+func MergeResourcesIfMissing(in v1.ResourceRequirements, out *v1.ResourceRequirements) {
+	if out.Limits == nil && in.Limits != nil {
+		out.Limits = make(v1.ResourceList)
+		for key, val := range in.Limits {
+			out.Limits[key] = val
+		}
+	} else if in.Limits != nil {
+		if out.Limits == nil {
+			out.Limits = make(v1.ResourceList)
+		}
+		for key, val := range in.Limits {
+			if _, exists := out.Limits[key]; !exists {
+				out.Limits[key] = val
+			}
+		}
+	}
+
+	if in.Requests != nil {
+		if out.Requests == nil {
+			out.Requests = make(v1.ResourceList)
+		}
+		for key, val := range in.Requests {
+			if _, exists := out.Requests[key]; !exists {
+				out.Requests[key] = val
+			}
+		}
+	}
+}
+
 type ResourceRequirement struct {
 	Request resource.Quantity
 	Limit   resource.Quantity
@@ -376,6 +407,7 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 		overrideResources = &v1.ResourceRequirements{}
 	}
 
+	SanitizeGPUResourceRequirements(&container.Resources)
 	// Handle pod template resources with proper fallback
 	var effectivePodTemplateResources v1.ResourceRequirements
 	if podTemplateResources != nil {
@@ -396,7 +428,7 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 		// merges podTemplateResources for any missing resources, and finally uses the platformResource values to set defaults.
 		MergeResources(*overrideResources, &container.Resources)
 		// Merge pod template resources for any resources not already set
-		container.Resources = ApplyResourceOverrides(effectivePodTemplateResources, container.Resources, assignIfUnset)
+		MergeResourcesIfMissing(effectivePodTemplateResources, &container.Resources)
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, assignIfUnset)
 	case ResourceCustomizationModeEnsureExistingResourcesInRange:
 		// This use the platformResources defaults to ensure that the container.Resources values are within the
@@ -405,7 +437,7 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 		// override them if necessary
 
 		// Merge pod template resources for any resources not already set
-		container.Resources = ApplyResourceOverrides(effectivePodTemplateResources, container.Resources, assignIfUnset)
+		MergeResourcesIfMissing(effectivePodTemplateResources, &container.Resources)
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
 	}
 
