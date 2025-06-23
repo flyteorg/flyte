@@ -439,7 +439,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// Fetch base pod template early to extract container resources for proper priority handling
-	basePodTemplate, err := GetBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
+	basePodTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -664,11 +664,11 @@ func GetContainer(podSpec *v1.PodSpec, name string) (*v1.Container, error) {
 	return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, container [%s] not defined", name)
 }
 
-// GetBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
+// getBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
 // come from one of the following:
 // (1) PodTemplate name in the TaskMetadata: This name is then looked up in the PodTemplateStore.
 // (2) Default PodTemplate name from configuration: This name is then looked up in the PodTemplateStore.
-func GetBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podTemplateStore PodTemplateStore) (*v1.PodTemplate, error) {
+func getBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podTemplateStore PodTemplateStore) (*v1.PodTemplate, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "TaskSpecification cannot be read, Err: [%v]", err.Error())
@@ -695,7 +695,7 @@ func MergeWithBasePodTemplate(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string, primaryInitContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 
 	// attempt to retrieve base PodTemplate
-	podTemplate, err := GetBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
+	podTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
 	if err != nil {
 		return nil, nil, err
 	} else if podTemplate == nil {
