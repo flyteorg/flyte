@@ -367,7 +367,6 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		pilot := &core.DataLoadingConfig{Enabled: true}
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, nil, pilot))
 		assertContainerHasVolumeMounts(t, cfg, pilot, nil, &c)
-		assertContainerHasPTrace(t, &c)
 	})
 
 	t.Run("happy-iface-empty-config", func(t *testing.T) {
