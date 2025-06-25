@@ -44,6 +44,11 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		Command:    CopilotCommandArgs(storage.GetConfig()),
 		Args:       args,
 		WorkingDir: "/",
+		SecurityContext: &v1.SecurityContext{
+			Capabilities: &v1.Capabilities{
+				Add: []v1.Capability{pTraceCapability},
+			},
+		},
 		Resources: v1.ResourceRequirements{
 			Limits: v1.ResourceList{
 				v1.ResourceCPU:    cpu,
@@ -169,13 +174,6 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 		return nil
 	}
 	logger.Infof(ctx, "Enabling CoPilot on main container [%s]", c.Name)
-	if c.SecurityContext == nil {
-		c.SecurityContext = &v1.SecurityContext{}
-	}
-	if c.SecurityContext.Capabilities == nil {
-		c.SecurityContext.Capabilities = &v1.Capabilities{}
-	}
-	c.SecurityContext.Capabilities.Add = append(c.SecurityContext.Capabilities.Add, pTraceCapability)
 
 	if iFace != nil {
 		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
