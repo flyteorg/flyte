@@ -1,0 +1,24 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
+
+message HealthRequest {
+  string service = 1;
+}
+
+message HealthResponse {
+  enum Status {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3;
+  }
+  Status status = 1;
+}
+
+service HealthService {
+  rpc Check (HealthRequest) returns (HealthResponse) {}
+
+  rpc Watch (HealthRequest) returns (stream HealthResponse) {}
+}

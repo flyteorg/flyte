@@ -20,8 +20,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
@@ -141,9 +139,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		}
 	}
 
-	healthServer := health.NewServer()
-	healthServer.SetServingStatus("flyteadmin", grpc_health_v1.HealthCheckResponse_SERVING)
-	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+	grpcService.RegisterHealthServiceServer(grpcServer, rpc.NewHealthService("flyteadmin"))
 	if cfg.GrpcConfig.ServerReflection || cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)
 	}

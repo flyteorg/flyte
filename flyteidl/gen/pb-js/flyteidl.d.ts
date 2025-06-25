@@ -27474,6 +27474,187 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a HealthRequest. */
+        interface IHealthRequest {
+
+            /** HealthRequest service */
+            service?: (string|null);
+        }
+
+        /** Represents a HealthRequest. */
+        class HealthRequest implements IHealthRequest {
+
+            /**
+             * Constructs a new HealthRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.IHealthRequest);
+
+            /** HealthRequest service. */
+            public service: string;
+
+            /**
+             * Creates a new HealthRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HealthRequest instance
+             */
+            public static create(properties?: flyteidl.service.IHealthRequest): flyteidl.service.HealthRequest;
+
+            /**
+             * Encodes the specified HealthRequest message. Does not implicitly {@link flyteidl.service.HealthRequest.verify|verify} messages.
+             * @param message HealthRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.IHealthRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a HealthRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns HealthRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.HealthRequest;
+
+            /**
+             * Verifies a HealthRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a HealthResponse. */
+        interface IHealthResponse {
+
+            /** HealthResponse status */
+            status?: (flyteidl.service.HealthResponse.Status|null);
+        }
+
+        /** Represents a HealthResponse. */
+        class HealthResponse implements IHealthResponse {
+
+            /**
+             * Constructs a new HealthResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.IHealthResponse);
+
+            /** HealthResponse status. */
+            public status: flyteidl.service.HealthResponse.Status;
+
+            /**
+             * Creates a new HealthResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HealthResponse instance
+             */
+            public static create(properties?: flyteidl.service.IHealthResponse): flyteidl.service.HealthResponse;
+
+            /**
+             * Encodes the specified HealthResponse message. Does not implicitly {@link flyteidl.service.HealthResponse.verify|verify} messages.
+             * @param message HealthResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.IHealthResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a HealthResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns HealthResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.HealthResponse;
+
+            /**
+             * Verifies a HealthResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace HealthResponse {
+
+            /** Status enum. */
+            enum Status {
+                UNKNOWN = 0,
+                SERVING = 1,
+                NOT_SERVING = 2,
+                SERVICE_UNKNOWN = 3
+            }
+        }
+
+        /** Represents a HealthService */
+        class HealthService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new HealthService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new HealthService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): HealthService;
+
+            /**
+             * Calls Check.
+             * @param request HealthRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and HealthResponse
+             */
+            public check(request: flyteidl.service.IHealthRequest, callback: flyteidl.service.HealthService.CheckCallback): void;
+
+            /**
+             * Calls Check.
+             * @param request HealthRequest message or plain object
+             * @returns Promise
+             */
+            public check(request: flyteidl.service.IHealthRequest): Promise<flyteidl.service.HealthResponse>;
+
+            /**
+             * Calls Watch.
+             * @param request HealthRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and HealthResponse
+             */
+            public watch(request: flyteidl.service.IHealthRequest, callback: flyteidl.service.HealthService.WatchCallback): void;
+
+            /**
+             * Calls Watch.
+             * @param request HealthRequest message or plain object
+             * @returns Promise
+             */
+            public watch(request: flyteidl.service.IHealthRequest): Promise<flyteidl.service.HealthResponse>;
+        }
+
+        namespace HealthService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.HealthService#check}.
+             * @param error Error, if any
+             * @param [response] HealthResponse
+             */
+            type CheckCallback = (error: (Error|null), response?: flyteidl.service.HealthResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.HealthService#watch}.
+             * @param error Error, if any
+             * @param [response] HealthResponse
+             */
+            type WatchCallback = (error: (Error|null), response?: flyteidl.service.HealthResponse) => void;
+        }
+
         /** Properties of a UserInfoRequest. */
         interface IUserInfoRequest {
         }

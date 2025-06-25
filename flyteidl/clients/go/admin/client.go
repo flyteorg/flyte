@@ -13,7 +13,6 @@ import (
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
@@ -31,7 +30,7 @@ type Clientset struct {
 	adminServiceClient        service.AdminServiceClient
 	watchServiceClient        service.WatchServiceClient
 	authMetadataServiceClient service.AuthMetadataServiceClient
-	healthServiceClient       grpc_health_v1.HealthClient
+	healthServiceClient       service.HealthServiceClient
 	identityServiceClient     service.IdentityServiceClient
 	dataProxyServiceClient    service.DataProxyServiceClient
 	signalServiceClient       service.SignalServiceClient
@@ -53,8 +52,7 @@ func (c Clientset) AuthMetadataClient() service.AuthMetadataServiceClient {
 	return c.authMetadataServiceClient
 }
 
-// HealthServiceClient retrieves the grpc_health_v1.HealthClient
-func (c Clientset) HealthServiceClient() grpc_health_v1.HealthClient {
+func (c Clientset) HealthServiceClient() service.HealthServiceClient {
 	return c.healthServiceClient
 }
 
@@ -287,7 +285,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.adminServiceClient = NewAdminClient(ctx, adminConnection)
 	cs.authMetadataServiceClient = service.NewAuthMetadataServiceClient(adminConnection)
 	cs.identityServiceClient = service.NewIdentityServiceClient(adminConnection)
-	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
+	cs.healthServiceClient = service.NewHealthServiceClient(adminConnection)
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
 	cs.artifactServiceClient = artifacts.NewArtifactRegistryClient(adminConnection)
@@ -308,6 +306,6 @@ func InitializeMockClientset() *Clientset {
 		authMetadataServiceClient: &mocks.AuthMetadataServiceClient{},
 		identityServiceClient:     &mocks.IdentityServiceClient{},
 		dataProxyServiceClient:    &mocks.DataProxyServiceClient{},
-		healthServiceClient:       grpc_health_v1.NewHealthClient(nil),
+		healthServiceClient:       &mocks.HealthServiceClient{},
 	}
 }

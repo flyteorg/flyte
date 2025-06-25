@@ -64443,6 +64443,352 @@
                 return TaskDeleteResponse;
             })();
     
+            service.HealthRequest = (function() {
+    
+                /**
+                 * Properties of a HealthRequest.
+                 * @memberof flyteidl.service
+                 * @interface IHealthRequest
+                 * @property {string|null} [service] HealthRequest service
+                 */
+    
+                /**
+                 * Constructs a new HealthRequest.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a HealthRequest.
+                 * @implements IHealthRequest
+                 * @constructor
+                 * @param {flyteidl.service.IHealthRequest=} [properties] Properties to set
+                 */
+                function HealthRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * HealthRequest service.
+                 * @member {string} service
+                 * @memberof flyteidl.service.HealthRequest
+                 * @instance
+                 */
+                HealthRequest.prototype.service = "";
+    
+                /**
+                 * Creates a new HealthRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.HealthRequest
+                 * @static
+                 * @param {flyteidl.service.IHealthRequest=} [properties] Properties to set
+                 * @returns {flyteidl.service.HealthRequest} HealthRequest instance
+                 */
+                HealthRequest.create = function create(properties) {
+                    return new HealthRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified HealthRequest message. Does not implicitly {@link flyteidl.service.HealthRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.HealthRequest
+                 * @static
+                 * @param {flyteidl.service.IHealthRequest} message HealthRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                HealthRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.service != null && message.hasOwnProperty("service"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.service);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a HealthRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.HealthRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.HealthRequest} HealthRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                HealthRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.HealthRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.service = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a HealthRequest message.
+                 * @function verify
+                 * @memberof flyteidl.service.HealthRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                HealthRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.service != null && message.hasOwnProperty("service"))
+                        if (!$util.isString(message.service))
+                            return "service: string expected";
+                    return null;
+                };
+    
+                return HealthRequest;
+            })();
+    
+            service.HealthResponse = (function() {
+    
+                /**
+                 * Properties of a HealthResponse.
+                 * @memberof flyteidl.service
+                 * @interface IHealthResponse
+                 * @property {flyteidl.service.HealthResponse.Status|null} [status] HealthResponse status
+                 */
+    
+                /**
+                 * Constructs a new HealthResponse.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a HealthResponse.
+                 * @implements IHealthResponse
+                 * @constructor
+                 * @param {flyteidl.service.IHealthResponse=} [properties] Properties to set
+                 */
+                function HealthResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * HealthResponse status.
+                 * @member {flyteidl.service.HealthResponse.Status} status
+                 * @memberof flyteidl.service.HealthResponse
+                 * @instance
+                 */
+                HealthResponse.prototype.status = 0;
+    
+                /**
+                 * Creates a new HealthResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.HealthResponse
+                 * @static
+                 * @param {flyteidl.service.IHealthResponse=} [properties] Properties to set
+                 * @returns {flyteidl.service.HealthResponse} HealthResponse instance
+                 */
+                HealthResponse.create = function create(properties) {
+                    return new HealthResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified HealthResponse message. Does not implicitly {@link flyteidl.service.HealthResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.HealthResponse
+                 * @static
+                 * @param {flyteidl.service.IHealthResponse} message HealthResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                HealthResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.status != null && message.hasOwnProperty("status"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.status);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a HealthResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.HealthResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.HealthResponse} HealthResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                HealthResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.HealthResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.status = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a HealthResponse message.
+                 * @function verify
+                 * @memberof flyteidl.service.HealthResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                HealthResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.status != null && message.hasOwnProperty("status"))
+                        switch (message.status) {
+                        default:
+                            return "status: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                            break;
+                        }
+                    return null;
+                };
+    
+                /**
+                 * Status enum.
+                 * @name flyteidl.service.HealthResponse.Status
+                 * @enum {string}
+                 * @property {number} UNKNOWN=0 UNKNOWN value
+                 * @property {number} SERVING=1 SERVING value
+                 * @property {number} NOT_SERVING=2 NOT_SERVING value
+                 * @property {number} SERVICE_UNKNOWN=3 SERVICE_UNKNOWN value
+                 */
+                HealthResponse.Status = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "UNKNOWN"] = 0;
+                    values[valuesById[1] = "SERVING"] = 1;
+                    values[valuesById[2] = "NOT_SERVING"] = 2;
+                    values[valuesById[3] = "SERVICE_UNKNOWN"] = 3;
+                    return values;
+                })();
+    
+                return HealthResponse;
+            })();
+    
+            service.HealthService = (function() {
+    
+                /**
+                 * Constructs a new HealthService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a HealthService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function HealthService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (HealthService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = HealthService;
+    
+                /**
+                 * Creates new HealthService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.HealthService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {HealthService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                HealthService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.HealthService#check}.
+                 * @memberof flyteidl.service.HealthService
+                 * @typedef CheckCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.service.HealthResponse} [response] HealthResponse
+                 */
+    
+                /**
+                 * Calls Check.
+                 * @function check
+                 * @memberof flyteidl.service.HealthService
+                 * @instance
+                 * @param {flyteidl.service.IHealthRequest} request HealthRequest message or plain object
+                 * @param {flyteidl.service.HealthService.CheckCallback} callback Node-style callback called with the error, if any, and HealthResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(HealthService.prototype.check = function check(request, callback) {
+                    return this.rpcCall(check, $root.flyteidl.service.HealthRequest, $root.flyteidl.service.HealthResponse, request, callback);
+                }, "name", { value: "Check" });
+    
+                /**
+                 * Calls Check.
+                 * @function check
+                 * @memberof flyteidl.service.HealthService
+                 * @instance
+                 * @param {flyteidl.service.IHealthRequest} request HealthRequest message or plain object
+                 * @returns {Promise<flyteidl.service.HealthResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.HealthService#watch}.
+                 * @memberof flyteidl.service.HealthService
+                 * @typedef WatchCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.service.HealthResponse} [response] HealthResponse
+                 */
+    
+                /**
+                 * Calls Watch.
+                 * @function watch
+                 * @memberof flyteidl.service.HealthService
+                 * @instance
+                 * @param {flyteidl.service.IHealthRequest} request HealthRequest message or plain object
+                 * @param {flyteidl.service.HealthService.WatchCallback} callback Node-style callback called with the error, if any, and HealthResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(HealthService.prototype.watch = function watch(request, callback) {
+                    return this.rpcCall(watch, $root.flyteidl.service.HealthRequest, $root.flyteidl.service.HealthResponse, request, callback);
+                }, "name", { value: "Watch" });
+    
+                /**
+                 * Calls Watch.
+                 * @function watch
+                 * @memberof flyteidl.service.HealthService
+                 * @instance
+                 * @param {flyteidl.service.IHealthRequest} request HealthRequest message or plain object
+                 * @returns {Promise<flyteidl.service.HealthResponse>} Promise
+                 * @variation 2
+                 */
+    
+                return HealthService;
+            })();
+    
             service.UserInfoRequest = (function() {
     
                 /**

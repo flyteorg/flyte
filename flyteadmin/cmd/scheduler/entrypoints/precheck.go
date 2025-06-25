@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -30,11 +30,11 @@ var preCheckRunCmd = &cobra.Command{
 		}
 
 		healthCheckResponse, err := clientSet.HealthServiceClient().Check(ctx,
-			&grpc_health_v1.HealthCheckRequest{Service: "flyteadmin"})
+			&service.HealthRequest{Service: "flyteadmin"})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to perform flyteadmin health check: %v", err)
 		}
-		if healthCheckResponse.GetStatus() != grpc_health_v1.HealthCheckResponse_SERVING {
+		if healthCheckResponse.GetStatus() != service.HealthResponse_SERVING {
 			logger.Errorf(ctx, healthCheckError, healthCheckResponse.GetStatus())
 			return fmt.Errorf(healthCheckError, healthCheckResponse.GetStatus())
 		}
