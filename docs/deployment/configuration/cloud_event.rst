@@ -32,8 +32,9 @@ Supported Implementations
 Event egress can be configured to work with **AWS** using
 `SQS <https://aws.amazon.com/sqs/>`_ and
 `SNS <https://aws.amazon.com/sns/>`_,
-**GCP** `Cloud Pub/Sub <https://cloud.google.com/pubsub>`_, or
-`Apache Kafka <https://kafka.apache.org/>`_
+**GCP** `Cloud Pub/Sub <https://cloud.google.com/pubsub>`_,
+`Apache Kafka <https://kafka.apache.org/>`_, or
+`NATS <https://https://nats.io/>`_
 
 *************
 Configuration
@@ -88,6 +89,21 @@ To turn on, add the following to your FlyteAdmin:
                - all
                topicName: myTopic
              type: kafka
+
+   .. tab:: Nats
+   
+       .. code:: yaml
+   
+         cloud_events.yaml: |
+           cloudEvents:
+             enable: true
+             nats:
+               servers: 127.0.0.1:4222
+             eventsPublisher:
+               eventTypes:
+               - all
+               topicName: myTopic # this will be used as NATS subject
+             type: nats
 
 Helm
 ======

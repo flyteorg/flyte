@@ -17,6 +17,7 @@ type Receiver = string
 
 const (
 	Kafka Receiver = "kafka"
+	Nats  Receiver = "nats"
 )
 
 // PubSubSender Implementation of Sender
@@ -49,6 +50,18 @@ func (s *KafkaSender) Send(ctx context.Context, notificationType string, event c
 		kafka_sarama.WithMessageKey(ctx, sarama.StringEncoder(event.ID())),
 		event,
 	); cloudevents.IsUndelivered(result) {
+		return fmt.Errorf("failed to send cloud event: %v", result)
+	}
+	return nil
+}
+
+// Nats Implementation of Sender
+type NatsSender struct {
+	Client cloudevents.Client
+}
+
+func (s *NatsSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
+	if result := s.Client.Send(ctx, event); cloudevents.IsUndelivered(result) {
 		return fmt.Errorf("failed to send cloud event: %v", result)
 	}
 	return nil

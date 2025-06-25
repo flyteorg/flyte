@@ -323,6 +323,31 @@ func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
 	}
 }
 
+type NatsUserPassAuthConfig struct {
+	// Whether to use user/pass authentication
+	Enabled bool `json:"enabled"`
+	// Username to be used when connecting to the server.
+	User string `json:"user"`
+	// Password to be used when connecting to a server.
+	Password string `json:"password"`
+}
+type NatsTokenAuthConfig struct {
+	// Whether to use token authentication
+	Enabled bool `json:"enabled"`
+	// Token to be used when connecting to the server.
+	Token string `json:"token"`
+}
+
+// This section holds configs for Nats clients
+type NatsConfig struct {
+	// nats broker addresses
+	Servers []string `json:"servers"`
+	// Username/password authentication config
+	UserPassAuthConfig NatsUserPassAuthConfig `json:"userAuthentication"`
+	// Token authentication config
+	TokenAuthConfig NatsTokenAuthConfig `json:"tokenAuthentication"`
+}
+
 // This section holds configuration for the event scheduler used to schedule workflow executions.
 type EventSchedulerConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -641,6 +666,7 @@ type CloudEventsConfig struct {
 	AWSConfig   AWSConfig   `json:"aws"`
 	GCPConfig   GCPConfig   `json:"gcp"`
 	KafkaConfig KafkaConfig `json:"kafka"`
+	NatsConfig  NatsConfig  `json:"nats"`
 	// Publish events to a pubsub tops
 	EventsPublisherConfig EventsPublisherConfig `json:"eventsPublisher"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.

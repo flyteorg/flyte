@@ -10,7 +10,9 @@ import (
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
 	"github.com/Shopify/sarama"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
+	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	nats "github.com/nats-io/nats.go"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	cloudEventImplementations "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
@@ -85,6 +87,25 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 			panic(err)
 		}
 		sender = &cloudEventImplementations.KafkaSender{Client: client}
+
+	case cloudEventImplementations.Nats:
+		natsOptions := []nats.Option{nats.ReconnectWait(reconnectDelay), nats.MaxReconnects(reconnectAttempts), nats.Name("flyteadmin")}
+		if cloudEventsConfig.NatsConfig.TokenAuthConfig.Enabled {
+			natsOptions = append(natsOptions, nats.Token(cloudEventsConfig.NatsConfig.TokenAuthConfig.Token))
+		}
+		if cloudEventsConfig.NatsConfig.UserPassAuthConfig.Enabled {
+			natsOptions = append(natsOptions, nats.UserInfo(cloudEventsConfig.NatsConfig.UserPassAuthConfig.User, cloudEventsConfig.NatsConfig.UserPassAuthConfig.Password))
+		}
+		natsSender, err := cenats.NewSender(strings.Join(cloudEventsConfig.NatsConfig.Servers, ","), cloudEventsConfig.EventsPublisherConfig.TopicName, natsOptions)
+		if err != nil {
+			panic(err)
+		}
+		client, err := cloudevents.NewClient(natsSender, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
+		if err != nil {
+			logger.Fatalf(ctx, "failed to create nats client, %v", err)
+			panic(err)
+		}
+		sender = &cloudEventImplementations.NatsSender{Client: client}
 
 	case common.Sandbox:
 		var publisher pubsub.Publisher
