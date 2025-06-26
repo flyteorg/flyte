@@ -1464,12 +1464,73 @@ func (x *KeyValuePair) GetValue() string {
 	return ""
 }
 
-// Retry strategy associated with an executable unit.
+// RetryOnOOM defines memory scaling behavior for out-of-memory errors.
+// New memory = min(previous_memory * factor, limit)
+type RetryOnOOM struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Factor to multiply previous memory by (e.g. 2.0 doubles memory)
+	Factor float32 `protobuf:"fixed32,1,opt,name=factor,proto3" json:"factor,omitempty"`
+	// Maximum memory limit as resource quantity (e.g. "2Gi")
+	Limit string `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
+}
+
+func (x *RetryOnOOM) Reset() {
+	*x = RetryOnOOM{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_core_literals_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RetryOnOOM) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RetryOnOOM) ProtoMessage() {}
+
+func (x *RetryOnOOM) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_core_literals_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RetryOnOOM.ProtoReflect.Descriptor instead.
+func (*RetryOnOOM) Descriptor() ([]byte, []int) {
+	return file_flyteidl_core_literals_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *RetryOnOOM) GetFactor() float32 {
+	if x != nil {
+		return x.Factor
+	}
+	return 0
+}
+
+func (x *RetryOnOOM) GetLimit() string {
+	if x != nil {
+		return x.Limit
+	}
+	return ""
+}
+
+// RetryStrategy configures task execution retry behavior
 type RetryStrategy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Optional memory scaling config for OOM errors
+	OnOom *RetryOnOOM `protobuf:"bytes,1,opt,name=on_oom,json=onOom,proto3" json:"on_oom,omitempty"`
 	// Number of retries. Retries will be consumed when the job fails with a recoverable error.
 	// The number of retries must be less than or equals to 10.
 	Retries uint32 `protobuf:"varint,5,opt,name=retries,proto3" json:"retries,omitempty"`
@@ -1478,7 +1539,7 @@ type RetryStrategy struct {
 func (x *RetryStrategy) Reset() {
 	*x = RetryStrategy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_core_literals_proto_msgTypes[20]
+		mi := &file_flyteidl_core_literals_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1491,7 +1552,7 @@ func (x *RetryStrategy) String() string {
 func (*RetryStrategy) ProtoMessage() {}
 
 func (x *RetryStrategy) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_core_literals_proto_msgTypes[20]
+	mi := &file_flyteidl_core_literals_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1504,7 +1565,14 @@ func (x *RetryStrategy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RetryStrategy.ProtoReflect.Descriptor instead.
 func (*RetryStrategy) Descriptor() ([]byte, []int) {
-	return file_flyteidl_core_literals_proto_rawDescGZIP(), []int{20}
+	return file_flyteidl_core_literals_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *RetryStrategy) GetOnOom() *RetryOnOOM {
+	if x != nil {
+		return x.OnOom
+	}
+	return nil
 }
 
 func (x *RetryStrategy) GetRetries() uint32 {
@@ -1719,21 +1787,28 @@ var file_flyteidl_core_literals_proto_rawDesc = []byte{
 	0x61, 0x6c, 0x75, 0x65, 0x50, 0x61, 0x69, 0x72, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
 	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
-	0x22, 0x29, 0x0a, 0x0d, 0x52, 0x65, 0x74, 0x72, 0x79, 0x53, 0x74, 0x72, 0x61, 0x74, 0x65, 0x67,
-	0x79, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x74, 0x72, 0x69, 0x65, 0x73, 0x18, 0x05, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x07, 0x72, 0x65, 0x74, 0x72, 0x69, 0x65, 0x73, 0x42, 0xb3, 0x01, 0x0a, 0x11,
-	0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72,
-	0x65, 0x42, 0x0d, 0x4c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66,
-	0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c,
-	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f,
-	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0xa2, 0x02,
-	0x03, 0x46, 0x43, 0x58, 0xaa, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e,
-	0x43, 0x6f, 0x72, 0x65, 0xca, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c,
-	0x43, 0x6f, 0x72, 0x65, 0xe2, 0x02, 0x19, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c,
-	0x43, 0x6f, 0x72, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x43, 0x6f, 0x72,
-	0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x22, 0x3a, 0x0a, 0x0a, 0x52, 0x65, 0x74, 0x72, 0x79, 0x4f, 0x6e, 0x4f, 0x4f, 0x4d, 0x12, 0x16,
+	0x0a, 0x06, 0x66, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x02, 0x52, 0x06,
+	0x66, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0x5b, 0x0a, 0x0d,
+	0x52, 0x65, 0x74, 0x72, 0x79, 0x53, 0x74, 0x72, 0x61, 0x74, 0x65, 0x67, 0x79, 0x12, 0x30, 0x0a,
+	0x06, 0x6f, 0x6e, 0x5f, 0x6f, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x52, 0x65,
+	0x74, 0x72, 0x79, 0x4f, 0x6e, 0x4f, 0x4f, 0x4d, 0x52, 0x05, 0x6f, 0x6e, 0x4f, 0x6f, 0x6d, 0x12,
+	0x18, 0x0a, 0x07, 0x72, 0x65, 0x74, 0x72, 0x69, 0x65, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x07, 0x72, 0x65, 0x74, 0x72, 0x69, 0x65, 0x73, 0x42, 0xb3, 0x01, 0x0a, 0x11, 0x63, 0x6f,
+	0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x42,
+	0x0d, 0x4c, 0x69, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79,
+	0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79, 0x74,
+	0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x63, 0x6f, 0x72, 0x65, 0xa2, 0x02, 0x03, 0x46,
+	0x43, 0x58, 0xaa, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x43, 0x6f,
+	0x72, 0x65, 0xca, 0x02, 0x0d, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x43, 0x6f,
+	0x72, 0x65, 0xe2, 0x02, 0x19, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x43, 0x6f,
+	0x72, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
+	0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x43, 0x6f, 0x72, 0x65, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1748,7 +1823,7 @@ func file_flyteidl_core_literals_proto_rawDescGZIP() []byte {
 	return file_flyteidl_core_literals_proto_rawDescData
 }
 
-var file_flyteidl_core_literals_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_flyteidl_core_literals_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_flyteidl_core_literals_proto_goTypes = []interface{}{
 	(*Primitive)(nil),                 // 0: flyteidl.core.Primitive
 	(*Void)(nil),                      // 1: flyteidl.core.Void
@@ -1770,64 +1845,66 @@ var file_flyteidl_core_literals_proto_goTypes = []interface{}{
 	(*BindingData)(nil),               // 17: flyteidl.core.BindingData
 	(*Binding)(nil),                   // 18: flyteidl.core.Binding
 	(*KeyValuePair)(nil),              // 19: flyteidl.core.KeyValuePair
-	(*RetryStrategy)(nil),             // 20: flyteidl.core.RetryStrategy
-	nil,                               // 21: flyteidl.core.Literal.MetadataEntry
-	nil,                               // 22: flyteidl.core.LiteralMap.LiteralsEntry
-	nil,                               // 23: flyteidl.core.BindingDataMap.BindingsEntry
-	(*timestamppb.Timestamp)(nil),     // 24: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),       // 25: google.protobuf.Duration
-	(*BlobType)(nil),                  // 26: flyteidl.core.BlobType
-	(*SchemaType)(nil),                // 27: flyteidl.core.SchemaType
-	(*LiteralType)(nil),               // 28: flyteidl.core.LiteralType
-	(*StructuredDatasetType)(nil),     // 29: flyteidl.core.StructuredDatasetType
-	(*Error)(nil),                     // 30: flyteidl.core.Error
-	(*structpb.Struct)(nil),           // 31: google.protobuf.Struct
-	(*OutputReference)(nil),           // 32: flyteidl.core.OutputReference
+	(*RetryOnOOM)(nil),                // 20: flyteidl.core.RetryOnOOM
+	(*RetryStrategy)(nil),             // 21: flyteidl.core.RetryStrategy
+	nil,                               // 22: flyteidl.core.Literal.MetadataEntry
+	nil,                               // 23: flyteidl.core.LiteralMap.LiteralsEntry
+	nil,                               // 24: flyteidl.core.BindingDataMap.BindingsEntry
+	(*timestamppb.Timestamp)(nil),     // 25: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),       // 26: google.protobuf.Duration
+	(*BlobType)(nil),                  // 27: flyteidl.core.BlobType
+	(*SchemaType)(nil),                // 28: flyteidl.core.SchemaType
+	(*LiteralType)(nil),               // 29: flyteidl.core.LiteralType
+	(*StructuredDatasetType)(nil),     // 30: flyteidl.core.StructuredDatasetType
+	(*Error)(nil),                     // 31: flyteidl.core.Error
+	(*structpb.Struct)(nil),           // 32: google.protobuf.Struct
+	(*OutputReference)(nil),           // 33: flyteidl.core.OutputReference
 }
 var file_flyteidl_core_literals_proto_depIdxs = []int32{
-	24, // 0: flyteidl.core.Primitive.datetime:type_name -> google.protobuf.Timestamp
-	25, // 1: flyteidl.core.Primitive.duration:type_name -> google.protobuf.Duration
+	25, // 0: flyteidl.core.Primitive.datetime:type_name -> google.protobuf.Timestamp
+	26, // 1: flyteidl.core.Primitive.duration:type_name -> google.protobuf.Duration
 	3,  // 2: flyteidl.core.Blob.metadata:type_name -> flyteidl.core.BlobMetadata
-	26, // 3: flyteidl.core.BlobMetadata.type:type_name -> flyteidl.core.BlobType
-	27, // 4: flyteidl.core.Schema.type:type_name -> flyteidl.core.SchemaType
+	27, // 3: flyteidl.core.BlobMetadata.type:type_name -> flyteidl.core.BlobType
+	28, // 4: flyteidl.core.Schema.type:type_name -> flyteidl.core.SchemaType
 	10, // 5: flyteidl.core.Union.value:type_name -> flyteidl.core.Literal
-	28, // 6: flyteidl.core.Union.type:type_name -> flyteidl.core.LiteralType
-	29, // 7: flyteidl.core.StructuredDatasetMetadata.structured_dataset_type:type_name -> flyteidl.core.StructuredDatasetType
+	29, // 6: flyteidl.core.Union.type:type_name -> flyteidl.core.LiteralType
+	30, // 7: flyteidl.core.StructuredDatasetMetadata.structured_dataset_type:type_name -> flyteidl.core.StructuredDatasetType
 	7,  // 8: flyteidl.core.StructuredDataset.metadata:type_name -> flyteidl.core.StructuredDatasetMetadata
 	0,  // 9: flyteidl.core.Scalar.primitive:type_name -> flyteidl.core.Primitive
 	2,  // 10: flyteidl.core.Scalar.blob:type_name -> flyteidl.core.Blob
 	4,  // 11: flyteidl.core.Scalar.binary:type_name -> flyteidl.core.Binary
 	5,  // 12: flyteidl.core.Scalar.schema:type_name -> flyteidl.core.Schema
 	1,  // 13: flyteidl.core.Scalar.none_type:type_name -> flyteidl.core.Void
-	30, // 14: flyteidl.core.Scalar.error:type_name -> flyteidl.core.Error
-	31, // 15: flyteidl.core.Scalar.generic:type_name -> google.protobuf.Struct
+	31, // 14: flyteidl.core.Scalar.error:type_name -> flyteidl.core.Error
+	32, // 15: flyteidl.core.Scalar.generic:type_name -> google.protobuf.Struct
 	8,  // 16: flyteidl.core.Scalar.structured_dataset:type_name -> flyteidl.core.StructuredDataset
 	6,  // 17: flyteidl.core.Scalar.union:type_name -> flyteidl.core.Union
 	9,  // 18: flyteidl.core.Literal.scalar:type_name -> flyteidl.core.Scalar
 	12, // 19: flyteidl.core.Literal.collection:type_name -> flyteidl.core.LiteralCollection
 	13, // 20: flyteidl.core.Literal.map:type_name -> flyteidl.core.LiteralMap
 	11, // 21: flyteidl.core.Literal.offloaded_metadata:type_name -> flyteidl.core.LiteralOffloadedMetadata
-	21, // 22: flyteidl.core.Literal.metadata:type_name -> flyteidl.core.Literal.MetadataEntry
-	28, // 23: flyteidl.core.LiteralOffloadedMetadata.inferred_type:type_name -> flyteidl.core.LiteralType
+	22, // 22: flyteidl.core.Literal.metadata:type_name -> flyteidl.core.Literal.MetadataEntry
+	29, // 23: flyteidl.core.LiteralOffloadedMetadata.inferred_type:type_name -> flyteidl.core.LiteralType
 	10, // 24: flyteidl.core.LiteralCollection.literals:type_name -> flyteidl.core.Literal
-	22, // 25: flyteidl.core.LiteralMap.literals:type_name -> flyteidl.core.LiteralMap.LiteralsEntry
+	23, // 25: flyteidl.core.LiteralMap.literals:type_name -> flyteidl.core.LiteralMap.LiteralsEntry
 	17, // 26: flyteidl.core.BindingDataCollection.bindings:type_name -> flyteidl.core.BindingData
-	23, // 27: flyteidl.core.BindingDataMap.bindings:type_name -> flyteidl.core.BindingDataMap.BindingsEntry
-	28, // 28: flyteidl.core.UnionInfo.targetType:type_name -> flyteidl.core.LiteralType
+	24, // 27: flyteidl.core.BindingDataMap.bindings:type_name -> flyteidl.core.BindingDataMap.BindingsEntry
+	29, // 28: flyteidl.core.UnionInfo.targetType:type_name -> flyteidl.core.LiteralType
 	9,  // 29: flyteidl.core.BindingData.scalar:type_name -> flyteidl.core.Scalar
 	14, // 30: flyteidl.core.BindingData.collection:type_name -> flyteidl.core.BindingDataCollection
-	32, // 31: flyteidl.core.BindingData.promise:type_name -> flyteidl.core.OutputReference
+	33, // 31: flyteidl.core.BindingData.promise:type_name -> flyteidl.core.OutputReference
 	15, // 32: flyteidl.core.BindingData.map:type_name -> flyteidl.core.BindingDataMap
 	11, // 33: flyteidl.core.BindingData.offloaded_metadata:type_name -> flyteidl.core.LiteralOffloadedMetadata
 	16, // 34: flyteidl.core.BindingData.union:type_name -> flyteidl.core.UnionInfo
 	17, // 35: flyteidl.core.Binding.binding:type_name -> flyteidl.core.BindingData
-	10, // 36: flyteidl.core.LiteralMap.LiteralsEntry.value:type_name -> flyteidl.core.Literal
-	17, // 37: flyteidl.core.BindingDataMap.BindingsEntry.value:type_name -> flyteidl.core.BindingData
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	20, // 36: flyteidl.core.RetryStrategy.on_oom:type_name -> flyteidl.core.RetryOnOOM
+	10, // 37: flyteidl.core.LiteralMap.LiteralsEntry.value:type_name -> flyteidl.core.Literal
+	17, // 38: flyteidl.core.BindingDataMap.BindingsEntry.value:type_name -> flyteidl.core.BindingData
+	39, // [39:39] is the sub-list for method output_type
+	39, // [39:39] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_core_literals_proto_init() }
@@ -2078,6 +2155,18 @@ func file_flyteidl_core_literals_proto_init() {
 			}
 		}
 		file_flyteidl_core_literals_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RetryOnOOM); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_core_literals_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RetryStrategy); i {
 			case 0:
 				return &v.state
@@ -2128,7 +2217,7 @@ func file_flyteidl_core_literals_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_core_literals_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -63,11 +63,30 @@ func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string
 	return te.execName, nil
 }
 
+type onOOMConfig struct {
+	Factor   float32
+	Limit    string
+	Exponent uint32
+}
+
+func (o onOOMConfig) GetFactor() float32 {
+	return o.Factor
+}
+
+func (o onOOMConfig) GetLimit() string {
+	return o.Limit
+}
+
+func (o onOOMConfig) GetExponent() uint32 {
+	return o.Exponent
+}
+
 type taskExecutionMetadata struct {
 	interfaces.NodeExecutionMetadata
 	taskExecID           taskExecutionID
 	o                    pluginCore.TaskOverrides
 	maxAttempts          uint32
+	onOOMConf            onOOMConfig
 	platformResources    *v1.ResourceRequirements
 	environmentVariables map[string]string
 }
@@ -82,6 +101,10 @@ func (t taskExecutionMetadata) GetOverrides() pluginCore.TaskOverrides {
 
 func (t taskExecutionMetadata) GetMaxAttempts() uint32 {
 	return t.maxAttempts
+}
+
+func (t taskExecutionMetadata) GetOnOOMConfig() pluginCore.OnOOMConfig {
+	return t.onOOMConf
 }
 
 func (t taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
@@ -188,6 +211,22 @@ func assignResource(resourceName v1.ResourceName, execConfigRequest, execConfigL
 	}
 	if !limit.IsZero() {
 		limits[resourceName] = limit
+	}
+}
+
+func generateOnOOMConfig(retryStrategy *v1alpha1.RetryStrategy, oomFailures uint32) onOOMConfig {
+	if retryStrategy == nil || retryStrategy.GetOnOOM() == nil {
+		return onOOMConfig{
+			Factor:   0,
+			Limit:    "",
+			Exponent: 0,
+		}
+	}
+	onOOM := retryStrategy.GetOnOOM()
+	return onOOMConfig{
+		Factor:   onOOM.Factor,
+		Limit:    onOOM.Limit,
+		Exponent: oomFailures,
 	}
 }
 
@@ -301,6 +340,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 			},
 			o:                    nCtx.Node(),
 			maxAttempts:          maxAttempts,
+			onOOMConf:            generateOnOOMConfig(nCtx.Node().GetRetryStrategy(), nCtx.CurrentOOMFailures()),
 			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
 			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},

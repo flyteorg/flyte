@@ -29,12 +29,13 @@ func TestToK8sEnvVar(t *testing.T) {
 
 func TestToK8sResourceList(t *testing.T) {
 	{
+
 		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
 			{Name: core.Resources_CPU, Value: "250m"},
 			{Name: core.Resources_GPU, Value: "1"},
 			{Name: core.Resources_MEMORY, Value: "1024Mi"},
 			{Name: core.Resources_EPHEMERAL_STORAGE, Value: "1024Mi"},
-		})
+		}, nil)
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, r)
@@ -45,23 +46,65 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
 	}
 	{
-		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{})
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{}, nil)
 		assert.NoError(t, err)
 		assert.Empty(t, r)
 	}
 	{
 		_, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
 			{Name: core.Resources_CPU, Value: "250x"},
-		})
+		}, nil)
 		assert.Error(t, err)
 	}
+	{
+		// Test with non-nil onOOMConfig
+		mockOnOOMConfig := &mocks.OnOOMConfig{}
+		mockOnOOMConfig.EXPECT().GetExponent().Return(uint32(2))
+		mockOnOOMConfig.EXPECT().GetFactor().Return(float32(2.0))
+		mockOnOOMConfig.EXPECT().GetLimit().Return("4096Mi")
 
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
+			{Name: core.Resources_MEMORY, Value: "1024Mi"},
+		}, mockOnOOMConfig)
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, r)
+		// Memory should be multiplied by 2^2 = 4
+		// Compare the raw values by converting to bytes
+		expectedQty := resource.MustParse("4096Mi")
+		actualQty := r[v1.ResourceMemory] // Extract value from map
+
+		assert.Equal(t, 0, actualQty.Cmp(expectedQty),
+			"Resource values do not match: expected %s, got %s", expectedQty.String(), actualQty.String())
+		// Check if resource.Quantity's string matches its numerical value
+		assert.Equal(t, actualQty.String(), "4294967296")
+	}
+	{
+		mockOnOOMConfig := &mocks.OnOOMConfig{}
+		mockOnOOMConfig.EXPECT().GetExponent().Return(uint32(2))
+		mockOnOOMConfig.EXPECT().GetFactor().Return(float32(2.0))
+		mockOnOOMConfig.EXPECT().GetLimit().Return("4096Mi")
+
+		// Test with a value that would exceed the limit
+		r, err := ToK8sResourceList([]*core.Resources_ResourceEntry{
+			{Name: core.Resources_MEMORY, Value: "2048Mi"},
+		}, mockOnOOMConfig)
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, r)
+		// 2048Mi * 4 = 8192Mi = 8Gi, but limit is 4096Mi
+		expectedQty := resource.MustParse("4096Mi")
+		actualQty := r[v1.ResourceMemory] // Extract value from map
+
+		assert.Equal(t, actualQty, expectedQty,
+			"Resource values do not match: expected %s, got %s", expectedQty.String(), actualQty.String())
+	}
 }
 
 func TestToK8sResourceRequirements(t *testing.T) {
 
 	{
-		r, err := ToK8sResourceRequirements(nil)
+		r, err := ToK8sResourceRequirements(nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Empty(t, r.Limits)
@@ -71,7 +114,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 		r, err := ToK8sResourceRequirements(&core.Resources{
 			Requests: nil,
 			Limits:   nil,
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Empty(t, r.Limits)
@@ -85,7 +128,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "1024m"},
 			},
-		})
+		}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, r)
 		assert.Equal(t, resource.MustParse("250m"), r.Requests[v1.ResourceCPU])
@@ -99,7 +142,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "1024m"},
 			},
-		})
+		}, nil)
 		assert.Error(t, err)
 	}
 	{
@@ -110,7 +153,7 @@ func TestToK8sResourceRequirements(t *testing.T) {
 			Limits: []*core.Resources_ResourceEntry{
 				{Name: core.Resources_CPU, Value: "blah"},
 			},
-		})
+		}, nil)
 		assert.Error(t, err)
 	}
 }
