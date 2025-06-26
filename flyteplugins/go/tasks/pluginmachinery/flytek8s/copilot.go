@@ -175,7 +175,6 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	if c.SecurityContext.Capabilities == nil {
 		c.SecurityContext.Capabilities = &v1.Capabilities{}
 	}
-	c.SecurityContext.Capabilities.Add = append(c.SecurityContext.Capabilities.Add, pTraceCapability)
 
 	if iFace != nil {
 		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
@@ -211,8 +210,6 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 	//nolint:protogetter
 	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
-	shareProcessNamespaceEnabled := true
-	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
 	primaryInitContainerName := ""
 	if iFace != nil {
 		if iFace.GetInputs() != nil && len(iFace.GetInputs().GetVariables()) > 0 {
