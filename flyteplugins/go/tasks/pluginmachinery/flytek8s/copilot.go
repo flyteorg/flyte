@@ -26,8 +26,6 @@ const (
 	flyteDownloaderContainerName = "downloader"
 )
 
-var pTraceCapability = v1.Capability("SYS_PTRACE")
-
 func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []string, volumeMounts ...v1.VolumeMount) (v1.Container, error) {
 	cpu, err := resource.ParseQuantity(cfg.CPU)
 	if err != nil {
