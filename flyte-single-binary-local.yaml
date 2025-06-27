@@ -34,7 +34,7 @@ webhook:
   certDir: $HOME/.flyte/webhook-certs
   localCert: true
   secretName: flyte-sandbox-webhook-secret
-  serviceName: flyte-sandbox-local
+  serviceName: flyte-pod-webhook
   servicePort: 9443
 
 tasks:
