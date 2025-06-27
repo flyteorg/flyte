@@ -169,6 +169,9 @@ message TaskMetadata {
     // the CR object itself while the metadata in the pod template/K8sPod is applied
     // to the pod template spec of the CR object.
     K8sObjectMetadata metadata = 16;
+
+    // Indicates the time to live (TTL) of the results of this task in the cache if caching is enabled.
+    google.protobuf.Duration cache_ttl = 17;
 }
 
 // A Task structure that uniquely identifies a task in the system

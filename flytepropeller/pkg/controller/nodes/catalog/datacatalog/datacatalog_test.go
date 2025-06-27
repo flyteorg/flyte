@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/datacatalog/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -66,10 +67,13 @@ var typedInterface = core.TypedInterface{
 	Outputs: variableMap,
 }
 
+var ttl = durationpb.New(time.Hour)
+
 var sampleKey = catalog.Key{
 	Identifier:     core.Identifier{ResourceType: core.ResourceType_TASK, Project: "project", Domain: "domain", Name: "name", Version: "version"},
 	TypedInterface: typedInterface,
 	CacheVersion:   "1.0.0",
+	CacheTtl:       ttl,
 }
 
 var noInputOutputKey = catalog.Key{
@@ -416,6 +420,7 @@ func TestCatalog_Put(t *testing.T) {
 				assert.NoError(t, parseErr)
 				assert.EqualValues(t, 1, len(o.GetArtifact().GetData()))
 				assert.EqualValues(t, "out1", o.GetArtifact().GetData()[0].GetName())
+				assert.EqualValues(t, ttl, o.GetArtifact().GetTtl())
 				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.GetArtifact().GetData()[0].GetValue()))
 				return true
 			}),
@@ -571,6 +576,7 @@ func TestCatalog_Put(t *testing.T) {
 				assert.NoError(t, parseErr)
 				assert.EqualValues(t, 1, len(o.GetArtifact().GetData()))
 				assert.EqualValues(t, "out1", o.GetArtifact().GetData()[0].GetName())
+				assert.EqualValues(t, ttl, o.GetArtifact().GetTtl())
 				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.GetArtifact().GetData()[0].GetValue()))
 				createArtifactCalled = true
 				return true
@@ -630,6 +636,7 @@ func TestCatalog_Update(t *testing.T) {
 				assert.True(t, proto.Equal(o.GetDataset(), datasetID))
 				assert.IsType(t, &datacatalog.UpdateArtifactRequest_TagName{}, o.GetQueryHandle())
 				assert.Equal(t, tagName, o.GetTagName())
+				assert.EqualValues(t, ttl, o.GetTtl())
 				return true
 			}),
 		).Return(&datacatalog.UpdateArtifactResponse{ArtifactId: "test-artifact"}, nil)

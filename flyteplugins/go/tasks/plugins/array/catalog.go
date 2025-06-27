@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -270,7 +272,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	//nolint:protogetter
 	catalogWriterItems, err := ConstructCatalogUploadRequests(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId,
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), taskTemplate.GetMetadata().GetDiscoveryVersion(),
-		taskTemplate.GetMetadata().GetCacheIgnoreInputVars(), iface, &tasksToCache, inputReaders, outputReaders)
+		taskTemplate.GetMetadata().GetCacheIgnoreInputVars(), taskTemplate.GetMetadata().GetCacheTtl(), iface, &tasksToCache, inputReaders, outputReaders)
 
 	if err != nil {
 		return nil, externalResources, err
@@ -340,7 +342,7 @@ func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogCl
 }
 
 func ConstructCatalogUploadRequests(keyID *idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
-	cacheVersion string, cacheIgnoreInputVars []string, taskInterface *idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
+	cacheVersion string, cacheIgnoreInputVars []string, cacheTtl *durationpb.Duration, taskInterface *idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
 	inputReaders []io.InputReader, outputReaders []io.OutputReader) ([]catalog.UploadRequest, error) {
 
 	writerWorkItems := make([]catalog.UploadRequest, 0, len(inputReaders))
@@ -362,6 +364,7 @@ func ConstructCatalogUploadRequests(keyID *idlCore.Identifier, taskExecID idlCor
 				InputReader:          input,
 				CacheVersion:         cacheVersion,
 				CacheIgnoreInputVars: cacheIgnoreInputVars,
+				CacheTtl:             cacheTtl,
 				TypedInterface:       *taskInterface,
 			},
 			ArtifactData: outputReaders[idx],
@@ -453,6 +456,7 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 			Key: catalog.Key{
 				Identifier:     *t.Id, //nolint:protogetter
 				CacheVersion:   t.GetMetadata().GetDiscoveryVersion(),
+				CacheTtl:       t.GetMetadata().GetCacheTtl(),
 				InputReader:    inputReader,
 				TypedInterface: *iface,
 			},
