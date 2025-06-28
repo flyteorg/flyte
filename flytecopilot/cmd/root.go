@@ -103,7 +103,7 @@ func waitForAWSCreds(ctx context.Context, timeout time.Duration) error {
 	})
 }
 
-// NewCommand returns a new instance of the co-pilot root command
+// NewDataCommand returns a new instance of the co-pilot root command
 func NewDataCommand() *cobra.Command {
 	rootOpts := &RootOptions{}
 	command := &cobra.Command{

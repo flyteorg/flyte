@@ -78,7 +78,7 @@ func (r *RootOptions) ConfigureClient() error {
 	return nil
 }
 
-// NewCommand returns a new instance of an argo command
+// NewFlyteCommand returns a new instance of an argo command
 func NewFlyteCommand() *cobra.Command {
 	rootOpts := &RootOptions{}
 	command := &cobra.Command{
