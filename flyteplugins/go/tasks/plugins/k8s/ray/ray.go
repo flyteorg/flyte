@@ -117,7 +117,12 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 	}
 
-	podSpec.ServiceAccountName = cfg.ServiceAccount
+	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	if len(serviceAccountName) == 0 || cfg.ServiceAccount != "" {
+		serviceAccountName = cfg.ServiceAccount
+	}
+
+	podSpec.ServiceAccountName = serviceAccountName
 
 	rayjob, err := constructRayJob(taskCtx, &rayJob, objectMeta, *podSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
 
@@ -198,16 +203,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob *plugins.R
 		}
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
-	}
-
-	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	if len(serviceAccountName) == 0 || cfg.ServiceAccount != "" {
-		serviceAccountName = cfg.ServiceAccount
-	}
-
-	rayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName = serviceAccountName
-	for index := range rayClusterSpec.WorkerGroupSpecs {
-		rayClusterSpec.WorkerGroupSpecs[index].Template.Spec.ServiceAccountName = serviceAccountName
 	}
 
 	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
