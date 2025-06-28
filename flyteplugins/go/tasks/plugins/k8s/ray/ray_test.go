@@ -299,10 +299,13 @@ func TestBuildPodTemplate(t *testing.T) {
 		},
 	}
 
+	customServiceAccount := "custom-sa"
+
 	customPodSpec :=
 		&core.K8SPod{
 			PodSpec: transformStructToStructPB(t, &corev1.PodSpec{
-				Tolerations: toleration,
+				Tolerations:        toleration,
+				ServiceAccountName: customServiceAccount,
 			}),
 			Metadata: &core.K8SObjectMetadata{
 				Labels:      map[string]string{"new-label-1": "val1"},
@@ -318,6 +321,7 @@ func TestBuildPodTemplate(t *testing.T) {
 	expectedAnnotations := map[string]string{"annotation-1": "val1", "new-annotation-1": "val1"}
 	assert.Equal(t, expectedLabels, podSpec.Labels)
 	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+	assert.Equal(t, customServiceAccount, podSpec.Spec.ServiceAccountName)
 
 	workerGroupSpec := plugins.WorkerGroupSpec{K8SPod: customPodSpec}
 	podSpec, err = buildWorkerPodTemplate(&basePodSpec.Containers[0], basePodSpec, objectMeta, taskContext, &workerGroupSpec)
@@ -325,6 +329,7 @@ func TestBuildPodTemplate(t *testing.T) {
 	assert.Equal(t, toleration, podSpec.Spec.Tolerations)
 	assert.Equal(t, expectedLabels, podSpec.Labels)
 	assert.Equal(t, expectedAnnotations, podSpec.Annotations)
+	assert.Equal(t, customServiceAccount, podSpec.Spec.ServiceAccountName)
 }
 
 func TestBuildResourceRayExtendedResources(t *testing.T) {
