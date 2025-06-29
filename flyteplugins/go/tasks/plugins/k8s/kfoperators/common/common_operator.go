@@ -328,7 +328,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	}
 
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if resources != nil {
+	if resources != nil && (len(resources.GetLimits()) > 0 || len(resources.GetRequests()) > 0) {
 		resources, err := flytek8s.ToK8sResourceRequirements(resources)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
