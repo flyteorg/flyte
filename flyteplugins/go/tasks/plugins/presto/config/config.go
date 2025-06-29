@@ -22,7 +22,7 @@ func URLMustParse(s string) config.URL {
 	if r != nil {
 		return config.URL{URL: *r}
 	}
-	logger.Panicf(context.TODO(), "Nil Presto URL specified.", err)
+	logger.Panic(context.TODO(), "Nil Presto URL specified.", err)
 	return config.URL{}
 }
 

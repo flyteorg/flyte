@@ -15,7 +15,6 @@ import (
 	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
@@ -190,8 +189,8 @@ func Test_ExtractQueryInfo(t *testing.T) {
 
 			ir := &mocks3.InputReader{}
 			tCtx.EXPECT().InputReader().Return(ir)
-			ir.EXPECT().GetInputPath().Return(storage.DataReference("s3://something"))
-			ir.EXPECT().GetInputPrefixPath().Return(storage.DataReference("s3://something/2"))
+			ir.EXPECT().GetInputPath().Return("s3://something")
+			ir.EXPECT().GetInputPrefixPath().Return("s3://something/2")
 			ir.EXPECT().Get(ctx).Return(nil, nil)
 
 			q, err := extractQueryInfo(ctx, tCtx)

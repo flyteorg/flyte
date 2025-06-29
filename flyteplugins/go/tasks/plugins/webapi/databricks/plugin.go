@@ -223,10 +223,12 @@ func (p Plugin) sendRequest(method string, databricksJob map[string]interface{},
 
 	// Send the request
 	resp, err := p.client.Do(req)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request to Databricks platform with err: [%v]", err)
 	}
-	defer resp.Body.Close()
 
 	// Parse the response body
 	responseBody, err := ioutil.ReadAll(resp.Body)
@@ -266,7 +268,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case "QUEUED":
 		return core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, message), nil
 	case "PENDING":
-		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
+		return core.PhaseInfoInitializing(core.DefaultPhaseVersion, message, taskInfo), nil
 	case "RUNNING":
 		fallthrough
 	case "BLOCKED":

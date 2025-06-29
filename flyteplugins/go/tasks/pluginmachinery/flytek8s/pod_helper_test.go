@@ -79,8 +79,8 @@ func dummyTaskTemplate() *core.TaskTemplate {
 
 func dummyInputReader() io.InputReader {
 	inputReader := &pluginsIOMock.InputReader{}
-	inputReader.EXPECT().GetInputPath().Return(storage.DataReference("test-data-reference"))
-	inputReader.EXPECT().GetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
+	inputReader.EXPECT().GetInputPath().Return("test-data-reference")
+	inputReader.EXPECT().GetInputPrefixPath().Return("test-data-reference-prefix")
 	inputReader.EXPECT().Get(mock.Anything).Return(&core.LiteralMap{}, nil)
 	return inputReader
 }

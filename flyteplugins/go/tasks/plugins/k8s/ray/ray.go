@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"gopkg.in/yaml.v2"
@@ -89,7 +88,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if primaryContainer == nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod: [%v]", err.Error())
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container %s from the pod spec", primaryContainerName)
 	}
 
 	cfg := GetConfig()
@@ -611,7 +610,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	}
 
 	if len(rayJob.Status.JobDeploymentStatus) == 0 {
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
 	}
 
 	var phaseInfo pluginsCore.PhaseInfo
@@ -619,15 +618,15 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {
 	case rayv1.JobDeploymentStatusInitializing:
-		phaseInfo, err = pluginsCore.PhaseInfoInitializing(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
+		phaseInfo, err = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
 	case rayv1.JobDeploymentStatusRunning:
 		phaseInfo, err = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	case rayv1.JobDeploymentStatusComplete:
 		phaseInfo, err = pluginsCore.PhaseInfoSuccess(info), nil
 	case rayv1.JobDeploymentStatusSuspended:
-		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Suspended", info), nil
+		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspended", info), nil
 	case rayv1.JobDeploymentStatusSuspending:
-		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Suspending", info), nil
+		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "Suspending", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
 		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil

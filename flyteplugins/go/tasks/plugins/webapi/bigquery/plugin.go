@@ -3,6 +3,7 @@ package bigquery
 import (
 	"context"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -111,7 +112,8 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 	resp, err := client.Jobs.Insert(job.JobReference.ProjectId, job).Do()
 
 	if err != nil {
-		apiError, ok := err.(*googleapi.Error)
+		var apiError *googleapi.Error
+		ok := errors.As(err, &apiError)
 		resourceMeta := ResourceMetaWrapper{
 			JobReference:      *job.JobReference,
 			Namespace:         namespace,
@@ -278,7 +280,7 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 	switch resource.Status.State {
 	case bigqueryStatusPending:
-		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), version, "Query is PENDING", taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(version, "Query is PENDING", taskInfo), nil
 
 	case bigqueryStatusRunning:
 		return core.PhaseInfoRunning(version, taskInfo), nil
