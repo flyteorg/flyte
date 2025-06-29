@@ -145,7 +145,7 @@ func (in *WorkflowStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID)
 
 	dataDir, err := in.ConstructNodeDataDir(ctx, id)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to construct data dir for node [%v], exec id [%v]", id)
+		logger.Errorf(ctx, "Failed to construct data dir for node [%v]", id)
 		return n
 	}
 

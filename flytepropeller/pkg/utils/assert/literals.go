@@ -113,12 +113,3 @@ func EqualLiteralMap(t *testing.T, l1 *core.LiteralMap, l2 *core.LiteralMap) {
 		}
 	}
 }
-
-func EqualLiteralCollection(t *testing.T, l1 *core.LiteralCollection, l2 *core.LiteralCollection) {
-	if assert.NotNil(t, l2) {
-		assert.Equal(t, len(l1.GetLiterals()), len(l2.GetLiterals()))
-		for i, v := range l1.GetLiterals() {
-			EqualLiterals(t, v, l2.GetLiterals()[i])
-		}
-	}
-}

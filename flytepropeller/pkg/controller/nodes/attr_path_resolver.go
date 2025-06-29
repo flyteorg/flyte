@@ -17,7 +17,7 @@ import (
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
 func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
-	var currVal *core.Literal = literal
+	var currVal = literal
 	var tmpVal *core.Literal
 	var err error
 	var exist bool

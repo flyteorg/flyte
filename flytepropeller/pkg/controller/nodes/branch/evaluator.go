@@ -15,7 +15,6 @@ import (
 const ErrorCodeUserProvidedError = "UserProvidedError"
 const ErrorCodeMalformedBranch = "MalformedBranchUserError"
 const ErrorCodeCompilerError = "CompilerError"
-const ErrorCodeFailedFetchOutputs = "FailedFetchOutputs"
 
 func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
@@ -94,7 +93,7 @@ func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralM
 // Decides the branch to be taken, returns the nodeId of the selected node or an error
 // The branchNode is marked as success. This is used by downstream node to determine if it can be executed
 // All downstream nodes are marked as skipped
-func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
+func DecideBranch(ctx context.Context, nl executors.NodeLookup, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
 	var selectedNodeID *v1alpha1.NodeID
 	var skippedNodeIds []*v1alpha1.NodeID
 	var err error

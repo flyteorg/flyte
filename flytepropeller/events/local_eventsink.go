@@ -65,8 +65,5 @@ func NewFileSink(path string) (EventSink, error) {
 
 	w := bufio.NewWriter(f)
 
-	if err != nil {
-		return nil, err
-	}
 	return &localSink{writer: &FileWriter{ioWriter: w}}, nil
 }

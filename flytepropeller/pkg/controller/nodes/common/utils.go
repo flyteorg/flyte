@@ -98,7 +98,7 @@ func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
 		return err
 	}
 
-	logger.Infof(ctx, "read offloaded literal at location [%s] with size [%s]", dataReference, size)
+	logger.Infof(ctx, "read offloaded literal at location [%s] with size [%d]", dataReference, size)
 	return nil
 }
 

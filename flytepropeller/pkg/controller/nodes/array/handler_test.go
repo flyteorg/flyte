@@ -23,12 +23,10 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
-	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	recoverymocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -52,7 +50,6 @@ var (
 
 func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler interfaces.NodeHandler, dataStore *storage.DataStore, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// mock components
-	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
 	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
 	offloadingConfig := config.LiteralOffloadingConfig{Enabled: false}
@@ -60,14 +57,11 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	mockEventSink := eventmocks.NewMockEventSink()
 	mockHandlerFactory := &mocks.HandlerFactory{}
 	mockHandlerFactory.EXPECT().GetHandler(mock.Anything).Return(nodeHandler, nil)
-	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
-	mockSignalClient := &gatemocks.SignalServiceClient{}
 	noopCatalogClient := catalog.NOOPCatalog{}
 
 	// create node executor
-	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient,
-		adminClient, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
+	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, "s3://bucket/", noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockHandlerFactory, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
