@@ -67,7 +67,7 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 	go func() {
 		<-ctx.Done()
 		if cerr := conn.Close(); cerr != nil {
-			grpclog.Infof("Failed to close conn to %s: %v", connector, cerr)
+			grpclog.Infof("Failed to close conn to %v: %v", connector, cerr)
 		}
 	}()
 
