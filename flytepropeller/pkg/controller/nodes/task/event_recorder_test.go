@@ -17,7 +17,7 @@ func TestBufferedEventRecorder(t *testing.T) {
 	assert.NotNil(t, bev)
 	assert.Equal(t, bev.GetAll(ctx), []pluginCore.PhaseInfo{})
 
-	ev1 := pluginCore.PhaseInfoInitializing(time.Now(), 0, "starting", nil)
+	ev1 := pluginCore.PhaseInfoInitializing(0, "starting", nil)
 	assert.NoError(t, bev.RecordRaw(ctx, ev1))
 	assert.Equal(t, bev.GetAll(ctx), []pluginCore.PhaseInfo{ev1})
 

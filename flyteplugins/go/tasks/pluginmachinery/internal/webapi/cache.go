@@ -85,7 +85,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 			resource.GetID())
 
 		if cacheItem.IsTerminal() {
-			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
+			logger.Debugf(ctx, "Sync loop - resource cache key [%s] in terminal state",
 				resource.GetID())
 			resp = append(resp, cache.ItemSyncResponse{
 				ID:     resource.GetID(),
@@ -97,8 +97,8 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		}
 
 		if cacheItem.SyncFailureCount > q.cfg.MaxSystemFailures {
-			logger.Debugf(ctx, "Sync loop - Item with key [%v] has failed to sync [%v] time(s). More than the allowed [%v] time(s). Marking as failure.",
-				cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
+			logger.Debugf(ctx, "Sync loop - Item with key [%s] has failed to sync [%d] time(s). More than the allowed [%d] time(s). Marking as failure.",
+				resource.GetID(), cacheItem.SyncFailureCount, q.cfg.MaxSystemFailures)
 			cacheItem.State.Phase = PhaseSystemFailure
 			resp = append(resp, cache.ItemSyncResponse{
 				ID:     resource.GetID(),

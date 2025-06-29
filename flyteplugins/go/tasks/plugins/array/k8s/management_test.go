@@ -565,13 +565,6 @@ func TestCheckSubTasksState(t *testing.T) {
 func TestTerminateSubTasksOnAbort(t *testing.T) {
 	ctx := context.Background()
 	subtaskCount := 3
-	config := Config{
-		MaxArrayJobSize: int64(subtaskCount * 10),
-		ResourceConfig: ResourceConfig{
-			PrimaryLabel: "p",
-			Limit:        subtaskCount,
-		},
-	}
 	kubeClient := mocks.KubeClient{}
 	kubeClient.EXPECT().GetClient().Return(mocks.NewFakeKubeClient())
 	kubeClient.EXPECT().GetCache().Return(mocks.NewFakeKubeCache())
@@ -603,7 +596,7 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 			return nil
 		}
 
-		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, mockTerminateFunction, currentState)
 
 		assert.Nil(t, err)
 		eventRecorder.AssertCalled(t, "RecordRaw", mock.Anything, mock.Anything)
@@ -619,7 +612,7 @@ func TestTerminateSubTasksOnAbort(t *testing.T) {
 			return fmt.Errorf("termination error")
 		}
 
-		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, mockTerminateFunction, currentState)
 
 		assert.NotNil(t, err)
 		eventRecorder.AssertNotCalled(t, "RecordRaw", mock.Anything, mock.Anything)
