@@ -1,6 +1,9 @@
 package get
 
 import (
+	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/encoding/protojson"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
@@ -13,7 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
@@ -26,6 +28,11 @@ To fetch a project, use the following command:
  flytectl get project
 `
 )
+
+var marshalOptions = &protojson.MarshalOptions{
+	Indent:    "  ",
+	Multiline: true,
+}
 
 // CreateGetCommand will return get command
 func CreateGetCommand() *cobra.Command {
@@ -65,6 +72,38 @@ func CreateGetCommand() *cobra.Command {
 		"workflow-execution-config": {CmdFunc: getWorkflowExecutionConfigFunc, Aliases: []string{"workflow-execution-config"},
 			Short: workflowExecutionConfigShort,
 			Long:  workflowExecutionConfigLong, PFlagProvider: workflowexecutionconfig.DefaultFetchConfig, ProjectDomainNotRequired: true},
+		"user-info": {
+			CmdFunc:                  UserInfo,
+			Aliases:                  []string{"me"},
+			ProjectDomainNotRequired: true,
+			Short:                    userInfoDesc,
+			Long:                     userInfoDesc,
+			PFlagProvider:            project.DefaultConfig,
+		},
+		"healthcheck": {
+			CmdFunc:                  HealthCheck,
+			Aliases:                  []string{"health"},
+			ProjectDomainNotRequired: true,
+			Short:                    healthDesc,
+			Long:                     healthDesc,
+			PFlagProvider:            project.DefaultConfig,
+		},
+		"public-client-config": {
+			CmdFunc:                  PublicClientConfig,
+			Aliases:                  []string{"client-cfg"},
+			ProjectDomainNotRequired: true,
+			Short:                    publicClientCfgDesc,
+			Long:                     publicClientCfgDesc,
+			PFlagProvider:            project.DefaultConfig,
+		},
+		"oauth-metadata": {
+			CmdFunc:                  OAuthMetadata,
+			Aliases:                  []string{"oauth-meta"},
+			ProjectDomainNotRequired: true,
+			Short:                    oauthMetadataDesc,
+			Long:                     oauthMetadataDesc,
+			PFlagProvider:            project.DefaultConfig,
+		},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)

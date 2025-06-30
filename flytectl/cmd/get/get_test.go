@@ -5,8 +5,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 )
 
 const projectValue = "dummyProject"
@@ -31,20 +32,23 @@ func TestCreateGetCommand(t *testing.T) {
 	assert.Equal(t, getCommand.Use, "get")
 	assert.Equal(t, getCommand.Short, "Fetches various Flyte resources such as tasks, workflows, launch plans, executions, and projects.")
 	fmt.Println(getCommand.Commands())
-	assert.Equal(t, len(getCommand.Commands()), 11)
+	assert.Equal(t, len(getCommand.Commands()), 15)
 	cmdNouns := getCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
 		return cmdNouns[i].Use < cmdNouns[j].Use
 	})
 	useArray := []string{"cluster-resource-attribute", "execution", "execution-cluster-label",
-		"execution-queue-attribute", "launchplan", "plugin-override", "project", "task", "task-resource-attribute", "workflow", "workflow-execution-config"}
+		"execution-queue-attribute", "healthcheck", "launchplan", "oauth-metadata", "plugin-override",
+		"project", "public-client-config", "task", "task-resource-attribute",
+		"user-info", "workflow", "workflow-execution-config"}
 	aliases := [][]string{{"cluster-resource-attributes"}, {"executions"}, {"execution-cluster-labels"},
-		{"execution-queue-attributes"}, {"launchplans"}, {"plugin-overrides"}, {"projects"}, {"tasks"}, {"task-resource-attributes"}, {"workflows"}, {"workflow-execution-config"}}
-	shortArray := []string{clusterResourceAttributesShort, executionShort, executionClusterLabelShort, executionQueueAttributesShort, launchPlanShort,
-		pluginOverrideShort, projectShort, taskShort, taskResourceAttributesShort, workflowShort, workflowExecutionConfigShort}
-	longArray := []string{clusterResourceAttributesLong, executionLong, executionClusterLabelLong, executionQueueAttributesLong, launchPlanLong,
-		pluginOverrideLong, projectLong, taskLong, taskResourceAttributesLong, workflowLong, workflowExecutionConfigLong}
+		{"execution-queue-attributes"}, {"health"}, {"launchplans"}, {"oauth-meta"}, {"plugin-overrides"},
+		{"projects"}, {"client-cfg"}, {"tasks"}, {"task-resource-attributes"}, {"me"}, {"workflows"}, {"workflow-execution-config"}}
+	shortArray := []string{clusterResourceAttributesShort, executionShort, executionClusterLabelShort, executionQueueAttributesShort, healthDesc, launchPlanShort, oauthMetadataDesc,
+		pluginOverrideShort, projectShort, publicClientCfgDesc, taskShort, taskResourceAttributesShort, userInfoDesc, workflowShort, workflowExecutionConfigShort}
+	longArray := []string{clusterResourceAttributesLong, executionLong, executionClusterLabelLong, executionQueueAttributesLong, healthDesc, launchPlanLong, oauthMetadataDesc,
+		pluginOverrideLong, projectLong, publicClientCfgDesc, taskLong, taskResourceAttributesLong, userInfoDesc, workflowLong, workflowExecutionConfigLong}
 	for i := range cmdNouns {
 		assert.Equal(t, cmdNouns[i].Use, useArray[i])
 		assert.Equal(t, cmdNouns[i].Aliases, aliases[i])

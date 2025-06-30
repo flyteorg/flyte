@@ -114,6 +114,8 @@ func GRPCGetIdentityFromIDToken(ctx context.Context, clientID string, provider *
 		if err != nil {
 			logger.Infof(ctx, "Could not unmarshal user info from metadata %v", err)
 		}
+	} else {
+		logger.Warnf(ctx, "No user info found in metadata")
 	}
 
 	return IdentityContextFromIDTokenToken(ctx, tokenStr, clientID, provider, userInfo)
