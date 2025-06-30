@@ -8029,16 +8029,35 @@
       },
       "description": "A customizable interface to convey resources requested for a container. This can be interpreted differently for different\ncontainer engines."
     },
+    "coreRetryOnOOM": {
+      "type": "object",
+      "properties": {
+        "factor": {
+          "type": "number",
+          "format": "float",
+          "title": "Factor to multiply previous memory by (e.g. 2.0 doubles memory)"
+        },
+        "limit": {
+          "type": "string",
+          "title": "Maximum memory limit as resource quantity (e.g. \"2Gi\")"
+        }
+      },
+      "title": "RetryOnOOM defines memory scaling behavior for out-of-memory errors.\nNew memory = min(previous_memory * factor, limit)"
+    },
     "coreRetryStrategy": {
       "type": "object",
       "properties": {
+        "on_oom": {
+          "$ref": "#/definitions/coreRetryOnOOM",
+          "title": "Optional memory scaling config for OOM errors"
+        },
         "retries": {
           "type": "integer",
           "format": "int64",
           "description": "Number of retries. Retries will be consumed when the job fails with a recoverable error.\nThe number of retries must be less than or equals to 10."
         }
       },
-      "description": "Retry strategy associated with an executable unit."
+      "title": "RetryStrategy configures task execution retry behavior"
     },
     "coreRuntimeBinding": {
       "type": "object"

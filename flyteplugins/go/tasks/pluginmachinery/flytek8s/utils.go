@@ -1,7 +1,10 @@
 package flytek8s
 
 import (
-	"github.com/pkg/errors"
+	"math"
+	"strconv"
+
+	"github.com/pkg/errors" // For decimal arithmetic
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -19,7 +22,7 @@ func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 
 // TODO we should modify the container resources to contain a map of enum values?
 // Also we should probably create tolerations / taints, but we could do that as a post process
-func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceList, error) {
+func ToK8sResourceList(resources []*core.Resources_ResourceEntry, onOOMConfig pluginmachinery_core.OnOOMConfig) (v1.ResourceList, error) {
 	k8sResources := make(v1.ResourceList, len(resources))
 	for _, r := range resources {
 		rVal := r.GetValue()
@@ -34,6 +37,34 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 			}
 		case core.Resources_MEMORY:
 			if !v.IsZero() {
+				if onOOMConfig != nil && onOOMConfig.GetExponent() > 0 && onOOMConfig.GetFactor() > 1.0 {
+					// Convert to multiplier into string and parse it to quantity
+					multiplier := math.Pow(float64(onOOMConfig.GetFactor()), float64(onOOMConfig.GetExponent()))
+					multiplier_str := strconv.FormatFloat(multiplier, 'f', -1, 64)
+					multiplier_quantity, err := resource.ParseQuantity(multiplier_str)
+					if err != nil {
+						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+					}
+
+					// Multiply the value by the multiplier
+					// Note: this does not update the string in resource.Quantity
+					v.AsDec().Mul(v.AsDec(), multiplier_quantity.AsDec())
+
+					// Convert the new value to a string and parse it to quantity
+					// Create a new resource.Quantity to have matching string and numerical value
+					v, err = resource.ParseQuantity(v.AsDec().String())
+					if err != nil {
+						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+					}
+
+					limitVal, err := resource.ParseQuantity(onOOMConfig.GetLimit())
+					if err != nil {
+						return nil, errors.Wrap(err, "Failed to parse resource as a valid quantity.")
+					}
+					if !limitVal.IsZero() && v.Cmp(limitVal) > 0 {
+						v = limitVal
+					}
+				}
 				k8sResources[v1.ResourceMemory] = v
 			}
 		case core.Resources_GPU:
@@ -49,16 +80,16 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 	return k8sResources, nil
 }
 
-func ToK8sResourceRequirements(resources *core.Resources) (*v1.ResourceRequirements, error) {
+func ToK8sResourceRequirements(resources *core.Resources, onOOMConfig pluginmachinery_core.OnOOMConfig) (*v1.ResourceRequirements, error) {
 	res := &v1.ResourceRequirements{}
 	if resources == nil {
 		return res, nil
 	}
-	req, err := ToK8sResourceList(resources.GetRequests())
+	req, err := ToK8sResourceList(resources.GetRequests(), onOOMConfig)
 	if err != nil {
 		return res, err
 	}
-	lim, err := ToK8sResourceList(resources.GetLimits())
+	lim, err := ToK8sResourceList(resources.GetLimits(), onOOMConfig)
 	if err != nil {
 		return res, err
 	}

@@ -21,6 +21,7 @@ type TaskNodeState struct {
 	LastPhaseUpdatedAt                 time.Time
 	PreviousNodeExecutionCheckpointURI storage.DataReference
 	CleanupOnFailure                   bool
+	OOMFailuresCount                   uint32
 }
 
 type BranchNodeState struct {

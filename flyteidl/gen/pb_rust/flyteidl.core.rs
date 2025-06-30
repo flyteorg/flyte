@@ -618,10 +618,25 @@ pub struct KeyValuePair {
     #[prost(string, tag="2")]
     pub value: ::prost::alloc::string::String,
 }
-/// Retry strategy associated with an executable unit.
+/// RetryOnOOM defines memory scaling behavior for out-of-memory errors.
+/// New memory = min(previous_memory * factor, limit)
 #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RetryOnOom {
+    /// Factor to multiply previous memory by (e.g. 2.0 doubles memory)
+    #[prost(float, tag="1")]
+    pub factor: f32,
+    /// Maximum memory limit as resource quantity (e.g. "2Gi")
+    #[prost(string, tag="2")]
+    pub limit: ::prost::alloc::string::String,
+}
+/// RetryStrategy configures task execution retry behavior
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RetryStrategy {
+    /// Optional memory scaling config for OOM errors
+    #[prost(message, optional, tag="1")]
+    pub on_oom: ::core::option::Option<RetryOnOom>,
     /// Number of retries. Retries will be consumed when the job fails with a recoverable error.
     /// The number of retries must be less than or equals to 10.
     #[prost(uint32, tag="5")]

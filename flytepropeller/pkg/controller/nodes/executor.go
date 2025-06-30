@@ -31,6 +31,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
@@ -1212,6 +1213,9 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 			nodeStatus.IncrementSystemFailures()
 			c.metrics.SystemErrorDuration.Observe(ctx, startTime, endTime)
 		} else if execErr.GetKind() == core.ExecutionError_USER {
+			if execErr.GetCode() == flytek8s.OOMKilled {
+				nodeStatus.IncrementOOMFailures()
+			}
 			c.metrics.UserErrorDuration.Observe(ctx, startTime, endTime)
 		} else {
 			c.metrics.UnknownErrorDuration.Observe(ctx, startTime, endTime)

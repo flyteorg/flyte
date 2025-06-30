@@ -322,6 +322,7 @@ type MutableNodeStatus interface {
 	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError)
 	IncrementAttempts() uint32
 	IncrementSystemFailures() uint32
+	IncrementOOMFailures() uint32
 	SetCached()
 	ResetDirty()
 
@@ -372,6 +373,7 @@ type ExecutableNodeStatus interface {
 	GetExecutionError() *core.ExecutionError
 	GetAttempts() uint32
 	GetSystemFailures() uint32
+	GetOOMFailures() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
 	GetTaskNodeStatus() ExecutableTaskNodeStatus
 

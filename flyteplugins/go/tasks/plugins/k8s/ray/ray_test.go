@@ -163,6 +163,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	})
 	taskExecutionMetadata.EXPECT().GetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.EXPECT().GetConsoleURL().Return("")
+	taskExecutionMetadata.EXPECT().GetOnOOMConfig().Return(nil)
 	taskCtx.EXPECT().TaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }
@@ -497,7 +498,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	}
 	headResources := &core.Resources{Requests: headResourceEntries, Limits: headResourceEntries}
 
-	expectedHeadResources, err := flytek8s.ToK8sResourceRequirements(headResources)
+	expectedHeadResources, err := flytek8s.ToK8sResourceRequirements(headResources, nil)
 	require.NoError(t, err)
 
 	workerResourceEntries := []*core.Resources_ResourceEntry{
@@ -507,7 +508,7 @@ func TestBuildResourceRayCustomK8SPod(t *testing.T) {
 	}
 	workerResources := &core.Resources{Requests: workerResourceEntries, Limits: workerResourceEntries}
 
-	expectedWorkerResources, err := flytek8s.ToK8sResourceRequirements(workerResources)
+	expectedWorkerResources, err := flytek8s.ToK8sResourceRequirements(workerResources, nil)
 	require.NoError(t, err)
 
 	nvidiaRuntimeClassName := "nvidia-cdi"

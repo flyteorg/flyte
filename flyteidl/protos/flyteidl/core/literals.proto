@@ -197,8 +197,21 @@ message KeyValuePair {
     string value = 2;
 }
 
-// Retry strategy associated with an executable unit.
+// RetryOnOOM defines memory scaling behavior for out-of-memory errors.
+// New memory = min(previous_memory * factor, limit)
+message RetryOnOOM {
+    // Factor to multiply previous memory by (e.g. 2.0 doubles memory)
+    float factor = 1;
+
+    // Maximum memory limit as resource quantity (e.g. "2Gi")
+    string limit = 2;
+}
+
+// RetryStrategy configures task execution retry behavior
 message RetryStrategy {
+    // Optional memory scaling config for OOM errors
+    RetryOnOOM on_oom = 1;
+
     // Number of retries. Retries will be consumed when the job fails with a recoverable error.
     // The number of retries must be less than or equals to 10.
     uint32 retries = 5;

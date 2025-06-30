@@ -50,13 +50,23 @@ func (in *Binding) DeepCopyInto(out *Binding) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
+type RetryOnOOM struct {
+	Factor float32 `json:"factor"`
+	Limit  string  `json:"limit"`
+}
+
 // Strategy to be used to Retry a node that is in RetryableFailure state
 type RetryStrategy struct {
+	OnOOM *RetryOnOOM `json:"onOOM,omitempty"`
 	// MinAttempts implies the at least n attempts to try this node before giving up. The at least here is because we may
 	// fail to write the attempt information and end up retrying again.
 	// Also `0` and `1` both mean at least one attempt will be done. 0 is a degenerate case.
 	MinAttempts *int `json:"minAttempts"`
 	// TODO Add retrydelay?
+}
+
+func (rs *RetryStrategy) GetOnOOM() *RetryOnOOM {
+	return rs.OnOOM
 }
 
 type Alias struct {

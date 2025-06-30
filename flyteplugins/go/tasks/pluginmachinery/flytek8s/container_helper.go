@@ -213,7 +213,7 @@ func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContex
 		containerName = rand.String(4)
 	}
 
-	res, err := ToK8sResourceRequirements(taskContainer.GetResources())
+	res, err := ToK8sResourceRequirements(taskContainer.GetResources(), tCtx.TaskExecutionMetadata().GetOnOOMConfig())
 	if err != nil {
 		return nil, err
 	}

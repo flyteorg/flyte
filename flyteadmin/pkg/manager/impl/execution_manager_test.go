@@ -3755,6 +3755,28 @@ func TestAddPluginOverrides(t *testing.T) {
 	}
 }
 
+func TestAdjustRetryStrategyLimits(t *testing.T) {
+	// Create a retry strategy with an OOM limit that exceeds platform limits
+	retryStrategy := &core.RetryStrategy{
+		OnOom: &core.RetryOnOOM{
+			Limit: "2Gi", // 2 gigabytes
+		},
+	}
+
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	execManager.(*ExecutionManager).adjustRetryStrategyLimits(context.Background(), retryStrategy, workflowengineInterfaces.TaskResources{
+		Limits: runtimeInterfaces.TaskResourceSet{
+			Memory: resource.MustParse("1Gi"),
+		},
+	})
+
+	adjustedLimit := retryStrategy.GetOnOom().GetLimit()
+	expectedLimit := resource.MustParse("1Gi")
+	assert.Equal(t, expectedLimit.String(), adjustedLimit)
+}
+
 func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 	executionID := &core.WorkflowExecutionIdentifier{
 		Project: project,

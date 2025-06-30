@@ -427,25 +427,26 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 		ignoreRetryCause              bool
 		attempts                      uint32
 		systemFailures                uint32
+		oomFailures                   uint32
 		maxAttempts                   int32
 		maxSystemFailures             uint32
 		interruptibleFailureThreshold int32
 		expectedInterruptible         bool
 	}{
-		{"Interruptible", false, 0, 0, 2, 1, 1, true},
-		{"NonInterruptible", false, 0, 1, 2, 1, 1, false},
-		{"InterruptibleNegativeThreshold", false, 0, 0, 2, 1, -1, true},
-		{"InterruptibleNegativeThreshold2", false, 3, 3, 5, 4, -1, true},
-		{"NonInterruptibleNegativeThreshold", false, 1, 1, 2, 1, -1, false},
+		{"Interruptible", false, 0, 0, 0, 2, 1, 1, true},
+		{"NonInterruptible", false, 0, 1, 1, 2, 1, 1, false},
+		{"InterruptibleNegativeThreshold", false, 0, 0, 0, 2, 1, -1, true},
+		{"InterruptibleNegativeThreshold2", false, 3, 3, 3, 5, 4, -1, true},
+		{"NonInterruptibleNegativeThreshold", false, 1, 1, 1, 2, 1, -1, false},
 		// maxSystemFailures should be ignored if ignoreRetryCause is true
-		{"IgnoreCauseInterruptible", true, 0, 0, 2, 999, 1, true},
-		{"IgnoreCauseInterruptibleFirstTry", true, 0, 0, 1, 999, -1, true}, // First try should always be interruptible if interruptible is set
-		{"IgnoreCauseInterruptibleNegativeThreshold", true, 0, 0, 2, 999, -1, true},
-		{"IgnoreCauseInterruptibleNegativeThreshold2", true, 2, 1, 4, 999, -1, true},
-		{"IgnoreCauseNonInterruptibleSystem", true, 1, 1, 2, 999, 1, false},
-		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 2, 999, 1, false},
-		{"IgnoreCauseNonInterruptibleSystemNegativeThreshold", true, 3, 3, 4, 0, -1, false},
-		{"IgnoreCauseNonInterruptibleUserNegativeThreshold", true, 3, 0, 4, 0, -1, false},
+		{"IgnoreCauseInterruptible", true, 0, 0, 0, 2, 999, 1, true},
+		{"IgnoreCauseInterruptibleFirstTry", true, 0, 0, 0, 1, 999, -1, true}, // First try should always be interruptible if interruptible is set
+		{"IgnoreCauseInterruptibleNegativeThreshold", true, 0, 0, 0, 2, 999, -1, true},
+		{"IgnoreCauseInterruptibleNegativeThreshold2", true, 2, 1, 1, 4, 999, -1, true},
+		{"IgnoreCauseNonInterruptibleSystem", true, 1, 1, 1, 2, 999, 1, false},
+		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 0, 2, 999, 1, false},
+		{"IgnoreCauseNonInterruptibleSystemNegativeThreshold", true, 3, 3, 2, 4, 0, -1, false},
+		{"IgnoreCauseNonInterruptibleUserNegativeThreshold", true, 3, 0, 2, 4, 0, -1, false},
 	}
 
 	for _, tt := range tests {
@@ -478,6 +479,7 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 			nodeLookup.EXPECT().GetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
 			nodeLookup.EXPECT().GetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
 				Attempts:       tt.attempts,
+				OOMFailures:    tt.oomFailures,
 				SystemFailures: tt.systemFailures,
 			})
 
