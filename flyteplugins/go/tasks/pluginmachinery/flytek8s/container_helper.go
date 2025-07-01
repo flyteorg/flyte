@@ -433,7 +433,7 @@ func AddFlyteCustomizationsToContainerWithPodTemplate(ctx context.Context, param
 	case ResourceCustomizationModeEnsureExistingResourcesInRange:
 		// This use the platformResources defaults to ensure that the container.Resources values are within the
 		// platformResources limits. It will override podTemplateResources with container.Resources and then
-		// will check whether effective resources are within defined platform limits (plaftormResources), and will
+		// will check whether effective resources are within defined platform limits (platformResources), and will
 		// override them if necessary
 
 		// Merge pod template resources for any resources not already set
