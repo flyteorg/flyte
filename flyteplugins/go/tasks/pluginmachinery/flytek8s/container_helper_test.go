@@ -24,49 +24,49 @@ func TestAssignResource(t *testing.T) {
 	t.Run("Leave valid requests and limits unchanged", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			resource.MustParse("1"), resource.MustParse("2"),
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.True(t, res.Request.Equal(resource.MustParse("1")))
 		assert.True(t, res.Limit.Equal(resource.MustParse("2")))
 	})
 	t.Run("Assign unset Request from Limit", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			zeroQuantity, resource.MustParse("2"),
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.True(t, res.Request.Equal(resource.MustParse("2")))
 		assert.True(t, res.Limit.Equal(resource.MustParse("2")))
 	})
 	t.Run("Assign unset Limit from Request", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			resource.MustParse("2"), zeroQuantity,
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.Equal(t, resource.MustParse("2"), res.Request)
 		assert.Equal(t, resource.MustParse("2"), res.Limit)
 	})
 	t.Run("Assign from platform defaults", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			zeroQuantity, zeroQuantity,
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.Equal(t, resource.MustParse("10"), res.Request)
 		assert.Equal(t, resource.MustParse("10"), res.Limit)
 	})
 	t.Run("Adjust Limit when Request > Limit", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			resource.MustParse("10"), resource.MustParse("2"),
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.Equal(t, resource.MustParse("2"), res.Request)
 		assert.Equal(t, resource.MustParse("2"), res.Limit)
 	})
 	t.Run("Adjust Limit > platformLimit", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			resource.MustParse("1"), resource.MustParse("40"),
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.True(t, res.Request.Equal(resource.MustParse("1")))
 		assert.True(t, res.Limit.Equal(resource.MustParse("20")))
 	})
 	t.Run("Adjust Request, Limit > platformLimit", func(t *testing.T) {
 		res := AdjustOrDefaultResource(
 			resource.MustParse("40"), resource.MustParse("50"),
-			resource.MustParse("10"), resource.MustParse("20"))
+			resource.MustParse("10"), resource.MustParse("20"), false)
 		assert.True(t, res.Request.Equal(resource.MustParse("20")))
 		assert.True(t, res.Limit.Equal(resource.MustParse("20")))
 	})
@@ -731,4 +731,72 @@ func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 	assert.Len(t, container.EnvFrom, 2)
 	assert.Equal(t, container.EnvFrom[0], configMapSource)
 	assert.Equal(t, container.EnvFrom[1], secretSource)
+}
+
+func TestApplyResourceOverrides_OverrideCpuAllowFloat(t *testing.T) {
+	cfg := config.GetK8sPluginConfig()
+	cfg.AllowCPULimitToFloatFromRequest = true
+	err := config.SetK8sPluginConfig(cfg)
+	assert.NoError(t, err)
+	platformRequirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("3"),
+		},
+		Limits: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("10"),
+		},
+	}
+	cpuRequest := resource.MustParse("1")
+	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU: cpuRequest,
+		},
+	}, platformRequirements, assignIfUnset)
+	assert.EqualValues(t, cpuRequest, overrides.Requests[v1.ResourceCPU])
+	_, ok := overrides.Limits[v1.ResourceCPU]
+	assert.False(t, ok)
+}
+
+func TestApplyResourceOverrides_EmptyCpuLimitAllowFloat(t *testing.T) {
+	cfg := config.GetK8sPluginConfig()
+	cfg.AllowCPULimitToFloatFromRequest = true
+	err := config.SetK8sPluginConfig(cfg)
+	assert.NoError(t, err)
+
+	{
+		platformRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("3"),
+			},
+		}
+		cpuRequest := resource.MustParse("1")
+		//tenCpuRequest := resource.MustParse("10")
+		overrides := ApplyResourceOverrides(v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: cpuRequest,
+			},
+		}, platformRequirements, assignIfUnset)
+		assert.EqualValues(t, cpuRequest, overrides.Requests[v1.ResourceCPU])
+		_, ok := overrides.Limits[v1.ResourceCPU]
+		assert.False(t, ok)
+	}
+	{
+		platformRequirements := v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("3"),
+			},
+			Limits: v1.ResourceList{
+				v1.ResourceCPU: resource.MustParse("10"),
+			},
+		}
+		cpuRequest := resource.MustParse("1")
+		overrides := ApplyResourceOverrides(v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceCPU: cpuRequest,
+			},
+		}, platformRequirements, assignIfUnset)
+		assert.EqualValues(t, cpuRequest, overrides.Requests[v1.ResourceCPU])
+		_, ok := overrides.Limits[v1.ResourceCPU]
+		assert.False(t, ok)
+	}
 }

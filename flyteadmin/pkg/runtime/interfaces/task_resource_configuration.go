@@ -13,4 +13,5 @@ type TaskResourceSet struct {
 type TaskResourceConfiguration interface {
 	GetDefaults() TaskResourceSet
 	GetLimits() TaskResourceSet
+	GetAllowCPULimitToFloatFromRequest() bool
 }
