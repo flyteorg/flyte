@@ -388,6 +388,7 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 		}
 
 		if len(raw) > 0 {
+			logger.Debugf(ctx, "Setting user info cookie [%s]", string(raw))
 			meta.Set(UserInfoMDKey, string(raw))
 		}
 
