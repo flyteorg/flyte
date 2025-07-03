@@ -271,7 +271,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return primaryInitContainerName, err
 			}
-			coPilotPod.InitContainers = append(coPilotPod.InitContainers, sidecar)
+			// Let the sidecar container start before the downloader; it will ensure the signal watcher is started before the main container finishes.
+			coPilotPod.InitContainers = append([]v1.Container{sidecar}, coPilotPod.InitContainers...)
 
 			coPilotPod.TerminationGracePeriodSeconds = (*int64)(&cfg.Timeout.Duration)
 		}

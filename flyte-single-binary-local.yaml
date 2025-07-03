@@ -56,6 +56,8 @@ plugins:
     cloudwatch-enabled: false
     stackdriver-enabled: false
   k8s:
+    co-pilot:
+      image: pingsutw/copilot:test
     default-env-vars:
       - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
       - FLYTE_AWS_ACCESS_KEY_ID: minio
@@ -85,7 +87,7 @@ storage:
       region: us-east-1
       disable_ssl: true
       v2_signing: true
-      endpoint: http://localhost:30002
+      endpoint: http://host.docker.internal:30002
       auth_type: accesskey
       access_key_id: minio
       secret_key: miniostorage
