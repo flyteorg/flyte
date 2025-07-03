@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strconv"
 	"time"
 
@@ -45,14 +44,18 @@ func (in *BranchNodeStatus) GetPhase() BranchNodePhase {
 }
 
 func (in *BranchNodeStatus) SetBranchNodeError() {
-	in.SetDirty()
-	in.Phase = BranchNodeError
+	if in.Phase != BranchNodeError {
+		in.SetDirty()
+		in.Phase = BranchNodeError
+	}
 }
 
 func (in *BranchNodeStatus) SetBranchNodeSuccess(id NodeID) {
-	in.SetDirty()
-	in.Phase = BranchNodeSuccess
-	in.FinalizedNodeID = &id
+	if in.Phase != BranchNodeSuccess || in.FinalizedNodeID == nil || *in.FinalizedNodeID != id {
+		in.SetDirty()
+		in.Phase = BranchNodeSuccess
+		in.FinalizedNodeID = &id
+	}
 }
 
 func (in *BranchNodeStatus) GetFinalizedNode() *NodeID {
@@ -527,8 +530,10 @@ func (in *NodeStatus) GetSystemFailures() uint32 {
 }
 
 func (in *NodeStatus) SetCached() {
-	in.Cached = true
-	in.SetDirty()
+	if !in.Cached {
+		in.Cached = true
+		in.SetDirty()
+	}
 }
 
 func (in *NodeStatus) IsCached() bool {
@@ -578,7 +583,6 @@ func (in *NodeStatus) GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus {
 	if in.WorkflowNodeStatus == nil {
 		return nil
 	}
-
 	return in.WorkflowNodeStatus
 }
 
@@ -711,9 +715,20 @@ func (in *NodeStatus) GetParentTaskID() *core.TaskExecutionIdentifier {
 }
 
 func (in *NodeStatus) SetParentNodeID(n *NodeID) {
-	if in.ParentNode == nil || in.ParentNode != n {
+	if in.ParentNode == nil && n == nil {
+		return
+	}
+
+	if in.ParentNode == nil || n == nil {
 		in.ParentNode = n
 		in.SetDirty()
+		return
+	}
+
+	if *in.ParentNode != *n {
+		in.ParentNode = n
+		in.SetDirty()
+		return
 	}
 }
 
@@ -807,6 +822,8 @@ func (in *NodeStatus) GetDataDir() DataReference {
 
 func (in *NodeStatus) SetDataDir(d DataReference) {
 	in.DataDir = d
+	// We do not need to set Dirty here because this field is not persisted.
+	// in.SetDirty()
 }
 
 func (in *NodeStatus) GetOutputDir() DataReference {
@@ -815,8 +832,12 @@ func (in *NodeStatus) GetOutputDir() DataReference {
 
 func (in *NodeStatus) SetOutputDir(d DataReference) {
 	in.OutputDir = d
+	// We do not need to set Dirty here because this field is not persisted.
+	// in.SetDirty()
 }
 
+// Equals compares this node status against another node status.
+// Note: The comparison omits unserialized values like parentTask, dataDir, outputDir
 func (in *NodeStatus) Equals(other *NodeStatus) bool {
 	// Assuming in is never nil
 	if other == nil {
@@ -829,7 +850,7 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 
 	if in.Phase == other.Phase {
 		if in.Phase == NodePhaseSucceeded || in.Phase == NodePhaseFailed {
-			return true
+			return true // If the phase is terminal ignore other possible differences
 		}
 	}
 
@@ -849,24 +870,12 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		return false
 	}
 
-	if in.DataDir != other.DataDir {
-		return false
-	}
-
-	if in.OutputDir != other.OutputDir {
-		return false
-	}
-
 	if in.ParentNode != nil && other.ParentNode != nil {
 		if *in.ParentNode != *other.ParentNode {
 			return false
 		}
 	} else if !(in.ParentNode == other.ParentNode) {
 		// Both are not nil
-		return false
-	}
-
-	if !reflect.DeepEqual(in.ParentTask, other.ParentTask) {
 		return false
 	}
 
@@ -938,18 +947,24 @@ func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
 }
 
 func (in *TaskNodeStatus) SetBarrierClockTick(tick uint32) {
-	in.BarrierClockTick = tick
-	in.SetDirty()
+	if in.BarrierClockTick != tick {
+		in.BarrierClockTick = tick
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) SetPreviousNodeExecutionCheckpointPath(path DataReference) {
-	in.PreviousNodeExecutionCheckpointPath = path
-	in.SetDirty()
+	if in.PreviousNodeExecutionCheckpointPath != path {
+		in.PreviousNodeExecutionCheckpointPath = path
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) SetPluginState(s []byte) {
-	in.PluginState = s
-	in.SetDirty()
+	if !bytes.Equal(in.PluginState, s) {
+		in.PluginState = s
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) SetLastPhaseUpdatedAt(updatedAt time.Time) {
@@ -957,13 +972,17 @@ func (in *TaskNodeStatus) SetLastPhaseUpdatedAt(updatedAt time.Time) {
 }
 
 func (in *TaskNodeStatus) SetPluginStateVersion(v uint32) {
-	in.PluginStateVersion = v
-	in.SetDirty()
+	if in.PluginStateVersion != v {
+		in.PluginStateVersion = v
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) SetCleanupOnFailure(cleanupOnFailure bool) {
-	in.CleanupOnFailure = cleanupOnFailure
-	in.SetDirty()
+	if in.CleanupOnFailure != cleanupOnFailure {
+		in.CleanupOnFailure = cleanupOnFailure
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) GetPluginState() []byte {
@@ -975,13 +994,17 @@ func (in *TaskNodeStatus) GetPluginStateVersion() uint32 {
 }
 
 func (in *TaskNodeStatus) SetPhase(phase int) {
-	in.Phase = phase
-	in.SetDirty()
+	if in.Phase != phase {
+		in.Phase = phase
+		in.SetDirty()
+	}
 }
 
 func (in *TaskNodeStatus) SetPhaseVersion(version uint32) {
-	in.PhaseVersion = version
-	in.SetDirty()
+	if in.PhaseVersion != version {
+		in.PhaseVersion = version
+		in.SetDirty()
+	}
 }
 
 func (in TaskNodeStatus) GetPhase() int {

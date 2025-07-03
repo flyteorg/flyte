@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -35,12 +36,6 @@ func TestNodeStatus_Equals(t *testing.T) {
 	assert.False(t, one.Equals(other))
 
 	other.Phase = one.Phase
-	assert.True(t, one.Equals(other))
-
-	one.DataDir = "data-dir"
-	assert.False(t, one.Equals(other))
-
-	other.DataDir = one.DataDir
 	assert.True(t, one.Equals(other))
 
 	parentNode := "x"
@@ -73,6 +68,143 @@ func TestNodeStatus_Equals(t *testing.T) {
 	assert.False(t, one.Equals(other))
 	other.SubNodeStatus[node].Phase = NodePhaseRunning
 	assert.True(t, one.Equals(other))
+}
+
+// Validates that node status is dirty only when changed
+func TestNodeStatus_IsDirty(t *testing.T) {
+	one := &NodeStatus{}
+
+	one.SetCached()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetCached()
+	require.False(t, one.IsDirty())
+
+	one.IncrementAttempts()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.IncrementSystemFailures()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateDynamicNodeStatus()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateDynamicNodeStatus()
+	require.False(t, one.IsDirty())
+
+	one.GetOrCreateBranchStatus()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateBranchStatus()
+	require.False(t, one.IsDirty())
+
+	one.GetOrCreateTaskStatus()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateTaskStatus()
+	require.False(t, one.IsDirty())
+
+	one.GetOrCreateArrayNodeStatus()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateArrayNodeStatus()
+	require.False(t, one.IsDirty())
+
+	nodeId := "test"
+
+	one.SetParentNodeID(&nodeId)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetParentNodeID(&nodeId)
+	require.False(t, one.IsDirty())
+
+	parentTaskId := &core.TaskExecutionIdentifier{}
+
+	one.SetParentTaskID(parentTaskId)
+	require.False(t, one.IsDirty()) // Not serialized
+
+	one.GetOrCreateWorkflowStatus()
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.GetOrCreateWorkflowStatus()
+	require.False(t, one.IsDirty())
+
+	one.SetDataDir("/test")
+	require.False(t, one.IsDirty()) // Not serializied
+
+	one.SetOutputDir("/test")
+	require.False(t, one.IsDirty()) // Not serialized
+}
+
+// Validates that task node status is dirty only when changed
+func TestTaskNodeStatus_IsDirty(t *testing.T) {
+	one := &TaskNodeStatus{}
+
+	one.SetBarrierClockTick(5)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetBarrierClockTick(5)
+	require.False(t, one.IsDirty())
+
+	one.SetPreviousNodeExecutionCheckpointPath("/test")
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetPreviousNodeExecutionCheckpointPath("/test")
+	require.False(t, one.IsDirty())
+
+	one.SetPluginState([]byte{1, 2, 3})
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetPluginState([]byte{1, 2, 3})
+	require.False(t, one.IsDirty())
+
+	one.SetPluginStateVersion(5)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetPluginStateVersion(5)
+	require.False(t, one.IsDirty())
+
+	one.SetCleanupOnFailure(true)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetCleanupOnFailure(true)
+	require.False(t, one.IsDirty())
+
+	one.SetPhase(5)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetPhase(5)
+	require.False(t, one.IsDirty())
+
+	one.SetPhaseVersion(5)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.SetPhaseVersion(5)
+	require.False(t, one.IsDirty())
+
+	one.UpdatePhase(10, 15)
+	require.True(t, one.IsDirty())
+	one.ResetDirty()
+
+	one.UpdatePhase(10, 15)
+	require.False(t, one.IsDirty())
+
 }
 
 func TestBranchNodeStatus_Equals(t *testing.T) {
