@@ -102,18 +102,20 @@ class ListDatasetsResponse(_message.Message):
     def __init__(self, datasets: _Optional[_Iterable[_Union[Dataset, _Mapping]]] = ..., next_token: _Optional[str] = ...) -> None: ...
 
 class UpdateArtifactRequest(_message.Message):
-    __slots__ = ["dataset", "artifact_id", "tag_name", "data", "metadata"]
+    __slots__ = ["dataset", "artifact_id", "tag_name", "data", "metadata", "ttl"]
     DATASET_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     TAG_NAME_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    TTL_FIELD_NUMBER: _ClassVar[int]
     dataset: DatasetID
     artifact_id: str
     tag_name: str
     data: _containers.RepeatedCompositeFieldContainer[ArtifactData]
     metadata: Metadata
-    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ...) -> None: ...
+    ttl: _duration_pb2.Duration
+    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class UpdateArtifactResponse(_message.Message):
     __slots__ = ["artifact_id"]
@@ -206,7 +208,7 @@ class DatasetID(_message.Message):
     def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., UUID: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class Artifact(_message.Message):
-    __slots__ = ["id", "dataset", "data", "metadata", "partitions", "tags", "created_at"]
+    __slots__ = ["id", "dataset", "data", "metadata", "partitions", "tags", "created_at", "ttl"]
     ID_FIELD_NUMBER: _ClassVar[int]
     DATASET_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
@@ -214,6 +216,7 @@ class Artifact(_message.Message):
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    TTL_FIELD_NUMBER: _ClassVar[int]
     id: str
     dataset: DatasetID
     data: _containers.RepeatedCompositeFieldContainer[ArtifactData]
@@ -221,7 +224,8 @@ class Artifact(_message.Message):
     partitions: _containers.RepeatedCompositeFieldContainer[Partition]
     tags: _containers.RepeatedCompositeFieldContainer[Tag]
     created_at: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ..., partitions: _Optional[_Iterable[_Union[Partition, _Mapping]]] = ..., tags: _Optional[_Iterable[_Union[Tag, _Mapping]]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    ttl: _duration_pb2.Duration
+    def __init__(self, id: _Optional[str] = ..., dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ..., partitions: _Optional[_Iterable[_Union[Partition, _Mapping]]] = ..., tags: _Optional[_Iterable[_Union[Tag, _Mapping]]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class ArtifactData(_message.Message):
     __slots__ = ["name", "value"]
