@@ -161,7 +161,9 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 	}
 
 	resourceRequirements.Requests[resourceName] = resourceValue.Request
-	// for all resources, if a limit is zero, we can get away with not setting it
+	// if the limit is zero, we don't need to set it - there is no benefit in setting a 0 limit in K8s for any resource.
+	// Not setting this allows resources to float. Note this shouldn't affect K8s QoS classes either since something
+	// that has 0 requests is already just BestEffort
 	if !resourceValue.Limit.IsZero() {
 		resourceRequirements.Limits[resourceName] = resourceValue.Limit
 	}
