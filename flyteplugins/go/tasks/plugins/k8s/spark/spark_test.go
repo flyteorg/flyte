@@ -120,11 +120,12 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Equal(t, expectedLinks, generatedLinks)
 
 	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
+	assert.NoError(t, err)
+
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
 		generatedLinks = append(generatedLinks, l.GetUri())
 	}
-	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
 	assert.True(t, info.Logs[4].GetShowWhilePending()) // All User Logs should be shown while pending

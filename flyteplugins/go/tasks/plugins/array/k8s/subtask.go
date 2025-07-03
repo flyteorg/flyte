@@ -198,7 +198,7 @@ func launchSubtask(ctx context.Context, stCtx SubTaskExecutionContext, cfg *Conf
 		if k8serrors.IsForbidden(err) {
 			if strings.Contains(err.Error(), "exceeded quota") {
 				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
-				return pluginsCore.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil), nil
+				return pluginsCore.PhaseInfoWaitingForResourcesInfo(pluginsCore.DefaultPhaseVersion, fmt.Sprintf("Exceeded resourcequota: %s", err.Error()), nil), nil
 			}
 			return pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {

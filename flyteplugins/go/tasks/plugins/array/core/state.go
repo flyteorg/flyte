@@ -185,10 +185,10 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 
 	switch p, version := state.GetPhase(); p {
 	case PhaseStart:
-		phaseInfo = core.PhaseInfoInitializing(t, core.DefaultPhaseVersion, state.GetReason(), nowTaskInfo)
+		phaseInfo = core.PhaseInfoInitializing(core.DefaultPhaseVersion, state.GetReason(), nowTaskInfo)
 
 	case PhaseWaitingForResources:
-		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(t, version, state.GetReason(), nowTaskInfo)
+		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(version, state.GetReason(), nowTaskInfo)
 
 	case PhasePreLaunch:
 		fallthrough
