@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
+	cacheserviceV2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice/v2"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	catalogIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -36,10 +37,12 @@ var (
 
 type CacheClient struct {
 	client      cacheservice.CacheServiceClient
+	v2Client    cacheserviceV2.CacheServiceClient
 	store       *storage.DataStore
 	maxCacheAge time.Duration
 	inlineCache bool
 	lruMap      *lru.Cache
+	useV2Client bool
 }
 
 func (c *CacheClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*catalogIdl.Reservation, error) {
@@ -49,11 +52,26 @@ func (c *CacheClient) GetOrExtendReservation(ctx context.Context, key catalog.Ke
 		return nil, errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
 	}
 
-	response, err := c.client.GetOrExtendReservation(ctx, &cacheservice.GetOrExtendReservationRequest{
+	cacheRequest := &cacheservice.GetOrExtendReservationRequest{
 		Key:               cacheKey,
 		OwnerId:           ownerID,
 		HeartbeatInterval: ptypes.DurationProto(heartbeatInterval),
-	})
+	}
+
+	var response *cacheservice.GetOrExtendReservationResponse
+	if c.useV2Client {
+		response, err = c.v2Client.GetOrExtendReservation(ctx, &cacheserviceV2.GetOrExtendReservationRequest{
+			BaseRequest: cacheRequest,
+			Identifier: &cacheserviceV2.Identifier{
+				Org:     key.Identifier.Org,
+				Project: key.Identifier.Project,
+				Domain:  key.Identifier.Domain,
+			},
+		})
+	} else {
+		response, err = c.client.GetOrExtendReservation(ctx, cacheRequest)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +92,24 @@ func (c *CacheClient) ReleaseReservation(ctx context.Context, key catalog.Key, o
 		return errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
 	}
 
-	_, err = c.client.ReleaseReservation(ctx, &cacheservice.ReleaseReservationRequest{
+	cacheRequest := &cacheservice.ReleaseReservationRequest{
 		Key:     cacheKey,
 		OwnerId: ownerID,
-	})
+	}
+
+	if c.useV2Client {
+		_, err = c.v2Client.ReleaseReservation(ctx, &cacheserviceV2.ReleaseReservationRequest{
+			BaseRequest: cacheRequest,
+			Identifier: &cacheserviceV2.Identifier{
+				Org:     key.Identifier.Org,
+				Project: key.Identifier.Project,
+				Domain:  key.Identifier.Domain,
+			},
+		})
+	} else {
+		_, err = c.client.ReleaseReservation(ctx, cacheRequest)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -91,9 +123,24 @@ func (c *CacheClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry, 
 		return catalog.Entry{}, errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
 	}
 
-	resp, err := c.client.Get(ctx, &cacheservice.GetCacheRequest{
+	cacheRequest := &cacheservice.GetCacheRequest{
 		Key: cacheKey,
-	})
+	}
+
+	var resp *cacheservice.GetCacheResponse
+	if c.useV2Client {
+		resp, err = c.v2Client.Get(ctx, &cacheserviceV2.GetCacheRequest{
+			BaseRequest: cacheRequest,
+			Identifier: &cacheserviceV2.Identifier{
+				Org:     key.Identifier.Org,
+				Project: key.Identifier.Project,
+				Domain:  key.Identifier.Domain,
+			},
+		})
+	} else {
+		resp, err = c.client.Get(ctx, cacheRequest)
+	}
+
 	if err != nil {
 		logger.Debugf(ctx, "CacheService failed to get output for ID %s, err: %+v", key.Identifier.String(), err)
 		return catalog.Entry{}, errors.Wrapf(err, "CacheService failed to get output for ID %s", key.Identifier.String())
@@ -205,7 +252,19 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 		}
 	}
 
-	_, err = c.client.Put(ctx, cacheRequest)
+	if c.useV2Client {
+		_, err = c.v2Client.Put(ctx, &cacheserviceV2.PutCacheRequest{
+			BaseRequest: cacheRequest,
+			Identifier: &cacheserviceV2.Identifier{
+				Org:     key.Identifier.Org,
+				Project: key.Identifier.Project,
+				Domain:  key.Identifier.Domain,
+			},
+		})
+	} else {
+		_, err = c.client.Put(ctx, cacheRequest)
+	}
+
 	if err != nil {
 		logger.Errorf(ctx, "Caching output for %v returned err %v", key.Identifier, err)
 		return catalog.NewPutFailureStatus(&key), err
@@ -240,7 +299,7 @@ func (c *CacheClient) UpdateReservationCache(ownerID string, entry catalog.Reser
 
 func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
 	useAdminAuth bool, maxRetries uint, backoffScalar int, backoffJitter float64, inlineCache bool, defaultServiceConfig string,
-	reservationMaxCacheSize int, authOpt ...grpc.DialOption) (*CacheClient, error) {
+	reservationMaxCacheSize int, useV2Client bool, authOpt ...grpc.DialOption) (*CacheClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
@@ -285,6 +344,7 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 		return nil, err
 	}
 	client := cacheservice.NewCacheServiceClient(clientConn)
+	v2Client := cacheserviceV2.NewCacheServiceClient(clientConn)
 
 	var evictionFunction func(key interface{}, value interface{})
 	lruCache, err := lru.NewWithEvict(reservationMaxCacheSize, evictionFunction)
@@ -294,10 +354,12 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 
 	return &CacheClient{
 		client:      client,
+		v2Client:    v2Client,
 		store:       dataStore,
 		maxCacheAge: maxCacheAge,
 		inlineCache: inlineCache,
 		lruMap:      lruCache,
+		useV2Client: useV2Client,
 	}, nil
 
 }

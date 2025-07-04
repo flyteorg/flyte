@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
+	cacheserviceV2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice/v2"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/grpcutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -55,7 +56,50 @@ func (s *CacheService) ReleaseReservation(ctx context.Context, request *cacheser
 	return s.CacheManager.ReleaseReservation(ctx, request)
 }
 
-func NewCacheServiceServer() *CacheService {
+type V2CacheService struct {
+	CacheManager interfaces.CacheManager
+}
+
+func updateCacheKey(key string, id *cacheserviceV2.Identifier) string {
+	return fmt.Sprintf("%s-%s-%s-%s", id.GetOrg(), id.GetProject(), id.GetDomain(), key)
+}
+
+func (s *V2CacheService) Get(ctx context.Context, request *cacheserviceV2.GetCacheRequest) (*cacheservice.GetCacheResponse, error) {
+	v1Request := request.GetBaseRequest()
+	v1Request.Key = updateCacheKey(v1Request.GetKey(), request.GetIdentifier())
+
+	return s.CacheManager.Get(ctx, v1Request)
+}
+
+func (s *V2CacheService) Put(ctx context.Context, request *cacheserviceV2.PutCacheRequest) (*cacheservice.PutCacheResponse, error) {
+	v1Request := request.GetBaseRequest()
+	v1Request.Key = updateCacheKey(v1Request.GetKey(), request.GetIdentifier())
+
+	return s.CacheManager.Put(ctx, v1Request)
+}
+
+func (s *V2CacheService) Delete(ctx context.Context, request *cacheserviceV2.DeleteCacheRequest) (*cacheservice.DeleteCacheResponse, error) {
+	v1Request := request.GetBaseRequest()
+	v1Request.Key = updateCacheKey(v1Request.GetKey(), request.GetIdentifier())
+
+	return s.CacheManager.Delete(ctx, v1Request)
+}
+
+func (s *V2CacheService) GetOrExtendReservation(ctx context.Context, request *cacheserviceV2.GetOrExtendReservationRequest) (*cacheservice.GetOrExtendReservationResponse, error) {
+	v1Request := request.GetBaseRequest()
+	v1Request.Key = updateCacheKey(v1Request.GetKey(), request.GetIdentifier())
+
+	return s.CacheManager.GetOrExtendReservation(ctx, v1Request, time.Now())
+}
+
+func (s *V2CacheService) ReleaseReservation(ctx context.Context, request *cacheserviceV2.ReleaseReservationRequest) (*cacheservice.ReleaseReservationResponse, error) {
+	v1Request := request.GetBaseRequest()
+	v1Request.Key = updateCacheKey(v1Request.GetKey(), request.GetIdentifier())
+
+	return s.CacheManager.ReleaseReservation(ctx, v1Request)
+}
+
+func NewCacheServiceServers() (*CacheService, *V2CacheService) {
 	configProvider := runtime.NewConfigurationProvider()
 	cacheServiceConfig := configProvider.ApplicationConfiguration().GetCacheServiceConfig()
 	cacheServiceScope := promutils.NewScope(cacheServiceConfig.MetricsScope).NewSubScope("cacheservice")
@@ -89,10 +133,18 @@ func NewCacheServiceServer() *CacheService {
 	pgDbConfigValues := configProvider.ApplicationConfiguration().GetDbConfig()
 	repos := repositories.GetRepositories(ctx, cacheServiceConfig, *pgDbConfigValues, cacheServiceScope)
 
-	return &CacheService{
-		CacheManager: impl.NewCacheManager(outputStore, repos.CachedOutputRepo(), repos.ReservationRepo(), cacheServiceConfig.MaxInlineSizeBytes, cacheServiceScope.NewSubScope("cache"),
-			time.Duration(cacheServiceConfig.HeartbeatGracePeriodMultiplier), cacheServiceConfig.MaxReservationHeartbeat.Duration),
+	cacheManager := impl.NewCacheManager(outputStore, repos.CachedOutputRepo(), repos.ReservationRepo(), cacheServiceConfig.MaxInlineSizeBytes, cacheServiceScope.NewSubScope("cache"),
+		time.Duration(cacheServiceConfig.HeartbeatGracePeriodMultiplier), cacheServiceConfig.MaxReservationHeartbeat.Duration)
+
+	v1Service := &CacheService{
+		CacheManager: cacheManager,
 	}
+
+	v2Service := &V2CacheService{
+		CacheManager: cacheManager,
+	}
+
+	return v1Service, v2Service
 }
 
 // ServeInsecure creates and starts the gRPC server
@@ -137,7 +189,9 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	grpcServer := grpc.NewServer(serverOpts...)
 
-	cacheservice.RegisterCacheServiceServer(grpcServer, NewCacheServiceServer())
+	v1Server, v2Server := NewCacheServiceServers()
+	cacheservice.RegisterCacheServiceServer(grpcServer, v1Server)
+	cacheserviceV2.RegisterCacheServiceServer(grpcServer, v2Server)
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
@@ -193,6 +247,7 @@ func newGRPCDummyServer(_ context.Context, cfg *config.Config) *grpc.Server {
 		),
 	)
 	cacheservice.RegisterCacheServiceServer(grpcServer, &CacheService{})
+	cacheserviceV2.RegisterCacheServiceServer(grpcServer, &V2CacheService{})
 	if cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)
 	}

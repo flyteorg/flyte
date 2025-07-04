@@ -444,36 +444,6 @@
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
     "coreIdentity": {
       "type": "object",
       "properties": {
@@ -1112,7 +1082,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -1300,6 +1270,36 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidlcoreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
     "flyteidlcoreKeyValuePair": {
       "type": "object",

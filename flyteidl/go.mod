@@ -5,6 +5,7 @@ go 1.22
 toolchain go1.22.0
 
 require (
+	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
 	github.com/golang-jwt/jwt/v5 v5.2.1

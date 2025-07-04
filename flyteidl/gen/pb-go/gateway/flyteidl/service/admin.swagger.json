@@ -9557,7 +9557,7 @@
               "description": "Indicates if this node is an ArrayNode."
             },
             "target_entity": {
-              "$ref": "#/definitions/coreIdentifier",
+              "$ref": "#/definitions/flyteidlcoreIdentifier",
               "description": "So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this\nin optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding\nto this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be\nnested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow."
             },
             "is_in_dynamic_chain": {
@@ -9586,7 +9586,7 @@
           "type": "object",
           "properties": {
             "task_id": {
-              "$ref": "#/definitions/coreIdentifier",
+              "$ref": "#/definitions/flyteidlcoreIdentifier",
               "description": "ID of the task. In combination with the retryAttempt this will indicate\nthe task execution uniquely for a given parent node execution."
             },
             "parent_node_execution_id": {
@@ -10685,7 +10685,7 @@
       "type": "object",
       "properties": {
         "launch_plan_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "ID of the launch plan that executed the workflow that contains the node to be re-run\nor the core.Identifier values aside from name used to create a new workflow when using a node spec\n+required"
         },
         "sub_node_ids": {
@@ -10756,7 +10756,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "id represents the unique identifier of the description entity."
         },
         "short_description": {
@@ -10937,7 +10937,7 @@
           "description": "The notification settings to use after merging the CreateExecutionRequest and the launch plan\nnotification settings. An execution launched with notifications will always prefer that definition\nto notifications defined statically in a launch plan."
         },
         "workflow_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Identifies the workflow definition for this execution."
         },
         "state_change_details": {
@@ -11187,7 +11187,7 @@
       "type": "object",
       "properties": {
         "launch_plan": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Launch plan to be executed"
         },
         "inputs": {
@@ -11416,7 +11416,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Uniquely identifies a launch plan entity."
         },
         "spec": {
@@ -11462,7 +11462,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Uniquely identifies a launch plan entity."
         },
         "spec": {
@@ -11519,7 +11519,7 @@
       "type": "object",
       "properties": {
         "workflow_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Reference to the Workflow template that the launch plan references"
         },
         "entity_metadata": {
@@ -12416,7 +12416,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "id represents the unique identifier of the task."
         },
         "closure": {
@@ -12718,7 +12718,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "id represents the unique identifier of the workflow."
         },
         "closure": {
@@ -12778,7 +12778,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "id represents the unique identifier of the workflow.\n+required"
         },
         "spec": {
@@ -13274,7 +13274,7 @@
       "type": "object",
       "properties": {
         "dataset_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Dataset ID in the catalog"
         },
         "artifact_tag": {
@@ -13725,36 +13725,6 @@
       },
       "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
     "coreIdentity": {
       "type": "object",
       "properties": {
@@ -13892,7 +13862,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "A globally unique identifier for the launch plan."
         },
         "interface": {
@@ -14733,7 +14703,7 @@
       "type": "object",
       "properties": {
         "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/flyteidlcoreIdentifier"
         },
         "node_execution_id": {
           "$ref": "#/definitions/coreNodeExecutionIdentifier"
@@ -14851,7 +14821,7 @@
       "type": "object",
       "properties": {
         "reference_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "A globally unique identifier for the task."
         },
         "overrides": {
@@ -14887,7 +14857,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
         },
         "type": {
@@ -15144,11 +15114,11 @@
       "type": "object",
       "properties": {
         "launchplan_ref": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "A globally unique identifier for the launch plan."
         },
         "sub_workflow_ref": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Reference to a subworkflow, that should be defined with the compiler context"
         }
       },
@@ -15158,7 +15128,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "A globally unique identifier for the workflow."
         },
         "metadata": {
@@ -15347,7 +15317,7 @@
           "description": "Indicates if this node is an ArrayNode."
         },
         "target_entity": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this\nin optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding\nto this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be\nnested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow."
         },
         "is_in_dynamic_chain": {
@@ -15395,7 +15365,7 @@
       "type": "object",
       "properties": {
         "task_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "ID of the task. In combination with the retryAttempt this will indicate\nthe task execution uniquely for a given parent node execution."
         },
         "parent_node_execution_id": {
@@ -15531,7 +15501,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "id represents the unique identifier of the workflow."
         },
         "compiled_workflow": {
@@ -15571,7 +15541,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "id represents the unique identifier of the task.\n+required"
         },
         "spec": {
@@ -15663,6 +15633,36 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "flyteidlcoreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
+    },
     "flyteidlcoreKeyValuePair": {
       "type": "object",
       "properties": {
@@ -15701,7 +15701,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "id represents the unique identifier of the workflow."
         },
         "compiled_workflow": {

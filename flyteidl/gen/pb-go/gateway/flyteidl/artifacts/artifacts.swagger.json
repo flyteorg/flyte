@@ -644,7 +644,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "Uniquely identifies a launch plan entity."
         },
         "spec": {
@@ -712,7 +712,7 @@
       "type": "object",
       "properties": {
         "workflow_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Reference to the Workflow template that the launch plan references"
         },
         "entity_metadata": {
@@ -881,7 +881,7 @@
       "type": "object",
       "properties": {
         "trigger_id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/flyteidlcoreIdentifier"
         }
       }
     },
@@ -892,7 +892,7 @@
       "type": "object",
       "properties": {
         "entity_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "These should all be launch plan IDs"
         },
         "inputs": {
@@ -917,7 +917,7 @@
       "type": "object",
       "properties": {
         "entity_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "description": "These can be tasks, and workflows. Keeping track of the launch plans that a given workflow has is purely in\nAdmin's domain."
         },
         "outputs": {
@@ -935,7 +935,7 @@
           "type": "string"
         },
         "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/flyteidlcoreIdentifier"
         },
         "retry_attempt": {
           "type": "integer",
@@ -1005,7 +1005,7 @@
       "type": "object",
       "properties": {
         "trigger_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "$ref": "#/definitions/flyteidlcoreIdentifier",
           "title": "Note that Trigger IDs are now 1:1 with Launch Plan IDs"
         }
       }
@@ -1358,36 +1358,6 @@
       ],
       "default": "UNSET",
       "title": "- DAY: default"
-    },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
     "coreIdentity": {
       "type": "object",
@@ -2114,6 +2084,36 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidlcoreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
     "flyteidlcoreKeyValuePair": {
       "type": "object",

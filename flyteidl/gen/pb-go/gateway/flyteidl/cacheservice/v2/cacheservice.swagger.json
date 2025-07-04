@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl/cacheservice/cacheservice.proto",
+    "title": "flyteidl/cacheservice/v2/cacheservice.proto",
     "version": "version not set"
   },
   "tags": [
@@ -128,6 +128,24 @@
     "cacheservicePutCacheResponse": {
       "type": "object",
       "description": "Response message of cache store/update operation.\n\nEmpty, success indicated by no errors"
+    },
+    "cacheservicev2Identifier": {
+      "type": "object",
+      "properties": {
+        "org": {
+          "type": "string",
+          "title": "Organization identifier"
+        },
+        "project": {
+          "type": "string",
+          "title": "Project identifier"
+        },
+        "domain": {
+          "type": "string",
+          "title": "Domain identifier"
+        }
+      },
+      "description": "Identifier for cache operations, including org, project, and domain.\nThis is used to scope cache operations to specific organizational contexts."
     },
     "coreBinary": {
       "type": "object",
@@ -524,6 +542,44 @@
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
     },
+    "flyteidlcacheserviceDeleteCacheRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Cache key"
+        }
+      },
+      "description": "Request to delete cached data by key."
+    },
+    "flyteidlcacheserviceGetCacheRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Cache key"
+        }
+      },
+      "description": "Request to retrieve cached data by key."
+    },
+    "flyteidlcacheserviceGetOrExtendReservationRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "The unique ID for the reservation - same as the cache key"
+        },
+        "owner_id": {
+          "type": "string",
+          "title": "The unique ID of the owner for the reservation"
+        },
+        "heartbeat_interval": {
+          "type": "string",
+          "title": "Requested reservation extension heartbeat interval"
+        }
+      },
+      "title": "Request to get or extend a reservation for a cache key"
+    },
     "flyteidlcacheserviceGetOrExtendReservationResponse": {
       "type": "object",
       "properties": {
@@ -557,6 +613,38 @@
         }
       },
       "description": "Metadata for cached outputs, including the source identifier and timestamps."
+    },
+    "flyteidlcacheservicePutCacheRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Cache key"
+        },
+        "output": {
+          "$ref": "#/definitions/cacheserviceCachedOutput",
+          "title": "Output to cache"
+        },
+        "overwrite": {
+          "$ref": "#/definitions/cacheserviceOverwriteOutput",
+          "title": "Overwrite flag if exists"
+        }
+      },
+      "description": "Request to store/update cached data by key."
+    },
+    "flyteidlcacheserviceReleaseReservationRequest": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "The unique ID for the reservation - same as the cache key"
+        },
+        "owner_id": {
+          "type": "string",
+          "title": "The unique ID of the owner for the reservation"
+        }
+      },
+      "title": "Request to release the reservation for a cache key"
     },
     "flyteidlcacheserviceReleaseReservationResponse": {
       "type": "object",

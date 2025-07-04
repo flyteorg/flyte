@@ -42,10 +42,11 @@ var (
 type DiscoveryType = string
 
 const (
-	NoOpDiscoveryType DiscoveryType = "noop"
-	DataCatalogType   DiscoveryType = "datacatalog"
-	CacheServiceType  DiscoveryType = "cacheservice"
-	FallbackType      DiscoveryType = "fallback"
+	NoOpDiscoveryType  DiscoveryType = "noop"
+	DataCatalogType    DiscoveryType = "datacatalog"
+	CacheServiceType   DiscoveryType = "cacheservice"
+	CacheServiceV2Type DiscoveryType = "cacheservicev2"
+	FallbackType       DiscoveryType = "fallback"
 )
 
 type Config struct {
@@ -91,12 +92,17 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, authOpt .
 		return cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
 			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, authOpt...)
+			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, false, authOpt...)
+	case CacheServiceV2Type:
+		return cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
+			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
+			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
+			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, true, authOpt...)
 	case FallbackType:
 		cacheClient, err := cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
 			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, authOpt...)
+			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, false, authOpt...)
 		if err != nil {
 			return nil, err
 		}
