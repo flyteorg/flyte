@@ -228,7 +228,8 @@ func assertContainerHasVolumeMounts(t *testing.T, cfg config.FlyteCoPilotConfig,
 }
 
 func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *core.DataLoadingConfig, iFace *core.TypedInterface, pod *v1.PodSpec) {
-	for _, c := range pod.Containers {
+	containers := append(pod.Containers, pod.InitContainers...)
+	for _, c := range containers {
 		if c.Name == "test" {
 			cntr := c
 			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &cntr)
@@ -510,6 +511,8 @@ func TestAddCoPilotToPod(t *testing.T) {
 		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
 		assert.NoError(t, err)
 		assert.Equal(t, "test-downloader", primaryInitContainerName)
+		assert.Equal(t, pod.InitContainers[0].Name, cfg.NamePrefix+flyteSidecarContainerName)
+		assert.Equal(t, pod.InitContainers[1].Name, cfg.NamePrefix+flyteDownloaderContainerName)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
 

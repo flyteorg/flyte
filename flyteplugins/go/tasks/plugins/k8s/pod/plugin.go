@@ -208,10 +208,18 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 		// DO NOTHING
 	default:
 		if !primaryContainerExists {
-			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
+			// if all of the containers and sidecars in the Pod are complete, as an optimization, we can declare the task as
 			// succeeded rather than waiting for the Pod to be marked completed.
 			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
 			for _, s := range pod.Status.ContainerStatuses {
+				if s.State.Waiting != nil || s.State.Running != nil || (s.State.Terminated != nil && s.State.Terminated.ExitCode != 0) {
+					allSuccessfullyTerminated = false
+				}
+			}
+
+			// Init container will become sidecar if the restart policy is set to Always
+			// https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/#sidecar-containers-and-pod-lifecycle
+			for _, s := range pod.Status.InitContainerStatuses {
 				if s.State.Waiting != nil || s.State.Running != nil || (s.State.Terminated != nil && s.State.Terminated.ExitCode != 0) {
 					allSuccessfullyTerminated = false
 				}
