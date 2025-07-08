@@ -14,7 +14,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 ## How It Works
 
-When a new execution for a launch plan with a `ConcurrencyPolicy` is requested, Flyte performs a check to count the number of currently active executions for that same launch plan (`project/domain/name`), irrespective of their versions.
+When a new execution for a launch plan with a `ConcurrencyPolicy` is requested, flyteadmin will perform a check to count the number of currently active executions for that same launch plan (`project/domain/name`), irrespective of their versions.
 
 This check is done using a database query that joins the `executions` table with the `launch_plans` table. It filters for executions that are in an active phase (e.g., `QUEUED`, `RUNNING`, `ABORTING`, etc.) and belong to the launch plan name being triggered.
 
