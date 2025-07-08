@@ -1980,6 +1980,10 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 			"overall count of publish event errors when invoking publish()"),
 		TerminateExecutionFailures: scope.MustNewCounter("execution_termination_failure",
 			"count of failed workflow executions terminations"),
+		ConcurrencyCheckDuration: labeled.NewStopWatch("concurrency_check_duration",
+			"time spent checking concurrency limits for launch plans", time.Millisecond, scope),
+		ConcurrencyLimitHits: scope.MustNewCounterVec("concurrency_limit_hits",
+			"count of times concurrency limits were hit for launch plans", "project", "domain", "name"),
 	}
 }
 
