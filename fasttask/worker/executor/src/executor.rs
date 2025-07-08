@@ -78,9 +78,13 @@ def reset_env(fast_register_path):
         "_union_fast_task.py",
         "_union_fast_task",
     )?;
+
+    let _importlib = PyModule::import_bound(py, "importlib").unwrap();
     let _os = PyModule::import_bound(py, "os").unwrap();
+    let _site = PyModule::import_bound(py, "site").unwrap();
 
     let cwd = _os.call_method0("getcwd").unwrap();
+    let mut last_execution_dir = None;
 
     loop {
         // retrieve next task
@@ -115,6 +119,23 @@ def reset_env(fast_register_path):
         {
             error!("executor '{}' failed to setup python env: {}", args.id, e);
             break;
+        }
+
+        // if we have decompressed a fast registration archive or the working directory has changed
+        // we need to rebuild the sys.path (by re-importing the site module) to ensure that any
+        // libs included in a fast registration are available.
+        if task.additional_distribution.is_some() || last_execution_dir != task.fast_register_dir {
+            // re-import site module to rebuild sys.path
+            if let Err(e) = _importlib.call_method1("reload", (_site.clone(),)) {
+                error!("executor '{}' failed to rebuild sys.path: {}", args.id, e);
+                break;
+            }
+
+            debug!(
+                "executor {} rebuilt sys.path with fast_register_dir: {:?}",
+                args.id, task.fast_register_dir
+            );
+            last_execution_dir = task.fast_register_dir.clone();
         }
 
         let entrypoint_method = task.cmd.get(0).map(|s| s.as_str());
