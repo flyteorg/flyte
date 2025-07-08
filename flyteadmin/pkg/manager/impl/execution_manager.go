@@ -1184,9 +1184,6 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	activePhases := []string{
 		core.WorkflowExecution_QUEUED.String(),
 		core.WorkflowExecution_RUNNING.String(),
-		core.WorkflowExecution_SUCCEEDING.String(),
-		core.WorkflowExecution_FAILING.String(),
-		core.WorkflowExecution_ABORTING.String(),
 	}
 
 	projectFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "project", lpProject)
