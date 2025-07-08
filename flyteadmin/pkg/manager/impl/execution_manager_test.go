@@ -4140,7 +4140,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 					Type:        &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 					Description: "foo_input",
 				},
-				Behavior: &core.Parameter_Default{Default: expectedRuntimeInputs.Literals["foo"]}, // Link to the literal for the mock
+				Behavior: &core.Parameter_Default{Default: expectedRuntimeInputs.GetLiterals()["foo"]},
 			},
 		},
 	}
@@ -4217,10 +4217,10 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			assert.NoError(t, err)
 
 			getLaunchPlanCb := func(id interfaces.Identifier) (models.LaunchPlan, error) {
-				assert.Equal(t, launchPlanID.Project, id.Project)
-				assert.Equal(t, launchPlanID.Domain, id.Domain)
-				assert.Equal(t, launchPlanID.Name, id.Name)
-				assert.Equal(t, launchPlanID.Version, id.Version)
+				assert.Equal(t, launchPlanID.GetProject(), id.Project)
+				assert.Equal(t, launchPlanID.GetDomain(), id.Domain)
+				assert.Equal(t, launchPlanID.GetName(), id.Name)
+				assert.Equal(t, launchPlanID.GetVersion(), id.Version)
 				activeState := int32(admin.LaunchPlanState_ACTIVE)
 				return models.LaunchPlan{
 					LaunchPlanKey: models.LaunchPlanKey{
@@ -4239,7 +4239,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 
 			getWorkflowCb := func(id interfaces.Identifier) (models.Workflow, error) {
 				return models.Workflow{
-					WorkflowKey:             models.WorkflowKey{Project: workflowID.Project, Domain: workflowID.Domain, Name: workflowID.Name, Version: workflowID.Version},
+					WorkflowKey:             models.WorkflowKey{Project: workflowID.GetProject(), Domain: workflowID.GetDomain(), Name: workflowID.GetName(), Version: workflowID.GetVersion()},
 					RemoteClosureIdentifier: remoteClosureIdentifier, // Use the global const
 				}, nil
 			}
@@ -4270,11 +4270,11 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 
 							if entity == common.Execution {
 								if field == "execution_project" {
-									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.Project {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetProject() {
 										foundProject = true
 									}
 								} else if field == "execution_domain" {
-									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.Domain {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetDomain() {
 										foundDomain = true
 									}
 								} else if field == "phase" {
@@ -4284,7 +4284,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 								}
 							} else if entity == common.LaunchPlan {
 								if field == shared.Name {
-									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.Name {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetName() {
 										foundLpName = true
 									}
 								} // No check for version filter as it's missing
@@ -4313,8 +4313,8 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			if tt.expectExecutionCreated {
 				mockRepo.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 					func(ctx context.Context, input models.Execution) error {
-						assert.Equal(t, launchPlanID.Project, input.Project)
-						assert.Equal(t, launchPlanID.Domain, input.Domain)
+						assert.Equal(t, launchPlanID.GetProject(), input.Project)
+						assert.Equal(t, launchPlanID.GetDomain(), input.Domain)
 						executionCreatedActual = true
 						input.ID = 1
 						return nil
@@ -4339,8 +4339,8 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			)
 
 			request := &admin.ExecutionCreateRequest{
-				Project: launchPlanID.Project,
-				Domain:  launchPlanID.Domain,
+				Project: launchPlanID.GetProject(),
+				Domain:  launchPlanID.GetDomain(),
 				Name:    "test-execution-" + strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ToLower(tt.name), " ", "-"), "(", ""), ")", ""),
 				Spec: &admin.ExecutionSpec{
 					LaunchPlan: launchPlanID,

@@ -1103,7 +1103,7 @@ func (m *ExecutionManager) launchExecution(
 	// NOTE: There's a potential race condition here. Multiple concurrent requests
 	// might pass this check before the database reflects the newly created executions,
 	// potentially leading to more than 'Max' concurrent executions.
-	if launchPlan.Spec.ConcurrencyPolicy != nil {
+	if launchPlan.GetSpec().GetConcurrencyPolicy() != nil {
 		if err := checkLaunchPlanConcurrency(ctx, launchPlan, m.db.ExecutionRepo(), m.systemMetrics); err != nil {
 			return nil, nil, nil, err
 		}
@@ -1169,16 +1169,16 @@ func (m *ExecutionManager) createExecutionModel(
 }
 
 func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPlan, executionRepo repositoryInterfaces.ExecutionRepoInterface, metrics executionSystemMetrics) error {
-	lpID := launchPlan.Id
-	lpProject := lpID.Project
-	lpDomain := lpID.Domain
-	lpName := lpID.Name
+	lpID := launchPlan.GetId()
+	lpProject := lpID.GetProject()
+	lpDomain := lpID.GetDomain()
+	lpName := lpID.GetName()
 	ctxForTimer := contextutils.WithProjectDomain(ctx, lpProject, lpDomain)
 	ctxForTimer = contextutils.WithLaunchPlanID(ctxForTimer, lpName)
 	timer := metrics.ConcurrencyCheckDuration.Start(ctxForTimer)
 	defer timer.Stop()
 
-	logger.Infof(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.Spec.ConcurrencyPolicy)
+	logger.Infof(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
 
 	// Active phases based on the workflow enum
 	activePhases := []string{
@@ -1247,13 +1247,13 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	logger.Infof(ctx, "Found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
 
 	// Check against the policy limit
-	if count >= int64(launchPlan.Spec.ConcurrencyPolicy.Max) {
-		logger.Warningf(ctx, "Concurrency limit (%d) reached for launch plan %v (active: %d)", launchPlan.Spec.ConcurrencyPolicy.Max, lpID, count)
-		if launchPlan.Spec.ConcurrencyPolicy.Behavior == admin.ConcurrencyLimitBehavior_SKIP {
+	if count >= int64(launchPlan.GetSpec().GetConcurrencyPolicy().GetMax()) {
+		logger.Warningf(ctx, "Concurrency limit (%d) reached for launch plan %v (active: %d)", launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpID, count)
+		if launchPlan.GetSpec().GetConcurrencyPolicy().GetBehavior() == admin.ConcurrencyLimitBehavior_SKIP {
 			metrics.ConcurrencyLimitHits.WithLabelValues(lpProject, lpDomain, lpName).Inc()
 			logger.Infof(ctx, "Skipping execution creation for launch plan %v due to concurrency limit", lpID)
 			return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Concurrency limit (%d) reached for launch plan %s. Skipping execution.",
-				launchPlan.Spec.ConcurrencyPolicy.Max, lpName)
+				launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpName)
 		}
 	}
 	return nil
