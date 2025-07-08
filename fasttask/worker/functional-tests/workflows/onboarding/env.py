@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
+from typing import ClassVar
 
 from union.actor import ActorEnvironment
 
@@ -14,7 +15,7 @@ class EnvironmentConfig:
     type: ServerlessEnvironmentType = ServerlessEnvironmentType.STAGING
 
     class Config:
-        json_encoders = {ServerlessEnvironmentType: lambda v: v.value}
+        json_encoders: ClassVar = {ServerlessEnvironmentType: lambda v: v.value}
 
 
 StagingEnvironment = EnvironmentConfig(type=ServerlessEnvironmentType.STAGING)

@@ -102,9 +102,9 @@ def test_fast_register_actor(config_path, union_image, remote, tmp_path):
     workflows_dir = tmp_path / "workflows"
     workflows_dir.mkdir()
     task_file = workflows_dir / "main.py"
-    random_name = "".join(choice(ascii_lowercase) for _ in range(20))
 
     for idx, (task_body, phase, expected_output) in enumerate(TASK_TEST_CASES):
+        random_name = "".join(choice(ascii_lowercase) for _ in range(20))
         task_code = TASK_TEMPLATE.substitute(
             CONTAINER_IMAGE=union_image,
             TASK_BODY=task_body,

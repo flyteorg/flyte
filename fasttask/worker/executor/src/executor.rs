@@ -33,11 +33,15 @@ import sys
 import os
 from contextlib import suppress
 
+debug_logs = os.environ.get("DEBUG_LOGS", "false").lower() == "true"
+
 def _get_fast_register_modules(fast_register_path):
     # Get modules that are defined in fast_register_path
     fast_register_modules = []
 
     module_names = list(sys.modules)
+    if debug_logs:
+        print(f"Module names: {module_names}")
     for module_name in module_names:
         # Do not unload this module
         if module_name == "_union_fast_task":
@@ -49,7 +53,10 @@ def _get_fast_register_modules(fast_register_path):
             continue
 
         absolute_file_path = os.path.abspath(module_file_path)
+
         if not os.path.commonpath([fast_register_path, absolute_file_path]) == fast_register_path:
+            if debug_logs:
+                print(f"Not unloading module {module_name} as it is not defined in under {fast_register_path}")
             continue
 
         fast_register_modules.append(module_name)
@@ -190,15 +197,20 @@ async fn setup_python_env<'a>(
     env_vars: &Option<HashMap<String, String>>,
     original_env_vars: &mut HashMap<String, Option<String>>,
 ) -> Result<(), PyErr> {
+    debug!("setting up python environment for fast task execution");
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
 
     if let Some(ref fast_register_dir) = fast_register_dir {
+        debug!("Fast registration dir: {}", fast_register_dir);
         // download `additional_distribution` if necessary
         if let Some(ref additional_distribution) = additional_distribution {
+            debug!("Additional distro: {}", additional_distribution);
             _fast_registration.call_method1(
                 "download_distribution",
                 (additional_distribution, fast_register_dir),
             )?;
+        } else {
+            debug!("no additional distro");
         }
 
         // append `fast_register_dir` to sys path
@@ -210,6 +222,8 @@ async fn setup_python_env<'a>(
 
         // update workdir to `fast_register_dir`;
         _os.call_method1("chdir", (fast_register_dir,))?;
+    } else {
+        debug!("no fast registration dir");
     }
 
     // Set environment variables if provided

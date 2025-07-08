@@ -254,6 +254,7 @@ impl TaskManager for MultiProcessManager {
                 cmd,
                 self.fast_register_dir_override.clone(),
                 fast_register_ids,
+                self.parallelism == 1,
             )?;
             let task_assignment = TaskAssignment {
                 task_id,
@@ -410,6 +411,7 @@ fn transform_cmd(
     mut cmd: Vec<String>,
     fast_register_dir_override: String,
     fast_register_ids: Arc<Mutex<HashSet<String>>>,
+    extract_in_root: bool,
 ) -> Result<(Option<String>, Vec<String>, Option<String>)> {
     let (mut pyflyte_execute_index, mut additional_distribution, mut fast_register_dir) =
         (None, None, None);
@@ -428,11 +430,14 @@ fn transform_cmd(
             }
         }
 
-        // hash `additional_distribution` (fast register unique id) to identify a
-        // unique subdirectory to decompress the fast register file
-        let mut h = DefaultHasher::new();
-        additional_distribution.hash(&mut h);
-        let dir = format!("{}/{}", fast_register_dir_override, h.finish());
+        let mut dir = fast_register_dir_override.clone();
+        if !extract_in_root {
+            // hash `additional_distribution` (fast register unique id) to identify a
+            // unique subdirectory to decompress the fast register file
+            let mut h = DefaultHasher::new();
+            additional_distribution.hash(&mut h);
+            dir = format!("{}/{}", fast_register_dir_override, h.finish());
+        }
 
         if let Err(e) = std::fs::create_dir_all(dir.clone()) {
             bail!("failed to create fast register subdir '{}': {:?}", dir, e);
@@ -452,6 +457,12 @@ fn transform_cmd(
         if fast_register_ids.contains(additional_distribution_str) {
             additional_distribution = None;
         } else {
+            // If we are inflating under /root, we can only ever maintain a single version.
+            // Clear the list so we keep only the latest.
+            if extract_in_root {
+                fast_register_ids.clear()
+            }
+
             fast_register_ids.insert(additional_distribution_str.clone());
         }
     }
@@ -732,6 +743,7 @@ mod tests {
             cmd.clone(),
             fast_register_dir_override.clone(),
             fast_register_ids.clone(),
+            false,
         );
         assert!(first_cmd_result.is_ok());
 
@@ -754,6 +766,7 @@ mod tests {
             cmd.clone(),
             fast_register_dir_override.clone(),
             fast_register_ids.clone(),
+            false,
         );
         assert!(second_cmd_result.is_ok());
 
