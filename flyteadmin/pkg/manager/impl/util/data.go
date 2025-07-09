@@ -17,11 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-const (
-	OutputsFile = "outputs.pb"
-	DeckFile    = "deck.html"
-)
-
 type GetObjectRequest struct {
 	Cluster  string
 	Org      string

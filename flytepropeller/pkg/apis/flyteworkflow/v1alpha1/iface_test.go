@@ -168,19 +168,3 @@ func TestGetInputsFile(t *testing.T) {
 		})
 	}
 }
-
-func TestGetDeckFile(t *testing.T) {
-	tests := []struct {
-		inputDir DataReference
-		expected DataReference
-	}{
-		{"dir1", "dir1/deck.html"},
-		{"dir2", "dir2/deck.html"},
-	}
-
-	for _, tt := range tests {
-		t.Run(string(tt.inputDir), func(t *testing.T) {
-			assert.Equal(t, tt.expected, GetDeckFile(tt.inputDir))
-		})
-	}
-}

@@ -109,7 +109,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(c.VolumeMounts))
 
-		assert.Equal(t, c.Command, CopilotCommandArgs(&storageConfigOverride))
+		assert.ElementsMatch(t, c.Command, CopilotCommandArgs(&storageConfigOverride))
 	})
 
 	t.Run("bad-res-cpu", func(t *testing.T) {

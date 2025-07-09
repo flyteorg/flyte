@@ -20,7 +20,6 @@ import (
 	dataMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -1385,7 +1384,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 		OutputResult: &admin.NodeExecutionClosure_OutputUri{
 			OutputUri: outputURI,
 		},
-		DeckUri: util.DeckFile,
+		DeckUri: "deck.html",
 	}
 	dynamicWorkflowClosureRef := "s3://bucket/foo/bar/dynamic.pb"
 

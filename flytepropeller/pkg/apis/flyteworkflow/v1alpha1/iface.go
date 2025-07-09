@@ -583,7 +583,3 @@ func GetOutputsLiteralMetadataFile(literalKey string, outputDir DataReference) D
 func GetInputsFile(inputDir DataReference) DataReference {
 	return inputDir + "/inputs.pb"
 }
-
-func GetDeckFile(inputDir DataReference) DataReference {
-	return inputDir + "/deck.html"
-}

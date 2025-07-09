@@ -35,6 +35,7 @@ func (w RemoteFileOutputPaths) GetOutputPath() storage.DataReference {
 }
 
 func (w RemoteFileOutputPaths) GetDeckPath() storage.DataReference {
+	deckSuffix := GetConfig().RemoteFileOutputPathsConfig.DeckFilename
 	return constructPath(w.store, w.outputPrefix, deckSuffix)
 }
 
