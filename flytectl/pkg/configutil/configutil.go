@@ -25,11 +25,18 @@ type DataConfig struct {
 	SecretKey string
 }
 
+type TaskConfig struct {
+	Project string
+	Domain  string
+	Org     string
+}
+
 type ConfigTemplateSpec struct {
 	Host       string
 	Insecure   bool
 	Console    string
 	DataConfig *DataConfig
+	TaskConfig *TaskConfig
 }
 
 var (

@@ -53,10 +53,18 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 
 		if !cmdEntry.ProjectDomainNotRequired {
 			if config.GetConfig().Project == "" {
-				return fmt.Errorf("project and domain are required parameters")
+				if config.GetTaskConfig().Project != "" {
+					config.GetConfig().Project = config.GetTaskConfig().Project
+				} else {
+					return fmt.Errorf("project and domain are required parameters")
+				}
 			}
 			if config.GetConfig().Domain == "" {
-				return fmt.Errorf("project and domain are required parameters")
+				if config.GetTaskConfig().Domain != "" {
+					config.GetConfig().Domain = config.GetTaskConfig().Domain
+				} else {
+					return fmt.Errorf("project and domain are required parameters")
+				}
 			}
 		}
 		if _, err := config.GetConfig().OutputFormat(); err != nil {

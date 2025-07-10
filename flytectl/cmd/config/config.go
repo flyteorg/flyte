@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
@@ -14,6 +15,9 @@ var (
 	}
 
 	section = config.MustRegisterSection("root", defaultConfig)
+
+	taskConfig  = &configutil.TaskConfig{}
+	taskSection = config.MustRegisterSection("task", taskConfig)
 )
 
 // Config hold configuration for flytectl flag
@@ -41,4 +45,9 @@ func (cfg Config) MustOutputFormat() printer.OutputFormat {
 // GetConfig will return the config
 func GetConfig() *Config {
 	return section.GetConfig().(*Config)
+}
+
+// GetTaskConfig will return the task config
+func GetTaskConfig() *configutil.TaskConfig {
+	return taskSection.GetConfig().(*configutil.TaskConfig)
 }
