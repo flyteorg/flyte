@@ -1232,7 +1232,7 @@ type Container struct {
 	// Only K8s
 	Ports []*ContainerPort `protobuf:"bytes,7,rep,name=ports,proto3" json:"ports,omitempty"`
 	// BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-	// This makes it possible to to run a completely portable container, that uses inputs and outputs
+	// This makes it possible to run a completely portable container, that uses inputs and outputs
 	// only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
 	// If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
 	// are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
@@ -1503,7 +1503,7 @@ type K8SPod struct {
 	// - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
 	PodSpec *structpb.Struct `protobuf:"bytes,2,opt,name=pod_spec,json=podSpec,proto3" json:"pod_spec,omitempty"`
 	// BETA: Optional configuration for DataLoading. If not specified, then default values are used.
-	// This makes it possible to to run a completely portable container, that uses inputs and outputs
+	// This makes it possible to run a completely portable container, that uses inputs and outputs
 	// only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
 	// If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
 	// are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
