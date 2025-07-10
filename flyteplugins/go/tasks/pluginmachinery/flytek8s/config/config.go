@@ -220,6 +220,10 @@ type K8sPluginConfig struct {
 	AddTolerationsForExtendedResources []string `json:"add-tolerations-for-extended-resources" pflag:",Name of the extended resources for which tolerations should be added."`
 
 	EnableDistributedErrorAggregation bool `json:"enable-distributed-error-aggregation" pflag:",If true, will aggregate errors of different worker pods for distributed tasks."`
+
+	// AllowCPULimitToFloatFromRequest - if on, if CPU limit is missing, Flyte will not copy the CPU request value.
+	// If set, make sure on the Admin side that TaskResourceSpec config is also set.
+	AllowCPULimitToFloatFromRequest bool `json:"allow-cpu-limit-to-float-from-request" pflag:",Used to allow zero CPU limits, to get Burstable pods"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
