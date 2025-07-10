@@ -16,5 +16,5 @@ func (m *HandlerMap) Get(key string) (*ComputeResourceAwareBackOffHandler, bool)
 		return nil, false
 	}
 	h, ok := value.(*ComputeResourceAwareBackOffHandler)
-	return h, found && ok
+	return h, ok
 }
