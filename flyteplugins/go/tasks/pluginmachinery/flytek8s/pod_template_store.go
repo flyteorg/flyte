@@ -41,15 +41,16 @@ func (p *PodTemplateStore) Delete(podTemplate *v1.PodTemplate) {
 
 // LoadOrDefault returns the PodTemplate with the specified name in the given namespace. If one
 // does not exist it attempts to retrieve the one associated with the defaultNamespace.
+// Returns a deep copy of the cached PodTemplate to prevent state pollution between workflows.
 func (p *PodTemplateStore) LoadOrDefault(namespace string, podTemplateName string) *v1.PodTemplate {
 	if value, ok := p.Load(podTemplateName); ok {
 		podTemplates := value.(*sync.Map)
 		if podTemplate, ok := podTemplates.Load(namespace); ok {
-			return podTemplate.(*v1.PodTemplate)
+			return podTemplate.(*v1.PodTemplate).DeepCopy()
 		}
 
 		if podTemplate, ok := podTemplates.Load(p.defaultNamespace); ok {
-			return podTemplate.(*v1.PodTemplate)
+			return podTemplate.(*v1.PodTemplate).DeepCopy()
 		}
 	}
 
