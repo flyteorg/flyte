@@ -108,7 +108,7 @@ func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, src
 	return nil
 }
 
-// RemoveKubeContext removes the contextToRemove from the kubeContext pointed to be fromConfigAccess
+// RemoveContext removes the contextToRemove from the kubeContext pointed to be fromConfigAccess
 func (k *ContextManager) RemoveContext(ctxName string) error {
 	fromStartingConfig, err := k.configAccess.GetStartingConfig()
 	if err != nil {
