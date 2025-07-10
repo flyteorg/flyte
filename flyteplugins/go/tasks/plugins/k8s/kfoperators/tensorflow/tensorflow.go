@@ -167,7 +167,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(ctx context.Context, plugi
 	evaluatorReplicasCount := common.GetReplicaCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeEval)
 
 	taskLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, app.ObjectMeta, taskTemplate, false,
-		*workersCount, *psReplicasCount, *chiefCount, *evaluatorReplicasCount)
+		*workersCount, *psReplicasCount, *chiefCount, *evaluatorReplicasCount, kubeflowv1.TFJobDefaultContainerName)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
