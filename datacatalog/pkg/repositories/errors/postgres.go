@@ -40,6 +40,11 @@ func (p *postgresErrorTransformer) fromGormError(err error) error {
 }
 
 func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
+	var dce catalogErrors.DataCatalogError
+	if errors.As(err, &dce) {
+		return dce // already a data catalog error
+	}
+
 	// First try the stdlib error handling
 	if database.IsPgErrorWithCode(err, uniqueConstraintViolationCode) {
 		return catalogErrors.NewDataCatalogErrorf(codes.AlreadyExists, uniqueConstraintViolation, err.Error())
