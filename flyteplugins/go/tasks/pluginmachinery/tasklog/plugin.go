@@ -11,11 +11,6 @@ import (
 
 type TemplateScheme int
 
-const (
-	TemplateSchemePod TemplateScheme = iota
-	TemplateSchemeTaskExecution
-)
-
 // TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
 type TemplateURI = string
 
