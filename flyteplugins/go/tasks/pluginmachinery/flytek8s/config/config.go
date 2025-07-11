@@ -222,10 +222,6 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
-
-	// AllowCPULimitToFloatFromRequest - if on, if CPU limit is missing, Flyte will not copy the CPU request value.
-	// If set, make sure on the Admin side that TaskResourceSpec config is also set.
-	AllowCPULimitToFloatFromRequest bool `json:"allow-cpu-limit-to-float-from-request" pflag:",Used to allow zero CPU limits, to get Burstable pods"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
