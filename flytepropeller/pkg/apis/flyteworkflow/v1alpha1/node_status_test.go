@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -37,10 +39,60 @@ func TestNodeStatus_Equals(t *testing.T) {
 	other.Phase = one.Phase
 	assert.True(t, one.Equals(other))
 
-	one.DataDir = "data-dir"
+	now := time.Now()
+
+	one.QueuedAt = &metav1.Time{Time: now}
 	assert.False(t, one.Equals(other))
 
-	other.DataDir = one.DataDir
+	other.QueuedAt = &metav1.Time{Time: now}
+	assert.True(t, one.Equals(other))
+
+	one.StartedAt = &metav1.Time{Time: now}
+	assert.False(t, one.Equals(other))
+
+	other.StartedAt = &metav1.Time{Time: now}
+	assert.True(t, one.Equals(other))
+
+	one.StoppedAt = &metav1.Time{Time: now}
+	assert.False(t, one.Equals(other))
+
+	other.StoppedAt = &metav1.Time{Time: now}
+	assert.True(t, one.Equals(other))
+
+	one.LastUpdatedAt = &metav1.Time{Time: now}
+	assert.False(t, one.Equals(other))
+
+	other.LastUpdatedAt = &metav1.Time{Time: now}
+	assert.True(t, one.Equals(other))
+
+	one.LastAttemptStartedAt = &metav1.Time{Time: now}
+	assert.False(t, one.Equals(other))
+
+	other.LastAttemptStartedAt = &metav1.Time{Time: now}
+	assert.True(t, one.Equals(other))
+
+	one.Message = "test"
+	assert.False(t, one.Equals(other))
+
+	other.Message = "test"
+	assert.True(t, one.Equals(other))
+
+	one.IncrementAttempts()
+	assert.False(t, one.Equals(other))
+
+	other.IncrementAttempts()
+	assert.True(t, one.Equals(other))
+
+	one.IncrementSystemFailures()
+	assert.False(t, one.Equals(other))
+
+	other.IncrementSystemFailures()
+	assert.True(t, one.Equals(other))
+
+	one.SetCached()
+	assert.False(t, one.Equals(other))
+
+	other.SetCached()
 	assert.True(t, one.Equals(other))
 
 	parentNode := "x"
@@ -72,6 +124,59 @@ func TestNodeStatus_Equals(t *testing.T) {
 	one.SubNodeStatus[node].Phase = NodePhaseRunning
 	assert.False(t, one.Equals(other))
 	other.SubNodeStatus[node].Phase = NodePhaseRunning
+	assert.True(t, one.Equals(other))
+
+	one.TaskNodeStatus = &TaskNodeStatus{
+		Phase: 1,
+	}
+	assert.False(t, one.Equals(other))
+
+	other.TaskNodeStatus = &TaskNodeStatus{
+		Phase: 1,
+	}
+	assert.True(t, one.Equals(other))
+
+	one.DynamicNodeStatus = &DynamicNodeStatus{
+		Phase: 1,
+	}
+	assert.False(t, one.Equals(other))
+
+	other.DynamicNodeStatus = &DynamicNodeStatus{
+		Phase: 1,
+	}
+	assert.True(t, one.Equals(other))
+
+	one.GateNodeStatus = &GateNodeStatus{
+		Phase: 1,
+	}
+	assert.False(t, one.Equals(other))
+
+	other.GateNodeStatus = &GateNodeStatus{
+		Phase: 1,
+	}
+	assert.True(t, one.Equals(other))
+
+	one.ArrayNodeStatus = &ArrayNodeStatus{
+		Phase: 1,
+	}
+	assert.False(t, one.Equals(other))
+
+	other.ArrayNodeStatus = &ArrayNodeStatus{
+		Phase: 1,
+	}
+	assert.True(t, one.Equals(other))
+
+	one.Error = &ExecutionError{
+		ExecutionError: &core.ExecutionError{
+			Code: "1",
+		},
+	}
+	assert.False(t, one.Equals(other))
+	other.Error = &ExecutionError{
+		ExecutionError: &core.ExecutionError{
+			Code: "1",
+		},
+	}
 	assert.True(t, one.Equals(other))
 }
 
@@ -121,45 +226,175 @@ func TestDynamicNodeStatus_Equals(t *testing.T) {
 	other.Phase = one.Phase
 
 	assert.True(t, one.Equals(other))
+
+	one.IsFailurePermanent = true
+	assert.False(t, one.Equals(other))
+	other.IsFailurePermanent = true
+
+	assert.True(t, one.Equals(other))
+
+	one.Error = &ExecutionError{
+		ExecutionError: &core.ExecutionError{
+			Code: "1",
+		},
+	}
+	assert.False(t, one.Equals(other))
+	other.Error = &ExecutionError{
+		ExecutionError: &core.ExecutionError{
+			Code: "1",
+		},
+	}
+	assert.True(t, one.Equals(other))
 }
 
-func TestCustomState_DeepCopyInto(t *testing.T) {
-	t.Run("Nil", func(t *testing.T) {
-		var in CustomState
-		var out CustomState
-		in.DeepCopyInto(&out)
-		assert.Nil(t, in)
-		assert.Nil(t, out)
-	})
+func TestTaskNodeStatus_Equals(t *testing.T) {
+	var one *TaskNodeStatus
+	var other *TaskNodeStatus
+	assert.True(t, one.Equals(other))
 
-	t.Run("Not nil in", func(t *testing.T) {
-		in := CustomState(map[string]interface{}{
-			"key1": "hello",
-		})
+	one = &TaskNodeStatus{}
+	assert.False(t, one.Equals(other))
 
-		var out CustomState
-		in.DeepCopyInto(&out)
-		assert.NotNil(t, out)
-		assert.Equal(t, 1, len(out))
-	})
+	other = &TaskNodeStatus{}
+	assert.True(t, one.Equals(other))
+
+	one.Phase = 5
+	assert.False(t, one.Equals(other))
+
+	other.Phase = 5
+	assert.True(t, one.Equals(other))
+
+	one.PhaseVersion = 5
+	assert.False(t, one.Equals(other))
+
+	other.PhaseVersion = 5
+	assert.True(t, one.Equals(other))
+
+	one.PluginState = []byte{1, 2, 3}
+	assert.False(t, one.Equals(other))
+
+	other.PluginState = []byte{1, 2, 3}
+	assert.True(t, one.Equals(other))
+
+	one.PluginStateVersion = 5
+	assert.False(t, one.Equals(other))
+
+	other.PluginStateVersion = 5
+	assert.True(t, one.Equals(other))
+
+	one.BarrierClockTick = 5
+	assert.False(t, one.Equals(other))
+
+	other.BarrierClockTick = 5
+	assert.True(t, one.Equals(other))
+
+	now := time.Now()
+	one.LastPhaseUpdatedAt = now
+	assert.False(t, one.Equals(other))
+
+	other.LastPhaseUpdatedAt = now
+	assert.True(t, one.Equals(other))
+
+	one.PreviousNodeExecutionCheckpointPath = "/test"
+	assert.False(t, one.Equals(other))
+
+	other.PreviousNodeExecutionCheckpointPath = "/test"
+	assert.True(t, one.Equals(other))
+
+	one.CleanupOnFailure = true
+	assert.False(t, one.Equals(other))
+
+	other.CleanupOnFailure = true
+	assert.True(t, one.Equals(other))
 }
 
-func TestCustomState_DeepCopy(t *testing.T) {
-	t.Run("Nil", func(t *testing.T) {
-		var in CustomState
-		assert.Nil(t, in)
-		assert.Nil(t, in.DeepCopy())
-	})
+func TestGateNodeStatus_Equals(t *testing.T) {
+	var one *GateNodeStatus
+	var other *GateNodeStatus
 
-	t.Run("Not nil in", func(t *testing.T) {
-		in := CustomState(map[string]interface{}{
-			"key1": "hello",
-		})
+	assert.True(t, one.Equals(other))
 
-		out := in.DeepCopy()
-		assert.NotNil(t, out)
-		assert.Equal(t, 1, len(*out))
-	})
+	one = &GateNodeStatus{}
+	assert.False(t, one.Equals(other))
+
+	other = &GateNodeStatus{}
+	assert.True(t, one.Equals(other))
+
+	one.Phase = 5
+	assert.False(t, one.Equals(other))
+
+	other.Phase = 5
+	assert.True(t, one.Equals(other))
+}
+
+func TestArrayNodeStatus_Equals(t *testing.T) {
+	var one *ArrayNodeStatus
+	var other *ArrayNodeStatus
+
+	assert.True(t, one.Equals(other))
+
+	one = &ArrayNodeStatus{}
+	assert.False(t, one.Equals(other))
+
+	other = &ArrayNodeStatus{}
+	assert.True(t, one.Equals(other))
+
+	one.Phase = 5
+	assert.False(t, one.Equals(other))
+
+	other.Phase = 5
+	assert.True(t, one.Equals(other))
+
+	one.ExecutionError = &core.ExecutionError{
+		Code: "1",
+	}
+	assert.False(t, one.Equals(other))
+
+	other.ExecutionError = &core.ExecutionError{
+		Code: "1",
+	}
+	assert.True(t, one.Equals(other))
+
+	compactArray, err := bitarray.NewCompactArray(10, bitarray.Item(10))
+	require.NoError(t, err)
+	compactArray.SetItem(0, 5)
+
+	one.SubNodePhases = compactArray
+	assert.False(t, one.Equals(other))
+
+	other.SubNodePhases = *compactArray.DeepCopy()
+	assert.True(t, one.Equals(other))
+
+	one.SubNodeTaskPhases = compactArray
+	assert.False(t, one.Equals(other))
+
+	other.SubNodeTaskPhases = *compactArray.DeepCopy()
+	assert.True(t, one.Equals(other))
+
+	one.SubNodeRetryAttempts = compactArray
+	assert.False(t, one.Equals(other))
+
+	other.SubNodeRetryAttempts = *compactArray.DeepCopy()
+	assert.True(t, one.Equals(other))
+
+	one.SubNodeSystemFailures = compactArray
+	assert.False(t, one.Equals(other))
+
+	other.SubNodeSystemFailures = *compactArray.DeepCopy()
+	assert.True(t, one.Equals(other))
+
+	one.SubNodeDeltaTimestamps = compactArray
+	assert.False(t, one.Equals(other))
+
+	other.SubNodeDeltaTimestamps = *compactArray.DeepCopy()
+	assert.True(t, one.Equals(other))
+
+	one.TaskPhaseVersion = 5
+	assert.False(t, one.Equals(other))
+
+	other.TaskPhaseVersion = 5
+	assert.True(t, one.Equals(other))
+
 }
 
 func TestWorkflowStatus_Deserialize(t *testing.T) {
