@@ -472,28 +472,6 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  storage.yaml: | 
-    storage:
-      type: minio
-      container: "my-s3-bucket"
-      stow:
-        kind: s3
-        config:
-          access_key_id: minio
-          auth_type: accesskey
-          secret_key: miniostorage
-          disable_ssl: true
-          endpoint: http://minio.flyte.svc.cluster.local:9000
-          region: us-east-1
-      signedUrl:
-        stowConfigOverride:
-          endpoint: http://minio.flyte.svc.cluster.local:9000
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 0
-        target_gc_percent: 70
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -516,6 +494,28 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  storage.yaml: | 
+    storage:
+      type: minio
+      container: "my-s3-bucket"
+      stow:
+        kind: s3
+        config:
+          access_key_id: minio
+          auth_type: accesskey
+          secret_key: miniostorage
+          disable_ssl: true
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+          region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -7113,7 +7113,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "64fbcfcc832f7e18df52613776616d47a931e8317789558e9ed06793914c671"
+        configChecksum: "f00130748c2292b483d3b4a56959ee8d2a8a18a110b0d8100435b35d447df3f"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 

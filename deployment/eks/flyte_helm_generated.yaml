@@ -345,19 +345,6 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  storage.yaml: | 
-    storage:
-      type: s3
-      container: "<METADATA_BUCKET_NAME>"
-      connection:
-        auth-type: iam
-        region: <AWS_REGION>
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 1024
-        target_gc_percent: 70
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -385,6 +372,19 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  storage.yaml: | 
+    storage:
+      type: s3
+      container: "<METADATA_BUCKET_NAME>"
+      connection:
+        auth-type: iam
+        region: <AWS_REGION>
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -1310,7 +1310,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "95e0b60dd6f2edb5a53c7b6a1ddd22e8d6908048a81192ec2803ce3972af5ac"
+        configChecksum: "367ac3ed801391826656f2e8e1ffb3db1b7d2312eb4f2f4a363f02fe97e098b"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 

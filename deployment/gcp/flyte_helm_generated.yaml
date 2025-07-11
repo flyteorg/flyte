@@ -355,22 +355,6 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
-  storage.yaml: | 
-    storage:
-      type: stow
-      stow:
-        kind: google
-        config:
-          json: ""
-          project_id: <PROJECT-ID>
-          scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<METADATA_BUCKET_NAME>"
-      enable-multicontainer: false
-      limits:
-        maxDownloadMBs: 10
-      cache:
-        max_size_mbs: 0
-        target_gc_percent: 70
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -398,6 +382,22 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+  storage.yaml: | 
+    storage:
+      type: stow
+      stow:
+        kind: google
+        config:
+          json: ""
+          project_id: <PROJECT-ID>
+          scopes: https://www.googleapis.com/auth/cloud-platform
+      container: "<METADATA_BUCKET_NAME>"
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   db.yaml: | 
     database:
       dbname: flyteadmin
@@ -1340,7 +1340,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f584904ce263d89211b247bfbab4e51833ec92a3ef8435267599204bea9f4dc"
+        configChecksum: "3ad39e468264fc9c6b42c3e1dcc66b79e2f36f398cf5ac76398f54ef1fbb56d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 

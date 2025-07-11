@@ -106,6 +106,46 @@ data:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
 ---
+# Source: flyte-core/templates/clusterresourcesync/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-clusterresourcesync-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  cluster_resources.yaml: | 
+    cluster_resources:
+      customData:
+      - production:
+        - projectQuotaCpu:
+            value: "5"
+        - projectQuotaMemory:
+            value: 4000Mi
+        - gsa:
+            value: gsa-production@<PROJECT-ID>.iam.gserviceaccount.com
+      - staging:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - gsa:
+            value: gsa-staging@<PROJECT-ID>.iam.gserviceaccount.com
+      - development:
+        - projectQuotaCpu:
+            value: "2"
+        - projectQuotaMemory:
+            value: 3000Mi
+        - gsa:
+            value: gsa-development@<PROJECT-ID>.iam.gserviceaccount.com
+      refreshInterval: 5m
+      standaloneDeployment: false
+      templatePath: /etc/flyte/clusterresource/templates
+---
 # Source: flyte-core/templates/propeller/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
