@@ -60,45 +60,6 @@ func (_m *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, erro
 	return r0, r1
 }
 
-type Client_GetByString struct {
-	*mock.Call
-}
-
-func (_m Client_GetByString) Return(_a0 catalog.Entry, _a1 error) *Client_GetByString {
-	return &Client_GetByString{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *Client) OnGetByString(ctx context.Context, key string) *Client_GetByString {
-	c_call := _m.On("GetByString", ctx, key)
-	return &Client_GetByString{Call: c_call}
-}
-
-func (_m *Client) OnGetByStringMatch(matchers ...interface{}) *Client_GetByString {
-	c_call := _m.On("GetByString", matchers...)
-	return &Client_GetByString{Call: c_call}
-}
-
-// GetByString provides a mock function with given fields: ctx, key
-func (_m *Client) GetByString(ctx context.Context, key string) (catalog.Entry, error) {
-	ret := _m.Called(ctx, key)
-
-	var r0 catalog.Entry
-	if rf, ok := ret.Get(0).(func(context.Context, string) catalog.Entry); ok {
-		r0 = rf(ctx, key)
-	} else {
-		r0 = ret.Get(0).(catalog.Entry)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, key)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type Client_GetOrExtendReservation struct {
 	*mock.Call
 }
@@ -132,47 +93,6 @@ func (_m *Client) GetOrExtendReservation(ctx context.Context, key catalog.Key, o
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, catalog.Key, string, time.Duration) error); ok {
-		r1 = rf(ctx, key, ownerID, heartbeatInterval)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Client_GetOrExtendReservationByString struct {
-	*mock.Call
-}
-
-func (_m Client_GetOrExtendReservationByString) Return(_a0 *datacatalog.Reservation, _a1 error) *Client_GetOrExtendReservationByString {
-	return &Client_GetOrExtendReservationByString{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *Client) OnGetOrExtendReservationByString(ctx context.Context, key string, ownerID string, heartbeatInterval time.Duration) *Client_GetOrExtendReservationByString {
-	c_call := _m.On("GetOrExtendReservationByString", ctx, key, ownerID, heartbeatInterval)
-	return &Client_GetOrExtendReservationByString{Call: c_call}
-}
-
-func (_m *Client) OnGetOrExtendReservationByStringMatch(matchers ...interface{}) *Client_GetOrExtendReservationByString {
-	c_call := _m.On("GetOrExtendReservationByString", matchers...)
-	return &Client_GetOrExtendReservationByString{Call: c_call}
-}
-
-// GetOrExtendReservationByString provides a mock function with given fields: ctx, key, ownerID, heartbeatInterval
-func (_m *Client) GetOrExtendReservationByString(ctx context.Context, key string, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error) {
-	ret := _m.Called(ctx, key, ownerID, heartbeatInterval)
-
-	var r0 *datacatalog.Reservation
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, time.Duration) *datacatalog.Reservation); ok {
-		r0 = rf(ctx, key, ownerID, heartbeatInterval)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*datacatalog.Reservation)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, time.Duration) error); ok {
 		r1 = rf(ctx, key, ownerID, heartbeatInterval)
 	} else {
 		r1 = ret.Error(1)
@@ -252,45 +172,6 @@ func (_m *Client) Put(ctx context.Context, key catalog.Key, reader io.OutputRead
 	return r0, r1
 }
 
-type Client_PutByString struct {
-	*mock.Call
-}
-
-func (_m Client_PutByString) Return(_a0 catalog.Status, _a1 error) *Client_PutByString {
-	return &Client_PutByString{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *Client) OnPutByString(ctx context.Context, key string, reader io.OutputReader, metadata catalog.Metadata) *Client_PutByString {
-	c_call := _m.On("PutByString", ctx, key, reader, metadata)
-	return &Client_PutByString{Call: c_call}
-}
-
-func (_m *Client) OnPutByStringMatch(matchers ...interface{}) *Client_PutByString {
-	c_call := _m.On("PutByString", matchers...)
-	return &Client_PutByString{Call: c_call}
-}
-
-// PutByString provides a mock function with given fields: ctx, key, reader, metadata
-func (_m *Client) PutByString(ctx context.Context, key string, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
-	ret := _m.Called(ctx, key, reader, metadata)
-
-	var r0 catalog.Status
-	if rf, ok := ret.Get(0).(func(context.Context, string, io.OutputReader, catalog.Metadata) catalog.Status); ok {
-		r0 = rf(ctx, key, reader, metadata)
-	} else {
-		r0 = ret.Get(0).(catalog.Status)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, io.OutputReader, catalog.Metadata) error); ok {
-		r1 = rf(ctx, key, reader, metadata)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type Client_ReleaseReservation struct {
 	*mock.Call
 }
@@ -315,38 +196,6 @@ func (_m *Client) ReleaseReservation(ctx context.Context, key catalog.Key, owner
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key, string) error); ok {
-		r0 = rf(ctx, key, ownerID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-type Client_ReleaseReservationByString struct {
-	*mock.Call
-}
-
-func (_m Client_ReleaseReservationByString) Return(_a0 error) *Client_ReleaseReservationByString {
-	return &Client_ReleaseReservationByString{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *Client) OnReleaseReservationByString(ctx context.Context, key string, ownerID string) *Client_ReleaseReservationByString {
-	c_call := _m.On("ReleaseReservationByString", ctx, key, ownerID)
-	return &Client_ReleaseReservationByString{Call: c_call}
-}
-
-func (_m *Client) OnReleaseReservationByStringMatch(matchers ...interface{}) *Client_ReleaseReservationByString {
-	c_call := _m.On("ReleaseReservationByString", matchers...)
-	return &Client_ReleaseReservationByString{Call: c_call}
-}
-
-// ReleaseReservationByString provides a mock function with given fields: ctx, key, ownerID
-func (_m *Client) ReleaseReservationByString(ctx context.Context, key string, ownerID string) error {
-	ret := _m.Called(ctx, key, ownerID)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
 		r0 = rf(ctx, key, ownerID)
 	} else {
 		r0 = ret.Error(0)
@@ -386,45 +235,6 @@ func (_m *Client) Update(ctx context.Context, key catalog.Key, reader io.OutputR
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) error); ok {
-		r1 = rf(ctx, key, reader, metadata)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Client_UpdateByString struct {
-	*mock.Call
-}
-
-func (_m Client_UpdateByString) Return(_a0 catalog.Status, _a1 error) *Client_UpdateByString {
-	return &Client_UpdateByString{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *Client) OnUpdateByString(ctx context.Context, key string, reader io.OutputReader, metadata catalog.Metadata) *Client_UpdateByString {
-	c_call := _m.On("UpdateByString", ctx, key, reader, metadata)
-	return &Client_UpdateByString{Call: c_call}
-}
-
-func (_m *Client) OnUpdateByStringMatch(matchers ...interface{}) *Client_UpdateByString {
-	c_call := _m.On("UpdateByString", matchers...)
-	return &Client_UpdateByString{Call: c_call}
-}
-
-// UpdateByString provides a mock function with given fields: ctx, key, reader, metadata
-func (_m *Client) UpdateByString(ctx context.Context, key string, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
-	ret := _m.Called(ctx, key, reader, metadata)
-
-	var r0 catalog.Status
-	if rf, ok := ret.Get(0).(func(context.Context, string, io.OutputReader, catalog.Metadata) catalog.Status); ok {
-		r0 = rf(ctx, key, reader, metadata)
-	} else {
-		r0 = ret.Get(0).(catalog.Status)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, io.OutputReader, catalog.Metadata) error); ok {
 		r1 = rf(ctx, key, reader, metadata)
 	} else {
 		r1 = ret.Error(1)

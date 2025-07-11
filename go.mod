@@ -147,7 +147,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/kubeflow/common v0.4.3 // indirect
-	github.com/kubeflow/training-operator v1.5.0-rc.0 // indirect
+	github.com/kubeflow/training-operator v1.7.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.2 // indirect

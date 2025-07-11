@@ -39,7 +39,7 @@ func TestEndToEnd(t *testing.T) {
 	}
 
 	cfg := defaultConfig
-	cfg.bigQueryEndpoint = server.URL
+	cfg.BigQueryEndpoint = server.URL
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
 	err := SetConfig(&cfg)

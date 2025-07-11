@@ -274,7 +274,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("bigQueryEndpoint", testValue)
 			if vString, err := cmdFlags.GetString("bigQueryEndpoint"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.bigQueryEndpoint)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BigQueryEndpoint)
 
 			} else {
 				assert.FailNow(t, err.Error())

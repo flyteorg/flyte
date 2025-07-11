@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -36,7 +35,7 @@ func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 func (pytorchOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	return &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       kubeflowv1.PytorchJobKind,
+			Kind:       kubeflowv1.PyTorchJobKind,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
@@ -52,10 +51,10 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
-	runPolicy := commonOp.RunPolicy{}
+	runPolicy := kubeflowv1.RunPolicy{}
 	var elasticPolicy *kubeflowv1.ElasticPolicy
 
-	var masterReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
+	var masterReplicaSpec, workerReplicaSpec *kubeflowv1.ReplicaSpec
 
 	if taskTemplate.TaskTypeVersion == 0 {
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
@@ -65,7 +64,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		replicaSpec, err := common.ToReplicaSpec(ctx, taskCtx, kubeflowv1.PytorchJobDefaultContainerName)
+		replicaSpec, err := common.ToReplicaSpec(ctx, taskCtx, kubeflowv1.PyTorchJobDefaultContainerName)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
 		}
@@ -89,12 +88,12 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		masterReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetMasterReplicas(), kubeflowv1.PytorchJobDefaultContainerName, true)
+		masterReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetMasterReplicas(), kubeflowv1.PyTorchJobDefaultContainerName, true)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create master replica spec: [%v]", err.Error())
 		}
 
-		workerReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetWorkerReplicas(), kubeflowv1.PytorchJobDefaultContainerName, false)
+		workerReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetWorkerReplicas(), kubeflowv1.PyTorchJobDefaultContainerName, false)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}
@@ -117,7 +116,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	}
 
 	jobSpec := kubeflowv1.PyTorchJobSpec{
-		PyTorchReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
+		PyTorchReplicaSpecs: map[kubeflowv1.ReplicaType]*kubeflowv1.ReplicaSpec{
 			kubeflowv1.PyTorchJobReplicaTypeMaster: masterReplicaSpec,
 			kubeflowv1.PyTorchJobReplicaTypeWorker: workerReplicaSpec,
 		},
@@ -132,7 +131,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 
 	job := &kubeflowv1.PyTorchJob{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       kubeflowv1.PytorchJobKind,
+			Kind:       kubeflowv1.PyTorchJobKind,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 		Spec: jobSpec,

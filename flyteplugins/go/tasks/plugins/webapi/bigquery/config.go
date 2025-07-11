@@ -60,8 +60,8 @@ type Config struct {
 	// GoogleTokenSource configures token source for BigQuery client
 	GoogleTokenSource google.TokenSourceFactoryConfig `json:"googleTokenSource" pflag:",Defines Google token source"`
 
-	// bigQueryEndpoint overrides BigQuery client endpoint, only for testing
-	bigQueryEndpoint string
+	// BigQueryEndpoint overrides BigQuery client endpoint, only for testing
+	BigQueryEndpoint string `json:"bigQueryEndpoint" pflag:",Overrides BigQuery client endpoint, only for testing. If not set, uses the default endpoint."`
 }
 
 func GetConfig() *Config {

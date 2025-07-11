@@ -112,7 +112,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kubeflow/common v0.4.3 // indirect
-	github.com/kubeflow/training-operator v1.5.0-rc.0 // indirect
+	github.com/kubeflow/training-operator v1.7.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect

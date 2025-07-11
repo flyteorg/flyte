@@ -521,9 +521,9 @@ func (p Plugin) newBigQueryClient(ctx context.Context, identity google.Identity)
 	}
 
 	// for mocking/testing purposes
-	if p.cfg.bigQueryEndpoint != "" {
+	if p.cfg.BigQueryEndpoint != "" {
 		options = append(options,
-			option.WithEndpoint(p.cfg.bigQueryEndpoint),
+			option.WithEndpoint(p.cfg.BigQueryEndpoint),
 			option.WithTokenSource(oauth2.StaticTokenSource(&oauth2.Token{})))
 	} else if p.cfg.GoogleTokenSource.Type != "default" {
 

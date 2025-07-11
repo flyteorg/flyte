@@ -62,6 +62,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.name"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Name, "Friendly name of the remote cluster")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.endpoint"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Endpoint, " Remote K8s cluster endpoint")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "googleTokenSource.gke-task-workload-identity.remoteClusterConfig.enabled"), defaultConfig.GoogleTokenSource.GkeTaskWorkloadIdentityTokenSourceFactoryConfig.RemoteClusterConfig.Enabled, " Boolean flag to enable or disable")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "bigQueryEndpoint"), defaultConfig.bigQueryEndpoint, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "bigQueryEndpoint"), defaultConfig.BigQueryEndpoint, "Overrides BigQuery client endpoint,  only for testing. If not set,  uses the default endpoint.")
 	return cmdFlags
 }
