@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	regErrors "github.com/pkg/errors"
@@ -234,24 +235,25 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog          catalog.Client
-	asyncCatalog     catalog.AsyncClient
-	defaultPlugins   map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType   map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap   map[MetricKey]*taskMetrics
-	defaultPlugin    pluginCore.Plugin
-	metrics          *metrics
-	pluginRegistry   PluginRegistryIface
-	kubeClient       pluginCore.KubeClient
-	kubeClientset    kubernetes.Interface
-	secretManager    pluginCore.SecretManager
-	resourceManager  resourcemanager.BaseResourceManager
-	cfg              *config.Config
-	pluginScope      promutils.Scope
-	eventConfig      *controllerConfig.EventConfig
-	clusterID        string
-	agentService     *agent.AgentService
-	connectorService *connector.ConnectorService
+	catalog             catalog.Client
+	asyncCatalog        catalog.AsyncClient
+	defaultPlugins      map[pluginCore.TaskType]pluginCore.Plugin
+	pluginsForType      map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap      map[MetricKey]*taskMetrics
+	taskMetricsMapMutex sync.RWMutex
+	defaultPlugin       pluginCore.Plugin
+	metrics             *metrics
+	pluginRegistry      PluginRegistryIface
+	kubeClient          pluginCore.KubeClient
+	kubeClientset       kubernetes.Interface
+	secretManager       pluginCore.SecretManager
+	resourceManager     resourcemanager.BaseResourceManager
+	cfg                 *config.Config
+	pluginScope         promutils.Scope
+	eventConfig         *controllerConfig.EventConfig
+	clusterID           string
+	agentService        *agent.AgentService
+	connectorService    *connector.ConnectorService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -435,15 +437,38 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := t.taskMetricsMap[metricNameKey]; !ok {
-		t.taskMetricsMap[metricNameKey] = &taskMetrics{
-			taskSucceeded: labeled.NewCounter(metricNameKey+"_success",
-				"Task "+metricNameKey+" finished successfully", t.pluginScope, labeled.EmitUnlabeledMetric),
-			taskFailed: labeled.NewCounter(metricNameKey+"_failure",
-				"Task "+metricNameKey+" failed", t.pluginScope, labeled.EmitUnlabeledMetric),
-		}
+
+	// Acquire read lock for fast read, this is the happy case
+	t.taskMetricsMapMutex.RLock()
+	maybeTaskMetrics, ok := t.taskMetricsMap[metricNameKey]
+	t.taskMetricsMapMutex.RUnlock()
+
+	if ok {
+		return maybeTaskMetrics, nil
 	}
-	return t.taskMetricsMap[metricNameKey], nil
+
+	// Acquire write lock since we may need to populate the map. We use a lock to avoid panics for concurrent writes
+	// and duplicate prometheus metrics
+	t.taskMetricsMapMutex.Lock()
+	defer t.taskMetricsMapMutex.Unlock()
+
+	// check condition again
+	maybeTaskMetrics, ok = t.taskMetricsMap[metricNameKey]
+
+	if ok {
+		return maybeTaskMetrics, nil
+	}
+
+	newTaskMetrics := &taskMetrics{
+		taskSucceeded: labeled.NewCounter(metricNameKey+"_success",
+			"Task "+metricNameKey+" finished successfully", t.pluginScope, labeled.EmitUnlabeledMetric),
+		taskFailed: labeled.NewCounter(metricNameKey+"_failure",
+			"Task "+metricNameKey+" failed", t.pluginScope, labeled.EmitUnlabeledMetric),
+	}
+
+	t.taskMetricsMap[metricNameKey] = newTaskMetrics
+
+	return newTaskMetrics, nil
 }
 
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {
