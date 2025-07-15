@@ -1,3 +1,11 @@
+{{- /* Determine the role/binding scoping */}}
+{{- $roleType := "ClusterRole" }}
+{{- if eq .Values.webhook.serviceAccount.rbacScope "namespace" }}
+  {{- $roleType = "Role" }}
+{{- else if ne .Values.webhook.serviceAccount.rbacScope "cluster" }}
+  {{- fail "Invalid value for .Values.webhook.serviceAccount.rbacScope. Expected 'namespace' or 'cluster'." }}
+{{- end }}
+
 {{- if .Values.flytepropeller.enabled }}
 {{- if .Values.webhook.enabled }}
 # Create an empty secret that the first propeller pod will populate
@@ -170,26 +178,15 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Create a ClusterRole for the webhook
+# Create a Role/ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
-kind: ClusterRole
+kind: {{ $roleType }}
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ template "flyte.namespace" . -}}-{{- template "flyte-pod-webhook.name" . }}
   namespace: {{ template "flyte.namespace" . }}
 rules:
-  - apiGroups:
-      - "*"
-    resources:
-      - mutatingwebhookconfigurations
-      - secrets
-      - pods
-      - replicasets/finalizers
-    verbs:
-      - get
-      - create
-      - update
-      - patch
+  {{- toYaml .Values.webhook.serviceAccount.rbacRules | nindent 2 }}
 ---
 {{- if .Values.webhook.serviceAccount.create }}
 # Create a Service Account for webhook
@@ -207,14 +204,14 @@ imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
   {{- end }}
 ---
 # Create a binding from Role -> ServiceAccount
-kind: ClusterRoleBinding
+kind: {{ $roleType }}Binding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ template "flyte.namespace" . -}}-{{- template "flyte-pod-webhook.name" . }}
   namespace: {{ template "flyte.namespace" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: {{ $roleType }}
   name: {{ template "flyte.namespace" . -}}-{{- template "flyte-pod-webhook.name" . }}
 subjects:
   - kind: ServiceAccount
