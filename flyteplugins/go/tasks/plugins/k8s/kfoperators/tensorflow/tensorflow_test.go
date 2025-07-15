@@ -695,7 +695,7 @@ func TestGetLogs(t *testing.T) {
 	taskTemplate := dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas))
 	pluginContext := dummyTensorFlowPluginContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
 	jobLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, taskTemplate, false,
-		workers, psReplicas, chiefReplicas, evaluatorReplicas)
+		workers, psReplicas, chiefReplicas, evaluatorReplicas, kubeflowv1.TFJobDefaultContainerName)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 5, len(jobLogs))

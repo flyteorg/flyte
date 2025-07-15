@@ -648,7 +648,7 @@ func TestGetLogs(t *testing.T) {
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, kubeflowv1.JobRunning)
 	taskTemplate := dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots))
 	pluginContext := dummyMPIPluginContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{})
-	jobLogs, err := common.GetLogs(pluginContext, common.MPITaskType, mpiJob.ObjectMeta, taskTemplate, false, workers, launcher, 0, 0)
+	jobLogs, err := common.GetLogs(pluginContext, common.MPITaskType, mpiJob.ObjectMeta, taskTemplate, false, workers, launcher, 0, 0, kubeflowv1.MPIJobDefaultContainerName)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))

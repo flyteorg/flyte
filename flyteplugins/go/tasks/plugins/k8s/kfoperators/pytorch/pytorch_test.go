@@ -764,7 +764,7 @@ func TestGetLogs(t *testing.T) {
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, kubeflowv1.JobRunning)
 	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
 	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
-	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0)
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
@@ -786,7 +786,7 @@ func TestGetLogsElastic(t *testing.T) {
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, kubeflowv1.JobRunning)
 	taskTemplate := dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers))
 	pluginContext := dummyPytorchPluginContext(taskTemplate, resourceRequirements, k8s.PluginState{})
-	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0)
+	jobLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, pytorchJob.ObjectMeta, taskTemplate, hasMaster, workers, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
