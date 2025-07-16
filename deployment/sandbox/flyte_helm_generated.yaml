@@ -671,6 +671,7 @@ data:
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
+        redis: null
         type: noop
   storage.yaml: | 
     storage:
@@ -5528,69 +5529,64 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
-# Allow RO access to PODS
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
-  - watch
-# Allow Event recording access
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access All plugin objects
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access to CRD
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - delete
-  - update
-# Allow Access to all resources under flyte.lyft.com
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-  - flyteworkflows/finalizers
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-  - post
-  - deletecollection
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+  - apiGroups:
+    - flyte.lyft.com
+    resources:
+    - flyteworkflows
+    - flyteworkflows/finalizers
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+    - post
+    - deletecollection
 ---
 # Source: flyte/charts/flyte/templates/propeller/webhook.yaml
-# Create a ClusterRole for the webhook
+# Create a Role/ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -5599,17 +5595,17 @@ metadata:
   namespace: flyte
 rules:
   - apiGroups:
-      - "*"
+    - '*'
     resources:
-      - mutatingwebhookconfigurations
-      - secrets
-      - pods
-      - replicasets/finalizers
+    - mutatingwebhookconfigurations
+    - secrets
+    - pods
+    - replicasets/finalizers
     verbs:
-      - get
-      - create
-      - update
-      - patch
+    - get
+    - create
+    - update
+    - patch
 ---
 # Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -7189,7 +7185,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fe60472a10d9e71dea69ddfa28ab9232b15b80cb3453af79354a885e1b6a93f"
+        configChecksum: "580cd917ae7b7ed52d3100047b252b68a265175f2572a5803417473bb9e5e8d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7267,7 +7263,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.0-b2
       annotations:
-        configChecksum: "fe60472a10d9e71dea69ddfa28ab9232b15b80cb3453af79354a885e1b6a93f"
+        configChecksum: "580cd917ae7b7ed52d3100047b252b68a265175f2572a5803417473bb9e5e8d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
