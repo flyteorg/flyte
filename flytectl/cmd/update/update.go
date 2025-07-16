@@ -1,6 +1,8 @@
 package update
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
@@ -11,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.

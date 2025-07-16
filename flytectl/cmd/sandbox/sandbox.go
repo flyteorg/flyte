@@ -1,9 +1,10 @@
 package sandbox
 
 import (
+	"github.com/spf13/cobra"
+
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.

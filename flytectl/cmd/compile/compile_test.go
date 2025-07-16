@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
+
 	config "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/compile"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCompileCommand(t *testing.T) {

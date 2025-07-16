@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -20,11 +21,9 @@ import (
 )
 
 const (
-	flyteSidecarContainerName = "sidecar"
-	flyteInitContainerName    = "downloader"
+	flyteSidecarContainerName    = "uploader"
+	flyteDownloaderContainerName = "downloader"
 )
-
-var pTraceCapability = v1.Capability("SYS_PTRACE")
 
 func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []string, volumeMounts ...v1.VolumeMount) (v1.Container, error) {
 	cpu, err := resource.ParseQuantity(cfg.CPU)
@@ -50,11 +49,6 @@ func FlyteCoPilotContainer(name string, cfg config.FlyteCoPilotConfig, args []st
 		Command:    CopilotCommandArgs(storageCfg),
 		Args:       args,
 		WorkingDir: "/",
-		SecurityContext: &v1.SecurityContext{
-			Capabilities: &v1.Capabilities{
-				Add: []v1.Capability{pTraceCapability},
-			},
-		},
 		Resources: v1.ResourceRequirements{
 			Limits: v1.ResourceList{
 				v1.ResourceCPU:    cpu,
@@ -75,6 +69,7 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	var commands = []string{
 		"/bin/flyte-copilot",
 		"--storage.limits.maxDownloadMBs=0",
+		"--logger.level=" + strconv.Itoa(logger.GetConfig().Level),
 	}
 	if storageConfig.MultiContainerEnabled {
 		commands = append(commands, "--storage.enable-multicontainer")
@@ -101,7 +96,7 @@ func CopilotCommandArgs(storageConfig *storage.Config) []string {
 	}...)
 }
 
-func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, startTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
+func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storage.DataReference, uploadTimeout time.Duration, iface *core.TypedInterface) ([]string, error) {
 	if iface == nil {
 		return nil, fmt.Errorf("interface is required for CoPilot Sidecar")
 	}
@@ -111,8 +106,8 @@ func SidecarCommandArgs(fromLocalPath string, outputPrefix, rawOutputPath storag
 	}
 	return []string{
 		"sidecar",
-		"--start-timeout",
-		startTimeout.String(),
+		"--timeout",
+		uploadTimeout.String(),
 		"--to-raw-output",
 		rawOutputPath.String(),
 		"--to-output-prefix",
@@ -179,6 +174,12 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 		return nil
 	}
 	logger.Infof(ctx, "Enabling CoPilot on main container [%s]", c.Name)
+	if c.SecurityContext == nil {
+		c.SecurityContext = &v1.SecurityContext{}
+	}
+	if c.SecurityContext.Capabilities == nil {
+		c.SecurityContext.Capabilities = &v1.Capabilities{}
+	}
 
 	if iFace != nil {
 		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
@@ -212,9 +213,8 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 		return nil
 	}
 
-	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
-	shareProcessNamespaceEnabled := true
-	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
+	//nolint:protogetter
+	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 	if iFace != nil {
 		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
@@ -239,7 +239,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			if err != nil {
 				return err
 			}
-			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount)
+			downloader, err := FlyteCoPilotContainer(flyteDownloaderContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
 				return err
 			}
@@ -264,15 +264,21 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.OutputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.StartTimeout.Duration, iFace)
+			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.Timeout.Duration, iFace)
 			if err != nil {
 				return err
 			}
 			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
+			// Make it into sidecar container
+			restartPolicy := v1.ContainerRestartPolicyAlways
+			sidecar.RestartPolicy = &restartPolicy
 			if err != nil {
 				return err
 			}
-			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
+			// Let the sidecar container start before the downloader; it will ensure the signal watcher is started before the main container finishes.
+			coPilotPod.InitContainers = append([]v1.Container{sidecar}, coPilotPod.InitContainers...)
+
+			coPilotPod.TerminationGracePeriodSeconds = (*int64)(&cfg.Timeout.Duration)
 		}
 	}
 

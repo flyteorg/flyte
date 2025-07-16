@@ -5,10 +5,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func testCommandFunc(ctx context.Context, args []string, cmdCtx CommandContext) error {

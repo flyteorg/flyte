@@ -3,8 +3,9 @@ package config
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 )
 
 func TestOutputFormat(t *testing.T) {

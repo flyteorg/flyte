@@ -123,7 +123,7 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 	// set primaryContainerKey annotation if this is a Sidecar task or, as an optimization, if there is only a single
 	// container. this plugin marks the task complete if the primary Container is complete, so if there is only one
 	// container we can mark the task as complete before the Pod has been marked complete.
-	if taskTemplate.Type == SidecarTaskType || len(podSpec.Containers) == 1 {
+	if taskTemplate.Type == SidecarTaskType || (len(podSpec.Containers) == 1 && taskTemplate.Type != rawContainerTaskType) {
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
@@ -222,6 +222,14 @@ func DemystifyPodStatus(ctx context.Context, pod *v1.Pod, info pluginsCore.TaskI
 			// succeeded rather than waiting for the Pod to be marked completed.
 			allSuccessfullyTerminated := len(pod.Status.ContainerStatuses) > 0
 			for _, s := range pod.Status.ContainerStatuses {
+				if s.State.Waiting != nil || s.State.Running != nil || (s.State.Terminated != nil && s.State.Terminated.ExitCode != 0) {
+					allSuccessfullyTerminated = false
+				}
+			}
+
+			// Init container will become sidecar if the restart policy is set to Always
+			// https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/#sidecar-containers-and-pod-lifecycle
+			for _, s := range pod.Status.InitContainerStatuses {
 				if s.State.Waiting != nil || s.State.Running != nil || (s.State.Terminated != nil && s.State.Terminated.ExitCode != 0) {
 					allSuccessfullyTerminated = false
 				}
