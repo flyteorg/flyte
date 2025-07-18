@@ -440,11 +440,11 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 
 	// Acquire read lock for fast read, this is the happy case
 	t.taskMetricsMapMutex.RLock()
-	maybeTaskMetrics, ok := t.taskMetricsMap[metricNameKey]
+	existingTaskMetrics, ok := t.taskMetricsMap[metricNameKey]
 	t.taskMetricsMapMutex.RUnlock()
 
 	if ok {
-		return maybeTaskMetrics, nil
+		return existingTaskMetrics, nil
 	}
 
 	// Acquire write lock since we may need to populate the map. We use a lock to avoid panics for concurrent writes
@@ -453,10 +453,10 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	defer t.taskMetricsMapMutex.Unlock()
 
 	// check condition again
-	maybeTaskMetrics, ok = t.taskMetricsMap[metricNameKey]
+	existingTaskMetrics, ok = t.taskMetricsMap[metricNameKey]
 
 	if ok {
-		return maybeTaskMetrics, nil
+		return existingTaskMetrics, nil
 	}
 
 	newTaskMetrics := &taskMetrics{
