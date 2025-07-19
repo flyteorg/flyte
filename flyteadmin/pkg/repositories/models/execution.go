@@ -26,7 +26,7 @@ type Execution struct {
 	LaunchPlanID uint   `gorm:"index"`
 	WorkflowID   uint   `gorm:"index"`
 	TaskID       uint   `gorm:"index"`
-	Phase        string `valid:"length(0|255)"`
+	Phase        string `gorm:"index:idx_executions_phase" valid:"length(0|255)"`
 	Closure      []byte
 	Spec         []byte `gorm:"not null"`
 	StartedAt    *time.Time
