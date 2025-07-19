@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -438,7 +439,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
 
-	// force to shut down servers after 10 seconds
+	// Forced shutdown because of timeout
 	logger.Infof(ctx, "Shutting down server... timeout: %d seconds", cfg.GracefulShutdownTimeoutSeconds)
 	shutdownTimeout := cfg.GracefulShutdownTimeoutSeconds
 	timer := time.AfterFunc(time.Duration(shutdownTimeout)*time.Second, func() {
@@ -448,12 +449,22 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	})
 	defer timer.Stop()
 
-	grpcServer.GracefulStop()
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Errorf(ctx, "Failed to gracefully shutdown HTTP server: %v", err)
-	}
+	go func() {
+		defer wg.Done()
+		if err := server.Shutdown(ctx); err != nil {
+			logger.Errorf(ctx, "Failed to gracefully shutdown HTTP server: %v", err)
+		}
+	}()
 
+	go func() {
+		defer wg.Done()
+		grpcServer.GracefulStop()
+	}()
+
+	wg.Wait()
 	logger.Infof(ctx, "Servers gracefully stopped")
 	return nil
 }
