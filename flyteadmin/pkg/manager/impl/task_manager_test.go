@@ -37,7 +37,7 @@ func getMockConfigForTaskTest() runtimeInterfaces.Configuration {
 	whitelistConfiguration.EXPECT().GetTaskTypeWhitelist().Return(map[string][]runtimeInterfaces.WhitelistScope{})
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, runtimeMocks.NewMockTaskResourceConfiguration(
-			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}), whitelistConfiguration, nil)
+			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}, false), whitelistConfiguration, nil)
 	return mockConfig
 }
 

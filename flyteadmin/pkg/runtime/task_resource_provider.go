@@ -24,9 +24,12 @@ var taskResourceConfig = config.MustRegisterSection(taskResourceKey, &TaskResour
 type TaskResourceSpec struct {
 	Defaults interfaces.TaskResourceSet `json:"defaults"`
 	Limits   interfaces.TaskResourceSet `json:"limits"`
+
+	// If set here, make sure K8sPluginConfig is also set.
+	AllowCPULimitToFloatFromRequest bool `json:"allow-cpu-limit-to-float-from-request"`
 }
 
-// Implementation of an interfaces.TaskResourceConfiguration
+// TaskResourceProvider Implementation of an interfaces.TaskResourceConfiguration
 type TaskResourceProvider struct{}
 
 func (p *TaskResourceProvider) GetDefaults() interfaces.TaskResourceSet {
@@ -35,6 +38,10 @@ func (p *TaskResourceProvider) GetDefaults() interfaces.TaskResourceSet {
 
 func (p *TaskResourceProvider) GetLimits() interfaces.TaskResourceSet {
 	return taskResourceConfig.GetConfig().(*TaskResourceSpec).Limits
+}
+
+func (p *TaskResourceProvider) GetAllowCPULimitToFloatFromRequest() bool {
+	return taskResourceConfig.GetConfig().(*TaskResourceSpec).AllowCPULimitToFloatFromRequest
 }
 
 func NewTaskResourceProvider() interfaces.TaskResourceConfiguration {
