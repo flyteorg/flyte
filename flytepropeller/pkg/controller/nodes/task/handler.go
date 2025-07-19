@@ -705,7 +705,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		if tk.GetInterface() != nil && tk.GetInterface().GetInputs() != nil && len(tk.GetInterface().GetInputs().GetVariables()) > 0 {
 			inputs, err = nCtx.InputReader().Get(ctx)
 			if err != nil {
-				logger.Errorf(ctx, "failed to read inputs when checking catalog cache %w", err)
+				logger.Errorf(ctx, "failed to read inputs when checking catalog cache %v", err)
 				return handler.UnknownTransition, err
 			}
 		}
@@ -815,7 +815,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// increment parallelism if the final pluginTrns is not in a terminal state
-	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+	if !pluginTrns.pInfo.Phase().IsTerminal() {
 		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
 	}
 	return pluginTrns.FinalTransition(ctx)
@@ -915,7 +915,7 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
 	if currentPhase.IsTerminal() && !(currentPhase.IsFailure() && taskNodeState.CleanupOnFailure) {
-		logger.Debugf(ctx, "Returning immediately from Abort since task is already in terminal phase.", currentPhase)
+		logger.Debugf(ctx, "Returning immediately from Abort since task phase %s is already in terminal phase.", currentPhase)
 		return nil
 	}
 
