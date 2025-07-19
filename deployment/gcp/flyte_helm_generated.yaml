@@ -650,69 +650,64 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
-# Allow RO access to PODS
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
-  - watch
-# Allow Event recording access
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access All plugin objects
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access to CRD
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - delete
-  - update
-# Allow Access to all resources under flyte.lyft.com
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-  - flyteworkflows/finalizers
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-  - post
-  - deletecollection
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+  - apiGroups:
+    - flyte.lyft.com
+    resources:
+    - flyteworkflows
+    - flyteworkflows/finalizers
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+    - post
+    - deletecollection
 ---
 # Source: flyte-core/templates/propeller/webhook.yaml
-# Create a ClusterRole for the webhook
+# Create a Role/ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -721,17 +716,17 @@ metadata:
   namespace: flyte
 rules:
   - apiGroups:
-      - "*"
+    - '*'
     resources:
-      - mutatingwebhookconfigurations
-      - secrets
-      - pods
-      - replicasets/finalizers
+    - mutatingwebhookconfigurations
+    - secrets
+    - pods
+    - replicasets/finalizers
     verbs:
-      - get
-      - create
-      - update
-      - patch
+    - get
+    - create
+    - update
+    - patch
 ---
 # Source: flyte-core/templates/admin/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
