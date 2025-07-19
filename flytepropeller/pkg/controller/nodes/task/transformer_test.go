@@ -85,7 +85,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		TaskExecContext: tCtx,
 		InputReader:     in,
 		OutputWriter:    out,
-		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(n, 0, "reason", &pluginCore.TaskInfo{
+		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(0, "reason", &pluginCore.TaskInfo{
 			OccurredAt: &n,
 		}),
 		NodeExecutionMetadata: &nodeExecutionMetadata,
@@ -280,7 +280,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 		TaskExecContext: tCtx,
 		InputReader:     in,
 		OutputWriter:    out,
-		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(n, 0, "reason", &pluginCore.TaskInfo{
+		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(0, "reason", &pluginCore.TaskInfo{
 			OccurredAt: &n,
 		}),
 		NodeExecutionMetadata: &nodeExecutionMetadata,

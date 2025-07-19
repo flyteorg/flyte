@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"time"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -175,14 +174,14 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			// attempt to allocateResource
 			allocationStatus, err := allocateResource(ctx, stCtx, config, podName)
 			if err != nil {
-				logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
+				logger.Errorf(ctx, "Resource manager failed for TaskExecId [%v] token [%s]. error %s",
 					stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), podName, err)
 				return currentState, externalResources, err
 			}
 
 			logger.Infof(ctx, "Allocation result for [%s] is [%s]", podName, allocationStatus)
 			if allocationStatus != core.AllocationStatusGranted {
-				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, "Exceeded ResourceManager quota", nil)
+				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(core.DefaultPhaseVersion, "Exceeded ResourceManager quota", nil)
 			} else {
 				phaseInfo, perr = launchSubtask(ctx, stCtx, config, kubeClient)
 
@@ -325,8 +324,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	return newState, externalResources, nil
 }
 
-func TerminateSubTasksOnAbort(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, config *Config,
-	terminateFunction func(context.Context, SubTaskExecutionContext, *Config, core.KubeClient) error, currentState *arrayCore.State) error {
+func TerminateSubTasksOnAbort(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, terminateFunction func(context.Context, SubTaskExecutionContext, *Config, core.KubeClient) error, currentState *arrayCore.State) error {
 
 	_, externalResources, err := TerminateSubTasks(ctx, tCtx, kubeClient, GetConfig(), terminateFunction, currentState)
 	if err != nil {

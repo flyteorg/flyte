@@ -160,7 +160,7 @@ func GetAllocationToken(
 
 	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, routingGroup, uniqueID, resourceConstraintsSpec)
 	if err != nil {
-		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
+		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%v] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID, err)
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error requesting allocation token %s", uniqueID)
 	}
@@ -393,9 +393,9 @@ func KickOffQuery(
 		_, err := cache.GetOrCreate(uniqueID, executionStateCacheItem)
 		if err != nil {
 			// This means that our cache has fundamentally broken... return a system error
-			logger.Errorf(ctx, "Cache failed to GetOrCreate for execution [%s] cache key [%s], owner [%s]. Error %s",
+			logger.Errorf(ctx, "Cache failed to GetOrCreate for execution [%v] cache key [%s], owner [%s]. Error %s",
 				tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID,
-				tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
+				tCtx.TaskExecutionMetadata().GetOwnerReference().Name, err)
 			return currentState, err
 		}
 	}
@@ -418,9 +418,9 @@ func MonitorQuery(
 	cachedItem, err := cache.GetOrCreate(uniqueQueryID, executionStateCacheItem)
 	if err != nil {
 		// This means that our cache has fundamentally broken... return a system error
-		logger.Errorf(ctx, "Cache is broken on execution [%s] cache key [%s], owner [%s]. Error %s",
+		logger.Errorf(ctx, "Cache is broken on execution [%v] cache key [%s], owner [%s]. Error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueQueryID,
-			tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
+			tCtx.TaskExecutionMetadata().GetOwnerReference().Name, err)
 		return currentState, errors.Wrapf(errors.CacheFailed, err, "Error when GetOrCreate while monitoring")
 	}
 

@@ -219,7 +219,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			// TODO we should calculate input volume size based on the size of the inputs which is known ahead of time. We should store that as part of the metadata
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
 			//nolint:protogetter
-			logger.Infof(ctx, "Adding Input path [%s] of Size [%d] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
+			logger.Infof(ctx, "Adding Input path [%s] of Size [%v] for Task [%s]", inPath, size, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 			inputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.InputVolumeName,
 				MountPath: inPath,
@@ -250,7 +250,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 			size := CalculateStorageSize(taskExecMetadata.GetOverrides().GetResources())
 			//nolint:protogetter
-			logger.Infof(ctx, "Adding Output path [%s] of size [%d] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
+			logger.Infof(ctx, "Adding Output path [%s] of size [%v] for Task [%s]", size, outPath, taskExecMetadata.GetTaskExecutionID().GetID().TaskId.GetName())
 
 			outputsVolumeMount := v1.VolumeMount{
 				Name:      cfg.OutputVolumeName,
