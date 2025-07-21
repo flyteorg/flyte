@@ -205,7 +205,7 @@ func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
 	}
 }
 
-// NewSubtaskExecutionID constructs a SubTaskExecutionID using the provided parameters
+// NewSubTaskExecutionID constructs a SubTaskExecutionID using the provided parameters
 func NewSubTaskExecutionID(taskExecutionID pluginsCore.TaskExecutionID, executionIndex int, retryAttempt uint64) SubTaskExecutionID {
 	return SubTaskExecutionID{
 		taskExecutionID,
@@ -240,7 +240,7 @@ func (s SubTaskExecutionMetadata) GetTaskExecutionID() pluginsCore.TaskExecution
 	return s.subtaskExecutionID
 }
 
-// IsInterruptbile overrides the base NodeExecutionMetadata to return a subtask specific identifier
+// IsInterruptible overrides the base NodeExecutionMetadata to return a subtask specific identifier
 func (s SubTaskExecutionMetadata) IsInterruptible() bool {
 	return s.interruptible
 }

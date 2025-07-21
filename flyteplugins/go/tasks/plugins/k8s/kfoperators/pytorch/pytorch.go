@@ -222,7 +222,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, taskTemplate, hasMaster, *workersCount, 0, 0, 0)
+	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, taskTemplate, hasMaster, *workersCount, 0, 0, 0, kubeflowv1.PyTorchJobDefaultContainerName)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
