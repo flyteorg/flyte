@@ -198,6 +198,25 @@ func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
 	}
 }
 
+func (in *WorkflowNodeStatus) Equals(other *WorkflowNodeStatus) bool {
+	if in == nil && other == nil {
+		return true
+	}
+	if in == nil || other == nil {
+		return false
+	}
+
+	if in.ExecutionError != nil && other.ExecutionError != nil {
+		if !proto.Equal(in.ExecutionError, other.ExecutionError) {
+			return false
+		}
+	} else if in.ExecutionError != other.ExecutionError {
+		return false
+	}
+
+	return in.Phase == other.Phase
+}
+
 type GateNodePhase int
 
 const (
@@ -408,7 +427,6 @@ type NodeStatus struct {
 	SubNodeStatus map[NodeID]*NodeStatus `json:"subNodeStatus,omitempty"`
 	// We can store the outputs at this layer
 
-	// TODO not used delete
 	WorkflowNodeStatus *WorkflowNodeStatus `json:"workflowNodeStatus,omitempty"`
 
 	TaskNodeStatus    *TaskNodeStatus    `json:",omitempty"`
@@ -952,6 +970,10 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		if !v.Equals(otherV) {
 			return false
 		}
+	}
+
+	if !in.WorkflowNodeStatus.Equals(other.WorkflowNodeStatus) {
+		return false
 	}
 
 	if in.Error != nil && other.Error != nil {

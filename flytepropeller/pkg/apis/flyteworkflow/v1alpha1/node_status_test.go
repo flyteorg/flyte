@@ -121,6 +121,15 @@ func TestNodeStatus_Equals(t *testing.T) {
 	}
 	assert.True(t, one.Equals(other))
 
+	one.WorkflowNodeStatus = &WorkflowNodeStatus{
+		Phase: WorkflowNodePhaseExecuting,
+	}
+	assert.False(t, one.Equals(other))
+	other.WorkflowNodeStatus = &WorkflowNodeStatus{
+		Phase: WorkflowNodePhaseExecuting,
+	}
+	assert.True(t, one.Equals(other))
+
 	one.SubNodeStatus[node].Phase = NodePhaseRunning
 	assert.False(t, one.Equals(other))
 	other.SubNodeStatus[node].Phase = NodePhaseRunning
@@ -324,6 +333,35 @@ func TestGateNodeStatus_Equals(t *testing.T) {
 	assert.False(t, one.Equals(other))
 
 	other.Phase = 5
+	assert.True(t, one.Equals(other))
+}
+
+func TestWorkflowNodeStatus_Equals(t *testing.T) {
+	var one *WorkflowNodeStatus
+	var other *WorkflowNodeStatus
+
+	assert.True(t, one.Equals(other))
+
+	one = &WorkflowNodeStatus{}
+	assert.False(t, one.Equals(other))
+
+	other = &WorkflowNodeStatus{}
+	assert.True(t, one.Equals(other))
+
+	one.Phase = 5
+	assert.False(t, one.Equals(other))
+
+	other.Phase = 5
+	assert.True(t, one.Equals(other))
+
+	one.ExecutionError = &core.ExecutionError{
+		Code: "1",
+	}
+	assert.False(t, one.Equals(other))
+
+	other.ExecutionError = &core.ExecutionError{
+		Code: "1",
+	}
 	assert.True(t, one.Equals(other))
 }
 
