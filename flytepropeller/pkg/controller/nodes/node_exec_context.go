@@ -276,11 +276,7 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	}
 
 	workflowEnqueuer := func() error {
-		workflowIdentifier := types.NamespacedName{
-			Name:      executionContext.GetName(),
-			Namespace: executionContext.GetNamespace(),
-		}
-		c.enqueueWorkflow(workflowIdentifier.String())
+		c.enqueueWorkflow(executionContext.GetK8sWorkflowID().String())
 		return nil
 	}
 
