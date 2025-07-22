@@ -1182,7 +1182,7 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	ctxForTimer = contextutils.WithLaunchPlanID(ctxForTimer, lpName)
 	defer metrics.ConcurrencyCheckDuration.Start(ctxForTimer).Stop()
 
-	logger.Debugf(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
+	logger.Debugf(ctx, "checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
 
 	projectFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "project", lpProject)
 	if err != nil {
@@ -1204,10 +1204,11 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 		return fmt.Errorf("failed to create phase filter for concurrency check (JOIN): %w", err)
 	}
 
-	// Count active executions for this launch plan, including an inner join with launch_plans table.
-	// This query joins 'executions' with 'launch_plans' to filter by launch plan name across all its versions,
-	// and then filters by active execution phases. This benefits from the existing indexes on the join keys (project, domain, name on launch_plans) and the execution phase. In plain SQL this is the expression:
 	/*
+		Count active executions for this launch plan, including an inner join with launch_plans table.
+		This query joins 'executions' with 'launch_plans' to filter by launch plan name across all its versions,
+		and then filters by active execution phases. This benefits from the existing indexes on the join keys (project, domain, name on launch_plans) and the execution phase. In plain SQL this is the expression:
+
 		SELECT
 			COUNT(executions.id)
 		FROM
@@ -1221,9 +1222,6 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 			AND executions.phase IN (
 				'QUEUED',
 				'RUNNING',
-				'SUCCEEDING',
-				'FAILING',
-				'ABORTING'
 			); -- Values from the activePhases slice
 	*/
 
@@ -1239,16 +1237,25 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 		// We still proceed to log the count as 0 and potentially hit the concurrency limit if Max is 0.
 	}
 
-	logger.Infof(ctx, "found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
+	logger.Debugf(ctx, "found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
 
 	// Check against the policy limit
 	if count >= int64(launchPlan.GetSpec().GetConcurrencyPolicy().GetMax()) {
-		logger.Warningf(ctx, "Concurrency limit (%d) reached for launch plan %v (active: %d)", launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpID, count)
-		if launchPlan.GetSpec().GetConcurrencyPolicy().GetBehavior() == admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP {
+		behavior := launchPlan.GetSpec().GetConcurrencyPolicy().GetBehavior()
+
+		switch behavior {
+		case admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP:
 			metrics.ConcurrencyLimitHits.WithLabelValues(lpProject, lpDomain, lpName).Inc()
-			logger.Infof(ctx, "Skipping execution creation for launch plan %v due to concurrency limit", lpID)
-			return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Concurrency limit (%d) reached for launch plan %s. Skipping execution.",
+			logger.Warningf(ctx, "skipping execution creation for launch plan %v due to concurrency limit", lpID)
+			return errors.NewFlyteAdminErrorf(
+				codes.ResourceExhausted,
+				"concurrency limit (%d) reached for launch plan %s; skipping execution",
 				launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpName)
+
+		case admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED:
+			// fall through
+		default:
+			return fmt.Errorf("unsupported concurrency-limit behavior: %v", behavior)
 		}
 	}
 	return nil
