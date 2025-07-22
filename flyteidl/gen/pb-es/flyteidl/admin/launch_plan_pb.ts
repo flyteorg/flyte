@@ -46,15 +46,21 @@ proto3.util.setEnumType(LaunchPlanState, "flyteidl.admin.LaunchPlanState", [
  */
 export enum ConcurrencyLimitBehavior {
   /**
+   * @generated from enum value: CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
    * A workflow that will be skipped because the limit has been hit.
    *
-   * @generated from enum value: SKIP = 0;
+   * @generated from enum value: CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1;
    */
-  SKIP = 0,
+  SKIP = 1,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ConcurrencyLimitBehavior)
 proto3.util.setEnumType(ConcurrencyLimitBehavior, "flyteidl.admin.ConcurrencyLimitBehavior", [
-  { no: 0, name: "SKIP" },
+  { no: 0, name: "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED" },
+  { no: 1, name: "CONCURRENCY_LIMIT_BEHAVIOR_SKIP" },
 ]);
 
 /**
@@ -448,7 +454,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
   /**
    * Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached
    *
-   * @generated from field: flyteidl.admin.ConcurrencyPolicy concurrency_policy = 25;
+   * @generated from field: flyteidl.admin.ConcurrencyPolicy concurrency_policy = 24;
    */
   concurrencyPolicy?: ConcurrencyPolicy;
 
@@ -478,7 +484,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 21, name: "envs", kind: "message", T: Envs },
     { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
     { no: 23, name: "cluster_assignment", kind: "message", T: ClusterAssignment },
-    { no: 25, name: "concurrency_policy", kind: "message", T: ConcurrencyPolicy },
+    { no: 24, name: "concurrency_policy", kind: "message", T: ConcurrencyPolicy },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {
@@ -514,7 +520,7 @@ export class ConcurrencyPolicy extends Message<ConcurrencyPolicy> {
    *
    * @generated from field: flyteidl.admin.ConcurrencyLimitBehavior behavior = 2;
    */
-  behavior = ConcurrencyLimitBehavior.SKIP;
+  behavior = ConcurrencyLimitBehavior.UNSPECIFIED;
 
   constructor(data?: PartialMessage<ConcurrencyPolicy>) {
     super();
