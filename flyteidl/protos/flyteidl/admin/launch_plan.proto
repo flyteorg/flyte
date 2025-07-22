@@ -158,8 +158,10 @@ message ConcurrencyPolicy {
 }
 
 enum ConcurrencyLimitBehavior {
+    CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0;
+    
     // A workflow that will be skipped because the limit has been hit.
-    SKIP = 0;
+    CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1;
 }
 
 // Values computed by the flyte platform after launch plan registration.
