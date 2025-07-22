@@ -47,6 +47,11 @@ import (
 
 const childContainerQueueKey = "child_queue"
 
+var activeExecutionPhases = []string{
+	core.WorkflowExecution_QUEUED.String(),
+	core.WorkflowExecution_RUNNING.String(),
+}
+
 type executionSystemMetrics struct {
 	Scope                      promutils.Scope
 	ActiveExecutions           prometheus.Gauge
@@ -1177,35 +1182,26 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	ctxForTimer = contextutils.WithLaunchPlanID(ctxForTimer, lpName)
 	defer metrics.ConcurrencyCheckDuration.Start(ctxForTimer).Stop()
 
-	logger.Infof(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
-
-	// Active phases based on the workflow enum
-	activePhases := []string{
-		core.WorkflowExecution_QUEUED.String(),
-		core.WorkflowExecution_RUNNING.String(),
-	}
+	logger.Debugf(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
 
 	projectFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "project", lpProject)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create project filter for concurrency check: %v", err)
-		return err
+		return fmt.Errorf("failed to create project filter for concurrency check: %w", err)
 	}
 	domainFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, "domain", lpDomain)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create domain filter for concurrency check: %v", err)
-		return err
+		return fmt.Errorf("failed to create domain filter for concurrency check: %w", err)
+
 	}
 
 	lpNameFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, "name", lpName)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create launch plan name filter for concurrency check (JOIN): %v", err)
-		return err
+		return fmt.Errorf("failed to create launch plan name filter for concurrency check (JOIN): %w", err)
 	}
 
-	phaseFilter, err := common.NewRepeatedValueFilter(common.Execution, common.ValueIn, "phase", activePhases)
+	phaseFilter, err := common.NewRepeatedValueFilter(common.Execution, common.ValueIn, "phase", activeExecutionPhases)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create phase filter for concurrency check (JOIN): %v", err)
-		return err
+		return fmt.Errorf("failed to create phase filter for concurrency check (JOIN): %w", err)
 	}
 
 	// Count active executions for this launch plan, including an inner join with launch_plans table.
@@ -1239,16 +1235,16 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	})
 
 	if err != nil {
-		logger.Errorf(ctx, "Failed to count active executions using JOIN for launch plan %s.%s.%s: %v", lpProject, lpDomain, lpName, err)
+		logger.Errorf(ctx, "failed to count active executions using JOIN for launch plan %s.%s.%s: %v", lpProject, lpDomain, lpName, err)
 		// We still proceed to log the count as 0 and potentially hit the concurrency limit if Max is 0.
 	}
 
-	logger.Infof(ctx, "Found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
+	logger.Infof(ctx, "found %d active executions for launch plan %s.%s.%s (any version)", count, lpProject, lpDomain, lpName)
 
 	// Check against the policy limit
 	if count >= int64(launchPlan.GetSpec().GetConcurrencyPolicy().GetMax()) {
 		logger.Warningf(ctx, "Concurrency limit (%d) reached for launch plan %v (active: %d)", launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpID, count)
-		if launchPlan.GetSpec().GetConcurrencyPolicy().GetBehavior() == admin.ConcurrencyLimitBehavior_SKIP {
+		if launchPlan.GetSpec().GetConcurrencyPolicy().GetBehavior() == admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP {
 			metrics.ConcurrencyLimitHits.WithLabelValues(lpProject, lpDomain, lpName).Inc()
 			logger.Infof(ctx, "Skipping execution creation for launch plan %v due to concurrency limit", lpID)
 			return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Concurrency limit (%d) reached for launch plan %s. Skipping execution.",

@@ -4157,7 +4157,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			name: "Limit Not Reached",
 			concurrencyPolicy: &admin.ConcurrencyPolicy{
 				Max:      3,
-				Behavior: admin.ConcurrencyLimitBehavior_SKIP,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
 			},
 			activeExecutionsCount:  2,
 			expectError:            false,
@@ -4167,7 +4167,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			name: "Limit Reached (Skip)",
 			concurrencyPolicy: &admin.ConcurrencyPolicy{
 				Max:      3,
-				Behavior: admin.ConcurrencyLimitBehavior_SKIP,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
 			},
 			activeExecutionsCount:  3,
 			expectError:            true,
@@ -4178,7 +4178,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			name: "Limit Exceeded (Skip)",
 			concurrencyPolicy: &admin.ConcurrencyPolicy{
 				Max:      3,
-				Behavior: admin.ConcurrencyLimitBehavior_SKIP,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
 			},
 			activeExecutionsCount:  4,
 			expectError:            true,
