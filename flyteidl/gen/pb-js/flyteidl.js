@@ -40525,7 +40525,7 @@
                     if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
                         $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     if (message.concurrencyPolicy != null && message.hasOwnProperty("concurrencyPolicy"))
-                        $root.flyteidl.admin.ConcurrencyPolicy.encode(message.concurrencyPolicy, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                        $root.flyteidl.admin.ConcurrencyPolicy.encode(message.concurrencyPolicy, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
                     return writer;
                 };
     
@@ -40603,7 +40603,7 @@
                         case 23:
                             message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
                             break;
-                        case 25:
+                        case 24:
                             message.concurrencyPolicy = $root.flyteidl.admin.ConcurrencyPolicy.decode(reader, reader.uint32());
                             break;
                         default:
@@ -40847,6 +40847,7 @@
                         default:
                             return "behavior: enum value expected";
                         case 0:
+                        case 1:
                             break;
                         }
                     return null;
@@ -40859,11 +40860,13 @@
              * ConcurrencyLimitBehavior enum.
              * @name flyteidl.admin.ConcurrencyLimitBehavior
              * @enum {string}
-             * @property {number} SKIP=0 SKIP value
+             * @property {number} CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED=0 CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED value
+             * @property {number} CONCURRENCY_LIMIT_BEHAVIOR_SKIP=1 CONCURRENCY_LIMIT_BEHAVIOR_SKIP value
              */
             admin.ConcurrencyLimitBehavior = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "SKIP"] = 0;
+                values[valuesById[0] = "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED"] = 0;
+                values[valuesById[1] = "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"] = 1;
                 return values;
             })();
     

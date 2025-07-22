@@ -146,7 +146,7 @@ message LaunchPlanSpec {
     ClusterAssignment cluster_assignment = 23;
 
     // Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached
-    ConcurrencyPolicy concurrency_policy = 25;
+    ConcurrencyPolicy concurrency_policy = 24;
 }
 
 message ConcurrencyPolicy {

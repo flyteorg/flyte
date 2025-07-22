@@ -25,10 +25,12 @@ class LaunchPlanState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 
 class ConcurrencyLimitBehavior(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
-    SKIP: _ClassVar[ConcurrencyLimitBehavior]
+    CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED: _ClassVar[ConcurrencyLimitBehavior]
+    CONCURRENCY_LIMIT_BEHAVIOR_SKIP: _ClassVar[ConcurrencyLimitBehavior]
 INACTIVE: LaunchPlanState
 ACTIVE: LaunchPlanState
-SKIP: ConcurrencyLimitBehavior
+CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED: ConcurrencyLimitBehavior
+CONCURRENCY_LIMIT_BEHAVIOR_SKIP: ConcurrencyLimitBehavior
 
 class LaunchPlanCreateRequest(_message.Message):
     __slots__ = ["id", "spec"]

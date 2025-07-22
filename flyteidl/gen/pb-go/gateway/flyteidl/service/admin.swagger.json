@@ -4597,10 +4597,11 @@
     "adminConcurrencyLimitBehavior": {
       "type": "string",
       "enum": [
-        "SKIP"
+        "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+        "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"
       ],
-      "default": "SKIP",
-      "description": " - SKIP: A workflow that will be skipped because the limit has been hit."
+      "default": "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+      "description": " - CONCURRENCY_LIMIT_BEHAVIOR_SKIP: A workflow that will be skipped because the limit has been hit."
     },
     "adminConcurrencyPolicy": {
       "type": "object",

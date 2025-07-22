@@ -16786,7 +16786,8 @@ export namespace flyteidl {
 
         /** ConcurrencyLimitBehavior enum. */
         enum ConcurrencyLimitBehavior {
-            SKIP = 0
+            CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0,
+            CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1
         }
 
         /** Properties of a LaunchPlanClosure. */
