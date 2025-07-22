@@ -36,7 +36,6 @@ func (p *passthroughWorkflowStore) Get(ctx context.Context, namespace, name stri
 		// The FlyteWorkflow resource may no longer exist, in which case we stop
 		// processing.
 		if kubeerrors.IsNotFound(err) {
-			logger.Warningf(ctx, "Workflow not found in cache.")
 			return nil, ErrWorkflowNotFound
 		}
 		return nil, err

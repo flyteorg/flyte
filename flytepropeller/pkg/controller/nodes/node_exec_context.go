@@ -276,7 +276,7 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	}
 
 	workflowEnqueuer := func() error {
-		c.enqueueWorkflow(executionContext.GetID())
+		c.enqueueWorkflow(executionContext.GetK8sWorkflowID().String())
 		return nil
 	}
 
