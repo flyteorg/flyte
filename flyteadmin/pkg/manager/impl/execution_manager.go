@@ -1175,8 +1175,7 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 	lpName := lpID.GetName()
 	ctxForTimer := contextutils.WithProjectDomain(ctx, lpProject, lpDomain)
 	ctxForTimer = contextutils.WithLaunchPlanID(ctxForTimer, lpName)
-	timer := metrics.ConcurrencyCheckDuration.Start(ctxForTimer)
-	defer timer.Stop()
+	defer metrics.ConcurrencyCheckDuration.Start(ctxForTimer).Stop()
 
 	logger.Infof(ctx, "Checking concurrency limits for launch plan %v with policy %+v", lpID, launchPlan.GetSpec().GetConcurrencyPolicy())
 
