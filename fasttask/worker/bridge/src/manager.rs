@@ -21,10 +21,10 @@ pub trait TaskManager {
         &self,
         task_id: String,
         namespace: String,
-        workflow_id: String,
         exec_id: Option<ExecutionIdentifier>,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
+        enqueue_labels: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>>;
     fn delete(&self, task_id: String) -> impl Future<Output = Result<()>>;
     fn get_capacity(&self) -> Result<Capacity>;
@@ -105,11 +105,12 @@ impl ExecutionStrategy {
                     .send(TaskStatus {
                         task_id: task_assignment.task_id.clone(),
                         namespace: task_assignment.namespace,
-                        workflow_id: task_assignment.workflow_id,
                         exec_id: task_assignment.exec_id,
                         phase: SUCCEEDED,
                         reason: "reason".to_string(),
                         task_duration: None,
+                        enqueue_labels: task_assignment.enqueue_labels,
+                        workflow_id: None,
                     })
                     .await?;
 
@@ -122,10 +123,10 @@ impl ExecutionStrategy {
                     task_contexts.clone(),
                     task_assignment.task_id.clone(),
                     task_assignment.namespace,
-                    task_assignment.workflow_id,
                     task_assignment.exec_id,
                     task_assignment.cmd,
                     task_assignment.env_vars,
+                    task_assignment.enqueue_labels,
                     task_assignment.additional_distribution,
                     task_assignment.fast_register_dir,
                     task_status_tx,
@@ -158,10 +159,10 @@ impl ExecutionStrategy {
 struct TaskAssignment {
     task_id: String,
     namespace: String,
-    workflow_id: String,
     exec_id: Option<ExecutionIdentifier>,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
+    enqueue_labels: HashMap<String, String>,
     additional_distribution: Option<String>,
     fast_register_dir: Option<String>,
 }
@@ -241,10 +242,10 @@ impl TaskManager for MultiProcessManager {
         &self,
         task_id: String,
         namespace: String,
-        workflow_id: String,
         exec_id: Option<ExecutionIdentifier>,
         cmd: Vec<String>,
         env_vars: HashMap<String, String>,
+        enqueue_labels: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
         let fast_register_ids = self.fast_register_ids.clone();
         let task_assignment_tx = self.task_assignment_tx.clone();
@@ -259,10 +260,10 @@ impl TaskManager for MultiProcessManager {
             let task_assignment = TaskAssignment {
                 task_id,
                 namespace,
-                workflow_id,
                 exec_id,
                 cmd: actor_cmd,
                 env_vars,
+                enqueue_labels,
                 additional_distribution,
                 fast_register_dir,
             };
@@ -482,8 +483,8 @@ fn transform_cmd(
  */
 
 pub struct SuccessManager {
-    task_tx: Sender<(String, String, String, Option<ExecutionIdentifier>)>,
-    task_rx: Receiver<(String, String, String, Option<ExecutionIdentifier>)>,
+    task_tx: Sender<(String, String, Option<ExecutionIdentifier>)>,
+    task_rx: Receiver<(String, String, Option<ExecutionIdentifier>)>,
 }
 
 impl SuccessManager {
@@ -502,16 +503,14 @@ impl TaskManager for SuccessManager {
         &self,
         task_id: String,
         namespace: String,
-        workflow_id: String,
         exec_id: Option<ExecutionIdentifier>,
         _cmd: Vec<String>,
         _env_vars: HashMap<String, String>,
+        _enqueue_labels: HashMap<String, String>,
     ) -> impl Future<Output = Result<()>> {
         let task_tx = self.task_tx.clone();
         async move {
-            let send_result = task_tx
-                .send((task_id, namespace, workflow_id, exec_id))
-                .await;
+            let send_result = task_tx.send((task_id, namespace, exec_id)).await;
             assert!(send_result.is_ok());
             Ok(())
         }
@@ -538,7 +537,7 @@ impl TaskManager for SuccessManager {
 }
 
 pub struct SuccessRuntime {
-    task_rx: Receiver<(String, String, String, Option<ExecutionIdentifier>)>,
+    task_rx: Receiver<(String, String, Option<ExecutionIdentifier>)>,
 }
 
 impl TaskManagerRuntime for SuccessRuntime {
@@ -557,15 +556,16 @@ impl TaskManagerRuntime for SuccessRuntime {
             let task_result = task_rx.recv().await;
             assert!(task_result.is_ok());
 
-            let (task_id, namespace, workflow_id, exec_id) = task_result.unwrap();
+            let (task_id, namespace, exec_id) = task_result.unwrap();
             let task_status = TaskStatus {
                 task_id,
                 namespace,
-                workflow_id,
                 exec_id,
                 phase: SUCCEEDED,
                 reason: "".to_string(),
+                enqueue_labels: HashMap::new(),
                 task_duration: None,
+                workflow_id: None,
             };
 
             let send_result = task_status_tx.send(task_status).await;
@@ -583,11 +583,7 @@ mod tests {
         use std::time::Duration;
 
         let (task_status_tx, task_status_rx) = async_channel::unbounded();
-        let (task_id, namespace, workflow_id) = (
-            "task_id".to_string(),
-            "namespace".to_string(),
-            "workflow_id".to_string(),
-        );
+        let (task_id, namespace) = ("task_id".to_string(), "namespace".to_string());
         let exec_id = ExecutionIdentifier {
             org: "dogfood".to_string(),
             project: "flytesnacks".to_string(),
@@ -635,10 +631,10 @@ mod tests {
             .assign(
                 task_id.clone(),
                 namespace.clone(),
-                workflow_id.clone(),
                 Some(exec_id.clone()),
                 cmd,
                 env_vars,
+                HashMap::new(),
             )
             .await;
         assert!(assign_result.is_ok());
@@ -657,7 +653,6 @@ mod tests {
 
         assert_eq!(task_status.task_id, task_id);
         assert_eq!(task_status.namespace, namespace);
-        assert_eq!(task_status.workflow_id, workflow_id);
         assert_eq!(task_status.phase, SUCCEEDED);
         assert_eq!(task_status.exec_id, Some(exec_id));
 

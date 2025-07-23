@@ -84,10 +84,10 @@ pub async fn run<T: ConnectionBuilder, U: Heartbeater + Send, V: TaskManager>(
                         Some(Operation::Assign) => manager.assign(
                             operation.task_id.clone(),
                             operation.namespace,
-                            operation.workflow_id,
                             operation.exec_id,
                             operation.cmd,
-                            operation.env_vars).await,
+                            operation.env_vars,
+                            operation.enqueue_labels).await,
                         Some(Operation::Ack) => manager.ack(operation.task_id.clone()).await,
                         Some(Operation::Delete) => manager.delete(operation.task_id.clone()).await,
                         _ => unimplemented!(),
@@ -153,7 +153,6 @@ mod tests {
         let heartbeat_request = HeartbeatResponse {
             task_id: "task_id".to_string(),
             namespace: "namespace".to_string(),
-            workflow_id: "workflow_id".to_string(),
             exec_id: Some(ExecutionIdentifier {
                 org: "foo".to_string(),
                 project: "bar".to_string(),
@@ -162,7 +161,9 @@ mod tests {
             }),
             cmd: vec!["c".to_string(), "m".to_string(), "d".to_string()],
             env_vars: HashMap::new(),
+            enqueue_labels: HashMap::new(),
             operation: Operation::Assign.into(),
+            workflow_id: None,
         };
 
         let operation_result = operation_tx.send(heartbeat_request.clone()).await;
@@ -193,7 +194,6 @@ mod tests {
         let task_status = &heartbeat_response.task_statuses[0];
         assert_eq!(task_status.task_id, heartbeat_request.task_id);
         assert_eq!(task_status.namespace, heartbeat_request.namespace);
-        assert_eq!(task_status.workflow_id, heartbeat_request.workflow_id);
         assert_eq!(task_status.phase, SUCCEEDED);
         assert_eq!(task_status.exec_id, heartbeat_request.exec_id);
 

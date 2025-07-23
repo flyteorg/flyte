@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
-//go:generate mockery -all -case=underscore
+//go:generate mockery --all --case=underscore
 
 type TaskStatus struct {
 	Phase        core.Phase
@@ -20,5 +20,5 @@ type TaskStatus struct {
 type FastTaskService interface {
 	CheckStatus(ctx context.Context, taskID, queueID, workerID string) (TaskStatus, error)
 	Cleanup(ctx context.Context, taskID, queueID, workerID string) error
-	OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error)
+	OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (string, error)
 }

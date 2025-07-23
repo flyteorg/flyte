@@ -39,7 +39,7 @@ type fastTaskServiceImpl struct {
 
 	// A map of pending owners by queue. When a new worker becomes available, use this to enqueue owners for reevaluation.
 	// Note, this is an optimistic approach and may not include all pending owners.
-	pendingTaskOwners     map[string]map[string]types.NamespacedName // map[queueID]map[taskID]ownerID
+	pendingTaskOwners     map[string]map[string]map[string]string // map[queueID]map[taskID]enqueueLabels
 	pendingTaskOwnersLock sync.RWMutex
 
 	taskStatusChannels sync.Map // map[taskID]chan *WorkerTaskStatus
@@ -259,13 +259,19 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 			// if taskStatus is complete then enqueueOwner for fast feedback
 			phase := core.Phase(taskStatus.GetPhase())
 			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
+				labels := make(map[string]string)
+
+				// for backwards compatibility, add workflow id
 				namespacedName := types.NamespacedName{
 					Namespace: taskStatus.GetNamespace(),
 					Name:      taskStatus.GetWorkflowId(),
 				}
-				labels := map[string]string{
-					k8s.WorkflowID: namespacedName.String(),
+				labels[k8s.WorkflowID] = namespacedName.String()
+
+				for label, value := range taskStatus.GetEnqueueLabels() {
+					labels[label] = value
 				}
+
 				if err := f.enqueueOwner(labels); err != nil {
 					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
 				}
@@ -316,20 +322,20 @@ func (f *fastTaskServiceImpl) removeWorkerFromQueue(queueID, workerID string) {
 }
 
 // addPendingOwner adds to the pending owners list for the queue, if not already full
-func (f *fastTaskServiceImpl) addPendingOwner(queueID, taskID string, ownerID types.NamespacedName) {
+func (f *fastTaskServiceImpl) addPendingOwner(queueID, taskID string, enqueueLabels map[string]string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
 	owners, exists := f.pendingTaskOwners[queueID]
 	if !exists {
-		owners = make(map[string]types.NamespacedName)
+		owners = make(map[string]map[string]string)
 		f.pendingTaskOwners[queueID] = owners
 	}
 
 	if len(owners) >= maxPendingOwnersPerQueue {
 		return
 	}
-	owners[taskID] = ownerID
+	owners[taskID] = enqueueLabels
 }
 
 // removePendingOwner removes the pending owner from the list if still there
@@ -358,18 +364,16 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 		return
 	}
 
-	enqueued := make(map[types.NamespacedName]bool)
-	for _, ownerID := range owners {
-		if _, ok := enqueued[ownerID]; ok {
+	enqueued := make(map[string]bool)
+	for _, ownerLabels := range owners {
+		hashedLabels := hashMapValues(ownerLabels)
+		if _, ok := enqueued[hashedLabels]; ok {
 			continue
 		}
-		labels := map[string]string{
-			k8s.WorkflowID: ownerID.String(),
+		if err := f.enqueueOwner(ownerLabels); err != nil {
+			logger.Warnf(context.Background(), "failed to enqueue owner %v: %+v", ownerLabels, err)
 		}
-		if err := f.enqueueOwner(labels); err != nil {
-			logger.Warnf(context.Background(), "failed to enqueue owner %s: %+v", ownerID, err)
-		}
-		enqueued[ownerID] = true
+		enqueued[hashedLabels] = true
 	}
 
 	delete(f.pendingTaskOwners, queueID)
@@ -377,13 +381,13 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 
 // OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
 // empty string is returned.
-func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string) (string, error) {
+func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (string, error) {
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
 	queue, exists := f.queues[queueID]
 	if !exists {
-		f.addPendingOwner(queueID, taskID, types.NamespacedName{Namespace: namespace, Name: workflowID})
+		f.addPendingOwner(queueID, taskID, enqueueLabels)
 		f.metrics.taskNoWorkersAvailable.Inc()
 		return "", nil // no workers available
 	}
@@ -427,11 +431,12 @@ func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, execID *coreIdl.
 			Domain:  execID.GetDomain(),
 			Name:    execID.GetName(),
 		},
-		Namespace:  namespace,
-		WorkflowId: workflowID,
-		Cmd:        cmd,
-		EnvVars:    envVars,
-		Operation:  pb.HeartbeatResponse_ASSIGN,
+		Namespace:     namespace,
+		Cmd:           cmd,
+		EnvVars:       envVars,
+		WorkflowId:    &workflowID,
+		EnqueueLabels: enqueueLabels,
+		Operation:     pb.HeartbeatResponse_ASSIGN,
 	}
 
 	// create task status channel
@@ -531,7 +536,7 @@ func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope, c
 	svc := &fastTaskServiceImpl{
 		enqueueOwner:      enqueueOwner,
 		queues:            make(map[string]*Queue),
-		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
+		pendingTaskOwners: make(map[string]map[string]map[string]string),
 		metrics:           newServiceMetrics(scope, cfg),
 	}
 	prometheus.MustRegister(svc)

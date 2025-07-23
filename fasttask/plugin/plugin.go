@@ -90,6 +90,7 @@ type Plugin struct {
 	cfg             *Config
 	fastTaskService api.FastTaskService
 	metrics         pluginMetrics
+	enqueueLabels   map[string]struct{}
 }
 
 // GetID returns the unique identifier for the plugin.
@@ -390,7 +391,20 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 	queueID := fastTaskEnvironment.GetQueueId()
 	ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
 	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	workerID, err := p.fastTaskService.OfferOnQueue(ctx, taskExecID.GetNodeExecutionId().GetExecutionId(), queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars)
+
+	// set enqueue labels to be passed in as part of the heartbeat response
+	// include namespaced execution name for v1
+	enqueueLabels := map[string]string{
+		k8s.WorkflowID: ownerID.String(),
+	}
+
+	for label, value := range tCtx.TaskExecutionMetadata().GetLabels() {
+		if _, ok := p.enqueueLabels[label]; ok {
+			enqueueLabels[label] = value
+		}
+	}
+
+	workerID, err := p.fastTaskService.OfferOnQueue(ctx, taskExecID.GetNodeExecutionId().GetExecutionId(), queueID, taskID, ownerID.Namespace, ownerID.Name, command, envVars, enqueueLabels)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
 	}
@@ -731,10 +745,16 @@ func init() {
 					}
 				}()
 
+				enqueueLabels := make(map[string]struct{})
+				for _, label := range iCtx.IncludeEnqueueLabels() {
+					enqueueLabels[label] = struct{}{}
+				}
+
 				return &Plugin{
 					cfg:             cfg,
 					fastTaskService: fastTaskService,
 					metrics:         newPluginMetrics(iCtx.MetricsScope()),
+					enqueueLabels:   enqueueLabels,
 				}, nil
 			},
 			IsDefault: false,

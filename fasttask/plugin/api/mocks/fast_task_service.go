@@ -96,8 +96,8 @@ func (_m FastTaskService_OfferOnQueue) Return(_a0 string, _a1 error) *FastTaskSe
 	return &FastTaskService_OfferOnQueue{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) *FastTaskService_OfferOnQueue {
-	c_call := _m.On("OfferOnQueue", ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
+func (_m *FastTaskService) OnOfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) *FastTaskService_OfferOnQueue {
+	c_call := _m.On("OfferOnQueue", ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars, enqueueLabels)
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
@@ -106,20 +106,20 @@ func (_m *FastTaskService) OnOfferOnQueueMatch(matchers ...interface{}) *FastTas
 	return &FastTaskService_OfferOnQueue{Call: c_call}
 }
 
-// OfferOnQueue provides a mock function with given fields: ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars
-func (_m *FastTaskService) OfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string) (string, error) {
-	ret := _m.Called(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
+// OfferOnQueue provides a mock function with given fields: ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars, enqueueLabels
+func (_m *FastTaskService) OfferOnQueue(ctx context.Context, execID *core.WorkflowExecutionIdentifier, queueID string, taskID string, namespace string, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (string, error) {
+	ret := _m.Called(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars, enqueueLabels)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string) string); ok {
-		r0 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string, map[string]string) string); ok {
+		r0 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars, enqueueLabels)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string) error); ok {
-		r1 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, string, string, string, string, []string, map[string]string, map[string]string) error); ok {
+		r1 = rf(ctx, execID, queueID, taskID, namespace, workflowID, cmd, envVars, enqueueLabels)
 	} else {
 		r1 = ret.Error(1)
 	}

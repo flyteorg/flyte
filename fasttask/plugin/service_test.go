@@ -11,6 +11,7 @@ import (
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
@@ -311,10 +312,16 @@ func TestCleanup(t *testing.T) {
 			}
 			fastTaskService.queues = test.queues
 
+			workflowID := types.NamespacedName{
+				Name: "foo",
+			}
+			enqueueLabels := map[string]string{
+				k8s.WorkflowID: workflowID.String(),
+			}
+
 			// initialize pendingTaskOwners and taskStatusChannels if necessary
 			if test.pendingOwnerExists {
-				fastTaskService.addPendingOwner(test.queueID, test.taskID,
-					types.NamespacedName{Name: "foo"})
+				fastTaskService.addPendingOwner(test.queueID, test.taskID, enqueueLabels)
 			} else {
 				_, exists := fastTaskService.pendingTaskOwners[test.queueID]
 				assert.False(t, exists)
@@ -516,7 +523,16 @@ func TestOfferOnQueue(t *testing.T) {
 				Domain:  "dev",
 				Name:    "abc",
 			}
-			workerID, err := fastTaskService.OfferOnQueue(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string))
+
+			workflowID := types.NamespacedName{
+				Namespace: test.namespace,
+				Name:      test.workflowID,
+			}
+			enqueueLabels := map[string]string{
+				k8s.WorkflowID: workflowID.String(),
+			}
+
+			workerID, err := fastTaskService.OfferOnQueue(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string), enqueueLabels)
 			assert.Equal(t, test.expectedWorkerID, workerID)
 			assert.Equal(t, test.expectedError, err)
 
@@ -610,7 +626,11 @@ func TestPendingOwnerManagement(t *testing.T) {
 	}
 
 	for _, addition := range additions {
-		fastTaskService.addPendingOwner(addition.queueID, addition.taskID, types.NamespacedName{Name: addition.ownerIDName})
+		enqueueLabels := map[string]string{
+			k8s.WorkflowID: types.NamespacedName{Name: addition.ownerIDName}.String(),
+		}
+
+		fastTaskService.addPendingOwner(addition.queueID, addition.taskID, enqueueLabels)
 
 		assert.Equal(t, addition.expectedQueueOwnersCount, len(fastTaskService.pendingTaskOwners))
 		totalOwnerCount := 0
@@ -623,11 +643,17 @@ func TestPendingOwnerManagement(t *testing.T) {
 	// validate overflow management on addPendingOwner
 	overflowTestQueueID := "baz"
 	for i := 0; i < maxPendingOwnersPerQueue; i++ {
-		fastTaskService.addPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), types.NamespacedName{Name: fmt.Sprintf("%d", i)})
+		enqueueLabels := map[string]string{
+			k8s.WorkflowID: types.NamespacedName{Name: fmt.Sprintf("%d", i)}.String(),
+		}
+		fastTaskService.addPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), enqueueLabels)
 	}
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
-	fastTaskService.addPendingOwner(overflowTestQueueID, "overflow", types.NamespacedName{Name: "overflow"})
+	enqueueLabels := map[string]string{
+		k8s.WorkflowID: types.NamespacedName{Name: "overflow"}.String(),
+	}
+	fastTaskService.addPendingOwner(overflowTestQueueID, "overflow", enqueueLabels)
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
 	// validate enqueuePendingOwners

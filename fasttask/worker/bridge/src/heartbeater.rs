@@ -177,6 +177,7 @@ impl HeartbeatRuntime for PassthroughHeartbeatRuntime {
 mod tests {
     use super::*;
     use crate::pb::fasttask::ExecutionIdentifier;
+    use std::collections::HashMap;
 
     #[tokio::test]
     async fn periodic_heartbeater() {
@@ -235,7 +236,6 @@ mod tests {
         let task_status_succeeded = TaskStatus {
             task_id: "task_id".to_string(),
             namespace: "namespace".to_string(),
-            workflow_id: "workflow_id".to_string(),
             exec_id: Some(ExecutionIdentifier {
                 org: "foo".to_string(),
                 project: "bar".to_string(),
@@ -245,6 +245,8 @@ mod tests {
             phase: SUCCEEDED,
             reason: "reason".to_string(),
             task_duration: None,
+            enqueue_labels: HashMap::new(),
+            workflow_id: None,
         };
 
         let succeeded_now = Instant::now();

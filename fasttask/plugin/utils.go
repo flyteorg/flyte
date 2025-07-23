@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -125,4 +126,21 @@ func sanitizeEnvName(name string) string {
 
 	// return the first `N` characters where `N` is 63 characters minus the nonce length and dash
 	return cleanedName[:min(len(cleanedName), 63-(GetConfig().NonceLength+1))]
+}
+
+func hashMapValues(m map[string]string) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var sb strings.Builder
+	for _, k := range keys {
+		sb.WriteString(k)
+		sb.WriteString("=")
+		sb.WriteString(m[k])
+		sb.WriteString(";")
+	}
+	return sb.String()
 }

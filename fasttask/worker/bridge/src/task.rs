@@ -22,10 +22,10 @@ pub async fn execute(
     task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
     task_id: String,
     namespace: String,
-    workflow_id: String,
     exec_id: Option<ExecutionIdentifier>,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
+    enqueue_labels: HashMap<String, String>,
     additional_distribution: Option<String>,
     fast_register_dir: Option<String>,
     task_status_tx: Sender<TaskStatus>,
@@ -61,7 +61,7 @@ pub async fn execute(
             &kill_rx,
             &task_id,
             &namespace,
-            &workflow_id,
+            enqueue_labels.clone(),
             &exec_id,
             &task_status_tx,
             task_status_report_interval_seconds,
@@ -82,10 +82,10 @@ pub async fn execute(
             &kill_rx,
             &task_id,
             &namespace,
-            &workflow_id,
             &exec_id,
             cmd,
             env_vars,
+            enqueue_labels.clone(),
             additional_distribution,
             fast_register_dir,
             &task_status_tx,
@@ -130,7 +130,7 @@ pub async fn execute(
             &kill_rx,
             &task_id,
             &namespace,
-            &workflow_id,
+            enqueue_labels.clone(),
             &exec_id,
             &task_status_tx,
             task_status_report_interval_seconds,
@@ -164,7 +164,7 @@ async fn report_terminal_status(
     kill_rx: &Receiver<()>,
     task_id: &str,
     namespace: &str,
-    workflow_id: &str,
+    enqueue_labels: HashMap<String, String>,
     exec_id: &Option<ExecutionIdentifier>,
     task_status_tx: &Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
@@ -199,11 +199,12 @@ async fn report_terminal_status(
                 let error = task_status_tx.send(TaskStatus{
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
-                    workflow_id: workflow_id.to_string(),
+                    enqueue_labels: enqueue_labels.clone(),
                     exec_id: exec_id.clone(),
                     phase: *phase,
                     reason: reason.clone(),
                     task_duration: task_duration.map(|d|d.to_prost()),
+                    workflow_id: None,
                 }).await;
 
                 if error.is_err() {
@@ -223,10 +224,10 @@ async fn run_command(
     kill_rx: &Receiver<()>,
     task_id: &str,
     namespace: &str,
-    workflow_id: &str,
     exec_id: &Option<ExecutionIdentifier>,
     cmd: Vec<String>,
     env_vars: HashMap<String, String>,
+    enqueue_labels: HashMap<String, String>,
     additional_distribution: Option<String>,
     fast_register_dir: Option<String>,
     task_status_tx: &Sender<TaskStatus>,
@@ -328,11 +329,12 @@ async fn run_command(
                 let error = task_status_tx.send(TaskStatus{
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
-                    workflow_id: workflow_id.to_string(),
+                    enqueue_labels: enqueue_labels.clone(),
                     exec_id: exec_id.clone(),
                     phase: *phase,
                     reason: reason.clone(),
                     task_duration: Some(current_duration.to_prost()),
+                    workflow_id: None,
                 }).await;
 
                 if error.is_err() {
@@ -364,7 +366,7 @@ async fn wait_in_backlog<T>(
     kill_rx: &Receiver<()>,
     task_id: &str,
     namespace: &str,
-    workflow_id: &str,
+    enqueue_labels: HashMap<String, String>,
     exec_id: &Option<ExecutionIdentifier>,
     task_status_tx: &Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
@@ -410,11 +412,12 @@ async fn wait_in_backlog<T>(
                 let error = task_status_tx.send(TaskStatus{
                     task_id: task_id.to_string(),
                     namespace: namespace.to_string(),
-                    workflow_id: workflow_id.to_string(),
+                    enqueue_labels: enqueue_labels.clone(),
                     exec_id: exec_id.clone(),
                     phase: *phase,
                     reason: reason.clone(),
                     task_duration: None,
+                    workflow_id: None,
                 }).await;
 
                 if error.is_err() {
@@ -481,11 +484,7 @@ mod tests {
         // initialize variables
         let task_contexts = Arc::new(RwLock::new(HashMap::<String, TaskContext>::new()));
         let (kill_tx, kill_rx) = async_channel::unbounded();
-        let (task_id, namespace, workflow_id) = (
-            "task_id".to_string(),
-            "namespace".to_string(),
-            "workflow_id".to_string(),
-        );
+        let (task_id, namespace) = ("task_id".to_string(), "namespace".to_string());
         let exec_id = ExecutionIdentifier {
             org: "dogfood".to_string(),
             project: "flytesnacks".to_string(),
@@ -523,7 +522,7 @@ mod tests {
                 &kill_rx,
                 &task_id,
                 &namespace,
-                &workflow_id,
+                HashMap::new(),
                 &Some(exec_id),
                 &task_status_tx,
                 task_status_report_interval_seconds,
@@ -630,11 +629,7 @@ mod tests {
         // initialize variables
         let task_contexts = Arc::new(RwLock::new(HashMap::<String, TaskContext>::new()));
         let (kill_tx, kill_rx) = async_channel::unbounded();
-        let (task_id, namespace, workflow_id) = (
-            "task_id".to_string(),
-            "namespace".to_string(),
-            "workflow_id".to_string(),
-        );
+        let (task_id, namespace) = ("task_id".to_string(), "namespace".to_string());
         let exec_id = ExecutionIdentifier {
             org: "dogfood".to_string(),
             project: "flytesnacks".to_string(),
@@ -667,7 +662,7 @@ mod tests {
                 &kill_rx,
                 &task_id,
                 &namespace,
-                &workflow_id,
+                HashMap::new(),
                 &Some(exec_id),
                 &task_status_tx,
                 task_status_report_interval_seconds,

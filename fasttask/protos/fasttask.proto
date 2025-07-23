@@ -25,7 +25,7 @@ message TaskStatus {
     string namespace = 2;
 
     // The workflow identifier that triggered the fasttask execution.
-    string workflow_id = 3;
+    optional string workflow_id = 3 [deprecated = true];
 
     // The current phase of the fasttask execution.
     int32 phase = 4;
@@ -39,6 +39,9 @@ message TaskStatus {
 
     // For how long this task was running since last task status report
     google.protobuf.Duration task_duration = 7;
+
+    // A map of values used to re-enqueue the execution
+    map<string, string> enqueue_labels = 8;
 }
 
 // The current execution capacity for a fasttask worker replia.
@@ -82,7 +85,7 @@ message HeartbeatResponse {
     string namespace = 2;
 
     // The workflow identifier that triggered the fasttask execution.
-    string workflow_id = 3;
+    optional string workflow_id = 3 [deprecated = true];
 
     // A string array representing the command to be evaluated for the fasttask execution.
     repeated string cmd = 4;
@@ -109,6 +112,9 @@ message HeartbeatResponse {
     map<string, string> envVars = 6;
 
     ExecutionIdentifier exec_id = 7;
+
+    // A map of pod labels used to re-enqueue the execution
+    map<string, string> enqueue_labels = 8;
 }
 
 service FastTask {

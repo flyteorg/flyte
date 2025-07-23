@@ -22,8 +22,9 @@ pub struct TaskStatus {
     #[prost(string, tag = "2")]
     pub namespace: ::prost::alloc::string::String,
     /// The workflow identifier that triggered the fasttask execution.
-    #[prost(string, tag = "3")]
-    pub workflow_id: ::prost::alloc::string::String,
+    #[deprecated]
+    #[prost(string, optional, tag = "3")]
+    pub workflow_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The current phase of the fasttask execution.
     #[prost(int32, tag = "4")]
     pub phase: i32,
@@ -37,6 +38,10 @@ pub struct TaskStatus {
     /// For how long this task was running since last task status report
     #[prost(message, optional, tag = "7")]
     pub task_duration: ::core::option::Option<::prost_types::Duration>,
+    /// A map of values used to re-enqueue the execution
+    #[prost(map = "string, string", tag = "8")]
+    pub enqueue_labels:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// The current execution capacity for a fasttask worker replia.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -85,8 +90,9 @@ pub struct HeartbeatResponse {
     #[prost(string, tag = "2")]
     pub namespace: ::prost::alloc::string::String,
     /// The workflow identifier that triggered the fasttask execution.
-    #[prost(string, tag = "3")]
-    pub workflow_id: ::prost::alloc::string::String,
+    #[deprecated]
+    #[prost(string, optional, tag = "3")]
+    pub workflow_id: ::core::option::Option<::prost::alloc::string::String>,
     /// A string array representing the command to be evaluated for the fasttask execution.
     #[prost(string, repeated, tag = "4")]
     pub cmd: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
@@ -99,6 +105,10 @@ pub struct HeartbeatResponse {
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     #[prost(message, optional, tag = "7")]
     pub exec_id: ::core::option::Option<ExecutionIdentifier>,
+    /// A map of pod labels used to re-enqueue the execution
+    #[prost(map = "string, string", tag = "8")]
+    pub enqueue_labels:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Nested message and enum types in `HeartbeatResponse`.
 pub mod heartbeat_response {

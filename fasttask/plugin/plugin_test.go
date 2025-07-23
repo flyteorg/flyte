@@ -27,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -558,7 +559,11 @@ func TestHandleNotYetStarted(t *testing.T) {
 	})
 	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
-	taskMetadata.OnGetLabels().Return(map[string]string{})
+	enqueueLabels := map[string]string{
+		"additional-label":  "additional-label-value",
+		"un-included-label": "un-included-label-value",
+	}
+	taskMetadata.OnGetLabels().Return(enqueueLabels)
 
 	for _, test := range tests {
 		for _, taskTemplate := range taskTemplateTests {
@@ -604,9 +609,21 @@ func TestHandleNotYetStarted(t *testing.T) {
 				)
 				tCtx.OnPluginStateWriter().Return(pluginStateWriter)
 
+				namespaceName := "namespace"
+				executionName := "execution_id"
+				workflowID := types.NamespacedName{
+					Namespace: namespaceName,
+					Name:      executionName,
+				}
+				// ensure the correct labels are used for enqueueing
+				updatedEnqueueLabels := map[string]string{
+					k8s.WorkflowID:     workflowID.String(),
+					"additional-label": "additional-label-value",
+				}
+
 				// create FastTaskService mock
 				fastTaskService := &mocks.FastTaskService{}
-				fastTaskService.OnOfferOnQueue(ctx, execID, "foo", "task-id", "namespace", "execution_id", []string{}, envVars).Return(test.workerID, nil)
+				fastTaskService.OnOfferOnQueue(ctx, execID, "foo", "task-id", namespaceName, executionName, []string{}, envVars, updatedEnqueueLabels).Return(test.workerID, nil)
 
 				// initialize plugin
 				plugin := &Plugin{
@@ -615,6 +632,10 @@ func TestHandleNotYetStarted(t *testing.T) {
 					},
 					fastTaskService: fastTaskService,
 					metrics:         newPluginMetrics(scope),
+					enqueueLabels: map[string]struct{}{
+						k8s.WorkflowID:     {},
+						"additional-label": {},
+					},
 				}
 
 				// call handle

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -228,4 +228,25 @@ func TestSanitizePodName(t *testing.T) {
 			assert.Equal(t, test.output, output)
 		})
 	}
+}
+
+func TestHashMapValues(t *testing.T) {
+	labels1 := map[string]string{
+		"a": "one",
+		"b": "two",
+		"c": "three",
+	}
+
+	labels2 := map[string]string{
+		"a": "one",
+		"c": "three",
+		"b": "two",
+	}
+
+	result1 := hashMapValues(labels1)
+	result2 := hashMapValues(labels2)
+	expected := "a=one;b=two;c=three;"
+
+	assert.Equal(t, expected, result1)
+	assert.Equal(t, expected, result2)
 }
