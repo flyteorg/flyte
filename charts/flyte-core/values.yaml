@@ -387,64 +387,64 @@ flytepropeller:
     rbacRules:
       # Allow RO access to PODS
       - apiGroups:
-        - ""
+          - ""
         resources:
-        - pods
+          - pods
         verbs:
-        - get
-        - list
-        - watch
+          - get
+          - list
+          - watch
       # Allow Event recording access
       - apiGroups:
-        - ""
+          - ""
         resources:
-        - events
+          - events
         verbs:
-        - create
-        - update
-        - delete
-        - patch
+          - create
+          - update
+          - delete
+          - patch
       # Allow Access All plugin objects
       - apiGroups:
-        - '*'
+          - '*'
         resources:
-        - '*'
+          - '*'
         verbs:
-        - get
-        - list
-        - watch
-        - create
-        - update
-        - delete
-        - patch
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - delete
+          - patch
       # Allow Access to CRD
       - apiGroups:
-        - apiextensions.k8s.io
+          - apiextensions.k8s.io
         resources:
-        - customresourcedefinitions
+          - customresourcedefinitions
         verbs:
-        - get
-        - list
-        - watch
-        - create
-        - delete
-        - update
+          - get
+          - list
+          - watch
+          - create
+          - delete
+          - update
       # Allow Access to all resources under flyte.lyft.com
       - apiGroups:
-        - flyte.lyft.com
+          - flyte.lyft.com
         resources:
-        - flyteworkflows
-        - flyteworkflows/finalizers
+          - flyteworkflows
+          - flyteworkflows/finalizers
         verbs:
-        - get
-        - list
-        - watch
-        - create
-        - update
-        - delete
-        - patch
-        - post
-        - deletecollection
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - delete
+          - patch
+          - post
+          - deletecollection
 
   # -- Annotations for Flytepropeller deployment
   annotations: {}
