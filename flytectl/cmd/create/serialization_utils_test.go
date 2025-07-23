@@ -3,9 +3,8 @@ package create
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMakeLiteralForTypes(t *testing.T) {

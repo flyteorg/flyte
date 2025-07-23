@@ -2247,6 +2247,8 @@ pub struct TaskLog {
     pub show_while_pending: bool,
     #[prost(bool, tag="6")]
     pub hide_once_finished: bool,
+    #[prost(enumeration="task_log::LinkType", tag="7")]
+    pub link_type: i32,
 }
 /// Nested message and enum types in `TaskLog`.
 pub mod task_log {
@@ -2275,6 +2277,38 @@ pub mod task_log {
                 "UNKNOWN" => Some(Self::Unknown),
                 "CSV" => Some(Self::Csv),
                 "JSON" => Some(Self::Json),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum LinkType {
+        /// The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.
+        External = 0,
+        /// The link for spark UI, ray dashboard, etc.
+        Dashboard = 1,
+        /// The link for vscode or other IDEs.
+        Ide = 2,
+    }
+    impl LinkType {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                LinkType::External => "EXTERNAL",
+                LinkType::Dashboard => "DASHBOARD",
+                LinkType::Ide => "IDE",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "EXTERNAL" => Some(Self::External),
+                "DASHBOARD" => Some(Self::Dashboard),
+                "IDE" => Some(Self::Ide),
                 _ => None,
             }
         }

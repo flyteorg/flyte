@@ -1,10 +1,9 @@
 package create
 
 import (
-	"github.com/spf13/cobra"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using Sphinx.

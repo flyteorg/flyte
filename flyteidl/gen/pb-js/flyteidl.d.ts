@@ -5882,6 +5882,9 @@ export namespace flyteidl {
 
             /** TaskLog HideOnceFinished */
             HideOnceFinished?: (boolean|null);
+
+            /** TaskLog linkType */
+            linkType?: (flyteidl.core.TaskLog.LinkType|null);
         }
 
         /** Represents a TaskLog. */
@@ -5910,6 +5913,9 @@ export namespace flyteidl {
 
             /** TaskLog HideOnceFinished. */
             public HideOnceFinished: boolean;
+
+            /** TaskLog linkType. */
+            public linkType: flyteidl.core.TaskLog.LinkType;
 
             /**
              * Creates a new TaskLog instance using the specified properties.
@@ -5951,6 +5957,13 @@ export namespace flyteidl {
                 UNKNOWN = 0,
                 CSV = 1,
                 JSON = 2
+            }
+
+            /** LinkType enum. */
+            enum LinkType {
+                EXTERNAL = 0,
+                DASHBOARD = 1,
+                IDE = 2
             }
         }
 

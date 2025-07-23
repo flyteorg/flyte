@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
@@ -15,6 +12,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 const (

@@ -451,6 +451,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 				Uri:           customInfoMap[sparkHistoryUI],
 				Name:          "Spark History UI",
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_DASHBOARD,
 			})
 		}
 	} else if sj.Status.AppState.State == sparkOp.RunningState && sj.Status.DriverInfo.WebUIIngressAddress != "" {
@@ -466,6 +467,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			Uri:           customInfoMap[sparkDriverUI],
 			Name:          "Spark Driver UI",
 			MessageFormat: core.TaskLog_JSON,
+			LinkType:      core.TaskLog_DASHBOARD,
 		})
 	}
 

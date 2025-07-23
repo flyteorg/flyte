@@ -18,13 +18,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/google/go-github/v42/github"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
@@ -40,6 +33,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+	"github.com/google/go-github/v42/github"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	v1 "k8s.io/api/core/v1"
 )
 
 // Variable define in serialized proto that needs to be replace in registration time

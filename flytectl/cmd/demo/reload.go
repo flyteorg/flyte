@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (

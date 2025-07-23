@@ -4,11 +4,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetProjectSpec(t *testing.T) {

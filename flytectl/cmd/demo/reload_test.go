@@ -9,16 +9,15 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	testclient "k8s.io/client-go/kubernetes/fake"
-
-	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/flyteorg/flyte/flytectl/pkg/docker"
-	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
-	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 )
 
 var fakePod = corev1.Pod{

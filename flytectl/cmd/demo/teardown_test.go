@@ -7,9 +7,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
@@ -19,6 +16,8 @@ import (
 	k8sMocks "github.com/flyteorg/flyte/flytectl/pkg/k8s/mocks"
 	"github.com/flyteorg/flyte/flytectl/pkg/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 var containers []types.Container

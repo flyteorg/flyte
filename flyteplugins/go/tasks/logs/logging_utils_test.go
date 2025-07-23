@@ -398,6 +398,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 					"https://my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_EXTERNAL.String(),
 			},
 			{
 				DisplayName: "Internal",
@@ -405,6 +406,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 					"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs",
 				},
 				MessageFormat: core.TaskLog_JSON,
+				LinkType:      core.TaskLog_EXTERNAL.String(),
 			},
 		},
 	}, nil, []*core.TaskLog{
@@ -412,11 +414,13 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 			Uri:           "https://my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "StackDriver my-Suffix",
+			LinkType:      core.TaskLog_EXTERNAL,
 		},
 		{
 			Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/attempt/1/view/logs",
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "Internal my-Suffix",
+			LinkType:      core.TaskLog_EXTERNAL,
 		},
 	}, "")
 }
@@ -498,6 +502,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 						TemplateURIs: []tasklog.TemplateURI{
 							"https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
 						},
+						LinkType: core.TaskLog_IDE.String(),
 					},
 				},
 			},
@@ -513,6 +518,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://abc.com:65535/a-route",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
 				},
 			},
 		},
@@ -539,6 +545,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://abc.com:65535:65535",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
 				},
 			},
 		},
@@ -587,11 +594,13 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 					Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "Kubernetes Logs my-Suffix",
+					LinkType:      core.TaskLog_EXTERNAL,
 				},
 				{
 					Uri:           "https://flyteinteractive.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "vscode link my-Suffix",
+					LinkType:      core.TaskLog_IDE,
 				},
 			},
 		},

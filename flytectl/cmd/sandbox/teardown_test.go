@@ -5,9 +5,6 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
@@ -15,6 +12,8 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	k8sMocks "github.com/flyteorg/flyte/flytectl/pkg/k8s/mocks"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestTearDownClusterFunc(t *testing.T) {

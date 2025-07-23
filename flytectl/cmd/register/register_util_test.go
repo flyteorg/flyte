@@ -12,14 +12,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-github/v42/github"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/durationpb"
-	v1 "k8s.io/api/core/v1"
-
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	ghMocks "github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
@@ -31,6 +23,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/google/go-github/v42/github"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+	v1 "k8s.io/api/core/v1"
 )
 
 type MockHTTPClient struct {

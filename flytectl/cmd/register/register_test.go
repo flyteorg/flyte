@@ -6,9 +6,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/stretchr/testify/assert"
 )
 
 var (

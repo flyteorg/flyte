@@ -437,6 +437,11 @@ export class TaskLog extends Message<TaskLog> {
    */
   HideOnceFinished = false;
 
+  /**
+   * @generated from field: flyteidl.core.TaskLog.LinkType link_type = 7;
+   */
+  linkType = TaskLog_LinkType.EXTERNAL;
+
   constructor(data?: PartialMessage<TaskLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -451,6 +456,7 @@ export class TaskLog extends Message<TaskLog> {
     { no: 4, name: "ttl", kind: "message", T: Duration },
     { no: 5, name: "ShowWhilePending", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 6, name: "HideOnceFinished", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "link_type", kind: "enum", T: proto3.getEnumType(TaskLog_LinkType) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskLog {
@@ -494,6 +500,38 @@ proto3.util.setEnumType(TaskLog_MessageFormat, "flyteidl.core.TaskLog.MessageFor
   { no: 0, name: "UNKNOWN" },
   { no: 1, name: "CSV" },
   { no: 2, name: "JSON" },
+]);
+
+/**
+ * @generated from enum flyteidl.core.TaskLog.LinkType
+ */
+export enum TaskLog_LinkType {
+  /**
+   * The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.
+   *
+   * @generated from enum value: EXTERNAL = 0;
+   */
+  EXTERNAL = 0,
+
+  /**
+   * The link for spark UI, ray dashboard, etc.
+   *
+   * @generated from enum value: DASHBOARD = 1;
+   */
+  DASHBOARD = 1,
+
+  /**
+   * The link for vscode or other IDEs.
+   *
+   * @generated from enum value: IDE = 2;
+   */
+  IDE = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(TaskLog_LinkType)
+proto3.util.setEnumType(TaskLog_LinkType, "flyteidl.core.TaskLog.LinkType", [
+  { no: 0, name: "EXTERNAL" },
+  { no: 1, name: "DASHBOARD" },
+  { no: 2, name: "IDE" },
 ]);
 
 /**

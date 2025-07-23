@@ -1,10 +1,9 @@
 package demo
 
 import (
-	"github.com/spf13/cobra"
-
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/spf13/cobra"
 )
 
 const (

@@ -330,6 +330,58 @@ func (TaskLog_MessageFormat) EnumDescriptor() ([]byte, []int) {
 	return file_flyteidl_core_execution_proto_rawDescGZIP(), []int{4, 0}
 }
 
+type TaskLog_LinkType int32
+
+const (
+	// The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.
+	TaskLog_EXTERNAL TaskLog_LinkType = 0
+	// The link for spark UI, ray dashboard, etc.
+	TaskLog_DASHBOARD TaskLog_LinkType = 1
+	// The link for vscode or other IDEs.
+	TaskLog_IDE TaskLog_LinkType = 2
+)
+
+// Enum value maps for TaskLog_LinkType.
+var (
+	TaskLog_LinkType_name = map[int32]string{
+		0: "EXTERNAL",
+		1: "DASHBOARD",
+		2: "IDE",
+	}
+	TaskLog_LinkType_value = map[string]int32{
+		"EXTERNAL":  0,
+		"DASHBOARD": 1,
+		"IDE":       2,
+	}
+)
+
+func (x TaskLog_LinkType) Enum() *TaskLog_LinkType {
+	p := new(TaskLog_LinkType)
+	*p = x
+	return p
+}
+
+func (x TaskLog_LinkType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TaskLog_LinkType) Descriptor() protoreflect.EnumDescriptor {
+	return file_flyteidl_core_execution_proto_enumTypes[5].Descriptor()
+}
+
+func (TaskLog_LinkType) Type() protoreflect.EnumType {
+	return &file_flyteidl_core_execution_proto_enumTypes[5]
+}
+
+func (x TaskLog_LinkType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TaskLog_LinkType.Descriptor instead.
+func (TaskLog_LinkType) EnumDescriptor() ([]byte, []int) {
+	return file_flyteidl_core_execution_proto_rawDescGZIP(), []int{4, 1}
+}
+
 type QualityOfService_Tier int32
 
 const (
@@ -367,11 +419,11 @@ func (x QualityOfService_Tier) String() string {
 }
 
 func (QualityOfService_Tier) Descriptor() protoreflect.EnumDescriptor {
-	return file_flyteidl_core_execution_proto_enumTypes[5].Descriptor()
+	return file_flyteidl_core_execution_proto_enumTypes[6].Descriptor()
 }
 
 func (QualityOfService_Tier) Type() protoreflect.EnumType {
-	return &file_flyteidl_core_execution_proto_enumTypes[5]
+	return &file_flyteidl_core_execution_proto_enumTypes[6]
 }
 
 func (x QualityOfService_Tier) Number() protoreflect.EnumNumber {
@@ -590,6 +642,7 @@ type TaskLog struct {
 	Ttl              *durationpb.Duration  `protobuf:"bytes,4,opt,name=ttl,proto3" json:"ttl,omitempty"`
 	ShowWhilePending bool                  `protobuf:"varint,5,opt,name=ShowWhilePending,proto3" json:"ShowWhilePending,omitempty"`
 	HideOnceFinished bool                  `protobuf:"varint,6,opt,name=HideOnceFinished,proto3" json:"HideOnceFinished,omitempty"`
+	LinkType         TaskLog_LinkType      `protobuf:"varint,7,opt,name=link_type,json=linkType,proto3,enum=flyteidl.core.TaskLog_LinkType" json:"link_type,omitempty"`
 }
 
 func (x *TaskLog) Reset() {
@@ -664,6 +717,13 @@ func (x *TaskLog) GetHideOnceFinished() bool {
 		return x.HideOnceFinished
 	}
 	return false
+}
+
+func (x *TaskLog) GetLinkType() TaskLog_LinkType {
+	if x != nil {
+		return x.LinkType
+	}
+	return TaskLog_EXTERNAL
 }
 
 // Contains metadata required to identify logs produces by a set of pods
@@ -1099,7 +1159,7 @@ var file_flyteidl_core_execution_proto_rawDesc = []byte{
 	0x52, 0x04, 0x6b, 0x69, 0x6e, 0x64, 0x22, 0x2e, 0x0a, 0x09, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x4b,
 	0x69, 0x6e, 0x64, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00,
 	0x12, 0x08, 0x0a, 0x04, 0x55, 0x53, 0x45, 0x52, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x59,
-	0x53, 0x54, 0x45, 0x4d, 0x10, 0x02, 0x22, 0xb2, 0x02, 0x0a, 0x07, 0x54, 0x61, 0x73, 0x6b, 0x4c,
+	0x53, 0x54, 0x45, 0x4d, 0x10, 0x02, 0x22, 0xa2, 0x03, 0x0a, 0x07, 0x54, 0x61, 0x73, 0x6b, 0x4c,
 	0x6f, 0x67, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x69, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x03, 0x75, 0x72, 0x69, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x4b, 0x0a, 0x0e, 0x6d, 0x65, 0x73, 0x73,
@@ -1115,10 +1175,17 @@ var file_flyteidl_core_execution_proto_rawDesc = []byte{
 	0x6f, 0x77, 0x57, 0x68, 0x69, 0x6c, 0x65, 0x50, 0x65, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x12, 0x2a,
 	0x0a, 0x10, 0x48, 0x69, 0x64, 0x65, 0x4f, 0x6e, 0x63, 0x65, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68,
 	0x65, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x10, 0x48, 0x69, 0x64, 0x65, 0x4f, 0x6e,
-	0x63, 0x65, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x65, 0x64, 0x22, 0x2f, 0x0a, 0x0d, 0x4d, 0x65,
-	0x73, 0x73, 0x61, 0x67, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x0b, 0x0a, 0x07, 0x55,
-	0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x43, 0x53, 0x56, 0x10,
-	0x01, 0x12, 0x08, 0x0a, 0x04, 0x4a, 0x53, 0x4f, 0x4e, 0x10, 0x02, 0x22, 0x68, 0x0a, 0x0a, 0x4c,
+	0x63, 0x65, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x65, 0x64, 0x12, 0x3c, 0x0a, 0x09, 0x6c, 0x69,
+	0x6e, 0x6b, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1f, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x54, 0x61,
+	0x73, 0x6b, 0x4c, 0x6f, 0x67, 0x2e, 0x4c, 0x69, 0x6e, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x52, 0x08,
+	0x6c, 0x69, 0x6e, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x22, 0x2f, 0x0a, 0x0d, 0x4d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b,
+	0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x43, 0x53, 0x56, 0x10, 0x01, 0x12,
+	0x08, 0x0a, 0x04, 0x4a, 0x53, 0x4f, 0x4e, 0x10, 0x02, 0x22, 0x30, 0x0a, 0x08, 0x4c, 0x69, 0x6e,
+	0x6b, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0c, 0x0a, 0x08, 0x45, 0x58, 0x54, 0x45, 0x52, 0x4e, 0x41,
+	0x4c, 0x10, 0x00, 0x12, 0x0d, 0x0a, 0x09, 0x44, 0x41, 0x53, 0x48, 0x42, 0x4f, 0x41, 0x52, 0x44,
+	0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x49, 0x44, 0x45, 0x10, 0x02, 0x22, 0x68, 0x0a, 0x0a, 0x4c,
 	0x6f, 0x67, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x12, 0x30, 0x0a, 0x04, 0x70, 0x6f, 0x64,
 	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
 	0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x64, 0x4c, 0x6f, 0x67, 0x43, 0x6f,
@@ -1206,7 +1273,7 @@ func file_flyteidl_core_execution_proto_rawDescGZIP() []byte {
 	return file_flyteidl_core_execution_proto_rawDescData
 }
 
-var file_flyteidl_core_execution_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_flyteidl_core_execution_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_flyteidl_core_execution_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_flyteidl_core_execution_proto_goTypes = []interface{}{
 	(WorkflowExecution_Phase)(0),            // 0: flyteidl.core.WorkflowExecution.Phase
@@ -1214,39 +1281,41 @@ var file_flyteidl_core_execution_proto_goTypes = []interface{}{
 	(TaskExecution_Phase)(0),                // 2: flyteidl.core.TaskExecution.Phase
 	(ExecutionError_ErrorKind)(0),           // 3: flyteidl.core.ExecutionError.ErrorKind
 	(TaskLog_MessageFormat)(0),              // 4: flyteidl.core.TaskLog.MessageFormat
-	(QualityOfService_Tier)(0),              // 5: flyteidl.core.QualityOfService.Tier
-	(*WorkflowExecution)(nil),               // 6: flyteidl.core.WorkflowExecution
-	(*NodeExecution)(nil),                   // 7: flyteidl.core.NodeExecution
-	(*TaskExecution)(nil),                   // 8: flyteidl.core.TaskExecution
-	(*ExecutionError)(nil),                  // 9: flyteidl.core.ExecutionError
-	(*TaskLog)(nil),                         // 10: flyteidl.core.TaskLog
-	(*LogContext)(nil),                      // 11: flyteidl.core.LogContext
-	(*PodLogContext)(nil),                   // 12: flyteidl.core.PodLogContext
-	(*ContainerContext)(nil),                // 13: flyteidl.core.ContainerContext
-	(*QualityOfServiceSpec)(nil),            // 14: flyteidl.core.QualityOfServiceSpec
-	(*QualityOfService)(nil),                // 15: flyteidl.core.QualityOfService
-	(*ContainerContext_ProcessContext)(nil), // 16: flyteidl.core.ContainerContext.ProcessContext
-	(*durationpb.Duration)(nil),             // 17: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),           // 18: google.protobuf.Timestamp
+	(TaskLog_LinkType)(0),                   // 5: flyteidl.core.TaskLog.LinkType
+	(QualityOfService_Tier)(0),              // 6: flyteidl.core.QualityOfService.Tier
+	(*WorkflowExecution)(nil),               // 7: flyteidl.core.WorkflowExecution
+	(*NodeExecution)(nil),                   // 8: flyteidl.core.NodeExecution
+	(*TaskExecution)(nil),                   // 9: flyteidl.core.TaskExecution
+	(*ExecutionError)(nil),                  // 10: flyteidl.core.ExecutionError
+	(*TaskLog)(nil),                         // 11: flyteidl.core.TaskLog
+	(*LogContext)(nil),                      // 12: flyteidl.core.LogContext
+	(*PodLogContext)(nil),                   // 13: flyteidl.core.PodLogContext
+	(*ContainerContext)(nil),                // 14: flyteidl.core.ContainerContext
+	(*QualityOfServiceSpec)(nil),            // 15: flyteidl.core.QualityOfServiceSpec
+	(*QualityOfService)(nil),                // 16: flyteidl.core.QualityOfService
+	(*ContainerContext_ProcessContext)(nil), // 17: flyteidl.core.ContainerContext.ProcessContext
+	(*durationpb.Duration)(nil),             // 18: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),           // 19: google.protobuf.Timestamp
 }
 var file_flyteidl_core_execution_proto_depIdxs = []int32{
 	3,  // 0: flyteidl.core.ExecutionError.kind:type_name -> flyteidl.core.ExecutionError.ErrorKind
 	4,  // 1: flyteidl.core.TaskLog.message_format:type_name -> flyteidl.core.TaskLog.MessageFormat
-	17, // 2: flyteidl.core.TaskLog.ttl:type_name -> google.protobuf.Duration
-	12, // 3: flyteidl.core.LogContext.pods:type_name -> flyteidl.core.PodLogContext
-	13, // 4: flyteidl.core.PodLogContext.containers:type_name -> flyteidl.core.ContainerContext
-	13, // 5: flyteidl.core.PodLogContext.init_containers:type_name -> flyteidl.core.ContainerContext
-	16, // 6: flyteidl.core.ContainerContext.process:type_name -> flyteidl.core.ContainerContext.ProcessContext
-	17, // 7: flyteidl.core.QualityOfServiceSpec.queueing_budget:type_name -> google.protobuf.Duration
-	5,  // 8: flyteidl.core.QualityOfService.tier:type_name -> flyteidl.core.QualityOfService.Tier
-	14, // 9: flyteidl.core.QualityOfService.spec:type_name -> flyteidl.core.QualityOfServiceSpec
-	18, // 10: flyteidl.core.ContainerContext.ProcessContext.container_start_time:type_name -> google.protobuf.Timestamp
-	18, // 11: flyteidl.core.ContainerContext.ProcessContext.container_end_time:type_name -> google.protobuf.Timestamp
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	18, // 2: flyteidl.core.TaskLog.ttl:type_name -> google.protobuf.Duration
+	5,  // 3: flyteidl.core.TaskLog.link_type:type_name -> flyteidl.core.TaskLog.LinkType
+	13, // 4: flyteidl.core.LogContext.pods:type_name -> flyteidl.core.PodLogContext
+	14, // 5: flyteidl.core.PodLogContext.containers:type_name -> flyteidl.core.ContainerContext
+	14, // 6: flyteidl.core.PodLogContext.init_containers:type_name -> flyteidl.core.ContainerContext
+	17, // 7: flyteidl.core.ContainerContext.process:type_name -> flyteidl.core.ContainerContext.ProcessContext
+	18, // 8: flyteidl.core.QualityOfServiceSpec.queueing_budget:type_name -> google.protobuf.Duration
+	6,  // 9: flyteidl.core.QualityOfService.tier:type_name -> flyteidl.core.QualityOfService.Tier
+	15, // 10: flyteidl.core.QualityOfService.spec:type_name -> flyteidl.core.QualityOfServiceSpec
+	19, // 11: flyteidl.core.ContainerContext.ProcessContext.container_start_time:type_name -> google.protobuf.Timestamp
+	19, // 12: flyteidl.core.ContainerContext.ProcessContext.container_end_time:type_name -> google.protobuf.Timestamp
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_core_execution_proto_init() }
@@ -1397,7 +1466,7 @@ func file_flyteidl_core_execution_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_core_execution_proto_rawDesc,
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,

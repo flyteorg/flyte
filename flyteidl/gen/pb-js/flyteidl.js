@@ -14179,6 +14179,7 @@
                  * @property {google.protobuf.IDuration|null} [ttl] TaskLog ttl
                  * @property {boolean|null} [ShowWhilePending] TaskLog ShowWhilePending
                  * @property {boolean|null} [HideOnceFinished] TaskLog HideOnceFinished
+                 * @property {flyteidl.core.TaskLog.LinkType|null} [linkType] TaskLog linkType
                  */
     
                 /**
@@ -14245,6 +14246,14 @@
                 TaskLog.prototype.HideOnceFinished = false;
     
                 /**
+                 * TaskLog linkType.
+                 * @member {flyteidl.core.TaskLog.LinkType} linkType
+                 * @memberof flyteidl.core.TaskLog
+                 * @instance
+                 */
+                TaskLog.prototype.linkType = 0;
+    
+                /**
                  * Creates a new TaskLog instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskLog
@@ -14280,6 +14289,8 @@
                         writer.uint32(/* id 5, wireType 0 =*/40).bool(message.ShowWhilePending);
                     if (message.HideOnceFinished != null && message.hasOwnProperty("HideOnceFinished"))
                         writer.uint32(/* id 6, wireType 0 =*/48).bool(message.HideOnceFinished);
+                    if (message.linkType != null && message.hasOwnProperty("linkType"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).int32(message.linkType);
                     return writer;
                 };
     
@@ -14318,6 +14329,9 @@
                             break;
                         case 6:
                             message.HideOnceFinished = reader.bool();
+                            break;
+                        case 7:
+                            message.linkType = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14364,6 +14378,15 @@
                     if (message.HideOnceFinished != null && message.hasOwnProperty("HideOnceFinished"))
                         if (typeof message.HideOnceFinished !== "boolean")
                             return "HideOnceFinished: boolean expected";
+                    if (message.linkType != null && message.hasOwnProperty("linkType"))
+                        switch (message.linkType) {
+                        default:
+                            return "linkType: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                            break;
+                        }
                     return null;
                 };
     
@@ -14380,6 +14403,22 @@
                     values[valuesById[0] = "UNKNOWN"] = 0;
                     values[valuesById[1] = "CSV"] = 1;
                     values[valuesById[2] = "JSON"] = 2;
+                    return values;
+                })();
+    
+                /**
+                 * LinkType enum.
+                 * @name flyteidl.core.TaskLog.LinkType
+                 * @enum {string}
+                 * @property {number} EXTERNAL=0 EXTERNAL value
+                 * @property {number} DASHBOARD=1 DASHBOARD value
+                 * @property {number} IDE=2 IDE value
+                 */
+                TaskLog.LinkType = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "EXTERNAL"] = 0;
+                    values[valuesById[1] = "DASHBOARD"] = 1;
+                    values[valuesById[2] = "IDE"] = 2;
                     return values;
                 })();
     

@@ -5,13 +5,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func getClusterResourceAttributeSetup() {

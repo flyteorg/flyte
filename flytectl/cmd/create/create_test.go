@@ -4,9 +4,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/stretchr/testify/assert"
 )
 
 const testDataFolder = "../testdata/"

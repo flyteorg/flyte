@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"sigs.k8s.io/yaml"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"sigs.k8s.io/yaml"
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,

@@ -1190,8 +1190,9 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "Ray Dashboard",
-					Uri:  "http://test/generated-name",
+					Name:     "Ray Dashboard",
+					Uri:      "http://test/generated-name",
+					LinkType: core.TaskLog_DASHBOARD,
 				},
 			},
 		},
@@ -1243,8 +1244,9 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
-					Name: "Ray Dashboard",
-					Uri:  "http://test/generated-name",
+					Name:     "Ray Dashboard",
+					Uri:      "http://test/generated-name",
+					LinkType: core.TaskLog_DASHBOARD,
 				},
 			},
 		},

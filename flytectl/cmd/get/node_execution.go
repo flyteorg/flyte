@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/disiqueira/gotree"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"

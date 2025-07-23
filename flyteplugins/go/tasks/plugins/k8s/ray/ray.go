@@ -620,6 +620,7 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 	if dashboardURLTemplate != nil &&
 		rayJob.Status.DashboardURL != "" &&
 		rayJob.Status.JobStatus == rayv1.JobStatusRunning {
+		dashboardURLTemplate.LinkType = core.TaskLog_DASHBOARD.String()
 		dashboardURLOutput, err := dashboardURLTemplate.GetTaskLogs(input)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate Ray dashboard link. Error: %w", err)

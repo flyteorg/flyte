@@ -19,7 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ inputs.go-version }}

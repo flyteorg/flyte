@@ -10376,6 +10376,16 @@
       "default": "DEFAULT",
       "description": "Includes the broad category of machine used for this specific task execution.\n\n - DEFAULT: The default instance class configured for the flyte application platform.\n - INTERRUPTIBLE: The instance class configured for interruptible tasks."
     },
+    "TaskLogLinkType": {
+      "type": "string",
+      "enum": [
+        "EXTERNAL",
+        "DASHBOARD",
+        "IDE"
+      ],
+      "default": "EXTERNAL",
+      "description": " - EXTERNAL: The link for task log. For example, the aws cloudwatch logs, gcp stackdriver logs, etc.\n - DASHBOARD: The link for spark UI, ray dashboard, etc.\n - IDE: The link for vscode or other IDEs."
+    },
     "TaskLogMessageFormat": {
       "type": "string",
       "enum": [
@@ -14750,6 +14760,9 @@
         },
         "HideOnceFinished": {
           "type": "boolean"
+        },
+        "link_type": {
+          "$ref": "#/definitions/TaskLogLinkType"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"

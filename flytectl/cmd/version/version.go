@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/spf13/cobra"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/github"
 	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.

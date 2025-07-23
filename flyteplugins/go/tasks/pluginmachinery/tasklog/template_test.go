@@ -509,6 +509,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 					{
 						Uri:           "vscode://flyteinteractive:1234/my-pod-name",
 						MessageFormat: core.TaskLog_JSON,
+						LinkType:      core.TaskLog_IDE,
 					},
 				},
 			},
@@ -540,6 +541,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 						MessageFormat:    core.TaskLog_JSON,
 						ShowWhilePending: true,
 						HideOnceFinished: true,
+						LinkType:         core.TaskLog_IDE,
 					},
 				},
 			},

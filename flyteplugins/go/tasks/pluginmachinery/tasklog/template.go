@@ -232,6 +232,11 @@ func getDynamicLogLinkTypes(input Input) []string {
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	templateVars := input.templateVars()
+	linkType := core.TaskLog_EXTERNAL
+	if len(p.LinkType) != 0 {
+		linkType = core.TaskLog_LinkType(core.TaskLog_LinkType_value[strings.ToUpper(p.LinkType)])
+	}
+
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
@@ -240,6 +245,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			MessageFormat:    p.MessageFormat,
 			ShowWhilePending: p.ShowWhilePending,
 			HideOnceFinished: p.HideOnceFinished,
+			LinkType:         linkType,
 		})
 	}
 
@@ -253,12 +259,17 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 						}
 					}
 				}
+				if dynamicLogLinkType == vscode {
+					linkType = core.TaskLog_IDE
+				}
+
 				taskLogs = append(taskLogs, &core.TaskLog{
 					Uri:              replaceAll(dynamicTemplateURI, templateVars),
 					Name:             p.DisplayName + input.LogName,
 					MessageFormat:    p.MessageFormat,
 					ShowWhilePending: p.ShowWhilePending,
 					HideOnceFinished: p.HideOnceFinished,
+					LinkType:         linkType,
 				})
 			}
 		}

@@ -8,15 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/spf13/cobra"
-
 	initConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/config"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
+	"github.com/spf13/cobra"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using Sphinx.

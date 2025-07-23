@@ -4,15 +4,14 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/github"
 	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
