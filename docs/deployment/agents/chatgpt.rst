@@ -4,7 +4,7 @@ ChatGPT agent
 =================
 
 This guide provides an overview of how to set up the ChatGPT agent in your Flyte deployment.
-Please note that you have to set up the OpenAI API key in the agent server to to run ChatGPT tasks.
+Please note that you have to set up the OpenAI API key in the agent server to run ChatGPT tasks.
 
 Specify agent configuration
 ----------------------------
@@ -37,7 +37,7 @@ Specify agent configuration
         plugins:
           agent-service:
             # Configuring the timeout is optional.
-            # Tasks like using ChatGPT with a large model might require a longer time, 
+            # Tasks like using ChatGPT with a large model might require a longer time,
             # so we have the option to adjust the timeout setting here.
             defaultAgent:
               timeouts:
@@ -69,7 +69,7 @@ Specify agent configuration
             plugins:
               agent-service:
                 # Configuring the timeout is optional.
-                # Tasks like using ChatGPT with a large model might require a longer time, 
+                # Tasks like using ChatGPT with a large model might require a longer time,
                 # so we have the option to adjust the timeout setting here.
                 defaultAgent:
                   timeouts:
