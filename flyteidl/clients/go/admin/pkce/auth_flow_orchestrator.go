@@ -58,7 +58,7 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 	values.Add(nonceKey, nonces)
 	values.Add(codeChallengeKey, pkceCodeChallenge)
 	values.Add(codeChallengeMethodKey, codeChallengeMethodVal)
-	urlToOpen := fmt.Sprintf("%s&%s", f.ClientConfig.AuthCodeURL(""), values.Encode())
+	urlToOpen := fmt.Sprintf("%s&%s", f.ClientConfig.AuthCodeURL(stateString), values.Encode())
 
 	serveMux := http.NewServeMux()
 	server := &http.Server{Addr: redirectURL.Host, Handler: serveMux, ReadHeaderTimeout: 0}
