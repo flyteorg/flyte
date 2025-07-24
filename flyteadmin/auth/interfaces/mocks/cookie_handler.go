@@ -251,3 +251,35 @@ func (_m *CookieHandler) SetUserInfoCookie(ctx context.Context, writer http.Resp
 
 	return r0
 }
+
+type CookieHandler_SetUserInfoCookieRaw struct {
+	*mock.Call
+}
+
+func (_m CookieHandler_SetUserInfoCookieRaw) Return(_a0 error) *CookieHandler_SetUserInfoCookieRaw {
+	return &CookieHandler_SetUserInfoCookieRaw{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *CookieHandler) OnSetUserInfoCookieRaw(ctx context.Context, writer http.ResponseWriter, userInfoStr string) *CookieHandler_SetUserInfoCookieRaw {
+	c_call := _m.On("SetUserInfoCookieRaw", ctx, writer, userInfoStr)
+	return &CookieHandler_SetUserInfoCookieRaw{Call: c_call}
+}
+
+func (_m *CookieHandler) OnSetUserInfoCookieRawMatch(matchers ...interface{}) *CookieHandler_SetUserInfoCookieRaw {
+	c_call := _m.On("SetUserInfoCookieRaw", matchers...)
+	return &CookieHandler_SetUserInfoCookieRaw{Call: c_call}
+}
+
+// SetUserInfoCookieRaw provides a mock function with given fields: ctx, writer, userInfoStr
+func (_m *CookieHandler) SetUserInfoCookieRaw(ctx context.Context, writer http.ResponseWriter, userInfoStr string) error {
+	ret := _m.Called(ctx, writer, userInfoStr)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, http.ResponseWriter, string) error); ok {
+		r0 = rf(ctx, writer, userInfoStr)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}

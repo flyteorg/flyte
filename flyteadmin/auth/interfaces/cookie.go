@@ -16,6 +16,7 @@ type CookieHandler interface {
 	RetrieveTokenValues(ctx context.Context, request *http.Request) (idToken, accessToken, refreshToken string, err error)
 
 	SetUserInfoCookie(ctx context.Context, writer http.ResponseWriter, userInfo *service.UserInfoResponse) error
+	SetUserInfoCookieRaw(ctx context.Context, writer http.ResponseWriter, userInfoStr string) error
 	RetrieveUserInfo(ctx context.Context, request *http.Request) (*service.UserInfoResponse, error)
 
 	// SetAuthCodeCookie stores, in a cookie, the /authorize request url initiated by an app before executing OIdC protocol.

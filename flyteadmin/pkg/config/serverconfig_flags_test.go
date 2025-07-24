@@ -295,6 +295,20 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_security.experimentalRefreshCookiesInlineEnabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("security.experimentalRefreshCookiesInlineEnabled", testValue)
+			if vBool, err := cmdFlags.GetBool("security.experimentalRefreshCookiesInlineEnabled"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.Security.ExperimentalRefreshCookiesInlineEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_grpc.port", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

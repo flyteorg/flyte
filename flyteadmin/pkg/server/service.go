@@ -214,12 +214,24 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		// Add HTTP handlers for OAuth2 endpoints
 		authzserver.RegisterHandlers(mux, authCtx)
 
-		// This option translates HTTP authorization data (cookies) into a gRPC metadata field
-		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRequestCookieToMetadataHandler(authCtx)))
+		if cfg.Security.ExperimentalRefreshCookiesInlineEnabled {
+			// This option translates HTTP authorization data (cookies) into a gRPC metadata field and refreshes them if
+			// needed
+			logger.Infof(ctx, "Using experimental inline refresh cookies feature")
+			gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRefreshedRequestCookieToMetadataHandler(authCtx)))
+		} else {
+			// This option translates HTTP authorization data (cookies) into a gRPC metadata field
+			gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRequestCookieToMetadataHandler(authCtx)))
+		}
 
-		// In an attempt to be able to selectively enforce whether or not authentication is required, we're going to tag
+		// In an attempt to be able to selectively enforce whether authentication is required, we're going to tag
 		// the requests that come from the HTTP gateway. See the enforceHttp/Grpc options for more information.
 		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPMetadataTaggingHandler()))
+
+		if cfg.Security.ExperimentalRefreshCookiesInlineEnabled {
+			// Refresh cookies if they are expired
+			gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetRefreshCookiesResponseHandler(authCtx)))
+		}
 	}
 
 	// Create the grpc-gateway server with the options specified

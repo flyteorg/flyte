@@ -71,6 +71,7 @@ func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte, domain 
 		SameSite: sameSiteMode,
 		HttpOnly: true,
 		Secure:   !config.GetConfig().Security.InsecureCookieHeader,
+		Path:     "/",
 	}, nil
 }
 

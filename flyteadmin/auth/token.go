@@ -142,3 +142,25 @@ func IdentityContextFromIDTokenToken(ctx context.Context, tokenStr, clientID str
 	return NewIdentityContext(idToken.Audience[0], idToken.Subject, "", idToken.IssuedAt,
 		sets.NewString(ScopeAll), userInfo, claims)
 }
+
+func NewOAuthTokenFromRaw(accessToken, refreshToken, idToken string) *oauth2.Token {
+	return (&oauth2.Token{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}).WithExtra(map[string]interface{}{
+		idTokenExtra: idToken,
+	})
+}
+
+func ExtractTokensFromOauthToken(token *oauth2.Token) (idToken, accessToken, refreshToken string, err error) {
+	if token == nil {
+		return "", "", "", errors.Errorf(ErrTokenNil, "Attempting to set cookies with nil token")
+	}
+
+	idTokenRaw, converted := token.Extra(idTokenExtra).(string)
+	if !converted {
+		return "", "", "", errors.Errorf(ErrNoIDToken, "Response does not contain an id_token.")
+	}
+
+	return idTokenRaw, token.AccessToken, token.RefreshToken, nil
+}

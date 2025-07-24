@@ -7,6 +7,10 @@ const (
 	CsrfFormKey                   = "state"
 	AuthorizationResponseCodeType = "code"
 	DefaultAuthorizationHeader    = "authorization"
+	GRPCMetaKeyAccessToken        = "access-token"
+	GRPCMetaKeyRefreshToken       = "refresh-token"
+	GRPCMetaKeyIDToken            = "id-token"
+	GRPCMetaKeyUserInfo           = "user-info"
 	BearerScheme                  = "Bearer"
 	IDTokenScheme                 = "IDToken"
 	// Add the -bin suffix so that the header value is automatically base64 encoded

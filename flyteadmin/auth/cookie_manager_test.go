@@ -59,9 +59,9 @@ func TestCookieManager(t *testing.T) {
 		assert.NoError(t, err)
 		fmt.Println(w.Header().Get("Set-Cookie"))
 		c := w.Result().Cookies()
-		assert.Equal(t, "flyte_at_1", c[0].Name)
-		assert.Equal(t, "flyte_at_2", c[1].Name)
-		assert.Equal(t, "flyte_idt", c[2].Name)
+		assert.Equal(t, "flyte_idt", c[0].Name)
+		assert.Equal(t, "flyte_at_1", c[1].Name)
+		assert.Equal(t, "flyte_at_2", c[2].Name)
 		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
 
@@ -70,7 +70,7 @@ func TestCookieManager(t *testing.T) {
 
 		err = manager.SetTokenCookies(ctx, w, nil)
 
-		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Attempting to set cookies with nil token")
+		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Unable to read all token values from oauth token: [EMPTY_OAUTH_TOKEN] Attempting to set cookies with nil token")
 	})
 
 	t.Run("set_long_token_cookies", func(t *testing.T) {
@@ -140,9 +140,9 @@ func TestCookieManager(t *testing.T) {
 		assert.NoError(t, err)
 		fmt.Println(w.Header().Get("Set-Cookie"))
 		c := w.Result().Cookies()
-		assert.Equal(t, "flyte_at_1", c[0].Name)
-		assert.Equal(t, "flyte_at_2", c[1].Name)
-		assert.Equal(t, "flyte_idt", c[2].Name)
+		assert.Equal(t, "flyte_idt", c[0].Name)
+		assert.Equal(t, "flyte_at_1", c[1].Name)
+		assert.Equal(t, "flyte_at_2", c[2].Name)
 		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
 

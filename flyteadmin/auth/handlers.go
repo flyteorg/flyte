@@ -56,7 +56,7 @@ func (e *PreRedirectHookError) Error() string {
 type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
 type LogoutHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) error
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
-type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m proto.Message) error
+type ForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m proto.Message) error
 
 type AuthenticatedClientMeta struct {
 	ClientIds     []string
@@ -67,7 +67,7 @@ type AuthenticatedClientMeta struct {
 
 func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer, authCtx interfaces.AuthenticationContext, pluginRegistry *plugins.Registry) {
 	// Add HTTP handlers for OAuth2 endpoints
-	handler.HandleFunc("/login", RefreshTokensIfExists(ctx, authCtx,
+	handler.HandleFunc("/login", RefreshTokensIfNeededHandler(ctx, authCtx,
 		GetLoginHandler(ctx, authCtx)))
 	handler.HandleFunc("/callback", GetCallbackHandler(ctx, authCtx, pluginRegistry))
 
@@ -78,56 +78,70 @@ func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer,
 	handler.HandleFunc("/logout", GetLogoutEndpointHandler(ctx, authCtx, pluginRegistry))
 }
 
-// Look for access token and refresh token, if both are present and the access token is expired, then attempt to
-// refresh. Otherwise do nothing and proceed to the next handler. If successfully refreshed, proceed to the landing page.
-func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.AuthenticationContext, authHandler http.HandlerFunc) http.HandlerFunc {
+func RefreshTokensIfNeeded(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request) (
+	token *oauth2.Token, userInfo *service.UserInfoResponse, refreshed bool, err error) {
 
-	return func(writer http.ResponseWriter, request *http.Request) {
-		ctx = context.WithValue(ctx, oauth2.HTTPClient, authCtx.GetHTTPClient())
-		// Since we only do one thing if there are no errors anywhere along the chain, we can save code by just
-		// using one variable and checking for errors at the end.
-		idToken, accessToken, refreshToken, err := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
-		if err != nil {
-			logger.Errorf(ctx, "Failed to retrieve tokens from request, redirecting to login handler. Error: %s", err)
-			authHandler(writer, request)
-			return
-		}
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, authCtx.GetHTTPClient())
+	// Since we only do one thing if there are no errors anywhere along the chain, we can save code by just
+	// using one variable and checking for errors at the end.
+	idToken, accessToken, refreshToken, err := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+	if err != nil {
+		return nil, nil, false, fmt.Errorf("failed to retrieve tokens from request, redirecting to login handler. Error: %s", err)
+	}
 
-		_, err = ParseIDTokenAndValidate(ctx, authCtx.Options().UserAuth.OpenID.ClientID, idToken, authCtx.OidcProvider())
-		if err != nil && errors.IsCausedBy(err, ErrTokenExpired) && len(refreshToken) > 0 {
+	_, err = ParseIDTokenAndValidate(ctx, authCtx.Options().UserAuth.OpenID.ClientID, idToken, authCtx.OidcProvider())
+	if err != nil {
+		if errors.IsCausedBy(err, ErrTokenExpired) && len(refreshToken) > 0 {
 			logger.Debugf(ctx, "Expired id token found, attempting to refresh")
 			newToken, err := GetRefreshedToken(ctx, authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())), accessToken, refreshToken)
 			if err != nil {
-				logger.Infof(ctx, "Failed to refresh tokens. Restarting login flow. Error: %s", err)
-				authHandler(writer, request)
-				return
-			}
-
-			logger.Debugf(ctx, "Tokens are refreshed. Saving new tokens into cookies.")
-			err = authCtx.CookieManager().SetTokenCookies(ctx, writer, newToken)
-			if err != nil {
-				logger.Infof(ctx, "Failed to set token cookies. Restarting login flow. Error: %s", err)
-				authHandler(writer, request)
-				return
+				return nil, nil, false, fmt.Errorf("failed to refresh tokens. Error: %w", err)
 			}
 
 			userInfo, err := QueryUserInfoUsingAccessToken(ctx, request, authCtx, newToken.AccessToken)
 			if err != nil {
-				logger.Infof(ctx, "Failed to query user info. Restarting login flow. Error: %s", err)
+				return nil, nil, false, fmt.Errorf("failed to query user info. Error: %w", err)
+			}
+
+			return newToken, userInfo, true, nil
+		} else if err != nil {
+			return nil, nil, false, fmt.Errorf("failed to validate tokens. Error: %w", err)
+		} else {
+			logger.Infof(ctx, "Not refreshing tokens. Refresh Token length: %v, ParseID Token error: %v", len(refreshToken), err)
+		}
+	}
+
+	return NewOAuthTokenFromRaw(accessToken, refreshToken, idToken), nil, false, nil
+}
+
+// RefreshTokensIfNeededHandler looks for access token and refresh token, if both are present and the access token is
+// expired, then attempt to refresh. Otherwise, do nothing and proceed to the next handler. If successfully refreshed,
+// proceed to the landing page.
+func RefreshTokensIfNeededHandler(ctx context.Context, authCtx interfaces.AuthenticationContext, authHandler http.HandlerFunc) http.HandlerFunc {
+
+	return func(writer http.ResponseWriter, request *http.Request) {
+		newToken, userInfo, refreshed, err := RefreshTokensIfNeeded(ctx, authCtx, request)
+		if err != nil {
+			logger.Infof(ctx, "Failed to refresh tokens. Restarting login flow. Error: %s", err)
+			authHandler(writer, request)
+			return
+		}
+
+		if refreshed {
+			logger.Debugf(ctx, "Tokens are refreshed. Saving new tokens into cookies.")
+			err = authCtx.CookieManager().SetTokenCookies(ctx, writer, newToken)
+			if err != nil {
+				logger.Infof(ctx, "Failed to write tokens to response. Restarting login flow. Error: %s", err)
 				authHandler(writer, request)
 				return
 			}
 
 			err = authCtx.CookieManager().SetUserInfoCookie(ctx, writer, userInfo)
 			if err != nil {
-				logger.Infof(ctx, "Failed to set user info cookie. Restarting login flow. Error: %s", err)
+				logger.Infof(ctx, "Failed to write user info to response. Restarting login flow. Error: %s", err)
 				authHandler(writer, request)
 				return
 			}
-		} else if err != nil {
-			logger.Infof(ctx, "Failed to validate tokens. Restarting login flow. Error: %s", err)
-			authHandler(writer, request)
-			return
 		}
 
 		redirectURL := GetAuthFlowEndRedirect(ctx, authCtx, request)
@@ -319,7 +333,7 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
-			err := fmt.Errorf("id token err: %w, access token err: %w", fmt.Errorf("access token err: %w", accessTokenErr), idTokenErr)
+			err := fmt.Errorf("[id token err: %w] | [access token err: %w]", idTokenErr, accessTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 
@@ -345,7 +359,7 @@ func WithAuditFields(ctx context.Context, subject string, clientIds []string, to
 	})
 }
 
-// This is effectively middleware for the grpc gateway, it allows us to modify the translation between HTTP request
+// GetHTTPRequestCookieToMetadataHandler is effectively middleware for the grpc gateway, it allows us to modify the translation between HTTP request
 // and gRPC request. There are two potential sources for bearer tokens, it can come from an authorization header (not
 // yet implemented), or encrypted cookies. Note that when deploying behind Envoy, you have the option to look for a
 // configurable, non-standard header name. The token is extracted and turned into a metadata object which is then
@@ -385,14 +399,97 @@ func GetHTTPRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationCont
 		raw, err := json.Marshal(userInfo)
 		if err != nil {
 			logger.Infof(ctx, "Failed to marshal user info. Ignoring. Error: %v", err)
+
 		}
 
 		if len(raw) > 0 {
 			logger.Debugf(ctx, "Setting user info cookie [%s]", string(raw))
 			meta.Set(UserInfoMDKey, string(raw))
+
 		}
 
 		return meta
+	}
+}
+
+// GetHTTPRefreshedRequestCookieToMetadataHandler is effectively middleware for the grpc gateway, it allows us to modify the translation between HTTP request
+// and gRPC request. There are two potential sources for bearer tokens, it can come from an authorization header (not
+// yet implemented), or encrypted cookies. Note that when deploying behind Envoy, you have the option to look for a
+// configurable, non-standard header name. The token is extracted and turned into a metadata object which is then
+// attached to the request, from which the token is extracted later for verification.
+func GetHTTPRefreshedRequestCookieToMetadataHandler(authCtx interfaces.AuthenticationContext) HTTPRequestToMetadataAnnotator {
+	return func(ctx context.Context, request *http.Request) metadata.MD {
+		// TODO: Improve error handling
+		idToken, _, _, _ := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+		if len(idToken) == 0 {
+			// If no token was found in the cookies, look for an authorization header, starting with a potentially
+			// custom header set in the Config object
+			if len(authCtx.Options().HTTPAuthorizationHeader) > 0 {
+				header := authCtx.Options().HTTPAuthorizationHeader
+				// TODO: There may be a potential issue here when running behind a service mesh that uses the default Authorization
+				//       header. The grpc-gateway code will automatically translate the 'Authorization' header into the appropriate
+				//       metadata object so if two different tokens are presented, one with the default name and one with the
+				//       custom name, AuthFromMD will find the wrong one.
+				return metadata.MD{
+					DefaultAuthorizationHeader: []string{request.Header.Get(header)},
+				}
+			}
+
+			logger.Infof(ctx, "Could not find access token cookie while requesting %s", request.RequestURI)
+			return nil
+		}
+
+		// TODO (haytham): This looks bad, why are we doing this every single time?!
+		var rawUserInfoStr string
+		meta := metautils.ExtractIncoming(ctx)
+
+		newToken, userInfo, refreshed, err := RefreshTokensIfNeeded(ctx, authCtx, request)
+		if err != nil {
+			logger.Infof(ctx, "Failed to refresh tokens. Error: %s", err)
+		} else if refreshed {
+			logger.Infof(ctx, "Tokens are refreshed. Saving new tokens into grpc metadata.")
+			var accessToken, refreshToken string
+			idToken, accessToken, refreshToken, err = ExtractTokensFromOauthToken(newToken)
+			if err != nil {
+				logger.Infof(ctx, "Failed to convert id token from oauth2 token extra. Error: %v", err)
+			} else {
+				rawUserInfo, err := json.Marshal(userInfo)
+				if err != nil {
+					logger.Infof(ctx, "Failed to marshal user info. Ignoring. Error: %v", err)
+				}
+
+				logger.Infof(ctx, "Setting new tokens in grpc metadata.")
+				rawUserInfoStr = string(rawUserInfo)
+				meta.Set(GRPCMetaKeyIDToken, idToken)
+				meta.Set(GRPCMetaKeyAccessToken, accessToken)
+				meta.Set(GRPCMetaKeyRefreshToken, refreshToken)
+				meta.Set(GRPCMetaKeyUserInfo, rawUserInfoStr)
+			}
+		} else {
+			logger.Debugf(ctx, "Tokens are not refreshed.")
+			// If it's already fresh, read the user Info from cookies
+			userInfo, err = authCtx.CookieManager().RetrieveUserInfo(ctx, request)
+			if err != nil {
+				logger.Infof(ctx, "Failed to retrieve user info cookie. Ignoring. Error: %v", err)
+			}
+
+			rawUserInfo, err := json.Marshal(userInfo)
+			if err != nil {
+				logger.Infof(ctx, "Failed to marshal user info. Ignoring. Error: %v", err)
+			}
+
+			rawUserInfoStr = string(rawUserInfo)
+		}
+
+		// IDtoken is injected into grpc authorization metadata
+		meta.Set(DefaultAuthorizationHeader, fmt.Sprintf("%s %s", IDTokenScheme, idToken))
+
+		if len(rawUserInfoStr) > 0 {
+			logger.Debugf(ctx, "Setting user info in grpcMeta [%s]", rawUserInfoStr)
+			meta.Set(UserInfoMDKey, rawUserInfoStr)
+		}
+
+		return metadata.MD(meta)
 	}
 }
 
@@ -521,7 +618,43 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 	}
 }
 
-func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
+func GetRefreshCookiesResponseHandler(authCtx interfaces.AuthenticationContext) ForwardResponseHandler {
+	return func(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
+		meta := metautils.ExtractOutgoing(ctx)
+
+		if logger.IsLoggable(ctx, logger.DebugLevel) {
+			logger.Debugf(ctx, "ServerMetadata received in GetRefreshCookiesResponseHandler: [%+v]", meta)
+		}
+
+		idToken := meta.Get(GRPCMetaKeyIDToken)
+		accessToken := meta.Get(GRPCMetaKeyAccessToken)
+		refreshToken := meta.Get(GRPCMetaKeyRefreshToken)
+		userInfoStr := meta.Get(GRPCMetaKeyUserInfo)
+
+		if len(idToken) > 0 {
+			logger.Infof(ctx, "Setting new tokens in cookies.")
+			token := NewOAuthTokenFromRaw(accessToken, refreshToken, idToken)
+			err := authCtx.CookieManager().SetTokenCookies(ctx, w, token)
+			if err != nil {
+				logger.Errorf(ctx, "Error setting encrypted JWT cookie %s", err)
+				return status.Errorf(codes.Internal, "failed to set token cookies: %v", err)
+			}
+
+			if len(userInfoStr) > 0 {
+				logger.Infof(ctx, "Setting a new user info cookie.")
+				err = authCtx.CookieManager().SetUserInfoCookieRaw(ctx, w, userInfoStr)
+				if err != nil {
+					logger.Errorf(ctx, "Error setting encrypted user info cookie. Error: %v", err)
+					return status.Errorf(codes.Internal, "failed to set user info cookie: %v", err)
+				}
+			}
+		}
+
+		return nil
+	}
+}
+
+func GetUserInfoForwardResponseHandler() ForwardResponseHandler {
 	return func(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {

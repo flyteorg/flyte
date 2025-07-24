@@ -105,7 +105,11 @@ func (c CookieManager) SetUserInfoCookie(ctx context.Context, writer http.Respon
 		return fmt.Errorf("failed to marshal user info to store in a cookie. Error: %w", err)
 	}
 
-	userInfoCookie, err := NewSecureCookie(userInfoCookieName, string(raw), c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	return c.SetUserInfoCookieRaw(ctx, writer, string(raw))
+}
+
+func (c CookieManager) SetUserInfoCookieRaw(ctx context.Context, writer http.ResponseWriter, userInfoStr string) error {
+	userInfoCookie, err := NewSecureCookie(userInfoCookieName, userInfoStr, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
 	if err != nil {
 		logger.Errorf(ctx, "Error generating encrypted user info cookie %s", err)
 		return err
@@ -114,7 +118,6 @@ func (c CookieManager) SetUserInfoCookie(ctx context.Context, writer http.Respon
 	http.SetCookie(writer, &userInfoCookie)
 
 	return nil
-
 }
 
 func (c CookieManager) RetrieveUserInfo(ctx context.Context, request *http.Request) (*service.UserInfoResponse, error) {
@@ -174,33 +177,28 @@ func (c CookieManager) StoreAccessToken(ctx context.Context, accessToken string,
 }
 
 func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) error {
-	if token == nil {
-		logger.Errorf(ctx, "Attempting to set cookies with nil token")
-		return errors.Errorf(ErrTokenNil, "Attempting to set cookies with nil token")
+	idToken, accessToken, refreshToken, err := ExtractTokensFromOauthToken(token)
+	if err != nil {
+		logger.Errorf(ctx, "Unable to read all token values from oauth token: %s", err)
+		return errors.Errorf(ErrTokenNil, "Unable to read all token values from oauth token: %s", err)
 	}
 
-	err := c.StoreAccessToken(ctx, token.AccessToken, writer)
+	idCookie, err := NewSecureCookie(idTokenCookieName, idToken, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	if err != nil {
+		logger.Errorf(ctx, "Error generating encrypted id token cookie %s", err)
+		return err
+	}
 
+	http.SetCookie(writer, &idCookie)
+
+	err = c.StoreAccessToken(ctx, accessToken, writer)
 	if err != nil {
 		logger.Errorf(ctx, "Error storing access token %s", err)
 		return err
 	}
 
-	if idTokenRaw, converted := token.Extra(idTokenExtra).(string); converted {
-		idCookie, err := NewSecureCookie(idTokenCookieName, idTokenRaw, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
-		if err != nil {
-			logger.Errorf(ctx, "Error generating encrypted id token cookie %s", err)
-			return err
-		}
-
-		http.SetCookie(writer, &idCookie)
-	} else {
-		logger.Errorf(ctx, "Response does not contain an id_token.")
-		return errors.Errorf(ErrNoIDToken, "Response does not contain an id_token.")
-	}
-
 	// Set the refresh cookie if there is a refresh token
-	if token.RefreshToken != "" {
+	if len(refreshToken) > 0 {
 		refreshCookie, err := NewSecureCookie(refreshTokenCookieName, token.RefreshToken, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
 		if err != nil {
 			logger.Errorf(ctx, "Error generating encrypted refresh token cookie %s", err)
@@ -212,7 +210,7 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 	return nil
 }
 
-func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
+func (c CookieManager) getLogoutCookie(name string) *http.Cookie {
 	return &http.Cookie{
 		Name:     name,
 		Value:    "",

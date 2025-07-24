@@ -87,6 +87,8 @@ type ServerSecurityOptions struct {
 	// By default, the server will allow Accept, Accept-Language, Content-Language, and Content-Type.
 	// DeprecatedUser this setting to add any additional headers which are needed
 	AllowedHeaders []string `json:"allowedHeaders"`
+
+	ExperimentalRefreshCookiesInlineEnabled bool `json:"experimentalRefreshCookiesInlineEnabled" pflag:",If true, the server will return cookies in the response body of any rest endpoint."`
 }
 
 type SslOptions struct {

@@ -395,6 +395,8 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	mockAuthCtx := mocks.AuthenticationContext{}
 	mockAuthCtx.OnCookieManager().Return(&cookieManager)
 	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.OnGetHTTPClient().Return(&http.Client{})
+	mockAuthCtx.OnOidcProvider().Return(&oidc.Provider{})
 	handler := GetHTTPRequestCookieToMetadataHandler(&mockAuthCtx)
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
