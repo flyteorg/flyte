@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
@@ -27,6 +28,7 @@ type Key struct {
 	Identifier           core.Identifier
 	CacheVersion         string
 	CacheIgnoreInputVars []string
+	CacheTtl             *durationpb.Duration
 	TypedInterface       core.TypedInterface
 	InputReader          io.InputReader
 }
