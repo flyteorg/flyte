@@ -42,6 +42,8 @@ const (
 	OrganizationLabel = "organization"
 	EmptySecretScope  = ""
 
+	GroupKeyDelimiter = "/"
+
 	SecretNotFoundErrorFormat                                   = "secret %v not found in the secret manager"                                // #nosec G101
 	SecretReadFailureErrorFormat                                = "secret %v failed to be read from secret manager"                          // #nosec G101
 	SecretNilErrorFormat                                        = "secret %v read as empty from the secret manager"                          // #nosec G101
@@ -62,12 +64,12 @@ const (
 // Files will be mounted on /etc/flyte/secrets/<SecretGroup>/<SecretKey>
 type EmbeddedSecretManagerInjector struct {
 	cfg                config.EmbeddedSecretManagerConfig
-	secretFetcher      SecretFetcher
+	secretFetchers     []SecretFetcher
 	k8sClient          client.Client
 	referenceNamespace string
 }
 
-func (i EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
+func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeEmbedded
 }
 
@@ -106,11 +108,19 @@ func deriveSecretNameComponents(secret *core.Secret, labels map[string]string) (
 		return nil, err
 	}
 
+	var name string
+	if secret.Group != "" {
+		// This is to support OSS secret model, where the group is used to identify the secret
+		name = secret.Group + GroupKeyDelimiter + secret.Key
+	} else {
+		name = secret.Key
+	}
+
 	return &SecretNameComponents{
 		Project: labels[ProjectLabel],
 		Domain:  labels[DomainLabel],
 		Org:     labels[OrganizationLabel],
-		Name:    secret.Key,
+		Name:    name,
 	}, nil
 }
 
@@ -118,37 +128,40 @@ func encodeSecretName(components *SecretNameComponents) string {
 	return EncodeSecretName(components.Org, components.Domain, components.Project, components.Name)
 }
 
-func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
-	// Fetch project-domain scoped secret
-	projectDomainScopedSecret := encodeSecretName(components)
-	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
-	if err == nil {
-		return secretValue, ToImagePullK8sName(*components), nil
-	}
-	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, "", err
-	}
+func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
+	for _, secretFetcher := range i.secretFetchers {
+		components := *components // Create a copy to avoid modifying the original
+		// Fetch project-domain scoped secret
+		projectDomainScopedSecret := encodeSecretName(&components)
+		secretValue, err := secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
+		if err == nil {
+			return secretValue, ToImagePullK8sName(components), nil
+		}
+		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+			return nil, "", err
+		}
 
-	// Fetch domain scoped secret
-	components.Project = EmptySecretScope
-	domainScopedSecret := encodeSecretName(components)
-	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
-	if err == nil {
-		return secretValue, ToImagePullK8sName(*components), nil
-	}
-	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, "", err
-	}
+		// Fetch domain scoped secret
+		components.Project = EmptySecretScope
+		domainScopedSecret := encodeSecretName(&components)
+		secretValue, err = secretFetcher.GetSecretValue(ctx, domainScopedSecret)
+		if err == nil {
+			return secretValue, ToImagePullK8sName(components), nil
+		}
+		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+			return nil, "", err
+		}
 
-	// Fetch organization scoped secret
-	components.Domain = EmptySecretScope
-	orgScopedSecret := encodeSecretName(components)
-	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
-	if err == nil {
-		return secretValue, ToImagePullK8sName(*components), err
-	}
-	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return nil, "", err
+		// Fetch organization scoped secret
+		components.Domain = EmptySecretScope
+		orgScopedSecret := encodeSecretName(&components)
+		secretValue, err = secretFetcher.GetSecretValue(ctx, orgScopedSecret)
+		if err == nil {
+			return secretValue, ToImagePullK8sName(components), err
+		}
+		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+			return nil, "", err
+		}
 	}
 
 	return nil, "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
@@ -242,7 +255,7 @@ func (i *EmbeddedSecretManagerInjector) findAndAddImagePullSecret(
 	return i.addImagePullSecretToPod(ctx, pod, referenceSecret)
 }
 
-func (i EmbeddedSecretManagerInjector) Inject(
+func (i *EmbeddedSecretManagerInjector) Inject(
 	ctx context.Context,
 	secret *core.Secret,
 	pod *corev1.Pod,
@@ -306,7 +319,7 @@ func (i EmbeddedSecretManagerInjector) Inject(
 	return pod, true, nil
 }
 
-func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
+func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secretValue string, pod *corev1.Pod) {
 	envVars := []corev1.EnvVar{
 		{
 			Name:  SecretEnvVarPrefix,
@@ -327,7 +340,7 @@ func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secre
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
 }
 
-func (i EmbeddedSecretManagerInjector) injectAsFile(secret *core.Secret, secretValue []byte, pod *corev1.Pod) {
+func (i *EmbeddedSecretManagerInjector) injectAsFile(secret *core.Secret, secretValue []byte, pod *corev1.Pod) {
 	initContainer, exists := i.getOrAppendFileMountInitContainer(pod)
 	appendSecretToFileMountInitContainer(initContainer, secret.GetKey(), secretValue)
 
@@ -375,7 +388,7 @@ func (i EmbeddedSecretManagerInjector) injectAsFile(secret *core.Secret, secretV
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
 }
 
-func (i EmbeddedSecretManagerInjector) getOrAppendFileMountInitContainer(pod *corev1.Pod) (*corev1.Container, bool /*exists*/) {
+func (i *EmbeddedSecretManagerInjector) getOrAppendFileMountInitContainer(pod *corev1.Pod) (*corev1.Container, bool /*exists*/) {
 	index := slices.IndexFunc(
 		pod.Spec.InitContainers,
 		func(c corev1.Container) bool {
@@ -444,13 +457,13 @@ func appendSecretToFileMountInitContainer(initContainer *corev1.Container, secre
 
 func NewEmbeddedSecretManagerInjector(
 	cfg config.EmbeddedSecretManagerConfig,
-	secretFetcher SecretFetcher,
+	secretFetchers []SecretFetcher,
 	k8sClient client.Client,
 	referenceNamespace string,
 ) SecretsInjector {
-	return EmbeddedSecretManagerInjector{
+	return &EmbeddedSecretManagerInjector{
 		cfg:                cfg,
-		secretFetcher:      secretFetcher,
+		secretFetchers:     secretFetchers,
 		k8sClient:          k8sClient,
 		referenceNamespace: referenceNamespace,
 	}

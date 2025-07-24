@@ -40,11 +40,6 @@ func newSecretsInjector(
 	case config.SecretManagerTypeVault:
 		return NewVaultSecretManagerInjector(webhookConfig.VaultSecretManagerConfig), nil
 	case config.SecretManagerTypeEmbedded:
-		secretFetcher, err := NewSecretFetcher(ctx, webhookConfig.EmbeddedSecretManagerConfig)
-		if err != nil {
-			return nil, err
-		}
-
 		kubeConfig, err := rest.InClusterConfig()
 		if err != nil {
 			logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
@@ -64,7 +59,21 @@ func newSecretsInjector(
 		if err != nil {
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
 		}
-		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetcher, ctrlRuntimeClient, podNamespace), nil
+
+		var secretFetchers []SecretFetcher
+		secretFetcher, err := NewSecretFetcher(ctx, webhookConfig.EmbeddedSecretManagerConfig)
+		if err != nil {
+			return nil, err
+		}
+		secretFetchers = append(secretFetchers, secretFetcher)
+		if webhookConfig.EmbeddedSecretManagerConfig.EnableDefaultFetcher {
+			defaultSecretFetcher, err := NewDefaultSecretFetcher(ctx)
+			if err != nil {
+				return nil, err
+			}
+			secretFetchers = append(secretFetchers, defaultSecretFetcher)
+		}
+		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetchers, ctrlRuntimeClient, podNamespace), nil
 	case config.SecretManagerTypeAzure:
 		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil
 	default:

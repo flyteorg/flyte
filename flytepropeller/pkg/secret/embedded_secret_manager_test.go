@@ -201,7 +201,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					Return(k8sError.NewNotFound(corev1.Resource("secret"), tt.expectedK8sSecretName))
 			}
 
-			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, gcpSecretsFetcher, mockClient, testReferenceNamespace)
+			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace)
 
 			actualP, injected, err := injector.Inject(ctx, inputSecret, tt.pod)
 			assert.Equal(t, tt.expectedInjected, injected)
@@ -269,13 +269,13 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
-				secretFetcherMock{
+				[]SecretFetcher{secretFetcherMock{
 					Secrets: map[string]SecretValue{
 						"u__org__organization__domain__domain__project__project__key__secret1": {
 							BinaryValue: []byte("banana"),
 						},
 					},
-				}, mockClient, testReferenceNamespace)
+				}}, mockClient, testReferenceNamespace)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -348,13 +348,13 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
-				secretFetcherMock{
+				[]SecretFetcher{secretFetcherMock{
 					Secrets: map[string]SecretValue{
 						"u__org__o-apple__domain____project____key__secret1": {
 							StringValue: "fruits",
 						},
 					},
-				}, mockClient, testReferenceNamespace)
+				}}, mockClient, testReferenceNamespace)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -405,7 +405,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
-		secretFetcherMock{
+		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				"u__org__o-apple__domain____project____key__secret1": {
 					StringValue: "fruits @ org",
@@ -414,7 +414,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 					StringValue: "fruits @ domain",
 				},
 			},
-		}, mockClient, testReferenceNamespace)
+		}}, mockClient, testReferenceNamespace)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -471,7 +471,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
-		secretFetcherMock{
+		[]SecretFetcher{secretFetcherMock{
 			Secrets: map[string]SecretValue{
 				"u__org__o-apple__domain____project____key__secret1": {
 					StringValue: "fruits @ org",
@@ -483,7 +483,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 					StringValue: "fruits @ project",
 				},
 			},
-		}, mockClient, testReferenceNamespace)
+		}}, mockClient, testReferenceNamespace)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -566,13 +566,13 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
-			secretFetcherMock{
+			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{
 					secretName: {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -602,13 +602,13 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
-			secretFetcherMock{
+			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{
 					secretName: {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -623,13 +623,13 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		injector := NewEmbeddedSecretManagerInjector(
 			config.EmbeddedSecretManagerConfig{},
-			secretFetcherMock{
+			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{
 					secretName: {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -673,13 +673,13 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
-			secretFetcherMock{
+			[]SecretFetcher{secretFetcherMock{
 				Secrets: map[string]SecretValue{
 					orgBasedSecretName: {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
