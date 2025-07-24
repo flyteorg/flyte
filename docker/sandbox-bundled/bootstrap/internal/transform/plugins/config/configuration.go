@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/kustomize/api/types"
+
+	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
 )
 
 type ConfigurationNotFound struct {

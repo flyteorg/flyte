@@ -13,6 +13,13 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/google/go-github/v42/github"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	testclient "k8s.io/client-go/kubernetes/fake"
+
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
@@ -22,12 +29,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	k8sMocks "github.com/flyteorg/flyte/flytectl/pkg/k8s/mocks"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
-	"github.com/google/go-github/v42/github"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
 var content = `

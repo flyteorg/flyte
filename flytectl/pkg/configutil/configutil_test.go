@@ -5,9 +5,10 @@ import (
 	"os"
 	"testing"
 
-	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 )
 
 func TestSetupConfig(t *testing.T) {

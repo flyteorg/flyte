@@ -10,10 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/visualize"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
@@ -21,6 +17,11 @@ import (
 	"github.com/pkg/browser"
 	"github.com/yalp/jsonpath"
 	"sigs.k8s.io/yaml"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/visualize"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 )
 
 //go:generate enumer --type=OutputFormat -json -yaml -trimprefix=OutputFormat

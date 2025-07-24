@@ -11,9 +11,10 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
-	"github.com/golang/protobuf/proto"
 )
 
 var (

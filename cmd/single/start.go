@@ -34,7 +34,6 @@ import (
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"

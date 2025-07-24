@@ -4,11 +4,12 @@ import (
 	"context"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/unionai/flyte/fasttask/plugin"
 
 	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+
+	"github.com/unionai/flyte/fasttask/plugin"
 )
 
 // TODO currently we only have one ExecutionEnvironment builder (ie. fast-task), but in the future

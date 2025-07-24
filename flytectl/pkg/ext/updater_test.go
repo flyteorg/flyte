@@ -3,8 +3,9 @@ package ext
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 )
 
 var updaterFetcherClient *AdminUpdaterExtClient

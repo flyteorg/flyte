@@ -5,8 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 
 const testVersion = "v0.1.20"

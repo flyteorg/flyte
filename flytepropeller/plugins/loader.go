@@ -2,9 +2,6 @@
 package plugins
 
 import (
-	// Importing external plugins
-	_ "github.com/unionai/flyte/fasttask/plugin"
-
 	// Common place to import all plugins, so that it can be imported by Singlebinary (flytelite) or by propeller main
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/k8s"
@@ -21,4 +18,7 @@ import (
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/bigquery"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/databricks"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/snowflake"
+
+	// Importing external plugins
+	_ "github.com/unionai/flyte/fasttask/plugin"
 )

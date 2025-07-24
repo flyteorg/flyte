@@ -8,11 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type Inner struct {

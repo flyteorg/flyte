@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	graphviz "github.com/awalterschulze/gographviz"
+
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )

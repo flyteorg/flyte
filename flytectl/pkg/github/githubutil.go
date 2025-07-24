@@ -9,15 +9,16 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
-	"github.com/flyteorg/flyte/flytectl/pkg/util"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/google/go-github/v42/github"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 )
 
 const (

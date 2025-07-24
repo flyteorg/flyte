@@ -3,10 +3,11 @@ package github
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
 	go_github "github.com/google/go-github/v42/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
 )
 
 func TestGetLatestFlytectlVersion(t *testing.T) {

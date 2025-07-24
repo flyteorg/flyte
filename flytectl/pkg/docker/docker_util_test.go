@@ -17,11 +17,12 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 var (

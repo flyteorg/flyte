@@ -10,9 +10,10 @@ import (
 	"strings"
 
 	"github.com/enescakir/emoji"
+	hversion "github.com/hashicorp/go-version"
+
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
-	hversion "github.com/hashicorp/go-version"
 )
 
 const (

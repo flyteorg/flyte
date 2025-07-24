@@ -5,8 +5,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 )
 
 const projectValue = "dummyProject"

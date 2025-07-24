@@ -3,10 +3,11 @@ package get
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestTaskInputs(t *testing.T) {

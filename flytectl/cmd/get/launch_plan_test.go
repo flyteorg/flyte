@@ -5,6 +5,11 @@ import (
 	"os"
 	"testing"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/launchplan"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
@@ -13,10 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (

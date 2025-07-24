@@ -3,6 +3,8 @@ package get
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	taskConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/task"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
@@ -10,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
 )
 
 const (

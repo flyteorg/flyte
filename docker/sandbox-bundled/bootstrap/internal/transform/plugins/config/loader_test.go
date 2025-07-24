@@ -7,8 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap/internal/utils"
 )
 
 func TestLoaderHappy(t *testing.T) {

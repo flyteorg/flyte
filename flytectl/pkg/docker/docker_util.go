@@ -19,11 +19,12 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/enescakir/emoji"
+	"github.com/moby/term"
+
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/docker"
 	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
-	"github.com/moby/term"
 )
 
 var (

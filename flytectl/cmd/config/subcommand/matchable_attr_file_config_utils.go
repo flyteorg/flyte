@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"sigs.k8s.io/yaml"
+
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 )
 
 // WriteConfigToFile used for marshaling the Config to a file which can then be used for update/delete

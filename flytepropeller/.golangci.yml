@@ -35,4 +35,5 @@ linters-settings:
       - standard
       - default
       - prefix(github.com/flyteorg)
+      - prefix(github.com/unionai)
     skip-generated: true

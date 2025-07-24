@@ -1,8 +1,9 @@
 package single
 
 import (
-	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/spf13/cobra"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 )
 
 var secretsCmd = &cobra.Command{

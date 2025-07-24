@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/enescakir/emoji"
+
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 

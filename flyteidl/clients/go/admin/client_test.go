@@ -9,14 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc"
-
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
+	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
@@ -26,6 +23,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

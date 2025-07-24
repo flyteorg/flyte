@@ -14,6 +14,12 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
 	"github.com/enescakir/emoji"
+	"github.com/kataras/tablewriter"
+	corev1api "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	dockerCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/docker"
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
@@ -23,11 +29,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/kataras/tablewriter"
-	corev1api "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (

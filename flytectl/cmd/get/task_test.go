@@ -5,6 +5,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	taskConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/task"
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
@@ -12,9 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (

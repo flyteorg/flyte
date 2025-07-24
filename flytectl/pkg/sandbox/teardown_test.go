@@ -7,13 +7,14 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
 	k8sMocks "github.com/flyteorg/flyte/flytectl/pkg/k8s/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestTearDownFunc(t *testing.T) {

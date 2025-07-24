@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/golang/glog"
+
 	"github.com/flyteorg/flyte/cmd/single"
 	_ "github.com/flyteorg/flyte/flytepropeller/plugins"
-	"github.com/golang/glog"
 )
 
 func main() {

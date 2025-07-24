@@ -1,6 +1,9 @@
 package get
 
 import (
+	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/encoding/protojson"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
@@ -13,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/spf13/cobra"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.

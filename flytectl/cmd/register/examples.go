@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/go-github/v42/github"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	g "github.com/flyteorg/flyte/flytectl/pkg/github"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/google/go-github/v42/github"
 )
 
 const (

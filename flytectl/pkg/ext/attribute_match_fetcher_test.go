@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 var wResp *admin.WorkflowAttributesGetResponse

@@ -8,10 +8,11 @@ import (
 	"sync"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/flyteorg/flyte/flytectl/pkg/filters"
-	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flytectl/pkg/filters"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 )
 
 type DataCallback func(filter filters.Filters) ([]proto.Message, error)

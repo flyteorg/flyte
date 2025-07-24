@@ -12,13 +12,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	extMocks "github.com/flyteorg/flyte/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	"github.com/stretchr/testify/assert"
 )
 
 const projectValue = "dummyProject"
