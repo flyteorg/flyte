@@ -525,15 +525,13 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	occurredAt := time.Now()
-
 	var phaseInfo pluginsCore.PhaseInfo
 
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
-		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info)
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(pluginsCore.DefaultPhaseVersion, "job queued", info)
 	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
-		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info)
+		phaseInfo = pluginsCore.PhaseInfoInitializing(pluginsCore.DefaultPhaseVersion, "job submitted", info)
 	case sparkOp.FailedSubmissionState:
 		reason := fmt.Sprintf("Spark Job  Submission Failed with Error: %s", app.Status.AppState.ErrorMessage)
 		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)

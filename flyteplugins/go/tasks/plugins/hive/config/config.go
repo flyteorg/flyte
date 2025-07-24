@@ -21,7 +21,7 @@ func MustParse(s string) config.URL {
 	if r != nil {
 		return config.URL{URL: *r}
 	}
-	logger.Panicf(context.TODO(), "Nil Qubole URL specified.", err)
+	logger.Panic(context.TODO(), "Nil Qubole URL specified.", err)
 	return config.URL{}
 }
 
