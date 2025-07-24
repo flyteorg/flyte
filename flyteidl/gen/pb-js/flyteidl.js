@@ -40292,6 +40292,7 @@
                  * @property {flyteidl.admin.IEnvs|null} [envs] LaunchPlanSpec envs
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] LaunchPlanSpec executionEnvAssignments
                  * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] LaunchPlanSpec clusterAssignment
+                 * @property {flyteidl.admin.IConcurrencyPolicy|null} [concurrencyPolicy] LaunchPlanSpec concurrencyPolicy
                  */
     
                 /**
@@ -40455,6 +40456,14 @@
                 LaunchPlanSpec.prototype.clusterAssignment = null;
     
                 /**
+                 * LaunchPlanSpec concurrencyPolicy.
+                 * @member {flyteidl.admin.IConcurrencyPolicy|null|undefined} concurrencyPolicy
+                 * @memberof flyteidl.admin.LaunchPlanSpec
+                 * @instance
+                 */
+                LaunchPlanSpec.prototype.concurrencyPolicy = null;
+    
+                /**
                  * Creates a new LaunchPlanSpec instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.LaunchPlanSpec
@@ -40515,6 +40524,8 @@
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
                     if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
                         $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
+                    if (message.concurrencyPolicy != null && message.hasOwnProperty("concurrencyPolicy"))
+                        $root.flyteidl.admin.ConcurrencyPolicy.encode(message.concurrencyPolicy, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
                     return writer;
                 };
     
@@ -40591,6 +40602,9 @@
                             break;
                         case 23:
                             message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                            break;
+                        case 24:
+                            message.concurrencyPolicy = $root.flyteidl.admin.ConcurrencyPolicy.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -40699,10 +40713,161 @@
                         if (error)
                             return "clusterAssignment." + error;
                     }
+                    if (message.concurrencyPolicy != null && message.hasOwnProperty("concurrencyPolicy")) {
+                        var error = $root.flyteidl.admin.ConcurrencyPolicy.verify(message.concurrencyPolicy);
+                        if (error)
+                            return "concurrencyPolicy." + error;
+                    }
                     return null;
                 };
     
                 return LaunchPlanSpec;
+            })();
+    
+            admin.ConcurrencyPolicy = (function() {
+    
+                /**
+                 * Properties of a ConcurrencyPolicy.
+                 * @memberof flyteidl.admin
+                 * @interface IConcurrencyPolicy
+                 * @property {number|null} [max] ConcurrencyPolicy max
+                 * @property {flyteidl.admin.ConcurrencyLimitBehavior|null} [behavior] ConcurrencyPolicy behavior
+                 */
+    
+                /**
+                 * Constructs a new ConcurrencyPolicy.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConcurrencyPolicy.
+                 * @implements IConcurrencyPolicy
+                 * @constructor
+                 * @param {flyteidl.admin.IConcurrencyPolicy=} [properties] Properties to set
+                 */
+                function ConcurrencyPolicy(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConcurrencyPolicy max.
+                 * @member {number} max
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @instance
+                 */
+                ConcurrencyPolicy.prototype.max = 0;
+    
+                /**
+                 * ConcurrencyPolicy behavior.
+                 * @member {flyteidl.admin.ConcurrencyLimitBehavior} behavior
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @instance
+                 */
+                ConcurrencyPolicy.prototype.behavior = 0;
+    
+                /**
+                 * Creates a new ConcurrencyPolicy instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @static
+                 * @param {flyteidl.admin.IConcurrencyPolicy=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConcurrencyPolicy} ConcurrencyPolicy instance
+                 */
+                ConcurrencyPolicy.create = function create(properties) {
+                    return new ConcurrencyPolicy(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConcurrencyPolicy message. Does not implicitly {@link flyteidl.admin.ConcurrencyPolicy.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @static
+                 * @param {flyteidl.admin.IConcurrencyPolicy} message ConcurrencyPolicy message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConcurrencyPolicy.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.max != null && message.hasOwnProperty("max"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.max);
+                    if (message.behavior != null && message.hasOwnProperty("behavior"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.behavior);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConcurrencyPolicy message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConcurrencyPolicy} ConcurrencyPolicy
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConcurrencyPolicy.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConcurrencyPolicy();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.max = reader.int32();
+                            break;
+                        case 2:
+                            message.behavior = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConcurrencyPolicy message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConcurrencyPolicy
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConcurrencyPolicy.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.max != null && message.hasOwnProperty("max"))
+                        if (!$util.isInteger(message.max))
+                            return "max: integer expected";
+                    if (message.behavior != null && message.hasOwnProperty("behavior"))
+                        switch (message.behavior) {
+                        default:
+                            return "behavior: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
+                    return null;
+                };
+    
+                return ConcurrencyPolicy;
+            })();
+    
+            /**
+             * ConcurrencyLimitBehavior enum.
+             * @name flyteidl.admin.ConcurrencyLimitBehavior
+             * @enum {string}
+             * @property {number} CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED=0 CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED value
+             * @property {number} CONCURRENCY_LIMIT_BEHAVIOR_SKIP=1 CONCURRENCY_LIMIT_BEHAVIOR_SKIP value
+             */
+            admin.ConcurrencyLimitBehavior = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED"] = 0;
+                values[valuesById[1] = "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"] = 1;
+                return values;
             })();
     
             admin.LaunchPlanClosure = (function() {

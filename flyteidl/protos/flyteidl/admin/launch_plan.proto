@@ -144,6 +144,24 @@ message LaunchPlanSpec {
     // ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.
     // This can be overwritten at execution creation level.
     ClusterAssignment cluster_assignment = 23;
+
+    // Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached
+    ConcurrencyPolicy concurrency_policy = 24;
+}
+
+message ConcurrencyPolicy {
+    // A setting for the maximum number of concurrent workflows
+    int32 max = 1;
+
+    // Descriptor for workflow execution behavior after the concurrency limit is hit
+    ConcurrencyLimitBehavior behavior = 2;
+}
+
+enum ConcurrencyLimitBehavior {
+    CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0;
+    
+    // A workflow that will be skipped because the limit has been hit.
+    CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1;
 }
 
 // Values computed by the flyte platform after launch plan registration.

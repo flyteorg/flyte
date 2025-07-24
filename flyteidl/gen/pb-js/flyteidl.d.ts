@@ -16622,6 +16622,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec clusterAssignment */
             clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** LaunchPlanSpec concurrencyPolicy */
+            concurrencyPolicy?: (flyteidl.admin.IConcurrencyPolicy|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -16687,6 +16690,9 @@ export namespace flyteidl {
             /** LaunchPlanSpec clusterAssignment. */
             public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
+            /** LaunchPlanSpec concurrencyPolicy. */
+            public concurrencyPolicy?: (flyteidl.admin.IConcurrencyPolicy|null);
+
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
              * @param [properties] Properties to set
@@ -16718,6 +16724,70 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ConcurrencyPolicy. */
+        interface IConcurrencyPolicy {
+
+            /** ConcurrencyPolicy max */
+            max?: (number|null);
+
+            /** ConcurrencyPolicy behavior */
+            behavior?: (flyteidl.admin.ConcurrencyLimitBehavior|null);
+        }
+
+        /** Represents a ConcurrencyPolicy. */
+        class ConcurrencyPolicy implements IConcurrencyPolicy {
+
+            /**
+             * Constructs a new ConcurrencyPolicy.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IConcurrencyPolicy);
+
+            /** ConcurrencyPolicy max. */
+            public max: number;
+
+            /** ConcurrencyPolicy behavior. */
+            public behavior: flyteidl.admin.ConcurrencyLimitBehavior;
+
+            /**
+             * Creates a new ConcurrencyPolicy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ConcurrencyPolicy instance
+             */
+            public static create(properties?: flyteidl.admin.IConcurrencyPolicy): flyteidl.admin.ConcurrencyPolicy;
+
+            /**
+             * Encodes the specified ConcurrencyPolicy message. Does not implicitly {@link flyteidl.admin.ConcurrencyPolicy.verify|verify} messages.
+             * @param message ConcurrencyPolicy message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IConcurrencyPolicy, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ConcurrencyPolicy message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ConcurrencyPolicy
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ConcurrencyPolicy;
+
+            /**
+             * Verifies a ConcurrencyPolicy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** ConcurrencyLimitBehavior enum. */
+        enum ConcurrencyLimitBehavior {
+            CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0,
+            CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1
         }
 
         /** Properties of a LaunchPlanClosure. */
