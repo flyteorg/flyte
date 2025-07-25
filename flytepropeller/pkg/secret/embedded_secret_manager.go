@@ -42,7 +42,9 @@ const (
 	OrganizationLabel = "organization"
 	EmptySecretScope  = ""
 
-	GroupKeyDelimiter = "/"
+	// All of the namespace, group and key cannot contain '/' so it is safe to use '/' as a delimiter.
+	NamespaceGroupKeyDelimiter = "/"
+	rawK8sSecretsStorageFormat = valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter + NamespaceGroupKeyDelimiter + valueFormatter
 
 	SecretNotFoundErrorFormat                                   = "secret %v not found in the secret manager"                                // #nosec G101
 	SecretReadFailureErrorFormat                                = "secret %v failed to be read from secret manager"                          // #nosec G101
@@ -102,8 +104,8 @@ func validateRequiredFieldsExist(labels map[string]string) error {
 	return nil
 }
 
-func deriveSecretNameComponents(secret *core.Secret, labels map[string]string) (*SecretNameComponents, error) {
-	err := validateRequiredFieldsExist(labels)
+func deriveSecretNameComponents(secret *core.Secret, pod *corev1.Pod) (*SecretNameComponents, error) {
+	err := validateRequiredFieldsExist(pod.Labels)
 	if err != nil {
 		return nil, err
 	}
@@ -111,15 +113,15 @@ func deriveSecretNameComponents(secret *core.Secret, labels map[string]string) (
 	var name string
 	if secret.Group != "" {
 		// This is to support OSS secret model, where the group is used to identify the secret
-		name = secret.Group + GroupKeyDelimiter + secret.Key
+		name = fmt.Sprintf(rawK8sSecretsStorageFormat, pod.GetNamespace(), secret.Group, secret.Key)
 	} else {
 		name = secret.Key
 	}
 
 	return &SecretNameComponents{
-		Project: labels[ProjectLabel],
-		Domain:  labels[DomainLabel],
-		Org:     labels[OrganizationLabel],
+		Project: pod.Labels[ProjectLabel],
+		Domain:  pod.Labels[DomainLabel],
+		Org:     pod.Labels[OrganizationLabel],
 		Name:    name,
 	}, nil
 }
@@ -264,7 +266,7 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 		return pod, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. Secret: [%v]", secret)
 	}
 
-	secretNameComponents, err := deriveSecretNameComponents(secret, pod.Labels)
+	secretNameComponents, err := deriveSecretNameComponents(secret, pod)
 	if err != nil {
 		return pod, false, err
 	}

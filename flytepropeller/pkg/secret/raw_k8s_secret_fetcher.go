@@ -27,11 +27,14 @@ func (s RawK8sSecretFetcher) GetSecretValue(ctx context.Context, secretID string
 		return nil, wrappedErr
 	}
 
-	secretGroupKey := strings.Split(secretNameComponents.Name, GroupKeyDelimiter)
-	secretGroup, secretKey := secretGroupKey[0], secretGroupKey[1]
-	// Assume namespace mapping is project-domain, which is the default for Flyte
-	namespace := secretNameComponents.Project + "-" + secretNameComponents.Domain
-	secretClient := s.kubeClientset.CoreV1().Secrets(namespace)
+	secretNamespaceGroupKey := strings.Split(secretNameComponents.Name, NamespaceGroupKeyDelimiter)
+	if len(secretNamespaceGroupKey) != 3 {
+		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, errors.New("invalid secret ID format"), fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
+		logger.Error(ctx, wrappedErr)
+		return nil, wrappedErr
+	}
+	secretNamespace, secretGroup, secretKey := secretNamespaceGroupKey[0], secretNamespaceGroupKey[1], secretNamespaceGroupKey[2]
+	secretClient := s.kubeClientset.CoreV1().Secrets(secretNamespace)
 	secret, err := secretClient.Get(ctx, secretGroup, metav1.GetOptions{})
 
 	if err != nil {
