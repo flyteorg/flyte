@@ -54,9 +54,9 @@ metadata:
   name: {{ template "flyte.namespace" . -}}-{{- template "flyteadmin.name" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
-- apiGroups: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.apiGroups | nindent 2 }}
-  resources: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.resources | nindent 2 }}
-  verbs: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.verbs | nindent 2 }}
+- apiGroups: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.apiGroups | nindent 4 }}
+  resources: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.resources | nindent 4 }}
+  verbs: {{ toYaml .Values.flyteadmin.serviceAccount.rbacRules.verbs | nindent 4 }}
 ---
 {{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
 apiVersion: rbac.authorization.k8s.io/v1
