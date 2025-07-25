@@ -500,10 +500,14 @@ metadata:
 apiVersion: v1
 data:
 <<<<<<< HEAD
+<<<<<<< HEAD
   haSharedSecret: TE9jc3lGcHEyT0x0MjNYNA==
 =======
   haSharedSecret: UEVGT0pEckFRUDRSS0J5bg==
 >>>>>>> 33ce313ba (make helm)
+=======
+  haSharedSecret: WHNtSnFIc01lUTY3UGMzag==
+>>>>>>> 98fd4ec8b (more indenting.)
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -939,10 +943,14 @@ spec:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
 <<<<<<< HEAD
+<<<<<<< HEAD
         checksum/secret: 2324d3b4d1438542551b214c27aa620c5987b8870d1b17a6ac61b99753e07d01
 =======
         checksum/secret: 33f1faf905a878722dd782b3dd0b3babef451083c0f7782123d432ba3238f2a9
 >>>>>>> 33ce313ba (make helm)
+=======
+        checksum/secret: 76e0d99022cbd1b3c5d7f0eecfa8a7faa92d8df82b6fbd1f225561d814846bb2
+>>>>>>> 98fd4ec8b (more indenting.)
       labels:
         app: docker-registry
         release: flyte-sandbox

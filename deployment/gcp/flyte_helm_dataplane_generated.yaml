@@ -233,24 +233,24 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups: 
-  - ""
-  - flyte.lyft.com
-  - rbac.authorization.k8s.io
+    - ""
+    - flyte.lyft.com
+    - rbac.authorization.k8s.io
   resources: 
-  - configmaps
-  - flyteworkflows
-  - namespaces
-  - pods
-  - resourcequotas
-  - roles
-  - rolebindings
-  - secrets
-  - services
-  - serviceaccounts
-  - spark-role
-  - limitranges
+    - configmaps
+    - flyteworkflows
+    - namespaces
+    - pods
+    - resourcequotas
+    - roles
+    - rolebindings
+    - secrets
+    - services
+    - serviceaccounts
+    - spark-role
+    - limitranges
   verbs: 
-  - '*'
+    - '*'
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
