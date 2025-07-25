@@ -1,0 +1,56 @@
+name: Build unionai-reuse
+
+on:
+  push:
+    branches:
+      - refactor-alt-approach-2
+      - concurrent-workers
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_wheel:
+    name: Build wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU for multi-arch
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: docker/setup-qemu-action@v3
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.19.0
+        with:
+          package-dir: fasttask/worker-v2
+        env:
+          CIBW_ARCHS_LINUX: "auto aarch64"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
+
+  pypi-publish:
+    name: Upload release to PyPI
+    needs: [build_wheel]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    environment: release
+    # if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          # unpacks all CIBW artifacts into dist/
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
+      - run: ls dist
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: false

@@ -1,0 +1,21 @@
+[package]
+name = "unionai_actor_executor"
+version.workspace = true
+edition = "2021"
+
+[lib]
+name = "_lib"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+bincode = { workspace = true }
+futures = { workspace = true }
+pyo3 = { version = "0.25.1" }
+pyo3-async-runtimes = { version = "0.25.0", features = ["tokio-runtime"] }
+tokio = { version = "1.45.1", features = ["full"] }
+tokio-util = { workspace = true, features = ["rt"] }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3.19", workspace = true, features = ["fmt", "time"] }
+unionai_actor_bridge = { path = "../bridge" }
+bytes = "1.6.0"

@@ -1,0 +1,5 @@
+exclude *
+
+recursive-exclude bridge *
+recursive-exclude executor *
+recursive-exclude functional-tests *

@@ -13,7 +13,7 @@ import (
 var (
 	defaultConfig = &Config{
 		AdditionalWorkerArgs:      []string{},
-		CallbackURI:               "http://host.k3d.internal:15605",
+		CallbackURI:               "http://host.docker.internal:15605",
 		DefaultTTL:                config.Duration{Duration: time.Second * 90},
 		Endpoint:                  "0.0.0.0:15605",
 		EnvDetectOrphanInterval:   config.Duration{Duration: time.Second * 60},

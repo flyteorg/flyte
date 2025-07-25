@@ -1,0 +1,9 @@
+target
+build
+dist
+
+Dockerfile*
+functional-tests
+tests-requirements.txt
+.idea
+testing
