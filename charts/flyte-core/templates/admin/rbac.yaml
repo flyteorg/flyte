@@ -3,7 +3,7 @@ Deprecation: Replacing createClusterRole with generic rbac setting. In a future
 release the print will be replaced with fail.
 */}}
 {{- if ne .Values.flyteadmin.serviceAccount.createClusterRole nil }}
-  {{- print "WARNING: .Values.flyteadmin.serviceAccount.createClusterRole is set (either true or false). Please use the .Values.flyteadmin.serviceAccount.rbac setting instead." }}
+  {{- fail ".Values.flyteadmin.serviceAccount.createClusterRole is set (either true or false). Please use the .Values.flyteadmin.serviceAccount.rbac setting instead." }}
 {{- end }}
 
 {{- /*
