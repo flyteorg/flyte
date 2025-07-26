@@ -35,12 +35,6 @@ const (
 var tracerProviders = make(map[string]*trace.TracerProvider)
 var noopTracerProvider = noop.NewTracerProvider()
 
-// Deprecated: RegisterTracerProvider registers a tracer provider for the given service name. It uses a default context if necessary.
-// Instead, use RegisterTracerProviderWithContext.
-func RegisterTracerProvider(serviceName string, config *Config) error {
-	return RegisterTracerProviderWithContext(context.Background(), serviceName, config)
-}
-
 // RegisterTracerProviderWithContext registers a tracer provider for the given service name.
 func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, config *Config) error {
 	if config == nil {
