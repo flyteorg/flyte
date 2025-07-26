@@ -164,6 +164,18 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -431,7 +443,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8b321446ff6486842c8d75e847b553d4dce5d8db837a464c52fbc7d79f6873b"
+        configChecksum: "f5c6c3ba4626fd2b81280a9c58f26da46d9a698fab839f2399302703b86e807"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -516,7 +528,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.0-b4
       annotations:
-        configChecksum: "8b321446ff6486842c8d75e847b553d4dce5d8db837a464c52fbc7d79f6873b"
+        configChecksum: "f5c6c3ba4626fd2b81280a9c58f26da46d9a698fab839f2399302703b86e807"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

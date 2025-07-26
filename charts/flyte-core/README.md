@@ -123,6 +123,13 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","connector-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
+| configmap.otel | object | `{"otel":{"file":"/tmp/trace.txt","jaeger":{"endpoint":"http://localhost:14268/api/traces"},"otlpgrpc":{"endpoint":"http://localhost:4317"},"otlphttp":{"endpoint":"http://localhost:4318/v1/traces"},"sampler":{"parentSampler":"always"},"type":"noop"}}` | Open Telemetry Configuration |
+| configmap.otel.otel.file | string | `"/tmp/trace.txt"` | Configuration for the file exporter type |
+| configmap.otel.otel.jaeger | object | `{"endpoint":"http://localhost:14268/api/traces"}` | Configuration for the jaeger exporter type |
+| configmap.otel.otel.otlphttp | object | `{"endpoint":"http://localhost:4318/v1/traces"}` | Configuration for the otlp exporter type |
+| configmap.otel.otel.sampler | object | `{"parentSampler":"always"}` | Configuration for sampling of traces |
+| configmap.otel.otel.sampler.parentSampler | string | `"always"` | Configuration for the parent based sampler |
+| configmap.otel.otel.type | string | `"noop"` | The type of exporter to use |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
 | configmap.remoteData.remoteData.signedUrls.durationMinutes | int | `3` |  |
