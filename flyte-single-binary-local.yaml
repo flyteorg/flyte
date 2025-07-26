@@ -45,7 +45,6 @@ tasks:
       - K8S-ARRAY
       - echo
       - agent-service
-      # - noop_async_agent_task
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
@@ -69,51 +68,61 @@ plugins:
         kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
         cloudwatch-enabled: false
         stackdriver-enabled: false
-  # connector-service:
-  #   supportedTaskTypes:
-  #     - bigquery_query_job_task
-  #     - sensor
-  #     - chatgpt
-    # connectors:
-    #   my-test-connector1:
-    #     endpoint: "localhost:8000"
-    #     insecure: true
-    #     timeouts:
-    #       CreateTask: 5s
-    #       GetTask: 30s
-    #       DeleteTask: 30s
-    #     defaultTimeout: 30s
-    #     webApi:
-    #       caching:
-    #         resyncInterval: 60s
-    # defaultConnector:
-    #   endpoint: "localhost:8000"
-    # webApi:
-    #   caching:
-    #     resyncInterval: 120s
-    # connectorForTaskTypes:
-    #   - noop_async_agent_task: my-test-connector1
-  agent-service:
+  connector-service:
     supportedTaskTypes:
       - bigquery_query_job_task
       - sensor
-      - chatgpt
-    agents:
+    connectors:
       my-test-connector1:
-        endpoint: "localhost:8000"
+        endpoint: "localhost:8001"
         insecure: true
         timeouts:
           CreateTask: 5s
           GetTask: 30s
           DeleteTask: 30s
         defaultTimeout: 30s
-    defaultAgent:
+        webApi:
+          caching:
+            resyncInterval: 60s
+      my-test-connector2:
+        endpoint: "localhost:8002"
+        insecure: true
+        timeouts:
+          CreateTask: 5s
+          GetTask: 30s
+          DeleteTask: 30s
+        defaultTimeout: 30s
+        webApi:
+          caching:
+            resyncInterval: 120s
+    defaultConnector:
       endpoint: "localhost:8000"
     webApi:
       caching:
         resyncInterval: 120s
-    agentForTaskTypes:
+    connectorForTaskTypes:
       - noop_async_agent_task: my-test-connector1
+  # agent-service:
+  #   supportedTaskTypes:
+  #     - bigquery_query_job_task
+  #     - sensor
+  #     - chatgpt
+  #   agents:
+  #     my-test-connector1:
+  #       endpoint: "localhost:8000"
+  #       insecure: true
+  #       timeouts:
+  #         CreateTask: 5s
+  #         GetTask: 30s
+  #         DeleteTask: 30s
+  #       defaultTimeout: 30s
+  #   defaultAgent:
+  #     endpoint: "localhost:8000"
+  #   webApi:
+  #     caching:
+  #       resyncInterval: 120s
+  #   agentForTaskTypes:
+  #     - noop_async_agent_task: my-test-connector1
 
 database:
   postgres:

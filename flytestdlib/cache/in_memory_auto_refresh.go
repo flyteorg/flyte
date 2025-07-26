@@ -133,6 +133,8 @@ func NewInMemoryAutoRefresh(
 	}
 
 	metrics := newMetrics(scope)
+	ctx := context.Background()
+	logger.Debug(ctx, "the scope is %s", metrics)
 	// #nosec G115
 	lruCache, err := lru.NewWithEvict(int(size), getEvictionFunction(metrics.Evictions))
 	if err != nil {

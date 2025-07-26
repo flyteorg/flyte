@@ -11,19 +11,33 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-const defaultPluginBufferSize = 5
+const defaultPluginBufferSize = 100
+
+// PluginRegistrationInfo contains information about plugin registration
+type PluginRegistrationInfo struct {
+	Plugin   webapi.PluginEntry
+	DeploymentID string
+}
+
+type PluginUpdateInfo struct {
+	TaskType string
+	DeploymentID string
+}
 
 type taskPluginRegistry struct {
 	m          sync.Mutex
 	k8sPlugin  []k8s.PluginEntry
 	corePlugin []core.PluginEntry
-	pluginRegistrationChan chan webapi.PluginEntry
-	registeredTaskTypes map[string]struct{}
+	pluginRegistrationChan chan PluginRegistrationInfo
+	pluginUpdateChan chan PluginUpdateInfo
+	registeredPlugins map[string]map[string]struct{}
 }
 
 // A singleton variable that maintains a registry of all plugins. The framework uses this to access all plugins
 var pluginRegistry = &taskPluginRegistry{
-	pluginRegistrationChan: make(chan webapi.PluginEntry, defaultPluginBufferSize),
+	pluginRegistrationChan: make(chan PluginRegistrationInfo, defaultPluginBufferSize),
+	pluginUpdateChan:  make(chan PluginUpdateInfo, defaultPluginBufferSize),
+	registeredPlugins: make(map[string]map[string]struct{}),
 }
 
 func PluginRegistry() TaskPluginRegistry {
@@ -47,27 +61,44 @@ func (p *taskPluginRegistry) RegisterRemotePlugin(info webapi.PluginEntry) {
 	p.m.Lock()
 	defer p.m.Unlock()
 	p.corePlugin = append(p.corePlugin, internalRemote.CreateRemotePlugin(info))
-	p.AddRegisteredTaskType(info.ID)
 }
 
-func (p *taskPluginRegistry) GetPluginRegistrationChan() chan webapi.PluginEntry {
+func (p *taskPluginRegistry) GetPluginRegistrationChan() chan PluginRegistrationInfo {
 	return p.pluginRegistrationChan
 }
 
-// IsTaskTypeRegistered checks if a task type is registered
-func (p *taskPluginRegistry) IsTaskTypeRegistered(taskType string) bool {
+func (p *taskPluginRegistry) GetPluginUpdateChan() chan PluginUpdateInfo {
+	return p.pluginUpdateChan
+}
+
+// IsPluginForTaskTypeRegistered checks if a task type is registered
+func (p *taskPluginRegistry) IsPluginForTaskTypeRegistered(taskType string, deploymentID string) bool {
 	p.m.Lock()
 	defer p.m.Unlock()
-	_, exists := p.registeredTaskTypes[taskType]
+	
+	if p.registeredPlugins == nil {
+		return false
+	}
+	
+	deploymentMap, exists := p.registeredPlugins[taskType]
+	if !exists {
+		return false
+	}
+	
+	_, exists = deploymentMap[deploymentID]
 	return exists
 }
 
 // RegisterTaskType registers a single task type
-func (p *taskPluginRegistry) AddRegisteredTaskType(taskType string) {
-	if p.registeredTaskTypes == nil {
-		p.registeredTaskTypes = make(map[string]struct{})
+func (p *taskPluginRegistry) AddRegisteredPluginForTaskType(taskType string, deploymentID string) {
+	p.m.Lock()
+	defer p.m.Unlock()
+	
+	if p.registeredPlugins[taskType] == nil {
+		p.registeredPlugins[taskType] = make(map[string]struct{})
 	}
-	p.registeredTaskTypes[taskType] = struct{}{}
+	
+	p.registeredPlugins[taskType][deploymentID] = struct{}{}
 }
 
 func CreateRemotePlugin(pluginEntry webapi.PluginEntry) core.PluginEntry {
@@ -134,7 +165,8 @@ type TaskPluginRegistry interface {
 	RegisterRemotePlugin(info webapi.PluginEntry)
 	GetCorePlugins() []core.PluginEntry
 	GetK8sPlugins() []k8s.PluginEntry
-	GetPluginRegistrationChan() chan webapi.PluginEntry
-	IsTaskTypeRegistered(taskType string) bool
-	AddRegisteredTaskType(taskType string)
+	GetPluginRegistrationChan() chan PluginRegistrationInfo
+	GetPluginUpdateChan() chan PluginUpdateInfo
+	IsPluginForTaskTypeRegistered(taskType string, deploymentID string) bool
+	AddRegisteredPluginForTaskType(taskType string, deploymentID string)
 }

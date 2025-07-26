@@ -353,7 +353,7 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				pluginsForType:   tt.fields.pluginsForType,
 				agentService:     &agent.AgentService{},
 			}
-			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
+			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig, 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Handler.ResolvePlugin() error = %v, wantErr %v", err, tt.wantErr)
 				return

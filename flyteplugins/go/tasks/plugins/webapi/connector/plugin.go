@@ -382,6 +382,14 @@ func (p *Plugin) getAsyncConnectorClient(ctx context.Context, connector *Deploym
 	return client, nil
 }
 
+// UpdateDeployment updates the deployment configuration for the plugin.
+// This method is thread-safe and can be called concurrently.
+func (p *Plugin) UpdateDeployment(deployment Connector) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.deployment = deployment
+}
+
 func WatchConnectors(ctx context.Context) {
 	cfg := GetConfig()
 	go wait.Until(func() {
@@ -428,15 +436,16 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func createPluginEntry(taskType core.TaskType, deployment *Deployment, clientSet *ClientSet) webapi.PluginEntry {
+func createPluginEntry(taskType core.TaskType, taskVersion int32, deployment *Deployment, clientSet *ClientSet) webapi.PluginEntry {
+	versionedTaskType := fmt.Sprintf("%s_%d", taskType, taskVersion)
 	plugin := &Plugin{
-		metricScope: promutils.NewScope(taskType),
+		metricScope: promutils.NewScope(versionedTaskType),
 		cfg:         GetConfig(),
 		cs:          clientSet,
 		deployment:  Connector{IsSync: false, ConnectorDeployment: deployment},
 	}
 	return webapi.PluginEntry{
-		ID:                 taskType,
+		ID:                 versionedTaskType,
 		SupportedTaskTypes: []core.TaskType{taskType},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return plugin, nil
@@ -444,27 +453,33 @@ func createPluginEntry(taskType core.TaskType, deployment *Deployment, clientSet
 	}
 }
 
-func newConnectorPlugins(ctx context.Context) []webapi.PluginEntry {
-	clientSet := getConnectorClientSets(ctx)
-	// Get deployments from config in order to init plugins
-	cfg := GetConfig()
-	plugins := make([]webapi.PluginEntry, 0)
-	for taskType, deploymentID := range cfg.ConnectorForTaskTypes {
-		if deployment, ok := cfg.ConnectorDeployments[deploymentID]; ok {
-			plugins = append(plugins, createPluginEntry(taskType, deployment, clientSet))
-		}
+func updatePlugin(versionedTaskType string, deploymentID string) {
+	select {
+	case pluginmachinery.PluginRegistry().GetPluginUpdateChan() <- pluginmachinery.PluginUpdateInfo{
+		TaskType: versionedTaskType,
+		DeploymentID: deploymentID,
+	}:
+	default:
+		logger.Errorf(context.Background(), "Failed to update plugin for task type %s: channel is full", versionedTaskType)
 	}
-	return plugins
+}
+
+func registerNewPlugin(taskType core.TaskType, taskTypeVersion int32, deploymentID string, deployment *Deployment, cs *ClientSet) {
+	plugin := createPluginEntry(taskType, taskTypeVersion, deployment, cs)
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(plugin)
+	select {
+	case pluginmachinery.PluginRegistry().GetPluginRegistrationChan() <- pluginmachinery.PluginRegistrationInfo{
+		Plugin:   plugin,
+		DeploymentID: deploymentID,
+	}:
+	default:
+		logger.Errorf(context.Background(), "Failed to register plugin %s: channel is full", plugin.ID)
+	}
 }
 
 func RegisterConnectorPlugin() {
 	ctx := context.Background()
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	plugins := newConnectorPlugins(ctx)
-	for _, plugin := range plugins {
-		// Register a remote plugin to CorePlugins for task handler to read
-		pluginmachinery.PluginRegistry().RegisterRemotePlugin(plugin)
-	}
 	WatchConnectors(ctx)
 }
