@@ -1547,6 +1547,23 @@ kafka (`interfaces.KafkaConfig`_)
   version: ""
   
 
+nats (`interfaces.NatsConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  servers: null
+  tokenAuthentication:
+    enabled: false
+    token: ""
+  userAuthentication:
+    enabled: false
+    password: ""
+    user: ""
+  
+
 eventsPublisher (`interfaces.EventsPublisherConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1796,6 +1813,98 @@ certPath (string)
   
 
 keyPath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.NatsConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+servers ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+userAuthentication (`interfaces.NatsUserPassAuthConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  password: ""
+  user: ""
+  
+
+tokenAuthentication (`interfaces.NatsTokenAuthConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enabled: false
+  token: ""
+  
+
+interfaces.NatsTokenAuthConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+token (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+interfaces.NatsUserPassAuthConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+user (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+password (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3262,8 +3371,9 @@ k8s (`config.K8sPluginConfig`_)
     memory: 128Mi
     name: flyte-copilot-
     output-vol-name: flyte-outputs
-    start-timeout: 1m40s
+    start-timeout: 0s
     storage: ""
+    timeout: 1h0m0s
   create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
@@ -3989,8 +4099,9 @@ Co-Pilot Configuration
   memory: 128Mi
   name: flyte-copilot-
   output-vol-name: flyte-outputs
-  start-timeout: 1m40s
+  start-timeout: 0s
   storage: ""
+  timeout: 1h0m0s
   
 
 delete-resource-on-finalize (bool)
@@ -4311,7 +4422,17 @@ start-timeout (`config.Duration`_)
 
 .. code-block:: yaml
 
-  1m40s
+  0s
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
   
 
 cpu (string)
@@ -7031,6 +7152,18 @@ Configuration to control the Kubernetes client
   burst: 25
   qps: 100
   timeout: 30s
+  
+
+gracefulShutdownTimeoutSeconds (int)
+------------------------------------------------------------------------------------------------------------------------
+
+Number of seconds to wait for graceful shutdown before forcefully terminating the server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
   
 
 config.DataProxyConfig
