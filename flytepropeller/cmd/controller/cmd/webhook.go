@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -28,10 +30,13 @@ import (
 var webhookCmd = &cobra.Command{
 	Use:     "webhook",
 	Aliases: []string{"webhooks"},
-	Short:   "Runs Propeller Pod Webhook that listens for certain labels and modify the pod accordingly.",
+	Short:   "Runs Propeller Webhook that listens for certain labels and mutates pods and nodes accordingly.",
 	Long: `
-This command initializes propeller's Pod webhook that enables it to mutate pods whether they are created directly from
-plugins or indirectly through the creation of other CRDs (e.g. Spark/Pytorch).
+This command initializes propeller's webhook that enables it to mutate pods and nodes whether they are created directly from
+plugins or indirectly through the creation of other CRDs (e.g. Spark/Pytorch). The webhook supports:
+- Pod mutations: secret injection, image transformations, and other pod-level modifications
+- Node mutations: startup taints and other node-level modifications
+
 In order to use this Webhook:
 1) Keys need to be mounted to the POD that runs this command; tls.crt should be a CA-issued cert (not a self-signed
    cert), tls.key as the private key for that cert and, optionally, ca.crt in case tls.crt's CA is not a known
@@ -122,6 +127,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		}),
 	}
 
+	log.SetLogger(logr.New(logger.LoggerSink{}))
 	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, options)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to create controller manager. Error: %v", err)

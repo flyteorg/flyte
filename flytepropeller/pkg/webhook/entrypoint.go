@@ -6,6 +6,7 @@ import (
 	errors2 "errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,18 +55,29 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook, err := NewPodCreationWebhookConfig(ctx, cfg, mgr.GetScheme(), defaultNamespace, webhookScope)
+	caBytes, err := os.ReadFile(filepath.Join(cfg.ExpandCertDir(), "ca.crt"))
+	if err != nil {
+		// ca.crt is optional. If not provided, API Server will assume the webhook is serving SSL using a certificate
+		// issued by a known Cert Authority.
+		if os.IsNotExist(err) {
+			caBytes = make([]byte, 0)
+		} else {
+			return err
+		}
+	}
+
+	webhookConfig, err := NewWebhookConfig(ctx, cfg, mgr.GetScheme(), defaultNamespace, webhookScope, caBytes)
 	if err != nil {
 		return err
 	}
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
-	err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace)
+	err = createMutationConfig(ctx, kubeClient, webhookConfig, defaultNamespace)
 	if err != nil {
 		return err
 	}
 
-	err = secretsWebhook.Register(ctx, K8sRuntimeHTTPHookRegisterer{mgr: mgr})
+	err = webhookConfig.Register(ctx, K8sRuntimeHTTPHookRegisterer{mgr: mgr})
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
@@ -76,7 +88,7 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodCreationWebhookConfig, podNamespace string) error {
+func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *WebhookConfig, podNamespace string) error {
 	shouldAddOwnerRef := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {
