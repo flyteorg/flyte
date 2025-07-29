@@ -37,7 +37,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags. For example, 0.1.1, 1.16.0-b0
-release = "1.16.0-b2"
+release = "1.16.0-b3"
 
 # -- General configuration ---------------------------------------------------
 
@@ -120,13 +120,11 @@ redirects = {
     "concepts/versioning": "../user_guide/concepts/main_concepts/versioning.html",
     "concepts/workflow_lifecycle": "../user_guide/concepts/main_concepts/workflow_lifecycle.html",
     "concepts/workflows": "../user_guide/concepts/main_concepts/workflows.html",
-
     # core use cases
     "core_use_cases/index": "../flytesnacks/tutorials/index.html",
     "core_use_cases/analytics": "../flytesnacks/tutorials/index.html",
     "core_use_cases/data_engineering": "../flytesnacks/tutorials/index.html",
     "core_use_cases/machine_learning": "../flytesnacks/tutorials/index.html",
-
     # deprecated integrations
     "deprecated_integrations/index": "../../flytesnacks/deprecated_integrations/index.html",
     "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
@@ -137,7 +135,6 @@ redirects = {
     "deprecated_integrations/databricks_plugin/databricks_plugin_example": "../../flytesnacks/deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
     "deprecated_integrations/snowflake_plugin/index": "../../flytesnacks/deprecated_integrations/snowflake_plugin/index.html",
     "deprecated_integrations/snowflake_plugin/snowflake_plugin_example": "../../flytesnacks/deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
-
     # flyte agents
     "flyte_agents/index": "../user_guide/flyte_agents/index.html",
     "flyte_agents/deploying_agents_to_the_flyte_sandbox": "../user_guide/flyte_agents/deploying_agents_to_the_flyte_sandbox.html",
@@ -146,7 +143,6 @@ redirects = {
     "flyte_agents/implementing_the_agent_metadata_service": "../user_guide/flyte_agents/implementing_the_agent_metadata_service.html",
     "flyte_agents/testing_agents_in_a_local_development_cluster": "../user_guide/flyte_agents/testing_agents_in_a_local_development_cluster.html",
     "flyte_agents/testing_agents_in_a_local_python_environment": "../user_guide/flyte_agents/testing_agents_in_a_local_python_environment.html",
-
     # flyte fundamentals
     "flyte_fundamentals/index": "../user_guide/flyte_fundamentals/index.html",
     "flyte_fundamentals/extending_flyte": "../user_guide/flyte_fundamentals/extending_flyte.html",
@@ -155,29 +151,24 @@ redirects = {
     "flyte_fundamentals/running_and_scheduling_workflows": "../user_guide/flyte_fundamentals/running_and_scheduling_workflows.html",
     "flyte_fundamentals/tasks_workflows_and_launch_plans": "../user_guide/flyte_fundamentals/tasks_workflows_and_launch_plans.html",
     "flyte_fundamentals/visualizing_task_input_and_output": "../user_guide/flyte_fundamentals/visualizing_task_input_and_output.html",
-
     # flytesnacks
     "flytesnacks/contribute": "../community/contribute/contribute_docs.html",
     "community/contribute": "community/contribute/contribute_code.html",
     "flytesnacks/integrations": "../flytesnacks/integrations/index.html",
     "flytesnacks/tutorials": "../flytesnacks/tutorials.html",
-
     # getting started with workflow development
     "getting_started_with_workflow_development/index": "../user_guide/getting_started_with_workflow_development/index.html",
     "getting_started_with_workflow_development/creating_a_flyte_project": "../user_guide/getting_started_with_workflow_development/creating_a_flyte_project.html",
     "getting_started_with_workflow_development/flyte_project_components": "../user_guide/getting_started_with_workflow_development/flyte_project_components.html",
     "getting_started_with_workflow_development/installing_development_tools": "../user_guide/getting_started_with_workflow_development/installing_development_tools.html",
     "getting_started_with_workflow_development/running_a_workflow_locally": "../user_guide/getting_started_with_workflow_development/running_a_workflow_locally.html",
-
     # misc standalone pages
     "introduction": "../user_guide/introduction.html",
     "quickstart_guide": "../user_guide/quickstart_guide.html",
-
     # flytectl
     "flytectl/docs_index": "../../api/flytectl/docs_index.html",
     "flytectl/overview": "../../api/flytectl/overview.html",
     "flytectl/gen/flytectl": "../../api/flytectl/gen/flytectl.html",
-
     # flytectl verbs
     "flytectl/verbs": "../../api/flytectl/verbs.html",
     "flytectl/gen/flytectl_create": "../../api/flytectl/gen/flytectl_create.html",
@@ -192,97 +183,80 @@ redirects = {
     "flytectl/gen/flytectl_demo": "../../api/flytectl/gen/flytectl_demo.html",
     "flytectl/gen/flytectl_version": "../../api/flytectl/gen/flytectl_version.html",
     "flytectl/gen/flytectl_upgrade": "../../api/flytectl/gen/flytectl_upgrade.html",
-
     # flytectl nouns
     "flytectl/nouns": "../../api/flytectl/nouns.html",
-
     # flytectl project
     "flytectl/project": "../../api/flytectl/project.html",
     "flytectl/gen/flytectl_create_project": "../../api/flytectl/gen/flytectl_create_project.html",
     "flytectl/gen/flytectl_create_project": "../../api/flytectl/gen/flytectl_create_project.html",
     "flytectl/gen/flytectl_update_project": "../../api/flytectl/gen/flytectl_update_project.html",
-
     # flytectl execution
     "flytectl/execution": "../../api/flytectl/execution.html",
     "flytectl/gen/flytectl_create_execution": "../../api/flytectl/gen/flytectl_create_execution.html",
     "flytectl/gen/flytectl_get_execution": "../../api/flytectl/gen/flytectl_get_execution.html",
     "flytectl/gen/flytectl_update_execution": "../../api/flytectl/gen/flytectl_update_execution.html",
     "flytectl/gen/flytectl_delete_execution": "../../api/flytectl/gen/flytectl_delete_execution.html",
-
     # flytectl workflow
     "flytectl/workflow": "../../api/flytectl/workflow.html",
     "flytectl/gen/flytectl_get_workflow": "../../api/flytectl/gen/flytectl_get_workflow.html",
     "flytectl/gen/flytectl_update_workflow-meta": "../../api/flytectl/gen/flytectl_update_workflow-meta.html",
-
     # flytectl task
     "flytectl/task": "../../api/flytectl/task.html",
     "flytectl/gen/flytectl_get_task": "../../api/flytectl/gen/flytectl_get_task.html",
     "flytectl/gen/flytectl_update_task-meta": "../../api/flytectl/gen/flytectl_update_task-meta.html",
-
     # flytectl task resource attribute
     "flytectl/task-resource-attribute": "../../api/flytectl/task-resource-attribute.html",
     "flytectl/gen/flytectl_get_task-resource-attribute": "../../api/flytectl/gen/flytectl_get_task-resource-attribute.html",
     "flytectl/gen/flytectl_update_task-resource-attribute": "../../api/flytectl/gen/flytectl_update_task-resource-attribute.html",
     "flytectl/gen/flytectl_delete_task-resource-attribute": "../../api/flytectl/gen/flytectl_delete_task-resource-attribute.html",
-
     # flytectl cluster resource attribute
     "flytectl/cluster-resource-attribute": "../../api/flytectl/cluster-resource-attribute.html",
     "flytectl/gen/flytectl_get_cluster-resource-attribute": "../../api/flytectl/gen/flytectl_get_cluster-resource-attribute.html",
     "flytectl/gen/flytectl_update_cluster-resource-attribute": "../../api/flytectl/gen/flytectl_update_cluster-resource-attribute.html",
     "flytectl/gen/flytectl_delete_cluster-resource-attribute": "../../api/flytectl/gen/flytectl_delete_cluster-resource-attribute.html",
-
     # flytectl execution cluster label
     "flytectl/execution-cluster-label": "../../api/flytectl/execution-cluster-label.html",
     "flytectl/gen/flytectl_get_execution-cluster-label": "../../api/flytectl/gen/flytectl_get_execution-cluster-label.html",
     "flytectl/gen/flytectl_update_execution-cluster-label": "../../api/flytectl/gen/flytectl_update_execution-cluster-label.html",
     "flytectl/gen/flytectl_delete_execution-cluster-label": "../../api/flytectl/gen/flytectl_delete_execution-cluster-label",
-
     # flytectl execution queue attribute
     "flytectl/execution-queue-attribute": "../../api/flytectl/execution-queue-attribute.html",
     "flytectl/gen/flytectl_get_execution-queue-attribute": "../../api/flytectl/gen/flytectl_get_execution-queue-attribute.html",
     "flytectl/gen/flytectl_update_execution-queue-attribute": "../../api/flytectl/gen/flytectl_update_execution-queue-attribute.html",
     "flytectl/gen/flytectl_delete_execution-queue-attribute": "../../api/flytectl/gen/flytectl_delete_execution-queue-attribute",
-
     # flytectl plugin override
     "flytectl/plugin-override": "../../api/flytectl/plugin-override.html",
     "flytectl/gen/flytectl_get_plugin-override": "../../api/flytectl/gen/flytectl_get_plugin-override.html",
     "flytectl/gen/flytectl_update_plugin-override": "../../api/flytectl/gen/flytectl_update_plugin-override.html",
     "flytectl/gen/flytectl_delete_plugin-override": "../../api/flytectl/gen/flytectl_delete_plugin-override",
-
     # flytectl launchplan
     "flytectl/launchplan": "../../api/flytectl/launchplan.html",
     "flytectl/gen/flytectl_get_launchplan": "../../api/flytectl/gen/flytectl_get_launchplan.html",
     "flytectl/gen/flytectl_update_launchplan": "../../api/flytectl/gen/flytectl_update_launchplan.html",
     "flytectl/gen/flytectl_update_launchplan-meta": "../../api/flytectl/gen/flytectl_update_launchplan-meta.html",
-
     # flytectl workflow execution config
     "flytectl/workflow-execution-config": "../../api/flytectl/workflow-execution-config.html",
     "flytectl/gen/flytectl_get_workflow-execution-config": "../../api/flytectl/gen/flytectl_get_workflow-execution-config.html",
     "flytectl/gen/flytectl_update_workflow-execution-config": "../../api/flytectl/gen/flytectl_update_workflow-execution-config.html",
     "flytectl/gen/flytectl_delete_workflow-execution-config": "../../api/flytectl/gen/flytectl_delete_workflow-execution-config",
-
     # flytectl examples
     "flytectl/examples": "../../api/flytectl/examples.html",
     "flytectl/gen/flytectl_register_examples": "../../api/flytectl/gen/flytectl_register_examples",
-
     # flytectl files
     "flytectl/files": "../../api/flytectl/files.html",
     "flytectl/gen/flytectl_register_files": "../../api/flytectl/gen/flytectl_register_files",
-
     # flytectl config
     "flytectl/config": "../../api/flytectl/config.html",
     "flytectl/gen/flytectl_config_validate": "../../api/flytectl/gen/flytectl_config_validate",
     "flytectl/gen/flytectl_config_init": "../../api/flytectl/gen/flytectl_config_init",
     "flytectl/gen/flytectl_config_docs": "../../api/flytectl/gen/flytectl_config_docs",
     "flytectl/gen/flytectl_config_discover": "../../api/flytectl/gen/flytectl_config_discover",
-
     # flytectl sandbox
     "flytectl/sandbox": "../../api/flytectl/sandbox.html",
     "flytectl/gen/flytectl_sandbox_start": "../../api/flytectl/gen/flytectl_sandbox_start",
     "flytectl/gen/flytectl_sandbox_status": "../../api/flytectl/gen/flytectl_sandbox_status",
     "flytectl/gen/flytectl_sandbox_teardown": "../../api/flytectl/gen/flytectl_sandbox_teardown",
     "flytectl/gen/flytectl_sandbox_exec": "../../api/flytectl/gen/flytectl_sandbox_exec",
-
     # flytectl demo
     "flytectl/demo": "../../api/flytectl/demo.html",
     "flytectl/gen/flytectl_demo_start": "../../api/flytectl/gen/flytectl_demo_start",
@@ -290,7 +264,6 @@ redirects = {
     "flytectl/gen/flytectl_demo_teardown": "../../api/flytectl/gen/flytectl_demo_teardown",
     "flytectl/gen/flytectl_demo_exec": "../../api/flytectl/gen/flytectl_demo_exec",
     "flytectl/gen/flytectl_demo_reload": "../../api/flytectl/gen/flytectl_demo_reload",
-
     # flyteidl
     "reference_flyteidl": "../../api/flyteidl/docs_index.html",
     "protos/docs/core/core": "../../api/flyteidl/docs/core/core.html",
@@ -428,7 +401,7 @@ html_theme_options = {
             "url": "https://flyte.org",
             "icon": "fa-solid fa-dragon",
             "type": "fontawesome",
-        }
+        },
     ],
     "use_edit_page_button": True,
     "navbar_start": ["navbar-logo"],
@@ -458,7 +431,7 @@ html_sidebars = {
     "ecosystem/**": ["sidebar/custom"],
     "flytesnacks/integrations/**": ["sidebar/integrations"],
     "flytesnacks/tutorials/**": ["sidebar/tutorials"],
-    "user_guide/**": ["sidebar/custom"]
+    "user_guide/**": ["sidebar/custom"],
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -572,7 +545,9 @@ nb_custom_formats = {
 #
 # - :ref:`cookbook:label` -> :ref:`label`
 # - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
-INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
+INTERSPHINX_REFS_PATTERN = (
+    r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
+)
 INTERSPHINX_REFS_REPLACE = r"\1"
 
 # Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
@@ -582,7 +557,6 @@ PROTO_REF_REPLACE = r"\1/api/flyteidl/docs"
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
-
     r"<flyte:deployment/index>": r"</deployment/index>",
     r"<flytectl:index>": r"</api/flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
@@ -597,7 +571,7 @@ REPLACE_PATTERNS = {
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    r"/protos/docs/service/index": r"/api/flyteidl/docs/service/service"
+    r"/protos/docs/service/index": r"/api/flyteidl/docs/service/service",
 }
 
 # r"<environment_setup>": r"</flytesnacks/environment_setup>",
@@ -606,10 +580,7 @@ import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
-    "list_table_toc": [
-       "flytesnacks/tutorials",
-       "flytesnacks/integrations"
-    ],
+    "list_table_toc": ["flytesnacks/tutorials", "flytesnacks/integrations"],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
 
@@ -638,7 +609,7 @@ import_projects = [
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
                 "flytesnacks/index.md",
-            ]
+            ],
         ],
         "local": flytesnacks_local_path is not None,
     },
@@ -649,8 +620,18 @@ import_projects = [
         "dest": "api/flytekit",
         "cmd": [
             ["mkdir", "-p", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", f"{flytekit_path}/flytekit", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", f"{flytekit_path}/plugins", import_projects_config["flytekit_api_dir"]],
+            [
+                "cp",
+                "-R",
+                f"{flytekit_path}/flytekit",
+                import_projects_config["flytekit_api_dir"],
+            ],
+            [
+                "cp",
+                "-R",
+                f"{flytekit_path}/plugins",
+                import_projects_config["flytekit_api_dir"],
+            ],
             ["cp", "-R", f"{flytekit_path}/tests", "./tests"],
         ],
         "local": flytekit_local_path is not None,
@@ -668,7 +649,7 @@ import_projects = [
         "docs_path": "protos",
         "dest": "api/flyteidl",
         "local": True,
-    }
+    },
 ]
 
 # myst notebook docs customization
@@ -810,7 +791,6 @@ def setup(app: sphinx.application.Sphinx) -> None:
     logger = logging.getLogger("sphinx")
 
     warning_handler, *_ = [
-        h for h in logger.handlers
-        if isinstance(h, sphinx_logging.WarningStreamHandler)
+        h for h in logger.handlers if isinstance(h, sphinx_logging.WarningStreamHandler)
     ]
     warning_handler.filters.insert(0, CustomWarningSuppressor(app))
