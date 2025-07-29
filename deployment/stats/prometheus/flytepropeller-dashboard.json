@@ -4406,7 +4406,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000",
+              "expr": "sum(flyte:propeller:all:build_dynamic_workflow_us) by (quantile, wf) / 1000",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4414,7 +4414,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000",
+              "query": "sum(flyte:propeller:all:build_dynamic_workflow_us) by (quantile, wf) / 1000",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4533,7 +4533,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)",
+              "expr": "sum(rate(flyte:propeller:all:build_dynamic_workflow_us_count[5m])) by (wf)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4541,7 +4541,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)",
+              "query": "sum(rate(flyte:propeller:all:build_dynamic_workflow_us_count[5m])) by (wf)",
               "refId": "A",
               "step": 10,
               "target": ""
