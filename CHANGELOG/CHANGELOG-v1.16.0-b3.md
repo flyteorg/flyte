@@ -11,7 +11,7 @@ Primarily, changes around sys_ptrace and how container tasks work
 * Bump github.com/go-viper/mapstructure/v2 from 2.1.0 to 2.3.0 in /boilerplate/flyte/golang_support_tools by @dependabot[bot] in https://github.com/flyteorg/flyte/pull/6512
 * chore: fix some minor issues in the comments by @gopherorg in https://github.com/flyteorg/flyte/pull/6511
 * Do not override compile-time podTemplate resources with config defaults if they're set by @punkerpunker in https://github.com/flyteorg/flyte/pull/6483
-* Set service account in base ray pod spec, allow it to be overriden by pod template by @Sovietaced in https://github.com/flyteorg/flyte/pull/6514
+* Set service account in base ray pod spec, allow it to be overridden by pod template by @Sovietaced in https://github.com/flyteorg/flyte/pull/6514
 * refactor: Adjust CoPilot init and Pod status logic by @pingsutw in https://github.com/flyteorg/flyte/pull/6523
 * chore: fix inconsistent function name in comment by @jingchanglu in https://github.com/flyteorg/flyte/pull/6528
 * Fix PodTemplate resource state pollution between workflow runs by @punkerpunker in https://github.com/flyteorg/flyte/pull/6530
