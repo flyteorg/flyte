@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -99,7 +100,7 @@ func processTaskType(ctx context.Context, taskName string, taskVersion int32, de
 
 	// Register default version if not registered
 	if !pluginmachinery.PluginRegistry().IsPluginForTaskTypeRegistered(versionedTaskType, deploymentID) {
-		registerNewPlugin(taskName, taskVersion, deploymentID, connectorDeployment, cs)
+		registerNewPlugin(taskName, taskVersion, deploymentID, *connectorDeployment, cs)
 	} else {
 		updatePlugin(versionedTaskType, deploymentID)
 	}
@@ -108,18 +109,19 @@ func processTaskType(ctx context.Context, taskName string, taskVersion int32, de
 
 func watchConnectors(ctx context.Context, cs *ClientSet) {
 	cfg := GetConfig()
-	connectorDeployments := make(map[string]*Deployment)
+	var connectorDeploymentIDs []string
+	var connectorDeployments []*Deployment
 
-	// Merge ConnectorDeployments
-	for key, deployment := range cfg.ConnectorDeployments {
-		connectorDeployments[key] = deployment
-	}
-	
 	// Merge DefaultConnector (if endpoint is not empty)
 	if len(cfg.DefaultConnector.Endpoint) != 0 {
-		connectorDeployments[defaultDeploymentID] = &cfg.DefaultConnector
+		connectorDeploymentIDs = append(connectorDeploymentIDs, defaultDeploymentID)
+		connectorDeployments = append(connectorDeployments, &cfg.DefaultConnector) 
 	}
-	for deploymentID, connectorDeployment := range connectorDeployments {
+	connectorDeploymentIDs = append(connectorDeploymentIDs, maps.Keys(cfg.ConnectorDeployments)...)
+	connectorDeployments = append(connectorDeployments, maps.Values(cfg.ConnectorDeployments)...)
+	
+	for idx, connectorDeployment := range connectorDeployments {
+		deploymentID := connectorDeploymentIDs[idx]
 		client, ok := cs.connectorMetadataClients[connectorDeployment.Endpoint]
 		if !ok {
 			logger.Warningf(ctx, "Connector client not found in the clientSet for the endpoint: %v", connectorDeployment.Endpoint)
@@ -159,8 +161,10 @@ func watchConnectors(ctx context.Context, cs *ClientSet) {
 			}
 			// Process supported task categories
 			for _, supportedCategory := range supportedTaskCategories {
-				versionedTaskType := processTaskType(ctx, supportedCategory.Name, supportedCategory.Version, deploymentID, connectorDeployment, cs)
-				connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
+				if supportedCategory.Version != defaultTaskTypeVersion {
+					versionedTaskType := processTaskType(ctx, supportedCategory.Name, supportedCategory.Version, deploymentID, connectorDeployment, cs)
+					connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
+				}
 			}
 		}
 		keys := make([]string, 0, len(connectorSupportedTaskCategories))

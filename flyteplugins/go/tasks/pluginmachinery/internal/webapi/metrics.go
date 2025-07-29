@@ -1,12 +1,19 @@
 package webapi
 
 import (
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+)
+
+// Global metrics cache to avoid recreating metrics for the same scope
+var (
+	metricsCache = make(map[string]*Metrics)
+	metricsMutex sync.RWMutex
 )
 
 type Metrics struct {
@@ -25,7 +32,26 @@ var (
 )
 
 func newMetrics(scope promutils.Scope) Metrics {
-	return Metrics{
+	scopeName := scope.CurrentScope()
+	
+	// Check if we already have metrics for this scope
+	metricsMutex.RLock()
+	if cachedMetrics, exists := metricsCache[scopeName]; exists {
+		defer metricsMutex.RUnlock()
+		return *cachedMetrics
+	}
+	metricsMutex.RUnlock()
+	
+	// Create new metrics and store globally
+	metricsMutex.Lock()
+	defer metricsMutex.Unlock()
+	
+	// Double-check in case another goroutine created metrics while we were acquiring the lock
+	if cachedMetrics, exists := metricsCache[scopeName]; exists {
+		return *cachedMetrics
+	}
+	
+	newMetrics := Metrics{
 		Scope: scope,
 		ResourceReleased: labeled.NewCounter("resource_release_success",
 			"Resource allocation token released", scope, labeled.EmitUnlabeledMetric),
@@ -42,4 +68,7 @@ func newMetrics(scope promutils.Scope) Metrics {
 		FailedUnmarshalState: labeled.NewCounter("unmarshal_state_failed",
 			"Failed to unmarshal state", scope, labeled.EmitUnlabeledMetric),
 	}
+	
+	metricsCache[scopeName] = &newMetrics
+	return newMetrics
 }

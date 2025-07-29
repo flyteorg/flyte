@@ -2,7 +2,6 @@ package webapi
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -176,13 +175,12 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 		cfg:    cfg,
 	}
 
-	scopeName := fmt.Sprintf("cache_%s", name)
 	autoRefreshCache, err := cache.NewAutoRefreshCache(name, q.SyncResource,
 		workqueue.NewMaxOfRateLimiter(
 			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
 			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
 		), cfg.ResyncInterval.Duration, uint(cfg.Workers), uint(cfg.Size), // #nosec G115
-		scope.NewSubScope(scopeName))
+		scope.NewSubScope("cache"))
 
 	if err != nil {
 		logger.Errorf(ctx, "Could not create AutoRefreshCache. Error: [%s]", err)

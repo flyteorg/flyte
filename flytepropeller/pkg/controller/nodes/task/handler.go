@@ -261,6 +261,33 @@ func (t *Handler) FinalizeRequired() bool {
 	return true
 }
 
+// getConnectorPlugin retrieves a plugin from connectorDeploymentsForType map with proper locking
+func (t *Handler) getConnectorPlugin(taskType pluginCore.TaskType, deploymentID string) (pluginCore.Plugin, bool) {
+	t.mu.RLock()
+	deploymentMap, exists := t.connectorDeploymentsForType[taskType]
+	t.mu.RUnlock()
+	
+	if !exists {
+		return nil, false
+	}
+	
+	t.mu.RLock()
+	plugin, pluginExists := deploymentMap[deploymentID]
+	t.mu.RUnlock()
+	
+	return plugin, pluginExists
+}
+
+func (t *Handler) registerConnectorPlugin(corePlugin pluginCore.Plugin, deploymentID string) {
+	t.mu.Lock()
+	t.defaultPlugins[corePlugin.GetID()] = corePlugin
+	if t.connectorDeploymentsForType[corePlugin.GetID()] == nil {
+		t.connectorDeploymentsForType[corePlugin.GetID()] = make(map[string]pluginCore.Plugin)
+	}
+	t.connectorDeploymentsForType[corePlugin.GetID()][deploymentID] = corePlugin
+	t.mu.Unlock()
+}
+
 func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	if t.defaultPlugin != nil {
 		logger.Errorf(ctx, "cannot set plugin [%s] as default as plugin [%s] is already configured as default", p.GetID(), t.defaultPlugin.GetID())
@@ -288,49 +315,29 @@ func (t *Handler) watchPlugins(ctx context.Context, sCtx interfaces.SetupContext
 				sCtxFinal := newNameSpacedSetupCtx(
 					tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), wpe.ID)
 				// register core plugin
-				for _, cpe := range pluginMachinery.PluginRegistry().GetCorePlugins() {
-					if cpe.ID == wpe.ID {
-						cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, cpe)
-						if err != nil {
-							return regErrors.Wrapf(err, "failed to load plugin - %s", wpe.ID)
-						}
-						// register the plugin to task handler local plugin registry
-						t.mu.Lock()
-						t.defaultPlugins[cp.GetID()] = cp
-						if t.connectorDeploymentsForType[cp.GetID()] == nil {
-							t.connectorDeploymentsForType[cp.GetID()] = make(map[string]pluginCore.Plugin)
-						}
-						t.connectorDeploymentsForType[cp.GetID()][registerInfo.DeploymentID] = cp
-						t.mu.Unlock()
-						pluginMachinery.PluginRegistry().AddRegisteredPluginForTaskType(cp.GetID(), registerInfo.DeploymentID)
-						logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] registered", registerInfo.Plugin.ID, registerInfo.DeploymentID)
-						break
+				if cpe, ok := pluginMachinery.PluginRegistry().GetConnectorCorePlugin(wpe.ID, registerInfo.DeploymentID); ok {
+					cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, cpe)
+					if err != nil {
+						return regErrors.Wrapf(err, "failed to load plugin - %s", wpe.ID)
 					}
+					// register the plugin to task handler local plugin registry
+					t.registerConnectorPlugin(cp, registerInfo.DeploymentID)
+					pluginMachinery.PluginRegistry().AddRegisteredPluginForTaskType(cp.GetID(), registerInfo.DeploymentID)
+					logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] registered", registerInfo.Plugin.ID, registerInfo.DeploymentID)
 				}
 			} else {
 				logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] already registered", registerInfo.Plugin.ID, registerInfo.DeploymentID)
 			}
 		case updateInfo := <-pluginMachinery.PluginRegistry().GetPluginUpdateChan():
 			if pluginMachinery.PluginRegistry().IsPluginForTaskTypeRegistered(updateInfo.TaskType, updateInfo.DeploymentID) {
-				t.mu.RLock()
-				deploymentMap, exists := t.connectorDeploymentsForType[updateInfo.TaskType]
-				t.mu.RUnlock()
-				
-				if exists {
-					t.mu.RLock()
-					plugin, pluginExists := deploymentMap[updateInfo.DeploymentID]
-					t.mu.RUnlock()
-					
-					if pluginExists {
-						t.mu.Lock()
-						t.defaultPlugins[updateInfo.TaskType] = plugin
-						t.mu.Unlock()
-						logger.Infof(ctx, "The default plugin for TaskType [%s] has been updated to Deployment ID [%s]", updateInfo.TaskType, updateInfo.DeploymentID)
-					} else {
-						logger.Warningf(ctx, "Plugin for TaskType [%s] and deployment ID [%s] not found", updateInfo.TaskType, updateInfo.DeploymentID)
-					}
+				plugin, pluginExists := t.getConnectorPlugin(updateInfo.TaskType, updateInfo.DeploymentID)
+				if pluginExists {
+					t.mu.Lock()
+					t.defaultPlugins[updateInfo.TaskType] = plugin
+					t.mu.Unlock()
+					logger.Infof(ctx, "The default plugin for TaskType [%s] has been updated to Deployment ID [%s]", updateInfo.TaskType, updateInfo.DeploymentID)
 				} else {
-					logger.Warningf(ctx, "Deployment ID [%s] for TaskType [%s] not found", updateInfo.DeploymentID, updateInfo.TaskType)
+					logger.Warningf(ctx, "Plugin for TaskType [%s] and deployment ID [%s] not found", updateInfo.TaskType, updateInfo.DeploymentID)
 				}
 			} else {
 				logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] not yet registered", updateInfo.TaskType, updateInfo.DeploymentID)

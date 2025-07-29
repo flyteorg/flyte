@@ -436,13 +436,13 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func createPluginEntry(taskType core.TaskType, taskVersion int32, deployment *Deployment, clientSet *ClientSet) webapi.PluginEntry {
+func createPluginEntry(taskType core.TaskType, taskVersion int32, deployment Deployment, clientSet *ClientSet) webapi.PluginEntry {
 	versionedTaskType := fmt.Sprintf("%s_%d", taskType, taskVersion)
 	plugin := &Plugin{
 		metricScope: promutils.NewScope(versionedTaskType),
 		cfg:         GetConfig(),
 		cs:          clientSet,
-		deployment:  Connector{IsSync: false, ConnectorDeployment: deployment},
+		deployment:  Connector{IsSync: false, ConnectorDeployment: &deployment},
 	}
 	return webapi.PluginEntry{
 		ID:                 versionedTaskType,
@@ -464,9 +464,9 @@ func updatePlugin(versionedTaskType string, deploymentID string) {
 	}
 }
 
-func registerNewPlugin(taskType core.TaskType, taskTypeVersion int32, deploymentID string, deployment *Deployment, cs *ClientSet) {
+func registerNewPlugin(taskType core.TaskType, taskTypeVersion int32, deploymentID string, deployment Deployment, cs *ClientSet) {
 	plugin := createPluginEntry(taskType, taskTypeVersion, deployment, cs)
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(plugin)
+	pluginmachinery.PluginRegistry().RegisterConnectorCorePlugin(plugin, deploymentID)
 	select {
 	case pluginmachinery.PluginRegistry().GetPluginRegistrationChan() <- pluginmachinery.PluginRegistrationInfo{
 		Plugin:   plugin,

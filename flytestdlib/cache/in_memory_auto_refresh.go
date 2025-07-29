@@ -19,6 +19,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+// Global metrics cache to avoid recreating metrics for the same scope
+var (
+	metricsCache = make(map[string]*metrics)
+	metricsMutex sync.RWMutex
+)
+
 type metrics struct {
 	SyncErrors  prometheus.Counter
 	Evictions   prometheus.Counter
@@ -30,7 +36,25 @@ type metrics struct {
 }
 
 func newMetrics(scope promutils.Scope) metrics {
-	return metrics{
+	scopeName := scope.CurrentScope()
+	// Check if we already have metrics for this scope
+	metricsMutex.RLock()
+	if cachedMetrics, exists := metricsCache[scopeName]; exists {
+		defer metricsMutex.RUnlock()
+		return *cachedMetrics
+	}
+	metricsMutex.RUnlock()
+	
+	// Create new metrics and store globally
+	metricsMutex.Lock()
+	defer metricsMutex.Unlock()
+	
+	// Double-check in case another goroutine created metrics while we were acquiring the lock
+	if cachedMetrics, exists := metricsCache[scopeName]; exists {
+		return *cachedMetrics
+	}
+	
+	newMetrics := metrics{
 		SyncErrors:  scope.MustNewCounter("sync_errors", "Counter for sync errors."),
 		Evictions:   scope.MustNewCounter("lru_evictions", "Counter for evictions from LRU."),
 		SyncLatency: scope.MustNewStopWatch("latency", "Latency for sync operations.", time.Millisecond),
@@ -39,6 +63,9 @@ func newMetrics(scope promutils.Scope) metrics {
 		Size:        scope.MustNewGauge("size", "Current size of the cache"),
 		scope:       scope,
 	}
+	
+	metricsCache[scopeName] = &newMetrics
+	return newMetrics
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -133,8 +160,6 @@ func NewInMemoryAutoRefresh(
 	}
 
 	metrics := newMetrics(scope)
-	ctx := context.Background()
-	logger.Debug(ctx, "the scope is %s", metrics)
 	// #nosec G115
 	lruCache, err := lru.NewWithEvict(int(size), getEvictionFunction(metrics.Evictions))
 	if err != nil {
@@ -152,7 +177,7 @@ func NewInMemoryAutoRefresh(
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue: workqueue.NewRateLimitingQueueWithConfig(syncRateLimiter, workqueue.RateLimitingQueueConfig{
-			Name:  scope.CurrentScope(),
+			// Name:  scope.CurrentScope(),
 			Clock: opts.clock,
 		}),
 		clock:              opts.clock,
