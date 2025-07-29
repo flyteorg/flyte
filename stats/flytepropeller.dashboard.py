@@ -438,7 +438,7 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f"sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000",
+                        expr=f"sum(flyte:propeller:all:build_dynamic_workflow_us) by (quantile, wf) / 1000",
                         refId="A",
                     ),
                 ],
@@ -449,7 +449,7 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f"sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)",
+                        expr=f"sum(rate(flyte:propeller:all:build_dynamic_workflow_us_count[5m])) by (wf)",
                         refId="A",
                     ),
                 ],
