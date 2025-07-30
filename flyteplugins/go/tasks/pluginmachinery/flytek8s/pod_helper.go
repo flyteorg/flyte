@@ -438,6 +438,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
+	// Fetch base pod template early to extract container resources for proper priority handling
+	basePodTemplate, err := getBasePodTemplate(ctx, tCtx, DefaultPodTemplateStore)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
 		Inputs:            tCtx.InputReader(),
@@ -449,9 +455,16 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// iterate over the initContainers first
 	for index := range podSpec.InitContainers {
-		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
+		var resourceMode = ResourceCustomizationModeMergeExistingResources
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
+		// Extract pod template resources for this init container
+		var podTemplateResources *v1.ResourceRequirements
+		if basePodTemplate != nil {
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, podSpec.InitContainers[index].Name, true)
+			podTemplateResources = &resources
+		}
+
+		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index], podTemplateResources); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -464,7 +477,14 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 			resourceMode = ResourceCustomizationModeMergeExistingResources
 		}
 
-		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.Containers[index]); err != nil {
+		// Extract pod template resources for this container
+		var podTemplateResources *v1.ResourceRequirements
+		if basePodTemplate != nil {
+			resources := ExtractContainerResourcesFromPodTemplate(basePodTemplate, container.Name, false)
+			podTemplateResources = &resources
+		}
+
+		if err := AddFlyteCustomizationsToContainerWithPodTemplate(ctx, templateParameters, resourceMode, &podSpec.Containers[index], podTemplateResources); err != nil {
 			return nil, nil, err
 		}
 

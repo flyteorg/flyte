@@ -90,7 +90,7 @@ func GetMPIPhaseInfo(currentCondition kubeflowv1.JobCondition, occurredAt time.T
 
 // GetLogs will return the logs for kubeflow job
 func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, taskTemplate *core.TaskTemplate, hasMaster bool,
-	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32) ([]*core.TaskLog, error) {
+	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32, primaryContainerName string) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
 
@@ -126,6 +126,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 				PodUnixFinishTime:    finishTime,
 				TaskExecutionID:      taskExecID,
 				TaskTemplate:         taskTemplate,
+				ContainerName:        primaryContainerName,
 			},
 		)
 		if masterErr != nil {
@@ -145,6 +146,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			PodUnixFinishTime:    finishTime,
 			TaskExecutionID:      taskExecID,
 			TaskTemplate:         taskTemplate,
+			ContainerName:        primaryContainerName,
 		})
 		if err != nil {
 			return nil, err
@@ -328,7 +330,7 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	}
 
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if resources != nil {
+	if resources != nil && (len(resources.GetLimits()) > 0 || len(resources.GetRequests()) > 0) {
 		resources, err := flytek8s.ToK8sResourceRequirements(resources)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())

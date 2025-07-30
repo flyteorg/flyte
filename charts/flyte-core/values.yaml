@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.15.3  # FLYTEADMIN_TAG
+    tag: v1.16.0-b3  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -33,6 +33,16 @@ flyteadmin:
   env: []
   # -- Additional flyteadmin environment variables from a reference (ie: Secret or ConfigMap)
   envFrom: []
+  # -- Default readinessProbe and livenessProbe for Flyteadmin deployment
+  readinessProbe: |-
+    exec:
+      command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+    initialDelaySeconds: 15
+  livenessProbe: |-
+    exec:
+      command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+    initialDelaySeconds: 20
+    periodSeconds: 5
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
     limits:
@@ -73,14 +83,23 @@ flyteadmin:
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
     # -- Should a ClusterRole be created for Flyteadmin
-    createClusterRole: true
+    # (DEPRECATED) Use `rbac: true` instead
+    createClusterRole:
+    # -- Should create RBAC resources for FlynAdmin (Role/RoleBinding or ClusterRole/ClusterRoleBinding)
+    rbac: true
+    # -- What scope are the RBAC resources created for - cluster, or namespace?
+    # Valid values are `cluster` and `namespace`
+    rbacScope: cluster
     # -- Configuration for ClusterRole created for Flyteadmin
+    # (DEPRECATED) Use `rbacRules` instead
     clusterRole:
+    # -- Configuration for ClusterRole created for Flyteadmin
+    rbacRules:
       # -- Specifies the API groups that this ClusterRole can access
       apiGroups:
         - ""
-        - "flyte.lyft.com"
-        - "rbac.authorization.k8s.io"
+        - flyte.lyft.com
+        - rbac.authorization.k8s.io
       # -- Specifies the resources that this ClusterRole can access
       resources:
         - configmaps
@@ -152,7 +171,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.15.3  # FLYTESCHEDULER_TAG
+    tag: v1.16.0-b3  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -222,7 +241,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.15.3  # DATACATALOG_TAG
+    tag: v1.16.0-b3  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -323,7 +342,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.15.3  # FLYTEPROPELLER_TAG
+    tag: v1.16.0-b3  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -361,6 +380,72 @@ flytepropeller:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+    # -- What scope are the RBAC resources created for - cluster, or namespace?
+    # Valid values are `cluster` and `namespace`
+    rbacScope: cluster
+    # -- Configuration for ClusterRole created for Flyteadmin
+    rbacRules:
+      # Allow RO access to PODS
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - watch
+      # Allow Event recording access
+      - apiGroups:
+          - ""
+        resources:
+          - events
+        verbs:
+          - create
+          - update
+          - delete
+          - patch
+      # Allow Access All plugin objects
+      - apiGroups:
+          - '*'
+        resources:
+          - '*'
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - delete
+          - patch
+      # Allow Access to CRD
+      - apiGroups:
+          - apiextensions.k8s.io
+        resources:
+          - customresourcedefinitions
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - delete
+          - update
+      # Allow Access to all resources under flyte.lyft.com
+      - apiGroups:
+          - flyte.lyft.com
+        resources:
+          - flyteworkflows
+          - flyteworkflows/finalizers
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - delete
+          - patch
+          - post
+          - deletecollection
+
   # -- Annotations for Flytepropeller deployment
   annotations: {}
   # -- Annotations for Flytepropeller pods
@@ -526,6 +611,24 @@ webhook:
     annotations: {}
     # -- ImagePullSecrets to automatically assign to the service account
     imagePullSecrets: []
+    # -- What scope are the RBAC resources created for - cluster, or namespace?
+    # Valid values are `cluster` and `namespace`
+    rbacScope: cluster
+    # -- Configuration for ClusterRole created for Flyteadmin
+    rbacRules:
+      # Allow RO access to PODS
+      - apiGroups:
+          - "*"
+        resources:
+          - mutatingwebhookconfigurations
+          - secrets
+          - pods
+          - replicasets/finalizers
+        verbs:
+          - get
+          - create
+          - update
+          - patch
   # -- Service settings for the webhook
   service:
     annotations:
@@ -853,7 +956,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.15.3  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b3  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration

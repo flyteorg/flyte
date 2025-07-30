@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -64,6 +66,10 @@ func getTestNodeSpec(interruptible *bool) *v1alpha1.NodeSpec {
 func getTestFlyteWorkflow() *v1alpha1.FlyteWorkflow {
 	interruptible := false
 	return &v1alpha1.FlyteWorkflow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "exec-id",
+			Namespace: "ns",
+		},
 		NodeDefaults: v1alpha1.NodeDefaults{Interruptible: false},
 		RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{
 			OutputLocationPrefix: ""},
@@ -127,12 +133,14 @@ func Test_NodeContextDefault(t *testing.T) {
 		SystemFailures: 0,
 	})
 
+	enqueuedWorkflows := []string{}
+
 	nodeExecutor := nodeExecutor{
 		interruptibleFailureThreshold: 0,
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
-		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) { enqueuedWorkflows = append(enqueuedWorkflows, workflowID) },
 	}
 	p := parentInfo{}
 	execContext := executors.NewExecutionContext(w1, w1, w1, p, nil)
@@ -151,6 +159,13 @@ func Test_NodeContextDefault(t *testing.T) {
 	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetDomain(), taskIdentifier.GetDomain())
 	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetName(), taskIdentifier.GetName())
 	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.GetId().GetVersion(), taskIdentifier.GetVersion())
+
+	// Validate correct workflow ID enqueued
+	err = nodeExecContext.EnqueueOwnerFunc()()
+	require.NoError(t, err)
+	require.Len(t, enqueuedWorkflows, 1)
+	enqueuedWorkflow := enqueuedWorkflows[0]
+	require.Equal(t, "ns/exec-id", enqueuedWorkflow)
 }
 
 func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {

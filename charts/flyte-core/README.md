@@ -111,8 +111,8 @@ helm install gateway bitnami/contour -n flyte
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |
 | configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config"}` | Configuration for Flyte console UI |
-| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.15.3","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
-| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.15.3","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
+| configmap.copilot | object | `{"plugins":{"k8s":{"co-pilot":{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b3","name":"flyte-copilot-","start-timeout":"30s"}}}}` | Copilot configuration |
+| configmap.copilot.plugins.k8s.co-pilot | object | `{"image":"cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b3","name":"flyte-copilot-","start-timeout":"30s"}` | Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig) |
 | configmap.core | object | `{"manager":{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"},"propeller":{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"},"webhook":{"certDir":"/etc/webhook/certs","serviceName":"flyte-pod-webhook"}}` | Core propeller configuration |
 | configmap.core.manager | object | `{"pod-application":"flytepropeller","pod-template-container-name":"flytepropeller","pod-template-name":"flytepropeller-template"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/manager/config#Config). |
 | configmap.core.propeller | object | `{"downstream-eval-duration":"30s","enable-admin-launcher":true,"leader-election":{"enabled":true,"lease-duration":"15s","lock-config-map":{"name":"propeller-leader","namespace":"flyte"},"renew-deadline":"10s","retry-period":"2s"},"limit-namespace":"all","literal-offloading-config":{"enabled":false},"max-workflow-retries":30,"metadata-prefix":"metadata/propeller","metrics-prefix":"flyte","prof-port":10254,"queue":{"batch-size":-1,"batching-interval":"2s","queue":{"base-delay":"5s","capacity":1000,"max-delay":"120s","rate":100,"type":"maxof"},"sub-queue":{"capacity":100,"rate":10,"type":"bucket"},"type":"batch"},"rawoutput-prefix":"s3://{{ .Values.storage.bucketName }}/","workers":4,"workflow-reeval-duration":"30s"}` | follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config). |
@@ -147,7 +147,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | datacatalog.image.repository | string | `"cr.flyte.org/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v1.15.3"` | Docker image tag |
+| datacatalog.image.tag | string | `"v1.16.0-b3"` | Docker image tag |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.podEnv | object | `{}` | Additional Datacatalog container environment variables |
@@ -186,28 +186,33 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.extraArgs | object | `{}` | Appends extra command line arguments to the serve command |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v1.15.3"` |  |
+| flyteadmin.image.tag | string | `"v1.16.0-b3"` |  |
 | flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
+| flyteadmin.livenessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 20\nperiodSeconds: 5"` |  |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.podLabels | object | `{}` | Labels for Flyteadmin pods |
 | flyteadmin.priorityClassName | string | `""` | Sets priorityClassName for flyteadmin pod(s). |
+| flyteadmin.readinessProbe | string | `"exec:\n  command: [ \"sh\", \"-c\", \"reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \\\"$reply\\\" -lt 200 -o \\\"$reply\\\" -ge 400 ]; then exit 1; fi;\",\"grpc_health_probe\", \"-addr=:8089\"]\ninitialDelaySeconds: 15"` | Default readinessProbe and livenessProbe for Flyteadmin deployment |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
 | flyteadmin.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flyteadmin pod(s). |
 | flyteadmin.service | object | `{"additionalPorts":[],"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"appProtocols":{"enabled":false},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
 | flyteadmin.service.additionalPorts | list | `[]` | Appends additional ports to the service spec. |
-| flyteadmin.serviceAccount | object | `{"alwaysCreate":false,"annotations":{},"clusterRole":{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]},"create":true,"createClusterRole":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlyteAdmin |
+| flyteadmin.serviceAccount | object | `{"alwaysCreate":false,"annotations":{},"clusterRole":null,"create":true,"createClusterRole":null,"imagePullSecrets":[],"rbac":true,"rbacRules":{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]},"rbacScope":"cluster"}` | Configuration for service accounts for FlyteAdmin |
 | flyteadmin.serviceAccount.alwaysCreate | bool | `false` | Should a service account always be created for flyteadmin even without an actual flyteadmin deployment running (e.g. for multi-cluster setups) |
 | flyteadmin.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flyteadmin pods |
-| flyteadmin.serviceAccount.clusterRole | object | `{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]}` | Configuration for ClusterRole created for Flyteadmin |
-| flyteadmin.serviceAccount.clusterRole.apiGroups | list | `["","flyte.lyft.com","rbac.authorization.k8s.io"]` | Specifies the API groups that this ClusterRole can access |
-| flyteadmin.serviceAccount.clusterRole.resources | list | `["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"]` | Specifies the resources that this ClusterRole can access |
-| flyteadmin.serviceAccount.clusterRole.verbs | list | `["*"]` | Specifies the verbs (actions) that this ClusterRole can perform on the specified resources |
+| flyteadmin.serviceAccount.clusterRole | string | `nil` | Configuration for ClusterRole created for Flyteadmin (DEPRECATED) Use `rbacRules` instead |
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
-| flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
+| flyteadmin.serviceAccount.createClusterRole | string | `nil` | Should a ClusterRole be created for Flyteadmin (DEPRECATED) Use `rbac: true` instead |
 | flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flyteadmin.serviceAccount.rbac | bool | `true` | Should create RBAC resources for FlynAdmin (Role/RoleBinding or ClusterRole/ClusterRoleBinding) |
+| flyteadmin.serviceAccount.rbacRules | object | `{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]}` | Configuration for ClusterRole created for Flyteadmin |
+| flyteadmin.serviceAccount.rbacRules.apiGroups | list | `["","flyte.lyft.com","rbac.authorization.k8s.io"]` | Specifies the API groups that this ClusterRole can access |
+| flyteadmin.serviceAccount.rbacRules.resources | list | `["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"]` | Specifies the resources that this ClusterRole can access |
+| flyteadmin.serviceAccount.rbacRules.verbs | list | `["*"]` | Specifies the verbs (actions) that this ClusterRole can perform on the specified resources |
+| flyteadmin.serviceAccount.rbacScope | string | `"cluster"` | What scope are the RBAC resources created for - cluster, or namespace? Valid values are `cluster` and `namespace` |
 | flyteadmin.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flyteadmin service monitor |
 | flyteadmin.serviceMonitor.enabled | bool | `false` | If enabled create the flyteadmin service monitor |
 | flyteadmin.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
@@ -261,7 +266,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"cr.flyte.org/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v1.15.3"` |  |
+| flytepropeller.image.tag | string | `"v1.16.0-b3"` |  |
 | flytepropeller.manager | bool | `false` |  |
 | flytepropeller.manager_resources | object | `{"resources":{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}}` | If manager is set to true this can be used to give the flytepropeller-manager different resource requests than the sharded flyte propeller pods |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
@@ -276,10 +281,12 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.service | object | `{"additionalPorts":[],"enabled":false}` | Settings for flytepropeller service |
 | flytepropeller.service.additionalPorts | list | `[]` | Appends additional ports to the service spec. |
 | flytepropeller.service.enabled | bool | `false` | If enabled create the flytepropeller service |
-| flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlytePropeller |
+| flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[],"rbacRules":[{"apiGroups":[""],"resources":["pods"],"verbs":["get","list","watch"]},{"apiGroups":[""],"resources":["events"],"verbs":["create","update","delete","patch"]},{"apiGroups":["*"],"resources":["*"],"verbs":["get","list","watch","create","update","delete","patch"]},{"apiGroups":["apiextensions.k8s.io"],"resources":["customresourcedefinitions"],"verbs":["get","list","watch","create","delete","update"]},{"apiGroups":["flyte.lyft.com"],"resources":["flyteworkflows","flyteworkflows/finalizers"],"verbs":["get","list","watch","create","update","delete","patch","post","deletecollection"]}],"rbacScope":"cluster"}` | Configuration for service accounts for FlytePropeller |
 | flytepropeller.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to FlytePropeller pods |
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flytepropeller.serviceAccount.rbacRules | list | `[{"apiGroups":[""],"resources":["pods"],"verbs":["get","list","watch"]},{"apiGroups":[""],"resources":["events"],"verbs":["create","update","delete","patch"]},{"apiGroups":["*"],"resources":["*"],"verbs":["get","list","watch","create","update","delete","patch"]},{"apiGroups":["apiextensions.k8s.io"],"resources":["customresourcedefinitions"],"verbs":["get","list","watch","create","delete","update"]},{"apiGroups":["flyte.lyft.com"],"resources":["flyteworkflows","flyteworkflows/finalizers"],"verbs":["get","list","watch","create","update","delete","patch","post","deletecollection"]}]` | Configuration for ClusterRole created for Flyteadmin |
+| flytepropeller.serviceAccount.rbacScope | string | `"cluster"` | What scope are the RBAC resources created for - cluster, or namespace? Valid values are `cluster` and `namespace` |
 | flytepropeller.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flytepropeller service monitor |
 | flytepropeller.serviceMonitor.enabled | bool | `false` | If enabled create the flyetepropeller service monitor |
 | flytepropeller.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
@@ -296,7 +303,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytescheduler.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | flytescheduler.image.repository | string | `"cr.flyte.org/flyteorg/flytescheduler"` | Docker image for Flytescheduler deployment |
-| flytescheduler.image.tag | string | `"v1.15.3"` | Docker image tag |
+| flytescheduler.image.tag | string | `"v1.16.0-b3"` | Docker image tag |
 | flytescheduler.nodeSelector | object | `{}` | nodeSelector for Flytescheduler deployment |
 | flytescheduler.podAnnotations | object | `{}` | Annotations for Flytescheduler pods |
 | flytescheduler.podEnv | object | `{}` | Additional Flytescheduler container environment variables |
@@ -358,10 +365,12 @@ helm install gateway bitnami/contour -n flyte
 | webhook.resources.requests.memory | string | `"500Mi"` |  |
 | webhook.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for webhook pod(s). |
 | webhook.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for the webhook |
-| webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for the webhook |
+| webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[],"rbacRules":[{"apiGroups":["*"],"resources":["mutatingwebhookconfigurations","secrets","pods","replicasets/finalizers"],"verbs":["get","create","update","patch"]}],"rbacScope":"cluster"}` | Configuration for service accounts for the webhook |
 | webhook.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to the webhook |
 | webhook.serviceAccount.create | bool | `true` | Should a service account be created for the webhook |
 | webhook.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| webhook.serviceAccount.rbacRules | list | `[{"apiGroups":["*"],"resources":["mutatingwebhookconfigurations","secrets","pods","replicasets/finalizers"],"verbs":["get","create","update","patch"]}]` | Configuration for ClusterRole created for Flyteadmin |
+| webhook.serviceAccount.rbacScope | string | `"cluster"` | What scope are the RBAC resources created for - cluster, or namespace? Valid values are `cluster` and `namespace` |
 | webhook.strategy | object | `{}` |  |
 | webhook.topologySpreadConstraints | object | `{}` | TopologySpreadConstraints for webhook deployment |
 | workflow_notifications | object | `{"config":{},"enabled":false}` | **Optional Component** Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of various events in their workflows |

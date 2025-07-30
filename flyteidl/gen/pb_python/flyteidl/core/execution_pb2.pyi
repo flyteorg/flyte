@@ -74,6 +74,7 @@ class TaskExecution(_message.Message):
         FAILED: _ClassVar[TaskExecution.Phase]
         INITIALIZING: _ClassVar[TaskExecution.Phase]
         WAITING_FOR_RESOURCES: _ClassVar[TaskExecution.Phase]
+        RETRYABLE_FAILED: _ClassVar[TaskExecution.Phase]
     UNDEFINED: TaskExecution.Phase
     QUEUED: TaskExecution.Phase
     RUNNING: TaskExecution.Phase
@@ -82,6 +83,7 @@ class TaskExecution(_message.Message):
     FAILED: TaskExecution.Phase
     INITIALIZING: TaskExecution.Phase
     WAITING_FOR_RESOURCES: TaskExecution.Phase
+    RETRYABLE_FAILED: TaskExecution.Phase
     def __init__(self) -> None: ...
 
 class ExecutionError(_message.Message):

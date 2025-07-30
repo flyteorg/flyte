@@ -38,3 +38,10 @@ func TestKafkaSender(t *testing.T) {
 	err := kafkaSender.Send(context.Background(), "test", cloudEvent)
 	assert.Nil(t, err)
 }
+
+func TestNatsSender(t *testing.T) {
+	natsSender := NatsSender{mockCloudEventClient{}}
+	cloudEvent := cloudevents.NewEvent()
+	err := natsSender.Send(context.Background(), "test", cloudEvent)
+	assert.Nil(t, err)
+}

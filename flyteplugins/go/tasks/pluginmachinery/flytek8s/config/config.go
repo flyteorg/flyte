@@ -40,8 +40,8 @@ var (
 			OutputVolumeName:     "flyte-outputs",
 			CPU:                  "500m",
 			Memory:               "128Mi",
-			StartTimeout: config2.Duration{
-				Duration: time.Second * 100,
+			Timeout: config2.Duration{
+				Duration: time.Hour * 1,
 			},
 		},
 		DefaultCPURequest:    defaultCPURequest,
@@ -240,6 +240,8 @@ type FlyteCoPilotConfig struct {
 	// Time for which the sidecar container should wait after starting up, for the primary process to appear. If it does not show up in this time
 	// the process will be assumed to be dead or in a terminal condition and will trigger an abort.
 	StartTimeout config2.Duration `json:"start-timeout" pflag:"-,Time for which the sidecar should wait on startup before assuming the primary container to have failed startup."`
+	// Timeout for upload
+	Timeout config2.Duration `json:"timeout" pflag:"-,Max time to allow for uploads to complete."`
 	// Resources for CoPilot Containers
 	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`

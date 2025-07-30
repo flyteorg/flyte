@@ -1251,8 +1251,9 @@ k8s (`config.K8sPluginConfig`_)
     memory: 128Mi
     name: flyte-copilot-
     output-vol-name: flyte-outputs
-    start-timeout: 1m40s
+    start-timeout: 0s
     storage: ""
+    timeout: 1h0m0s
   create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
@@ -2601,8 +2602,9 @@ Co-Pilot Configuration
   memory: 128Mi
   name: flyte-copilot-
   output-vol-name: flyte-outputs
-  start-timeout: 1m40s
+  start-timeout: 0s
   storage: ""
+  timeout: 1h0m0s
   
 
 delete-resource-on-finalize (bool)
@@ -2923,7 +2925,17 @@ start-timeout (`config.Duration`_)
 
 .. code-block:: yaml
 
-  1m40s
+  0s
+  
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1h0m0s
   
 
 cpu (string)
@@ -4872,6 +4884,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  max-delta-timestamp: 72h0m0s
   max-task-phase-version-attempts: 3
   use-map-plugin-logs: false
   
@@ -4970,6 +4983,18 @@ Override subNode log links with those configured for the map plugin logs
 .. code-block:: yaml
 
   "false"
+  
+
+max-delta-timestamp (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maximum delta timestamp between ArrayNode start and an individual subNode start.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  72h0m0s
   
 
 max-task-phase-version-attempts (int)

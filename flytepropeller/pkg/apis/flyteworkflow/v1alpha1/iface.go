@@ -21,7 +21,6 @@ import (
 
 //go:generate mockery --all --with-expecter
 
-type CustomState map[string]interface{}
 type WorkflowID = string
 type TaskID = string
 type NodeID = string

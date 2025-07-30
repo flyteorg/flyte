@@ -593,7 +593,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.15.3
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.16.0-b3
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -5498,24 +5498,24 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups: 
-  - ""
-  - flyte.lyft.com
-  - rbac.authorization.k8s.io
+    - ""
+    - flyte.lyft.com
+    - rbac.authorization.k8s.io
   resources: 
-  - configmaps
-  - flyteworkflows
-  - namespaces
-  - pods
-  - resourcequotas
-  - roles
-  - rolebindings
-  - secrets
-  - services
-  - serviceaccounts
-  - spark-role
-  - limitranges
+    - configmaps
+    - flyteworkflows
+    - namespaces
+    - pods
+    - resourcequotas
+    - roles
+    - rolebindings
+    - secrets
+    - services
+    - serviceaccounts
+    - spark-role
+    - limitranges
   verbs: 
-  - '*'
+    - '*'
 ---
 # Source: flyte/charts/flyte/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -5528,69 +5528,64 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 rules:
-# Allow RO access to PODS
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
-  - watch
-# Allow Event recording access
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access All plugin objects
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-# Allow Access to CRD
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - delete
-  - update
-# Allow Access to all resources under flyte.lyft.com
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flyteworkflows
-  - flyteworkflows/finalizers
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
-  - post
-  - deletecollection
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+  - apiGroups:
+    - flyte.lyft.com
+    resources:
+    - flyteworkflows
+    - flyteworkflows/finalizers
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+    - patch
+    - post
+    - deletecollection
 ---
 # Source: flyte/charts/flyte/templates/propeller/webhook.yaml
-# Create a ClusterRole for the webhook
+# Create a Role/ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -5599,17 +5594,17 @@ metadata:
   namespace: flyte
 rules:
   - apiGroups:
-      - "*"
+    - '*'
     resources:
-      - mutatingwebhookconfigurations
-      - secrets
-      - pods
-      - replicasets/finalizers
+    - mutatingwebhookconfigurations
+    - secrets
+    - pods
+    - replicasets/finalizers
     verbs:
-      - get
-      - create
-      - update
-      - patch
+    - get
+    - create
+    - update
+    - patch
 ---
 # Source: flyte/charts/kubernetes-dashboard/templates/clusterrole-metrics.yaml
 # Copyright 2017 The Kubernetes Authors.
@@ -6718,7 +6713,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           securityContext:
@@ -6738,7 +6733,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           securityContext:
@@ -6755,7 +6750,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           securityContext:
@@ -6771,7 +6766,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -6798,7 +6793,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -6897,7 +6892,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -7022,7 +7017,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.15.3"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -7039,7 +7034,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.15.3"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -7114,7 +7109,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.15.3"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         securityContext:
@@ -7133,7 +7128,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.15.3"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -7189,7 +7184,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8a5584ee60fdd7cd7ce34fcfd7dbc56a106801c2dd2316137c5f05969de8c25"
+        configChecksum: "8bce1a643c0519c417e8bf494855831cff669d133d706e0f74e517bd675ea7b"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -7216,7 +7211,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.15.3"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -7265,9 +7260,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.15.3
+        app.kubernetes.io/version: v1.16.0-b3
       annotations:
-        configChecksum: "8a5584ee60fdd7cd7ce34fcfd7dbc56a106801c2dd2316137c5f05969de8c25"
+        configChecksum: "8bce1a643c0519c417e8bf494855831cff669d133d706e0f74e517bd675ea7b"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
@@ -7281,7 +7276,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.15.3"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.16.0-b3"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -7308,7 +7303,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.15.3"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.16.0-b3"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

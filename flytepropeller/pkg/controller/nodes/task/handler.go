@@ -242,6 +242,7 @@ type Handler struct {
 	connectorDeploymentsForType map[pluginCore.TaskType]map[string]pluginCore.Plugin
 	pluginsForType   map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
 	taskMetricsMap   map[MetricKey]*taskMetrics
+	taskMetricsMapMutex sync.RWMutex
 	defaultPlugin    pluginCore.Plugin
 	metrics          *metrics
 	pluginRegistry   PluginRegistryIface
@@ -551,15 +552,38 @@ func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := t.taskMetricsMap[metricNameKey]; !ok {
-		t.taskMetricsMap[metricNameKey] = &taskMetrics{
-			taskSucceeded: labeled.NewCounter(metricNameKey+"_success",
-				"Task "+metricNameKey+" finished successfully", t.pluginScope, labeled.EmitUnlabeledMetric),
-			taskFailed: labeled.NewCounter(metricNameKey+"_failure",
-				"Task "+metricNameKey+" failed", t.pluginScope, labeled.EmitUnlabeledMetric),
-		}
+
+	// Acquire read lock for fast read, this is the happy case
+	t.taskMetricsMapMutex.RLock()
+	existingTaskMetrics, ok := t.taskMetricsMap[metricNameKey]
+	t.taskMetricsMapMutex.RUnlock()
+
+	if ok {
+		return existingTaskMetrics, nil
 	}
-	return t.taskMetricsMap[metricNameKey], nil
+
+	// Acquire write lock since we may need to populate the map. We use a lock to avoid panics for concurrent writes
+	// and duplicate prometheus metrics
+	t.taskMetricsMapMutex.Lock()
+	defer t.taskMetricsMapMutex.Unlock()
+
+	// check condition again
+	existingTaskMetrics, ok = t.taskMetricsMap[metricNameKey]
+
+	if ok {
+		return existingTaskMetrics, nil
+	}
+
+	newTaskMetrics := &taskMetrics{
+		taskSucceeded: labeled.NewCounter(metricNameKey+"_success",
+			"Task "+metricNameKey+" finished successfully", t.pluginScope, labeled.EmitUnlabeledMetric),
+		taskFailed: labeled.NewCounter(metricNameKey+"_failure",
+			"Task "+metricNameKey+" failed", t.pluginScope, labeled.EmitUnlabeledMetric),
+	}
+
+	t.taskMetricsMap[metricNameKey] = newTaskMetrics
+
+	return newTaskMetrics, nil
 }
 
 func GetDeckStatus(ctx context.Context, tCtx *taskExecutionContext) (DeckStatus, error) {

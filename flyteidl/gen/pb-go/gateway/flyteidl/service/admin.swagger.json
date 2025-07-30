@@ -8348,7 +8348,8 @@
         "ABORTED",
         "FAILED",
         "INITIALIZING",
-        "WAITING_FOR_RESOURCES"
+        "WAITING_FOR_RESOURCES",
+        "RETRYABLE_FAILED"
       ],
       "default": "UNDEFINED",
       "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
