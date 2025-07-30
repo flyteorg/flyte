@@ -94,19 +94,6 @@ func getFinalContext(ctx context.Context, operation string, connector *Deploymen
 	return context.WithTimeout(ctx, timeout)
 }
 
-// processTaskType handles the registration or update of a task type plugin
-func processTaskType(ctx context.Context, taskName string, taskVersion int32, deploymentID string, connectorDeployment *Deployment, cs *ClientSet) string {
-	versionedTaskType := fmt.Sprintf("%s_%d", taskName, taskVersion)
-
-	// Register default version if not registered
-	if !pluginmachinery.PluginRegistry().IsPluginForTaskTypeRegistered(versionedTaskType, deploymentID) {
-		registerNewPlugin(taskName, taskVersion, deploymentID, *connectorDeployment, cs)
-	} else {
-		updatePlugin(versionedTaskType, deploymentID)
-	}
-	return versionedTaskType
-}
-
 func watchConnectors(ctx context.Context, cs *ClientSet) {
 	cfg := GetConfig()
 	var connectorDeploymentIDs []string
@@ -156,35 +143,31 @@ func watchConnectors(ctx context.Context, cs *ClientSet) {
 			supportedTaskCategories := connector.GetSupportedTaskCategories()
 			// Process deprecated supported task types
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
-				versionedTaskType := processTaskType(ctx, supportedTaskType, defaultTaskTypeVersion, deploymentID, connectorDeployment, cs)
+				versionedTaskType := createOrUpdatePlugin(ctx, supportedTaskType, defaultTaskTypeVersion, deploymentID, connectorDeployment, cs)
 				connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
 			}
 			// Process supported task categories
 			for _, supportedCategory := range supportedTaskCategories {
 				if supportedCategory.Version != defaultTaskTypeVersion {
-					versionedTaskType := processTaskType(ctx, supportedCategory.Name, supportedCategory.Version, deploymentID, connectorDeployment, cs)
+					versionedTaskType := createOrUpdatePlugin(ctx, supportedCategory.Name, supportedCategory.Version, deploymentID, connectorDeployment, cs)
 					connectorSupportedTaskCategories[versionedTaskType] = struct{}{}
 				}
 			}
 		}
-		keys := make([]string, 0, len(connectorSupportedTaskCategories))
-		for k := range connectorSupportedTaskCategories {
-			keys = append(keys, k)
-		}
 		logger.Infof(ctx, "ConnectorDeployment [%v] supports the following task types: [%v]", connectorDeployment.Endpoint,
-					strings.Join(keys, ", "))
+			strings.Join(maps.Keys(connectorSupportedTaskCategories), ", "))
 	}
 	// always overwrite with connectorForTaskTypes config
 	for taskType, connectorDeploymentID := range cfg.ConnectorForTaskTypes {
 		if deployment, ok := cfg.ConnectorDeployments[connectorDeploymentID]; ok {
-			processTaskType(ctx, taskType, defaultTaskTypeVersion, connectorDeploymentID, deployment, cs)
+			createOrUpdatePlugin(ctx, taskType, defaultTaskTypeVersion, connectorDeploymentID, deployment, cs)
 		}
 	}
 	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
 		versionedTaskType := fmt.Sprintf("%s_%d", taskType, defaultTaskTypeVersion)
-		if ok := pluginmachinery.PluginRegistry().IsPluginForTaskTypeRegistered(versionedTaskType, defaultDeploymentID); !ok {
-			processTaskType(ctx, taskType, defaultTaskTypeVersion, defaultDeploymentID, &cfg.DefaultConnector, cs)
+		if ok := pluginmachinery.PluginRegistry().IsConnectorCorePluginRegistered(versionedTaskType, defaultDeploymentID); !ok {
+			createOrUpdatePlugin(ctx, taskType, defaultTaskTypeVersion, defaultDeploymentID, &cfg.DefaultConnector, cs)
 		}
 	}
 }

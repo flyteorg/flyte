@@ -63,12 +63,12 @@ func (p *Plugin) GetConfig() webapi.PluginConfig {
 	// Create a new config object by copying deployment's config
 	config := p.deployment.ConnectorDeployment.WebAPI
 
-	// 1. Check if ResourceQuotas is nil
+	// Check if ResourceQuotas is nil
 	if config.ResourceQuotas == nil {
 		config.ResourceQuotas = p.cfg.WebAPI.ResourceQuotas
 	}
 
-	// 2. Check ReadRateLimiter values individually
+	// Check ReadRateLimiter values individually
 	if config.ReadRateLimiter.QPS == 0 {
 		config.ReadRateLimiter.QPS = p.cfg.WebAPI.ReadRateLimiter.QPS
 	}
@@ -76,7 +76,7 @@ func (p *Plugin) GetConfig() webapi.PluginConfig {
 		config.ReadRateLimiter.Burst = p.cfg.WebAPI.ReadRateLimiter.Burst
 	}
 
-	// 3. Check WriteRateLimiter values individually
+	// Check WriteRateLimiter values individually
 	if config.WriteRateLimiter.QPS == 0 {
 		config.WriteRateLimiter.QPS = p.cfg.WebAPI.WriteRateLimiter.QPS
 	}
@@ -84,7 +84,7 @@ func (p *Plugin) GetConfig() webapi.PluginConfig {
 		config.WriteRateLimiter.Burst = p.cfg.WebAPI.WriteRateLimiter.Burst
 	}
 
-	// 4. Check Caching configuration values individually
+	// Check Caching configuration values individually
 	if config.Caching.ResyncInterval.Duration == time.Duration(0) {
 		config.Caching.ResyncInterval = p.cfg.WebAPI.Caching.ResyncInterval
 	}
@@ -98,7 +98,7 @@ func (p *Plugin) GetConfig() webapi.PluginConfig {
 		config.Caching.MaxSystemFailures = p.cfg.WebAPI.Caching.MaxSystemFailures
 	}
 
-	// 5. Check if ResourceMeta is nil
+	// Check if ResourceMeta is nil
 	if config.ResourceMeta == nil {
 		config.ResourceMeta = p.cfg.WebAPI.ResourceMeta
 	}
@@ -115,6 +115,7 @@ func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionC
 
 func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
+	logger.Debug(ctx, "create task for deployment %s", p.deployment.ConnectorDeployment.Endpoint)
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read task template with error: %v", err)
@@ -453,28 +454,26 @@ func createPluginEntry(taskType core.TaskType, taskVersion int32, deployment Dep
 	}
 }
 
-func updatePlugin(versionedTaskType string, deploymentID string) {
-	select {
-	case pluginmachinery.PluginRegistry().GetPluginUpdateChan() <- pluginmachinery.PluginUpdateInfo{
-		TaskType: versionedTaskType,
-		DeploymentID: deploymentID,
-	}:
-	default:
-		logger.Errorf(context.Background(), "Failed to update plugin for task type %s: channel is full", versionedTaskType)
-	}
-}
+// createOrUpdatePlugin handles the registration or update of a task type plugin
+func createOrUpdatePlugin(ctx context.Context, taskName string, taskVersion int32, deploymentID string, connectorDeployment *Deployment, cs *ClientSet) string {
+	versionedTaskType := fmt.Sprintf("%s_%d", taskName, taskVersion)
 
-func registerNewPlugin(taskType core.TaskType, taskTypeVersion int32, deploymentID string, deployment Deployment, cs *ClientSet) {
-	plugin := createPluginEntry(taskType, taskTypeVersion, deployment, cs)
-	pluginmachinery.PluginRegistry().RegisterConnectorCorePlugin(plugin, deploymentID)
-	select {
-	case pluginmachinery.PluginRegistry().GetPluginRegistrationChan() <- pluginmachinery.PluginRegistrationInfo{
-		Plugin:   plugin,
-		DeploymentID: deploymentID,
-	}:
-	default:
-		logger.Errorf(context.Background(), "Failed to register plugin %s: channel is full", plugin.ID)
+	// Register core plugin if not registered
+	if !pluginmachinery.PluginRegistry().IsConnectorCorePluginRegistered(versionedTaskType, deploymentID) {
+		plugin := createPluginEntry(taskName, taskVersion, *connectorDeployment, cs)
+		pluginmachinery.PluginRegistry().RegisterConnectorCorePlugin(plugin, deploymentID)
 	}
+
+	// send message to Flyte Propeller TaskHandler to register or update plugin
+	select {
+		case pluginmachinery.PluginRegistry().GetPluginChan() <- pluginmachinery.PluginInfo{
+			VersionedTaskType: versionedTaskType,
+			DeploymentID: deploymentID,
+		}:
+		default:
+			logger.Errorf(context.Background(), "Failed to create/update plugin for task type %s: channel is full", versionedTaskType)
+		}
+	return versionedTaskType
 }
 
 func RegisterConnectorPlugin() {

@@ -261,6 +261,24 @@ func (t *Handler) FinalizeRequired() bool {
 	return true
 }
 
+func (t *Handler) createResourceManagerAndSetupCtx(ctx context.Context, sCtx interfaces.SetupContext, taskType string) (*nameSpacedSetupCtx, error) {
+	tSCtx := t.newSetupContext(sCtx)
+	// Create a new base resource negotiator
+	resourceManagerConfig := rmConfig.GetConfig()
+	newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type, t.metrics.scope)
+	if err != nil {
+		return nil, err
+	}
+	return t.createNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder, taskType), nil
+}
+
+func (t *Handler) createNameSpacedSetupCtx(tSCtx *setupContext, newResourceManagerBuilder resourcemanager.Builder, taskType string) *nameSpacedSetupCtx {
+	pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(taskType))
+	sCtxFinal := newNameSpacedSetupCtx(
+		tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), taskType)
+	return &sCtxFinal
+}
+
 // getConnectorPlugin retrieves a plugin from connectorDeploymentsForType map with proper locking
 func (t *Handler) getConnectorPlugin(taskType pluginCore.TaskType, deploymentID string) (pluginCore.Plugin, bool) {
 	t.mu.RLock()
@@ -288,6 +306,18 @@ func (t *Handler) registerConnectorPlugin(corePlugin pluginCore.Plugin, deployme
 	t.mu.Unlock()
 }
 
+func (t *Handler) isConnectorPluginRegistered(versionedTaskType string, deploymentID string) bool {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	pluginsMap, ok := t.connectorDeploymentsForType[versionedTaskType]
+	if !ok {
+		return false
+	}
+
+	_, ok = pluginsMap[deploymentID]
+	return ok
+}
+
 func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	if t.defaultPlugin != nil {
 		logger.Errorf(ctx, "cannot set plugin [%s] as default as plugin [%s] is already configured as default", p.GetID(), t.defaultPlugin.GetID())
@@ -298,53 +328,50 @@ func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	return nil
 }
 
-func (t *Handler) watchPlugins(ctx context.Context, sCtx interfaces.SetupContext) error {
+func (t *Handler) watchPlugins(ctx context.Context, sCtx interfaces.SetupContext) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Errorf(ctx, "WatchPlugins goroutine panicked: %v", r)
+			logger.Errorf(ctx, "Stack trace: %s", debug.Stack())
+		}
+	}()
+	
 	for {
 		select {
-		case registerInfo := <-pluginMachinery.PluginRegistry().GetPluginRegistrationChan():
-			if !pluginMachinery.PluginRegistry().IsPluginForTaskTypeRegistered(registerInfo.Plugin.ID, registerInfo.DeploymentID){
-				wpe := registerInfo.Plugin
-				tSCtx := t.newSetupContext(sCtx)
-				// Create a new base resource negotiator
-				resourceManagerConfig := rmConfig.GetConfig()
-				newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type, t.metrics.scope)
+		case info := <-pluginMachinery.PluginRegistry().GetPluginChan():
+			// If plugin not registered yet, do registeration
+			if !t.isConnectorPluginRegistered(info.VersionedTaskType, info.DeploymentID){
+				sCtxFinal, err := t.createResourceManagerAndSetupCtx(ctx, sCtx, info.VersionedTaskType)
 				if err != nil {
-					return err
+					logger.Errorf(ctx, "Failed to create resource manager and setup context for task type [%s]: %v", info.VersionedTaskType, err)
+					continue
 				}
-				pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(wpe.ID))
-				sCtxFinal := newNameSpacedSetupCtx(
-					tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), wpe.ID)
 				// register core plugin
-				if cpe, ok := pluginMachinery.PluginRegistry().GetConnectorCorePlugin(wpe.ID, registerInfo.DeploymentID); ok {
+				if cpe, ok := pluginMachinery.PluginRegistry().GetConnectorCorePlugin(info.VersionedTaskType, info.DeploymentID); ok {
 					cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, cpe)
 					if err != nil {
-						return regErrors.Wrapf(err, "failed to load plugin - %s", wpe.ID)
+						logger.Errorf(ctx, "Failed to load plugin of task type [%s]: %v", info.VersionedTaskType, err)
+						continue
 					}
 					// register the plugin to task handler local plugin registry
-					t.registerConnectorPlugin(cp, registerInfo.DeploymentID)
-					pluginMachinery.PluginRegistry().AddRegisteredPluginForTaskType(cp.GetID(), registerInfo.DeploymentID)
-					logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] registered", registerInfo.Plugin.ID, registerInfo.DeploymentID)
+					t.registerConnectorPlugin(cp, info.DeploymentID)
+					logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] registered", info.VersionedTaskType, info.DeploymentID)
 				}
+			// If plugin already registered, update deployment
 			} else {
-				logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] already registered", registerInfo.Plugin.ID, registerInfo.DeploymentID)
-			}
-		case updateInfo := <-pluginMachinery.PluginRegistry().GetPluginUpdateChan():
-			if pluginMachinery.PluginRegistry().IsPluginForTaskTypeRegistered(updateInfo.TaskType, updateInfo.DeploymentID) {
-				plugin, pluginExists := t.getConnectorPlugin(updateInfo.TaskType, updateInfo.DeploymentID)
+				plugin, pluginExists := t.getConnectorPlugin(info.VersionedTaskType, info.DeploymentID)
 				if pluginExists {
 					t.mu.Lock()
-					t.defaultPlugins[updateInfo.TaskType] = plugin
+					t.defaultPlugins[info.VersionedTaskType] = plugin
 					t.mu.Unlock()
-					logger.Infof(ctx, "The default plugin for TaskType [%s] has been updated to Deployment ID [%s]", updateInfo.TaskType, updateInfo.DeploymentID)
+					logger.Infof(ctx, "The default plugin for TaskType [%s] has been updated to Deployment ID [%s]", info.VersionedTaskType, info.DeploymentID)
 				} else {
-					logger.Warningf(ctx, "Plugin for TaskType [%s] and deployment ID [%s] not found", updateInfo.TaskType, updateInfo.DeploymentID)
+					logger.Warningf(ctx, "Plugin for TaskType [%s] and deployment ID [%s] not found", info.VersionedTaskType, info.DeploymentID)
 				}
-			} else {
-				logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] not yet registered", updateInfo.TaskType, updateInfo.DeploymentID)
 			}
 		case <-ctx.Done():
 			logger.Infof(ctx, "Plugin watcher stopped due to context cancellation")
-			return nil
+			return
 		}
 	}
 }
@@ -359,7 +386,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
-	// execute watcher to monitor plugins waiting for register from connector/agent plugin
+	// execute watcher to monitor plugins waiting for register/update from connector/agent plugin
 	go t.watchPlugins(ctx, sCtx)
 
 	once.Do(func() {
@@ -382,9 +409,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 	for _, p := range enabledPlugins {
 		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
-		pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(p.ID))
-		sCtxFinal := newNameSpacedSetupCtx(
-			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
+		sCtxFinal := t.createNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder, p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 

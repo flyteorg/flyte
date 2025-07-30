@@ -49,11 +49,6 @@ func newMetrics(scope promutils.Scope) metrics {
 	metricsMutex.Lock()
 	defer metricsMutex.Unlock()
 	
-	// Double-check in case another goroutine created metrics while we were acquiring the lock
-	if cachedMetrics, exists := metricsCache[scopeName]; exists {
-		return *cachedMetrics
-	}
-	
 	newMetrics := metrics{
 		SyncErrors:  scope.MustNewCounter("sync_errors", "Counter for sync errors."),
 		Evictions:   scope.MustNewCounter("lru_evictions", "Counter for evictions from LRU."),
