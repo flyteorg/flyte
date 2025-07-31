@@ -170,6 +170,9 @@ message ArrayNode {
 
     //+optional. Specifies input bindings that are not mapped over for the node.
     repeated string bound_inputs = 8;
+
+    // Deprecated field, do not use.
+    reserved 9;
 }
 
 // Defines extra information about the Node.
