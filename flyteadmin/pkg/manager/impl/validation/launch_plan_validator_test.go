@@ -106,7 +106,7 @@ func TestValidateLpDefaultInputsWrongType(t *testing.T) {
 	request.Spec.DefaultInputs.Parameters["foo"].Var.Type = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}}
 	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultProject(), lpApplicationConfig, getWorkflowInterface())
 
-	expected := "Type mismatch for Parameter foo in default_inputs has type simple:FLOAT , expected simple:STRING "
+	expected := "Invalid default value for variable foo in default_inputs - expected type simple:FLOAT, but got literal scalar:{primitive:{string_value:\"foo-value\"}}"
 	utils.AssertEqualWithSanitizedRegex(t, expected, err.Error())
 }
 
@@ -207,7 +207,7 @@ func TestGetLpExpectedInvalidFixedInputType(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
 
-	utils.AssertEqualWithSanitizedRegex(t, "invalid fixed_input wrong type bar, expected simple:BINARY , got simple:STRING  instead", err.Error())
+	utils.AssertEqualWithSanitizedRegex(t, "invalid fixed_input wrong type bar, expected simple:BINARY, got literal scalar: {primitive: {string_value: \"bar-value\"}} instead", err.Error())
 	assert.Nil(t, actualMap)
 }
 
@@ -272,7 +272,7 @@ func TestGetLpExpectedInvalidFixedInputWithUnknownIDL(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// Expected error message
-	assert.Contains(t, err.Error(), failedToValidateLiteralType)
+	assert.Contains(t, err.Error(), "invalid fixed_input wrong type foo, expected simple:1000, got literal scalar:{} instead")
 }
 
 func TestGetLpExpectedNoFixedInput(t *testing.T) {
