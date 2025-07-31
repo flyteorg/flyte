@@ -21,18 +21,7 @@ var (
 		Images: []ManagedImageConfig{
 			{
 				Regex:              "managed.cr.union.ai/sglang:stable",
-				ReplacementPattern: "public.ecr.aws/g1m2l3c1/union-serving-staging/sglang:main-opt",
-				Tolerations: []v1.Toleration{
-					{
-						Key:      "union.ai/containerd-snapshotter",
-						Operator: v1.TolerationOpEqual,
-						Effect:   v1.TaintEffectNoSchedule,
-						Value:    "nydus",
-					},
-				},
-				NodeSelector: map[string]string{
-					"union.ai/containerd-snapshotter": "nydus",
-				},
+				ReplacementPattern: "public.ecr.aws/g1m2l3c1/union-serving-staging/sglang:main",
 			},
 		},
 	}
