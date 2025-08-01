@@ -4171,7 +4171,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			},
 			activeExecutionsCount:  3,
 			expectError:            true,
-			expectedErrorCode:      codes.ResourceExhausted,
+			expectedErrorCode:      codes.AlreadyExists,
 			expectExecutionCreated: false,
 		},
 		{
@@ -4182,7 +4182,7 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 			},
 			activeExecutionsCount:  4,
 			expectError:            true,
-			expectedErrorCode:      codes.ResourceExhausted,
+			expectedErrorCode:      codes.AlreadyExists,
 			expectExecutionCreated: false,
 		},
 		{
@@ -4278,7 +4278,9 @@ func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
 										foundDomain = true
 									}
 								} else if field == "phase" {
-									if phaseList, ok := gormQueryExpr.Args.([]string); ok && len(phaseList) > 0 {
+									if phaseList, ok := gormQueryExpr.Args.([]string); ok {
+										assert.Equal(t, len(activeExecutionPhases), len(phaseList), "execution phase filter list length mismatch")
+										assert.ElementsMatch(t, activeExecutionPhases, phaseList, "phase list contents mismatch")
 										foundPhase = true
 									}
 								}

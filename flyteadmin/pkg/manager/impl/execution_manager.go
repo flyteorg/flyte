@@ -1248,7 +1248,7 @@ func checkLaunchPlanConcurrency(ctx context.Context, launchPlan *admin.LaunchPla
 			metrics.ConcurrencyLimitHits.WithLabelValues(lpProject, lpDomain, lpName).Inc()
 			logger.Warningf(ctx, "skipping execution creation for launch plan %v due to concurrency limit", lpID)
 			return errors.NewFlyteAdminErrorf(
-				codes.ResourceExhausted,
+				codes.AlreadyExists,
 				"concurrency limit (%d) reached for launch plan %s; skipping execution",
 				launchPlan.GetSpec().GetConcurrencyPolicy().GetMax(), lpName)
 
