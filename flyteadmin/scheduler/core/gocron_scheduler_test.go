@@ -204,6 +204,62 @@ func TestGetCronScheduledTime(t *testing.T) {
 	assert.Equal(t, expectedNextTime, nextTime)
 }
 
+func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
+	t.Run("invalid cron expression with February 31st should return error", func(t *testing.T) {
+		// Test cron expression that specifies day 31 of February (which doesn't exist)
+		s := models.SchedulableEntity{
+			CronExpression: "0 0 31 2 *", // February 31st - invalid
+		}
+		from := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		to := time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC)
+
+		// This should return an error due to invalid crontab configuration
+		catchupTimes, err := GetCatchUpTimes(s, from, to)
+
+		// Should return error
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "invalid crontab configuration")
+
+		// Should return nil catchup times
+		assert.Nil(t, catchupTimes)
+
+		t.Logf("Got expected error: %v", err)
+	})
+
+	t.Run("invalid cron expression with April 31st should return error", func(t *testing.T) {
+		// Test cron expression that specifies day 31 of April (which doesn't exist)
+		s := models.SchedulableEntity{
+			CronExpression: "0 0 31 4 *", // April 31st - invalid
+		}
+		from := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		to := time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC)
+
+		catchupTimes, err := GetCatchUpTimes(s, from, to)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "invalid crontab configuration")
+		assert.Nil(t, catchupTimes)
+
+		t.Logf("Got expected error: %v", err)
+	})
+
+	t.Run("valid cron expression should work normally", func(t *testing.T) {
+		// Test a valid cron expression for comparison
+		s := models.SchedulableEntity{
+			CronExpression: "0 0 15 2 *", // February 15th - valid
+		}
+		from := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+		to := time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC)
+
+		catchupTimes, err := GetCatchUpTimes(s, from, to)
+
+		assert.Nil(t, err)
+		assert.True(t, len(catchupTimes) > 0, "Should get valid catchup times")
+
+		t.Logf("Got %d valid catchup times", len(catchupTimes))
+	})
+}
+
 func TestGetCatchUpTimes(t *testing.T) {
 	t.Run("to time before scheduled time", func(t *testing.T) {
 		s := models.SchedulableEntity{
