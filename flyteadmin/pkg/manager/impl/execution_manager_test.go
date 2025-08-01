@@ -4088,6 +4088,292 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 	assert.Empty(t, executionList.GetToken())
 }
 
+func getLaunchPlanSpecWithPolicyBytes(t *testing.T, policy *admin.ConcurrencyPolicy) []byte {
+	spec := admin.LaunchPlanSpec{
+		WorkflowId: &core.Identifier{
+			ResourceType: core.ResourceType_WORKFLOW,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+		},
+		ConcurrencyPolicy: policy,
+	}
+	marshaledSpec, err := proto.Marshal(&spec)
+	assert.NoError(t, err)
+	return marshaledSpec
+}
+
+func TestCreateExecution_ConcurrencyPolicy(t *testing.T) {
+	ctx := context.Background()
+	mockStorage := getMockStorageForExecTest(ctx)
+	var mockPublisher notificationMocks.Publisher
+	var mockUrlData dataMocks.RemoteURLInterface
+
+	workflowID := &core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "project",
+		Domain:       "domain",
+		Name:         "name",
+		Version:      "version",
+	}
+
+	launchPlanID := &core.Identifier{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Project:      "project",
+		Domain:       "domain",
+		Name:         "concurrency_lp",
+		Version:      "v1",
+	}
+
+	// This is a LiteralMap, used for the actual execution request inputs
+	expectedRuntimeInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}},
+		},
+	}
+
+	expectedLPInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					Type:        &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+					Description: "foo_input",
+				},
+				Behavior: &core.Parameter_Default{Default: expectedRuntimeInputs.GetLiterals()["foo"]},
+			},
+		},
+	}
+
+	tests := []struct {
+		name                   string
+		concurrencyPolicy      *admin.ConcurrencyPolicy
+		activeExecutionsCount  int64
+		expectError            bool
+		expectedErrorCode      codes.Code
+		expectExecutionCreated bool
+	}{
+		{
+			name: "Limit Not Reached",
+			concurrencyPolicy: &admin.ConcurrencyPolicy{
+				Max:      3,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
+			},
+			activeExecutionsCount:  2,
+			expectError:            false,
+			expectExecutionCreated: true,
+		},
+		{
+			name: "Limit Reached (Skip)",
+			concurrencyPolicy: &admin.ConcurrencyPolicy{
+				Max:      3,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
+			},
+			activeExecutionsCount:  3,
+			expectError:            true,
+			expectedErrorCode:      codes.AlreadyExists,
+			expectExecutionCreated: false,
+		},
+		{
+			name: "Limit Exceeded (Skip)",
+			concurrencyPolicy: &admin.ConcurrencyPolicy{
+				Max:      3,
+				Behavior: admin.ConcurrencyLimitBehavior_CONCURRENCY_LIMIT_BEHAVIOR_SKIP,
+			},
+			activeExecutionsCount:  4,
+			expectError:            true,
+			expectedErrorCode:      codes.AlreadyExists,
+			expectExecutionCreated: false,
+		},
+		{
+			name:                   "No Policy",
+			concurrencyPolicy:      nil,
+			activeExecutionsCount:  10,
+			expectError:            false,
+			expectExecutionCreated: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := getMockRepositoryForExecTest()
+			mockPluginRegistry := plugins.NewRegistry()
+
+			mockWorkflowExecutor := &workflowengineMocks.WorkflowExecutor{}
+			mockWorkflowExecutor.On(
+				"Execute",
+				mock.Anything,
+				mock.Anything,
+			).Return(workflowengineInterfaces.ExecutionResponse{Cluster: "test-cluster"}, nil)
+
+			mockPluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, mockWorkflowExecutor)
+
+			launchPlanSpecBytes := getLaunchPlanSpecWithPolicyBytes(t, tt.concurrencyPolicy)
+
+			lpClosure := admin.LaunchPlanClosure{
+				ExpectedInputs: expectedLPInputs,
+			}
+			lpClosureBytes, err := proto.Marshal(&lpClosure)
+			assert.NoError(t, err)
+
+			getLaunchPlanCb := func(id interfaces.Identifier) (models.LaunchPlan, error) {
+				assert.Equal(t, launchPlanID.GetProject(), id.Project)
+				assert.Equal(t, launchPlanID.GetDomain(), id.Domain)
+				assert.Equal(t, launchPlanID.GetName(), id.Name)
+				assert.Equal(t, launchPlanID.GetVersion(), id.Version)
+				activeState := int32(admin.LaunchPlanState_ACTIVE)
+				return models.LaunchPlan{
+					LaunchPlanKey: models.LaunchPlanKey{
+						Project: id.Project,
+						Domain:  id.Domain,
+						Name:    id.Name,
+						Version: id.Version,
+					},
+					WorkflowID: 1, // Assuming a valid workflow ID
+					Spec:       launchPlanSpecBytes,
+					State:      &activeState,
+					Closure:    lpClosureBytes,
+				}, nil
+			}
+			mockRepo.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanCb)
+
+			getWorkflowCb := func(id interfaces.Identifier) (models.Workflow, error) {
+				return models.Workflow{
+					WorkflowKey:             models.WorkflowKey{Project: workflowID.GetProject(), Domain: workflowID.GetDomain(), Name: workflowID.GetName(), Version: workflowID.GetVersion()},
+					RemoteClosureIdentifier: remoteClosureIdentifier, // Use the global const
+				}, nil
+			}
+			mockRepo.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(getWorkflowCb)
+
+			if tt.concurrencyPolicy != nil {
+				mockRepo.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(
+					func(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+						t.Logf("Received %d filters in SetCountCallback for test: %s", len(input.InlineFilters), tt.name)
+						for i, f := range input.InlineFilters {
+							gexpr, _ := f.GetGormQueryExpr()
+							t.Logf("Filter %d: Entity=%v, Field=%s, Args=%v", i, f.GetEntity(), f.GetField(), gexpr.Args)
+						}
+
+						var foundProject, foundDomain, foundLpName, foundPhase bool
+
+						for _, filter := range input.InlineFilters {
+							gormQueryExpr, err := filter.GetGormQueryExpr()
+							if !assert.NoError(t, err) {
+								continue
+							}
+							if !assert.NotNil(t, gormQueryExpr.Args) {
+								continue
+							}
+
+							entity := filter.GetEntity()
+							field := filter.GetField()
+
+							if entity == common.Execution {
+								if field == "execution_project" {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetProject() {
+										foundProject = true
+									}
+								} else if field == "execution_domain" {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetDomain() {
+										foundDomain = true
+									}
+								} else if field == "phase" {
+									if phaseList, ok := gormQueryExpr.Args.([]string); ok {
+										assert.Equal(t, len(activeExecutionPhases), len(phaseList), "execution phase filter list length mismatch")
+										assert.ElementsMatch(t, activeExecutionPhases, phaseList, "phase list contents mismatch")
+										foundPhase = true
+									}
+								}
+							} else if entity == common.LaunchPlan {
+								if field == shared.Name {
+									if val, ok := gormQueryExpr.Args.(string); ok && val == launchPlanID.GetName() {
+										foundLpName = true
+									}
+								} // No check for version filter as it's missing
+							}
+						}
+						assert.True(t, foundProject, "execution project filter not found or incorrect")
+						assert.True(t, foundDomain, "execution domain filter not found or incorrect")
+						assert.True(t, foundLpName, "lp name filter not found or incorrect")
+						assert.True(t, foundPhase, "execution phase filter not found or incorrect")
+						var joinedWithLaunchPlan bool
+						if assert.NotNil(t, input.JoinTableEntities) {
+							for entityInJoin := range input.JoinTableEntities {
+								if entityInJoin == common.LaunchPlan {
+									joinedWithLaunchPlan = true
+									break
+								}
+							}
+						}
+						assert.True(t, joinedWithLaunchPlan, "Join with LaunchPlan table not specified")
+						return tt.activeExecutionsCount, nil
+					},
+				)
+			}
+
+			executionCreatedActual := false
+			if tt.expectExecutionCreated {
+				mockRepo.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
+					func(ctx context.Context, input models.Execution) error {
+						assert.Equal(t, launchPlanID.GetProject(), input.Project)
+						assert.Equal(t, launchPlanID.GetDomain(), input.Domain)
+						executionCreatedActual = true
+						input.ID = 1
+						return nil
+					},
+				)
+			}
+
+			executionManager := NewExecutionManager(
+				mockRepo,
+				mockPluginRegistry,
+				getMockExecutionsConfigProvider(),
+				mockStorage,
+				mockScope.NewTestScope(),
+				mockScope.NewTestScope(),
+				&mockPublisher,
+				&mockUrlData,
+				&managerMocks.WorkflowInterface{},
+				&managerMocks.NamedEntityInterface{},
+				nil,
+				nil,
+				nil,
+			)
+
+			request := &admin.ExecutionCreateRequest{
+				Project: launchPlanID.GetProject(),
+				Domain:  launchPlanID.GetDomain(),
+				Name:    "test-execution-" + strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(strings.ToLower(tt.name), " ", "-"), "(", ""), ")", ""),
+				Spec: &admin.ExecutionSpec{
+					LaunchPlan: launchPlanID,
+				},
+				Inputs: expectedRuntimeInputs,
+			}
+
+			_, err = executionManager.CreateExecution(ctx, request, time.Now())
+			t.Logf("Test: %s, Received error: [%v], Error type: %T", tt.name, err, err)
+
+			if tt.expectError {
+				assert.Error(t, err)
+				adminErr, ok := err.(flyteAdminErrors.FlyteAdminError)
+				assert.True(t, ok, "Error should be a FlyteAdminError, got %T: %v", err, err)
+				if ok {
+					t.Logf("Test: %s, Admin error code: [%v] (expected: [%v])", tt.name, adminErr.Code(), tt.expectedErrorCode)
+				}
+				assert.Equal(t, tt.expectedErrorCode, adminErr.Code())
+			} else {
+				assert.NoError(t, err)
+			}
+
+			if tt.expectExecutionCreated {
+				assert.True(t, executionCreatedActual, "ExecutionRepo.Create was expected to be called but was not")
+			} else {
+				assert.False(t, executionCreatedActual, "ExecutionRepo.Create was not expected to be called but was")
+			}
+		})
+	}
+}
+
 func TestSetDefaults(t *testing.T) {
 	task := &core.CompiledTask{
 		Template: &core.TaskTemplate{

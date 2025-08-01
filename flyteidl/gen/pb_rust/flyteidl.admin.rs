@@ -2149,6 +2149,19 @@ pub struct LaunchPlanSpec {
     /// This can be overwritten at execution creation level.
     #[prost(message, optional, tag="23")]
     pub cluster_assignment: ::core::option::Option<ClusterAssignment>,
+    /// Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached
+    #[prost(message, optional, tag="24")]
+    pub concurrency_policy: ::core::option::Option<ConcurrencyPolicy>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct ConcurrencyPolicy {
+    /// A setting for the maximum number of concurrent workflows
+    #[prost(int32, tag="1")]
+    pub max: i32,
+    /// Descriptor for workflow execution behavior after the concurrency limit is hit
+    #[prost(enumeration="ConcurrencyLimitBehavior", tag="2")]
+    pub behavior: i32,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
@@ -2272,6 +2285,33 @@ impl LaunchPlanState {
         match value {
             "INACTIVE" => Some(Self::Inactive),
             "ACTIVE" => Some(Self::Active),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ConcurrencyLimitBehavior {
+    Unspecified = 0,
+    /// A workflow that will be skipped because the limit has been hit.
+    Skip = 1,
+}
+impl ConcurrencyLimitBehavior {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            ConcurrencyLimitBehavior::Unspecified => "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+            ConcurrencyLimitBehavior::Skip => "CONCURRENCY_LIMIT_BEHAVIOR_SKIP",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED" => Some(Self::Unspecified),
+            "CONCURRENCY_LIMIT_BEHAVIOR_SKIP" => Some(Self::Skip),
             _ => None,
         }
     }

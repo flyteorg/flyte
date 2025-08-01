@@ -4594,6 +4594,29 @@
         }
       }
     },
+    "adminConcurrencyLimitBehavior": {
+      "type": "string",
+      "enum": [
+        "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+        "CONCURRENCY_LIMIT_BEHAVIOR_SKIP"
+      ],
+      "default": "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED",
+      "description": " - CONCURRENCY_LIMIT_BEHAVIOR_SKIP: A workflow that will be skipped because the limit has been hit."
+    },
+    "adminConcurrencyPolicy": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "integer",
+          "format": "int32",
+          "title": "A setting for the maximum number of concurrent workflows"
+        },
+        "behavior": {
+          "$ref": "#/definitions/adminConcurrencyLimitBehavior",
+          "title": "Descriptor for workflow execution behavior after the concurrency limit is hit"
+        }
+      }
+    },
     "adminCronSchedule": {
       "type": "object",
       "properties": {
@@ -5378,6 +5401,10 @@
         "cluster_assignment": {
           "$ref": "#/definitions/adminClusterAssignment",
           "description": "ClusterAssignment controls how to select an available cluster on which executions of this LaunchPlan should run.\nThis can be overwritten at execution creation level."
+        },
+        "concurrency_policy": {
+          "$ref": "#/definitions/adminConcurrencyPolicy",
+          "title": "Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached"
         }
       },
       "description": "User-provided launch plan definition and configuration values."

@@ -42,6 +42,28 @@ proto3.util.setEnumType(LaunchPlanState, "flyteidl.admin.LaunchPlanState", [
 ]);
 
 /**
+ * @generated from enum flyteidl.admin.ConcurrencyLimitBehavior
+ */
+export enum ConcurrencyLimitBehavior {
+  /**
+   * @generated from enum value: CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * A workflow that will be skipped because the limit has been hit.
+   *
+   * @generated from enum value: CONCURRENCY_LIMIT_BEHAVIOR_SKIP = 1;
+   */
+  SKIP = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ConcurrencyLimitBehavior)
+proto3.util.setEnumType(ConcurrencyLimitBehavior, "flyteidl.admin.ConcurrencyLimitBehavior", [
+  { no: 0, name: "CONCURRENCY_LIMIT_BEHAVIOR_UNSPECIFIED" },
+  { no: 1, name: "CONCURRENCY_LIMIT_BEHAVIOR_SKIP" },
+]);
+
+/**
  * Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
  * to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
  * set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
@@ -429,6 +451,13 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    */
   clusterAssignment?: ClusterAssignment;
 
+  /**
+   * Concurrency setting for a given workflow to determine concurrency limits and behavior when the limit is breached
+   *
+   * @generated from field: flyteidl.admin.ConcurrencyPolicy concurrency_policy = 24;
+   */
+  concurrencyPolicy?: ConcurrencyPolicy;
+
   constructor(data?: PartialMessage<LaunchPlanSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -455,6 +484,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 21, name: "envs", kind: "message", T: Envs },
     { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
     { no: 23, name: "cluster_assignment", kind: "message", T: ClusterAssignment },
+    { no: 24, name: "concurrency_policy", kind: "message", T: ConcurrencyPolicy },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {
@@ -471,6 +501,53 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
 
   static equals(a: LaunchPlanSpec | PlainMessage<LaunchPlanSpec> | undefined, b: LaunchPlanSpec | PlainMessage<LaunchPlanSpec> | undefined): boolean {
     return proto3.util.equals(LaunchPlanSpec, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ConcurrencyPolicy
+ */
+export class ConcurrencyPolicy extends Message<ConcurrencyPolicy> {
+  /**
+   * A setting for the maximum number of concurrent workflows
+   *
+   * @generated from field: int32 max = 1;
+   */
+  max = 0;
+
+  /**
+   * Descriptor for workflow execution behavior after the concurrency limit is hit
+   *
+   * @generated from field: flyteidl.admin.ConcurrencyLimitBehavior behavior = 2;
+   */
+  behavior = ConcurrencyLimitBehavior.UNSPECIFIED;
+
+  constructor(data?: PartialMessage<ConcurrencyPolicy>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ConcurrencyPolicy";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "max", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "behavior", kind: "enum", T: proto3.getEnumType(ConcurrencyLimitBehavior) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConcurrencyPolicy {
+    return new ConcurrencyPolicy().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ConcurrencyPolicy {
+    return new ConcurrencyPolicy().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ConcurrencyPolicy {
+    return new ConcurrencyPolicy().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ConcurrencyPolicy | PlainMessage<ConcurrencyPolicy> | undefined, b: ConcurrencyPolicy | PlainMessage<ConcurrencyPolicy> | undefined): boolean {
+    return proto3.util.equals(ConcurrencyPolicy, a, b);
   }
 }
 

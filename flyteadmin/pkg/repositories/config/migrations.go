@@ -1285,6 +1285,19 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return nil
 		},
 	},
+	// Create index for execution phases in executions table
+	{
+		ID: "2025-05-29-add-index-executions-phase",
+		Migrate: func(tx *gorm.DB) error {
+			if tx.Dialector.Name() == "mysql" {
+				return tx.Exec("CREATE INDEX idx_executions_phase ON executions(phase(50))").Error
+			}
+			return tx.Migrator().CreateIndex(&models.Execution{}, "Phase")
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropIndex(&models.Execution{}, "idx_executions_phase")
+		},
+	},
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)
