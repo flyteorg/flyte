@@ -3,8 +3,8 @@ name: Build unionai-reuse
 on:
   push:
     branches:
-      - refactor-alt-approach-2
-      - concurrent-workers
+      - master
+      - fix-unwrap
   workflow_dispatch:
 
 concurrency:

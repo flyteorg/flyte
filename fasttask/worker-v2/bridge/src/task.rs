@@ -261,18 +261,22 @@ async fn run_command(
                 info!("completed task_id {} in {} ms", task_id, task_first_ts.elapsed().as_millis());
                 *task_duration = task_prev_ts.elapsed();
 
-                let buf = result.unwrap().unwrap();
+                let buf = match result {
+                    Some(Ok(buf)) => {
+                        let response: Response = bincode::deserialize(&buf).unwrap();
 
-                let response: Response = bincode::deserialize(&buf).unwrap();
+                    *phase = response.phase;
+                    *reason = response.reason.unwrap_or("".to_string());
 
-                *phase = response.phase;
-                *reason = response.reason.unwrap_or("".to_string());
-
-                return Ok(
-                    RunCommandResult{
-                        build_new_executor: response.executor_corrupt,
-                        killed: false,
-                    })
+                    return Ok(
+                        RunCommandResult{
+                            build_new_executor: response.executor_corrupt,
+                            killed: false,
+                        })
+                    }
+                    Some(Err(e)) => bail!(format!("failed to receive response from executor: {:?}", e)),
+                    None => bail!("executor closed before sending response"),
+                };
             },
             result = executor.child.wait() => {
                 // executor process completed
