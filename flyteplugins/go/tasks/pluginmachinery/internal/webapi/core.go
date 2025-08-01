@@ -195,9 +195,9 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 					}
 				}
 			}
-
+			scopeName := fmt.Sprintf("cache_%s", pluginEntry.ID)
 			resourceCache, err := NewResourceCache(ctx, pluginEntry.ID, p, p.GetConfig().Caching,
-				p.GetConfig().ReadRateLimiter, iCtx.MetricsScope().NewSubScope("cache"))
+				p.GetConfig().ReadRateLimiter, iCtx.MetricsScope().NewSubScope(scopeName))
 
 			if err != nil {
 				return nil, err
