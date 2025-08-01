@@ -8,12 +8,21 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
+type TaskConfig struct {
+	Project string
+	Domain  string
+	Org     string
+}
+
 var (
 	defaultConfig = &Config{
 		Output: printer.OutputFormatTABLE.String(),
 	}
 
 	section = config.MustRegisterSection("root", defaultConfig)
+
+	defaultTaskConfig = &TaskConfig{}
+	taskSection       = config.MustRegisterSection("task", defaultTaskConfig)
 )
 
 // Config hold configuration for flytectl flag
@@ -40,5 +49,12 @@ func (cfg Config) MustOutputFormat() printer.OutputFormat {
 
 // GetConfig will return the config
 func GetConfig() *Config {
-	return section.GetConfig().(*Config)
+	r := section.GetConfig().(*Config)
+	if taskSection.GetConfig().(*TaskConfig).Project != "" {
+		r.Project = taskSection.GetConfig().(*TaskConfig).Project
+	}
+	if taskSection.GetConfig().(*TaskConfig).Domain != "" {
+		r.Domain = taskSection.GetConfig().(*TaskConfig).Domain
+	}
+	return r
 }
