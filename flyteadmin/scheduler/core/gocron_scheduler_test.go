@@ -217,14 +217,14 @@ func TestGetCronScheduledTime(t *testing.T) {
 			cronExpression: "0 0 31 2 *", // February 31st - invalid
 			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
 			expectError:    true,
-			errorContains:  "invalid crontab configuration",
+			errorContains:  "invalid crontab string configuration",
 		},
 		{
 			name:           "invalid cron expression with April 31st should return error",
 			cronExpression: "0 0 31 4 *", // April 31st - invalid
 			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
 			expectError:    true,
-			errorContains:  "invalid crontab configuration",
+			errorContains:  "invalid crontab string configuration",
 		},
 		{
 			name:           "invalid cron expression with malformed syntax should return error",
@@ -244,7 +244,6 @@ func TestGetCronScheduledTime(t *testing.T) {
 					assert.Contains(t, err.Error(), tt.errorContains)
 				}
 				assert.True(t, nextTime.IsZero())
-				t.Logf("Got expected error: %v", err)
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.expectedTime, nextTime)
@@ -253,7 +252,7 @@ func TestGetCronScheduledTime(t *testing.T) {
 	}
 }
 
-func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
+func TestGetCatchUpTimesWithCronExpression(t *testing.T) {
 	tests := []struct {
 		name           string
 		cronExpression string
@@ -261,7 +260,6 @@ func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
 		toTime         time.Time
 		expectError    bool
 		errorContains  string
-		expectCatchup  bool
 	}{
 		{
 			name:           "invalid cron expression with February 31st should return error",
@@ -269,8 +267,7 @@ func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
 			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
 			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
 			expectError:    true,
-			errorContains:  "invalid crontab configuration",
-			expectCatchup:  false,
+			errorContains:  "invalid crontab string configuration",
 		},
 		{
 			name:           "invalid cron expression with April 31st should return error",
@@ -278,8 +275,7 @@ func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
 			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
 			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
 			expectError:    true,
-			errorContains:  "invalid crontab configuration",
-			expectCatchup:  false,
+			errorContains:  "invalid crontab string configuration",
 		},
 		{
 			name:           "valid cron expression should work normally",
@@ -287,7 +283,6 @@ func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
 			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
 			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
 			expectError:    false,
-			expectCatchup:  true,
 		},
 	}
 
@@ -305,15 +300,9 @@ func TestGetCatchUpTimesWithInvalidCronExpression(t *testing.T) {
 					assert.Contains(t, err.Error(), tt.errorContains)
 				}
 				assert.Nil(t, catchupTimes)
-				t.Logf("Got expected error: %v", err)
 			} else {
 				assert.Nil(t, err)
-				if tt.expectCatchup {
-					assert.True(t, len(catchupTimes) > 0, "Should get valid catchup times")
-					t.Logf("Got %d valid catchup times", len(catchupTimes))
-				} else {
-					assert.Nil(t, catchupTimes)
-				}
+				assert.True(t, len(catchupTimes) > 0, "Should get valid catchup times")
 			}
 		})
 	}

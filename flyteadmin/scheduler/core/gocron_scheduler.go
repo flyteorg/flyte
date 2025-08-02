@@ -257,7 +257,7 @@ func getCronScheduledTime(cronString string, fromTime time.Time) (time.Time, err
 	// which can cause infinite while loops. This is a known library issue that should be fixed
 	// by modifying the ParseStandard method in the future.
 	if nextTime.IsZero() {
-		return time.Time{}, fmt.Errorf("invalid crontab configuration")
+		return time.Time{}, fmt.Errorf("invalid crontab string configuration: %s", cronString)
 	}
 	return nextTime, nil
 }
