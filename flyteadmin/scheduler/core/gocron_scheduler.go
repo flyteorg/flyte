@@ -232,14 +232,6 @@ func GetCatchUpTimes(s models.SchedulableEntity, from time.Time, to time.Time) (
 		if scheduledTime.After(to) {
 			break
 		}
-		// Todo: scheduledTime.Before(from) check is needed because cron.ParseStandard library
-		// incorrectly returns January 1st, year 1 for certain invalid cron schedules (e.g. 0 0 31 2 *),
-		// which can cause infinite while loops. This is a known library issue that should be fixed
-		// by modifying the ParseStandard method in the future.
-		if scheduledTime.Before(from) {
-			return nil, fmt.Errorf("invalid crontab configuration")
-		}
-
 		scheduledTimes = append(scheduledTimes, scheduledTime)
 		currFrom = scheduledTime
 	}
@@ -259,7 +251,15 @@ func getCronScheduledTime(cronString string, fromTime time.Time) (time.Time, err
 	if err != nil {
 		return time.Time{}, err
 	}
-	return sched.Next(fromTime), nil
+	nextTime := sched.Next(fromTime)
+	// Todo: nextTime.IsZero() check is needed because cron.ParseStandard library
+	// incorrectly returns January 1st, year 1 for certain invalid cron schedules (e.g. 0 0 31 2 *),
+	// which can cause infinite while loops. This is a known library issue that should be fixed
+	// by modifying the ParseStandard method in the future.
+	if nextTime.IsZero() {
+		return time.Time{}, fmt.Errorf("invalid crontab configuration")
+	}
+	return nextTime, nil
 }
 
 func getFixedIntervalScheduledTime(unit admin.FixedRateUnit, fixedRateValue uint32, fromTime time.Time) (time.Time, error) {
