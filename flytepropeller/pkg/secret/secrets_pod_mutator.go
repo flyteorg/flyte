@@ -2,7 +2,6 @@ package secret
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -77,10 +76,7 @@ func (s *SecretsPodMutator) LabelSelector() *metav1.LabelSelector {
 }
 
 func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secret, pod *corev1.Pod) (*corev1.Pod, bool /*injected*/, error) {
-	errs := make([]error, 0)
-
 	logger.Debugf(ctx, "Injecting secret [%v].", secret)
-
 	for _, secretManagerType := range s.enabledSecretManagerTypes {
 		injector := s.injectors[secretManagerType]
 
@@ -91,7 +87,6 @@ func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secre
 			injector.Type(), injected, err)
 
 		if err != nil {
-			errs = append(errs, err)
 			continue
 		}
 		if injected {
@@ -99,7 +94,8 @@ func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secre
 		}
 	}
 
-	return pod, false, errors.Join(errs...)
+	err := fmt.Errorf("failed to inject secret [%v] using any of the enabled secret managers: %v. Possible reasons: the secret cannot be found or an internal error occurred", secret, s.enabledSecretManagerTypes)
+	return pod, false, err
 }
 
 // NewSecretsMutator creates a new SecretsMutator with all available plugins.
