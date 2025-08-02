@@ -36,6 +36,8 @@ const (
 	ParentShardLabel = "parent-shard"
 	// Name of the workflow getting re-enqueued
 	WorkflowID = "workflow-id"
+	// UnionV2Label indicates that a resource is part of v2
+	UnionV2Label = "union.ai/v2"
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
@@ -255,6 +257,8 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 	hash := h.Sum32() % v1alpha1.ShardKeyspaceSize
 
 	obj.ObjectMeta.Labels[ShardKeyLabel] = fmt.Sprint(hash)
+
+	obj.ObjectMeta.Labels[UnionV2Label] = "false"
 
 	if obj.Nodes == nil || obj.Connections.Downstream == nil {
 		// If we come here, we'd better have an error generated earlier. Otherwise, add one to make sure build fails.

@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
@@ -28,6 +30,7 @@ import (
 	adminServer "github.com/flyteorg/flyte/flyteadmin/pkg/server"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	adminScheduler "github.com/flyteorg/flyte/flyteadmin/scheduler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	propellerEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -130,10 +133,19 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		}
 	}
 
+	// TODO @pvditt follow up with making this an in selector
+	requirement, err := labels.NewRequirement(k8s.UnionV2Label, selection.NotIn, []string{"true"})
+	if err != nil {
+		return err
+	}
+
 	options := manager.Options{
 		Cache: cache.Options{
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
+			DefaultLabelSelector: labels.NewSelector().Add(
+				*requirement,
+			),
 		},
 		NewCache:  executors.NewCache,
 		NewClient: executors.BuildNewClientFunc(propellerScope),

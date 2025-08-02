@@ -12,12 +12,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -139,10 +142,19 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		}
 	}
 
+	// TODO @pvditt follow up with making this an in selector
+	requirement, err := labels.NewRequirement(k8s.UnionV2Label, selection.NotIn, []string{"true"})
+	if err != nil {
+		return err
+	}
+
 	options := manager.Options{
 		Cache: cache.Options{
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
+			DefaultLabelSelector: labels.NewSelector().Add(
+				*requirement,
+			),
 		},
 		NewCache:  executors.NewCache,
 		NewClient: executors.BuildNewClientFunc(propellerScope),

@@ -8,12 +8,15 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -110,10 +113,19 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 		}
 	}
 
+	// TODO @pvditt follow up with making this an in selector
+	requirement, err := labels.NewRequirement(k8s.UnionV2Label, selection.NotIn, []string{"true"})
+	if err != nil {
+		return err
+	}
+
 	options := manager.Options{
 		Cache: cache.Options{
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
+			DefaultLabelSelector: labels.NewSelector().Add(
+				*requirement,
+			),
 		},
 		NewCache:  executors.NewCache,
 		NewClient: executors.BuildNewClientFunc(webhookScope),
