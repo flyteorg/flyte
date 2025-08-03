@@ -1,0 +1,15 @@
+{{- if and .Values.workflow_scheduler.enabled (eq .Values.workflow_scheduler.type "native") .Values.flytescheduler.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ template "flyte.namespace" . }}
+  name: {{ template "flytescheduler.name" . }}
+  labels: {{ include "flytescheduler.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      protocol: TCP
+      port: {{ .Values.configmap.schedulerConfig.scheduler.profilerPort }}
+  selector: {{ include "flytescheduler.selectorLabels" . | nindent 4 }}
+{{- end }}

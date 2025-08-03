@@ -228,6 +228,23 @@ flytescheduler:
     seLinuxOptions:
       type: spc_t
 
+  # -- Settings for flytescheduler service
+  service:
+    # -- If enabled create the flytescheduler service
+    enabled: false
+
+  # -- Settings for flytescheduler service monitor
+  serviceMonitor:
+    # -- If enabled create the flytescheduler service monitor
+    enabled: false
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+
 #
 # DATACATALOG SETTINGS
 #

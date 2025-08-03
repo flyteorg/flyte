@@ -313,10 +313,17 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.runPrecheck | bool | `true` | Whether to inject an init container which waits on flyteadmin |
 | flytescheduler.secrets | object | `{}` |  |
 | flytescheduler.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flytescheduler pod(s). |
+| flytescheduler.service | object | `{"enabled":false}` | Settings for flytescheduler service |
+| flytescheduler.service.enabled | bool | `false` | If enabled create the flytescheduler service |
 | flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Flytescheduler |
 | flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
 | flytescheduler.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| flytescheduler.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flytescheduler service monitor |
+| flytescheduler.serviceMonitor.enabled | bool | `false` | If enabled create the flytescheduler service monitor |
+| flytescheduler.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
+| flytescheduler.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flytescheduler.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flytescheduler.strategy | object | `{}` |  |
 | flytescheduler.tolerations | list | `[]` | tolerations for Flytescheduler deployment |
 | secrets.adminOauthClientCredentials.clientId | string | `"flytepropeller"` |  |
