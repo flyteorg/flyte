@@ -63,6 +63,9 @@ spec:
       {{- if or .Values.deployment.initContainers (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
       initContainers:
         {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
+        {{- if .Values.deployment.preInitContainers }}
+        {{- tpl ( .Values.deployment.preInitContainers | toYaml ) . | nindent 8 }}
+        {{- end }}
         - name: wait-for-db
           {{- with .Values.deployment.waitForDB.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
