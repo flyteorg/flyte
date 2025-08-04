@@ -61,7 +61,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gcpSecretManager.sidecarImage"), DefaultConfig.GCPSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "vaultSecretManager.role"), DefaultConfig.VaultSecretManagerConfig.Role, "Specifies the vault role to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.type"), DefaultConfig.EmbeddedSecretManagerConfig.Type.String(), "")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.enableDefaultFetcher"), DefaultConfig.EmbeddedSecretManagerConfig.EnableDefaultFetcher, "Whether to enable the default secret fetcher for the embedded secret manager.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.awsConfig.region"), DefaultConfig.EmbeddedSecretManagerConfig.AWSConfig.Region, "AWS region")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.gcpConfig.project"), DefaultConfig.EmbeddedSecretManagerConfig.GCPConfig.Project, "GCP project to be used for secret manager")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.azureConfig.vaultURI"), DefaultConfig.EmbeddedSecretManagerConfig.AzureConfig.VaultURI, "Azure Vault URI")

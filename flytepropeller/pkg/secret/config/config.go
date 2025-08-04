@@ -72,7 +72,6 @@ var (
 			KVVersion: KVVersion2,
 		},
 		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
-			EnableDefaultFetcher: false,
 			FileMountInitContainer: FileMountInitContainerConfig{
 				Image: "busybox:1.28",
 				Resources: corev1.ResourceRequirements{
@@ -173,7 +172,6 @@ const (
 
 type EmbeddedSecretManagerConfig struct {
 	Type                   EmbeddedSecretManagerType    `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
-	EnableDefaultFetcher   bool                         `json:"enableDefaultFetcher" pflag:",Whether to enable the default secret fetcher for the embedded secret manager."`
 	AWSConfig              AWSConfig                    `json:"awsConfig" pflag:",Config for AWS settings"`
 	GCPConfig              GCPConfig                    `json:"gcpConfig" pflag:",Config for GCP settings"`
 	AzureConfig            AzureConfig                  `json:"azureConfig" pflag:",Config for Azure settings"`

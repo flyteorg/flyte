@@ -253,20 +253,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_embeddedSecretManagerConfig.enableDefaultFetcher", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("embeddedSecretManagerConfig.enableDefaultFetcher", testValue)
-			if vBool, err := cmdFlags.GetBool("embeddedSecretManagerConfig.enableDefaultFetcher"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EmbeddedSecretManagerConfig.EnableDefaultFetcher)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_embeddedSecretManagerConfig.awsConfig.region", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

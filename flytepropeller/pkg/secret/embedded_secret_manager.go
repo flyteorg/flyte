@@ -110,19 +110,11 @@ func deriveSecretNameComponents(secret *core.Secret, pod *corev1.Pod) (*SecretNa
 		return nil, err
 	}
 
-	var name string
-	if secret.Group != "" {
-		// This is to support OSS secret model, where the group is used to identify the secret
-		name = fmt.Sprintf(rawK8sSecretsStorageFormat, pod.GetNamespace(), secret.Group, secret.Key)
-	} else {
-		name = secret.Key
-	}
-
 	return &SecretNameComponents{
 		Project: pod.Labels[ProjectLabel],
 		Domain:  pod.Labels[DomainLabel],
 		Org:     pod.Labels[OrganizationLabel],
-		Name:    name,
+		Name:    secret.Key,
 	}, nil
 }
 

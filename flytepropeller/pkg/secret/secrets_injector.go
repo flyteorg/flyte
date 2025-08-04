@@ -66,13 +66,6 @@ func newSecretsInjector(
 			return nil, err
 		}
 		secretFetchers = append(secretFetchers, secretFetcher)
-		if webhookConfig.EmbeddedSecretManagerConfig.EnableDefaultFetcher {
-			defaultSecretFetcher, err := NewDefaultSecretFetcher(ctx)
-			if err != nil {
-				return nil, err
-			}
-			secretFetchers = append(secretFetchers, defaultSecretFetcher)
-		}
 		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetchers, ctrlRuntimeClient, podNamespace), nil
 	case config.SecretManagerTypeAzure:
 		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil

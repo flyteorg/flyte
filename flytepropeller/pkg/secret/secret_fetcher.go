@@ -65,18 +65,3 @@ func NewSecretFetcher(ctx context.Context, cfg config.EmbeddedSecretManagerConfi
 
 	return nil, fmt.Errorf("failed to start secret fetcher service due to unsupported type %v. Only supported for aws and gcp right now", cfg.Type)
 }
-
-func NewDefaultSecretFetcher(ctx context.Context) (SecretFetcher, error) {
-	logger.Infof(ctx, "use k8s secret manager service")
-	kubeConfig, err := rest.InClusterConfig()
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get kubernetes config: %v", err)
-		return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
-	}
-	kubeClientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to create kubernetes clientset: %v", err)
-		return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
-	}
-	return NewRawK8sSecretFetcher(kubeClientset), nil
-}
