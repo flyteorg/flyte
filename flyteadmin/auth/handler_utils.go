@@ -109,6 +109,30 @@ func FirstURL(urls ...*url.URL) *url.URL {
 	return nil
 }
 
+// wildcardMatch checks if hostname matches a wildcard pattern (only one level deep)
+// Supports patterns like "*.union.ai" matching "tenant1.union.ai"
+func wildcardMatch(hostname, pattern string) bool {
+	if strings.HasPrefix(pattern, "*.") {
+		urlParts := strings.SplitN(hostname, ".", 2)
+		if len(urlParts) < 2 {
+			return false
+		}
+		return urlParts[1] == pattern[2:]
+	}
+	return hostname == pattern
+}
+
+// buildURL constructs a URL using the authorized template but with the matched hostname
+func buildURL(authorizedURL *url.URL, matchedHostname string) *url.URL {
+	result := *authorizedURL // Copy the URL to avoid modifying the original
+	if authorizedURL.Port() != "" {
+		result.Host = matchedHostname + ":" + authorizedURL.Port()
+	} else {
+		result.Host = matchedHostname
+	}
+	return &result
+}
+
 // GetPublicURL attempts to retrieve the public url of the service. If httpPublicUri is set in the config, it takes
 // precedence. If the request is not nil and has a host set, it comes second and lastly it attempts to retrieve the url
 // from context if set (e.g. by gRPC gateway).
@@ -116,30 +140,32 @@ func GetPublicURL(ctx context.Context, req *http.Request, cfg *config.Config) *u
 	u := FirstURL(URLFromRequest(req), URLFromContext(ctx))
 	var hostMatching *url.URL
 	var hostAndPortMatching *url.URL
+	var matchedHostname string
 
 	for i, authorized := range cfg.AuthorizedURIs {
 		if u == nil {
 			return &authorized.URL
 		}
 
-		if u.Hostname() == authorized.Hostname() {
+		if wildcardMatch(u.Hostname(), authorized.Hostname()) {
+			matchedHostname = u.Hostname()
 			hostMatching = &cfg.AuthorizedURIs[i].URL
 			if u.Port() == authorized.Port() {
 				hostAndPortMatching = &cfg.AuthorizedURIs[i].URL
 			}
 
 			if u.Scheme == authorized.Scheme {
-				return &cfg.AuthorizedURIs[i].URL
+				return buildURL(&cfg.AuthorizedURIs[i].URL, matchedHostname)
 			}
 		}
 	}
 
 	if hostAndPortMatching != nil {
-		return hostAndPortMatching
+		return buildURL(hostAndPortMatching, matchedHostname)
 	}
 
 	if hostMatching != nil {
-		return hostMatching
+		return buildURL(hostMatching, matchedHostname)
 	}
 
 	if len(cfg.AuthorizedURIs) > 0 {
@@ -157,14 +183,7 @@ func isAuthorizedRedirectURL(url *url.URL, authorizedURL *url.URL) bool {
 		return false
 	}
 	// Allow wildcard subdomains (only one level deep)
-	if strings.HasPrefix(authorizedURL.Hostname(), "*.") {
-		urlParts := strings.SplitN(url.Hostname(), ".", 2)
-		if len(urlParts) < 2 {
-			return false
-		}
-		return urlParts[1] == authorizedURL.Hostname()[2:]
-	}
-	return url.Hostname() == authorizedURL.Hostname()
+	return wildcardMatch(url.Hostname(), authorizedURL.Hostname())
 }
 
 func GetRedirectURLAllowed(ctx context.Context, urlRedirectParam string, cfg *config.Config) bool {

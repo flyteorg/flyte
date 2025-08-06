@@ -71,6 +71,30 @@ func TestGetPublicURL(t *testing.T) {
 		})
 		assert.Equal(t, "http://localhost:30081", u.String())
 	})
+
+	t.Run("Matching scheme and host with wildcard", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, "https://abc.example.com", nil)
+		assert.NoError(t, err)
+		u := GetPublicURL(context.Background(), req, &config.Config{
+			AuthorizedURIs: []flytestdconfig.URL{
+				{URL: *config.MustParseURL("https://xyz.com")},
+				{URL: *config.MustParseURL("https://*.example.com")},
+			},
+		})
+		assert.Equal(t, "https://abc.example.com", u.String())
+	})
+
+	t.Run("Matching host and non-matching scheme with wildcard", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, "https://abc.example.com", nil)
+		assert.NoError(t, err)
+		u := GetPublicURL(context.Background(), req, &config.Config{
+			AuthorizedURIs: []flytestdconfig.URL{
+				{URL: *config.MustParseURL("https://xyz.com")},
+				{URL: *config.MustParseURL("http://*.example.com")},
+			},
+		})
+		assert.Equal(t, "http://abc.example.com", u.String())
+	})
 }
 
 func TestGetRedirectURLAllowed(t *testing.T) {
@@ -114,5 +138,27 @@ func TestGetRedirectURLAllowed(t *testing.T) {
 	})
 	t.Run("unauthorized url without subdomain", func(t *testing.T) {
 		assert.False(t, GetRedirectURLAllowed(ctx, "https://example2.com", cfg))
+	})
+}
+
+func TestWildcardMatch(t *testing.T) {
+	t.Run("wildcard subdomain match", func(t *testing.T) {
+		assert.True(t, wildcardMatch("tenant1.api.myapp.com", "*.api.myapp.com"))
+	})
+
+	t.Run("wildcard subdomain not match with empty", func(t *testing.T) {
+		assert.False(t, wildcardMatch("api.myapp.com", "*.api.myapp.com"))
+	})
+
+	t.Run("exact match", func(t *testing.T) {
+		assert.True(t, wildcardMatch("api.myapp.com", "api.myapp.com"))
+	})
+
+	t.Run("wildcard subdomain not match", func(t *testing.T) {
+		assert.False(t, wildcardMatch("tenant1.fakeapi.myapp.com", "*.api.myapp.com"))
+	})
+
+	t.Run("wildcard nested subdomain should not match", func(t *testing.T) {
+		assert.False(t, wildcardMatch("tenant1.subdomain.api.myapp.com", "*.api.myapp.com"))
 	})
 }
