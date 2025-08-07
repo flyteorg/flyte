@@ -540,9 +540,12 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 		}
 	}
 
-	if (phaseInfo.Phase() == core.PhaseSuccess || phaseInfo.Phase() == core.PhaseRetryableFailure) && errors.Is(getTaskInfoErr, podContainerNotFoundError) {
-		// if we have reached a terminal state we should retry under system failure until we can find
-		// the container to correctly populate the logs
+	// if we could not find the pod / container (and the task is not attempting to failover to
+	// another replica) we should retry for terminal phases to ensure that logs are correctly
+	// populated before completing the task.
+	if errors.Is(getTaskInfoErr, podContainerNotFoundError) && !errors.Is(err, statusUpdateNotFoundError) &&
+		(phaseInfo.Phase() == core.PhaseSuccess || phaseInfo.Phase() == core.PhaseRetryableFailure) {
+
 		return nil, core.PhaseInfoUndefined, getTaskInfoErr
 	}
 
