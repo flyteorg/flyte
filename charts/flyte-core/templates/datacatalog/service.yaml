@@ -12,6 +12,9 @@ spec:
   {{- with .Values.datacatalog.service.type}}
   type: {{ . }}
   {{- end }}
+  {{- with .Values.datacatalog.service.clusterIP}}
+  clusterIP: {{ . }}
+  {{- end }}
   ports:
   - name: http
     port: 88
