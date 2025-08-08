@@ -238,7 +238,7 @@ flytescheduler:
     # -- If enabled create the flytescheduler service monitor
     enabled: false
     # -- Sets the labels for the service monitor which are required by the
-    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    # prometheus to auto-detect the service monitor and start scraping the metrics
     labels: {}
     # -- Sets the interval at which metrics will be scraped by prometheus
     interval: 60s
