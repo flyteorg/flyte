@@ -197,11 +197,115 @@ func TestGetTimedFuncWithSchedule(t *testing.T) {
 }
 
 func TestGetCronScheduledTime(t *testing.T) {
-	fromTime := time.Date(2022, time.January, 27, 19, 0, 0, 0, time.UTC)
-	nextTime, err := getCronScheduledTime("0 19 * * *", fromTime)
-	assert.Nil(t, err)
-	expectedNextTime := time.Date(2022, time.January, 28, 19, 0, 0, 0, time.UTC)
-	assert.Equal(t, expectedNextTime, nextTime)
+	tests := []struct {
+		name           string
+		cronExpression string
+		fromTime       time.Time
+		expectError    bool
+		errorContains  string
+		expectedTime   time.Time
+	}{
+		{
+			name:           "valid cron expression",
+			cronExpression: "0 19 * * *",
+			fromTime:       time.Date(2022, time.January, 27, 19, 0, 0, 0, time.UTC),
+			expectError:    false,
+			expectedTime:   time.Date(2022, time.January, 28, 19, 0, 0, 0, time.UTC),
+		},
+		{
+			name:           "invalid cron expression with February 31st should return error",
+			cronExpression: "0 0 31 2 *", // February 31st - invalid
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			expectError:    true,
+			errorContains:  "invalid crontab string configuration",
+		},
+		{
+			name:           "invalid cron expression with April 31st should return error",
+			cronExpression: "0 0 31 4 *", // April 31st - invalid
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			expectError:    true,
+			errorContains:  "invalid crontab string configuration",
+		},
+		{
+			name:           "invalid cron expression with malformed syntax should return error",
+			cronExpression: "invalid cron expression",
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			expectError:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nextTime, err := getCronScheduledTime(tt.cronExpression, tt.fromTime)
+
+			if tt.expectError {
+				assert.NotNil(t, err)
+				if tt.errorContains != "" {
+					assert.Contains(t, err.Error(), tt.errorContains)
+				}
+				assert.True(t, nextTime.IsZero())
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expectedTime, nextTime)
+			}
+		})
+	}
+}
+
+func TestGetCatchUpTimesWithCronExpression(t *testing.T) {
+	tests := []struct {
+		name           string
+		cronExpression string
+		fromTime       time.Time
+		toTime         time.Time
+		expectError    bool
+		errorContains  string
+	}{
+		{
+			name:           "invalid cron expression with February 31st should return error",
+			cronExpression: "0 0 31 2 *", // February 31st - invalid
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
+			expectError:    true,
+			errorContains:  "invalid crontab string configuration",
+		},
+		{
+			name:           "invalid cron expression with April 31st should return error",
+			cronExpression: "0 0 31 4 *", // April 31st - invalid
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
+			expectError:    true,
+			errorContains:  "invalid crontab string configuration",
+		},
+		{
+			name:           "valid cron expression should work normally",
+			cronExpression: "0 0 15 2 *", // February 15th - valid
+			fromTime:       time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC),
+			toTime:         time.Date(2023, time.December, 31, 23, 59, 59, 0, time.UTC),
+			expectError:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := models.SchedulableEntity{
+				CronExpression: tt.cronExpression,
+			}
+
+			catchupTimes, err := GetCatchUpTimes(s, tt.fromTime, tt.toTime)
+
+			if tt.expectError {
+				assert.NotNil(t, err)
+				if tt.errorContains != "" {
+					assert.Contains(t, err.Error(), tt.errorContains)
+				}
+				assert.Nil(t, catchupTimes)
+			} else {
+				assert.Nil(t, err)
+				assert.True(t, len(catchupTimes) > 0, "Should get valid catchup times")
+			}
+		})
+	}
 }
 
 func TestGetCatchUpTimes(t *testing.T) {
