@@ -66,8 +66,7 @@ flyteadmin:
   service:
     appProtocols:
       enabled: false
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+    annotations: {}
     type: ClusterIP
     loadBalancerSourceRanges: []
     # -- Appends additional ports to the service spec.
@@ -260,8 +259,7 @@ datacatalog:
   configPath: /etc/datacatalog/config/*.yaml
   # -- Service settings for Datacatalog
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+    annotations: {}
     type: NodePort
     # -- Appends additional ports to the service spec.
     additionalPorts: []
@@ -631,8 +629,7 @@ webhook:
           - patch
   # -- Service settings for the webhook
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+    annotations: {}
     type: ClusterIP
   # -- Annotations for webhook deployment
   annotations: {}

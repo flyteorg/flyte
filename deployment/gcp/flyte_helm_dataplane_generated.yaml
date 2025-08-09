@@ -402,8 +402,6 @@ kind: Service
 metadata:
   name: flyte-pod-webhook
   namespace: flyte
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   selector:
     app: flyte-pod-webhook

@@ -52,8 +52,7 @@ flyteadmin:
     - flyteexamples
   # -- Service settings for Flyteadmin
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+    annotations: {}
     type: ClusterIP
     loadBalancerSourceRanges: []
   # -- Configuration for service accounts for FlyteAdmin
@@ -165,8 +164,6 @@ datacatalog:
   configPath: /etc/datacatalog/config/*.yaml
   # -- Service settings for Datacatalog
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
@@ -324,8 +321,6 @@ webhook:
     imagePullSecrets: []
   # -- Service settings for the webhook
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
 
 # ------------------------------------------------

@@ -772,8 +772,6 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
   ports:
@@ -830,8 +828,6 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: NodePort
   ports:
@@ -854,8 +850,6 @@ kind: Service
 metadata:
   name: flyte-pod-webhook
   namespace: flyte
-  annotations: 
-    projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   selector:
     app: flyte-pod-webhook
