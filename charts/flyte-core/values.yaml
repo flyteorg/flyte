@@ -232,6 +232,7 @@ flytescheduler:
   service:
     # -- If enabled create the flytescheduler service
     enabled: false
+    type: ClusterIP
 
   # -- Settings for flytescheduler service monitor
   serviceMonitor:

@@ -6,7 +6,9 @@ metadata:
   name: {{ template "flytescheduler.name" . }}
   labels: {{ include "flytescheduler.labels" . | nindent 4 }}
 spec:
-  type: ClusterIP
+  {{- with .Values.flytescheduler.service.type}}
+  type: {{ . }}
+  {{- end }}
   ports:
     - name: http-metrics
       protocol: TCP

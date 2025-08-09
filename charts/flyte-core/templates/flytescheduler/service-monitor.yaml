@@ -1,4 +1,4 @@
-{{- if and .Values.workflow_scheduler.enabled (eq .Values.workflow_scheduler.type "native") .Values.flytescheduler.service.enabled .Values.flytescheduler.serviceMonitor.enabled}}
+{{- if and .Values.workflow_scheduler.enabled (eq .Values.workflow_scheduler.type "native") .Values.flytescheduler.service.enabled .Values.flytescheduler.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
