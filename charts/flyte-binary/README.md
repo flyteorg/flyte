@@ -106,6 +106,7 @@ Chart for basic single Flyte executable deployment
 | deployment.podSecurityContext.fsGroup | int | `65534` |  |
 | deployment.podSecurityContext.runAsGroup | int | `65534` |  |
 | deployment.podSecurityContext.runAsUser | int | `65534` |  |
+| deployment.preInitContainers | list | `[]` |  |
 | deployment.readinessProbe | object | `{}` |  |
 | deployment.securityContext | object | `{}` |  |
 | deployment.sidecars | list | `[]` |  |

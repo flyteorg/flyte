@@ -302,6 +302,8 @@ deployment:
   sidecars: []
   # initContainers Specify additional init containers for Flyte pod
   initContainers: []
+  # preInitContainers Specify additional pre-init containers for Flyte pod that run before the wait-for-db init container
+  preInitContainers: []
   # extraPodSpec Specify additional configuration for Flyte pod
   # This can be used for adding affinity, tolerations, hostNetwork, etc.
   extraPodSpec: {}
