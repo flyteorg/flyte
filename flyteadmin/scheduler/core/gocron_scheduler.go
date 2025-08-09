@@ -252,7 +252,7 @@ func getCronScheduledTime(cronString string, fromTime time.Time) (time.Time, err
 		return time.Time{}, err
 	}
 	nextTime := sched.Next(fromTime)
-	// Todo: nextTime.IsZero() check is needed because cron.ParseStandard library
+	// TODO: nextTime.IsZero() check is needed because cron.ParseStandard library
 	// incorrectly returns January 1st, year 1 for certain invalid cron schedules (e.g. 0 0 31 2 *),
 	// which can cause infinite while loops. This is a known library issue that should be fixed
 	// by modifying the ParseStandard method in the future.
