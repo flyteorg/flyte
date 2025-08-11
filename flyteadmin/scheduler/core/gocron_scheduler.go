@@ -189,6 +189,7 @@ func (g *GoCronScheduler) CatchupAll(ctx context.Context, until time.Time) bool 
 			err := g.CatchUpSingleSchedule(ctx, job.schedule, *fromTime, until)
 			if err != nil {
 				// stop the iteration since one of the catchups failed
+				logger.Errorf(ctx, "catching up schedule failed with error: %v", err)
 				failed = true
 				return false
 			}
