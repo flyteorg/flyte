@@ -189,6 +189,7 @@ func (g *GoCronScheduler) CatchupAll(ctx context.Context, until time.Time) bool 
 			err := g.CatchUpSingleSchedule(ctx, job.schedule, *fromTime, until)
 			if err != nil {
 				// stop the iteration since one of the catchups failed
+				logger.Errorf(ctx, "catching up schedule failed with error: %v", err)
 				failed = true
 				return false
 			}
@@ -251,7 +252,15 @@ func getCronScheduledTime(cronString string, fromTime time.Time) (time.Time, err
 	if err != nil {
 		return time.Time{}, err
 	}
-	return sched.Next(fromTime), nil
+	nextTime := sched.Next(fromTime)
+	// TODO: nextTime.IsZero() check is needed because cron.ParseStandard library
+	// incorrectly returns January 1st, year 1 for certain invalid cron schedules (e.g. 0 0 31 2 *),
+	// which can cause infinite while loops. This is a known library issue that should be fixed
+	// by modifying the ParseStandard method in the future.
+	if nextTime.IsZero() {
+		return time.Time{}, fmt.Errorf("invalid crontab string configuration: %s", cronString)
+	}
+	return nextTime, nil
 }
 
 func getFixedIntervalScheduledTime(unit admin.FixedRateUnit, fixedRateValue uint32, fromTime time.Time) (time.Time, error) {
