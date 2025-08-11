@@ -46,7 +46,7 @@ you'll need to add the configuration settings under the `inline` section in the 
 * - {ref}`Optimizing Performance <deployment-configuration-performance>`
   - Improve the performance of the core Flyte engine.
 * - {ref}`Platform Events <deployment-configuration-eventing>`
-  - Configure Flyte to to send events to external pub/sub systems.
+  - Configure Flyte to send events to external pub/sub systems.
 * - {ref}`Resource Manager <deployment-configuration-resource-manager>`
   - Manage external resource pooling
 ```
