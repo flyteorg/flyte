@@ -101,7 +101,9 @@ func resolvePlatformDefaults(platformResources v1.ResourceRequirements, configCP
 
 // AdjustOrDefaultResource validates resources conform to platform limits and assigns defaults for Request and Limit values by
 // using the Request when the Limit is unset, and vice versa.
-func AdjustOrDefaultResource(request, limit, platformDefault, platformLimit resource.Quantity) ResourceRequirement {
+// doNotMatchLimitToRequest should pretty much always be off, only turn it on when running for CPU, and you're okay having
+// different request and limit values (pod will no longer be Guaranteed).
+func AdjustOrDefaultResource(request, limit, platformDefault, platformLimit resource.Quantity, doNotMatchLimitToRequest bool) ResourceRequirement {
 	if request.IsZero() {
 		if !limit.IsZero() {
 			request = limit
@@ -110,7 +112,7 @@ func AdjustOrDefaultResource(request, limit, platformDefault, platformLimit reso
 		}
 	}
 
-	if limit.IsZero() {
+	if limit.IsZero() && !doNotMatchLimitToRequest {
 		limit = request
 	}
 
@@ -144,21 +146,27 @@ func ensureResourceRange(request, limit, platformLimit resource.Quantity) Resour
 	}
 }
 
+// adjustResourceRequirement mutates the resourceRequirements for the given resourceName
 func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirements,
-	platformResources v1.ResourceRequirements, assignIfUnset bool) {
+	platformResources v1.ResourceRequirements, assignIfUnset bool, doNotMatchLimitToRequest bool) {
 
 	var resourceValue ResourceRequirement
 	if assignIfUnset {
 		resourceValue = AdjustOrDefaultResource(resourceRequirements.Requests[resourceName],
 			resourceRequirements.Limits[resourceName], platformResources.Requests[resourceName],
-			platformResources.Limits[resourceName])
+			platformResources.Limits[resourceName], doNotMatchLimitToRequest)
 	} else {
 		resourceValue = ensureResourceRange(resourceRequirements.Requests[resourceName],
 			resourceRequirements.Limits[resourceName], platformResources.Limits[resourceName])
 	}
 
 	resourceRequirements.Requests[resourceName] = resourceValue.Request
-	resourceRequirements.Limits[resourceName] = resourceValue.Limit
+	// if the limit is zero, we don't need to set it - there is no benefit in setting a 0 limit in K8s for any resource.
+	// Not setting this allows resources to float. Note this shouldn't affect K8s QoS classes either since something
+	// that has 0 requests is already just BestEffort
+	if !resourceValue.Limit.IsZero() {
+		resourceRequirements.Limits[resourceName] = resourceValue.Limit
+	}
 }
 
 // Convert GPU resource requirements named 'gpu' the recognized 'nvidia.com/gpu' identifier.
@@ -193,14 +201,16 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	platformResources = resolvePlatformDefaults(platformResources, config.GetK8sPluginConfig().DefaultCPURequest,
 		config.GetK8sPluginConfig().DefaultMemoryRequest)
 
-	adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset)
-	adjustResourceRequirement(v1.ResourceMemory, resources, platformResources, assignIfUnset)
+	// Only used for CPU.
+	doNotMatchLimitToRequest := config.GetK8sPluginConfig().AllowCPULimitToFloatFromRequest
+	adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset, doNotMatchLimitToRequest)
+	adjustResourceRequirement(v1.ResourceMemory, resources, platformResources, assignIfUnset, false)
 
 	_, ephemeralStorageRequested := resources.Requests[v1.ResourceEphemeralStorage]
 	_, ephemeralStorageLimited := resources.Limits[v1.ResourceEphemeralStorage]
 
 	if ephemeralStorageRequested || ephemeralStorageLimited {
-		adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset)
+		adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset, false)
 	}
 
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
@@ -215,7 +225,7 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	}
 
 	if shouldAdjustGPU {
-		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
+		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset, false)
 	}
 
 	return resources
