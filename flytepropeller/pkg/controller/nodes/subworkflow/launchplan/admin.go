@@ -186,7 +186,7 @@ func (a *adminLaunchPlanExecutor) GetLaunchPlan(ctx context.Context, launchPlanR
 	if launchPlanRef == nil {
 		return nil, fmt.Errorf("launch plan reference is nil")
 	}
-	logger.Debugf(ctx, "Retrieving launch plan %s", *launchPlanRef)
+	logger.Debugf(ctx, "Retrieving launch plan %v", *launchPlanRef)
 	getObjectRequest := admin.ObjectGetRequest{
 		Id: launchPlanRef,
 	}
