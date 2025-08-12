@@ -1354,6 +1354,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	nodeStatus.ClearDynamicNodeStatus()
 	nodeStatus.ClearGateNodeStatus()
 	nodeStatus.ClearArrayNodeStatus()
+	nodeStatus.ClearExecutionError()
 	nodeStatus.ClearCacheStatus()
 	return interfaces.NodeStatusPending, nil
 }
