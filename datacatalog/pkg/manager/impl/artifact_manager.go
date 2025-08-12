@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
@@ -51,6 +52,7 @@ type artifactManager struct {
 	repo          repositories.RepositoryInterface
 	artifactStore ArtifactDataStore
 	systemMetrics artifactMetrics
+	clock         clock.Clock
 }
 
 // Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
@@ -109,6 +111,12 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 		logger.Errorf(ctx, "Failed to transform artifact err: %v", err)
 		m.systemMetrics.transformerErrorCounter.Inc(ctx)
 		return nil, err
+	}
+
+	// Set expiration
+	if request.GetArtifact().GetTtl() != nil {
+		expiration := m.clock.Now().Add(request.GetArtifact().GetTtl().AsDuration())
+		artifactModel.ExpiresAt = &expiration
 	}
 
 	err = m.repo.ArtifactRepo().Create(ctx, artifactModel)
@@ -184,7 +192,7 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 		logger.Debugf(ctx, "Get artifact by id %v", key)
 		artifactKey := transformers.ToArtifactKey(datasetID, key)
 		var err error
-		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
+		artifactModel, err = m.repo.ArtifactRepo().GetAndFilterExpired(ctx, artifactKey)
 
 		if err != nil {
 			if errors.IsDoesNotExistError(err) {
@@ -213,6 +221,11 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 		}
 
 		artifactModel = tag.Artifact
+	}
+
+	// If the artifact is expired consider this tag expired too
+	if artifactModel.ExpiresAt != nil && artifactModel.ExpiresAt.Before(m.clock.Now()) {
+		return models.Artifact{}, errors.NewDataCatalogErrorf(codes.NotFound, "entry not found")
 	}
 
 	if len(artifactModel.ArtifactData) == 0 {
@@ -273,7 +286,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	}
 
 	// Perform the list with the dataset and listInput filters
-	artifactModels, err := m.repo.ArtifactRepo().List(ctx, dataset.DatasetKey, listInput)
+	artifactModels, err := m.repo.ArtifactRepo().ListAndFilterExpired(ctx, dataset.DatasetKey, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Unable to list Artifacts err: %v", err)
 		m.systemMetrics.listFailureCounter.Inc(ctx)
@@ -379,6 +392,15 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 
 	// update artifact in DB, also replaces/upserts associated artifact data
 	artifactModel.ArtifactData = artifactDataModels
+
+	// Reset TTL on the artifact since all the data is fresh.
+	if request.GetTtl() != nil {
+		expiration := m.clock.Now().Add(request.GetTtl().AsDuration())
+		artifactModel.ExpiresAt = &expiration
+	} else {
+		artifactModel.ExpiresAt = nil
+	}
+
 	logger.Debugf(ctx, "Updating ArtifactModel with %+v", artifactModel)
 
 	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
@@ -416,7 +438,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	}, nil
 }
 
-func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
+func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope, clock clock.Clock) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
 		createResponseTime:       labeled.NewStopWatch("create_duration", "The duration of the create artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
@@ -446,5 +468,6 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		repo:          repo,
 		artifactStore: NewArtifactDataStore(store, storagePrefix),
 		systemMetrics: artifactMetrics,
+		clock:         clock,
 	}
 }
