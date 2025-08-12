@@ -325,6 +325,9 @@ type MutableNodeStatus interface {
 	IncrementAttempts() uint32
 	IncrementSystemFailures() uint32
 	SetCached()
+	SetCacheStatus(s *core.CatalogCacheStatus)
+	GetCacheStatus() *core.CatalogCacheStatus
+	ClearCacheStatus()
 	ResetDirty()
 
 	GetBranchStatus() MutableBranchNodeStatus

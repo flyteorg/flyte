@@ -300,6 +300,7 @@ type NodeConfig struct {
 	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
 	EnableCRDebugMetadata          bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
 	DisableInputFileWrites         bool             `json:"disable-input-file-writes" pflag:",Disable writing input files to storage. This is useful for v2 nodes that are guaranteed to have inputs files already created"`
+	PersistCacheStatus             bool             `json:"persist-cache-status" pflag:",Persist cache status in the node status. This is needed to persist cache status in v2 as part of the action status"`
 }
 
 // DefaultDeadlines contains default values for timeouts

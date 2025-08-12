@@ -25,6 +25,11 @@ func (_m *ExecutableNodeStatus) ClearArrayNodeStatus() {
 	_m.Called()
 }
 
+// ClearCacheStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) ClearCacheStatus() {
+	_m.Called()
+}
+
 // ClearDynamicNodeStatus provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
@@ -154,6 +159,40 @@ func (_m *ExecutableNodeStatus) GetBranchStatus() v1alpha1.MutableBranchNodeStat
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.MutableBranchNodeStatus)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_GetCacheStatus struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetCacheStatus) Return(_a0 *core.CatalogCacheStatus) *ExecutableNodeStatus_GetCacheStatus {
+	return &ExecutableNodeStatus_GetCacheStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetCacheStatus() *ExecutableNodeStatus_GetCacheStatus {
+	c_call := _m.On("GetCacheStatus")
+	return &ExecutableNodeStatus_GetCacheStatus{Call: c_call}
+}
+
+func (_m *ExecutableNodeStatus) OnGetCacheStatusMatch(matchers ...interface{}) *ExecutableNodeStatus_GetCacheStatus {
+	c_call := _m.On("GetCacheStatus", matchers...)
+	return &ExecutableNodeStatus_GetCacheStatus{Call: c_call}
+}
+
+// GetCacheStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetCacheStatus() *core.CatalogCacheStatus {
+	ret := _m.Called()
+
+	var r0 *core.CatalogCacheStatus
+	if rf, ok := ret.Get(0).(func() *core.CatalogCacheStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.CatalogCacheStatus)
 		}
 	}
 
@@ -1165,6 +1204,11 @@ func (_m *ExecutableNodeStatus) IsDirty() bool {
 // ResetDirty provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ResetDirty() {
 	_m.Called()
+}
+
+// SetCacheStatus provides a mock function with given fields: s
+func (_m *ExecutableNodeStatus) SetCacheStatus(s *core.CatalogCacheStatus) {
+	_m.Called(s)
 }
 
 // SetCached provides a mock function with given fields:

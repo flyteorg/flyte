@@ -23,6 +23,11 @@ func (_m *MutableNodeStatus) ClearArrayNodeStatus() {
 	_m.Called()
 }
 
+// ClearCacheStatus provides a mock function with given fields:
+func (_m *MutableNodeStatus) ClearCacheStatus() {
+	_m.Called()
+}
+
 // ClearDynamicNodeStatus provides a mock function with given fields:
 func (_m *MutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
@@ -120,6 +125,40 @@ func (_m *MutableNodeStatus) GetBranchStatus() v1alpha1.MutableBranchNodeStatus 
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.MutableBranchNodeStatus)
+		}
+	}
+
+	return r0
+}
+
+type MutableNodeStatus_GetCacheStatus struct {
+	*mock.Call
+}
+
+func (_m MutableNodeStatus_GetCacheStatus) Return(_a0 *core.CatalogCacheStatus) *MutableNodeStatus_GetCacheStatus {
+	return &MutableNodeStatus_GetCacheStatus{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableNodeStatus) OnGetCacheStatus() *MutableNodeStatus_GetCacheStatus {
+	c_call := _m.On("GetCacheStatus")
+	return &MutableNodeStatus_GetCacheStatus{Call: c_call}
+}
+
+func (_m *MutableNodeStatus) OnGetCacheStatusMatch(matchers ...interface{}) *MutableNodeStatus_GetCacheStatus {
+	c_call := _m.On("GetCacheStatus", matchers...)
+	return &MutableNodeStatus_GetCacheStatus{Call: c_call}
+}
+
+// GetCacheStatus provides a mock function with given fields:
+func (_m *MutableNodeStatus) GetCacheStatus() *core.CatalogCacheStatus {
+	ret := _m.Called()
+
+	var r0 *core.CatalogCacheStatus
+	if rf, ok := ret.Get(0).(func() *core.CatalogCacheStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.CatalogCacheStatus)
 		}
 	}
 
@@ -565,6 +604,11 @@ func (_m *MutableNodeStatus) IsDirty() bool {
 // ResetDirty provides a mock function with given fields:
 func (_m *MutableNodeStatus) ResetDirty() {
 	_m.Called()
+}
+
+// SetCacheStatus provides a mock function with given fields: s
+func (_m *MutableNodeStatus) SetCacheStatus(s *core.CatalogCacheStatus) {
+	_m.Called(s)
 }
 
 // SetCached provides a mock function with given fields:

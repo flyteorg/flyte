@@ -491,6 +491,7 @@ type nodeExecutor struct {
 	cache                           catalog.Client
 	clusterID                       string
 	enableCRDebugMetadata           bool
+	persistCacheStatus              bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultDataSandboxSuffix        []string
@@ -1012,6 +1013,11 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		}
 	}
 
+	if cacheStatus != nil && c.persistCacheStatus {
+		catalogCacheStatus := cacheStatus.GetCacheStatus()
+		nodeStatus.SetCacheStatus(&catalogCacheStatus)
+	}
+
 	np, err := ToNodePhase(p.GetPhase())
 	if err != nil {
 		return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "failed to move from queued")
@@ -1189,6 +1195,11 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 	// other metadata
 	p = updatePhaseCacheInfo(p, cacheStatus, catalogReservationStatus)
 
+	if cacheStatus != nil && c.persistCacheStatus {
+		catalogCacheStatus := cacheStatus.GetCacheStatus()
+		nodeStatus.SetCacheStatus(&catalogCacheStatus)
+	}
+
 	np, err := ToNodePhase(p.GetPhase())
 	if err != nil {
 		return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "failed to move from queued")
@@ -1343,6 +1354,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	nodeStatus.ClearDynamicNodeStatus()
 	nodeStatus.ClearGateNodeStatus()
 	nodeStatus.ClearArrayNodeStatus()
+	nodeStatus.ClearCacheStatus()
 	return interfaces.NodeStatusPending, nil
 }
 
@@ -1540,6 +1552,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		cache:                           cacheClient,
 		clusterID:                       clusterID,
 		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
+		persistCacheStatus:              nodeConfig.PersistCacheStatus,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultDataSandboxSuffix:        defaultRawOutputSuffix,

@@ -364,6 +364,9 @@ type NodeStatus struct {
 	SystemFailures       uint32        `json:"systemFailures,omitempty"`
 	Cached               bool          `json:"cached,omitempty"`
 
+	// TODO @pvditt remove after BB-5263 is completed
+	CacheStatus *core.CatalogCacheStatus `json:"cacheStatus,omitempty"`
+
 	// This is useful only for branch nodes. If this is set, then it can be used to determine if execution can proceed
 	ParentNode    *NodeID                  `json:"parentNode,omitempty"`
 	ParentTask    *TaskExecutionIdentifier `json:"-"`
@@ -532,6 +535,20 @@ func (in *NodeStatus) GetSystemFailures() uint32 {
 
 func (in *NodeStatus) SetCached() {
 	in.Cached = true
+	in.SetDirty()
+}
+
+func (in *NodeStatus) SetCacheStatus(s *core.CatalogCacheStatus) {
+	in.CacheStatus = s
+	in.SetDirty()
+}
+
+func (in *NodeStatus) GetCacheStatus() *core.CatalogCacheStatus {
+	return in.CacheStatus
+}
+
+func (in *NodeStatus) ClearCacheStatus() {
+	in.CacheStatus = nil
 	in.SetDirty()
 }
 
