@@ -23,6 +23,9 @@ const (
 	DataCatalog_GetDataset_FullMethodName             = "/datacatalog.DataCatalog/GetDataset"
 	DataCatalog_CreateArtifact_FullMethodName         = "/datacatalog.DataCatalog/CreateArtifact"
 	DataCatalog_GetArtifact_FullMethodName            = "/datacatalog.DataCatalog/GetArtifact"
+	DataCatalog_CreateFutureArtifact_FullMethodName   = "/datacatalog.DataCatalog/CreateFutureArtifact"
+	DataCatalog_GetFutureArtifact_FullMethodName      = "/datacatalog.DataCatalog/GetFutureArtifact"
+	DataCatalog_UpdateFutureArtifact_FullMethodName   = "/datacatalog.DataCatalog/UpdateFutureArtifact"
 	DataCatalog_AddTag_FullMethodName                 = "/datacatalog.DataCatalog/AddTag"
 	DataCatalog_ListArtifacts_FullMethodName          = "/datacatalog.DataCatalog/ListArtifacts"
 	DataCatalog_ListDatasets_FullMethodName           = "/datacatalog.DataCatalog/ListDatasets"
@@ -45,6 +48,12 @@ type DataCatalogClient interface {
 	CreateArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error)
 	// Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
 	GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
+	// Create future artifact data.
+	CreateFutureArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error)
+	// Retrieve a future artifact by an identifying handle. This returns an artifact along with the artifact data.
+	GetFutureArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
+	// Updates an existing future artifact, overwriting the stored artifact data in the underlying blob storage.
+	UpdateFutureArtifact(ctx context.Context, in *UpdateArtifactRequest, opts ...grpc.CallOption) (*UpdateArtifactResponse, error)
 	// Associate a tag with an artifact. Tags are unique within a Dataset.
 	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
 	// Return a paginated list of artifacts
@@ -108,6 +117,33 @@ func (c *dataCatalogClient) CreateArtifact(ctx context.Context, in *CreateArtifa
 func (c *dataCatalogClient) GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error) {
 	out := new(GetArtifactResponse)
 	err := c.cc.Invoke(ctx, DataCatalog_GetArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataCatalogClient) CreateFutureArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error) {
+	out := new(CreateArtifactResponse)
+	err := c.cc.Invoke(ctx, DataCatalog_CreateFutureArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataCatalogClient) GetFutureArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error) {
+	out := new(GetArtifactResponse)
+	err := c.cc.Invoke(ctx, DataCatalog_GetFutureArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataCatalogClient) UpdateFutureArtifact(ctx context.Context, in *UpdateArtifactRequest, opts ...grpc.CallOption) (*UpdateArtifactResponse, error) {
+	out := new(UpdateArtifactResponse)
+	err := c.cc.Invoke(ctx, DataCatalog_UpdateFutureArtifact_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -182,6 +218,12 @@ type DataCatalogServer interface {
 	CreateArtifact(context.Context, *CreateArtifactRequest) (*CreateArtifactResponse, error)
 	// Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
 	GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
+	// Create future artifact data.
+	CreateFutureArtifact(context.Context, *CreateArtifactRequest) (*CreateArtifactResponse, error)
+	// Retrieve a future artifact by an identifying handle. This returns an artifact along with the artifact data.
+	GetFutureArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
+	// Updates an existing future artifact, overwriting the stored artifact data in the underlying blob storage.
+	UpdateFutureArtifact(context.Context, *UpdateArtifactRequest) (*UpdateArtifactResponse, error)
 	// Associate a tag with an artifact. Tags are unique within a Dataset.
 	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
 	// Return a paginated list of artifacts
@@ -222,6 +264,15 @@ func (UnimplementedDataCatalogServer) CreateArtifact(context.Context, *CreateArt
 }
 func (UnimplementedDataCatalogServer) GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetArtifact not implemented")
+}
+func (UnimplementedDataCatalogServer) CreateFutureArtifact(context.Context, *CreateArtifactRequest) (*CreateArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFutureArtifact not implemented")
+}
+func (UnimplementedDataCatalogServer) GetFutureArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFutureArtifact not implemented")
+}
+func (UnimplementedDataCatalogServer) UpdateFutureArtifact(context.Context, *UpdateArtifactRequest) (*UpdateArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFutureArtifact not implemented")
 }
 func (UnimplementedDataCatalogServer) AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTag not implemented")
@@ -321,6 +372,60 @@ func _DataCatalog_GetArtifact_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DataCatalogServer).GetArtifact(ctx, req.(*GetArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_CreateFutureArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).CreateFutureArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataCatalog_CreateFutureArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).CreateFutureArtifact(ctx, req.(*CreateArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_GetFutureArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).GetFutureArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataCatalog_GetFutureArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).GetFutureArtifact(ctx, req.(*GetArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_UpdateFutureArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).UpdateFutureArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataCatalog_UpdateFutureArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).UpdateFutureArtifact(ctx, req.(*UpdateArtifactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -455,6 +560,18 @@ var DataCatalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetArtifact",
 			Handler:    _DataCatalog_GetArtifact_Handler,
+		},
+		{
+			MethodName: "CreateFutureArtifact",
+			Handler:    _DataCatalog_CreateFutureArtifact_Handler,
+		},
+		{
+			MethodName: "GetFutureArtifact",
+			Handler:    _DataCatalog_GetFutureArtifact_Handler,
+		},
+		{
+			MethodName: "UpdateFutureArtifact",
+			Handler:    _DataCatalog_UpdateFutureArtifact_Handler,
 		},
 		{
 			MethodName: "AddTag",
