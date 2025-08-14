@@ -9,6 +9,9 @@ data:
 {{- with .Values.db.datacatalog }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.otel }}
+  otel.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}

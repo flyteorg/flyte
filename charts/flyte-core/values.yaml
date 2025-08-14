@@ -853,6 +853,28 @@ configmap:
       - id: production
         name: production
 
+  # -- Open Telemetry Configuration
+  otel:
+    otel:
+      # -- The type of exporter to use
+      type: noop
+      # -- Configuration for the file exporter type
+      file: "/tmp/trace.txt"
+      # -- Configuration for the jaeger exporter type
+      jaeger:
+        endpoint: "http://localhost:14268/api/traces"
+        # -- Configuration for the otlpgrpc exporter type
+      otlpgrpc:
+        endpoint: "http://localhost:4317"
+      # -- Configuration for the otlp exporter type
+      otlphttp:
+        endpoint: "http://localhost:4318/v1/traces"
+      # -- Configuration for sampling of traces
+      sampler:
+        # -- Configuration for the parent based sampler
+        parentSampler: always
+
+
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
   schedulerConfig:
     scheduler:

@@ -130,6 +130,18 @@ data:
       name: staging
     - id: production
       name: production
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   server.yaml: | 
     auth:
       appAuth:
@@ -380,6 +392,18 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   server.yaml: | 
     application:
       grpcMaxRecvMsgSizeMBs: 6
@@ -507,6 +531,18 @@ data:
         default-cpus: 100m
         default-env-vars: []
         default-memory: 100Mi
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   resource_manager.yaml: | 
     propeller:
       resourcemanager:
@@ -848,7 +884,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c943b200cd0bed97fe456c0c713dd79cdc4e22133495cac89db3fc55e9b79c7"
+        configChecksum: "1a3b03ce2201b7f44bd9e8d17d00e1ef9d227362fc9b4e45f3d08b56f7e1530"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1170,7 +1206,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b33f5d90f29b33dc6980bf47d7ac39d9955e0275fec16a356777fa864b90e7f"
+        configChecksum: "a296db3de9a904e87ff0f51ab5ac2f025193cdfb92ea5621af5d46a70699ac9"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1274,7 +1310,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e66708079659fcb71e5d56a4c050b58dc9085c97d599d2cd867968b1a20babc"
+        configChecksum: "ecda597a26eaad8f7d1611096e736f0870b74b7c13e915deb99c16e5545cc99"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1360,7 +1396,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.16.0-b4
       annotations:
-        configChecksum: "e66708079659fcb71e5d56a4c050b58dc9085c97d599d2cd867968b1a20babc"
+        configChecksum: "ecda597a26eaad8f7d1611096e736f0870b74b7c13e915deb99c16e5545cc99"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

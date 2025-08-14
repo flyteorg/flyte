@@ -111,6 +111,18 @@ data:
       name: staging
     - id: production
       name: production
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   server.yaml: | 
     auth:
       appAuth:
@@ -346,6 +358,18 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
+  otel.yaml: | 
+    otel:
+      file: /tmp/trace.txt
+      jaeger:
+        endpoint: http://localhost:14268/api/traces
+      otlpgrpc:
+        endpoint: http://localhost:4317
+      otlphttp:
+        endpoint: http://localhost:4318/v1/traces
+      sampler:
+        parentSampler: always
+      type: noop
   server.yaml: | 
     application:
       grpcMaxRecvMsgSizeMBs: 6
@@ -558,7 +582,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
+        configChecksum: "c26f85c2c14e2d92b7ffe4c931918a375a459870b142caad4f9b97947e467ad"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -880,7 +904,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b33f5d90f29b33dc6980bf47d7ac39d9955e0275fec16a356777fa864b90e7f"
+        configChecksum: "a296db3de9a904e87ff0f51ab5ac2f025193cdfb92ea5621af5d46a70699ac9"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -984,7 +1008,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "391e8e126d669f751ac1a03de0b45fe7969a0fe58f3dfead9bb7be1b5d951ff"
+        configChecksum: "c26f85c2c14e2d92b7ffe4c931918a375a459870b142caad4f9b97947e467ad"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
