@@ -71,7 +71,7 @@ type TaskStatus struct {
 }
 
 type FastTaskService interface {
-	AddPendingOwner(queueID, taskID string, enqueueLabels map[string]string)
+	AddPendingOwner(queueID, taskID string, enqueueLabels map[string]string) bool
 	CheckStatus(ctx context.Context, taskID, queueID, workerID string) (TaskStatus, error)
 	Cleanup(ctx context.Context, taskID, queueID, workerID string) error
 	OfferTaskToEnvironment(ctx context.Context, execID *idlcore.WorkflowExecutionIdentifier, environmentID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (Worker, error)

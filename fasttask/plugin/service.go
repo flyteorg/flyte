@@ -160,8 +160,9 @@ type workerTaskStatus struct {
 	taskStatus *pb.TaskStatus
 }
 
-// AddPendingOwner adds to the pending owners list for the queue, if not already full
-func (f *fastTaskServiceImpl) AddPendingOwner(queueID, taskID string, enqueueLabels map[string]string) {
+// AddPendingOwner adds to the pending owners list for the queue, if not already full.
+// Returns true if the task was newly added, false if it was already pending or queue is full.
+func (f *fastTaskServiceImpl) AddPendingOwner(queueID, taskID string, enqueueLabels map[string]string) bool {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -173,9 +174,15 @@ func (f *fastTaskServiceImpl) AddPendingOwner(queueID, taskID string, enqueueLab
 
 	if len(owners) >= maxPendingOwnersPerQueue {
 		f.metrics.pendingOwnerQueueFull.Inc()
-		return
+		return false
 	}
+
+	if _, alreadyExists := owners[taskID]; alreadyExists {
+		return false
+	}
+
 	owners[taskID] = enqueueLabels
+	return true
 }
 
 // RemovePendingOwner removes the pending owner from the list if still there

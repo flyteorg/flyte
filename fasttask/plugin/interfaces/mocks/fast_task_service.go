@@ -25,8 +25,21 @@ func (_m *FastTaskService) EXPECT() *FastTaskService_Expecter {
 }
 
 // AddPendingOwner provides a mock function with given fields: queueID, taskID, enqueueLabels
-func (_m *FastTaskService) AddPendingOwner(queueID string, taskID string, enqueueLabels map[string]string) {
-	_m.Called(queueID, taskID, enqueueLabels)
+func (_m *FastTaskService) AddPendingOwner(queueID string, taskID string, enqueueLabels map[string]string) bool {
+	ret := _m.Called(queueID, taskID, enqueueLabels)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddPendingOwner")
+	}
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string, map[string]string) bool); ok {
+		r0 = rf(queueID, taskID, enqueueLabels)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
 }
 
 // FastTaskService_AddPendingOwner_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddPendingOwner'
@@ -49,12 +62,12 @@ func (_c *FastTaskService_AddPendingOwner_Call) Run(run func(queueID string, tas
 	return _c
 }
 
-func (_c *FastTaskService_AddPendingOwner_Call) Return() *FastTaskService_AddPendingOwner_Call {
-	_c.Call.Return()
+func (_c *FastTaskService_AddPendingOwner_Call) Return(_a0 bool) *FastTaskService_AddPendingOwner_Call {
+	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FastTaskService_AddPendingOwner_Call) RunAndReturn(run func(string, string, map[string]string)) *FastTaskService_AddPendingOwner_Call {
+func (_c *FastTaskService_AddPendingOwner_Call) RunAndReturn(run func(string, string, map[string]string) bool) *FastTaskService_AddPendingOwner_Call {
 	_c.Call.Return(run)
 	return _c
 }

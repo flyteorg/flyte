@@ -380,7 +380,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 					fastTaskService.On("OfferTaskToEnvironment", ctx, execID, "project_domain_foo_0", "task-id", "namespace", "execution_id", []string{}, envVars, updatedEnqueueLabels).Return(mockWorker, nil)
 				} else {
 					fastTaskService.On("OfferTaskToEnvironment", ctx, execID, "project_domain_foo_0", "task-id", "namespace", "execution_id", []string{}, envVars, updatedEnqueueLabels).Return(nil, noCapacityAvailableError)
-					fastTaskService.On("AddPendingOwner", "project_domain_foo_0", "task-id", updatedEnqueueLabels).Return()
+					fastTaskService.On("AddPendingOwner", "project_domain_foo_0", "task-id", updatedEnqueueLabels).Return(true)
 				}
 
 				mockEnv := &interfaceMocks.Environment{}

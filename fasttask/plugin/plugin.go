@@ -262,9 +262,10 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 				return &pluginState, phaseInfo, nil
 			}
 
-			// add pending owner and initiate scale up
-			p.fastTaskService.AddPendingOwner(executionEnvID.String(), taskID, enqueueLabels)
-			p.builder.ScaleUp(ctx, executionEnvID.String())
+			// only init scale up if this task is newly added to pending (prevents duplicate scale-ups)
+			if p.fastTaskService.AddPendingOwner(executionEnvID.String(), taskID, enqueueLabels) {
+				p.builder.ScaleUp(ctx, executionEnvID.String())
+			}
 
 			phaseInfo := core.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginState.PhaseVersion, "no workers available", taskInfo)
 			return &pluginState, phaseInfo, nil

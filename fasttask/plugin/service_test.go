@@ -725,7 +725,10 @@ func TestPendingOwnerManagement(t *testing.T) {
 		enqueueLabels := map[string]string{
 			k8s.WorkflowID: types.NamespacedName{Name: addition.ownerIDName}.String(),
 		}
-		fastTaskService.AddPendingOwner(addition.queueID, addition.taskID, enqueueLabels)
+
+		// Test that AddPendingOwner returns true for newly added tasks
+		isNewlyAdded := fastTaskService.AddPendingOwner(addition.queueID, addition.taskID, enqueueLabels)
+		assert.True(t, isNewlyAdded, "Task %s should be newly added to queue %s", addition.taskID, addition.queueID)
 
 		assert.Equal(t, addition.expectedQueueOwnersCount, len(fastTaskService.pendingTaskOwners))
 		totalOwnerCount := 0
@@ -735,13 +738,20 @@ func TestPendingOwnerManagement(t *testing.T) {
 		assert.Equal(t, addition.totalOwnerCount, totalOwnerCount)
 	}
 
+	// Test duplicate addition should return false
+	for _, addition := range additions {
+		isNewlyAdded := fastTaskService.AddPendingOwner(addition.queueID, addition.taskID, nil)
+		assert.False(t, isNewlyAdded, "Adding duplicate task should return false")
+	}
+
 	// validate overflow management on addPendingOwner
 	overflowTestQueueID := "baz"
 	for i := 0; i < maxPendingOwnersPerQueue; i++ {
 		enqueueLabels := map[string]string{
 			k8s.WorkflowID: types.NamespacedName{Name: fmt.Sprintf("%d", i)}.String(),
 		}
-		fastTaskService.AddPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), enqueueLabels)
+		isNewlyAdded := fastTaskService.AddPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), enqueueLabels)
+		assert.True(t, isNewlyAdded, "Task %d should be newly added", i)
 	}
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
@@ -749,7 +759,9 @@ func TestPendingOwnerManagement(t *testing.T) {
 		k8s.WorkflowID: types.NamespacedName{Name: "overflow"}.String(),
 	}
 
-	fastTaskService.AddPendingOwner(overflowTestQueueID, "overflow", enqueueLabels)
+	// Test that adding to full queue returns false
+	isOverflow := fastTaskService.AddPendingOwner(overflowTestQueueID, "overflow", enqueueLabels)
+	assert.False(t, isOverflow, "Adding to full queue should return false")
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
 	// validate enqueuePendingOwners
