@@ -207,7 +207,7 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 
 	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueID, resourceConstraintsSpec)
 	if err != nil {
-		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
+		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%v] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID, err)
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error requesting allocation token %s", uniqueID)
 	}
@@ -300,7 +300,7 @@ func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label
 	found = false
 
 	if label == "" {
-		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", label, primaryLabel)
+		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", primaryLabel)
 		return
 	}
 
@@ -308,7 +308,7 @@ func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label
 	// which is determined specifically for the readability of the corresponding configmap yaml file
 	for _, clusterCfg := range quboleCfg.ClusterConfigs {
 		for _, l := range clusterCfg.Labels {
-			if label != "" && l == label {
+			if l == label {
 				logger.Debugf(ctx, "Found the primary label [%v] for label [%v]", clusterCfg.PrimaryLabel, label)
 				primaryLabel, found = clusterCfg.PrimaryLabel, true
 				break
@@ -412,9 +412,9 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 		_, err := cache.GetOrCreate(uniqueID, executionStateCacheItem)
 		if err != nil {
 			// This means that our cache has fundamentally broken... return a system error
-			logger.Errorf(ctx, "Cache failed to GetOrCreate for execution [%s] cache key [%s], owner [%s]. Error %s",
+			logger.Errorf(ctx, "Cache failed to GetOrCreate for execution [%v] cache key [%s], owner [%v]. Error %s",
 				taskExecutionIdentifier, uniqueID,
-				tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
+				tCtx.TaskExecutionMetadata().GetOwnerReference().Name, err)
 			return currentState, err
 		}
 	}
@@ -434,9 +434,9 @@ func MonitorQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 	cachedItem, err := cache.GetOrCreate(uniqueID, executionStateCacheItem)
 	if err != nil {
 		// This means that our cache has fundamentally broken... return a system error
-		logger.Errorf(ctx, "Cache is broken on execution [%s] cache key [%s], owner [%s]. Error %s",
+		logger.Errorf(ctx, "Cache is broken on execution [%v] cache key [%s], owner [%s]. Error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID,
-			tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
+			tCtx.TaskExecutionMetadata().GetOwnerReference().Name, err)
 		return currentState, errors.Wrapf(errors.CacheFailed, err, "Error when GetOrCreate while monitoring")
 	}
 
