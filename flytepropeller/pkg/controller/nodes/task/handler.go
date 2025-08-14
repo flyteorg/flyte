@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -235,29 +236,87 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog             catalog.Client
-	asyncCatalog        catalog.AsyncClient
-	defaultPlugins      map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType      map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap      map[MetricKey]*taskMetrics
+	catalog          catalog.Client
+	asyncCatalog     catalog.AsyncClient
+	defaultPlugins   map[pluginCore.TaskType]pluginCore.Plugin
+	connectorDeploymentsForType map[pluginCore.TaskType]map[string]pluginCore.Plugin
+	pluginsForType   map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap   map[MetricKey]*taskMetrics
 	taskMetricsMapMutex sync.RWMutex
-	defaultPlugin       pluginCore.Plugin
-	metrics             *metrics
-	pluginRegistry      PluginRegistryIface
-	kubeClient          pluginCore.KubeClient
-	kubeClientset       kubernetes.Interface
-	secretManager       pluginCore.SecretManager
-	resourceManager     resourcemanager.BaseResourceManager
-	cfg                 *config.Config
-	pluginScope         promutils.Scope
-	eventConfig         *controllerConfig.EventConfig
-	clusterID           string
-	agentService        *agent.AgentService
-	connectorService    *connector.ConnectorService
+	defaultPlugin    pluginCore.Plugin
+	metrics          *metrics
+	pluginRegistry   PluginRegistryIface
+	kubeClient       pluginCore.KubeClient
+	kubeClientset    kubernetes.Interface
+	secretManager    pluginCore.SecretManager
+	resourceManager  resourcemanager.BaseResourceManager
+	cfg              *config.Config
+	pluginScope      promutils.Scope
+	eventConfig      *controllerConfig.EventConfig
+	clusterID        string
+	agentService     *agent.AgentService
+	mu               sync.RWMutex
 }
 
 func (t *Handler) FinalizeRequired() bool {
 	return true
+}
+
+func (t *Handler) createResourceManagerAndSetupCtx(ctx context.Context, sCtx interfaces.SetupContext, taskType string) (*nameSpacedSetupCtx, error) {
+	tSCtx := t.newSetupContext(sCtx)
+	// Create a new base resource negotiator
+	resourceManagerConfig := rmConfig.GetConfig()
+	newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type, t.metrics.scope)
+	if err != nil {
+		return nil, err
+	}
+	return t.createNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder, taskType), nil
+}
+
+func (t *Handler) createNameSpacedSetupCtx(tSCtx *setupContext, newResourceManagerBuilder resourcemanager.Builder, taskType string) *nameSpacedSetupCtx {
+	pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(taskType))
+	sCtxFinal := newNameSpacedSetupCtx(
+		tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), taskType)
+	return &sCtxFinal
+}
+
+// getConnectorPlugin retrieves a plugin from connectorDeploymentsForType map with proper locking
+func (t *Handler) getConnectorPlugin(taskType pluginCore.TaskType, deploymentID string) (pluginCore.Plugin, bool) {
+	t.mu.RLock()
+	deploymentMap, exists := t.connectorDeploymentsForType[taskType]
+	t.mu.RUnlock()
+	
+	if !exists {
+		return nil, false
+	}
+	
+	t.mu.RLock()
+	plugin, pluginExists := deploymentMap[deploymentID]
+	t.mu.RUnlock()
+	
+	return plugin, pluginExists
+}
+
+func (t *Handler) registerConnectorPlugin(corePlugin pluginCore.Plugin, deploymentID string) {
+	t.mu.Lock()
+	t.defaultPlugins[corePlugin.GetID()] = corePlugin
+	if t.connectorDeploymentsForType[corePlugin.GetID()] == nil {
+		t.connectorDeploymentsForType[corePlugin.GetID()] = make(map[string]pluginCore.Plugin)
+	}
+	t.connectorDeploymentsForType[corePlugin.GetID()][deploymentID] = corePlugin
+	t.mu.Unlock()
+}
+
+func (t *Handler) isConnectorPluginRegistered(versionedTaskType string, deploymentID string) bool {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	pluginsMap, ok := t.connectorDeploymentsForType[versionedTaskType]
+	if !ok {
+		return false
+	}
+
+	_, ok = pluginsMap[deploymentID]
+	return ok
 }
 
 func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
@@ -270,6 +329,54 @@ func (t *Handler) setDefault(ctx context.Context, p pluginCore.Plugin) error {
 	return nil
 }
 
+func (t *Handler) watchPlugins(ctx context.Context, sCtx interfaces.SetupContext) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Errorf(ctx, "WatchPlugins goroutine panicked: %v", r)
+			logger.Errorf(ctx, "Stack trace: %s", debug.Stack())
+		}
+	}()
+	
+	for {
+		select {
+		case info := <-pluginMachinery.PluginRegistry().GetPluginChan():
+			// If plugin not registered yet, do registeration
+			if !t.isConnectorPluginRegistered(info.VersionedTaskType, info.DeploymentID){
+				sCtxFinal, err := t.createResourceManagerAndSetupCtx(ctx, sCtx, info.VersionedTaskType)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to create resource manager and setup context for task type [%s]: %v", info.VersionedTaskType, err)
+					continue
+				}
+				// register core plugin
+				if cpe, ok := pluginMachinery.PluginRegistry().GetConnectorCorePlugin(info.VersionedTaskType, info.DeploymentID); ok {
+					cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, cpe)
+					if err != nil {
+						logger.Errorf(ctx, "Failed to load plugin of task type [%s]: %v", info.VersionedTaskType, err)
+						continue
+					}
+					// register the plugin to task handler local plugin registry
+					t.registerConnectorPlugin(cp, info.DeploymentID)
+					logger.Infof(ctx, "Plugin of TaskType [%s] and deployment ID [%s] registered", info.VersionedTaskType, info.DeploymentID)
+				}
+			// If plugin already registered, update deployment
+			} else {
+				plugin, pluginExists := t.getConnectorPlugin(info.VersionedTaskType, info.DeploymentID)
+				if pluginExists {
+					t.mu.Lock()
+					t.defaultPlugins[info.VersionedTaskType] = plugin
+					t.mu.Unlock()
+					logger.Infof(ctx, "The default plugin for TaskType [%s] has been updated to Deployment ID [%s]", info.VersionedTaskType, info.DeploymentID)
+				} else {
+					logger.Warningf(ctx, "Plugin for TaskType [%s] and deployment ID [%s] not found", info.VersionedTaskType, info.DeploymentID)
+				}
+			}
+		case <-ctx.Done():
+			logger.Infof(ctx, "Plugin watcher stopped due to context cancellation")
+			return
+		}
+	}
+}
+
 func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error {
 	tSCtx := t.newSetupContext(sCtx)
 
@@ -280,10 +387,13 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
+	// execute watcher to monitor plugins waiting for register/update from connector/agent plugin
+	go t.watchPlugins(ctx, sCtx)
+
 	once.Do(func() {
 		// The agent service plugin is deprecated and will be removed in the future
 		agent.RegisterAgentPlugin(t.agentService)
-		connector.RegisterConnectorPlugin(t.connectorService)
+		connector.RegisterConnectorPlugin()
 	})
 
 	// Create the resource negotiator here
@@ -300,18 +410,12 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 	for _, p := range enabledPlugins {
 		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
-		pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(p.ID))
-		sCtxFinal := newNameSpacedSetupCtx(
-			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
+		sCtxFinal := t.createNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder, p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
-		}
-
-		if cp.GetID() == connector.ID {
-			t.connectorService.CorePlugin = cp
 		}
 
 		// The agent service plugin is deprecated and will be removed in the future
@@ -380,12 +484,15 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	return nil
 }
 
-func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfig v1alpha1.ExecutionConfig) (pluginCore.Plugin, error) {
+func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfig v1alpha1.ExecutionConfig, taskVersion int32) (pluginCore.Plugin, error) {
 	// If the workflow specifies plugin overrides, check to see if any of the specified plugins for that type are
 	// registered in this deployment of flytepropeller.
 	if len(executionConfig.TaskPluginImpls[ttype].PluginIDs) > 0 {
-		if len(t.pluginsForType[ttype]) > 0 {
-			pluginsForType := t.pluginsForType[ttype]
+		t.mu.RLock()
+		pluginsForType, exists := t.pluginsForType[ttype]
+		t.mu.RUnlock()
+		
+		if exists && len(pluginsForType) > 0 {
 			for _, pluginImplID := range executionConfig.TaskPluginImpls[ttype].PluginIDs {
 				pluginImpl := pluginsForType[pluginImplID]
 				if pluginImpl != nil {
@@ -402,14 +509,22 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		}
 	}
 
+	t.mu.RLock()
 	p, ok := t.defaultPlugins[ttype]
+	t.mu.RUnlock()
 	if ok {
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
 	}
 
-	if t.connectorService != nil && t.connectorService.ContainTaskType(ttype) {
-		return t.connectorService.CorePlugin, nil
+	// check if the task type is a connector/agent task type
+	versionedTaskType := fmt.Sprintf("%s_%d", ttype, taskVersion)
+	t.mu.RLock()
+	p, ok = t.defaultPlugins[versionedTaskType]
+	t.mu.RUnlock()
+	if ok {
+		logger.Debugf(ctx, "Plugin [%s] resolved for versioned task type [%s]", p.GetID(), versionedTaskType)
+		return p, nil
 	}
 
 	// The agent service plugin is deprecated and will be removed in the future
@@ -670,8 +785,16 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	defer span.End()
 
 	ttype := nCtx.TaskReader().GetTaskType()
+	taskTemplate, err := nCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return handler.UnknownTransition, errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to read task template")
+	}
+	tVersion := taskTemplate.GetTaskTypeVersion()
 	ctx = contextutils.WithTaskType(ctx, ttype)
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig(), tVersion)
+	jsonBytes, _ := json.MarshalIndent(p, "", "  ")
+	logger.Debug(ctx, "The task type is [%s]", string(ttype))
+	logger.Debug(ctx, "The deployment config is [%s]", string(jsonBytes))
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
@@ -920,7 +1043,12 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 	}
 
 	ttype := nCtx.TaskReader().GetTaskType()
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	taskTemplate, err := nCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to read task template")
+	}
+	tVersion := taskTemplate.GetTaskTypeVersion()
+	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig(), tVersion)
 	if err != nil {
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
@@ -1015,7 +1143,12 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	logger.Debugf(ctx, "Finalize invoked.")
 	ttype := nCtx.TaskReader().GetTaskType()
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	taskTemplate, err := nCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to read task template")
+	}
+	tVersion := taskTemplate.GetTaskTypeVersion()
+	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig(), tVersion)
 	if err != nil {
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
@@ -1057,6 +1190,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 	return &Handler{
 		pluginRegistry: pluginMachinery.PluginRegistry(),
 		defaultPlugins: make(map[pluginCore.TaskType]pluginCore.Plugin),
+		connectorDeploymentsForType: make(map[pluginCore.TaskType]map[string]pluginCore.Plugin),
 		pluginsForType: make(map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin),
 		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{
@@ -1077,6 +1211,5 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		eventConfig:      eventConfig,
 		clusterID:        clusterID,
 		agentService:     &agent.AgentService{},
-		connectorService: &connector.ConnectorService{},
 	}, nil
 }
