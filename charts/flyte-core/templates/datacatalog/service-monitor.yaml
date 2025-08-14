@@ -1,0 +1,19 @@
+{{- if and .Values.datacatalog.enabled .Values.datacatalog.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  namespace: {{ template "flyte.namespace" . }}
+  name: {{ template "datacatalog.name" . }}
+  labels:
+  {{- with .Values.datacatalog.serviceMonitor.labels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    - interval: {{ .Values.datacatalog.serviceMonitor.interval }}
+      port: http-metrics
+      path: /metrics
+      scrapeTimeout: {{ .Values.datacatalog.serviceMonitor.scrapeTimeout }}
+  selector:
+    matchLabels: {{ include "datacatalog.selectorLabels" . | nindent 6 }}
+{{- end }}
