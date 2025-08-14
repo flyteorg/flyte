@@ -3,6 +3,8 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"sync"
 	"testing"
 	"time"
 
@@ -11,10 +13,12 @@ import (
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
+	"github.com/unionai/flyte/fasttask/plugin/interfaces"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -122,7 +126,61 @@ func TestCheckStatus(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
+			workersMap := sync.Map{}
+			queue := &environmentImpl{
+				workers: &workersMap,
+			}
+			store := newEnvironmentStore()
+			store.GetOrCreate(test.queueID, queue)
+			// setup response channels for env workers
+			responseChans := make(map[string]chan *pb.HeartbeatResponse)
+			if len(test.queueID) > 0 {
+				if len(test.workerID) > 0 {
+					responseChan := make(chan *pb.HeartbeatResponse, 1)
+					worker := &workerImpl{
+						id:           test.workerID,
+						responseChan: responseChan,
+					}
+					queue.workers.Store(test.workerID, worker)
+
+					responseChans[test.workerID] = responseChan
+				}
+
+				for _, taskStatus := range test.taskStatuses {
+					if taskStatus.workerID != test.workerID {
+						responseChan := make(chan *pb.HeartbeatResponse, 1)
+						worker := &workerImpl{
+							id:           taskStatus.workerID,
+							responseChan: responseChan,
+						}
+						queue.workers.Store(taskStatus.workerID, worker)
+
+						responseChans[taskStatus.workerID] = responseChan
+					}
+				}
+			}
+
+			// initialize InMemoryBuilder
+			kubeClient := &kubeClient{}
+			kubeCache := &kubeCache{}
+
+			kubeClientImpl := &pluginsCoreMock.KubeClient{}
+			kubeClientImpl.OnGetClient().Return(kubeClient)
+			kubeClientImpl.OnGetCache().Return(kubeCache)
+
+			// Set up metrics
+			metrics := newBuilderMetrics(scope)
+
+			// Create test builder
+			builder := &environmentBuilderImpl{
+				kubeClient:  kubeClientImpl,
+				store:       store,
+				metrics:     metrics,
+				randSource:  rand.New(rand.NewSource(time.Now().UnixNano())),
+				scaleUpChan: make(chan string, 1),
+			}
+
+			fastTaskService := newFastTaskService(enqueueOwner, builder, store, scope, testConfig)
 
 			// setup taskStatusChannels
 			if test.taskStatuses != nil {
@@ -132,42 +190,6 @@ func TestCheckStatus(t *testing.T) {
 				}
 				fastTaskService.taskStatusChannels.Store(test.taskID, taskStatusChannel)
 			}
-
-			// setup response channels for queue workers
-			queue := &Queue{
-				workers: make(map[string]*Worker),
-			}
-			queues := map[string]*Queue{
-				test.queueID: queue,
-			}
-
-			responseChans := make(map[string]chan *pb.HeartbeatResponse)
-			if len(test.queueID) > 0 {
-				if len(test.workerID) > 0 {
-					responseChan := make(chan *pb.HeartbeatResponse, 1)
-					worker := &Worker{
-						workerID:     test.workerID,
-						responseChan: responseChan,
-					}
-					queue.workers[test.workerID] = worker
-
-					responseChans[test.workerID] = responseChan
-				}
-
-				for _, taskStatus := range test.taskStatuses {
-					if taskStatus.workerID != test.workerID {
-						responseChan := make(chan *pb.HeartbeatResponse, 1)
-						worker := &Worker{
-							workerID:     taskStatus.workerID,
-							responseChan: responseChan,
-						}
-						queue.workers[taskStatus.workerID] = worker
-
-						responseChans[taskStatus.workerID] = responseChan
-					}
-				}
-			}
-			fastTaskService.queues = queues
 
 			// offer on queue and validate
 			taskStatus, err := fastTaskService.CheckStatus(ctx, test.taskID, test.queueID, test.workerID)
@@ -208,12 +230,36 @@ func TestCheckStatus(t *testing.T) {
 
 func TestCleanup(t *testing.T) {
 	ctx := context.TODO()
+
+	env1 := newEnvironmentStore()
+	workers1 := sync.Map{}
+	workers1.Store("w0", &workerImpl{id: "w0"})
+	env1.GetOrCreate("foo", &environmentImpl{
+		workers: &workers1,
+	})
+
+	env2 := newEnvironmentStore()
+	workers2 := sync.Map{}
+	workers2.Store("w0", &workerImpl{id: "w0"})
+	workers2.Store("w1", &workerImpl{id: "w1"})
+	env2.GetOrCreate("foo", &environmentImpl{
+		workers: &workers2,
+	})
+
+	env3 := newEnvironmentStore()
+	workers3 := sync.Map{}
+	workers3.Store("w0", &workerImpl{id: "w0"})
+	workers3.Store("w1", &workerImpl{id: "w1"})
+	env3.GetOrCreate("foo", &environmentImpl{
+		workers: &workers3,
+	})
+
 	tests := []struct {
 		name                    string
 		taskID                  string
 		queueID                 string
 		workerID                string
-		queues                  map[string]*Queue
+		envStore                interfaces.EnvironmentStore
 		expectedError           error
 		pendingOwnerExists      bool
 		taskStatusChannelExists bool
@@ -223,68 +269,38 @@ func TestCleanup(t *testing.T) {
 			taskID:                  "bar",
 			queueID:                 "foo",
 			workerID:                "w1",
-			queues:                  map[string]*Queue{},
+			envStore:                newEnvironmentStore(),
 			expectedError:           nil,
 			pendingOwnerExists:      false,
 			taskStatusChannelExists: false,
 		},
 		{
-			name:     "WorkerDoesNostExist",
-			taskID:   "bar",
-			queueID:  "foo",
-			workerID: "w1",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-						},
-					},
-				},
-			},
+			name:                    "WorkerDoesNostExist",
+			taskID:                  "bar",
+			queueID:                 "foo",
+			workerID:                "w1",
+			envStore:                env1,
 			expectedError:           nil,
 			pendingOwnerExists:      false,
 			taskStatusChannelExists: false,
 		},
 		{
-			name:     "WorkerExists",
-			taskID:   "bar",
-			queueID:  "foo",
-			workerID: "w1",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-						},
-						"w1": &Worker{
-							workerID: "w1",
-						},
-					},
-				},
-			},
+			name:                    "WorkerExists",
+			taskID:                  "bar",
+			queueID:                 "foo",
+			workerID:                "w1",
+			envStore:                env2,
 			expectedError:           nil,
 			pendingOwnerExists:      false,
 			taskStatusChannelExists: false,
 		},
 		{
 			// worker exists and pendingOwner / taskStatusChannel are cleaned up
-			name:     "WorkerExistsCleanupAll",
-			taskID:   "bar",
-			queueID:  "foo",
-			workerID: "w1",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-						},
-						"w1": &Worker{
-							workerID: "w1",
-						},
-					},
-				},
-			},
+			name:                    "WorkerExistsCleanupAll",
+			taskID:                  "bar",
+			queueID:                 "foo",
+			workerID:                "w1",
+			envStore:                env3,
 			expectedError:           nil,
 			pendingOwnerExists:      true,
 			taskStatusChannelExists: true,
@@ -299,18 +315,46 @@ func TestCleanup(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
+			// initialize InMemoryBuilder
+			kubeClient := &kubeClient{}
+			kubeCache := &kubeCache{}
 
+			kubeClientImpl := &pluginsCoreMock.KubeClient{}
+			kubeClientImpl.OnGetClient().Return(kubeClient)
+			kubeClientImpl.OnGetCache().Return(kubeCache)
+
+			// Set up metrics
+			metrics := newBuilderMetrics(scope)
+
+			// Create test builder
+			builder := &environmentBuilderImpl{
+				kubeClient:  kubeClientImpl,
+				store:       test.envStore,
+				metrics:     metrics,
+				randSource:  rand.New(rand.NewSource(time.Now().UnixNano())),
+				scaleUpChan: make(chan string, 1),
+			}
+
+			fastTaskService := newFastTaskService(enqueueOwner, builder, test.envStore, scope, testConfig)
 			// setup response channels for queue workers
 			responseChans := make(map[string]chan *pb.HeartbeatResponse)
-			if queue, exists := test.queues[test.queueID]; exists {
-				for workerID, worker := range queue.workers {
+			if env := test.envStore.Get(test.queueID); env != nil {
+				//for workerID, worker := range queue.workers {
+				//	responseChan := make(chan *pb.HeartbeatResponse, 1)
+				//	responseChans[workerID] = responseChan
+				//	worker.responseChan = responseChan
+				//}
+				env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
+					workerImpl, ok := worker.(*workerImpl)
+					if !ok {
+						return true
+					}
 					responseChan := make(chan *pb.HeartbeatResponse, 1)
 					responseChans[workerID] = responseChan
-					worker.responseChan = responseChan
-				}
+					workerImpl.responseChan = responseChan
+					return true
+				})
 			}
-			fastTaskService.queues = test.queues
 
 			workflowID := types.NamespacedName{
 				Name: "foo",
@@ -321,7 +365,7 @@ func TestCleanup(t *testing.T) {
 
 			// initialize pendingTaskOwners and taskStatusChannels if necessary
 			if test.pendingOwnerExists {
-				fastTaskService.addPendingOwner(test.queueID, test.taskID, enqueueLabels)
+				fastTaskService.AddPendingOwner(test.queueID, test.taskID, enqueueLabels)
 			} else {
 				_, exists := fastTaskService.pendingTaskOwners[test.queueID]
 				assert.False(t, exists)
@@ -342,8 +386,8 @@ func TestCleanup(t *testing.T) {
 			for responseWorkerID, responseChan := range responseChans {
 				expectDelete := false
 				if responseWorkerID == test.workerID {
-					if queue, exists := test.queues[test.queueID]; exists {
-						if _, exists := queue.workers[responseWorkerID]; exists {
+					if queue := test.envStore.Get(test.queueID); queue != nil {
+						if queue.GetWorker(responseWorkerID) != nil {
 							expectDelete = true
 						}
 					}
@@ -381,13 +425,73 @@ func TestCleanup(t *testing.T) {
 
 func TestOfferOnQueue(t *testing.T) {
 	ctx := context.TODO()
+
+	env1 := newEnvironmentStore()
+	workers1 := sync.Map{}
+	workers1.Store("w0", &workerImpl{
+		id: "w0",
+		capacity: &pb.Capacity{
+			ExecutionCount: 0,
+			ExecutionLimit: 1,
+		},
+	})
+	workers1.Store("w1", &workerImpl{
+		id: "w1",
+		capacity: &pb.Capacity{
+			ExecutionCount: 1,
+			ExecutionLimit: 1,
+		},
+	})
+	env1.GetOrCreate("foo", &environmentImpl{
+		workers: &workers1,
+	})
+
+	env2 := newEnvironmentStore()
+	workers2 := sync.Map{}
+	workers2.Store("w0", &workerImpl{
+		id: "w0",
+		capacity: &pb.Capacity{
+			ExecutionCount: 1,
+			ExecutionLimit: 1,
+			BacklogCount:   1,
+			BacklogLimit:   1,
+		},
+	})
+	workers2.Store("w1", &workerImpl{
+		id: "w1",
+		capacity: &pb.Capacity{
+			ExecutionCount: 1,
+			ExecutionLimit: 1,
+			BacklogCount:   0,
+			BacklogLimit:   1,
+		},
+	})
+	env2.GetOrCreate("foo", &environmentImpl{
+		workers: &workers2,
+	})
+
+	env3 := newEnvironmentStore()
+	workers3 := sync.Map{}
+	workers3.Store("w0", &workerImpl{
+		id: "w0",
+		capacity: &pb.Capacity{
+			ExecutionCount: 1,
+			ExecutionLimit: 1,
+			BacklogCount:   1,
+			BacklogLimit:   1,
+		},
+	})
+	env3.GetOrCreate("foo", &environmentImpl{
+		workers: &workers3,
+	})
+
 	tests := []struct {
 		name                 string
 		queueID              string
 		taskID               string
 		namespace            string
 		workflowID           string
-		queues               map[string]*Queue
+		envStore             interfaces.EnvironmentStore
 		expectedWorkerID     string
 		expectedError        error
 		expectedPendingOwner bool
@@ -398,96 +502,40 @@ func TestOfferOnQueue(t *testing.T) {
 			taskID:               "bar",
 			namespace:            "x",
 			workflowID:           "y",
-			queues:               map[string]*Queue{},
+			envStore:             newEnvironmentStore(),
 			expectedWorkerID:     "",
-			expectedError:        nil,
+			expectedError:        fmt.Errorf("environment 'foo' not found"),
 			expectedPendingOwner: true,
 		},
 		{
-			name:       "PreferredWorker",
-			queueID:    "foo",
-			taskID:     "bar",
-			namespace:  "x",
-			workflowID: "y",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-							capacity: &pb.Capacity{
-								ExecutionCount: 0,
-								ExecutionLimit: 1,
-							},
-						},
-						"w1": &Worker{
-							workerID: "w1",
-							capacity: &pb.Capacity{
-								ExecutionCount: 1,
-								ExecutionLimit: 1,
-							},
-						},
-					},
-				},
-			},
+			name:             "PreferredWorker",
+			queueID:          "foo",
+			taskID:           "bar",
+			namespace:        "x",
+			workflowID:       "y",
+			envStore:         env1,
 			expectedWorkerID: "w0",
 			expectedError:    nil,
 		},
 		{
-			name:       "AcceptedWorker",
-			queueID:    "foo",
-			taskID:     "bar",
-			namespace:  "x",
-			workflowID: "y",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-							capacity: &pb.Capacity{
-								ExecutionCount: 1,
-								ExecutionLimit: 1,
-								BacklogCount:   1,
-								BacklogLimit:   1,
-							},
-						},
-						"w1": &Worker{
-							workerID: "w1",
-							capacity: &pb.Capacity{
-								ExecutionCount: 1,
-								ExecutionLimit: 1,
-								BacklogCount:   0,
-								BacklogLimit:   1,
-							},
-						},
-					},
-				},
-			},
+			name:             "AcceptedWorker",
+			queueID:          "foo",
+			taskID:           "bar",
+			namespace:        "x",
+			workflowID:       "y",
+			envStore:         env2,
 			expectedWorkerID: "w1",
 			expectedError:    nil,
 		},
 		{
-			name:       "NoWorkerAvailable",
-			queueID:    "foo",
-			taskID:     "bar",
-			namespace:  "x",
-			workflowID: "y",
-			queues: map[string]*Queue{
-				"foo": &Queue{
-					workers: map[string]*Worker{
-						"w0": &Worker{
-							workerID: "w0",
-							capacity: &pb.Capacity{
-								ExecutionCount: 1,
-								ExecutionLimit: 1,
-								BacklogCount:   1,
-								BacklogLimit:   1,
-							},
-						},
-					},
-				},
-			},
+			name:             "NoWorkerAvailable",
+			queueID:          "foo",
+			taskID:           "bar",
+			namespace:        "x",
+			workflowID:       "y",
+			envStore:         env3,
 			expectedWorkerID: "",
-			expectedError:    nil,
+			expectedError:    noCapacityAvailableError,
 		},
 	}
 
@@ -499,24 +547,53 @@ func TestOfferOnQueue(t *testing.T) {
 			}
 			scope := promutils.NewTestScope()
 
-			fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
+			// initialize InMemoryBuilder
+			kubeClient := &kubeClient{}
+			kubeCache := &kubeCache{}
+
+			kubeClientImpl := &pluginsCoreMock.KubeClient{}
+			kubeClientImpl.OnGetClient().Return(kubeClient)
+			kubeClientImpl.OnGetCache().Return(kubeCache)
+
+			// Set up metrics
+			metrics := newBuilderMetrics(scope)
+
+			// Create test builder
+			builder := &environmentBuilderImpl{
+				kubeClient:  kubeClientImpl,
+				store:       test.envStore,
+				metrics:     metrics,
+				randSource:  rand.New(rand.NewSource(time.Now().UnixNano())),
+				scaleUpChan: make(chan string, 1),
+			}
+
+			fastTaskService := newFastTaskService(enqueueOwner, builder, test.envStore, scope, testConfig)
 
 			// setup response channels for queue workers
 			responseChans := make(map[string]chan *pb.HeartbeatResponse)
-			if queue, exists := test.queues[test.queueID]; exists {
-				for workerID, worker := range queue.workers {
+			if env := test.envStore.Get(test.queueID); env != nil {
+				env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
+					workerImpl, ok := worker.(*workerImpl)
+					if !ok {
+						return true
+					}
 					responseChan := make(chan *pb.HeartbeatResponse, 1)
 					responseChans[workerID] = responseChan
-					worker.responseChan = responseChan
-				}
+					workerImpl.responseChan = responseChan
+					return true
+				})
 			}
-			fastTaskService.queues = test.queues
 
 			// pre-execute validation - taskStatusChannel does not exist
 			_, exists := fastTaskService.taskStatusChannels.Load(test.taskID)
 			assert.False(t, exists)
 
 			// offer on queue and validate
+			workflowID := types.NamespacedName{
+				Namespace: test.namespace,
+				Name:      test.workflowID,
+			}
+
 			execID := &coreIdl.WorkflowExecutionIdentifier{
 				Org:     "foo",
 				Project: "bar",
@@ -524,22 +601,23 @@ func TestOfferOnQueue(t *testing.T) {
 				Name:    "abc",
 			}
 
-			workflowID := types.NamespacedName{
-				Namespace: test.namespace,
-				Name:      test.workflowID,
-			}
 			enqueueLabels := map[string]string{
 				k8s.WorkflowID: workflowID.String(),
 			}
 
-			workerID, err := fastTaskService.OfferOnQueue(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string), enqueueLabels)
-			assert.Equal(t, test.expectedWorkerID, workerID)
+			worker, err := fastTaskService.OfferTaskToEnvironment(ctx, execID, test.queueID, test.taskID, test.namespace, test.workflowID, []string{}, make(map[string]string), enqueueLabels)
+			if test.expectedError != nil {
+				assert.Nil(t, worker)
+				assert.Equal(t, test.expectedError, err)
+				return
+			}
+			assert.Equal(t, test.expectedWorkerID, worker.ID())
 			assert.Equal(t, test.expectedError, err)
 
-			if len(workerID) > 0 {
+			if len(worker.ID()) > 0 {
 				// validate ASSIGN response
 				for responseWorkerID, responseChan := range responseChans {
-					if responseWorkerID == workerID {
+					if responseWorkerID == worker.ID() {
 						// the assigned worker should have received an ASSIGN response
 						select {
 						case response := <-responseChan:
@@ -562,10 +640,6 @@ func TestOfferOnQueue(t *testing.T) {
 						}
 					}
 				}
-
-				// ensure taskStatusChannel now exists
-				_, exists := fastTaskService.taskStatusChannels.Load(test.taskID)
-				assert.True(t, exists)
 			}
 
 			if test.expectedPendingOwner {
@@ -588,8 +662,30 @@ func TestPendingOwnerManagement(t *testing.T) {
 	}
 	scope := promutils.NewTestScope()
 
-	fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
-	assert.Equal(t, 0, len(fastTaskService.queues))
+	// initialize InMemoryBuilder
+	kubeClient := &kubeClient{}
+	kubeCache := &kubeCache{}
+
+	kubeClientImpl := &pluginsCoreMock.KubeClient{}
+	kubeClientImpl.OnGetClient().Return(kubeClient)
+	kubeClientImpl.OnGetCache().Return(kubeCache)
+
+	// Set up metrics
+	metrics := newBuilderMetrics(scope)
+
+	store := newEnvironmentStore()
+
+	// Create test builder
+	builder := &environmentBuilderImpl{
+		kubeClient:  kubeClientImpl,
+		store:       store,
+		metrics:     metrics,
+		randSource:  rand.New(rand.NewSource(time.Now().UnixNano())),
+		scaleUpChan: make(chan string, 1),
+	}
+
+	fastTaskService := newFastTaskService(enqueueOwner, builder, store, scope, testConfig)
+	assert.Equal(t, 0, len(fastTaskService.store.List()))
 
 	// add pending owners
 	additions := []struct {
@@ -629,8 +725,7 @@ func TestPendingOwnerManagement(t *testing.T) {
 		enqueueLabels := map[string]string{
 			k8s.WorkflowID: types.NamespacedName{Name: addition.ownerIDName}.String(),
 		}
-
-		fastTaskService.addPendingOwner(addition.queueID, addition.taskID, enqueueLabels)
+		fastTaskService.AddPendingOwner(addition.queueID, addition.taskID, enqueueLabels)
 
 		assert.Equal(t, addition.expectedQueueOwnersCount, len(fastTaskService.pendingTaskOwners))
 		totalOwnerCount := 0
@@ -646,24 +741,25 @@ func TestPendingOwnerManagement(t *testing.T) {
 		enqueueLabels := map[string]string{
 			k8s.WorkflowID: types.NamespacedName{Name: fmt.Sprintf("%d", i)}.String(),
 		}
-		fastTaskService.addPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), enqueueLabels)
+		fastTaskService.AddPendingOwner(overflowTestQueueID, fmt.Sprintf("%d", i), enqueueLabels)
 	}
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
 	enqueueLabels := map[string]string{
 		k8s.WorkflowID: types.NamespacedName{Name: "overflow"}.String(),
 	}
-	fastTaskService.addPendingOwner(overflowTestQueueID, "overflow", enqueueLabels)
+
+	fastTaskService.AddPendingOwner(overflowTestQueueID, "overflow", enqueueLabels)
 	assert.Equal(t, maxPendingOwnersPerQueue, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
 	// validate enqueuePendingOwners
 	assert.Equal(t, 0, ownerEnqueueCount)
 
-	fastTaskService.enqueuePendingOwners(overflowTestQueueID)
+	fastTaskService.EnqueuePendingOwners(overflowTestQueueID)
 	assert.Equal(t, maxPendingOwnersPerQueue, ownerEnqueueCount)
 	assert.Equal(t, 0, len(fastTaskService.pendingTaskOwners[overflowTestQueueID]))
 
-	fastTaskService.enqueuePendingOwners(overflowTestQueueID) // call a second time to validate on empty queue
+	fastTaskService.EnqueuePendingOwners(overflowTestQueueID) // call a second time to validate on empty queue
 	assert.Equal(t, maxPendingOwnersPerQueue, ownerEnqueueCount)
 
 	// remove workers
@@ -697,7 +793,7 @@ func TestPendingOwnerManagement(t *testing.T) {
 	}
 
 	for _, removal := range removals {
-		fastTaskService.removePendingOwner(removal.queueID, removal.taskID)
+		fastTaskService.RemovePendingOwner(removal.queueID, removal.taskID)
 
 		assert.Equal(t, removal.expectedQueueOwnersCount, len(fastTaskService.pendingTaskOwners))
 		totalOwnerCount := 0
@@ -705,103 +801,5 @@ func TestPendingOwnerManagement(t *testing.T) {
 			totalOwnerCount += len(queueOwners)
 		}
 		assert.Equal(t, removal.totalOwnerCount, totalOwnerCount)
-	}
-}
-
-func TestQueueWorkerManagement(t *testing.T) {
-	// create fastTaskService
-	enqueueOwner := func(labels map[string]string) error {
-		return nil
-	}
-	scope := promutils.NewTestScope()
-
-	fastTaskService := newFastTaskService(enqueueOwner, scope, testConfig)
-	assert.Equal(t, 0, len(fastTaskService.queues))
-
-	// add workers
-	additions := []struct {
-		queueID            string
-		workerID           string
-		expectedQueueCount int
-		totalWorkerCount   int
-	}{
-		{
-			// add worker to new queue
-			queueID:            "foo",
-			workerID:           "a",
-			expectedQueueCount: 1,
-			totalWorkerCount:   1,
-		},
-		{
-			// add worker to existing queue
-			queueID:            "foo",
-			workerID:           "b",
-			expectedQueueCount: 1,
-			totalWorkerCount:   2,
-		},
-		{
-			// add worker to another new queue
-			queueID:            "bar",
-			workerID:           "c",
-			expectedQueueCount: 2,
-			totalWorkerCount:   3,
-		},
-	}
-
-	for _, addition := range additions {
-		worker := &Worker{
-			workerID: addition.workerID,
-		}
-
-		queue := fastTaskService.addWorkerToQueue(addition.queueID, worker)
-		assert.NotNil(t, queue)
-
-		assert.Equal(t, addition.expectedQueueCount, len(fastTaskService.queues))
-		totalWorkers := 0
-		for _, q := range fastTaskService.queues {
-			totalWorkers += len(q.workers)
-		}
-		assert.Equal(t, addition.totalWorkerCount, totalWorkers)
-	}
-
-	// remove workers
-	removals := []struct {
-		queueID            string
-		workerID           string
-		expectedQueueCount int
-		totalWorkerCount   int
-	}{
-		{
-			// remove worker from non-existent queue
-			queueID:            "baz",
-			workerID:           "d",
-			expectedQueueCount: 2,
-			totalWorkerCount:   3,
-		},
-		{
-			// remove worker from existing queue
-			queueID:            "foo",
-			workerID:           "a",
-			expectedQueueCount: 2,
-			totalWorkerCount:   2,
-		},
-		{
-			// remove last worker from queue
-			queueID:            "foo",
-			workerID:           "b",
-			expectedQueueCount: 1,
-			totalWorkerCount:   1,
-		},
-	}
-
-	for _, removal := range removals {
-		fastTaskService.removeWorkerFromQueue(removal.queueID, removal.workerID)
-
-		assert.Equal(t, removal.expectedQueueCount, len(fastTaskService.queues))
-		totalWorkers := 0
-		for _, q := range fastTaskService.queues {
-			totalWorkers += len(q.workers)
-		}
-		assert.Equal(t, removal.totalWorkerCount, totalWorkers)
 	}
 }

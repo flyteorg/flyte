@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 
+	"github.com/unionai/flyte/fasttask/plugin/interfaces"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -29,19 +30,19 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 
 	tests := []struct {
 		name                    string
-		executionEnvironmentID  core.ExecutionEnvID
+		executionEnvironmentID  interfaces.ExecutionEnvID
 		fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec
 		expectedError           string
 	}{
 		{
 			name:                    "EmptyExecutionEnvironmentName",
-			executionEnvironmentID:  core.ExecutionEnvID{},
+			executionEnvironmentID:  interfaces.ExecutionEnvID{},
 			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{},
 			expectedError:           "execution environment name is required",
 		},
 		{
 			name: "EmptyExecutionEnvironmentVersion",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name: "foo",
 			},
 			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{},
@@ -49,7 +50,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "NegativeBacklogLength",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -60,7 +61,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "ZeroParallelism",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -72,7 +73,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "ZeroTTLSeconds",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -87,7 +88,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "InvalidPodTemplateSpec",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -102,7 +103,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "ZeroReplicaCount",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -119,7 +120,7 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 		},
 		{
 			name: "Success",
-			executionEnvironmentID: core.ExecutionEnvID{
+			executionEnvironmentID: interfaces.ExecutionEnvID{
 				Name:    "foo",
 				Version: "bar",
 			},
@@ -149,18 +150,18 @@ func TestIsValidEnvironmentSpec(t *testing.T) {
 	}
 }
 
-func TestGetTTLSeconds(t *testing.T) {
+func TestGetEnvironmentTTLOrDefault(t *testing.T) {
 	tests := []struct {
 		name                    string
 		fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec
 		defaultTTL              time.Duration
-		expected                time.Duration
+		expected                float64
 	}{
 		{
 			name:                    "Default",
 			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{},
 			defaultTTL:              time.Second * time.Duration(90),
-			expected:                time.Second * time.Duration(90),
+			expected:                90,
 		},
 		{
 			name: "TerminationCriteria",
@@ -169,17 +170,17 @@ func TestGetTTLSeconds(t *testing.T) {
 					TtlSeconds: 120,
 				},
 			},
-			defaultTTL: time.Second * time.Duration(90),
-			expected:   time.Second * time.Duration(120),
+			defaultTTL: time.Second * time.Duration(120),
+			expected:   120,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			GetConfig().DefaultTTL = config.Duration{Duration: tt.defaultTTL}
+			GetConfig().DefaultEnvironmentTTL = config.Duration{Duration: tt.defaultTTL}
 
-			actual := getTTLOrDefault(tt.fastTaskEnvironmentSpec)
-			assert.Equal(t, time.Duration(tt.expected), actual)
+			actual := getEnvironmentTTLOrDefault(tt.fastTaskEnvironmentSpec)
+			assert.Equal(t, tt.expected, actual)
 		})
 	}
 }
@@ -226,6 +227,79 @@ func TestSanitizePodName(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			output := sanitizeEnvName(test.input)
 			assert.Equal(t, test.output, output)
+		})
+	}
+}
+
+func TestGetReplicaTTLOrDefault(t *testing.T) {
+	tests := []struct {
+		name                    string
+		fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec
+		defaultTTL              time.Duration
+		expected                float64
+	}{
+		{
+			name:                    "Default",
+			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{},
+			defaultTTL:              time.Second * time.Duration(90),
+			expected:                90,
+		},
+		{
+			name: "Set",
+			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+				ScaledownTtlSeconds: wrapperspb.Int32(120),
+			},
+			defaultTTL: time.Second * time.Duration(120),
+			expected:   120,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			GetConfig().DefaultEnvironmentTTL = config.Duration{Duration: tt.defaultTTL}
+
+			actual := getReplicaTTLOrDefault(tt.fastTaskEnvironmentSpec)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
+}
+
+func TestGetMinReplicaCount(t *testing.T) {
+	tests := []struct {
+		name                    string
+		fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec
+		expected                int
+	}{
+		{
+			name: "Unset",
+			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+				ReplicaCount: 10,
+			},
+			expected: 10,
+		},
+		{
+			name: "min replica less than 1",
+			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+				ReplicaCount:    10,
+				MinReplicaCount: wrapperspb.Int32(0),
+			},
+			expected: 10,
+		},
+		{
+			name: "Set",
+			fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+				ReplicaCount:    10,
+				MinReplicaCount: wrapperspb.Int32(1),
+			},
+			expected: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			actual := getMinReplicaCount(tt.fastTaskEnvironmentSpec)
+			assert.Equal(t, tt.expected, actual)
 		})
 	}
 }

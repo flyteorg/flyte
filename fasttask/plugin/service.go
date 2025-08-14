@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/rand"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -13,38 +13,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/types"
 
-	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	"github.com/unionai/flyte/fasttask/plugin/api"
+	"github.com/unionai/flyte/fasttask/plugin/interfaces"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
 const (
-	maxPendingOwnersPerQueue = 100
+	maxPendingOwnersPerQueue = 1024 // TODO @hamersaw - default to 100? 512? 1024?
 	queueIdLabel             = "queue_id"
 )
-
-// fastTaskServiceImpl is a gRPC service that manages assignment and management of task executions
-// with respect to fasttask workers.
-type fastTaskServiceImpl struct {
-	pb.UnimplementedFastTaskServer
-	enqueueOwner core.EnqueueOwner
-
-	queues     map[string]*Queue
-	queuesLock sync.RWMutex
-
-	// A map of pending owners by queue. When a new worker becomes available, use this to enqueue owners for reevaluation.
-	// Note, this is an optimistic approach and may not include all pending owners.
-	pendingTaskOwners     map[string]map[string]map[string]string // map[queueID]map[taskID]enqueueLabels
-	pendingTaskOwnersLock sync.RWMutex
-
-	taskStatusChannels sync.Map // map[taskID]chan *WorkerTaskStatus
-	metrics            serviceMetrics
-}
 
 type fastTaskExecutionMetric struct {
 	prom  *prometheus.CounterVec
@@ -79,25 +61,6 @@ func (m *fastTaskExecutionMetric) add(execID *pb.ExecutionIdentifier, namespace,
 	m.cache.Set(key, nil, cache.DefaultExpiration)
 }
 
-// Queue is a collection of Workers that are capable of executing similar tasks.
-type Queue struct {
-	lock    sync.RWMutex
-	workers map[string]*Worker
-}
-
-// Worker represents a fasttask worker.
-type Worker struct {
-	workerID     string
-	capacity     *pb.Capacity
-	responseChan chan<- *pb.HeartbeatResponse
-}
-
-// workerTaskStatus represents the status of a task as reported by a worker.
-type workerTaskStatus struct {
-	workerID   string
-	taskStatus *pb.TaskStatus
-}
-
 // serviceMetrics defines a collection of metrics for the fasttask service.
 type serviceMetrics struct {
 	taskNoWorkersAvailable    prometheus.Counter
@@ -109,6 +72,9 @@ type serviceMetrics struct {
 	executionsLimit           *prometheus.Desc
 	backlog                   *prometheus.Desc
 	backlogLimit              *prometheus.Desc
+	workerConnectionErrors    *prometheus.CounterVec
+	enqueueOwnerFailure       prometheus.Counter
+	pendingOwnerQueueFull     prometheus.Counter
 	fastTaskExecutionDuration fastTaskExecutionMetric
 }
 
@@ -124,9 +90,30 @@ func newServiceMetrics(scope promutils.Scope, cfg *Config) serviceMetrics {
 		executionsLimit:           prometheus.NewDesc(scope.NewScopedMetricName("executions_limit"), "Total executions limit per queue", []string{queueIdLabel}, nil),
 		backlog:                   prometheus.NewDesc(scope.NewScopedMetricName("backlog"), "Current number of backlogged tasks per queue", []string{queueIdLabel}, nil),
 		backlogLimit:              prometheus.NewDesc(scope.NewScopedMetricName("backlog_limit"), "Total backlog limit per queue", []string{queueIdLabel}, nil),
+		enqueueOwnerFailure:       scope.MustNewCounter("enqueue_owner_failure", "Count of tasks that failed to enqueue a workflow to be re-evaluated"),
+		pendingOwnerQueueFull:     scope.MustNewCounter("pending_owner_queue_full", "Count of tasks that could not add pending owner due to queue being full"),
+		workerConnectionErrors:    scope.MustNewCounterVec("worker_connection_errors", "Count of errors encountered during worker connection communications", "error_type"),
 		fastTaskExecutionDuration: newFastTaskExecutionMetric(scope, &cfg.FastTaskExecutionMetric),
 	}
 }
+
+type fastTaskServiceImpl struct {
+	pb.UnimplementedFastTaskServer
+	enqueueOwner core.EnqueueOwner
+
+	builder            interfaces.EnvironmentBuilder
+	store              interfaces.EnvironmentStore
+	taskStatusChannels *sync.Map // map[taskID]chan interfaces.WorkerTaskStatus
+	metrics            serviceMetrics
+
+	// A map of pending owners by queue. When a new worker becomes available, use this to enqueue owners for reevaluation.
+	// Note, this is an optimistic approach and may not include all pending owners.
+	pendingTaskOwners     map[string]map[string]map[string]string // map[queueID]map[taskID]enqueueLabels
+	pendingTaskOwnersLock sync.RWMutex
+}
+
+var _ interfaces.FastTaskService = (*fastTaskServiceImpl)(nil)
+var _ pb.FastTaskServer = (*fastTaskServiceImpl)(nil)
 
 func (f *fastTaskServiceImpl) Describe(ch chan<- *prometheus.Desc) {
 	ch <- f.metrics.queues
@@ -140,189 +127,41 @@ func (f *fastTaskServiceImpl) Describe(ch chan<- *prometheus.Desc) {
 // Collect emits snapshot metrics for the fasttask service. This is useful to periodically capture the state of queues and workers.
 func (f *fastTaskServiceImpl) Collect(ch chan<- prometheus.Metric) {
 	logger.Info(context.Background(), "Collecting fasttask service metrics")
-	f.queuesLock.RLock()
-	defer f.queuesLock.RUnlock()
 
-	ch <- prometheus.MustNewConstMetric(f.metrics.queues, prometheus.GaugeValue, float64(len(f.queues)))
-	for queueID, queue := range f.queues {
-		queue.lock.RLock()
+	environments := f.store.List()
 
+	ch <- prometheus.MustNewConstMetric(f.metrics.queues, prometheus.GaugeValue, float64(len(environments)))
+	for _, env := range environments {
 		executions := int32(0)
 		executionsLimit := int32(0)
 		backlog := int32(0)
 		backlogLimit := int32(0)
-		for _, worker := range queue.workers {
-			executions += worker.capacity.GetExecutionCount()
-			executionsLimit += worker.capacity.GetExecutionLimit()
-			backlog += worker.capacity.GetBacklogCount()
-			backlogLimit += worker.capacity.GetBacklogLimit()
-		}
-		ch <- prometheus.MustNewConstMetric(f.metrics.workers, prometheus.GaugeValue, float64(len(queue.workers)), queueID)
-		ch <- prometheus.MustNewConstMetric(f.metrics.executionsLimit, prometheus.GaugeValue, float64(executionsLimit), queueID)
-		ch <- prometheus.MustNewConstMetric(f.metrics.executions, prometheus.GaugeValue, float64(executions), queueID)
-		ch <- prometheus.MustNewConstMetric(f.metrics.backlog, prometheus.GaugeValue, float64(backlog), queueID)
-		ch <- prometheus.MustNewConstMetric(f.metrics.backlogLimit, prometheus.GaugeValue, float64(backlogLimit), queueID)
+		totalWorkers := 0
+		env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
+			executions += worker.Capacity().GetExecutionCount()
+			executionsLimit += worker.Capacity().GetExecutionLimit()
+			backlog += worker.Capacity().GetBacklogCount()
+			backlogLimit += worker.Capacity().GetBacklogLimit()
 
-		queue.lock.RUnlock()
+			totalWorkers++
+			return true
+		})
+		ch <- prometheus.MustNewConstMetric(f.metrics.workers, prometheus.GaugeValue, float64(totalWorkers), env.EnvID().String())
+		ch <- prometheus.MustNewConstMetric(f.metrics.executionsLimit, prometheus.GaugeValue, float64(executionsLimit), env.EnvID().String())
+		ch <- prometheus.MustNewConstMetric(f.metrics.executions, prometheus.GaugeValue, float64(executions), env.EnvID().String())
+		ch <- prometheus.MustNewConstMetric(f.metrics.backlog, prometheus.GaugeValue, float64(backlog), env.EnvID().String())
+		ch <- prometheus.MustNewConstMetric(f.metrics.backlogLimit, prometheus.GaugeValue, float64(backlogLimit), env.EnvID().String())
 	}
 }
 
-// Heartbeat is a gRPC stream that manages the heartbeat of a fasttask worker. This includes
-// receiving task status updates and sending task assignments.
-func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
-	workerID := ""
-
-	// recv initial heartbeat request
-	heartbeatRequest, err := stream.Recv()
-	if heartbeatRequest != nil {
-		workerID = heartbeatRequest.GetWorkerId()
-	}
-
-	if err == io.EOF || heartbeatRequest == nil {
-		logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
-		return nil
-	} else if err != nil {
-		return err
-	}
-
-	logger.Debugf(context.Background(), "received initial heartbeat for worker %s", workerID)
-
-	// create worker
-	responseChan := make(chan *pb.HeartbeatResponse, GetConfig().HeartbeatBufferSize)
-	worker := &Worker{
-		workerID:     workerID,
-		capacity:     heartbeatRequest.GetCapacity(),
-		responseChan: responseChan,
-	}
-
-	// register worker with queue
-	queue := f.addWorkerToQueue(heartbeatRequest.GetQueueId(), worker)
-
-	// cleanup worker on exit
-	defer func() {
-		f.removeWorkerFromQueue(heartbeatRequest.GetQueueId(), workerID)
-	}()
-
-	// start go routine to handle heartbeat responses
-	go func() {
-		for {
-			select {
-			case message := <-responseChan:
-				if err := stream.Send(message); err != nil {
-					logger.Warnf(context.Background(), "failed to send heartbeat response %+v", message)
-				}
-			case <-stream.Context().Done():
-				return
-			}
-		}
-	}()
-
-	// new worker available, enqueue owners
-	f.enqueuePendingOwners(heartbeatRequest.GetQueueId())
-
-	// handle heartbeat requests
-	for {
-		heartbeatRequest, err := stream.Recv()
-		if err == io.EOF || heartbeatRequest == nil {
-			logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
-			break
-		} else if err != nil {
-			logger.Warnf(context.Background(), "failed to recv heartbeat request %+v", err)
-			continue
-		}
-
-		// update worker capacity
-		queue.lock.Lock()
-		worker.capacity = heartbeatRequest.GetCapacity()
-		queue.lock.Unlock()
-
-		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
-			// if the taskContext exists then send the taskStatus to the statusChannel
-			// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
-			// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
-			// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
-			// cleanup would require a separate GC process.
-			if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
-				taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
-				taskStatusChannel <- &workerTaskStatus{
-					workerID:   worker.workerID,
-					taskStatus: taskStatus,
-				}
-			}
-			execID := taskStatus.GetExecId()
-			if taskStatus.GetTaskDuration().AsDuration() > 0 {
-				f.metrics.fastTaskExecutionDuration.add(execID,
-					taskStatus.GetNamespace(),
-					heartbeatRequest.GetWorkerId(),
-					taskStatus.GetTaskDuration().AsDuration())
-			}
-			// if taskStatus is complete then enqueueOwner for fast feedback
-			phase := core.Phase(taskStatus.GetPhase())
-			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
-				labels := make(map[string]string)
-
-				// for backwards compatibility, add workflow id
-				namespacedName := types.NamespacedName{
-					Namespace: taskStatus.GetNamespace(),
-					Name:      taskStatus.GetWorkflowId(),
-				}
-				labels[k8s.WorkflowID] = namespacedName.String()
-
-				for label, value := range taskStatus.GetEnqueueLabels() {
-					labels[label] = value
-				}
-
-				if err := f.enqueueOwner(labels); err != nil {
-					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
-				}
-			}
-		}
-	}
-
-	return nil
+// workerTaskStatus represents the status of a task as reported by a worker.
+type workerTaskStatus struct {
+	workerID   string
+	taskStatus *pb.TaskStatus
 }
 
-// addWorkerToQueue adds a worker to the queue. If the queue does not exist, it is created.
-func (f *fastTaskServiceImpl) addWorkerToQueue(queueID string, worker *Worker) *Queue {
-	f.queuesLock.Lock()
-	defer f.queuesLock.Unlock()
-
-	queue, exists := f.queues[queueID]
-	if !exists {
-		queue = &Queue{
-			workers: make(map[string]*Worker),
-		}
-		f.queues[queueID] = queue
-	}
-
-	queue.lock.Lock()
-	defer queue.lock.Unlock()
-
-	queue.workers[worker.workerID] = worker
-	return queue
-}
-
-// removeWorkerFromQueue removes a worker from the queue. If the queue is empty, it is deleted.
-func (f *fastTaskServiceImpl) removeWorkerFromQueue(queueID, workerID string) {
-	f.queuesLock.Lock()
-	defer f.queuesLock.Unlock()
-
-	queue, exists := f.queues[queueID]
-	if !exists {
-		return
-	}
-
-	queue.lock.Lock()
-	defer queue.lock.Unlock()
-
-	delete(queue.workers, workerID)
-	if len(queue.workers) == 0 {
-		delete(f.queues, queueID)
-	}
-}
-
-// addPendingOwner adds to the pending owners list for the queue, if not already full
-func (f *fastTaskServiceImpl) addPendingOwner(queueID, taskID string, enqueueLabels map[string]string) {
+// AddPendingOwner adds to the pending owners list for the queue, if not already full
+func (f *fastTaskServiceImpl) AddPendingOwner(queueID, taskID string, enqueueLabels map[string]string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -333,13 +172,14 @@ func (f *fastTaskServiceImpl) addPendingOwner(queueID, taskID string, enqueueLab
 	}
 
 	if len(owners) >= maxPendingOwnersPerQueue {
+		f.metrics.pendingOwnerQueueFull.Inc()
 		return
 	}
 	owners[taskID] = enqueueLabels
 }
 
-// removePendingOwner removes the pending owner from the list if still there
-func (f *fastTaskServiceImpl) removePendingOwner(queueID, taskID string) {
+// RemovePendingOwner removes the pending owner from the list if still there
+func (f *fastTaskServiceImpl) RemovePendingOwner(queueID, taskID string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -355,7 +195,7 @@ func (f *fastTaskServiceImpl) removePendingOwner(queueID, taskID string) {
 }
 
 // enqueuePendingOwners drains the pending owners list for the queue and enqueues them for reevaluation
-func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
+func (f *fastTaskServiceImpl) EnqueuePendingOwners(queueID string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -372,6 +212,7 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 		}
 		if err := f.enqueueOwner(ownerLabels); err != nil {
 			logger.Warnf(context.Background(), "failed to enqueue owner %v: %+v", ownerLabels, err)
+			f.metrics.enqueueOwnerFailure.Inc()
 		}
 		enqueued[hashedLabels] = true
 	}
@@ -379,79 +220,14 @@ func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 	delete(f.pendingTaskOwners, queueID)
 }
 
-// OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
-// empty string is returned.
-func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, execID *coreIdl.WorkflowExecutionIdentifier, queueID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (string, error) {
-	f.queuesLock.RLock()
-	defer f.queuesLock.RUnlock()
-
-	queue, exists := f.queues[queueID]
-	if !exists {
-		f.addPendingOwner(queueID, taskID, enqueueLabels)
-		f.metrics.taskNoWorkersAvailable.Inc()
-		return "", nil // no workers available
-	}
-
-	// retrieve random worker with capacity
-	queue.lock.Lock()
-	defer queue.lock.Unlock()
-
-	preferredWorkers := make([]*Worker, 0)
-	acceptedWorkers := make([]*Worker, 0)
-	for _, worker := range queue.workers {
-		if worker.capacity.GetExecutionLimit()-worker.capacity.GetExecutionCount() > 0 {
-			preferredWorkers = append(preferredWorkers, worker)
-		} else if worker.capacity.GetBacklogLimit()-worker.capacity.GetBacklogCount() > 0 {
-			acceptedWorkers = append(acceptedWorkers, worker)
-		}
-	}
-
-	var worker *Worker
-	if len(preferredWorkers) > 0 {
-		worker = preferredWorkers[rand.Intn(len(preferredWorkers))]
-		worker.capacity.ExecutionCount++
-	} else if len(acceptedWorkers) > 0 {
-		worker = acceptedWorkers[rand.Intn(len(acceptedWorkers))]
-		worker.capacity.BacklogCount++
-	} else {
-		// No workers available. Note, we do not add to pending owners at this time as we are optimizing for the worker
-		// startup case. The worker backlog should be sufficient to keep the worker busy without needing to proactively
-		// enqueue owners when capacity becomes available.
-		f.metrics.taskNoCapacityAvailable.Inc()
-		return "", nil
-	}
-
-	// send assign message to worker
-	f.metrics.taskAssigned.Inc()
-	worker.responseChan <- &pb.HeartbeatResponse{
-		TaskId: taskID,
-		ExecId: &pb.ExecutionIdentifier{
-			Org:     execID.GetOrg(),
-			Project: execID.GetProject(),
-			Domain:  execID.GetDomain(),
-			Name:    execID.GetName(),
-		},
-		Namespace:     namespace,
-		Cmd:           cmd,
-		EnvVars:       envVars,
-		WorkflowId:    &workflowID,
-		EnqueueLabels: enqueueLabels,
-		Operation:     pb.HeartbeatResponse_ASSIGN,
-	}
-
-	// create task status channel
-	f.taskStatusChannels.LoadOrStore(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
-	return worker.workerID, nil
-}
-
 // CheckStatus checks the status of a task on a specific queue and worker.
-func (f *fastTaskServiceImpl) CheckStatus(_ context.Context, taskID, queueID, workerID string) (api.TaskStatus, error) {
+func (f *fastTaskServiceImpl) CheckStatus(ctx context.Context, taskID, queueID, workerID string) (interfaces.TaskStatus, error) {
 	taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskID)
 	if !exists {
 		// if this plugin restarts then TaskContexts may not exist for tasks that are still active. we can
 		// create a TaskContext here because we ensure it will be cleaned up when the task completes.
 		f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
-		return api.TaskStatus{}, fmt.Errorf("task context not found: %w", taskContextNotFoundError)
+		return interfaces.TaskStatus{}, fmt.Errorf("task context not found: %w", taskContextNotFoundError)
 	}
 
 	taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
@@ -471,7 +247,7 @@ Loop:
 	}
 
 	if latestWorkerTaskStatus == nil {
-		return api.TaskStatus{}, fmt.Errorf("unable to find task status update: %w", statusUpdateNotFoundError)
+		return interfaces.TaskStatus{}, fmt.Errorf("unable to find task status update: %w", statusUpdateNotFoundError)
 	}
 
 	taskStatus := latestWorkerTaskStatus.taskStatus
@@ -479,24 +255,20 @@ Loop:
 
 	// if not completed need to send ACK on taskID to worker
 	if phase != core.PhaseSuccess && phase != core.PhaseRetryableFailure {
-		f.queuesLock.RLock()
-		defer f.queuesLock.RUnlock()
-
-		// if here it should be impossible for the queue not to exist, but left for safety
-		if queue, exists := f.queues[queueID]; exists {
-			queue.lock.RLock()
-			defer queue.lock.RUnlock()
-
-			if worker, exists := queue.workers[workerID]; exists {
-				worker.responseChan <- &pb.HeartbeatResponse{
-					TaskId:    taskID,
-					Operation: pb.HeartbeatResponse_ACK,
+		if env := f.store.Get(queueID); env != nil {
+			if worker := env.GetWorker(workerID); worker != nil {
+				if worker.State() == interfaces.HEALTHY {
+					worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
+						TaskId:    taskID,
+						Operation: pb.HeartbeatResponse_ACK,
+					})
+					worker.SetLastAccessedAt(time.Now().Unix())
 				}
 			}
 		}
 	}
 
-	return api.TaskStatus{
+	return interfaces.TaskStatus{
 		Phase:        phase,
 		Reason:       taskStatus.GetReason(),
 		TaskDuration: taskStatus.GetTaskDuration().AsDuration(),
@@ -507,18 +279,12 @@ Loop:
 // associated task context.
 func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, workerID string) error {
 	// send delete taskID message to worker
-	f.queuesLock.RLock()
-	defer f.queuesLock.RUnlock()
-
-	if queue, exists := f.queues[queueID]; exists {
-		queue.lock.RLock()
-		defer queue.lock.RUnlock()
-
-		if worker, exists := queue.workers[workerID]; exists {
-			worker.responseChan <- &pb.HeartbeatResponse{
+	if env := f.store.Get(queueID); env != nil {
+		if worker := env.GetWorker(workerID); worker != nil {
+			worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
 				TaskId:    taskID,
 				Operation: pb.HeartbeatResponse_DELETE,
-			}
+			})
 		}
 	}
 
@@ -526,18 +292,239 @@ func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, work
 	f.taskStatusChannels.Delete(taskID)
 
 	// remove pending owner
-	f.removePendingOwner(queueID, taskID)
+	f.RemovePendingOwner(queueID, taskID)
 
 	return nil
 }
 
-// newFastTaskService creates a new fastTaskServiceImpl.
-func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope, cfg *Config) *fastTaskServiceImpl {
+// Heartbeat is a gRPC stream that manages the heartbeat of a fasttask worker. This includes
+// receiving task status updates and sending task assignments.
+func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
+	workerID := ""
+
+	// recv initial heartbeat request
+	heartbeatRequest, err := stream.Recv()
+	if heartbeatRequest != nil {
+		workerID = heartbeatRequest.GetWorkerId()
+	}
+
+	if err == io.EOF || heartbeatRequest == nil {
+		logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
+		return nil
+	} else if err != nil {
+		f.metrics.workerConnectionErrors.WithLabelValues("initial_connection").Inc()
+		return err
+	}
+
+	logger.Debugf(context.Background(), "received initial heartbeat for worker %s", workerID)
+
+	// connect this worker to an existing environment. we wait (up to 30s) for the environment to
+	// be created from either (1) a new task or (2) orphan detection to ensure the environment
+	// contains necessary metadata to `scaleDown`.
+	var env interfaces.Environment
+	for i := 0; i < 600; i++ {
+		env = f.store.Get(heartbeatRequest.GetQueueId())
+		if env != nil {
+			break
+		}
+
+		select {
+		case <-stream.Context().Done():
+			return nil
+		case <-time.After(50 * time.Millisecond):
+			// continue
+		}
+	}
+
+	if env == nil {
+		return fmt.Errorf("environment %s not found", heartbeatRequest.GetQueueId())
+	}
+
+	worker := env.GetOrCreateWorker(heartbeatRequest.GetWorkerId())
+	worker.SetCapacity(heartbeatRequest.GetCapacity())
+	worker.SetState(interfaces.HEALTHY)
+
+	// if the worker disconnects, we transition state to `ORPHANED` to ensure no future tasks are
+	// assigned. if the worker reconnects, we will transition back to `HEALTHY`; otherwise, the
+	// worker will be cleaned up by the `scaleDown` operation.
+	defer func() {
+		worker.SetState(interfaces.ORPHANED)
+	}()
+
+	// start go routine to handle heartbeat responses
+	go func() {
+		for {
+			select {
+			case message := <-worker.Responses():
+				if err := stream.Send(message); err != nil {
+					f.metrics.workerConnectionErrors.WithLabelValues("send").Inc()
+					logger.Warnf(context.Background(), "failed to send heartbeat response %+v", message)
+				}
+			case <-stream.Context().Done():
+				return
+			}
+		}
+	}()
+
+	// new worker available, enqueue owners
+	f.EnqueuePendingOwners(heartbeatRequest.GetQueueId())
+
+	// handle heartbeat requests
+	for {
+		heartbeatRequest, err := stream.Recv()
+		if err == io.EOF || heartbeatRequest == nil {
+			logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
+			break
+		} else if err != nil {
+			f.metrics.workerConnectionErrors.WithLabelValues("receive").Inc()
+			logger.Warnf(context.Background(), "failed to recv heartbeat request %+v", err)
+			continue
+		}
+
+		// update worker capacity
+		worker.SetCapacity(heartbeatRequest.GetCapacity())
+
+		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
+			// if the taskContext exists then send the taskStatus to the statusChannel
+			// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
+			// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
+			// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
+			// cleanup would require a separate GC process.
+			if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
+				taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
+				taskStatusChannel <- &workerTaskStatus{
+					workerID:   worker.ID(),
+					taskStatus: taskStatus,
+				}
+			}
+			execID := taskStatus.GetExecId()
+			if taskStatus.GetTaskDuration().AsDuration() > 0 {
+				f.metrics.fastTaskExecutionDuration.add(execID,
+					taskStatus.GetNamespace(),
+					heartbeatRequest.GetWorkerId(),
+					taskStatus.GetTaskDuration().AsDuration())
+			}
+
+			// if taskStatus is complete then enqueueOwner for fast feedback
+			phase := core.Phase(taskStatus.GetPhase())
+			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
+				labels := make(map[string]string)
+
+				// for backwards compatibility, add workflow id
+				namespacedName := types.NamespacedName{
+					Namespace: taskStatus.GetNamespace(),
+					Name:      taskStatus.GetWorkflowId(),
+				}
+				labels[k8s.WorkflowID] = namespacedName.String()
+
+				for label, value := range taskStatus.GetEnqueueLabels() {
+					labels[label] = value
+				}
+
+				if err := f.enqueueOwner(labels); err != nil {
+					f.metrics.enqueueOwnerFailure.Inc()
+					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID *idlCore.WorkflowExecutionIdentifier, environmentID, taskID, namespace, workflowID string, cmd []string, envVars map[string]string, enqueueLabels map[string]string) (interfaces.Worker, error) {
+	// retrieve environment
+	env := f.store.Get(environmentID)
+	if env == nil {
+		f.metrics.taskNoWorkersAvailable.Inc()
+		return nil, fmt.Errorf("environment '%s' not found", environmentID)
+	}
+
+	// identify preferred (ie. has capacity) and acceptable (ie. has backlog capacity) worker(s)
+	preferredWorkers := make([]interfaces.Worker, 0)
+	acceptableWorkers := make([]interfaces.Worker, 0)
+	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
+		if worker.State() != interfaces.HEALTHY {
+			return true
+		}
+		capacity := worker.Capacity()
+		if capacity.GetExecutionCount() < capacity.GetExecutionLimit() {
+			preferredWorkers = append(preferredWorkers, worker)
+		} else if capacity.GetBacklogCount() < capacity.GetBacklogLimit() {
+			acceptableWorkers = append(acceptableWorkers, worker)
+		}
+
+		return true
+	})
+
+	// we sort workers by ID to ensure determinism in the selection process. this is important to
+	// (1) assign to the same worker in case of failures between assignment and state persistence
+	// and (2) allow the maximum number of workers to be cleaned up if unused. each worker
+	// maintains a `lastAccessedAt` timestamp to determine when it was last used. by assigning
+	// tasks to workers alphabetically, we can ensure that workers are allowed to become stale.
+	var worker interfaces.Worker
+	if len(preferredWorkers) > 0 {
+		sort.Slice(preferredWorkers, func(i, j int) bool {
+			return preferredWorkers[i].ID() < preferredWorkers[j].ID()
+		})
+
+		for _, w := range preferredWorkers {
+			capacity := *w.Capacity()
+			capacity.ExecutionCount++
+			w.SetCapacity(&capacity)
+
+			worker = w
+			break
+		}
+	}
+
+	if worker == nil && len(acceptableWorkers) > 0 {
+		sort.Slice(acceptableWorkers, func(i, j int) bool {
+			return acceptableWorkers[i].ID() < acceptableWorkers[j].ID()
+		})
+
+		for _, w := range acceptableWorkers {
+			capacity := *w.Capacity()
+			capacity.BacklogCount++
+			w.SetCapacity(&capacity)
+
+			worker = w
+		}
+	}
+
+	if worker == nil {
+		f.metrics.taskNoWorkersAvailable.Inc()
+		return nil, noCapacityAvailableError
+	}
+
+	// add task to worker
+	f.metrics.taskAssigned.Inc()
+	worker.EnqueueHeartbeatResponse(&pb.HeartbeatResponse{
+		TaskId: taskID,
+		ExecId: &pb.ExecutionIdentifier{
+			Org:     execID.GetOrg(),
+			Project: execID.GetProject(),
+			Domain:  execID.GetDomain(),
+			Name:    execID.GetName(),
+		},
+		Namespace:     namespace,
+		Cmd:           cmd,
+		EnvVars:       envVars,
+		Operation:     pb.HeartbeatResponse_ASSIGN,
+		EnqueueLabels: enqueueLabels,
+	})
+	worker.SetLastAccessedAt(time.Now().Unix())
+	return worker, nil
+}
+
+func newFastTaskService(enqueueOwner core.EnqueueOwner, builder interfaces.EnvironmentBuilder, store interfaces.EnvironmentStore, scope promutils.Scope, cfg *Config) *fastTaskServiceImpl {
 	svc := &fastTaskServiceImpl{
-		enqueueOwner:      enqueueOwner,
-		queues:            make(map[string]*Queue),
-		pendingTaskOwners: make(map[string]map[string]map[string]string),
-		metrics:           newServiceMetrics(scope, cfg),
+		enqueueOwner:       enqueueOwner,
+		builder:            builder,
+		pendingTaskOwners:  make(map[string]map[string]map[string]string),
+		store:              store,
+		taskStatusChannels: &sync.Map{},
+		metrics:            newServiceMetrics(scope, cfg),
 	}
 	prometheus.MustRegister(svc)
 	return svc

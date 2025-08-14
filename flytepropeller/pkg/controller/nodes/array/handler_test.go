@@ -14,7 +14,6 @@ import (
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	plugincoremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	eventmocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
@@ -92,12 +91,11 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
 	mockSignalClient := &gatemocks.SignalServiceClient{}
-	mockExecutionEnvClient := &plugincoremocks.ExecutionEnvClient{}
 	noopCatalogClient := catalog.NOOPCatalog{}
 
 	// create node executor
 	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient, adminClient,
-		"s3://bucket/", make([]string, 0), mockKubeClient, noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, mockExecutionEnvClient, scope)
+		"s3://bucket/", make([]string, 0), mockKubeClient, noopCatalogClient, mockRecoveryClient, offloadingConfig, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler

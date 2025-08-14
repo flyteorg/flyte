@@ -63,9 +63,6 @@ type TaskExecutionContext interface {
 
 	// Returns a handle to the Task events recorder, which get stored in the Admin.
 	EventsRecorder() EventsRecorder
-
-	// GetExecutionEnvClient returns the execution environment client.
-	GetExecutionEnvClient() ExecutionEnvClient
 }
 
 // A simple fire-and-forget func

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/wrappers.proto";
+
 package fasttask;
 
 option go_package = "pb/";
@@ -156,6 +158,12 @@ message FastTaskEnvironmentSpec {
         // executions) that this environment will be GCed.
         int32 ttl_seconds = 6;
     }
+
+    // The minimum number of replicas that should be maintained for this environment.
+    google.protobuf.Int32Value min_replica_count = 7;
+
+    // the ttl for auto-scaled workers that exceed the min_replicas count
+    google.protobuf.Int32Value scaledown_ttl_seconds = 8;
 }
 
 // Represents an fasttask worker replica assignment.

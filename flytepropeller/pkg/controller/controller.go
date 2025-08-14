@@ -456,14 +456,9 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
-	executionEnvClient, err := NewExecutionEnvClient(ctx, kubeClient, scope)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to create execution environment client")
-	}
-
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), cfg.DefaultRawOutputSuffix, kubeClient,
-		cacheClient, recoveryClient, cfg.LiteralOffloadingConfig, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvClient, scope)
+		cacheClient, recoveryClient, cfg.LiteralOffloadingConfig, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
@@ -475,7 +470,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	controller.executionStats = workflowstore.NewExecutionStatsMonitor(scope.NewSubScope("execstats"), flyteworkflowInformer.Lister(), activeExecutions)
 
 	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, executionEnvClient, activeExecutions, scope)
+		controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, activeExecutions, scope)
 	if err != nil {
 		return nil, err
 	}

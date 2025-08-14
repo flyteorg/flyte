@@ -14,7 +14,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginsutils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -133,21 +132,20 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 }
 
 type nodeExecContext struct {
-	store              *storage.DataStore
-	tr                 interfaces.TaskReader
-	md                 interfaces.NodeExecutionMetadata
-	EventRecorder      interfaces.EventRecorder
-	inputs             io.InputReader
-	node               v1alpha1.ExecutableNode
-	nodeStatus         v1alpha1.ExecutableNodeStatus
-	nsm                *nodeStateManager
-	enqueueOwner       func() error
-	rawOutputPrefix    storage.DataReference
-	rawOutputSuffix    []string
-	shardSelector      ioutils.ShardSelector
-	nl                 executors.NodeLookup
-	ic                 executors.ExecutionContext
-	executionEnvClient pluginscore.ExecutionEnvClient
+	store           *storage.DataStore
+	tr              interfaces.TaskReader
+	md              interfaces.NodeExecutionMetadata
+	EventRecorder   interfaces.EventRecorder
+	inputs          io.InputReader
+	node            v1alpha1.ExecutableNode
+	nodeStatus      v1alpha1.ExecutableNodeStatus
+	nsm             *nodeStateManager
+	enqueueOwner    func() error
+	rawOutputPrefix storage.DataReference
+	rawOutputSuffix []string
+	shardSelector   ioutils.ShardSelector
+	nl              executors.NodeLookup
+	ic              executors.ExecutionContext
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -218,16 +216,10 @@ func (e nodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadat
 	return e.md
 }
 
-// GetExecutionEnvClient returns the execution environment client.
-func (e nodeExecContext) GetExecutionEnvClient() pluginscore.ExecutionEnvClient {
-	return e.executionEnvClient
-}
-
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
-	TaskEventRecorder events.TaskEventRecorder, NodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
-	enqueueOwner func() error, rawOutputPrefix storage.DataReference, rawOutputSuffix []string, outputShardSelector ioutils.ShardSelector,
-	executionEnvClient pluginscore.ExecutionEnvClient) *nodeExecContext {
+	taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
+	enqueueOwner func() error, rawOutputPrefix storage.DataReference, rawOutputSuffix []string, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
 	md := nodeExecMetadata{
 		Meta: execContext,
@@ -258,18 +250,17 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		nodeStatus: nodeStatus,
 		inputs:     inputs,
 		EventRecorder: &EventRecorder{
-			TaskEventRecorder: TaskEventRecorder,
-			NodeEventRecorder: NodeEventRecorder,
+			TaskEventRecorder: taskEventRecorder,
+			NodeEventRecorder: nodeEventRecorder,
 		},
-		tr:                 tr,
-		nsm:                nsm,
-		enqueueOwner:       enqueueOwner,
-		rawOutputPrefix:    rawOutputPrefix,
-		rawOutputSuffix:    rawOutputSuffix,
-		shardSelector:      outputShardSelector,
-		nl:                 nl,
-		ic:                 execContext,
-		executionEnvClient: executionEnvClient,
+		tr:              tr,
+		nsm:             nsm,
+		enqueueOwner:    enqueueOwner,
+		rawOutputPrefix: rawOutputPrefix,
+		rawOutputSuffix: rawOutputSuffix,
+		shardSelector:   outputShardSelector,
+		nl:              nl,
+		ic:              execContext,
 	}
 }
 
@@ -410,6 +401,5 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		rawOutputPrefix,
 		rawOutputSuffix,
 		c.shardSelector,
-		c.executionEnvClient,
 	), nil
 }

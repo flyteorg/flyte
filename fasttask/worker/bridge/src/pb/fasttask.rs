@@ -182,6 +182,12 @@ pub struct FastTaskEnvironmentSpec {
     /// The number of replicas to initialize for this environment.
     #[prost(int32, tag = "5")]
     pub replica_count: i32,
+    /// The minimum number of replicas that should be maintained for this environment.
+    #[prost(message, optional, tag = "7")]
+    pub min_replica_count: ::core::option::Option<i32>,
+    /// the ttl for auto-scaled workers that exceed the min_replicas count
+    #[prost(message, optional, tag = "8")]
+    pub scaledown_ttl_seconds: ::core::option::Option<i32>,
     /// The criteria to determine how this environment should be deleted.
     #[prost(oneof = "fast_task_environment_spec::TerminationCriteria", tags = "6")]
     pub termination_criteria:

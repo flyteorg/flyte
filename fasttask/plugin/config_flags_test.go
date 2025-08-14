@@ -130,11 +130,39 @@ func TestConfig_SetFlags(t *testing.T) {
 	t.Run("Test_default-ttl", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.DefaultTTL.String()
+			testValue := defaultConfig.DefaultEnvironmentTTL.String()
 
 			cmdFlags.Set("default-ttl", testValue)
 			if vString, err := cmdFlags.GetString("default-ttl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultTTL)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultEnvironmentTTL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-worker-ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultWorkerTTL.String()
+
+			cmdFlags.Set("default-worker-ttl", testValue)
+			if vString, err := cmdFlags.GetString("default-worker-ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultWorkerTTL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_orphaned-worker-ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.OrphanedWorkerTTL.String()
+
+			cmdFlags.Set("orphaned-worker-ttl", testValue)
+			if vString, err := cmdFlags.GetString("orphaned-worker-ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.OrphanedWorkerTTL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -169,28 +197,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_env-gc-interval", func(t *testing.T) {
+	t.Run("Test_env-scale-down-interval", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.EnvGCInterval.String()
+			testValue := defaultConfig.EnvScaleDownInterval.String()
 
-			cmdFlags.Set("env-gc-interval", testValue)
-			if vString, err := cmdFlags.GetString("env-gc-interval"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EnvGCInterval)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_env-repair-interval", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.EnvRepairInterval.String()
-
-			cmdFlags.Set("env-repair-interval", testValue)
-			if vString, err := cmdFlags.GetString("env-repair-interval"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EnvRepairInterval)
+			cmdFlags.Set("env-scale-down-interval", testValue)
+			if vString, err := cmdFlags.GetString("env-scale-down-interval"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EnvScaleDownInterval)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -401,6 +415,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("task-status-buffer-size", testValue)
 			if vInt, err := cmdFlags.GetInt("task-status-buffer-size"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.TaskStatusBufferSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_scaling-buffer-size", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("scaling-buffer-size", testValue)
+			if vInt, err := cmdFlags.GetInt("scaling-buffer-size"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ScalingBufferSize)
 
 			} else {
 				assert.FailNow(t, err.Error())
