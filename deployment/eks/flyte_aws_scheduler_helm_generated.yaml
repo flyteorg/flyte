@@ -413,7 +413,7 @@ data:
     datacatalog:
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s
-      metrics-scope: datacatalog
+      metrics-scope: flyte
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
   storage.yaml: | 
@@ -836,14 +836,13 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: http
-    port: 88
-    protocol: TCP
-    targetPort: 8088
-  - name: grpc
-    port: 89
-    protocol: TCP
-    targetPort: 8089
+    - name: http-metrics
+      protocol: TCP
+      port: 10254
+    - name: grpc
+      port: 89
+      protocol: TCP
+      targetPort: 8089
   selector: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -1206,7 +1205,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "a296db3de9a904e87ff0f51ab5ac2f025193cdfb92ea5621af5d46a70699ac9"
+        configChecksum: "43fd7fbb0370b3be922e40062b2903cb185d2436b4507c4e357a7c18dee71a1"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
