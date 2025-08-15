@@ -161,9 +161,9 @@ replace (
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
-	k8s.io/api => k8s.io/api v0.28.2
-	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
-	k8s.io/client-go => k8s.io/client-go v0.28.2
+	k8s.io/api => k8s.io/api v0.28.15
+	k8s.io/apimachinery => k8s.io/apimachinery v0.28.15
+	k8s.io/client-go => k8s.io/client-go v0.28.15
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.60.1
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
