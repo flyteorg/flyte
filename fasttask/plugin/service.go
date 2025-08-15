@@ -500,7 +500,7 @@ func (f *fastTaskServiceImpl) OfferTaskToEnvironment(ctx context.Context, execID
 	}
 
 	if worker == nil {
-		f.metrics.taskNoWorkersAvailable.Inc()
+		f.metrics.taskNoCapacityAvailable.Inc()
 		return nil, noCapacityAvailableError
 	}
 
