@@ -68,6 +68,7 @@ func (h *PodHandler) GetMutatingWebhook(namespace string, caBytes []byte, cfg *c
 			},
 		},
 		Rules:                   getPodAdmissionRules(),
+		TimeoutSeconds:          &cfg.WebhookTimeout,
 		FailurePolicy:           &admissionRegistrationFailurePolicy,
 		SideEffects:             &admissionRegistrationSideEffects,
 		AdmissionReviewVersions: admissionRegistrationVersions,

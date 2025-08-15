@@ -93,6 +93,7 @@ var (
 		ImageBuilderConfig: ImageBuilderConfig{
 			ExcludedContainerNames: []string{EmbeddedSecretsFileMountInitContainerName},
 		},
+		WebhookTimeout: 30, // default timeout for webhook calls in seconds
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
@@ -158,6 +159,7 @@ type Config struct {
 
 	// Ignore PFlag for Image Builder
 	ImageBuilderConfig ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
+	WebhookTimeout     int32              `json:"webhookTimeout" pflag:",Timeout for webhook calls in seconds. Defaults to 30 seconds."`
 }
 
 //go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType

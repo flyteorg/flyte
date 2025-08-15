@@ -365,4 +365,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_webhookTimeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("webhookTimeout", testValue)
+			if vInt32, err := cmdFlags.GetInt32("webhookTimeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.WebhookTimeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

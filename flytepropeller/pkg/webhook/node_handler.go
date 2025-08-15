@@ -62,6 +62,7 @@ func (h *NodeHandler) GetMutatingWebhook(namespace string, caBytes []byte, cfg *
 			},
 		},
 		Rules:                   getNodeAdmissionRules(),
+		TimeoutSeconds:          &cfg.WebhookTimeout,
 		FailurePolicy:           &admissionRegistrationFailurePolicy,
 		SideEffects:             &admissionRegistrationSideEffects,
 		AdmissionReviewVersions: admissionRegistrationVersions,
