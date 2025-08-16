@@ -50,11 +50,12 @@ func (cfg Config) MustOutputFormat() printer.OutputFormat {
 // GetConfig will return the config
 func GetConfig() *Config {
 	r := section.GetConfig().(*Config)
-	if taskSection.GetConfig().(*TaskConfig).Project != "" {
-		r.Project = taskSection.GetConfig().(*TaskConfig).Project
+	taskCfg := taskSection.GetConfig().(*TaskConfig)
+	if r.Project == "" && taskCfg.Project != "" {
+		r.Project = taskCfg.Project
 	}
-	if taskSection.GetConfig().(*TaskConfig).Domain != "" {
-		r.Domain = taskSection.GetConfig().(*TaskConfig).Domain
+	if r.Domain == "" && taskCfg.Domain != "" {
+		r.Domain = taskCfg.Domain
 	}
 	return r
 }
