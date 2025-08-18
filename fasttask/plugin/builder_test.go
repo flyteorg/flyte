@@ -10,11 +10,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/unionai/flyte/fasttask/plugin/interfaces"
+	"github.com/unionai/flyte/fasttask/plugin/pb"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 
+	flytestdlibConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/mock"
@@ -526,6 +529,18 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 	}
 }
 
+// withConfigOverride saves the current config, runs the provided function, and restores the config after
+func withConfigOverride(t *testing.T, fn func()) {
+	if fn == nil {
+		return
+	}
+	original := *GetConfig()
+	t.Cleanup(func() {
+		*GetConfig() = original
+	})
+	fn()
+}
+
 func TestAddObjectMetadata(t *testing.T) {
 	ctx := context.Background()
 
@@ -581,4 +596,477 @@ func TestAddObjectMetadata(t *testing.T) {
 	assert.Equal(t, "test-namespace", spec.GetNamespace())
 	assert.Len(t, spec.GetOwnerReferences(), 0)
 	assert.Len(t, spec.GetFinalizers(), 0)
+}
+
+func TestScaleDown(t *testing.T) {
+	ctx := context.Background()
+
+	podTemplateSpec := &v1.PodTemplateSpec{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "test-namespace",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{{Name: "test"}},
+		},
+	}
+	podTemplateSpecBytes, err := json.Marshal(podTemplateSpec)
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name                   string
+		setupConfig            func()
+		setupEnv               func() *environmentImpl
+		expectedDeletedWorkers []string
+		expectedEnvDeleted     bool
+		expectedDeletePodCalls int
+	}{
+		{
+			name: "Delete expired environment based on lastAccessedAt",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 100 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix() - 200,
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 100,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				worker := &workerImpl{
+					id:             "worker-1",
+					lastAccessedAt: time.Now().Unix() - 150,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+				env.workers.Store("worker-1", worker)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"worker-1"},
+			expectedEnvDeleted:     true,
+			expectedDeletePodCalls: 1,
+		},
+		{
+			name: "Delete orphaned workers beyond TTL",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    2,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Create orphaned workers
+				orphanedWorker1 := &workerImpl{
+					id:             "orphaned-1",
+					lastAccessedAt: time.Now().Unix() - 40, // Beyond 30s TTL
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				orphanedWorker2 := &workerImpl{
+					id:             "orphaned-2",
+					lastAccessedAt: time.Now().Unix() - 20, // Within 30s TTL
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				healthyWorker := &workerImpl{
+					id:             "healthy-1",
+					lastAccessedAt: time.Now().Unix() - 10,
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("orphaned-1", orphanedWorker1)
+				env.workers.Store("orphaned-2", orphanedWorker2)
+				env.workers.Store("healthy-1", healthyWorker)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"orphaned-1"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 1,
+		},
+		{
+			name: "Delete expired workers but maintain minimum replicas",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 300 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    2, // Minimum 2 replicas
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 300,
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Create 3 healthy workers, 2 expired
+				worker1 := &workerImpl{
+					id:             "worker-1",
+					lastAccessedAt: time.Now().Unix() - 70, // Expired
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+				worker2 := &workerImpl{
+					id:             "worker-2",
+					lastAccessedAt: time.Now().Unix() - 65, // Expired
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+				worker3 := &workerImpl{
+					id:             "worker-3",
+					lastAccessedAt: time.Now().Unix() - 10, // Not expired
+					state:          interfaces.HEALTHY,
+					lock:           sync.RWMutex{},
+				}
+
+				env.workers.Store("worker-1", worker1)
+				env.workers.Store("worker-2", worker2)
+				env.workers.Store("worker-3", worker3)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{"worker-1"},
+			expectedEnvDeleted:     false,
+			expectedDeletePodCalls: 1,
+		},
+		{
+			name: "Environment with only orphaned workers uses lastAccessedAt for TTL check",
+			setupConfig: func() {
+				GetConfig().OrphanedWorkerTTL = flytestdlibConfig.Duration{Duration: 30 * time.Second}
+				GetConfig().DefaultWorkerTTL = flytestdlibConfig.Duration{Duration: 60 * time.Second}
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 100 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix() - 200, // Created 200s ago
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 100, // 100s TTL
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Create only orphaned workers with recent activity
+				orphanedWorker := &workerImpl{
+					id:             "orphaned-1",
+					lastAccessedAt: time.Now().Unix() - 10, // Recently accessed
+					state:          interfaces.ORPHANED,
+					lock:           sync.RWMutex{},
+				}
+				env.workers.Store("orphaned-1", orphanedWorker)
+
+				return env
+			},
+			expectedDeletedWorkers: []string{},
+			expectedEnvDeleted:     false, // Should NOT delete because worker was recently accessed
+			expectedDeletePodCalls: 0,
+		},
+		{
+			name: "Empty environment uses createdAt for TTL check",
+			setupConfig: func() {
+				GetConfig().DefaultEnvironmentTTL = flytestdlibConfig.Duration{Duration: 100 * time.Second}
+			},
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix() - 150, // Created 150s ago
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
+							TtlSeconds: 100, // 100s TTL
+						},
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				return env
+			},
+			expectedDeletedWorkers: []string{},
+			expectedEnvDeleted:     true, // Should delete because createdAt exceeds TTL
+			expectedDeletePodCalls: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			withConfigOverride(t, tt.setupConfig)
+
+			env := tt.setupEnv()
+
+			kubeClient := &kubeClient{}
+			mockKubeClient := &pluginsCoreMock.KubeClient{}
+			mockKubeClient.OnGetClient().Return(kubeClient)
+
+			store := newEnvironmentStore()
+			store.GetOrCreate(env.EnvID().String(), env)
+
+			scope := promutils.NewTestScope()
+			builder := &environmentBuilderImpl{
+				kubeClient: mockKubeClient,
+				store:      store,
+				metrics:    newBuilderMetrics(scope),
+			}
+
+			err := builder.scaleDown(ctx, env)
+			assert.NoError(t, err)
+
+			assert.Equal(t, tt.expectedDeletePodCalls, kubeClient.deleteCalls)
+
+			if tt.expectedEnvDeleted {
+				assert.Nil(t, store.Get(env.EnvID().String()), "Environment should be deleted from store")
+			} else {
+				assert.NotNil(t, store.Get(env.EnvID().String()), "Environment should remain in store")
+
+				for _, workerID := range tt.expectedDeletedWorkers {
+					_, exists := env.workers.Load(workerID)
+					assert.False(t, exists, "Worker %s should be deleted", workerID)
+				}
+			}
+		})
+	}
+}
+
+func TestScaleUp(t *testing.T) {
+	ctx := context.Background()
+
+	podTemplateSpec := &v1.PodTemplateSpec{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "test-namespace",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{{Name: "test"}},
+		},
+	}
+	podTemplateSpecBytes, _ := json.Marshal(podTemplateSpec)
+
+	tests := []struct {
+		name                   string
+		setupEnv               func() *environmentImpl
+		expectedCreatePodCalls int
+		expectedWorkerCount    int
+	}{
+		{
+			name: "Scale up to minimum replicas",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    3, // Want 3 replicas
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Start with 1 worker
+				worker := &workerImpl{
+					id:    "worker-1",
+					state: interfaces.HEALTHY,
+					lock:  sync.RWMutex{},
+				}
+				env.workers.Store("worker-1", worker)
+
+				return env
+			},
+			expectedCreatePodCalls: 2,
+			expectedWorkerCount:    3,
+		},
+		{
+			name: "Already at desired replica count",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    2,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Already have 2 workers
+				worker1 := &workerImpl{
+					id:    "worker-1",
+					state: interfaces.HEALTHY,
+					lock:  sync.RWMutex{},
+				}
+				worker2 := &workerImpl{
+					id:    "worker-2",
+					state: interfaces.HEALTHY,
+					lock:  sync.RWMutex{},
+				}
+				env.workers.Store("worker-1", worker1)
+				env.workers.Store("worker-2", worker2)
+
+				return env
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    2,
+		},
+		{
+			name: "Skip scale up for unhealthy environment",
+			setupEnv: func() *environmentImpl {
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    3,
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.TOMBSTONED,
+					workers: &sync.Map{},
+				}
+
+				return env
+			},
+			expectedCreatePodCalls: 0,
+			expectedWorkerCount:    0,
+		},
+		{
+			name: "Scale up by one when between min and max",
+			setupEnv: func() *environmentImpl {
+				minReplicas := int32(2)
+				env := &environmentImpl{
+					createdAt: time.Now().Unix(),
+					envID: interfaces.ExecutionEnvID{
+						Name:    "test-env",
+						Project: "test-project",
+						Domain:  "test-domain",
+					},
+					fastTaskEnvironmentSpec: &pb.FastTaskEnvironmentSpec{
+						PodTemplateSpec: podTemplateSpecBytes,
+						ReplicaCount:    5,                                        // Max replicas
+						MinReplicaCount: &wrappers.Int32Value{Value: minReplicas}, // Min replicas
+					},
+					lock:    sync.RWMutex{},
+					state:   interfaces.HEALTHY,
+					workers: &sync.Map{},
+				}
+
+				// Have 3 workers (above min of 2, below max of 5)
+				for i := 1; i <= 3; i++ {
+					worker := &workerImpl{
+						id:    fmt.Sprintf("worker-%d", i),
+						state: interfaces.HEALTHY,
+						lock:  sync.RWMutex{},
+					}
+					env.workers.Store(worker.id, worker)
+				}
+
+				return env
+			},
+			expectedCreatePodCalls: 1,
+			expectedWorkerCount:    4,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			env := tt.setupEnv()
+
+			kubeClient := &kubeClient{}
+			mockKubeClient := &pluginsCoreMock.KubeClient{}
+			mockKubeClient.OnGetClient().Return(kubeClient)
+
+			store := newEnvironmentStore()
+			store.GetOrCreate(env.EnvID().String(), env)
+
+			scope := promutils.NewTestScope()
+			builder := &environmentBuilderImpl{
+				kubeClient: mockKubeClient,
+				store:      store,
+				metrics:    newBuilderMetrics(scope),
+				randSource: rand.New(rand.NewSource(12345)),
+			}
+
+			err := builder.scaleUp(ctx, env)
+			assert.NoError(t, err)
+
+			assert.Equal(t, tt.expectedCreatePodCalls, kubeClient.createCalls)
+
+			workerCount := 0
+			env.workers.Range(func(key, value interface{}) bool {
+				workerCount++
+				return true
+			})
+			assert.Equal(t, tt.expectedWorkerCount, workerCount)
+		})
+	}
 }

@@ -543,6 +543,10 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 	workerCount := 0
 	env.RangeWorkers(func(workerID string, worker interfaces.Worker) bool {
 		workerLastAccessedAt := worker.LastAccessedAt()
+		if workerLastAccessedAt > lastAccessedAt {
+			lastAccessedAt = workerLastAccessedAt
+		}
+
 		if worker.State() == interfaces.ORPHANED {
 			if float64(now-workerLastAccessedAt) > orphanedTTL {
 				orphanedWorkers = append(orphanedWorkers, worker.ID())
@@ -551,10 +555,6 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 			if float64(now-workerLastAccessedAt) > workerTTL {
 				// expired will only get scaled down if we have more than the minimum number of replicas
 				expiredWorkers = append(expiredWorkers, worker.ID())
-			}
-
-			if workerLastAccessedAt > lastAccessedAt {
-				lastAccessedAt = workerLastAccessedAt
 			}
 		}
 
@@ -591,8 +591,8 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 		if err != nil && !k8serrors.IsNotFound(err) {
 			logger.Warnf(ctx, "failed to gc orphaned pod '%s' for environment '%s' [%v]", worker, env.EnvID().String(), err)
 		} else {
-			workerCount--
 			env.DeleteWorker(worker)
+			workerCount--
 		}
 	}
 
@@ -612,8 +612,8 @@ func (e *environmentBuilderImpl) scaleDown(ctx context.Context, env interfaces.E
 		if err != nil && !k8serrors.IsNotFound(err) {
 			logger.Warnf(ctx, "failed to gc pod '%s' for environment '%s' [%v]", worker, env.EnvID().String(), err)
 		} else {
-			workerCount--
 			env.DeleteWorker(worker)
+			workerCount--
 		}
 	}
 
