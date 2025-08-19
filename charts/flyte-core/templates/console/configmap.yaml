@@ -1,9 +1,0 @@
-{{- if .Values.flyteconsole.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: flyte-console-config
-  namespace: {{ template "flyte.namespace" . }}
-  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
-data: {{ toYaml .Values.configmap.console | nindent 2 }}
-{{- end }}

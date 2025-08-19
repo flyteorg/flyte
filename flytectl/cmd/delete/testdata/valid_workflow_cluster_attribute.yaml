@@ -1,6 +1,0 @@
-Domain: development
-Project: flytesnacks
-Workflow: core.control_flow.merge_sort.merge_sort
-attributes:
-  "foo": "bar"
-  "buzz": "lightyear"

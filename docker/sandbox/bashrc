@@ -1,8 +1,0 @@
-# Friendlier prompt
-export PS1="\e[0;35m\u@flyte-sandbox \w> \e[m"
-
-# Useful aliases
-alias k="kubectl"
-alias kf="kubectl -n flyte"
-alias l="ls -lthra"
-alias f="flytectl"

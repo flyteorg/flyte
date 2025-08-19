@@ -1,4 +1,0 @@
-domain: development
-project: flytesnacks
-workflow: core.control_flow.merge_sort.merge_sort
-value: foo
