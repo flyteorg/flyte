@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-0",
+    "namespace": "development",
+    "command": [
+      "unionai-actor-tester", 
+      "RUN_POOL=true",
+      "a0",
+      "--inputs", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/inputs.pb",
+      "--outputs-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "--version", "904a87c5b877afff041d3ff38e75b362",
+      "--raw-data-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-0",
+      "--checkpoint-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-0/_flytecheckpoints",
+      "--prev-checkpoint", "",
+      "--run-name", "{{.runName}}",
+      "--name", "{{.actionName}}",
+      "--image-cache", "H4sIAAAAAAAC/wXB0QqDIBQA0H+571tKmuQPbBAE9QPjZuok65bOh4j+fedcEFb09hOJlrKDvqBf0rvLJ73WkU3xKHKwZvSgwX9NegaqyhZow/CgnCsXz5/Vs5wYt5zV3NXGoRK8nRkqpaSQ2DYN3PcfUD/ec2gAAAA=",
+      "--tgz", "cmd/testdata/data/testproject/development/SBFIPRNYO6X76BA5H7ZY45NTMI======/fast5d5a40b1e9323acc394b96feb9aa34cf.tar.gz",
+      "--dest", ".",
+      "--resolver", "flyte._internal.resolvers.default.DefaultTaskResolver",
+      "mod", "examples.reuse.reusable", "instance", "square"
+    ],
+    "env_vars": {
+      "FLYTE_INTERNAL_TASK_DOMAIN": "development",
+      "FLYTE_INTERNAL_TASK_PROJECT": "testproject",
+      "_U_ORG_NAME": "testorg",
+      "_U_RUN_BASE": "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "ACTION_NAME": "a0",
+      "RUN_NAME": "run-1"
+    }
+  },
+  {
+    "task_id": "rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-1",
+    "namespace": "development",
+    "command": [
+      "unionai-actor-tester",
+      "RUN_POOL=true", 
+      "a1",
+      "--inputs", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/inputs.pb",
+      "--outputs-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "--version", "904a87c5b877afff041d3ff38e75b362",
+      "--raw-data-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-1",
+      "--checkpoint-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-1/_flytecheckpoints",
+      "--prev-checkpoint", "",
+      "--run-name", "{{.runName}}",
+      "--name", "{{.actionName}}",
+      "--image-cache", "H4sIAAAAAAAC/wXB0QqDIBQA0H+571tKmuQPbBAE9QPjZuok65bOh4j+fedcEFb09hOJlrKDvqBf0rvLJ73WkU3xKHKwZvSgwX9NegaqyhZow/CgnCsXz5/Vs5wYt5zV3NXGoRK8nRkqpaSQ2DYN3PcfUD/ec2gAAAA=",
+      "--tgz", "cmd/testdata/data/testproject/development/SBFIPRNYO6X76BA5H7ZY45NTMI======/fast5d5a40b1e9323acc394b96feb9aa34cf.tar.gz",
+      "--dest", ".",
+      "--resolver", "flyte._internal.resolvers.default.DefaultTaskResolver",
+      "mod", "examples.reuse.reusable", "instance", "cube"
+    ],
+    "env_vars": {
+      "FLYTE_INTERNAL_TASK_DOMAIN": "development",
+      "FLYTE_INTERNAL_TASK_PROJECT": "testproject", 
+      "_U_ORG_NAME": "testorg",
+      "_U_RUN_BASE": "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "ACTION_NAME": "a1",
+      "RUN_NAME": "run-2"
+    }
+  },
+  {
+    "task_id": "rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-2",
+    "namespace": "production",
+    "command": [
+      "unionai-actor-tester",
+      "RUN_POOL=false",
+      "a2", 
+      "--inputs", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/inputs.pb",
+      "--outputs-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "--version", "904a87c5b877afff041d3ff38e75b362",
+      "--raw-data-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-2",
+      "--checkpoint-path", "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1/di/rcf7sw8frpsbz7gcmk9v-bswd03zvzi8892d19tyoab8eq-2/_flytecheckpoints",
+      "--prev-checkpoint", "",
+      "--run-name", "{{.runName}}",
+      "--name", "{{.actionName}}",
+      "--image-cache", "H4sIAAAAAAAC/wXB0QqDIBQA0H+571tKmuQPbBAE9QPjZuok65bOh4j+fedcEFb09hOJlrKDvqBf0rvLJ73WkU3xKHKwZvSgwX9NegaqyhZow/CgnCsXz5/Vs5wYt5zV3NXGoRK8nRkqpaSQ2DYN3PcfUD/ec2gAAAA=",
+      "--tgz", "cmd/testdata/data/testproject/development/SBFIPRNYO6X76BA5H7ZY45NTMI======/fast5d5a40b1e9323acc394b96feb9aa34cf.tar.gz",
+      "--dest", ".",
+      "--resolver", "flyte._internal.resolvers.default.DefaultTaskResolver",
+      "mod", "examples.reuse.reusable", "instance", "multiply"
+    ],
+    "env_vars": {
+      "FLYTE_INTERNAL_TASK_DOMAIN": "production",
+      "FLYTE_INTERNAL_TASK_PROJECT": "testproject",
+      "_U_ORG_NAME": "testorg", 
+      "_U_RUN_BASE": "cmd/testdata/data/metadata/v2/testorg/testproject/development/rcf7sw8frpsbz7gcmk9v/bswd03zvzi8892d19tyoab8eq/1",
+      "ACTION_NAME": "a2",
+      "RUN_NAME": "run-3"
+    }
+  }
+]

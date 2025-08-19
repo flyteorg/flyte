@@ -4,7 +4,8 @@ use pyo3::types::PyDict;
 use pyo3_async_runtimes::TaskLocals;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use tracing::{debug, info, instrument};
+use tracing::{debug, info};
+use tracing_attributes::instrument;
 use unionai_actor_bridge::common::Task;
 
 /// Temporary structure to hold the task and its associated code bundle.
@@ -163,18 +164,18 @@ impl ActorEnvironment {
     }
 
     /// Download and load the task
+    #[instrument(skip(self), fields(tgz))]
     pub async fn download_tgz(
         &self,
         dest: &str,
         version: &str,
         tgz: &str,
     ) -> Result<Py<PyAny>, PyErr> {
-        debug!("[Actor core] Downloading code bundle...");
+        debug!("Downloading code bundle");
         let fut = Python::with_gil(|py| {
             let rusty = py.import("flyte._internal.runtime.rusty")?;
             pyo3_async_runtimes::into_future_with_locals(
                 &self.locals,
-                //pyo3_async_runtimes::tokio::into_future(
                 rusty.call_method1(
                     "download_tgz",
                     (
@@ -185,17 +186,18 @@ impl ActorEnvironment {
                 )?,
             )
         })?;
-        debug!("[Actor core] Code bundle download initiated");
         let v = fut.await?;
 
         // Store the results
         Ok(Python::with_gil(|py| {
             let code_bundle: Py<PyAny> = v.extract(py).unwrap();
-            debug!("[Actor core] Code bundle downloaded successfully");
+            debug!("Code bundle downloaded successfully");
             code_bundle.clone_ref(py)
         }))
     }
 
+    // Move instrument to past the guard.1
+    #[instrument(skip(self, task), fields(tgz))]
     async fn get_task_and_bundle_for_tgz(
         &self,
         tgz: &str,
@@ -207,9 +209,10 @@ impl ActorEnvironment {
             ));
         }
 
-        if self.tgz_tasks.lock().await.is_none() {
+        let mut guard = self.tgz_tasks.lock().await;
+        if guard.is_none() {
             // Download the TGZ tasks if not already set
-            debug!("[Actor core] TGZ tasks not set, downloading...");
+            debug!("TGZ tasks not set, downloading");
             let code_bundle = self
                 .download_tgz(
                     task.dest.clone().unwrap().as_str(),
@@ -221,13 +224,13 @@ impl ActorEnvironment {
                 tgz: tgz.to_string(),
                 code_bundle,
             });
-            self.tgz_tasks.lock().await.replace(tgz_tasks);
-            debug!("[Actor core] Code bundle downloaded and TGZ tasks initialized");
+            guard.replace(tgz_tasks);
+            debug!("TGZ tasks initialized");
         }
 
-        // check if tgz_tasks if the task has matching tgz value, if not return error
-        if let Some(tgz_tasks) = self.tgz_tasks.lock().await.as_ref() {
-            if tgz != tgz_tasks.tgz_bundle.tgz.as_str() {
+        if let Some(tgz_task) = guard.as_ref() {
+            // check if tgz_tasks if the task has matching tgz value, if not return error
+            if tgz != tgz_task.tgz_bundle.tgz.as_str() {
                 return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
                     "Task TGZ does not match the configured TGZ tasks",
                 ));
@@ -237,7 +240,7 @@ impl ActorEnvironment {
                 resolver: task.resolver.clone().unwrap_or_default(),
                 resolver_args: task.resolver_args.clone(),
             };
-            return tgz_tasks.get_or_load_task(&key).await;
+            return tgz_task.get_or_load_task(&key).await;
         }
 
         Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
@@ -273,15 +276,12 @@ impl ActorEnvironment {
         ))
     }
 
-    #[instrument(skip(self, task), level = "info")]
+    #[instrument(skip(self, task), fields(task.id = %task.unique_task_id), level = "info")]
     pub async fn run(&self, task: Task) -> Result<Py<PyAny>, PyErr> {
         let args = TaskArgs::from_command(&task.cmd)
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e))?;
 
         let task_and_bundle = self.load_task(&args).await?;
-
-        info!("[Actor core] Running task: {:?}", task.cmd);
-        debug!("[Actor core] Environment args: {:?}", task.env_vars);
 
         let env_vars = task.env_vars.unwrap_or_default();
         let run_name = env_vars.get("RUN_NAME");
@@ -290,6 +290,15 @@ impl ActorEnvironment {
         let org = env_vars.get("_U_ORG_NAME");
         let project = env_vars.get("FLYTE_INTERNAL_TASK_PROJECT");
         let domain = env_vars.get("FLYTE_INTERNAL_TASK_DOMAIN");
+
+        debug!(
+            run_name = ?run_name,
+            action_name = ?action_name,
+            org = ?org,
+            project = ?project,
+            domain = ?domain,
+            "Running task with environment context"
+        );
 
         let fut = Python::with_gil(|py| {
             let rusty = py.import("flyte._internal.runtime.rusty")?;
@@ -337,21 +346,24 @@ impl ActorEnvironment {
                 rusty.call_method("run_task", (), Some(&kwargs))?,
             )
         })?;
-        debug!("[Actor core] Task invoked asynchronously");
+        debug!("Task invoked asynchronously");
 
+        // TODO Support for task cancellation, using tokio::select
         let result = fut.await?;
 
-        info!("[Actor core] Task completed");
+        info!("Task completed successfully");
         Ok(result)
     }
 }
 
 /// Creates a controller for task execution
+#[instrument(fields(endpoint = ?endpoint, insecure))]
 pub async fn create_controller(
     endpoint: Option<String>,
     insecure: bool,
     api_key: Option<String>,
 ) -> Result<Py<PyAny>, PyErr> {
+    debug!("Creating controller");
     let fut = Python::with_gil(|py| {
         let rusty = py.import("flyte._internal.runtime.rusty")?;
         let kwargs = PyDict::new(py);
@@ -366,7 +378,7 @@ pub async fn create_controller(
     })?;
 
     let controller = fut.await?;
-    info!("[Actor core] Controller created");
+    info!("Controller created successfully");
 
     Ok(controller)
 }

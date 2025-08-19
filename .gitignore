@@ -43,3 +43,5 @@ flyteidl/clients/go/admin/pkce/*.html
 !flyteidl/clients/go/admin/pkce/callback.html
 
 .go-version
+.claude/
+

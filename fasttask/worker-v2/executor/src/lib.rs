@@ -6,9 +6,6 @@ mod tester;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use std::env;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{self, fmt};
 use unionai_actor_bridge::common::Task;
 
 #[pyfunction]
@@ -42,16 +39,6 @@ fn executor_py(py: Python) -> PyResult<Bound<PyAny>> {
         None => None, // Default to None if not provided
     };
 
-    tracing_subscriber::registry()
-        .with(
-            fmt::layer()
-                .with_timer(fmt::time::UtcTime::rfc_3339())
-                .with_span_events(fmt::format::FmtSpan::FULL)
-                .with_ansi(false)
-                .with_thread_names(true),
-        )
-        .init();
-
     let executor_args = executor::ExecutorArgs {
         executor_registration_addr,
         id,
@@ -59,18 +46,23 @@ fn executor_py(py: Python) -> PyResult<Bound<PyAny>> {
     };
 
     pyo3_async_runtimes::tokio::future_into_py(py, {
+        let (_temp_dir, _file_guard, _stdout_guard) =
+            unionai_actor_bridge::init_tracing_with_prefix("executor").map_err(|e| {
+                PyValueError::new_err(format!("Failed to initialize tracing: {}", e))
+            })?;
         // Create a new Python GIL token inside the async block
         let locals = pyo3_async_runtimes::tokio::get_current_locals(py)?;
 
-        executor::run_worker_pool(executor_args, locals)
+        executor::run_worker_pool(executor_args, locals, _temp_dir, _file_guard, _stdout_guard)
     })
 }
 
 #[pyfunction]
 fn rust_sleep(py: Python) -> PyResult<Bound<PyAny>> {
-    println!("Sleeping ...");
+    tracing::debug!("Starting sleep");
     pyo3_async_runtimes::tokio::future_into_py(py, async {
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        tracing::debug!("Sleep completed");
         Ok(())
     })
 }
@@ -107,6 +99,7 @@ fn tester_py(py: Python) -> PyResult<Bound<PyAny>> {
         additional_distribution: None,
         fast_register_dir: None,
         env_vars: Some(env_vars),
+        unique_task_id: "unique_task_id".to_string(),
     };
 
     // Capture env var to run pool or single executor
@@ -117,9 +110,10 @@ fn tester_py(py: Python) -> PyResult<Bound<PyAny>> {
         "false" => false,
         _ => return Err(PyValueError::new_err("RUN_POOL must be 'true' or 'false'")),
     };
-    println!(
-        "[Actor Core] Running task with args: {:?} and run_pool: {}",
-        task.cmd, run_pool
+    tracing::info!(
+        cmd = ?task.cmd,
+        run_pool,
+        "Running task"
     );
 
     pyo3_async_runtimes::tokio::future_into_py(py, {

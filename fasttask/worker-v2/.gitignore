@@ -167,3 +167,4 @@ target
 testing/examples
 testing/fast*
 testing/*.yaml
+docker_cargo_cache/

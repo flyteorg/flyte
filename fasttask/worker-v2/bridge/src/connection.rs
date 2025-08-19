@@ -2,8 +2,10 @@ use std::future::{Future, IntoFuture};
 
 use anyhow::{bail, Result};
 use async_channel::{Receiver, Sender};
+use tokio_util::sync::CancellationToken;
 use tonic::Request;
-use tracing::{debug, warn};
+use tracing::{debug, info, trace, warn};
+use tracing_attributes::instrument;
 
 use crate::pb::fasttask::fast_task_client::FastTaskClient;
 use crate::pb::fasttask::{HeartbeatRequest, HeartbeatResponse};
@@ -17,6 +19,7 @@ pub trait ConnectionRuntime {
         &self,
         heartbeat_rx: Receiver<HeartbeatRequest>,
         operation_tx: Sender<HeartbeatResponse>,
+        cancellation_token: CancellationToken,
     ) -> impl Future<Output = Result<()>> + Send;
 }
 
@@ -47,33 +50,51 @@ pub struct GRPCConnectionRuntime {
 }
 
 impl ConnectionRuntime for GRPCConnectionRuntime {
+    #[instrument(skip(self, heartbeat_rx, operation_tx), fields(fasttask.url = %self.fasttask_url))]
     fn run(
         &self,
         heartbeat_rx: Receiver<HeartbeatRequest>,
         operation_tx: Sender<HeartbeatResponse>,
+        cancellation_token: CancellationToken,
     ) -> impl Future<Output = Result<()>> + Send {
         let fasttask_url = self.fasttask_url.clone();
 
         async move {
+            info!("Connecting to FastTask service");
             let mut client = FastTaskClient::connect(fasttask_url).await?;
+            info!("Connected to FastTask service");
 
             // initialize request forwarding async stream
             let outbound = async_stream::stream! {
                 loop {
-                    let heartbeat_request = match heartbeat_rx.recv().await {
-                        Ok(heartbeat_request) => heartbeat_request,
-                        Err(e) => {
-                            warn!("failed to recv interval heartbeat: {}", e);
-                            continue
+                    tokio::select! {
+                        _ = cancellation_token.cancelled() => {
+                            debug!("Context cancelled, stopping heartbeat_rx stream");
+                            break;
                         },
-                    };
-
-                    debug!("sending heartbeat request = {:?}", heartbeat_request);
-                    yield heartbeat_request;
+                        heartbeat_request = heartbeat_rx.recv() => {
+                            match heartbeat_request {
+                                Ok(heartbeat_request) => {
+                                    debug!(
+                                        worker.id = %heartbeat_request.worker_id,
+                                        queue.id = %heartbeat_request.queue_id,
+                                        task_count = heartbeat_request.task_statuses.len(),
+                                        "Sending heartbeat request"
+                                    );
+                                    yield heartbeat_request;
+                                },
+                                Err(e) => {
+                                    info!(error = %e, "Failed to receive heartbeat request");
+                                    continue
+                                },
+                            };
+                        }
+                    }
                 }
             };
 
             // gRPC call to open heartbeat stream
+            info!("Opening heartbeat stream");
             let response = client.heartbeat(Request::new(outbound)).await?;
             let mut inbound = response.into_inner();
 
@@ -81,12 +102,18 @@ impl ConnectionRuntime for GRPCConnectionRuntime {
             loop {
                 let heartbeat_response = match inbound.message().await? {
                     Some(heartbeat_response) => heartbeat_response,
-                    None => bail!("failed to receive heartbeat response"),
+                    None => bail!("Heartbeat stream closed by server"),
                 };
 
-                debug!("recv heartbeat response = {:?}", heartbeat_response);
+                trace!(
+                    task.id = %heartbeat_response.task_id,
+                    operation = heartbeat_response.operation,
+                    "Received heartbeat response"
+                );
                 operation_tx.send(heartbeat_response).await?;
+                tokio::task::yield_now().await;
             }
+            info!("Exiting connection runtime heart-beating loop");
         }
         .into_future()
     }
@@ -133,6 +160,7 @@ impl ConnectionRuntime for TestConnectionRuntime {
         &self,
         heartbeat_rx: Receiver<HeartbeatRequest>,
         operation_tx: Sender<HeartbeatResponse>,
+        cancellation_token: CancellationToken,
     ) -> impl Future<Output = Result<()>> + Send {
         let (heartbeat_tx, heartbeat_rx) = (self.heartbeat_tx.clone(), heartbeat_rx.clone());
         let (operation_tx, operation_rx) = (operation_tx.clone(), self.operation_rx.clone());
@@ -141,6 +169,10 @@ impl ConnectionRuntime for TestConnectionRuntime {
             // forward heartbeats and operations down outbound channels
             loop {
                 tokio::select! {
+                    _ = cancellation_token.cancelled() => {
+                        debug!("Context cancelled, stopping test connection runtime");
+                        break;
+                    },
                     heartbeat_recv_result = heartbeat_rx.recv() => {
                         assert!(heartbeat_recv_result.is_ok());
 
@@ -157,6 +189,7 @@ impl ConnectionRuntime for TestConnectionRuntime {
                     }
                 };
             }
+            Ok(())
         }
         .into_future()
     }

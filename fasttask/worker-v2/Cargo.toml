@@ -17,7 +17,10 @@ tokio = { version = "1.0", features = [
 ] }
 tokio-util = { version = "0.7", features = ["codec"] }
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-attributes = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "time"] }
+tracing-appender = "0.2"
+tempfile = "3.0"
 
 [profile.release]
 strip = true

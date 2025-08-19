@@ -1,0 +1,12 @@
+ARG ARCH=aarch64
+FROM quay.io/pypa/manylinux_2_28_${ARCH}
+
+# Install any extra system dependencies (beyond manylinux defaults; add yours if needed, e.g., for your Rust crate)
+RUN yum install -y --enablerepo=powertools curl pkgconfig openssl-devel gcc-c++ make libffi-devel vim
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Install Maturin using one of the available Pythons (e.g., 3.12; manylinux has 3.8–3.13+)
+RUN /opt/python/cp310-cp310/bin/pip install maturin

@@ -2,14 +2,30 @@ use futures::{SinkExt, StreamExt};
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::PyErr;
 use pyo3_async_runtimes::TaskLocals;
+use std::fs::File;
+use std::io::{self, Write};
 use std::println;
+use tempfile::TempDir;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
-use tracing::field::debug;
-use tracing::{debug, error};
+use tracing::error;
+use tracing_appender::non_blocking;
+use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{fmt, layer::SubscriberExt};
 use unionai_actor_bridge::common::Task;
+
+struct NoOpWriter;
+
+impl Write for NoOpWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        Ok(buf.len()) // Pretend we wrote everything
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
 
 pub async fn run_server_test(addr: String, task: Task) -> Result<(), PyErr> {
     let listener = TcpListener::bind(&addr).await.map_err(|e| {
@@ -55,6 +71,17 @@ async fn handle_client(stream: TcpStream, task: Task) {
     println!("Client session ended");
 }
 
+fn make_test_guards() -> (TempDir, WorkerGuard, WorkerGuard) {
+    // Create a temporary directory that will be automatically cleaned up
+    let temp_dir = TempDir::new().expect("failed to create temp dir");
+
+    let (non_blocking_writer, guard1) = non_blocking(NoOpWriter);
+    let (non_blocking_writer, guard2) = non_blocking(NoOpWriter);
+
+    // You can now use nb1 and nb2 as `MakeWriter`s in tracing_subscriber
+    (temp_dir, guard1, guard2)
+}
+
 pub async fn run_task(task: Task, run_pool: bool, locals: TaskLocals) -> Result<(), PyErr> {
     tracing_subscriber::registry()
         .with(
@@ -83,7 +110,8 @@ pub async fn run_task(task: Task, run_pool: bool, locals: TaskLocals) -> Result<
             "[Actor Core] Running worker pool with args: {:?}",
             executor_args
         );
-        crate::executor::run_worker_pool(executor_args, locals).await?;
+        let (_temp_dir, guard1, guard2) = make_test_guards();
+        crate::executor::run_worker_pool(executor_args, locals, _temp_dir, guard1, guard2).await?;
     } else {
         println!(
             "[Actor Core] Running executor with args: {:?}",

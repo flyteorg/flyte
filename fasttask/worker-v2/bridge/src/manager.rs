@@ -1,772 +1,793 @@
-use std::collections::{HashMap, HashSet};
-use std::future::{Future, IntoFuture};
-use std::hash::{DefaultHasher, Hash, Hasher};
-use std::sync::{Arc, Mutex, RwLock};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime};
 
-use anyhow::{bail, Result};
-use async_channel::{Receiver, Sender};
-use tokio::net::TcpListener;
-use tokio::process::Command;
+use anyhow::{anyhow, Result};
+use async_channel::{Receiver, Sender, TryRecvError, TrySendError};
+use bytes;
+use futures::{
+    stream::{SplitSink, SplitStream},
+    SinkExt, StreamExt,
+};
+use tokio::net::{TcpListener, TcpStream};
+use tokio::process::{Child, Command};
+
+use tokio::time::interval;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
-use tracing::warn;
+use tracing::{debug, error, info, trace, warn};
+use tracing_attributes::instrument;
 
-use crate::common::{AsyncBool, Executor, TaskContext, SUCCEEDED};
-use crate::pb::fasttask::{Capacity, ExecutionIdentifier, TaskStatus};
-use crate::task::{self};
+use crate::common::{Task, ToProstDuration, FAILED, SUCCEEDED};
+use crate::connection::{ConnectionBuilder, ConnectionRuntime};
+use crate::pb::fasttask::{
+    heartbeat_response::Operation, Capacity, ExecutionIdentifier, HeartbeatRequest,
+    HeartbeatResponse, TaskStatus,
+};
 
-pub trait TaskManager {
-    fn ack(&self, task_id: String) -> impl Future<Output = Result<()>>;
-    fn assign(
-        &self,
-        task_id: String,
-        namespace: String,
-        exec_id: Option<ExecutionIdentifier>,
-        cmd: Vec<String>,
-        env_vars: HashMap<String, String>,
-        enqueue_labels: HashMap<String, String>,
-    ) -> impl Future<Output = Result<()>>;
-    fn delete(&self, task_id: String) -> impl Future<Output = Result<()>>;
-    fn get_capacity(&self) -> Result<Capacity>;
-    fn get_runtime<'a>(&self) -> Result<impl TaskManagerRuntime + 'a>;
+#[derive(Debug, Clone)]
+struct TaskInfo {
+    task_id: String,
+    namespace: String,
+    exec_id: ExecutionIdentifier,
+    phase: i32,
+    assigned_at: SystemTime,
+    reason: Option<String>,
+    env_vars: HashMap<String, String>,
+    enqueue_labels: HashMap<String, String>,
+    last_ack_time: Option<SystemTime>,
 }
 
-#[trait_variant::make(TaskManagerRuntime: Send)]
-pub trait LocalTaskManagerRuntime {
-    async fn run(
-        &self,
-        ready: Arc<Mutex<AsyncBool>>,
-        task_status_tx: Sender<TaskStatus>,
-    ) -> Result<()>;
+impl From<&TaskInfo> for TaskStatus {
+    fn from(task_info: &TaskInfo) -> Self {
+        TaskStatus {
+            task_id: task_info.task_id.clone(),
+            namespace: task_info.namespace.clone(),
+            workflow_id: None,
+            phase: task_info.phase,
+            reason: task_info.reason.clone().unwrap_or_default(),
+            exec_id: Some(task_info.exec_id.clone()),
+            task_duration: task_info.last_ack_time.and_then(|at| {
+                at.duration_since(task_info.assigned_at)
+                    .map_or(None, |d| Some(d.to_prost()))
+            }),
+            enqueue_labels: task_info.enqueue_labels.clone(),
+        }
+    }
 }
 
-pub struct CapacityReporter {
-    capacity_trigger_tx: Sender<()>,
-    capacity_report_rx: Receiver<Capacity>,
+pub struct V2TaskManager {
+    max_parallelism: i32,
+    executor_registration_addr: String,
+    worker_id: String,
+    queue_id: String,
+    heartbeat_interval_seconds: u64,
+
+    // Task tracking
+    tasks_in_progress: Arc<Mutex<HashMap<String, TaskInfo>>>,
+
+    // Executor process and communication
+    executor_process: Option<Child>,
+    executor_stream_reader: Option<SplitStream<Framed<TcpStream, LengthDelimitedCodec>>>,
+    executor_stream_writer:
+        Option<SplitSink<Framed<TcpStream, LengthDelimitedCodec>, bytes::Bytes>>,
+
+    // Channel for task assignment
+    assignment_tx: Option<Sender<Task>>,
 }
 
-impl CapacityReporter {
+impl V2TaskManager {
     pub fn new(
-        capacity_trigger_tx: Sender<()>,
-        capacity_report_rx: Receiver<Capacity>,
-    ) -> CapacityReporter {
-        CapacityReporter {
-            capacity_trigger_tx,
-            capacity_report_rx,
+        max_parallelism: i32,
+        executor_registration_addr: &str,
+        worker_id: String,
+        queue_id: String,
+        heartbeat_interval_seconds: u64,
+    ) -> Self {
+        Self {
+            max_parallelism,
+            executor_registration_addr: executor_registration_addr.to_string(),
+            worker_id,
+            queue_id,
+            heartbeat_interval_seconds,
+            tasks_in_progress: Arc::new(Mutex::new(HashMap::new())),
+            executor_process: None,
+            executor_stream_reader: None,
+            executor_stream_writer: None,
+            assignment_tx: None,
         }
     }
 
-    pub async fn get(&self) -> Result<Capacity> {
-        self.capacity_trigger_tx.send(()).await?;
-        let result = self.capacity_report_rx.recv().await?;
-        Ok(result)
+    #[instrument(skip(self), fields(worker.id = %self.worker_id, queue.id = %self.queue_id))]
+    pub async fn start(&mut self) -> Result<()> {
+        // Start TCP listener for executor connection
+        let listener = TcpListener::bind(&self.executor_registration_addr).await?;
+        info!(addr = %self.executor_registration_addr, "TCP listener started in bridge");
+
+        // Start unionai-actor-executor process
+        let child = Command::new("unionai-actor-executor")
+            .arg("--executor-registration-addr")
+            .arg(&self.executor_registration_addr)
+            .arg("--id")
+            .arg("0")
+            .arg("--num-workers")
+            .arg(self.max_parallelism.to_string())
+            .spawn()?;
+
+        let pid = child.id();
+        info!(executor.pid = ?pid, num_workers = self.max_parallelism, "Started executor process");
+        self.executor_process = Some(child);
+
+        // Wait for executor to connect
+        // ai: remove the first log but keep track of time.
+        info!("Waiting for executor connection");
+        let (stream, addr) = listener.accept().await?;
+        info!(executor.addr = %addr, "Executor connected");
+
+        // We split the communication with the executor into a reader and writer. The writer is used
+        // to send tasks to it to run, but it may block for some reason. But even if the executor blocks,
+        // it may still be sending updates back to us, so we need a separate coroutine to be reading.
+        let framed = Framed::new(stream, LengthDelimitedCodec::new());
+        let (framed_writer, framed_reader) = framed.split();
+        self.executor_stream_reader = Some(framed_reader);
+        self.executor_stream_writer = Some(framed_writer);
+
+        Ok(())
     }
-}
 
-#[derive(Clone)]
-pub enum ExecutionStrategy {
-    SuccessStrategy,
-    TheExecutionStrategy,
-}
-
-impl ExecutionStrategy {
-    async fn execute(
-        &self,
-        task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
-        task_assignment: TaskAssignment,
-        task_status_tx: Sender<TaskStatus>,
-        task_status_report_interval_seconds: u64,
-        last_ack_grace_period_seconds: u64,
-        backlog_tx: Sender<()>,
-        backlog_rx: Receiver<()>,
-        executor_tx: Sender<Executor>,
-        executor_rx: Receiver<Executor>,
-        build_executor_tx: Sender<()>,
+    #[instrument(skip(stream_writer, assignment_rx))]
+    async fn read_and_send_assignments(
+        mut stream_writer: SplitSink<Framed<TcpStream, LengthDelimitedCodec>, bytes::Bytes>,
+        assignment_rx: Receiver<Task>,
     ) -> Result<()> {
-        // initialize task context
-        let (kill_tx, kill_rx) = async_channel::bounded(1);
-        {
-            let mut task_contexts = task_contexts.write().unwrap();
-            task_contexts.insert(
-                task_assignment.task_id.clone(),
-                TaskContext {
-                    kill_tx,
-                    last_ack_timestamp: SystemTime::now()
-                        .duration_since(UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
-                },
-            );
-        }
-
-        match self {
-            ExecutionStrategy::SuccessStrategy => {
-                task_status_tx
-                    .send(TaskStatus {
-                        task_id: task_assignment.task_id.clone(),
-                        namespace: task_assignment.namespace,
-                        exec_id: task_assignment.exec_id,
-                        phase: SUCCEEDED,
-                        reason: "reason".to_string(),
-                        task_duration: None,
-                        enqueue_labels: task_assignment.enqueue_labels,
-                        workflow_id: None,
-                    })
-                    .await?;
-
-                // wait for kill_rx on task_context
-                kill_rx.recv().await?;
+        info!("Starting task assignment handler");
+        loop {
+            match assignment_rx.recv().await {
+                Ok(task) => {
+                    let task_id = &task.unique_task_id;
+                    let serialized_task = bincode::serialize(&task)
+                        .map_err(|e| anyhow!("Failed to serialize task {}: {}", task_id, e))?;
+                    match stream_writer.send(serialized_task.into()).await {
+                        Ok(()) => trace!(task.id = %task_id, "Sent task to executor"),
+                        Err(e) => {
+                            error!(task.id = %task_id, error = %e, "Failed to send task to executor");
+                        }
+                    }
+                }
+                Err(e) => {
+                    error!(error = ?e, "Assignment channel closed");
+                    return Err(anyhow!("Assignment channel closed: {}", e));
+                }
             }
-            ExecutionStrategy::TheExecutionStrategy => {
-                task::execute(
-                    kill_rx,
-                    task_contexts.clone(),
-                    task_assignment.task_id.clone(),
-                    task_assignment.namespace,
-                    task_assignment.exec_id,
-                    task_assignment.cmd,
-                    task_assignment.env_vars,
-                    task_assignment.enqueue_labels,
-                    task_assignment.additional_distribution,
-                    task_assignment.fast_register_dir,
-                    task_status_tx,
-                    task_status_report_interval_seconds,
-                    last_ack_grace_period_seconds,
-                    backlog_tx,
-                    backlog_rx,
-                    executor_tx,
-                    executor_rx,
-                    build_executor_tx,
+        }
+    }
+
+    #[instrument(skip(self, connection_builder), fields(worker.id = %self.worker_id, queue.id = %self.queue_id
+    ))]
+    pub async fn run<T: ConnectionBuilder>(
+        &mut self,
+        connection_builder: T,
+        cancellation_token: tokio_util::sync::CancellationToken,
+    ) -> Result<()> {
+        info!("Starting main event loop");
+
+        let tasks_in_progress = Arc::clone(&self.tasks_in_progress);
+
+        // This is an unbounded channel that the heartbeat timer, and the handler for the messages coming from
+        // the executor, will add messages to. Basically both periodically, and when this bridge receives any
+        // task status changes from the executor, we should fire off a heartbeat request.
+        // But this needs to be debounced (which is done below).
+        // todo: this should probably be a Notify.
+        let (trigger_heartbeater_tx, trigger_heartbeater_rx) = async_channel::unbounded::<()>();
+
+        // Spawn task to handle executor responses
+        let mut executor_handler = {
+            let mut executor_stream_reader = self
+                .executor_stream_reader
+                .take()
+                .ok_or_else(|| anyhow!("Executor stream not available"))?;
+            let tasks_in_progress = Arc::clone(&tasks_in_progress);
+            let trigger_heartbeat_from_executor_tx = trigger_heartbeater_tx.clone();
+
+            tokio::spawn(async move {
+                Self::handle_executor_responses(
+                    &mut executor_stream_reader,
+                    tasks_in_progress,
+                    trigger_heartbeat_from_executor_tx,
                 )
-                .await?;
+                .await
+            })
+        };
+
+        // Start heartbeat and work assignment loop
+        let mut heartbeat_timer = interval(Duration::from_secs(self.heartbeat_interval_seconds));
+        let connection_runtime = connection_builder.get_runtime()?;
+
+        // These two channels related to heartbeating.
+        // This channel will be used to connect the timer to the sending of the heartbeat request.
+        let (heartbeat_tx, heartbeat_rx) = async_channel::bounded(5);
+        // This channel is used to handle heartbeat responses.
+        let (operation_tx, operation_rx) = async_channel::bounded(self.max_parallelism as usize);
+
+        // Spawn connection handler
+        let connection_cancellation_token = cancellation_token.clone();
+        let mut connection_handler = tokio::spawn(async move {
+            connection_runtime
+                .run(heartbeat_rx, operation_tx, connection_cancellation_token)
+                .await
+        });
+
+        // This channel is used when an assign operation is received, and is used to actually send the Task down the
+        // TCP stream. This channel exists because the sending of the Task to the TCP stream can be blocking.
+        let (assignment_tx, assignment_rx) = async_channel::bounded(self.max_parallelism as usize);
+        // Spawn a task to pull from the assignment channel and actually pass into the TCP stream
+        self.assignment_tx = Some(assignment_tx);
+        let stream_writer = self
+            .executor_stream_writer
+            .take()
+            .ok_or_else(|| anyhow!("Executor stream writer not available"))?;
+        let mut assignment_handler = tokio::spawn(async move {
+            Self::read_and_send_assignments(stream_writer, assignment_rx).await
+        });
+
+        let trigger_heartbeat_from_timer_tx = trigger_heartbeater_tx.clone();
+        // Main event loop
+        let loop_result = loop {
+            tokio::select! {
+                _ = heartbeat_timer.tick() => {
+                    // On timer... don't actually send the heartbeat, just notify
+                    trigger_heartbeat_from_timer_tx.send(()).await.unwrap_or_else(|e| {
+                        error!(error = %e, "Failed to send heartbeat tick");
+                    });
+                }
+                _ = trigger_heartbeater_rx.recv() => {
+                    // consume until empty as a crude debounce mechanism
+                    loop {
+                        match trigger_heartbeater_rx.try_recv() {
+                            Ok(_) => {
+                                // Process the message (in this case just a unit type)
+                                // Do whatever you need to do with each message
+                            }
+                            Err(TryRecvError::Empty) => {
+                                // Channel is empty, break out of loop
+                                trace!("Heartbeat channel is empty, breaking out of inner loop");
+                                break;
+                            }
+                            Err(TryRecvError::Closed) => {
+                                // Channel is closed, break out of loop
+                                debug!("Heartbeat channel is empty, breaking out of inner loop");
+                                break;
+                            }
+                        }
+                    }
+                    let heartbeat_request = self.create_heartbeat_request();
+                    debug!(
+                        running_tasks = heartbeat_request.capacity.as_ref().map(|c| c.execution_count).unwrap_or(0),
+                        "Sending heartbeat"
+                    );
+                    if let Err(e) = heartbeat_tx.send(heartbeat_request).await {
+                        error!(error = %e, "Failed to send heartbeat");
+                    }
+                }
+
+                // Handle HeartbeatResponse messages from the fast task service
+                Ok(operation) = operation_rx.recv() => {
+                    if let Err(e) = self.handle_operation(operation).await {
+                        warn!(error = %e, "Failed to handle operation");
+                    }
+                }
+
+                // Handle executor process exit
+                result = &mut executor_handler => {
+                    match result {
+                        Ok(Ok(())) => {
+                            warn!("Executor handler completed normally");
+                        }
+                        Ok(Err(e)) => {
+                            error!("Executor handler failed: {}", e);
+                        }
+                        Err(e) => {
+                            error!("Executor handler panicked: {}", e);
+                        }
+                    }
+                    break Err(anyhow!("Executor process failed, terminating"));
+                }
+
+                // Handle connection failures
+                result = &mut connection_handler => {
+                    match result {
+                        Ok(Ok(())) => {
+                            warn!("Connection handler completed normally");
+                        }
+                        Ok(Err(e)) => {
+                            error!("Connection handler failed: {}", e);
+                        }
+                        Err(e) => {
+                            error!("Connection handler panicked: {}", e);
+                        }
+                    }
+                    // Connection failures should be retried, but for simplicity we'll exit
+                    break Err(anyhow!("Connection failed, terminating"));
+                }
+
+                // Handle cancellation signal
+                _ = cancellation_token.cancelled() => {
+                    info!("Received cancellation signal, shutting down gracefully");
+                    break Ok(());
+                }
+
+                // Handle assignment worker failures
+                result = &mut assignment_handler => {
+                    match result {
+                        Ok(Ok(())) => {
+                            // Assignment handler should never exit as long as the process is running
+                            error!("Assignment handler exited but without error");
+                        }
+                        Ok(Err(e)) => {
+                            error!("Assignment handler failed: {}", e);
+                        }
+                        Err(e) => {
+                            error!("Assignment handler panicked: {}", e);
+                        }
+                    }
+                    // Exit for now, can revisit if we move to sidecar pattern.
+                    break Err(anyhow!("Assignment handler failed, terminating"));
+                }
+
+                // Handle child executor process errors
+                child_result = self.executor_process.as_mut().unwrap().wait() => {
+                    match child_result {
+                        Ok(status) if status.success() => {
+                            error!("Executor process exited but is not supposed to.");
+                        }
+                        Ok(status) => {
+                            error!("Executor process exited with status: {}", status);
+                        }
+                        Err(e) => {
+                            error!("Failed to wait for executor process: {}", e);
+                        }
+                    }
+                    break Err(anyhow!("Executor process terminated, exiting"));
+                }
             }
+        };
+
+        // If the loop exits with an error,
+        // abort connection handler and assignment handler and executor handler.
+        let handles = [
+            &mut executor_handler,
+            &mut connection_handler,
+            &mut assignment_handler,
+        ];
+        for h in handles {
+            h.abort();
         }
 
-        // remove task_id from task_contexts
-        {
-            let mut task_contexts = task_contexts.write().unwrap();
-            task_contexts.remove(&task_assignment.task_id);
+        if let Err(e) = self.shutdown_executor().await {
+            error!(error = %e, "Failed to shutdown executor gracefully");
+        }
+
+        match loop_result {
+            Ok(()) => {
+                info!("Task manager run exiting without error");
+                Ok(())
+            }
+            Err(e) => {
+                error!(error = %e, "Task manager run failed");
+                // Mark unfinished tasks as failed with the error as the reason
+                let reason = e.to_string();
+                self.mark_unfinished_tasks_failed(&reason).await;
+                Err(e)
+            }
+        }
+    }
+
+    #[instrument(skip(executor_stream, tasks_in_progress))]
+    async fn handle_executor_responses(
+        executor_stream: &mut SplitStream<Framed<TcpStream, LengthDelimitedCodec>>,
+        tasks_in_progress: Arc<Mutex<HashMap<String, TaskInfo>>>,
+        trigger_heartbeat_tx: Sender<()>,
+    ) -> Result<()> {
+        info!("Starting executor response handler");
+        while let Some(response) = executor_stream.next().await {
+            match response {
+                Ok(bytes) => {
+                    // Try to deserialize as Response first (task completion)
+                    if let Ok(response) = bincode::deserialize::<crate::common::Response>(&bytes) {
+                        let task_updated = {
+                            let mut tasks = tasks_in_progress
+                                .lock()
+                                .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
+                            // if the task is in the map, then update its status
+                            if let Some(task_info) = tasks.get_mut(&response.unique_task_id) {
+                                // Update task status
+                                trace!(
+                                    task.id = %response.unique_task_id,
+                                    old_phase = task_info.phase,
+                                    new_phase = response.phase,
+                                    "Updating task phase"
+                                );
+                                task_info.phase = response.phase;
+                                task_info.reason = response.reason.clone();
+                                if response.phase == SUCCEEDED {
+                                    info!(task.id = %response.unique_task_id, "Task completed successfully");
+                                } else if response.phase == FAILED || response.phase == 8 {
+                                    warn!(
+                                        task.id = %response.unique_task_id,
+                                        phase = response.phase,
+                                        reason = ?response.reason,
+                                        "Task failed"
+                                    );
+                                }
+                                true
+                            } else {
+                                warn!(task.id = %response.unique_task_id, "Received response for unknown task");
+                                false
+                            }
+                        };
+
+                        if task_updated {
+                            trigger_heartbeat_tx.send(()).await.unwrap_or_else(|e| {
+                                error!(error = %e, "Failed to trigger heartbeat after task update");
+                            });
+                            warn!(task.id = %response.unique_task_id, "removeme - sent trigger heartbeat tx");
+                        }
+                    } else {
+                        error!(
+                            bytes_len = bytes.len(),
+                            "Failed to deserialize executor response"
+                        );
+                    }
+                }
+                Err(e) => {
+                    error!(error = %e, "Error reading from executor");
+                    return Err(e.into());
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn create_heartbeat_request(&self) -> HeartbeatRequest {
+        let tasks = self.tasks_in_progress.lock().unwrap();
+        let running_count = tasks
+            .values()
+            .filter(|task_info| {
+                task_info.phase != FAILED && task_info.phase != 8 && task_info.phase != SUCCEEDED
+            })
+            .count();
+        let task_statuses: Vec<TaskStatus> =
+            tasks.values().map(|task_info| task_info.into()).collect();
+
+        HeartbeatRequest {
+            worker_id: self.worker_id.clone(),
+            queue_id: self.queue_id.clone(),
+            capacity: Some(Capacity {
+                execution_count: running_count as i32,
+                execution_limit: self.max_parallelism,
+                backlog_count: 0,
+                backlog_limit: 0,
+            }),
+            task_statuses,
+        }
+    }
+
+    #[instrument(skip(self, hb_response), fields(operation = hb_response.operation, task.id = %hb_response.task_id
+    ))]
+    async fn handle_operation(&mut self, hb_response: HeartbeatResponse) -> Result<()> {
+        match Operation::from_i32(hb_response.operation) {
+            Some(Operation::Assign) => {
+                trace!("Received task assignment");
+                self.try_assign_task(hb_response).await
+            }
+            Some(Operation::Ack) => {
+                trace!("Received task ACK");
+                self.update_ack_time(hb_response).await
+            }
+            Some(Operation::Delete) => {
+                trace!("Received task deletion request");
+                self.delete_task(hb_response.task_id).await
+            }
+            None => {
+                warn!(operation_code = hb_response.operation, "Unknown operation");
+                Ok(())
+            }
+        }
+    }
+
+    async fn update_ack_time(&self, operation: HeartbeatResponse) -> Result<()> {
+        let mut tasks = self
+            .tasks_in_progress
+            .lock()
+            .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
+        if let Some(task_info) = tasks.get_mut(&operation.task_id) {
+            task_info.last_ack_time = Some(SystemTime::now());
+            trace!(task.id = %operation.task_id, "Updated ACK time for task");
+        } else {
+            warn!(task.id = %operation.task_id, "ACK received for unknown task");
+        }
+        Ok(())
+    }
+
+    async fn try_assign_task(&mut self, operation: HeartbeatResponse) -> Result<()> {
+        let mut tasks = self
+            .tasks_in_progress
+            .lock()
+            .map_err(|e| anyhow!("Failed to acquire lock: {}", e))?;
+        let tx = self
+            .assignment_tx
+            .as_ref()
+            .ok_or_else(|| anyhow!("Assignment channel not available"))?;
+
+        let running_count = tasks
+            .values()
+            .filter(|task_info| {
+                task_info.phase != FAILED && task_info.phase != 8 && task_info.phase != SUCCEEDED
+            })
+            .count();
+        if running_count >= self.max_parallelism as usize {
+            warn!(
+                running_count,
+                max_parallelism = self.max_parallelism,
+                "Max parallelism reached"
+            );
+            return Err(anyhow!("Max parallelism reached"));
+        }
+        let exec_id = operation
+            .exec_id
+            .clone()
+            .ok_or_else(|| anyhow!("Execution ID is required for task assignment"))?;
+
+        // Create the initial task info to track
+        let task_info = TaskInfo {
+            task_id: operation.task_id.clone(),
+            phase: 0,
+            namespace: operation.namespace.clone(),
+            exec_id: exec_id.clone(),
+            assigned_at: SystemTime::now(),
+            reason: None,
+            env_vars: operation.env_vars.clone(),
+            enqueue_labels: operation.enqueue_labels.clone(),
+            last_ack_time: None,
+        };
+
+        // Create the initial task to send to the executor
+        let _task = Task {
+            cmd: operation.cmd,
+            additional_distribution: None, // ketan: confirm that these are no longer used
+            fast_register_dir: None,
+            env_vars: Some(operation.env_vars),
+            unique_task_id: operation.task_id.clone(),
+        };
+
+        debug!(exec.name = %exec_id.name, "Submitting task to executor");
+        // try_send because we're holding the lock, if the channel is full, fail immediately
+        match tx.try_send(_task) {
+            Ok(()) => {
+                tasks.insert(operation.task_id.clone(), task_info);
+                debug!(
+                    running_count = running_count + 1,
+                    "Task assigned to executor"
+                );
+            }
+            Err(TrySendError::Full(_)) => {
+                error!("Assignment channel is full");
+                return Err(anyhow!("Failed to send task assignment - channel full"));
+            }
+            Err(e) => {
+                error!(error = %e, "Failed to send task assignment");
+                return Err(anyhow!("Failed to send task assignment"));
+            }
         }
 
         Ok(())
     }
-}
 
-/*
- * TheManager
- */
+    #[instrument(skip(self), fields(task.id = %task_id))]
+    async fn delete_task(&mut self, task_id: String) -> Result<()> {
+        let mut tasks = self.tasks_in_progress.lock().unwrap();
 
-struct TaskAssignment {
-    task_id: String,
-    namespace: String,
-    exec_id: Option<ExecutionIdentifier>,
-    cmd: Vec<String>,
-    env_vars: HashMap<String, String>,
-    enqueue_labels: HashMap<String, String>,
-    additional_distribution: Option<String>,
-    fast_register_dir: Option<String>,
-}
-
-pub struct MultiProcessManager {
-    backlog_length: i32,
-    execution_strategy: ExecutionStrategy,
-    executor_registration_addr: String,
-    fast_register_dir_override: String,
-    last_ack_grace_period_seconds: u64,
-    parallelism: i32,
-    task_status_report_interval_seconds: u64,
-
-    backlog_tx: Sender<()>,
-    backlog_rx: Receiver<()>,
-    executor_tx: Sender<Executor>,
-    executor_rx: Receiver<Executor>,
-    fast_register_ids: Arc<Mutex<HashSet<String>>>,
-    task_assignment_tx: Sender<TaskAssignment>,
-    task_assignment_rx: Receiver<TaskAssignment>,
-    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
-}
-
-impl MultiProcessManager {
-    pub fn new(
-        backlog_length: i32,
-        execution_strategy: ExecutionStrategy,
-        executor_registration_addr: String,
-        fast_register_dir_override: String,
-        last_ack_grace_period_seconds: u64,
-        parallelism: i32,
-        task_status_report_interval_seconds: u64,
-    ) -> MultiProcessManager {
-        let (backlog_tx, backlog_rx) = async_channel::unbounded(); // TODO - this should be a bounded channel to re-enable backlog
-        let (executor_tx, executor_rx) = async_channel::unbounded();
-        let (task_assignment_tx, task_assignment_rx) = async_channel::unbounded();
-
-        MultiProcessManager {
-            backlog_length,
-            execution_strategy,
-            executor_registration_addr,
-            fast_register_dir_override,
-            last_ack_grace_period_seconds,
-            parallelism,
-            task_status_report_interval_seconds,
-            backlog_tx,
-            backlog_rx,
-            executor_tx,
-            executor_rx,
-            fast_register_ids: Arc::new(Mutex::new(HashSet::new())),
-            task_assignment_tx,
-            task_assignment_rx,
-            task_contexts: Arc::new(RwLock::new(HashMap::<String, TaskContext>::new())),
-        }
-    }
-}
-
-impl TaskManager for MultiProcessManager {
-    fn ack(&self, task_id: String) -> impl Future<Output = Result<()>> {
-        async move {
-            let mut task_contexts = self.task_contexts.write().unwrap();
-
-            // update last ack timestamp
-            if let Some(ref mut task_context) = task_contexts.get_mut(&task_id) {
-                task_context.last_ack_timestamp = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs();
-            }
-
-            Ok(())
-        }
-        .into_future()
-    }
-
-    fn assign(
-        &self,
-        task_id: String,
-        namespace: String,
-        exec_id: Option<ExecutionIdentifier>,
-        cmd: Vec<String>,
-        env_vars: HashMap<String, String>,
-        enqueue_labels: HashMap<String, String>,
-    ) -> impl Future<Output = Result<()>> {
-        let fast_register_ids = self.fast_register_ids.clone();
-        let task_assignment_tx = self.task_assignment_tx.clone();
-
-        async move {
-            let (additional_distribution, actor_cmd, fast_register_dir) = transform_cmd(
-                cmd,
-                self.fast_register_dir_override.clone(),
-                fast_register_ids,
-                self.parallelism == 1,
-            )?;
-            let task_assignment = TaskAssignment {
-                task_id,
-                namespace,
-                exec_id,
-                cmd: actor_cmd,
-                env_vars,
-                enqueue_labels,
-                additional_distribution,
-                fast_register_dir,
-            };
-
-            task_assignment_tx.send(task_assignment).await?;
-            Ok(())
-        }
-        .into_future()
-    }
-
-    fn delete(&self, task_id: String) -> impl Future<Output = Result<()>> {
-        async move {
-            let mut task_contexts = self.task_contexts.write().unwrap();
-
-            // send kill signal
-            if let Some(ref mut task_context) = task_contexts.get_mut(&task_id) {
-                task_context.kill_tx.send(()).await?;
-            }
-
-            Ok(())
-        }
-        .into_future()
-    }
-
-    fn get_capacity(&self) -> Result<Capacity> {
-        Ok(Capacity {
-            execution_count: self.parallelism - (self.executor_rx.len() as i32),
-            execution_limit: self.parallelism,
-            backlog_count: self.backlog_rx.len() as i32,
-            backlog_limit: self.backlog_length,
-        })
-    }
-
-    fn get_runtime<'a>(&self) -> Result<impl TaskManagerRuntime + 'a> {
-        Ok(MultiProcessRuntime {
-            backlog_tx: self.backlog_tx.clone(),
-            backlog_rx: self.backlog_rx.clone(),
-            execution_strategy: self.execution_strategy.clone(),
-            executor_tx: self.executor_tx.clone(),
-            executor_rx: self.executor_rx.clone(),
-            executor_registration_addr: self.executor_registration_addr.clone(),
-            last_ack_grace_period_seconds: self.last_ack_grace_period_seconds,
-            parallelism: self.parallelism,
-            task_assignment_rx: self.task_assignment_rx.clone(),
-            task_contexts: self.task_contexts.clone(),
-            task_status_report_interval_seconds: self.task_status_report_interval_seconds,
-        })
-    }
-}
-
-pub struct MultiProcessRuntime {
-    backlog_tx: Sender<()>,
-    backlog_rx: Receiver<()>,
-    execution_strategy: ExecutionStrategy,
-    executor_tx: Sender<Executor>,
-    executor_rx: Receiver<Executor>,
-    executor_registration_addr: String,
-    last_ack_grace_period_seconds: u64,
-    parallelism: i32,
-    task_assignment_rx: Receiver<TaskAssignment>,
-    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
-    task_status_report_interval_seconds: u64,
-}
-
-impl TaskManagerRuntime for MultiProcessRuntime {
-    async fn run(
-        &self,
-        ready: Arc<Mutex<AsyncBool>>,
-        task_status_tx: Sender<TaskStatus>,
-    ) -> Result<()> {
-        let (backlog_tx, backlog_rx) = (self.backlog_tx.clone(), self.backlog_rx.clone());
-        let (executor_tx, executor_rx) = (self.executor_tx.clone(), self.executor_rx.clone());
-        let (task_assignment_rx, task_contexts) =
-            (self.task_assignment_rx.clone(), self.task_contexts.clone());
-
-        let listener = TcpListener::bind(&self.executor_registration_addr).await?;
-
-        // send `parallelism` count down build_executor_tx to initialize
-        let (build_executor_tx, build_executor_rx) = async_channel::unbounded();
-        for _ in 0..self.parallelism {
-            let _ = build_executor_tx.send(()).await?;
-        }
-
-        let mut index = 0;
-        loop {
-            tokio::select! {
-                _ = build_executor_rx.recv() => {
-                    // start child process
-                    let child = Command::new("unionai-actor-executor")
-                        .arg("--executor-registration-addr")
-                        .arg(self.executor_registration_addr.clone())
-                        .arg("--id")
-                        .arg(index.to_string())
-                        .spawn()?;
-
-                    let stream = listener.accept().await?.0;
-                    let framed = Framed::new(stream, LengthDelimitedCodec::new());
-
-                    let executor = Executor { framed, child };
-                    self.executor_tx.send(executor).await?;
-
-                    index += 1;
-
-                    // trigger ready if all executors are initialized
-                    if index == self.parallelism {
-                        let mut ready = ready.lock().unwrap();
-                        ready.trigger();
-                    }
-                },
-                task_assignment_result = task_assignment_rx.recv() => {
-                    let task_assignment= task_assignment_result?;
-
-                    let (backlog_tx_clone, backlog_rx_clone) = (backlog_tx.clone(), backlog_rx.clone());
-                    let build_executor_tx_clone = build_executor_tx.clone();
-                    let (executor_tx_clone, executor_rx_clone) = (executor_tx.clone(), executor_rx.clone());
-                    let (task_status_tx_clone, task_contexts_clone) = (task_status_tx.clone(), task_contexts.clone());
-
-                    let (task_status_report_interval_seconds, last_ack_grace_period_seconds) =
-                        (self.task_status_report_interval_seconds, self.last_ack_grace_period_seconds);
-
-                    let execution_strategy = self.execution_strategy.clone();
-                    tokio::spawn(async move {
-                        if let Err(e) = execution_strategy.execute(
-                            task_contexts_clone,
-                            task_assignment,
-                            task_status_tx_clone,
-                            task_status_report_interval_seconds,
-                            last_ack_grace_period_seconds,
-                            backlog_tx_clone,
-                            backlog_rx_clone,
-                            executor_tx_clone,
-                            executor_rx_clone,
-                            build_executor_tx_clone,
-                        ).await
-                        {
-                            warn!("failed to execute task '{:?}'", e);
-                        }
-                    });
-                },
-            }
-        }
-    }
-}
-
-fn transform_cmd(
-    mut cmd: Vec<String>,
-    fast_register_dir_override: String,
-    fast_register_ids: Arc<Mutex<HashSet<String>>>,
-    extract_in_root: bool,
-) -> Result<(Option<String>, Vec<String>, Option<String>)> {
-    let (mut pyflyte_execute_index, mut additional_distribution, mut fast_register_dir) =
-        (None, None, None);
-
-    if cmd[0].eq("pyflyte-fast-execute") {
-        let mut dest_dir_index = None;
-        for i in 0..cmd.len() {
-            match cmd[i] {
-                ref x if x.eq("--dest-dir") => dest_dir_index = Some(i + 1),
-                ref x if x.eq("--additional-distribution") => {
-                    additional_distribution = Some(cmd[i + 1].clone())
-                }
-                ref x if x.eq("pyflyte-execute") => pyflyte_execute_index = Some(i),
-                ref x if x.eq("pyflyte-map-execute") => pyflyte_execute_index = Some(i),
-                _ => (),
-            }
-        }
-
-        let mut dir = fast_register_dir_override.clone();
-        if !extract_in_root {
-            // hash `additional_distribution` (fast register unique id) to identify a
-            // unique subdirectory to decompress the fast register file
-            let mut h = DefaultHasher::new();
-            additional_distribution.hash(&mut h);
-            dir = format!("{}/{}", fast_register_dir_override, h.finish());
-        }
-
-        if let Err(e) = std::fs::create_dir_all(dir.clone()) {
-            bail!("failed to create fast register subdir '{}': {:?}", dir, e);
-        }
-
-        match dest_dir_index {
-            Some(i) => cmd[i] = dir.clone(),
-            None => {} // TODO - inject `--dest-dir fast_register_dir` into cmd_str
-        }
-
-        fast_register_dir = Some(dir);
-    }
-
-    // if the fast register file has already been processed we skip the download
-    if let Some(ref additional_distribution_str) = additional_distribution {
-        let mut fast_register_ids = fast_register_ids.lock().unwrap();
-        if fast_register_ids.contains(additional_distribution_str) {
-            additional_distribution = None;
+        // todo: check that the task is done before deleting it. if not done, we'll need to
+        //       send a cancelled error to the executor in the future.
+        if let Some(task_info) = tasks.remove(&task_id) {
+            info!(phase = task_info.phase, "Task deleted");
         } else {
-            // If we are inflating under /root, we can only ever maintain a single version.
-            // Clear the list so we keep only the latest.
-            if extract_in_root {
-                fast_register_ids.clear()
-            }
+            warn!("Task not found for deletion");
+        }
 
-            fast_register_ids.insert(additional_distribution_str.clone());
+        Ok(())
+    }
+
+    async fn mark_unfinished_tasks_failed(&mut self, reason: &str) {
+        let mut tasks = self.tasks_in_progress.lock().unwrap();
+        let task_count = tasks.len();
+        info!(task_count, reason, "Marking all tasks as failed");
+
+        for (k, t_info) in tasks.iter_mut() {
+            t_info.last_ack_time = Some(SystemTime::now());
+            if is_terminal(t_info.phase) {
+                trace!(task.id = %k, phase = t_info.phase, "Task is already terminal, skipping");
+                continue; // Skip already terminal tasks
+            }
+            trace!(task.id = %k, old_phase = t_info.phase, "Marking task as failed");
+            t_info.phase = FAILED;
         }
     }
 
-    // strip `pyflyte-fast-execute` command if exists
-    let cmd = if let Some(pyflyte_execute_index) = pyflyte_execute_index {
-        cmd[pyflyte_execute_index..].to_vec()
-    } else {
-        cmd.clone()
-    };
+    /// Send a final heartbeat with a new gRPC connection
+    pub async fn send_final_heartbeat(&mut self, fasttask_url: String) {
+        use crate::pb::fasttask::fast_task_client::FastTaskClient;
+        use tonic::Request;
 
-    Ok((additional_distribution, cmd, fast_register_dir))
-}
+        info!("Sending final heartbeat before shutdown");
 
-/*
- * SuccessManager
- */
+        // Create final heartbeat request with current task states
+        let heartbeat_request = self.create_heartbeat_request();
 
-pub struct SuccessManager {
-    task_tx: Sender<(String, String, Option<ExecutionIdentifier>)>,
-    task_rx: Receiver<(String, String, Option<ExecutionIdentifier>)>,
-}
+        // Attempt to create a new gRPC connection for the final heartbeat
+        match FastTaskClient::connect(fasttask_url.clone()).await {
+            Ok(mut client) => {
+                // Create a single heartbeat stream
+                let outbound = async_stream::stream! {
+                    yield heartbeat_request;
+                };
 
-impl SuccessManager {
-    pub fn new() -> SuccessManager {
-        let (task_tx, task_rx) = async_channel::unbounded();
-        SuccessManager { task_tx, task_rx }
+                match client.heartbeat(Request::new(outbound)).await {
+                    Ok(_response) => {
+                        info!("Final heartbeat sent successfully");
+                        // We don't need to process the response since we're shutting down
+                    }
+                    Err(e) => {
+                        error!(error = %e, "Failed to send final heartbeat");
+                    }
+                }
+            }
+            Err(e) => {
+                error!(error = %e, fasttask.url = %fasttask_url, "Failed to connect to FastTask service for final heartbeat");
+            }
+        }
     }
-}
 
-impl TaskManager for SuccessManager {
-    fn ack(&self, _task_id: String) -> impl Future<Output = Result<()>> {
-        async { Ok(()) }.into_future()
-    }
-
-    fn assign(
-        &self,
-        task_id: String,
-        namespace: String,
-        exec_id: Option<ExecutionIdentifier>,
-        _cmd: Vec<String>,
-        _env_vars: HashMap<String, String>,
-        _enqueue_labels: HashMap<String, String>,
-    ) -> impl Future<Output = Result<()>> {
-        let task_tx = self.task_tx.clone();
-        async move {
-            let send_result = task_tx.send((task_id, namespace, exec_id)).await;
-            assert!(send_result.is_ok());
+    pub async fn shutdown_executor(&mut self) -> Result<()> {
+        if let Some(mut child) = self.executor_process.take() {
+            match child.start_kill() {
+                Ok(()) => {
+                    info!(executor.pid = ?child.id(), "Initiated kill of executor process");
+                    Ok(())
+                }
+                Err(e) => {
+                    error!(error = %e, executor.pid = ?child.id(), "Failed to kill executor process");
+                    Err(anyhow!("Killing of executor failed: {}", e))
+                }
+            }
+        } else {
+            debug!("Shutdown of executor received but process already gone");
             Ok(())
         }
-        .into_future()
-    }
-
-    fn delete(&self, _task_id: String) -> impl Future<Output = Result<()>> {
-        async { Ok(()) }.into_future()
-    }
-
-    fn get_capacity(&self) -> Result<Capacity> {
-        Ok(Capacity {
-            execution_count: 0,
-            execution_limit: 0,
-            backlog_count: 0,
-            backlog_limit: 0,
-        })
-    }
-
-    fn get_runtime<'a>(&self) -> Result<impl TaskManagerRuntime + 'a> {
-        let task_rx = self.task_rx.clone();
-        Ok(SuccessRuntime { task_rx })
     }
 }
 
-pub struct SuccessRuntime {
-    task_rx: Receiver<(String, String, Option<ExecutionIdentifier>)>,
-}
-
-impl TaskManagerRuntime for SuccessRuntime {
-    async fn run(
-        &self,
-        ready: Arc<Mutex<AsyncBool>>,
-        task_status_tx: Sender<TaskStatus>,
-    ) -> Result<()> {
-        {
-            let mut ready = ready.lock().unwrap();
-            ready.trigger();
-        }
-
-        let task_rx = self.task_rx.clone();
-        loop {
-            let task_result = task_rx.recv().await;
-            assert!(task_result.is_ok());
-
-            let (task_id, namespace, exec_id) = task_result.unwrap();
-            let task_status = TaskStatus {
-                task_id,
-                namespace,
-                exec_id,
-                phase: SUCCEEDED,
-                reason: "".to_string(),
-                enqueue_labels: HashMap::new(),
-                task_duration: None,
-                workflow_id: None,
-            };
-
-            let send_result = task_status_tx.send(task_status).await;
-            assert!(send_result.is_ok());
-        }
-    }
+fn is_terminal(phase: i32) -> bool {
+    // 8 permanent failure
+    phase == FAILED || phase == 8 || phase == SUCCEEDED
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::common::RUNNING;
+    use crate::pb::fasttask::{heartbeat_response, ExecutionIdentifier};
+    use std::time::Duration;
 
-    #[tokio::test]
-    async fn multi_process_manager() {
-        use std::time::Duration;
-
-        let (task_status_tx, task_status_rx) = async_channel::unbounded();
-        let (task_id, namespace) = ("task_id".to_string(), "namespace".to_string());
-        let exec_id = ExecutionIdentifier {
-            org: "dogfood".to_string(),
-            project: "flytesnacks".to_string(),
-            domain: "development".to_string(),
-            name: "abc123".to_string(),
-        };
-        let cmd = vec!["".to_string()];
-        let env_vars = HashMap::new();
-
-        // create manager
-        let backlog_length = 5i32;
-        let parallelism = 0i32; // explicitly set to 0 so that no workers are created
-        let manager = MultiProcessManager::new(
-            backlog_length,
-            ExecutionStrategy::SuccessStrategy,
-            "127.0.0.1:15605".to_string(),
-            "/tmp/fasttask".to_string(),
-            30,
-            parallelism,
-            10,
-        );
-
-        // start manager runtime
-        let manager_runtime_result = manager.get_runtime();
-        assert!(manager_runtime_result.is_ok());
-        let manager_runtime = manager_runtime_result.unwrap();
-
-        let ready = Arc::new(Mutex::new(AsyncBool::new()));
-        let manager_handle = tokio::spawn(async move {
-            super::TaskManagerRuntime::run(&manager_runtime, ready, task_status_tx).await
-        });
-
-        // validate get capacity works
-        let capacity_result = manager.get_capacity();
-        assert!(capacity_result.is_ok());
-
-        let capacity = capacity_result.unwrap();
-        assert_eq!(capacity.execution_count, 0);
-        assert_eq!(capacity.execution_limit, parallelism);
-        assert_eq!(capacity.backlog_count, 0);
-        assert_eq!(capacity.backlog_limit, backlog_length);
-
-        // assign task
-        let assign_result = manager
-            .assign(
-                task_id.clone(),
-                namespace.clone(),
-                Some(exec_id.clone()),
-                cmd,
-                env_vars,
-                HashMap::new(),
-            )
-            .await;
-        assert!(assign_result.is_ok());
-
-        // recv success TaskStatus
-        let mut counter = 0;
-        while task_status_rx.is_empty() && counter < 5 {
-            tokio::time::sleep(Duration::from_millis(10)).await;
-            counter += 1;
+    fn create_test_task_info() -> TaskInfo {
+        TaskInfo {
+            task_id: "test-task-123".to_string(),
+            namespace: "test-namespace".to_string(),
+            exec_id: ExecutionIdentifier {
+                org: "test-org".to_string(),
+                domain: "test-domain".to_string(),
+                name: "test-execution".to_string(),
+                project: "test-project".to_string(),
+            },
+            phase: RUNNING,
+            assigned_at: SystemTime::now() - Duration::from_secs(10),
+            reason: None,
+            env_vars: HashMap::new(),
+            enqueue_labels: HashMap::new(),
+            last_ack_time: None,
         }
-        assert!(!task_status_rx.is_empty());
+    }
 
-        let task_status_result = task_status_rx.recv().await;
-        assert!(task_status_result.is_ok());
-        let task_status = task_status_result.unwrap();
-
-        assert_eq!(task_status.task_id, task_id);
-        assert_eq!(task_status.namespace, namespace);
-        assert_eq!(task_status.phase, SUCCEEDED);
-        assert_eq!(task_status.exec_id, Some(exec_id));
-
-        // validate task_context
-        let initial_ack_timestamp = {
-            let task_contexts = manager.task_contexts.read().unwrap();
-            assert_eq!(task_contexts.len(), 1);
-            let task_context_option = task_contexts.get(&task_id);
-            assert!(task_context_option.is_some());
-
-            let task_context = task_context_option.unwrap();
-            task_context.last_ack_timestamp
-        };
-
-        // ack and validate
-        tokio::time::sleep(Duration::from_secs(1)).await;
-        let ack_result = manager.ack(task_id.clone()).await;
-        assert!(ack_result.is_ok());
-
-        let last_ack_timestamp = {
-            let task_contexts = manager.task_contexts.read().unwrap();
-            assert_eq!(task_contexts.len(), 1);
-            let task_context_option = task_contexts.get(&task_id);
-            assert!(task_context_option.is_some());
-
-            let task_context = task_context_option.unwrap();
-            task_context.last_ack_timestamp
-        };
-
-        assert!(last_ack_timestamp > initial_ack_timestamp);
-
-        // delete and validate
-        let delete_result = manager.delete(task_id).await;
-        assert!(delete_result.is_ok());
-
-        tokio::time::sleep(Duration::from_millis(50)).await; // sleep to allow delete to propagate
-
-        {
-            let task_contexts = manager.task_contexts.read().unwrap();
-            assert_eq!(task_contexts.len(), 0);
+    fn create_test_heartbeat_response() -> HeartbeatResponse {
+        HeartbeatResponse {
+            task_id: "test-task-123".to_string(),
+            namespace: "test-namespace".to_string(),
+            workflow_id: None,
+            cmd: vec!["python".to_string(), "test.py".to_string()],
+            operation: heartbeat_response::Operation::Ack as i32,
+            env_vars: HashMap::new(),
+            enqueue_labels: HashMap::new(),
+            exec_id: Some(ExecutionIdentifier {
+                org: "test-org".to_string(),
+                domain: "test-domain".to_string(),
+                name: "test-execution".to_string(),
+                project: "test-project".to_string(),
+            }),
         }
-
-        // cleanup
-        manager_handle.abort();
-        let _ = manager_handle.await;
     }
 
     #[tokio::test]
-    async fn transform_cmd_happy() {
-        let fast_register_dir_override = "/tmp".to_string();
-        let fast_register_ids = Arc::new(Mutex::new(HashSet::new()));
+    async fn test_update_ack_time_existing_task() {
+        let tasks = Arc::new(Mutex::new(HashMap::new()));
+        let task_info = create_test_task_info();
+        let task_id = task_info.task_id.clone();
 
-        let cmd = vec!(
-            "pyflyte-fast-execute",
-            "--additional-distribution",
-            "s3://my-s3-bucket/flytesnacks/development/7RZ4KNYDFWV7OLEGSCOH6RJ3SM======/fast00f05aad96604fca790e82f31fccdecc.tar.gz",
-            "--dest-dir",
-            ".",
-            "--",
-            "pyflyte-execute",
-            "--inputs",
-            "s3://my-s3-bucket/metadata/propeller/flytesnacks-development-avwmk5z2pbzccvdq5dqm/n0/data/inputs.pb",
-            "--output-prefix",
-            "s3://my-s3-bucket/metadata/propeller/flytesnacks-development-avwmk5z2pbzccvdq5dqm/n0/data/0",
-            "--raw-output-data-prefix",
-            "s3://my-s3-bucket/test/g8/avwmk5z2pbzccvdq5dqm-n0-0",
-            "--checkpoint-path",
-            "s3://my-s3-bucket/test/g8/avwmk5z2pbzccvdq5dqm-n0-0/_flytecheckpoints",
-            "--prev-checkpoint",
-            "\"\"",
-            "--resolver",
-            "flytekit.core.python_auto_container.default_task_resolver",
-            "--",
-            "task-module",
-            "hello_world",
-            "task-name",
-            "say_hello").iter().map(|x| x.to_string()).collect::<Vec<String>>();
+        // Insert task without ack time
+        assert!(task_info.last_ack_time.is_none());
+        tasks.lock().unwrap().insert(task_id.clone(), task_info);
 
-        let additional_distribution = cmd[2].clone();
+        let manager = V2TaskManager {
+            max_parallelism: 10,
+            executor_registration_addr: "test-addr".to_string(),
+            worker_id: "test-worker".to_string(),
+            queue_id: "test-queue".to_string(),
+            heartbeat_interval_seconds: 30,
+            tasks_in_progress: tasks.clone(),
+            executor_process: None,
+            executor_stream_reader: None,
+            executor_stream_writer: None,
+            assignment_tx: None,
+        };
 
-        // execute once to ensure correct transformation
-        let first_cmd_result = transform_cmd(
-            cmd.clone(),
-            fast_register_dir_override.clone(),
-            fast_register_ids.clone(),
-            false,
-        );
-        assert!(first_cmd_result.is_ok());
+        let hb_response = create_test_heartbeat_response();
+        let result = manager.update_ack_time(hb_response).await;
 
-        let (first_additional_distribution, first_cmd, first_fast_register_dir) =
-            first_cmd_result.unwrap();
+        assert!(result.is_ok());
 
-        assert_eq!(first_cmd.len(), 18); // stripped `pyflyte-fast-execute` command
-        assert_eq!(first_cmd[0], "pyflyte-execute");
-        assert_eq!(first_additional_distribution, Some(additional_distribution)); // additional_distribution set
-        assert_eq!(
-            first_fast_register_dir,
-            Some(format!(
-                "{}/2680285252280366039",
-                fast_register_dir_override
-            ))
-        ); // fast_register_dir was overridden
+        let tasks_guard = tasks.lock().unwrap();
+        let updated_task = tasks_guard.get(&task_id).unwrap();
+        assert!(updated_task.last_ack_time.is_some());
+    }
 
-        // execute again to ensure we do not inform to `download_distribution` twice
-        let second_cmd_result = transform_cmd(
-            cmd.clone(),
-            fast_register_dir_override.clone(),
-            fast_register_ids.clone(),
-            false,
-        );
-        assert!(second_cmd_result.is_ok());
+    #[tokio::test]
+    async fn test_update_ack_time_nonexistent_task() {
+        let tasks = Arc::new(Mutex::new(HashMap::new()));
+        let manager = V2TaskManager {
+            max_parallelism: 10,
+            executor_registration_addr: "test-addr".to_string(),
+            worker_id: "test-worker".to_string(),
+            queue_id: "test-queue".to_string(),
+            heartbeat_interval_seconds: 30,
+            tasks_in_progress: tasks.clone(),
+            executor_process: None,
+            executor_stream_reader: None,
+            executor_stream_writer: None,
+            assignment_tx: None,
+        };
 
-        let (second_additional_distribution, _, _) = second_cmd_result.unwrap();
+        let hb_response = create_test_heartbeat_response();
+        let result = manager.update_ack_time(hb_response).await;
 
-        assert_eq!(second_additional_distribution, None); // additional_distribution not set
+        // Should succeed even if task doesn't exist (just logs a warning)
+        assert!(result.is_ok());
+        assert!(tasks.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_taskinfo_to_taskstatus_with_ack_time() {
+        let mut task_info = create_test_task_info();
+        let ack_time = SystemTime::now();
+        task_info.last_ack_time = Some(ack_time);
+
+        let task_status = TaskStatus::from(&task_info);
+
+        assert_eq!(task_status.task_id, task_info.task_id);
+        assert_eq!(task_status.namespace, task_info.namespace);
+        assert_eq!(task_status.phase, task_info.phase);
+        assert_eq!(task_status.exec_id, Some(task_info.exec_id));
+        assert!(task_status.task_duration.is_some());
+
+        let duration = task_status.task_duration.unwrap();
+        assert!(duration.seconds >= 0);
+        assert!(duration.nanos >= 0);
     }
 }

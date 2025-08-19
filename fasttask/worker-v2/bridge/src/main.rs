@@ -1,45 +1,65 @@
 use clap::Parser;
-use tokio::runtime::Builder;
-use tracing::{self, error};
-use tracing_subscriber::{self, EnvFilter};
+use tokio::signal;
+use tokio_util::sync::CancellationToken;
+use tracing::{error, info, warn};
 use unionai_actor_bridge::cli::BridgeArgs;
 use unionai_actor_bridge::connection::GRPCConnectionBuilder;
-use unionai_actor_bridge::heartbeater::PeriodicHeartbeater;
-use unionai_actor_bridge::manager::{ExecutionStrategy, MultiProcessManager};
+use unionai_actor_bridge::manager::V2TaskManager;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = BridgeArgs::parse();
-    let subscriber = tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .finish();
+    let (_temp_dir, _file_guard, _stdout_guard) =
+        unionai_actor_bridge::init_tracing_with_prefix("bridge")?;
 
-    tracing::subscriber::with_default(subscriber, || {
-        let runtime = Builder::new_current_thread().enable_all().build().unwrap();
+    info!("Starting fasttask worker-v2 bridge");
+    // Initialize GRPC connection
+    let connection = GRPCConnectionBuilder::new(args.fasttask_url.clone());
 
-        let connection = GRPCConnectionBuilder::new(args.fasttask_url.clone());
-        let heartbeater = PeriodicHeartbeater::new(
-            args.heartbeat_interval_seconds,
-            args.queue_id,
-            args.worker_id,
-        );
-        let manager = MultiProcessManager::new(
-            args.backlog_length.try_into().unwrap(),
-            ExecutionStrategy::TheExecutionStrategy,
-            args.executor_registration_addr.clone(),
-            args.fast_register_dir_override.clone(),
-            args.last_ack_grace_period_seconds,
-            args.parallelism.try_into().unwrap(),
-            args.task_status_report_interval_seconds,
-        );
+    // Initialize V2TaskManager
+    let mut manager = V2TaskManager::new(
+        args.parallelism.try_into().unwrap(),
+        args.executor_registration_addr.clone().as_str(),
+        args.worker_id.clone(),
+        args.queue_id.clone(),
+        args.heartbeat_interval_seconds,
+    );
 
-        if let Err(e) = runtime.block_on(unionai_actor_bridge::bridge::run(
-            connection,
-            heartbeater,
-            manager,
-        )) {
-            error!("failed to execute bridge: '{}'", e);
+    // Start the executor process and TCP listener
+    manager.start().await?;
+
+    // Create cancellation token for graceful shutdown
+    let cancellation_token = CancellationToken::new();
+
+    // Setup signal handlers
+    let mut sigterm = signal::unix::signal(signal::unix::SignalKind::terminate())?;
+    let mut sigint = signal::unix::signal(signal::unix::SignalKind::interrupt())?;
+
+    tokio::select! {
+        res = manager.run(connection, cancellation_token.clone()) => {
+            if let Err(e) = res {
+                error!(error = %e, "Bridge run finished with error");
+                manager.send_final_heartbeat(args.fasttask_url.clone()).await;
+                return Err(e.into());
+            } else {
+                info!("Bridge run completed normally");
+            }
         }
-    });
+
+        // Handle SIGTERM (what k8s sends before SIGKILL)
+        _ = sigterm.recv() => {
+            warn!("Received SIGTERM, initiating graceful shutdown");
+            cancellation_token.cancel();
+            manager.send_final_heartbeat(args.fasttask_url.clone()).await;
+        }
+
+        // Handle SIGINT
+        _ = sigint.recv() => {
+            warn!("Received SIGINT, initiating graceful shutdown");
+            cancellation_token.cancel();
+            manager.send_final_heartbeat(args.fasttask_url.clone()).await;
+        }
+    }
 
     Ok(())
 }

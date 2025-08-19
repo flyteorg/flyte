@@ -16,6 +16,9 @@ pyo3-async-runtimes = { version = "0.25.0", features = ["tokio-runtime"] }
 tokio = { version = "1.45.1", features = ["full"] }
 tokio-util = { workspace = true, features = ["rt"] }
 tracing = { workspace = true }
+tracing-attributes = { workspace = true }
 tracing-subscriber = { version = "0.3.19", workspace = true, features = ["fmt", "time"] }
+tracing-appender = { workspace = true }
+tempfile = { workspace = true }
 unionai_actor_bridge = { path = "../bridge" }
 bytes = "1.6.0"
