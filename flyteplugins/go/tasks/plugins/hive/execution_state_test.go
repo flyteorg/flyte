@@ -20,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
 	quboleMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
-	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"

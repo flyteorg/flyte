@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	goCache "github.com/eko/gocache/lib/v4/cache"
 	corev1 "k8s.io/api/core/v1"
 	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -69,6 +70,7 @@ type EmbeddedSecretManagerInjector struct {
 	secretFetchers     []SecretFetcher
 	k8sClient          client.Client
 	referenceNamespace string
+	secretCache        goCache.CacheInterface[SecretValue]
 }
 
 func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
@@ -123,36 +125,73 @@ func encodeSecretName(components *SecretNameComponents) string {
 }
 
 func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, components *SecretNameComponents) (*SecretValue, string, error) {
+	componentsCopy := *components // Create a copy to avoid modifying the original
+
+	// Attempt to lookup from the cache
+	projectDomainScopedSecret := encodeSecretName(&componentsCopy)
+	projectDomainScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
+	if cachedValue, err := i.secretCache.Get(ctx, projectDomainScopedSecret); err == nil {
+		logger.Debugf(ctx, "Found secret [%s] in cache.", projectDomainScopedSecret)
+		return &cachedValue, projectDomainScopedImagePullSecretName, nil
+	}
+
+	componentsCopy.Project = EmptySecretScope
+	domainScopedSecret := encodeSecretName(&componentsCopy)
+	domainScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
+	if cachedValue, err := i.secretCache.Get(ctx, domainScopedSecret); err == nil {
+		logger.Debugf(ctx, "Found secret [%s] in cache.", domainScopedSecret)
+		return &cachedValue, domainScopedImagePullSecretName, nil
+	}
+
+	componentsCopy.Domain = EmptySecretScope
+	orgScopedSecret := encodeSecretName(&componentsCopy)
+	orgScopedImagePullSecretName := ToImagePullK8sName(componentsCopy)
+	if cachedValue, err := i.secretCache.Get(ctx, orgScopedSecret); err == nil {
+		logger.Debugf(ctx, "Found secret [%s] in cache.", orgScopedSecret)
+		return &cachedValue, orgScopedImagePullSecretName, nil
+	}
+
+	logger.Infof(ctx, "Secret [%s] not found in cache. Fetching from secret fetchers.", components)
+
 	for _, secretFetcher := range i.secretFetchers {
-		components := *components // Create a copy to avoid modifying the original
 		// Fetch project-domain scoped secret
-		projectDomainScopedSecret := encodeSecretName(&components)
 		secretValue, err := secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
 		if err == nil {
-			return secretValue, ToImagePullK8sName(components), nil
+			if err := i.secretCache.Set(ctx, projectDomainScopedSecret, *secretValue); err != nil {
+				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", projectDomainScopedSecret, err)
+			}
+
+			return secretValue, projectDomainScopedImagePullSecretName, nil
 		}
+
 		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 			return nil, "", err
 		}
 
 		// Fetch domain scoped secret
-		components.Project = EmptySecretScope
-		domainScopedSecret := encodeSecretName(&components)
 		secretValue, err = secretFetcher.GetSecretValue(ctx, domainScopedSecret)
 		if err == nil {
-			return secretValue, ToImagePullK8sName(components), nil
+			if err := i.secretCache.Set(ctx, domainScopedSecret, *secretValue); err != nil {
+				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", domainScopedSecret, err)
+			}
+
+			return secretValue, domainScopedImagePullSecretName, nil
 		}
+
 		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 			return nil, "", err
 		}
 
 		// Fetch organization scoped secret
-		components.Domain = EmptySecretScope
-		orgScopedSecret := encodeSecretName(&components)
 		secretValue, err = secretFetcher.GetSecretValue(ctx, orgScopedSecret)
 		if err == nil {
-			return secretValue, ToImagePullK8sName(components), err
+			if err := i.secretCache.Set(ctx, orgScopedSecret, *secretValue); err != nil {
+				logger.Warnf(ctx, "Failed to cache secret [%s]: %v", orgScopedSecret, err)
+			}
+
+			return secretValue, orgScopedImagePullSecretName, err
 		}
+
 		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 			return nil, "", err
 		}
@@ -454,12 +493,14 @@ func NewEmbeddedSecretManagerInjector(
 	secretFetchers []SecretFetcher,
 	k8sClient client.Client,
 	referenceNamespace string,
+	secretCache goCache.CacheInterface[SecretValue],
 ) SecretsInjector {
 	return &EmbeddedSecretManagerInjector{
 		cfg:                cfg,
 		secretFetchers:     secretFetchers,
 		k8sClient:          k8sClient,
 		referenceNamespace: referenceNamespace,
+		secretCache:        secretCache,
 	}
 }
 

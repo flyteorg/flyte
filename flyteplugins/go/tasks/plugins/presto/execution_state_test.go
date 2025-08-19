@@ -15,7 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"

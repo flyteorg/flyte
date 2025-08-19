@@ -21,8 +21,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/watch"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	ctrlConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
@@ -695,12 +695,12 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED() {
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_SUCCEEDED, actualCacheItem.Phase)
 	s.NoError(actualCacheItem.SyncError)
@@ -732,12 +732,12 @@ func (s *LPExecutorSuite) Test_syncItem_FAILED() {
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_FAILED, actualCacheItem.Phase)
 	s.Equal(expectedErr, actualCacheItem.ExecutionError)
@@ -764,12 +764,12 @@ func (s *LPExecutorSuite) Test_syncItem_RUNNING() {
 		}}, nil).
 		Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_RUNNING, actualCacheItem.Phase)
 	s.Empty(actualCacheItem.ExecutionOutputs)
@@ -789,7 +789,7 @@ func (s *LPExecutorSuite) Test_syncItem_AlreadyTerminal() {
 	defer itemWrapper.AssertExpectations(s.T())
 	itemWrapper.OnGetItem().Return(cacheItem).Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Empty(resp)
@@ -808,7 +808,7 @@ func (s *LPExecutorSuite) Test_syncItem_RecentlyUpdated() {
 	defer itemWrapper.AssertExpectations(s.T())
 	itemWrapper.OnGetItem().Return(cacheItem).Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Empty(resp)
@@ -834,12 +834,12 @@ func (s *LPExecutorSuite) Test_syncItem_SyncError() {
 		Return(nil, expectedErr).
 		Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_UNDEFINED, actualCacheItem.Phase)
 	s.ErrorIs(actualCacheItem.SyncError, expectedErr)
@@ -876,12 +876,12 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_SyncDataError() {
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_SUCCEEDED, actualCacheItem.Phase)
 	s.Equal(expectedErr, actualCacheItem.SyncError)
@@ -930,12 +930,12 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_Exhausted() {
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_SUCCEEDED, actualCacheItem.Phase)
 	s.Equal(expectedOutputs, actualCacheItem.ExecutionOutputs)
@@ -989,12 +989,12 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_MissingOutput
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_SUCCEEDED, actualCacheItem.Phase)
 	s.Equal(expectedOutputs, actualCacheItem.ExecutionOutputs)
@@ -1042,12 +1042,12 @@ func (s *LPExecutorSuite) Test_syncItem_SUCCEEDED_FetchDataFromURI_ReadProtoErro
 	}
 	s.enqueueWorkflow.On("enqueueWorkflow", labels).Return().Once()
 
-	resp, err := s.executor.syncItem(s.ctx, cache.Batch{itemWrapper})
+	resp, err := s.executor.syncItem(s.ctx, autorefreshcache.Batch{itemWrapper})
 
 	s.NoError(err)
 	s.Require().Len(resp, 1)
 	respItem := resp[0]
-	s.Equal(cache.Update, respItem.Action)
+	s.Equal(autorefreshcache.Update, respItem.Action)
 	actualCacheItem := respItem.Item.(executionCacheItem)
 	s.Equal(core.WorkflowExecution_SUCCEEDED, actualCacheItem.Phase)
 	s.ErrorIs(actualCacheItem.SyncError, expectedErr)
@@ -1164,7 +1164,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionNotFoundInCa
 
 	_, err := s.executor.cache.Get(execID.String())
 	s.Error(err)
-	s.True(errors.IsCausedBy(err, cache.ErrNotFound))
+	s.True(errors.IsCausedBy(err, autorefreshcache.ErrNotFound))
 }
 
 func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_ExecutionAlreadyTerminated() {

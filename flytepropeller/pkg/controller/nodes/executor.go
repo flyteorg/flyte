@@ -98,7 +98,7 @@ type nodeMetrics struct {
 	acceleratedInputCount labeled.Counter
 }
 
-// recursiveNodeExector implements the executors.Node interfaces and is the starting point for
+// recursiveNodeExecutor implements the executors.Node interfaces and is the starting point for
 // executing any node in the workflow.
 type recursiveNodeExecutor struct {
 	nodeExecutor       interfaces.NodeExecutor

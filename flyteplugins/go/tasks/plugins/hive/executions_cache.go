@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -23,7 +23,7 @@ const (
 )
 
 type QuboleHiveExecutionsCache struct {
-	cache.AutoRefresh
+	autorefreshcache.AutoRefresh
 	quboleClient  client.QuboleClient
 	secretManager core.SecretManager
 	scope         promutils.Scope
@@ -39,7 +39,7 @@ func NewQuboleHiveExecutionsCache(ctx context.Context, quboleClient client.Qubol
 		scope:         scope,
 		cfg:           cfg,
 	}
-	autoRefreshCache, err := cache.NewAutoRefreshCache("qubole", q.SyncQuboleQuery, workqueue.DefaultControllerRateLimiter(), ResyncDuration, cfg.Workers, cfg.LruCacheSize, scope)
+	autoRefreshCache, err := autorefreshcache.NewAutoRefreshCache("qubole", q.SyncQuboleQuery, workqueue.DefaultControllerRateLimiter(), ResyncDuration, cfg.Workers, cfg.LruCacheSize, scope)
 	if err != nil {
 		logger.Errorf(ctx, "Could not create AutoRefreshCache in QuboleHiveExecutor. [%s]", err)
 		return q, errors.Wrapf(errors.CacheFailed, err, "Error creating AutoRefreshCache")
@@ -67,10 +67,10 @@ func (e ExecutionStateCacheItem) IsTerminal() bool {
 
 // This basically grab an updated status from the Qubole API and store it in the cache
 // All other handling should be in the synchronous loop.
-func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch cache.Batch) (
-	updatedBatch []cache.ItemSyncResponse, err error) {
+func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch autorefreshcache.Batch) (
+	updatedBatch []autorefreshcache.ItemSyncResponse, err error) {
 
-	resp := make([]cache.ItemSyncResponse, 0, len(batch))
+	resp := make([]autorefreshcache.ItemSyncResponse, 0, len(batch))
 	for _, query := range batch {
 		// Cast the item back to the thing we want to work with.
 		executionStateCacheItem, ok := query.GetItem().(ExecutionStateCacheItem)
@@ -81,10 +81,10 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 
 		if executionStateCacheItem.CommandID == "" {
 			logger.Warnf(ctx, "Sync loop - CommandID is blank for [%s] skipping", executionStateCacheItem.Identifier)
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   query.GetItem(),
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -102,10 +102,10 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 			logger.Debugf(ctx, "Sync loop - Qubole id [%s] in terminal state [%s]",
 				executionStateCacheItem.CommandID, executionStateCacheItem.Identifier)
 
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   query.GetItem(),
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -118,10 +118,10 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 			logger.Errorf(ctx, "Error from Qubole command %s", executionStateCacheItem.CommandID)
 			executionStateCacheItem.SyncFailureCount++
 			// Make sure we don't return nil for the first argument, because that deletes it from the cache.
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   executionStateCacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 
 			continue
@@ -138,10 +138,10 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 
 			executionStateCacheItem.Phase = newExecutionPhase
 
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   executionStateCacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 		}
 	}

@@ -1,4 +1,4 @@
-package cache
+package autorefreshcache
 
 import (
 	"testing"

@@ -15,8 +15,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	mocks3 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	mocks3 "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
@@ -84,22 +84,22 @@ func BenchmarkStore_GetOrUpdate(b *testing.B) {
 }
 
 type mockItem struct {
-	id   cache.ItemID
-	item cache.Item
+	id   autorefreshcache.ItemID
+	item autorefreshcache.Item
 }
 
-func (m mockItem) GetID() cache.ItemID {
+func (m mockItem) GetID() autorefreshcache.ItemID {
 	return m.id
 }
 
-func (m mockItem) GetItem() cache.Item {
+func (m mockItem) GetItem() autorefreshcache.Item {
 	return m.item
 }
 
 func TestBatchJobsForSync(t *testing.T) {
 	t.Run("jobs < chunk size", func(t *testing.T) {
 		f := batchJobsForSync(context.TODO(), 2)
-		batches, err := f(context.TODO(), []cache.ItemWrapper{
+		batches, err := f(context.TODO(), []autorefreshcache.ItemWrapper{
 			mockItem{
 				id:   "id1",
 				item: &Job{ID: "id1"},
@@ -114,7 +114,7 @@ func TestBatchJobsForSync(t *testing.T) {
 
 	t.Run("jobs > chunk size", func(t *testing.T) {
 		f := batchJobsForSync(context.TODO(), 2)
-		batches, err := f(context.TODO(), []cache.ItemWrapper{
+		batches, err := f(context.TODO(), []autorefreshcache.ItemWrapper{
 			mockItem{
 				id:   "id1",
 				item: &Job{ID: "id1"},
@@ -138,7 +138,7 @@ func TestBatchJobsForSync(t *testing.T) {
 
 	t.Run("sub jobs > chunk size", func(t *testing.T) {
 		f := batchJobsForSync(context.TODO(), 2)
-		batches, err := f(context.TODO(), []cache.ItemWrapper{
+		batches, err := f(context.TODO(), []autorefreshcache.ItemWrapper{
 			mockItem{
 				id:   "id1",
 				item: &Job{ID: "id1"},
@@ -210,10 +210,10 @@ func Test_syncBatches(t *testing.T) {
 		})
 		i.OnGetID().Return("job")
 
-		var resp []cache.ItemSyncResponse
+		var resp []autorefreshcache.ItemSyncResponse
 		var err error
 		for iter := 0; iter < 2; iter++ {
-			resp, err = f(ctx, []cache.ItemWrapper{i, i, i})
+			resp, err = f(ctx, []autorefreshcache.ItemWrapper{i, i, i})
 			assert.NoError(t, err)
 			assert.Len(t, resp, 3)
 		}
@@ -245,10 +245,10 @@ func Test_syncBatches(t *testing.T) {
 		})
 		i.OnGetID().Return("job")
 
-		var resp []cache.ItemSyncResponse
+		var resp []autorefreshcache.ItemSyncResponse
 		var err error
 		for iter := 0; iter < 2; iter++ {
-			resp, err = f(ctx, []cache.ItemWrapper{i, i, i})
+			resp, err = f(ctx, []autorefreshcache.ItemWrapper{i, i, i})
 			assert.NoError(t, err)
 			assert.Len(t, resp, 3)
 		}

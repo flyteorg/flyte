@@ -15,7 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -74,7 +74,7 @@ type ExecutionState struct {
 
 // This is the main state iteration
 func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
-	executionsCache cache.AutoRefresh, cfg *config.Config, metrics QuboleHiveExecutorMetrics) (ExecutionState, error) {
+	executionsCache autorefreshcache.AutoRefresh, cfg *config.Config, metrics QuboleHiveExecutorMetrics) (ExecutionState, error) {
 
 	var transformError error
 	var newState ExecutionState
@@ -362,7 +362,7 @@ func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext,
 }
 
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
-	cache cache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
+	cache autorefreshcache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
 
 	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	apiKey, err := tCtx.SecretManager().Get(ctx, cfg.TokenKey)
@@ -422,7 +422,7 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 	return currentState, nil
 }
 
-func MonitorQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, cache cache.AutoRefresh) (
+func MonitorQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, cache autorefreshcache.AutoRefresh) (
 	ExecutionState, error) {
 
 	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()

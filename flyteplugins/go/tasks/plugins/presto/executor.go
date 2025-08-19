@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -26,7 +26,7 @@ type Executor struct {
 	id              string
 	metrics         ExecutorMetrics
 	prestoClient    client.PrestoClient
-	executionsCache cache.AutoRefresh
+	executionsCache autorefreshcache.AutoRefresh
 	cfg             *config.Config
 }
 

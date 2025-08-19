@@ -12,8 +12,8 @@ import (
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -61,9 +61,9 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := q.SyncResource(ctx, []autorefreshcache.ItemWrapper{iw})
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Unchanged, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Unchanged, newCacheItem[0].Action)
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
 
@@ -90,9 +90,9 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := q.SyncResource(ctx, []autorefreshcache.ItemWrapper{iw})
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
 		cacheItem.State.Phase = PhaseSystemFailure
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
@@ -124,9 +124,9 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := q.SyncResource(ctx, []autorefreshcache.ItemWrapper{iw})
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
 	})
 
 	t.Run("Failing to retrieve latest", func(t *testing.T) {
@@ -158,10 +158,10 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := q.SyncResource(ctx, []autorefreshcache.ItemWrapper{iw})
 		newExecutionState := newCacheItem[0].Item.(CacheItem)
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
 		assert.Equal(t, PhaseResourcesCreated, newExecutionState.Phase)
 	})
 }

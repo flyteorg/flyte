@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -201,7 +202,8 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 					Return(k8sError.NewNotFound(corev1.Resource("secret"), tt.expectedK8sSecretName))
 			}
 
-			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace)
+			secretCache := cacheMocks.NewMockCache[SecretValue](true)
+			injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, []SecretFetcher{gcpSecretsFetcher}, mockClient, testReferenceNamespace, secretCache)
 
 			actualP, injected, err := injector.Inject(ctx, inputSecret, tt.pod)
 			assert.Equal(t, tt.expectedInjected, injected)
@@ -267,6 +269,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 				On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 				Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName))
 
+			secretCache := cacheMocks.NewMockCache[SecretValue](true)
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
 				[]SecretFetcher{secretFetcherMock{
@@ -275,7 +278,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 							BinaryValue: []byte("banana"),
 						},
 					},
-				}}, mockClient, testReferenceNamespace)
+				}}, mockClient, testReferenceNamespace, secretCache)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -346,6 +349,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 				On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 				Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName))
 
+			secretCache := cacheMocks.NewMockCache[SecretValue](true)
 			injector := NewEmbeddedSecretManagerInjector(
 				config.EmbeddedSecretManagerConfig{},
 				[]SecretFetcher{secretFetcherMock{
@@ -354,7 +358,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testi
 							StringValue: "fruits",
 						},
 					},
-				}}, mockClient, testReferenceNamespace)
+				}}, mockClient, testReferenceNamespace, secretCache)
 
 			pod, injected, err := injector.Inject(ctx, tt.secret, pod)
 			assert.NoError(t, err)
@@ -403,6 +407,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName2, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName2))
 
+	secretCache := cacheMocks.NewMockCache[SecretValue](true)
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
 		[]SecretFetcher{secretFetcherMock{
@@ -414,7 +419,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) 
 					StringValue: "fruits @ domain",
 				},
 			},
-		}}, mockClient, testReferenceNamespace)
+		}}, mockClient, testReferenceNamespace, secretCache)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -469,6 +474,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 		On("Get", ctx, types.NamespacedName{Name: kubernetesSecretName3, Namespace: testReferenceNamespace}, &corev1.Secret{}).
 		Return(k8sError.NewNotFound(corev1.Resource("secret"), kubernetesSecretName3))
 
+	secretCache := cacheMocks.NewMockCache[SecretValue](true)
 	injector := NewEmbeddedSecretManagerInjector(
 		config.EmbeddedSecretManagerConfig{},
 		[]SecretFetcher{secretFetcherMock{
@@ -483,7 +489,7 @@ func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T)
 					StringValue: "fruits @ project",
 				},
 			},
-		}}, mockClient, testReferenceNamespace)
+		}}, mockClient, testReferenceNamespace, secretCache)
 
 	pod, injected, err := injector.Inject(ctx, secret, pod)
 	assert.NoError(t, err)
@@ -564,6 +570,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 			}).
 			Return(nil)
 
+		secretCache := cacheMocks.NewMockCache[SecretValue](true)
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
 			[]SecretFetcher{secretFetcherMock{
@@ -572,7 +579,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace, secretCache)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -600,6 +607,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 			On("Create", ctx, existingMirrorImagePullSecret).
 			Return(nil)
 
+		secretCache := cacheMocks.NewMockCache[SecretValue](true)
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
 			[]SecretFetcher{secretFetcherMock{
@@ -608,7 +616,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace, secretCache)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -621,6 +629,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 
 		mockClient := &mocks.MockableControllerRuntimeClient{}
 
+		secretCache := cacheMocks.NewMockCache[SecretValue](true)
 		injector := NewEmbeddedSecretManagerInjector(
 			config.EmbeddedSecretManagerConfig{},
 			[]SecretFetcher{secretFetcherMock{
@@ -629,7 +638,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace, secretCache)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)
@@ -671,6 +680,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 			}).
 			Return(nil)
 
+		secretCache := cacheMocks.NewMockCache[SecretValue](true)
 		injector := NewEmbeddedSecretManagerInjector(
 			enabledConfig,
 			[]SecretFetcher{secretFetcherMock{
@@ -679,7 +689,7 @@ func TestEmbeddedSecretManagerInjector_InjectImagePullSecret(t *testing.T) {
 						BinaryValue: []byte("test-credentials"),
 					},
 				},
-			}}, mockClient, testReferenceNamespace)
+			}}, mockClient, testReferenceNamespace, secretCache)
 
 		resultPod, injected, err := injector.Inject(ctx, secret, testPod)
 		assert.NoError(t, err)

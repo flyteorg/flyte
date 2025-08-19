@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	cache "github.com/flyteorg/flyte/flytestdlib/cache"
+	autorefreshcache "github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -51,7 +51,7 @@ type AutoRefreshWithUpdate_Get struct {
 	*mock.Call
 }
 
-func (_m AutoRefreshWithUpdate_Get) Return(_a0 cache.Item, _a1 error) *AutoRefreshWithUpdate_Get {
+func (_m AutoRefreshWithUpdate_Get) Return(_a0 autorefreshcache.Item, _a1 error) *AutoRefreshWithUpdate_Get {
 	return &AutoRefreshWithUpdate_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -66,15 +66,15 @@ func (_m *AutoRefreshWithUpdate) OnGetMatch(matchers ...interface{}) *AutoRefres
 }
 
 // Get provides a mock function with given fields: id
-func (_m *AutoRefreshWithUpdate) Get(id string) (cache.Item, error) {
+func (_m *AutoRefreshWithUpdate) Get(id string) (autorefreshcache.Item, error) {
 	ret := _m.Called(id)
 
-	var r0 cache.Item
-	if rf, ok := ret.Get(0).(func(string) cache.Item); ok {
+	var r0 autorefreshcache.Item
+	if rf, ok := ret.Get(0).(func(string) autorefreshcache.Item); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(cache.Item)
+			r0 = ret.Get(0).(autorefreshcache.Item)
 		}
 	}
 
@@ -92,11 +92,11 @@ type AutoRefreshWithUpdate_GetOrCreate struct {
 	*mock.Call
 }
 
-func (_m AutoRefreshWithUpdate_GetOrCreate) Return(_a0 cache.Item, _a1 error) *AutoRefreshWithUpdate_GetOrCreate {
+func (_m AutoRefreshWithUpdate_GetOrCreate) Return(_a0 autorefreshcache.Item, _a1 error) *AutoRefreshWithUpdate_GetOrCreate {
 	return &AutoRefreshWithUpdate_GetOrCreate{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AutoRefreshWithUpdate) OnGetOrCreate(id string, item cache.Item) *AutoRefreshWithUpdate_GetOrCreate {
+func (_m *AutoRefreshWithUpdate) OnGetOrCreate(id string, item autorefreshcache.Item) *AutoRefreshWithUpdate_GetOrCreate {
 	c_call := _m.On("GetOrCreate", id, item)
 	return &AutoRefreshWithUpdate_GetOrCreate{Call: c_call}
 }
@@ -107,20 +107,20 @@ func (_m *AutoRefreshWithUpdate) OnGetOrCreateMatch(matchers ...interface{}) *Au
 }
 
 // GetOrCreate provides a mock function with given fields: id, item
-func (_m *AutoRefreshWithUpdate) GetOrCreate(id string, item cache.Item) (cache.Item, error) {
+func (_m *AutoRefreshWithUpdate) GetOrCreate(id string, item autorefreshcache.Item) (autorefreshcache.Item, error) {
 	ret := _m.Called(id, item)
 
-	var r0 cache.Item
-	if rf, ok := ret.Get(0).(func(string, cache.Item) cache.Item); ok {
+	var r0 autorefreshcache.Item
+	if rf, ok := ret.Get(0).(func(string, autorefreshcache.Item) autorefreshcache.Item); ok {
 		r0 = rf(id, item)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(cache.Item)
+			r0 = ret.Get(0).(autorefreshcache.Item)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, cache.Item) error); ok {
+	if rf, ok := ret.Get(1).(func(string, autorefreshcache.Item) error); ok {
 		r1 = rf(id, item)
 	} else {
 		r1 = ret.Error(1)
@@ -169,7 +169,7 @@ func (_m AutoRefreshWithUpdate_Update) Return(ok bool) *AutoRefreshWithUpdate_Up
 	return &AutoRefreshWithUpdate_Update{Call: _m.Call.Return(ok)}
 }
 
-func (_m *AutoRefreshWithUpdate) OnUpdate(id string, item cache.Item) *AutoRefreshWithUpdate_Update {
+func (_m *AutoRefreshWithUpdate) OnUpdate(id string, item autorefreshcache.Item) *AutoRefreshWithUpdate_Update {
 	c_call := _m.On("Update", id, item)
 	return &AutoRefreshWithUpdate_Update{Call: c_call}
 }
@@ -180,11 +180,11 @@ func (_m *AutoRefreshWithUpdate) OnUpdateMatch(matchers ...interface{}) *AutoRef
 }
 
 // Update provides a mock function with given fields: id, item
-func (_m *AutoRefreshWithUpdate) Update(id string, item cache.Item) bool {
+func (_m *AutoRefreshWithUpdate) Update(id string, item autorefreshcache.Item) bool {
 	ret := _m.Called(id, item)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, cache.Item) bool); ok {
+	if rf, ok := ret.Get(0).(func(string, autorefreshcache.Item) bool); ok {
 		r0 = rf(id, item)
 	} else {
 		r0 = ret.Get(0).(bool)

@@ -17,7 +17,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -67,10 +67,10 @@ func GetJobID(id JobID, index int) JobID {
 	return fmt.Sprintf(arrayJobIDFormatter, id, index)
 }
 
-func batchJobsForSync(_ context.Context, batchChunkSize int) cache.CreateBatchesFunc {
-	return func(ctx context.Context, items []cache.ItemWrapper) (batches []cache.Batch, err error) {
-		batches = make([]cache.Batch, 0, 100)
-		currentBatch := make(cache.Batch, 0, batchChunkSize)
+func batchJobsForSync(_ context.Context, batchChunkSize int) autorefreshcache.CreateBatchesFunc {
+	return func(ctx context.Context, items []autorefreshcache.ItemWrapper) (batches []autorefreshcache.Batch, err error) {
+		batches = make([]autorefreshcache.Batch, 0, 100)
+		currentBatch := make(autorefreshcache.Batch, 0, batchChunkSize)
 		currentBatchSize := 0
 		for _, item := range items {
 			j := item.GetItem().(*Job)
@@ -82,7 +82,7 @@ func batchJobsForSync(_ context.Context, batchChunkSize int) cache.CreateBatches
 			if currentBatchSize > 0 && currentBatchSize+len(j.SubJobs)+1 > batchChunkSize {
 				batches = append(batches, currentBatch)
 				currentBatchSize = 0
-				currentBatch = make(cache.Batch, 0, batchChunkSize)
+				currentBatch = make(autorefreshcache.Batch, 0, batchChunkSize)
 			}
 
 			currentBatchSize += len(j.SubJobs) + 1
@@ -220,8 +220,8 @@ func toRanges(totalSize, chunkSize int) (startIdx, endIdx []int) {
 	return
 }
 
-func syncBatches(_ context.Context, client Client, handler EventHandler, batchChunkSize int) cache.SyncFunc {
-	return func(ctx context.Context, batch cache.Batch) ([]cache.ItemSyncResponse, error) {
+func syncBatches(_ context.Context, client Client, handler EventHandler, batchChunkSize int) autorefreshcache.SyncFunc {
+	return func(ctx context.Context, batch autorefreshcache.Batch) ([]autorefreshcache.ItemSyncResponse, error) {
 		jobIDsMap := make(map[JobID]*Job, len(batch))
 		jobIds := make([]JobID, 0, len(batch))
 		jobNames := make(map[JobID]string, len(batch))
@@ -254,12 +254,12 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 
 		if len(jobIds) == 0 {
 			logger.Debug(ctx, "All jobs in batch have terminated, skipping sync call.")
-			return []cache.ItemSyncResponse{}, nil
+			return []autorefreshcache.ItemSyncResponse{}, nil
 		}
 
 		logger.Debugf(ctx, "Syncing jobs [%v].", len(jobIds))
 
-		res := make([]cache.ItemSyncResponse, 0, len(jobIds))
+		res := make([]autorefreshcache.ItemSyncResponse, 0, len(jobIds))
 		startIdx, endIdx := toRanges(len(jobIds), batchChunkSize)
 		for i := 0; i < len(startIdx); i++ {
 			logger.Debugf(ctx, "Syncing chunk [%v, %v) out of [%v] job ids.", startIdx[i], endIdx[i])
@@ -284,9 +284,9 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 					})
 				}
 
-				action := cache.Unchanged
+				action := autorefreshcache.Unchanged
 				if changed {
-					action = cache.Update
+					action = autorefreshcache.Update
 				}
 
 				// If it's a single job, AWS Batch doesn't support arrays of size 1 so this workaround will ensure the rest
@@ -298,7 +298,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 				}
 
 				if jobName, found := jobNames[job.ID]; found {
-					res = append(res, cache.ItemSyncResponse{
+					res = append(res, autorefreshcache.ItemSyncResponse{
 						ID:     jobName,
 						Item:   job,
 						Action: action,
@@ -313,7 +313,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 
 type JobStore struct {
 	Client
-	cache.AutoRefresh
+	autorefreshcache.AutoRefresh
 
 	started bool
 }
@@ -370,7 +370,7 @@ func NewJobStore(ctx context.Context, batchClient Client, cfg config.JobStoreCon
 		Client: batchClient,
 	}
 
-	autoCache, err := cache.NewAutoRefreshBatchedCache("aws-batch-jobs", batchJobsForSync(ctx, cfg.BatchChunkSize),
+	autoCache, err := autorefreshcache.NewAutoRefreshBatchedCache("aws-batch-jobs", batchJobsForSync(ctx, cfg.BatchChunkSize),
 		syncBatches(ctx, store, handler, cfg.BatchChunkSize), workqueue.DefaultControllerRateLimiter(), cfg.ResyncPeriod.Duration,
 		cfg.Parallelizm, cfg.CacheSize, scope)
 

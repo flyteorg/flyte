@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	cache "github.com/flyteorg/flyte/flytestdlib/cache"
+	autorefreshcache "github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -48,7 +48,7 @@ type ItemWrapper_GetItem struct {
 	*mock.Call
 }
 
-func (_m ItemWrapper_GetItem) Return(_a0 cache.Item) *ItemWrapper_GetItem {
+func (_m ItemWrapper_GetItem) Return(_a0 autorefreshcache.Item) *ItemWrapper_GetItem {
 	return &ItemWrapper_GetItem{Call: _m.Call.Return(_a0)}
 }
 
@@ -63,15 +63,15 @@ func (_m *ItemWrapper) OnGetItemMatch(matchers ...interface{}) *ItemWrapper_GetI
 }
 
 // GetItem provides a mock function with given fields:
-func (_m *ItemWrapper) GetItem() cache.Item {
+func (_m *ItemWrapper) GetItem() autorefreshcache.Item {
 	ret := _m.Called()
 
-	var r0 cache.Item
-	if rf, ok := ret.Get(0).(func() cache.Item); ok {
+	var r0 autorefreshcache.Item
+	if rf, ok := ret.Get(0).(func() autorefreshcache.Item); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(cache.Item)
+			r0 = ret.Get(0).(autorefreshcache.Item)
 		}
 	}
 

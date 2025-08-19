@@ -12,7 +12,9 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	stdlibCache "github.com/flyteorg/flyte/flytestdlib/cache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 //go:generate mockery --output=./mocks --case=underscore --name=SecretsInjector
@@ -27,6 +29,7 @@ func newSecretsInjector(
 	webhookConfig *config.Config,
 	globalSecretManagerConfig *secretmanager.Config,
 	podNamespace string,
+	scope promutils.Scope,
 ) (SecretsInjector, error) {
 	switch secretManagerType {
 	case config.SecretManagerTypeGlobal:
@@ -65,8 +68,25 @@ func newSecretsInjector(
 		if err != nil {
 			return nil, err
 		}
+
 		secretFetchers = append(secretFetchers, secretFetcher)
-		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetchers, ctrlRuntimeClient, podNamespace), nil
+
+		cacheConfig := stdlibCache.GetConfig()
+		cacheFactory, err := stdlibCache.NewFactory(ctx, cacheConfig,
+			nil, scope.NewSubScope("secret_cache"))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create cache factory: %v", err)
+			return nil, fmt.Errorf("failed to create cache factory: %w", err)
+		}
+
+		secretCache, err := stdlibCache.New[SecretValue]("secret_cache", cacheConfig.Type, cacheFactory, nil, scope.NewSubScope("secret_value"))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create secret cache: %v", err)
+			return nil, fmt.Errorf("failed to create secret cache: %w", err)
+		}
+
+		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetchers,
+			ctrlRuntimeClient, podNamespace, secretCache), nil
 	case config.SecretManagerTypeAzure:
 		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil
 	default:

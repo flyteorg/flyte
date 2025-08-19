@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-This project is comprised of two parts - the bridge, and the executor - the bridge subprocesses the exector and communicates over a TCP socket.
+This project is comprised of two parts - the bridge, and the executor - the bridge subprocesses the executor and communicates over a TCP socket.
 
 ## Architecture
 

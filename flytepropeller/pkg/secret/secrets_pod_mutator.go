@@ -99,7 +99,7 @@ func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secre
 }
 
 // NewSecretsMutator creates a new SecretsMutator with all available plugins.
-func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace string, _ promutils.Scope) (*SecretsPodMutator, error) {
+func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace string, scope promutils.Scope) (*SecretsPodMutator, error) {
 	enabledSecretManagerTypes := []config.SecretManagerType{
 		config.SecretManagerTypeGlobal,
 	}
@@ -112,7 +112,8 @@ func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace str
 	injectors := make(map[config.SecretManagerType]SecretsInjector, len(enabledSecretManagerTypes))
 	globalSecretManagerConfig := secretmanager.GetConfig()
 	for _, secretManagerType := range enabledSecretManagerTypes {
-		injector, err := newSecretsInjector(ctx, secretManagerType, cfg, globalSecretManagerConfig, podNamespace)
+		injector, err := newSecretsInjector(ctx, secretManagerType, cfg, globalSecretManagerConfig, podNamespace,
+			scope.NewSubScope("secret_injector"))
 		if err != nil {
 			return nil, err
 		}

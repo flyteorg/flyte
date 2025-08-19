@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 )
 
 func Test_launch(t *testing.T) {

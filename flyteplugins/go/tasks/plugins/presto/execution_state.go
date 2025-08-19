@@ -17,7 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -98,7 +98,7 @@ func HandleExecutionState(
 	tCtx core.TaskExecutionContext,
 	currentState ExecutionState,
 	prestoClient client.PrestoClient,
-	executionsCache cache.AutoRefresh,
+	executionsCache autorefreshcache.AutoRefresh,
 	metrics ExecutorMetrics) (ExecutionState, error) {
 
 	var transformError error
@@ -358,7 +358,7 @@ func KickOffQuery(
 	tCtx core.TaskExecutionContext,
 	currentState ExecutionState,
 	prestoClient client.PrestoClient,
-	cache cache.AutoRefresh) (ExecutionState, error) {
+	cache autorefreshcache.AutoRefresh) (ExecutionState, error) {
 
 	// For the caching id, we can't rely simply on the task execution id since we have to run 5 consecutive queries and
 	// the ids used for each of these has to be unique. Because of this, we append a random postfix to the task
@@ -407,7 +407,7 @@ func MonitorQuery(
 	ctx context.Context,
 	tCtx core.TaskExecutionContext,
 	currentState ExecutionState,
-	cache cache.AutoRefresh) (ExecutionState, error) {
+	cache autorefreshcache.AutoRefresh) (ExecutionState, error) {
 
 	uniqueQueryID := currentState.CurrentPrestoQueryUUID
 	executionStateCacheItem := ExecutionStateCacheItem{

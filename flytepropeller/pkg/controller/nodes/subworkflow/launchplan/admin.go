@@ -20,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -41,7 +41,7 @@ type adminLaunchPlanExecutor struct {
 	cfg                *config.Config
 	adminClient        service.AdminServiceClient
 	watchServiceClient service.WatchServiceClient
-	cache              cache.AutoRefreshWithUpdate
+	cache              autorefreshcache.AutoRefreshWithUpdate
 	watchCfg           WatchConfig
 	itemSyncs          prometheus.Counter
 	watchAPIErrors     prometheus.Counter
@@ -294,9 +294,9 @@ func (a *adminLaunchPlanExecutor) Initialize(ctx context.Context) error {
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batch) (
-	resp []cache.ItemSyncResponse, err error) {
-	resp = make([]cache.ItemSyncResponse, 0, len(batch))
+func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch autorefreshcache.Batch) (
+	resp []autorefreshcache.ItemSyncResponse, err error) {
+	resp = make([]autorefreshcache.ItemSyncResponse, 0, len(batch))
 	for _, obj := range batch {
 		exec := obj.GetItem().(executionCacheItem)
 		execID := &exec.WorkflowExecutionIdentifier
@@ -341,10 +341,10 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 		// don't update exec.UpdatedAt intentionally, item should be considered fresh only when updated by Watch API
 
 		// Update the cache with the retrieved status
-		resp = append(resp, cache.ItemSyncResponse{
+		resp = append(resp, autorefreshcache.ItemSyncResponse{
 			ID:     obj.GetID(),
 			Item:   exec,
-			Action: cache.Update,
+			Action: autorefreshcache.Update,
 		})
 	}
 
@@ -510,12 +510,12 @@ func NewAdminLaunchPlanExecutor(_ context.Context,
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(adminCfg.TPS), adminCfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, adminCfg.CacheResyncDuration.Duration, adminCfg.Workers, adminCfg.MaxCacheSize, scope)
+	c, err := autorefreshcache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, adminCfg.CacheResyncDuration.Duration, adminCfg.Workers, adminCfg.MaxCacheSize, scope)
 	if err != nil {
 		return nil, err
 	}
 
-	cacheWithUpdate, ok := c.(cache.AutoRefreshWithUpdate)
+	cacheWithUpdate, ok := c.(autorefreshcache.AutoRefreshWithUpdate)
 	if !ok {
 		return nil, fmt.Errorf("expected to create auto-refresh cache with update, but got %T", c)
 	}

@@ -203,6 +203,10 @@ type SecretNameComponents struct {
 	Name    string // Secret name
 }
 
+func (s SecretNameComponents) String() string {
+	return fmt.Sprintf("%s/%s/%s/%s", s.Org, s.Domain, s.Project, s.Name)
+}
+
 func EncodeSecretName(org, domain, project, name string) string {
 	return fmt.Sprintf(secretsStorageFormat, org, domain, project, name)
 }

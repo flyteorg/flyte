@@ -20,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
 	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
-	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flytestdlib/utils"

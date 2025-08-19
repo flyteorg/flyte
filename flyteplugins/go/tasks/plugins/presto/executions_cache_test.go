@@ -11,8 +11,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/autorefreshcache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -43,9 +43,9 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := p.SyncPrestoQuery(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := p.SyncPrestoQuery(ctx, []autorefreshcache.ItemWrapper{iw})
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Unchanged, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Unchanged, newCacheItem[0].Action)
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
 
@@ -80,10 +80,10 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		iw.OnGetItem().Return(cacheItem)
 		iw.OnGetID().Return("some-id")
 
-		newCacheItem, err := p.SyncPrestoQuery(ctx, []cache.ItemWrapper{iw})
+		newCacheItem, err := p.SyncPrestoQuery(ctx, []autorefreshcache.ItemWrapper{iw})
 		newExecutionState := newCacheItem[0].Item.(ExecutionStateCacheItem)
 		assert.NoError(t, err)
-		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		assert.Equal(t, autorefreshcache.Update, newCacheItem[0].Action)
 		assert.Equal(t, PhaseQuerySucceeded, newExecutionState.CurrentPhase)
 	})
 }

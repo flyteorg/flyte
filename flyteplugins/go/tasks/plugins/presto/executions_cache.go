@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -19,7 +19,7 @@ const (
 )
 
 type ExecutionsCache struct {
-	cache.AutoRefresh
+	autorefreshcache.AutoRefresh
 	prestoClient client.PrestoClient
 	scope        promutils.Scope
 	cfg          *config.Config
@@ -36,7 +36,7 @@ func NewPrestoExecutionsCache(
 		scope:        scope,
 		cfg:          cfg,
 	}
-	autoRefreshCache, err := cache.NewAutoRefreshCache(cfg.RefreshCacheConfig.Name, q.SyncPrestoQuery, workqueue.DefaultControllerRateLimiter(), cfg.RefreshCacheConfig.SyncPeriod.Duration, cfg.RefreshCacheConfig.Workers, cfg.RefreshCacheConfig.LruCacheSize, scope)
+	autoRefreshCache, err := autorefreshcache.NewAutoRefreshCache(cfg.RefreshCacheConfig.Name, q.SyncPrestoQuery, workqueue.DefaultControllerRateLimiter(), cfg.RefreshCacheConfig.SyncPeriod.Duration, cfg.RefreshCacheConfig.Workers, cfg.RefreshCacheConfig.LruCacheSize, scope)
 	if err != nil {
 		logger.Errorf(ctx, "Could not create AutoRefreshCache in Executor. [%s]", err)
 		return q, errors.Wrapf(errors.CacheFailed, err, "Error creating AutoRefreshCache")
@@ -64,10 +64,10 @@ func (e ExecutionStateCacheItem) ID() string {
 
 // This basically grab an updated status from the Presto API and stores it in the cache
 // All other handling should be in the synchronous loop.
-func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch) (
-	updatedBatch []cache.ItemSyncResponse, err error) {
+func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch autorefreshcache.Batch) (
+	updatedBatch []autorefreshcache.ItemSyncResponse, err error) {
 
-	resp := make([]cache.ItemSyncResponse, 0, len(batch))
+	resp := make([]autorefreshcache.ItemSyncResponse, 0, len(batch))
 	for _, query := range batch {
 		// Cast the item back to the thing we want to work with.
 		executionStateCacheItem, ok := query.GetItem().(ExecutionStateCacheItem)
@@ -78,10 +78,10 @@ func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch
 
 		if executionStateCacheItem.CommandID == "" {
 			logger.Warnf(ctx, "Sync loop - CommandID is blank for [%s] skipping", executionStateCacheItem.Identifier)
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   query.GetItem(),
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -94,10 +94,10 @@ func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch
 			logger.Debugf(ctx, "Sync loop - Presto id [%s] in terminal state [%s]",
 				executionStateCacheItem.CommandID, executionStateCacheItem.Identifier)
 
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   query.GetItem(),
-				Action: cache.Unchanged,
+				Action: autorefreshcache.Unchanged,
 			})
 
 			continue
@@ -110,10 +110,10 @@ func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch
 			logger.Errorf(ctx, "Error from Presto command %s", executionStateCacheItem.CommandID)
 			executionStateCacheItem.SyncFailureCount++
 			// Make sure we don't return nil for the first argument, because that deletes it from the cache.
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   executionStateCacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 
 			continue
@@ -131,10 +131,10 @@ func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch
 			executionStateCacheItem.PreviousPhase = executionStateCacheItem.CurrentPhase
 			executionStateCacheItem.CurrentPhase = newExecutionPhase
 
-			resp = append(resp, cache.ItemSyncResponse{
+			resp = append(resp, autorefreshcache.ItemSyncResponse{
 				ID:     query.GetID(),
 				Item:   executionStateCacheItem,
-				Action: cache.Update,
+				Action: autorefreshcache.Update,
 			})
 		}
 	}

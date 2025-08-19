@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/autorefreshcache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -28,7 +28,7 @@ type QuboleHiveExecutor struct {
 	id              string
 	metrics         QuboleHiveExecutorMetrics
 	quboleClient    client.QuboleClient
-	executionsCache cache.AutoRefresh
+	executionsCache autorefreshcache.AutoRefresh
 	cfg             *config.Config
 }
 
