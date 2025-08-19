@@ -71,16 +71,11 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 			"failed to validate that signal [%v] exists, err: [%+v]",
 			signalModel.SignalKey, err)
 	}
-	valueType := propellervalidators.LiteralTypeForLiteral(request.GetValue())
 	lookupSignal, err := transformers.FromSignalModel(lookupSignalModel)
 	if err != nil {
 		return err
 	}
-	err = propellervalidators.ValidateLiteralType(valueType)
-	if err != nil {
-		return errors.NewInvalidLiteralTypeError("", err)
-	}
-	if !propellervalidators.AreTypesCastable(lookupSignal.GetType(), valueType) {
+	if !propellervalidators.IsInstance(request.GetValue(), lookupSignal.GetType()) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"requested signal value [%v] is not castable to existing signal type [%v]",
 			request.GetValue(), lookupSignalModel.Type)
