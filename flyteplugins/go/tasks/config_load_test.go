@@ -51,7 +51,7 @@ func TestLoadConfig(t *testing.T) {
 			Effect:   v1.TaintEffectNoSchedule,
 		}
 
-		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations[("nvidia.com/gpu")])
+		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations["nvidia.com/gpu"])
 		expectedCPU := resource.MustParse("1000m")
 		assert.True(t, expectedCPU.Equal(k8sConfig.DefaultCPURequest))
 		expectedMemory := resource.MustParse("1024Mi")
