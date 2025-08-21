@@ -117,12 +117,10 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 	resp, err := p.client.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
 	if err != nil {
 		return nil, nil, err
 	}
+	defer resp.Body.Close()
 	data, err := buildResponse(resp)
 	if err != nil {
 		return nil, nil, err
@@ -151,12 +149,10 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	resp, err := p.client.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	data, err := buildResponse(resp)
 	if err != nil {
 		return nil, err
@@ -179,12 +175,10 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 	resp, err := p.client.Do(req)
-	if resp != nil {
-		defer resp.Body.Close()
-	}
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	logger.Infof(ctx, "Deleted query execution [%v]", resp)
 
 	return nil
