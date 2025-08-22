@@ -11,6 +11,8 @@ jobs:
     defaults:
       run:
         working-directory: ./gen/rust
+    permissions:
+      id-token: write     # Required for OIDC token exchange
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,11 +49,13 @@ jobs:
           VERSION_SEMVER=$(echo "$VERSION_NO_V" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b([0-9]+)$/\1-b\2/')
           sed -i.bak "s/^version = \".*\"/version = \"$VERSION_SEMVER\"/" Cargo.toml
           rm Cargo.toml.bak
-      - name: Login into crates.io
-        run: cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
-      - name: Build binaries in "release" mode
-        run: cargo build -r
       - name: "Package for crates.io"
         run: cargo package --allow-dirty # publishes a package as a tarball
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Build binaries in "release" mode
+        run: cargo build -r
       - name: "Publish to crates.io"
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
         run: cargo publish --allow-dirty # publishes your crate as a library that can be added as a dependency
