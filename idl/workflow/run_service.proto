@@ -1,0 +1,266 @@
+syntax = "proto3";
+
+package flyteidl.workflow;
+
+import "common/identifier.proto";
+import "common/list.proto";
+import "validate/validate.proto";
+import "workflow/run_definition.proto";
+import "workflow/task_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+
+// RunService provides an interface for managing runs.
+service RunService {
+  // Create a new run of the given task.
+  rpc CreateRun(CreateRunRequest) returns (CreateRunResponse) {}
+
+  // Abort a run.
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+
+  // Get detailed information about a run.
+  rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about a run. The call will terminate when the run reaches a terminal phase.
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+
+  // Get detailed information about an action.
+  rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+
+  // Get input and output for an action.
+  rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // List runs based on the provided filter criteria.
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
+  // runs or updates to existing ones from the point of invocation.
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+
+  // List all actions for a given run.
+  rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
+  // to  existing ones from the point of invocation.
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+
+  // Stream of k8s cluster events in human readable form
+  rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {}
+}
+
+// Request message for creating a run.
+message CreateRunRequest {
+  oneof id {
+    option (validate.required) = true;
+
+    // The user provided run id.
+    common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+
+    // The project id for this run. Run name will be generated.
+    common.ProjectIdentifier project_id = 6 [(validate.rules).message.required = true];
+  }
+
+  // The task to run.
+  oneof task {
+    option (validate.required) = true;
+
+    // The task id to use.
+    TaskIdentifier task_id = 2 [(validate.rules).message.required = true];
+
+    // The task spec to use.
+    TaskSpec task_spec = 3 [(validate.rules).message.required = true];
+  }
+
+  // Inputs to use.
+  Inputs inputs = 4;
+
+  // The run spec to use.
+  RunSpec run_spec = 5;
+}
+
+// Response message for creating a run.
+message CreateRunResponse {
+  Run run = 1;
+}
+
+// Request message for aborting a run.
+message AbortRunRequest {
+  // Run to abort.
+  common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for aborting a run.
+message AbortRunResponse {}
+
+// Request message for getting detailed information about a run.
+message GetRunDetailsRequest {
+  // Run to query.
+  common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for getting detailed information about a run.
+message GetRunDetailsResponse {
+  // Detailed information about the run.
+  RunDetails details = 1;
+}
+
+// Request message for watching detailed information about a run.
+message WatchRunDetailsRequest {
+  // Run to query.
+  common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for watching detailed information about a run.
+message WatchRunDetailsResponse {
+  // Detailed information about the run.
+  RunDetails details = 1;
+}
+
+// Request message for getting detailed information about an action.
+message GetActionDetailsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for getting detailed information about an action.
+message GetActionDetailsResponse {
+  // Detailed information about the action.
+  ActionDetails details = 1;
+}
+
+// Request message for watching detailed information about an action.
+message WatchActionDetailsRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for watching detailed information about an action.
+message WatchActionDetailsResponse {
+  // Detailed information about the action.
+  ActionDetails details = 1;
+}
+
+// Request message for querying action data.
+message GetActionDataRequest {
+  // Action to query.
+  common.ActionIdentifier action_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for querying action data.
+message GetActionDataResponse {
+  // Inputs for the action.
+  Inputs inputs = 1;
+
+  // Outputs for the action.
+  Outputs outputs = 2;
+}
+
+// Request message for listing runs.
+message ListRunsRequest {
+  reserved 3, 5; // Deprecated
+
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (validate.required) = true;
+
+    // Organization name for filtering runs.
+    string org = 2 [(validate.rules).string.min_len = 1];
+    // Project identifier for filtering runs.
+    common.ProjectIdentifier project_id = 4 [(validate.rules).message.required = true];
+  }
+}
+
+// Response message for listing runs.
+message ListRunsResponse {
+  // List of runs matching the filter criteria.
+  repeated Run runs = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+}
+
+// Request message for watching runs.
+message WatchRunsRequest {
+  oneof target {
+    option (validate.required) = true;
+
+    // Organization name for filtering runs.
+    string org = 2 [(validate.rules).string.min_len = 1];
+    // Cluster identifier for filtering runs.
+    common.ClusterIdentifier cluster_id = 3 [(validate.rules).message.required = true];
+    // Project identifier for filtering runs.
+    common.ProjectIdentifier project_id = 4 [(validate.rules).message.required = true];
+    // Task identifier for filtering runs.
+    TaskIdentifier task_id = 5 [(validate.rules).message.required = true];
+  }
+}
+
+// Response message for watching runs.
+message WatchRunsResponse {
+  // New or updated runs matching the filter criteria.
+  repeated Run runs = 1;
+}
+
+// Request message for listing actions.
+message ListActionsRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  // Run identifier for filtering actions.
+  common.RunIdentifier run_id = 2 [(validate.rules).message.required = true];
+}
+
+// Response message for listing actions.
+message ListActionsResponse {
+  // List of actions matching the filter criteria.
+  repeated Action actions = 1;
+
+  // Token for fetching the next page of results, if any.
+  string token = 2;
+
+  // Note: This response does not include the enriched actions.
+  // The enriched actions are only available in the WatchActionsResponse.
+}
+
+// Request message for watching actions.
+message WatchActionsRequest {
+  // Run identifier for filtering actions.
+  common.RunIdentifier run_id = 1 [(validate.rules).message.required = true];
+
+  // Optional filter(s) criteria for actions.
+  // Valid filter fields include:
+  // - NAME (must use function CONTAINS_CASE_INSENSITIVE): the value is whatever string to match to. This will cast all strings to lowercase and match.
+  // - PHASE (must use function VALUE_IN): the value is the stringified integer of the enum of the phase and you can pass multiple phases (i.e. ["1", "4"])
+  repeated common.Filter filter = 2;
+}
+
+// Response message for watching actions, comes with enriched action metadata.
+message WatchActionsResponse {
+  // New or updated actions matching the filter criteria. Enriched with children status counts
+  repeated EnrichedAction enriched_actions = 1;
+}
+
+message WatchClusterEventsRequest {
+  common.ActionIdentifier id = 1 [(validate.rules).message.required = true];
+
+  uint32 attempt = 2 [(validate.rules).uint32.gt = 0];
+}
+
+message WatchClusterEventsResponse {
+  repeated ClusterEvent cluster_events = 1;
+}

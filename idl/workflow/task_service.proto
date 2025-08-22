@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package flyteidl.workflow;
+
+import "common/identifier.proto";
+import "common/list.proto";
+import "validate/validate.proto";
+import "workflow/task_definition.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/workflow";
+
+// TaskService provides an interface for managing tasks.
+service TaskService {
+  // Deploy a task.
+  rpc DeployTask(DeployTaskRequest) returns (DeployTaskResponse) {}
+
+  // Get detailed information about a task.
+  rpc GetTaskDetails(GetTaskDetailsRequest) returns (GetTaskDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  // Lists tasks, one per task name, returning the latest version and who it was deployed by.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+// Request message for deploying a task.
+message DeployTaskRequest {
+  // The user provided task id.
+  TaskIdentifier task_id = 1 [(validate.rules).message.required = true];
+
+  // Specification for the task.
+  TaskSpec spec = 2 [(validate.rules).message.required = true];
+}
+
+// Response message for deploying a task.
+message DeployTaskResponse {}
+
+// Request message for getting detailed information about a task.
+message GetTaskDetailsRequest {
+  // Id of the task.
+  TaskIdentifier task_id = 1 [(validate.rules).message.required = true];
+}
+
+// Response message for deploying a task.
+message GetTaskDetailsResponse {
+  // Detailed information about the task.
+  TaskDetails details = 1;
+}
+
+message ListTasksRequest {
+  // Common list request parameters.
+  common.ListRequest request = 1;
+
+  oneof scope_by {
+    option (validate.required) = true;
+    // Organization name for filtering.
+    string org = 2 [(validate.rules).string.min_len = 1];
+    // Project identifier for filtering.
+    common.ProjectIdentifier project_id = 3 [(validate.rules).message.required = true];
+  }
+
+  message KnownFilter {
+    oneof filter_by {
+      // Filter by user
+      string deployed_by = 1;
+    }
+  }
+
+  // Known filters for listing tasks.
+  repeated KnownFilter known_filters = 4;
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+
+  // Pagination token for the next page of tasks.
+  string token = 2;
+}

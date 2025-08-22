@@ -1,0 +1,57 @@
+name: Publish Rust Crate
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./gen/rust
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('gen/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      - name: Cache cargo git
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('gen/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-git-
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: gen/rust/target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('gen/rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-
+      - name: Temporarily modify the rust toolchain version
+        run: rustup override set stable
+      - name: Output rust version for educational purposes
+        run: rustup --version
+      - name: Set Cargo.toml version from release tag
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION_NO_V="${VERSION#v}"
+          # Convert 1.2.3b1 to 1.2.3-b1 for semver compliance
+          VERSION_SEMVER=$(echo "$VERSION_NO_V" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b([0-9]+)$/\1-b\2/')
+          sed -i.bak "s/^version = \".*\"/version = \"$VERSION_SEMVER\"/" Cargo.toml
+          rm Cargo.toml.bak
+      - name: Login into crates.io
+        run: cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Build binaries in "release" mode
+        run: cargo build -r
+      - name: "Package for crates.io"
+        run: cargo package --allow-dirty # publishes a package as a tarball
+      - name: "Publish to crates.io"
+        run: cargo publish --allow-dirty # publishes your crate as a library that can be added as a dependency
