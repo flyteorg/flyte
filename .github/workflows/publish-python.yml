@@ -29,6 +29,7 @@ jobs:
           VERSION_NO_V="${VERSION#v}"
           VERSION_PY=$(echo "$VERSION_NO_V" | sed -E 's/-//')
           export SETUPTOOLS_SCM_PRETEND_VERSION="$VERSION_PY"
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=$SETUPTOOLS_SCM_PRETEND_VERSION"
       - name: Set up the environment
         uses: ./.github/actions/setup-python-env
         with:
