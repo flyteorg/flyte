@@ -1,0 +1,17 @@
+{
+  "name": "@flyteorg/flyteidl",
+  "version": "0.0.0-develop",
+  "description": "Compiled protocol buffers and gRPC service and connect clients/servers for Flyte IDLs",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:flyteorg/flyte"
+  },
+  "author": "Union Eng <support@union.ai>",
+  "license": "Apache-2.0",
+  "keywords": [
+    "flyte"
+  ],
+  "files": [
+    "../../../gen/ts"
+  ]
+}

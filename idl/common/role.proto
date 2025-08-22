@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package flyteidl.common;
+
+import "common/authorization.proto";
+import "common/identifier.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/gen/go/common";
+
+// A role type is a short-hand for understanding the permissions associated with a role.
+// Boilerplate role types include a conventional collection of permissions
+// Custom role types include a user-defined collection of permissions
+enum RoleType {
+  // Default group. Not used in practice.
+  ROLE_TYPE_NONE = 0;
+  // The admin role has a collective set of permissions to do everything
+  ROLE_TYPE_ADMIN = 1;
+  // The contributor role has a collective set of permissions to view inventory, view executions, write inventory and create executions
+  ROLE_TYPE_CONTRIBUTOR = 2;
+  // The viewer role has a collective set of permissions to view inventory and view executions
+  ROLE_TYPE_VIEWER = 3;
+
+  // Represent a role with user-defined sets of permissions.
+  ROLE_TYPE_CUSTOM = 4;
+
+  // The role with permissions to administer a specific customer cluster.
+  ROLE_TYPE_CLUSTER_MANAGER = 5;
+
+  // Role with permissions specific to administer flyte project(s).
+  ROLE_TYPE_FLYTE_PROJECT_ADMIN = 6;
+
+  // The viewer role for serverless
+  ROLE_TYPE_SERVERLESS_VIEWER = 7;
+
+  // The contributor role for serverless
+  ROLE_TYPE_SERVERLESS_CONTRIBUTOR = 8;
+
+  // The support role would have contributor permissions plus the access to support endpoints
+  ROLE_TYPE_SUPPORT = 9;
+}
+
+message Role {
+  RoleIdentifier id = 1 [(validate.rules).message.required = true];
+
+  repeated Permission permissions = 2 [deprecated = true];
+
+  RoleSpec role_spec = 3;
+
+  RoleType role_type = 4;
+
+  repeated Action actions = 5;
+}
+
+message RoleSpec {
+  // Optional, human readable description for this role.
+  string description = 1;
+}

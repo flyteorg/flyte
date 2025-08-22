@@ -1,0 +1,10 @@
+version: v1
+managed:
+  enabled: true
+  optimize_for: CODE_SIZE
+plugins:
+  - plugin: buf.build/bufbuild/es:v2.2.5
+    out: gen/ts
+    opt:
+      - target=ts
+      - import_extension=.ts
