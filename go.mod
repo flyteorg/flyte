@@ -1,8 +1,6 @@
 module github.com/flyteorg/flyte/v2
 
-go 1.23.0
-
-toolchain go1.24.6
+go 1.24.6
 
 require (
 	connectrpc.com/connect v1.18.1
