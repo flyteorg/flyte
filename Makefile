@@ -16,6 +16,7 @@ buf-rust:
 	cp idl/gen_utils/rust/* gen/rust/src/
 	cd gen/rust && cargo update --aggressive
 
+export SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
 .PHONY: buf-python
 buf-python:
 	buf generate --clean --template buf.gen.python.yaml
