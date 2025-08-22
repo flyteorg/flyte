@@ -393,7 +393,7 @@ If not, we can start backends with a single command.
    pyflyte run https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Running hello_world_wf() hello world
 
-**3-1. Run workflow in sandbox - with `ImageSpec`**
+**3-1. Run workflow in sandbox - with ImageSpec**
 
 Before running your workflow in the sandbox, make sure you're able to successfully run it
 locally. To run the workflow in the sandbox with the newest modification, you can use
@@ -402,6 +402,7 @@ locally. To run the workflow in the sandbox with the newest modification, you ca
 Create a workflow file that uses `ImageSpec` to define the image with your custom flytekit version:
 
 .. code:: python
+
    from flytekit import ImageSpec, task, workflow
 
    # Define your custom flytekit version - replace with your own repo and commit hash
@@ -432,12 +433,13 @@ Create a workflow file that uses `ImageSpec` to define the image with your custo
 Then submit the workflow to the Flyte cluster:
 
 .. code:: shell
+
    # ImageSpec will automatically build and push the image to the local registry
    pyflyte run --remote custom_workflow.py wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/<execution-id> to see execution in the console.
 
 
-**3-2. Run workflow in sandbox - with `Dockerfile`**
+**3-2. Run workflow in sandbox - with Dockerfile**
 
 Before running your workflow in the sandbox, make sure you're able to successfully run it locally.
 To deploy the workflow in the sandbox, you'll need to build a Flytekit image.
@@ -500,6 +502,7 @@ debugging changes you've made to flytekit's core functionality:
 Execute your workflow using the remote flag:
 
 .. code:: shell
+
    pyflyte run --remote custom_workflow.py wf
 
 **3. Describe the pod to get container arguments**
@@ -507,6 +510,7 @@ Execute your workflow using the remote flag:
 First, find the pod name from your execution. You can get this from the Flyte UI execution page or by listing pods:
 
 .. code:: shell
+
    # List pods to find your execution pod
    kubectl get pods -n flytesnacks-development
 
@@ -518,12 +522,14 @@ First, find the pod name from your execution. You can get this from the Flyte UI
 Then describe the pod to get the container arguments:
 
 .. code:: shell
+
    # Replace with your actual pod name from the execution
    kubectl describe pod -n flytesnacks-development ab5mg9lzgth62h82qprp-n0-0
 
 Look for the `Args:` section in the container specification and copy all the arguments. Example output:
 
 .. code:: shell
+
    Args:
      pyflyte-fast-execute
      --additional-distribution
@@ -538,6 +544,7 @@ Look for the `Args:` section in the container specification and copy all the arg
 Export the necessary Minio environment variables to access the object store if you are using demo cluster:
 
 .. code:: shell
+
    export FLYTE_AWS_ENDPOINT="http://localhost:30002"
    export FLYTE_AWS_ACCESS_KEY_ID="minio" 
    export FLYTE_AWS_SECRET_ACCESS_KEY="miniostorage"
@@ -549,6 +556,7 @@ them in your terminal. This will run the task locally with the same configuratio
 remote execution, allowing you to hit your breakpoints and inspect variables.
 
 .. code:: shell
+
    # Example: Convert the multi-line args to a single command
    pyflyte-fast-execute --additional-distribution /opt/venv --dest-dir /tmp/flyte --input s3://my-bucket/metadata/... --output-prefix s3://my-bucket/data/...
 
