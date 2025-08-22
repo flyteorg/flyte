@@ -338,7 +338,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			o, err := p.GetTaskLogs(tasklog.Input{
 				PodName:         sj.Status.DriverInfo.PodName,
 				Namespace:       sj.Namespace,
-				LogName:         "(Driver Logs)",
 				TaskExecutionID: taskExecID,
 			})
 
@@ -359,7 +358,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Status.DriverInfo.PodName,
 			Namespace:       sj.Namespace,
-			LogName:         "(User Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
@@ -404,7 +402,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Name,
 			Namespace:       sj.Namespace,
-			LogName:         "(System Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
@@ -424,7 +421,6 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:         sj.Name,
 			Namespace:       sj.Namespace,
-			LogName:         "(Spark-Submit/All User Logs)",
 			TaskExecutionID: taskExecID,
 		})
 
