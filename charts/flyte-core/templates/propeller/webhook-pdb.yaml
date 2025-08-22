@@ -1,0 +1,14 @@
+{{- if and .Values.webhook.enabled .Values.webhook.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+spec:
+  {{- if .Values.webhook.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.webhook.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "flyte-pod-webhook.name" . }}
+{{- end }}

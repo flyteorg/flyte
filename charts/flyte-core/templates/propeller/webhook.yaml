@@ -136,6 +136,9 @@ spec:
       {{- with .Values.webhook.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
+      {{- with .Values.webhook.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
 ---
 # Service
 apiVersion: v1

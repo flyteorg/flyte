@@ -574,6 +574,12 @@ webhook:
   podLabels: {}
   # -- nodeSelector for webhook deployment
   nodeSelector: {}
+  # -- Affinity settings for webhook pods
+  affinity: {}
+  # -- Pod Disruption Budget settings for webhook
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 0
   # -- Sets securityContext for webhook pod(s).
   securityContext:
     fsGroup: 65534

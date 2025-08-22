@@ -333,6 +333,7 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.authType | string | `"iam"` | type of authentication to use for S3 buckets, can either be iam or accesskey |
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
+| webhook.affinity | object | `{}` | Affinity settings for webhook pods |
 | webhook.autoscaling.enabled | bool | `false` |  |
 | webhook.autoscaling.maxReplicas | int | `10` |  |
 | webhook.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
@@ -347,6 +348,7 @@ helm install gateway bitnami/contour -n flyte
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
 | webhook.nodeSelector | object | `{}` | nodeSelector for webhook deployment |
 | webhook.podAnnotations | object | `{}` | Annotations for webhook pods |
+| webhook.podDisruptionBudget | object | `{"enabled":false,"minAvailable":0}` | Pod Disruption Budget settings for webhook |
 | webhook.podEnv | object | `{}` | Additional webhook container environment variables |
 | webhook.podLabels | object | `{}` | Labels for webhook pods |
 | webhook.priorityClassName | string | `""` | Sets priorityClassName for webhook pod |
