@@ -40,7 +40,7 @@ jobs:
           # Convert 1.2.3-b1 to 1.2.3b1 for Python versioning
           VERSION="${{ github.ref_name }}"
           VERSION_NO_V="${VERSION#v}"
-          VERSION_PY=$(echo "$VERSION_NO_V" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)-([a-zA-Z]+[0-9]+)/\1\2/')
+          VERSION_PY=$(echo "$VERSION_NO_V" | sed -E 's/-//')
           export SETUPTOOLS_SCM_PRETEND_VERSION="$VERSION_PY"
           uv run python -m build --wheel --installer uv
       - name: Publish to Test
